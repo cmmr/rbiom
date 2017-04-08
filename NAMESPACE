@@ -1,0 +1,22 @@
+
+export(alpha.div)
+export(beta.div)
+export(rarefy)
+export(read.biom)
+export(subsample)
+export(select)
+export(subset.BIOM)
+export(summary.BIOM)
+export(taxa.rollup)
+export(unifrac)
+export(write.biom)
+
+importClassesFrom("slam")
+
+importFrom("methods", "is")
+importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit")
+importFrom("utils", "download.file", "head", "write.table")
+importFrom("foreach", "foreach", "%dopar%", "%do%")
+
+S3method(subset, BIOM)
+S3method(summary, BIOM)
