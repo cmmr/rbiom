@@ -28,8 +28,8 @@
 
 
 rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
-
-
+  
+  
   #--------------------------------------------------------------
   # Choose the rarefaction depths to sample at
   #--------------------------------------------------------------

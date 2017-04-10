@@ -1,6 +1,8 @@
 #' Make a distance matrix of samples vs samples.
 #' 
-#' @param biom  A BIOM object, as returned from \link{read.biom}.
+#' @param biom  A BIOM object, as returned from \link{read.biom}. A 
+#'     \code{matrix} or \code{simple_triplet_matrix} is also acceptable, when
+#'     the names of the rows and columns are the taxa and samples, respectively.
 #' @param method  The distance algorithm to use. Options are:
 #'     \bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 
 #'     \bold{\dQuote{bray}}, \bold{\dQuote{jaccard}}, and
@@ -9,6 +11,10 @@
 #'     \code{biom} to use the UniFrac methods.
 #' @param weighted  Take relative abundances into account. When 
 #'     \code{weighted=FALSE}, only presence/absence is considered.
+#' @param tree  A \code{phylo} object representing the phylogenetic
+#'     relationships of the taxa in \code{biom}. Will be taken from the tree
+#'     embedded in the \code{biom} object if not explicitly specified. Only
+#'     required for computing UniFrac distance matrices.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within a
 #'     \pkg{shiny} session.
@@ -27,7 +33,7 @@
 #'     plot(hclust(dm))
 #'
 
-beta.div <- function (biom, method, weighted=TRUE, progressbar=FALSE) {
+beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE) {
   
   
   #--------------------------------------------------------------
@@ -56,7 +62,7 @@ beta.div <- function (biom, method, weighted=TRUE, progressbar=FALSE) {
   #--------------------------------------------------------------
   
   if (method == "unifrac") {
-    return (unifrac(biom, weighted=weighted, progressbar=progressbar))
+    return (unifrac(biom, weighted=weighted, tree=tree, progressbar=progressbar))
   }
   
   
@@ -74,12 +80,23 @@ beta.div <- function (biom, method, weighted=TRUE, progressbar=FALSE) {
   
   
   #--------------------------------------------------------------
+  # Ensure we've got a simple_triplet_matrix
+  #--------------------------------------------------------------
+  if (is(biom, "simple_triplet_matrix")) { counts <- biom
+  } else if (is(biom, "BIOM"))           { counts <- biom$counts
+  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+  } else {
+    stop(simpleError("Invalid value for biom. Must be BIOM class or matrix."))
+  }
+  
+  
+  #--------------------------------------------------------------
   # Lightweight dissimilarity algorithms
   #--------------------------------------------------------------
   
   as.dist(
     slam::crossapply_simple_triplet_matrix(
-      x   = biom$counts,
+      x   = counts,
       FUN = switch( as.character(weighted),
                     
         "FALSE" = switch( method,

@@ -4,10 +4,12 @@
 \alias{beta.div}
 \title{Make a distance matrix of samples vs samples.}
 \usage{
-beta.div(biom, method, weighted = TRUE, progressbar = FALSE)
+beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = FALSE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read.biom}. A 
+\code{matrix} or \code{simple_triplet_matrix} is also acceptable, when
+the names of the rows and columns are the taxa and samples, respectively.}
 
 \item{method}{The distance algorithm to use. Options are:
 \bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 
@@ -18,6 +20,11 @@ names are also accepted. A phylogentic tree must be present in
 
 \item{weighted}{Take relative abundances into account. When 
 \code{weighted=FALSE}, only presence/absence is considered.}
+
+\item{tree}{A \code{phylo} object representing the phylogenetic
+relationships of the taxa in \code{biom}. Will be taken from the tree
+embedded in the \code{biom} object if not explicitly specified. Only
+required for computing UniFrac distance matrices.}
 
 \item{progressbar}{Whether to display a progress bar and status messages
 (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within a

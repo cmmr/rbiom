@@ -59,8 +59,24 @@ dm <- readRDS("outputs/beta.div.rds")
 
 for (metric in c("manhattan", "euclidean", "bray", "jaccard", "unifrac")) {
   test_that(metric, {
-    expect_equal(dm[['wdm']][[metric]], beta.div(biom, metric, weighted=TRUE))
-    expect_equal(dm[['udm']][[metric]], beta.div(biom, metric, weighted=FALSE))
+    wdm <- as.matrix(dm[['wdm']][[metric]])
+    wdm <- wdm[order(rownames(wdm)), order(colnames(wdm)), drop=FALSE]
+    udm <- as.matrix(dm[['udm']][[metric]])
+    udm <- udm[order(rownames(udm)), order(colnames(udm)), drop=FALSE]
+    
+    res <- beta.div(biom, metric, weighted=TRUE)
+    expect_is(res, "dist")
+    
+    res <- as.matrix(res)
+    res <- res[order(rownames(res)), order(colnames(res)), drop=FALSE]
+    expect_equal(wdm, res)
+    
+    res <- beta.div(biom, metric, weighted=FALSE)
+    expect_is(res, "dist")
+    
+    res <- as.matrix(res)
+    res <- res[order(rownames(res)), order(colnames(res)), drop=FALSE]
+    expect_equal(udm, res)
   })
 }
 
