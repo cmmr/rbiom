@@ -7,7 +7,9 @@
 alpha.div(biom, progressbar = FALSE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+object, as returned from \link{read.biom}. For matrices, the rows and 
+columns are assumed to be the taxa and samples, respectively.}
 
 \item{progressbar}{Whether to display a progress bar and status messages
 (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within

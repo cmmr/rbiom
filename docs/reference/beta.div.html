@@ -80,14 +80,16 @@
     <p>Make a distance matrix of samples vs samples.</p>
     
 
-    <pre><span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='no'>method</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre><span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='no'>method</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
+      <td><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code> 
+object, as returned from <a href='read.biom.html'>read.biom</a>. For matrices, the rows and 
+columns are assumed to be the taxa and samples, respectively.</p></td>
     </tr>
     <tr>
       <th>method</th>
@@ -102,6 +104,13 @@ names are also accepted. A phylogentic tree must be present in
       <th>weighted</th>
       <td><p>Take relative abundances into account. When 
 <code>weighted=FALSE</code>, only presence/absence is considered.</p></td>
+    </tr>
+    <tr>
+      <th>tree</th>
+      <td><p>A <code>phylo</code> object representing the phylogenetic
+relationships of the taxa in <code>biom</code>. Will be taken from the tree
+embedded in the <code>biom</code> object if not explicitly specified. Only
+required for computing UniFrac distance matrices.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>

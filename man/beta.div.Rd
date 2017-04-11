@@ -7,9 +7,9 @@
 beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = FALSE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}. A 
-\code{matrix} or \code{simple_triplet_matrix} is also acceptable, when
-the names of the rows and columns are the taxa and samples, respectively.}
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+object, as returned from \link{read.biom}. For matrices, the rows and 
+columns are assumed to be the taxa and samples, respectively.}
 
 \item{method}{The distance algorithm to use. Options are:
 \bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 

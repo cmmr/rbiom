@@ -1,8 +1,8 @@
 #' Make a distance matrix of samples vs samples.
 #' 
-#' @param biom  A BIOM object, as returned from \link{read.biom}. A 
-#'     \code{matrix} or \code{simple_triplet_matrix} is also acceptable, when
-#'     the names of the rows and columns are the taxa and samples, respectively.
+#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+#'     object, as returned from \link{read.biom}. For matrices, the rows and 
+#'     columns are assumed to be the taxa and samples, respectively.
 #' @param method  The distance algorithm to use. Options are:
 #'     \bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 
 #'     \bold{\dQuote{bray}}, \bold{\dQuote{jaccard}}, and
@@ -80,13 +80,13 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   
   
   #--------------------------------------------------------------
-  # Ensure we've got a simple_triplet_matrix
+  # Get the input into a simple_triplet_matrix
   #--------------------------------------------------------------
   if (is(biom, "simple_triplet_matrix")) { counts <- biom
   } else if (is(biom, "BIOM"))           { counts <- biom$counts
   } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
   } else {
-    stop(simpleError("Invalid value for biom. Must be BIOM class or matrix."))
+    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
   }
   
   

@@ -7,7 +7,9 @@
 rarefy(biom, depth = NULL, seed = 0, progressbar = FALSE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+object, as returned from \link{read.biom}. For matrices, the rows and 
+columns are assumed to be the taxa and samples, respectively.}
 
 \item{depth}{The number of observations to keep, per sample. If set to
 \code{NULL}, a depth will be automatically selected. Samples that have
@@ -22,10 +24,12 @@ object, set this seed value to a different number each time.}
 \pkg{shiny} session.}
 }
 \value{
-A \code{BIOM} class object. See \link{read.biom} return value.
-    The retained observations are randomly selected, based on a seed value
-    derived from the \code{BIOM} object. Therefore, rarefying the same biom
-    to the same depth will always produce the same resultant rarified biom.
+A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+    object, depending on the input object type. The type of object provided
+    is the same type that is returned. The retained observations are randomly
+    selected, based on a seed value derived from the \code{BIOM} object. 
+    Therefore, rarefying the same biom to the same depth will always produce
+    the same resultant rarification.
 }
 \description{
 Subset counts so that all samples have the same number of observations.

@@ -4,9 +4,9 @@
 #' visible here so you can use it with matrices and trees without having to
 #' first convert them to \code{BIOM} objects.
 #'
-#' @param biom  A BIOM object, as returned from \link{read.biom}. A 
-#'     \code{matrix} or \code{simple_triplet_matrix} is also acceptable, when
-#'     the names of the rows and columns are the taxa and samples, respectively.
+#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+#'     object, as returned from \link{read.biom}. For matrices, the rows and 
+#'     columns are assumed to be the taxa and samples, respectively.
 #' @param weighted  Use weighted UniFrac, which takes abundance into account
 #'     rather than simply presence/absence.
 #' @param tree  A \code{phylo} object providing a phylogenetic tree for the

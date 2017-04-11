@@ -1,6 +1,8 @@
 #' Estimate the diversity of each sample.
 #' 
-#' @param biom  A BIOM object, as returned from \link{read.biom}.
+#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+#'     object, as returned from \link{read.biom}. For matrices, the rows and 
+#'     columns are assumed to be the taxa and samples, respectively.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within
 #'     a \pkg{shiny} session.
@@ -22,7 +24,18 @@
 
 alpha.div <- function (biom, progressbar=FALSE) {
   
-  samples <- biom$counts$dimnames[[2]]
+  #--------------------------------------------------------------
+  # Get the input into a simple_triplet_matrix
+  #--------------------------------------------------------------
+  if (is(biom, "simple_triplet_matrix")) { counts <- biom
+  } else if (is(biom, "BIOM"))           { counts <- biom$counts
+  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+  } else {
+    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+  }
+  
+  
+  samples <- counts$dimnames[[2]]
   metrics <- c('OTUs', 'Shannon', 'Simpson', 'Chao1')
   
   pb <- progressBar(progressbar = progressbar)
@@ -39,7 +52,7 @@ alpha.div <- function (biom, progressbar=FALSE) {
       foreach (set=cl$sets, .combine='c', .options.snow=cl$opts) %dopar% {
         foreach (idx=set, .combine='c') %do% {
           
-          otus    <- floor(biom$counts$v[biom$counts$j == idx])
+          otus    <- floor(counts$v[counts$j == idx])
           otus    <- otus[otus > 0]
           otus_p  <- otus / sum(otus)
         
