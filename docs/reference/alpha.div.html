@@ -113,7 +113,8 @@ a <span class="pkg">shiny</span> session.</p></td>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; Setting up 8 core cluster.</div><div class='input'>    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       OTUs  Shannon   Simpson     Chao1
+    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
+    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       OTUs  Shannon   Simpson     Chao1
 #&gt; HMP01   89 2.972967 0.9085382 123.72222
 #&gt; HMP02   41 2.223793 0.8243218  43.08333
 #&gt; HMP03   35 1.601946 0.6244216  63.16667

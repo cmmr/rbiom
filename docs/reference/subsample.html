@@ -116,13 +116,13 @@ different depths to automatically select.</p></td>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
     <span class='no'>rc</span> <span class='kw'>&lt;-</span> <span class='fu'>subsample</span>(<span class='no'>biom</span>, <span class='kw'>x</span><span class='kw'>=</span><span class='fl'>5</span>)
-    <span class='fu'>head</span>(<span class='no'>rc</span>)</div><div class='output co'>#&gt;   Sample Depth OTUs   Shannon   Simpson     Chao1
-#&gt; 1  HMP01     4    2 0.5623351 0.3750000       Inf
-#&gt; 2  HMP01    22   14 2.4763540 0.9008264  64.00000
-#&gt; 3  HMP01   106   24 2.6118402 0.8974724  48.00000
-#&gt; 4  HMP01   507   51 2.8942574 0.9061230  75.08333
-#&gt; 5  HMP01  2406   84 2.9544871 0.9074446 112.80000
-#&gt; 6  HMP02     4    4 1.3862944 0.7500000       Inf</div><div class='input'>
+    <span class='fu'>head</span>(<span class='no'>rc</span>)</div><div class='output co'>#&gt;   Sample Depth OTUs  Shannon   Simpson  Chao1
+#&gt; 1  HMP01     4    4 1.386294 0.7500000    Inf
+#&gt; 2  HMP01    22   10 2.095127 0.8553719  16.25
+#&gt; 3  HMP01   106   31 2.772185 0.8992524 121.25
+#&gt; 4  HMP01   507   52 2.914532 0.9091107  77.00
+#&gt; 5  HMP01  2406   85 2.978495 0.9094340 113.80
+#&gt; 6  HMP02     4    4 1.386294 0.7500000    Inf</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

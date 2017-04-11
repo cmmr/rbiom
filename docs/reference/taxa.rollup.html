@@ -80,15 +80,17 @@
     <p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p>
     
 
-    <pre><span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>, <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre><span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>, <span class='kw'>map</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
+      <td><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code> 
+object, as returned from <a href='read.biom.html'>read.biom</a>. For matrices, the rows and 
+columns are assumed to be the taxa and samples, respectively.</p></td>
     </tr>
     <tr>
       <th>rank</th>
@@ -97,6 +99,15 @@
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
 of taxonomic ranks encoded in the original biom file. See example below
 to fetch the names of all available ranks.</p></td>
+    </tr>
+    <tr>
+      <th>map</th>
+      <td><p>A character matrix defining the value that each taxa IDs is
+assigned for each taxonomic rank. If <code>map=NULL</code> and <code>biom</code> is a
+<code>BIOM</code> class object, the map will be automatically loaded from 
+<code>biom$taxonomy</code>. <code>map</code> must not be <code>null</code> when <code>biom</code>
+is a <code>matrix</code> or <code>simple_triplet_matrix</code>. See the example below
+for an example of <code>map</code>'s structure.</p></td>
     </tr>
     <tr>
       <th>lineage</th>
@@ -142,6 +153,22 @@ memory efficient in this scenario.</p></td>
 #&gt; Actinobacteria    46    41    11    33    65  1573
 #&gt; Bacteroidetes    798   181   102   141    97    32
 #&gt; BD1_5              1     0     0     0     1     0</div><div class='input'>
+    <span class='co'># Custom matrices should be formatted like so:</span>
+    <span class='no'>counts</span> <span class='kw'>&lt;-</span> <span class='fu'>as.matrix</span>(<span class='no'>biom</span>$<span class='no'>counts</span>)
+    <span class='no'>map</span>    <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>taxonomy</span>
+
+    <span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; AciSp313     0     0     0     0     0     0
+#&gt; AcnLingn     0     0     0     1     0     0
+#&gt; AcnOriho     0     0     0     0     0     0</div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          Kingdom    Phylum           Class                 Order            
+#&gt; AciSp313 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pseudomonadales"
+#&gt; AcnLingn "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"
+#&gt; AcnOriho "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"</div><div class='input'>
+    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>counts</span>, <span class='st'>'Phylum'</span>, <span class='kw'>map</span><span class='kw'>=</span><span class='no'>map</span>)
+    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; Acidobacteria      0     0     0     0     0     0
+#&gt; Actinobacteria    46    41    11    33    65  1573
+#&gt; Bacteroidetes    798   181   102   141    97    32</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

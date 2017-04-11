@@ -1,4 +1,6 @@
 
+library(slam)
+
 biom <- readRDS("inputs/biom.rds")
 
 
@@ -12,6 +14,27 @@ biom <- rarefy(biom, 100)
 
 test_that("Rarefaction", {
   expect_equal(biom, readRDS("outputs/rarefy.rds"))
+  
+  # matrix in, matrix out
+  x  <- matrix(runif(100, 0, 1000), ncol=10)
+  y  <- rarefy(x, depth=100)
+  z  <- merge(reshape2::melt(x), reshape2::melt(y), by=c('Var1', 'Var2'))
+  r2 <- summary(lm(value.x ~ value.y, data=z))$r.squared
+  expect_is(y, "matrix")
+  expect_gt(r2, .3)
+  
+  # simple_triplet_matrix in, simple_triplet_matrix out
+  x  <- slam::as.simple_triplet_matrix(matrix(runif(100, 0, 1000), ncol=10))
+  y  <- rarefy(x, depth=100)
+  z  <- merge(
+    reshape2::melt(as.matrix(x)), 
+    reshape2::melt(as.matrix(y)), 
+    by=c('Var1', 'Var2'))
+  r2 <- summary(lm(value.x ~ value.y, data=z))$r.squared
+  expect_is(y, "simple_triplet_matrix")
+  expect_gt(r2, .3)
+  
+  # ggplot(z, aes(x=value.x, y=value.y)) + geom_smooth(method = "lm") + geom_point()
 })
 
 

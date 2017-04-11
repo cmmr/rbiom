@@ -76,7 +76,7 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
     foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts) %dopar% {
       foreach (idx=set, .combine='rbind') %do% {
         
-        x <- floor(counts$v[counts$j == idx])
+        x <- ceiling(counts$v[counts$j == idx])
         nReads <- sum(x)
         
         if (nReads < depth)
