@@ -4,22 +4,33 @@
 \alias{alpha.div}
 \title{Estimate the diversity of each sample.}
 \usage{
-alpha.div(biom, progressbar = FALSE)
+alpha.div(biom, rarefy = FALSE, progressbar = FALSE)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-object, as returned from \link{read.biom}. For matrices, the rows and 
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
+object, as returned from \link{read.biom}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
+
+\item{rarefy}{Control how/whether rarefactions are done prior to alpha 
+diversity computations. Options are: 
+\describe{
+  \item{\code{FALSE}}{ Use each sample's current set of observations without
+                  applying any rarefaction. (Default) }
+  \item{\code{TRUE}}{ Automatically select and apply a single rarefaction. }
+  \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
+  \item{\emph{integer vector}}{ Rarefy ay the specified depth(s). }
+}}
 
 \item{progressbar}{Whether to display a progress bar and status messages
 (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within
 a \pkg{shiny} session.}
 }
 \value{
-A numeric matrix of four diversity values for each sample in 
-    \code{biom}. Row names are the sample names and column names are the 
+A data frame of four diversity values for each sample in
+    \code{biom}. The column names are \code{Sample}, \bold{Depth} and the 
     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 
-    \bold{Chao1}.
+    \bold{Chao1}. The row names are the sample names, except when multiple
+    rarefactions are done.
 }
 \description{
 Estimate the diversity of each sample.
@@ -32,5 +43,9 @@ Estimate the diversity of each sample.
     
     ad <- alpha.div(biom)
     head(ad)
+    
+    biom <- subset(biom, Body.Site == "Saliva")
+    ad   <- alpha.div(biom, "multi")
+    boxplot(Shannon ~ Depth, data=ad, xlab="Reads", ylab="Diversity")
 
 }

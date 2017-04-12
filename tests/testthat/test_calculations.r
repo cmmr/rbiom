@@ -12,10 +12,10 @@ curr <- alpha.div(biom)
 prev <- readRDS("outputs/alpha.div.rds")
 
 test_that("Diversity Metrics", {
-  expect_equal(curr[,'OTUs'],    prev[,'OTUs'])
-  expect_equal(curr[,'Shannon'], prev[,'Shannon'])
-  expect_equal(curr[,'Simpson'], prev[,'Simpson'])
-  expect_equal(curr[,'Chao1'],   prev[,'Chao1'])
+  expect_equal(curr[['OTUs']],    prev[['OTUs']])
+  expect_equal(curr[['Shannon']], prev[['Shannon']])
+  expect_equal(curr[['Simpson']], prev[['Simpson']])
+  expect_equal(curr[['Chao1']],   prev[['Chao1']])
 })
 
 remove("curr", "prev")

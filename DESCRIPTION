@@ -28,6 +28,7 @@ Imports:
     rjson,
     slam
 Suggests:
+    reshape2,
     shiny,
     testthat
 RoxygenNote: 6.0.1.9000
