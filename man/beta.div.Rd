@@ -12,11 +12,11 @@ object, as returned from \link{read.biom}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
 
 \item{method}{The distance algorithm to use. Options are:
-\bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 
-\bold{\dQuote{bray}}, \bold{\dQuote{jaccard}}, and
+\bold{\dQuote{manhattan}}, \bold{\dQuote{euclidean}}, 
+\bold{\dQuote{bray-curtis}}, \bold{\dQuote{jaccard}}, and
 \bold{\dQuote{unifrac}}. Non-ambiguous abbrevations of the method 
 names are also accepted. A phylogentic tree must be present in 
-\code{biom} to use the UniFrac methods.}
+\code{biom} or explicitly provided via \code{tree=} to use the UniFrac methods.}
 
 \item{weighted}{Take relative abundances into account. When 
 \code{weighted=FALSE}, only presence/absence is considered.}

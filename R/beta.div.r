@@ -4,11 +4,11 @@
 #'     object, as returned from \link{read.biom}. For matrices, the rows and 
 #'     columns are assumed to be the taxa and samples, respectively.
 #' @param method  The distance algorithm to use. Options are:
-#'     \bold{\dQuote{manhattan}}, \bold{\\dQuote{euclidean}}, 
-#'     \bold{\dQuote{bray}}, \bold{\dQuote{jaccard}}, and
+#'     \bold{\dQuote{manhattan}}, \bold{\dQuote{euclidean}}, 
+#'     \bold{\dQuote{bray-curtis}}, \bold{\dQuote{jaccard}}, and
 #'     \bold{\dQuote{unifrac}}. Non-ambiguous abbrevations of the method 
 #'     names are also accepted. A phylogentic tree must be present in 
-#'     \code{biom} to use the UniFrac methods.
+#'     \code{biom} or explicitly provided via \code{tree=} to use the UniFrac methods.
 #' @param weighted  Take relative abundances into account. When 
 #'     \code{weighted=FALSE}, only presence/absence is considered.
 #' @param tree  A \code{phylo} object representing the phylogenetic
@@ -35,13 +35,12 @@
 
 beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE) {
   
-  
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
   #--------------------------------------------------------------
   
-  methodList <- c("manhattan", "euclidean", "bray", "jaccard", "unifrac")
-  method <- methodList[pmatch(method, methodList)]
+  methodList <- c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac")
+  method <- methodList[pmatch(tolower(method), methodList)]
   
   
   
@@ -49,11 +48,8 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   # Sanity Checks
   #--------------------------------------------------------------
   
-  if (length(method) != 1 | identical(method, NA))
-    stop(simpleError("Invalid method for beta.div()"))
-  
-  if (!is(biom, "BIOM"))
-    stop(simpleError("beta.div function needs a BIOM object."))
+  if (length(method) != 1) stop(simpleError("Invalid method for beta.div()"))
+  if (is.na(method))       stop(simpleError("Invalid method for beta.div()"))
   
   
   
@@ -61,8 +57,8 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   # Use stand-alone function for UniFrac
   #--------------------------------------------------------------
   
-  if (method == "unifrac") {
-    return (unifrac(biom, weighted=weighted, tree=tree, progressbar=progressbar))
+  if (identical(method, "unifrac")) {
+    return (rbiom::unifrac(biom, weighted=weighted, tree=tree, progressbar=progressbar))
   }
   
   
@@ -71,7 +67,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   # Jaccard is simply a transformation of bray
   #--------------------------------------------------------------
   
-  if (method == "jaccard") {
+  if (identical(method, "jaccard")) {
     dm <- beta.div(biom, "bray", weighted, progressbar)
     dm <- 2 * dm / (1 + dm)
     return (dm)
@@ -102,13 +98,13 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
         "FALSE" = switch( method,
           "manhattan"   = function(x,y) { sum(x>0)+sum(y>0)-2*sum(x&y) }, 
           "euclidean"   = function(x,y) { sqrt(sum(x>0)+sum(y>0)-2*sum(x&y)) }, 
-          "bray"        = function(x,y) { (sum(x>0)+sum(y>0)-2*sum(x&y))/(sum(x>0)+sum(y>0)) }
+          "bray-curtis" = function(x,y) { (sum(x>0)+sum(y>0)-2*sum(x&y))/(sum(x>0)+sum(y>0)) }
         ),
         
         "TRUE" = switch( method,
           "manhattan"   = function(x,y) { sum(abs(x-y)) }, 
           "euclidean"   = function(x,y) { sqrt(sum((x-y)^2)) }, 
-          "bray"        = function(x,y) { sum(abs(x-y))/sum(x+y) }
+          "bray-curtis" = function(x,y) { sum(abs(x-y))/sum(x+y) }
         )
         
       )

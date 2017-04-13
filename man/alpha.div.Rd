@@ -27,7 +27,7 @@ a \pkg{shiny} session.}
 }
 \value{
 A data frame of four diversity values for each sample in
-    \code{biom}. The column names are \code{Sample}, \bold{Depth} and the 
+    \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 
     \bold{Chao1}. The row names are the sample names, except when multiple
     rarefactions are done.

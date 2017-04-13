@@ -113,7 +113,7 @@ a <span class="pkg">shiny</span> session.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A data frame of four diversity values for each sample in
-    <code>biom</code>. The column names are <code>Sample</code>, <b>Depth</b> and the 
+    <code>biom</code>. The column names are <b>Sample</b>, <b>Depth</b> and the 
     diversity metrics: <b>OTUs</b>, <b>Shannon</b>, <b>Simpson</b>, and 
     <b>Chao1</b>. The row names are the sample names, except when multiple
     rarefactions are done.</p>
@@ -125,8 +125,7 @@ a <span class="pkg">shiny</span> session.</p></td>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
-    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon   Simpson     Chao1
+    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; Setting up 8 core cluster.</div><div class='input'>    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon   Simpson     Chao1
 #&gt; HMP01  HMP01  2872   89 2.972967 0.9085382 123.72222
 #&gt; HMP02  HMP02  1906   41 2.223793 0.8243218  43.08333
 #&gt; HMP03  HMP03  1217   35 1.601946 0.6244216  63.16667
@@ -135,7 +134,7 @@ a <span class="pkg">shiny</span> session.</p></td>
 #&gt; HMP06  HMP06  2269   44 1.250978 0.5103010  62.06250</div><div class='input'>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>Body.Site</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span>)
     <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
-    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><img src='alpha.div-4.png' alt='' width='540' height='400' /><div class='input'>
+    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><img src='alpha.div-6.png' alt='' width='540' height='400' /><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
