@@ -114,6 +114,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   
   pb <- progressBar(progressbar)
   pb$set(0, paste('Calculating', ranks[rank], 'abundances'))
+  on.exit(pb$close())
   
   if (identical(lineage, TRUE)) rank <- 1:rank
   
@@ -137,7 +138,6 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
     res <- as.matrix(res)
   
   
-  pb$close()
   
   return (res)
 }

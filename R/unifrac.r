@@ -47,6 +47,7 @@ unifrac <- function (biom, weighted=TRUE, tree=NULL, progressbar=FALSE) {
   if (!is(tree, "phylo")) stop("No reference tree provided.")
   
   pb <- progressBar(progressbar)
+  on.exit(pb$close())
   
   
   #--------------------------------------------------------------
@@ -173,7 +174,6 @@ unifrac <- function (biom, weighted=TRUE, tree=NULL, progressbar=FALSE) {
   attr(distResults, "Labels") <- sampleNames
   
   
-  pb$close()
   
   return (distResults)
 }

@@ -69,9 +69,16 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=FALSE) {
   }
   
   
-  nTasks <- ncol(counts) * length(rLvls)
-  pb     <- progressBar(progressbar = progressbar)
-  cl     <- configCluster(nTasks = nTasks, pb, "Calculating Alpha Diversity")
+  
+  pb <- progressBar(progressbar)
+  on.exit(pb$close())
+  
+  msg <- "Calculating Alpha Diversity"
+  pb$set(value=0, message=msg)
+  
+  nTasks  <- ncol(counts) * length(rLvls)
+  cl      <- configCluster(nTasks = nTasks)
+  cl$opts <- list(progress = function (i) pb$inc(i/cl$nSets, message=msg))
   
   rLvl <- set <- idx <- NULL
   
@@ -116,4 +123,5 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=FALSE) {
     
     return (df)
   }
+  
 }

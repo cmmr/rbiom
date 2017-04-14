@@ -83,15 +83,15 @@ progressBar <- function (progressbar=FALSE) {
         'set'   = function (value=0, message="  Progress") { 
                     cat(sprintf("%s: %3.1f%%\n", message, value * 100))
                   },
-        'close' = function () { 
-                    invisible(NULL)
-                  }
+        'inc'   = function (...) { invisible(NULL) },
+        'close' = function (...) { invisible(NULL) }
       )
     }
   } else {
       
       list(
         'set'   = function (...) { invisible(NULL) },
+        'inc'   = function (...) { invisible(NULL) },
         'close' = function (...) { invisible(NULL) }
       )
   }

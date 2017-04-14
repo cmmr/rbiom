@@ -68,6 +68,7 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
   
   pb <- progressBar(progressbar)
   cl <- configCluster(nTasks=counts$ncol, pb, "Rarefying")
+  on.exit(pb$close())
   
   res <- {
     
@@ -94,9 +95,6 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
       }
     }
   }
-
-
-  pb$close()
 
 
 

@@ -75,7 +75,8 @@ read.biom <- function (src, progressbar=FALSE) {
     stop(simpleError("Data source for read.biom() must be a single string."))
 
 
-  pb <- progressBar(progressbar)
+  pb <- progressBar(progressbar=progressbar)
+  on.exit(pb$close())
 
 
   #--------------------------------------------------------------
@@ -157,10 +158,8 @@ read.biom <- function (src, progressbar=FALSE) {
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
     
   }
-
-
-  pb$close()
-
+  
+  
   #--------------------------------------------------------------
   # Return everything we've computed as a BIOM class object
   #--------------------------------------------------------------
