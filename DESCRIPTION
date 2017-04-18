@@ -17,6 +17,7 @@ License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.3.3)
+LinkingTo: Rcpp
 Imports:
     ape,
     doSNOW (>= 1.0.14),
@@ -25,6 +26,7 @@ Imports:
     methods,
     parallel,
     plyr,
+    Rcpp,
     rjson,
     slam
 Suggests:
