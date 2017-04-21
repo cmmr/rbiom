@@ -1,5 +1,5 @@
 
-configCluster <- function (nTasks, pb=NULL, msg=NULL) {
+configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
   
   #--------------------------------------------------------------
   # The number of cores we should use
@@ -48,13 +48,25 @@ configCluster <- function (nTasks, pb=NULL, msg=NULL) {
   # Partition the tasks
   #--------------------------------------------------------------
   
-  res <- list(
-    nTasks = nTasks, 
-    ncores = ncores,
-    sets   = parallel::splitIndices(nTasks, min(nTasks, ncores * 10)),
-    nSets  = min(nTasks, ncores * 10),
-    opts   = NULL
-  )
+  if (is.na(nTasks)) {
+    
+    res <- list(
+      nTasks = ncores * 10, 
+      ncores = ncores,
+      sets   = seq_len(ncores * 10),
+      nSets  = ncores * 10,
+      opts   = NULL
+    )
+  } else {
+  
+    res <- list(
+      nTasks = nTasks, 
+      ncores = ncores,
+      sets   = parallel::splitIndices(nTasks, min(nTasks, ncores * 10)),
+      nSets  = min(nTasks, ncores * 10),
+      opts   = NULL
+    )
+  }
   
   if (!is.null(pb)) 
     res$opts <- list(progress = function (i) pb$set(i/res$nSets, msg))

@@ -43,14 +43,13 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   method <- methodList[pmatch(tolower(method), methodList)]
   
   
-  
   #--------------------------------------------------------------
   # Sanity Checks
   #--------------------------------------------------------------
   
-  if (length(method) != 1) stop(simpleError("Invalid method for beta.div()"))
-  if (is.na(method))       stop(simpleError("Invalid method for beta.div()"))
-  
+  if (!is.logical(weighted)) stop(simpleError("Weighted must be TRUE/FALSE."))
+  if (length(method) != 1)   stop(simpleError("Invalid method for beta.div()"))
+  if (is.na(method))         stop(simpleError("Invalid method for beta.div()"))
   
   
   #--------------------------------------------------------------
@@ -62,22 +61,10 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   }
   
   
-  
-  #--------------------------------------------------------------
-  # Jaccard is simply a transformation of bray
-  #--------------------------------------------------------------
-  
-  if (identical(method, "jaccard")) {
-    dm <- beta.div(biom, "bray", weighted, progressbar)
-    dm <- 2 * dm / (1 + dm)
-    return (dm)
-  }
-  
-  
-  
   #--------------------------------------------------------------
   # Get the input into a simple_triplet_matrix
   #--------------------------------------------------------------
+  
   if (is(biom, "simple_triplet_matrix")) { counts <- biom
   } else if (is(biom, "BIOM"))           { counts <- biom$counts
   } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
@@ -87,29 +74,31 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   
   
   #--------------------------------------------------------------
-  # Lightweight dissimilarity algorithms
+  # Order the sparse matrix's values by sample, then by taxa
   #--------------------------------------------------------------
   
-  as.dist(
-    slam::crossapply_simple_triplet_matrix(
-      x   = counts,
-      FUN = switch( as.character(weighted),
-                    
-        "FALSE" = switch( method,
-          "manhattan"   = function(x,y) { sum(x>0)+sum(y>0)-2*sum(x&y) }, 
-          "euclidean"   = function(x,y) { sqrt(sum(x>0)+sum(y>0)-2*sum(x&y)) }, 
-          "bray-curtis" = function(x,y) { (sum(x>0)+sum(y>0)-2*sum(x&y))/(sum(x>0)+sum(y>0)) }
-        ),
-        
-        "TRUE" = switch( method,
-          "manhattan"   = function(x,y) { sum(abs(x-y)) }, 
-          "euclidean"   = function(x,y) { sqrt(sum((x-y)^2)) }, 
-          "bray-curtis" = function(x,y) { sum(abs(x-y))/sum(x+y) }
-        )
-        
-      )
-    )
-  )
+  ord      <- order(counts$j, counts$i)
+  counts$i <- counts$i[ord]
+  counts$j <- counts$j[ord]
+  counts$v <- counts$v[ord]
+  
+  
+  #--------------------------------------------------------------
+  # Run C++ implemented dissimilarity algorithms multithreaded
+  #--------------------------------------------------------------
+  
+  pb <- progressBar(progressbar)
+  cl <- configCluster(nTasks=NA, pb, sprintf("Calculating %s", method))
+  on.exit(pb$close())
+
+  set <- NULL
+  
+  foreach (set=cl$sets, .combine='+', .options.snow=cl$opts) %dopar% {
+    nJobs <- cl$nSets
+    iJob  <- set
+    distance(iJob, nJobs, counts, method, weighted)
+  }
+  
   
 }
 
