@@ -22,7 +22,6 @@ Imports:
     ape,
     doSNOW (>= 1.0.14),
     foreach,
-    h5,
     methods,
     parallel,
     plyr,
