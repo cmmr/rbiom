@@ -35,22 +35,22 @@ test_that("JSON Intermediate", {
 })
 
 
-# #----------------------------------------------------------
-# # Write/Read BIOM Format 2.1 (HDFS)
-# #----------------------------------------------------------
-# write.biom(biom, fp, format="hdf5")
-# hdf5 <- read.biom(fp)
-# 
-# test_that("HDF5 Intermediate", {
-#   expect_equal(biom$counts,    hdf5$counts)
-#   expect_equal(biom$phylogeny, hdf5$phylogeny)
-#   expect_equal(biom$metadata,  hdf5$metadata)
-#   expect_equal(biom$taxonomy,  hdf5$taxonomy)
-# })
-# 
-# 
-# unlink(fp)
-# remove("fp", "tsv", "json", "hdf5")
+#----------------------------------------------------------
+# Write/Read BIOM Format 2.1 (HDFS)
+#----------------------------------------------------------
+write.biom(biom, fp, format="hdf5")
+hdf5 <- read.biom(fp)
+
+test_that("HDF5 Intermediate", {
+  expect_equal(biom$counts,    hdf5$counts)
+  expect_equal(biom$phylogeny, hdf5$phylogeny)
+  expect_equal(biom$metadata,  hdf5$metadata)
+  expect_equal(biom$taxonomy,  hdf5$taxonomy)
+})
+
+
+unlink(fp)
+remove("fp", "tsv", "json", "hdf5")
 
 
 
