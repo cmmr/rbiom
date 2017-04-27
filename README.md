@@ -12,7 +12,7 @@ Installation
 rbiom is not currently available from CRAN, but you can install the development version from github with:
 
 ``` r
-install.packages(c("devtools", "ape", "doSNOW", "foreach", "h5", "methods", "plyr", "Rcpp", "rjson", "slam"))
+install.packages("devtools")
 devtools::install_github("cmmr/rbiom")
 ```
 
