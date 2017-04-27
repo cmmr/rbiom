@@ -126,21 +126,21 @@ loaded from <code>biom</code>, if encoded there.</p></td>
 
     <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>biom</span>)
     <span class='fu'>plot</span>(<span class='fu'>hclust</span>(<span class='no'>dm</span>), <span class='kw'>cex</span><span class='kw'>=</span><span class='fl'>.8</span>)</div><img src='unifrac-2.png' alt='' width='540' height='400' /><div class='input'>    <span class='fu'>as.matrix</span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
-#&gt; HMP01 0.0000000 0.4401804 0.5529220 0.6815143
-#&gt; HMP02 0.4401804 0.0000000 0.1957982 0.4714731
-#&gt; HMP03 0.5529220 0.1957982 0.0000000 0.4450208
-#&gt; HMP04 0.6815143 0.4714731 0.4450208 0.0000000</div><div class='input'>
+#&gt; HMP01 0.0000000 0.5714029 0.7262758 0.9639771
+#&gt; HMP02 0.5714029 0.0000000 0.3435511 0.5693744
+#&gt; HMP03 0.7262758 0.3435511 0.0000000 0.2639387
+#&gt; HMP04 0.9639771 0.5693744 0.2639387 0.0000000</div><div class='input'>
     <span class='co'># Using a custom matrix and tree</span>
     <span class='no'>mtx</span> <span class='kw'>&lt;-</span> <span class='fu'>matrix</span>(<span class='fu'>sample.int</span>(<span class='fl'>12</span>*<span class='fl'>20</span>), <span class='kw'>ncol</span><span class='kw'>=</span><span class='fl'>20</span>)
     <span class='fu'>dimnames</span>(<span class='no'>mtx</span>) <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='no'>LETTERS</span>[<span class='fl'>1</span>:<span class='fl'>12</span>], <span class='no'>letters</span>[<span class='fl'>1</span>:<span class='fl'>20</span>])
     <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='kw'>ape</span><span class='kw'>::</span><span class='fu'>as.phylo</span>(<span class='fu'>hclust</span>(<span class='fu'>dist</span>(<span class='no'>mtx</span>)))
 
     <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>mtx</span>, <span class='kw'>tree</span><span class='kw'>=</span><span class='no'>tree</span>)
-    <span class='fu'>as.matrix</span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           a         b         c         d
-#&gt; a 0.0000000 0.3055040 0.4175574 0.2803593
-#&gt; b 0.3055040 0.0000000 0.3584673 0.2540984
-#&gt; c 0.4175574 0.3584673 0.0000000 0.2549958
-#&gt; d 0.2803593 0.2540984 0.2549958 0.0000000</div><div class='input'>    
+    <span class='fu'>as.matrix</span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          a        b        c        d
+#&gt; a   0.0000 160.5852 207.3862 155.4818
+#&gt; b 160.5852   0.0000 199.9140 145.0543
+#&gt; c 207.3862 199.9140   0.0000 113.5140
+#&gt; d 155.4818 145.0543 113.5140   0.0000</div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

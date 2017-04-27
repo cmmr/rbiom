@@ -53,15 +53,6 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   
   
   #--------------------------------------------------------------
-  # Use stand-alone function for UniFrac
-  #--------------------------------------------------------------
-  
-  if (identical(method, "unifrac")) {
-    return (rbiom::unifrac(biom, weighted=weighted, tree=tree, progressbar=progressbar))
-  }
-  
-  
-  #--------------------------------------------------------------
   # Get the input into a simple_triplet_matrix
   #--------------------------------------------------------------
   
@@ -70,6 +61,25 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
   } else {
     stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+  }
+  
+  
+  #--------------------------------------------------------------
+  # Find the UniFrac tree
+  #--------------------------------------------------------------
+  
+  if (identical(method, "unifrac")) {
+    if (!is(tree, "phylo")) {
+      if (is(biom, "BIOM")) {
+        if (is(biom$phylogeny, "phylo")) {
+          tree <- biom$phylogeny
+        }
+      }
+      if (!is(tree, "phylo")) {
+        stop(simpleError("No tree provided to beta.div()."))
+      }
+    }
+    counts <- counts[as.character(tree$tip.label),]
   }
   
   
@@ -87,16 +97,23 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   # Run C++ implemented dissimilarity algorithms multithreaded
   #--------------------------------------------------------------
   
-  pb <- progressBar(progressbar)
-  cl <- configCluster(nTasks=NA, pb, sprintf("Calculating %s", method))
+  pb  <- progressBar(progressbar)
+  msg <- sprintf("Calculating %s %s", ifelse(weighted, "Weighted", "Unweighted"), method)
+  cl  <- configCluster(nTasks=NA, pb, msg)
   on.exit(pb$close())
 
   set <- NULL
   
-  foreach (set=cl$sets, .combine='+', .options.snow=cl$opts) %dopar% {
+  foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts) %dopar% {
     nJobs <- cl$nSets
     iJob  <- set
-    distance(iJob, nJobs, counts, method, weighted)
+    
+    if (identical(method, "unifrac")) {
+      rcpp_unifrac(iJob, nJobs, counts, tree, weighted)
+      
+    } else {
+      rcpp_distance(iJob, nJobs, counts, method, weighted)
+    }
   }
   
   

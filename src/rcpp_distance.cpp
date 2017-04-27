@@ -5,7 +5,7 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-NumericVector distance(int iJob, int nJobs, List sparseMatrix, const char* method, bool weighted) {
+NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* method, bool weighted) {
   
   IntegerVector samp = as<IntegerVector>(sparseMatrix["j"]);
   IntegerVector taxa = as<IntegerVector>(sparseMatrix["i"]);

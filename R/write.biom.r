@@ -131,7 +131,14 @@ write.biom.1.0 <- function (biom, file) {
     #------------------------------------------------------
     columns = lapply(1:biom$counts$ncol, function (j) list(
       id = biom$counts$dimnames[[2]][j],
-      metadata = sapply(names(biom$metadata), function (k) biom$metadata[j,k])
+      metadata = {
+        md_fields <- names(biom$metadata)
+        if (length(md_fields) > 0) {
+          sapply(md_fields, function (k) biom$metadata[j,k])
+        } else {
+          NULL
+        }
+      }
     )),
     
     
