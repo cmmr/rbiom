@@ -1,3 +1,11 @@
+
+# /usr/bin/time -v parallel_beta_diversity.py -i emp.biom -t emp.tre -m unweighted_unifrac -O 8 -o beta_div/
+# /usr/bin/time -v ./rbiom_unifrac.r -i emp.biom -t emp.tre -m weighted -o beta_div/rbiom_weighted.txt
+# /usr/bin/time -v ./phyloseq_unifrac.r -i emp.biom -t emp.tre -m weighted -o beta_div/phyloseq_weighted.txt
+# 
+
+
+
 # library(rbiom)
 # library(phyloseq)
 # library(doParallel)
