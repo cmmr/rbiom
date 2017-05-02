@@ -5,6 +5,19 @@
 
 using namespace Rcpp;
 
+// par_unifrac
+NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted);
+RcppExport SEXP rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type sparseMatrix(sparseMatrixSEXP);
+    Rcpp::traits::input_parameter< List >::type tree(treeSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type weighted(weightedSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_unifrac(sparseMatrix, tree, weighted));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_distance
 NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* method, bool weighted);
 RcppExport SEXP rbiom_rcpp_distance(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP methodSEXP, SEXP weightedSEXP) {

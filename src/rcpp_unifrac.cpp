@@ -70,7 +70,6 @@ NumericVector rcpp_unifrac(int iJob, int nJobs, List sparseMatrix, List tree, bo
   //======================================================
   
   LogicalMatrix edge2leaves = LogicalMatrix(nTreeEdges, nOTUs);
-  NumericVector otuDepths   = NumericVector(nOTUs);
   
   
   // Index where a given node is the child. Root node == -1

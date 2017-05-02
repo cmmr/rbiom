@@ -96,22 +96,22 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   #--------------------------------------------------------------
   # Run C++ implemented dissimilarity algorithms multithreaded
   #--------------------------------------------------------------
-  
-  pb  <- progressBar(progressbar)
-  msg <- sprintf("Calculating %s %s", ifelse(weighted, "Weighted", "Unweighted"), method)
-  cl  <- configCluster(nTasks=NA, pb, msg)
-  on.exit(pb$close())
 
-  set <- NULL
-  
-  foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts) %dopar% {
-    nJobs <- cl$nSets
-    iJob  <- set
+  if (identical(method, "unifrac")) {
+    par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
-    if (identical(method, "unifrac")) {
-      rcpp_unifrac(iJob, nJobs, counts, tree, weighted)
+  } else {
+    pb  <- progressBar(progressbar)
+    msg <- sprintf("Calculating %s %s", ifelse(weighted, "weighted", "unweighted"), method)
+    cl  <- configCluster(nTasks=NA, pb, msg)
+    on.exit(pb$close())
+  
+    set <- NULL
+    
+    foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts) %dopar% {
+      nJobs <- cl$nSets
+      iJob  <- set
       
-    } else {
       rcpp_distance(iJob, nJobs, counts, method, weighted)
     }
   }
