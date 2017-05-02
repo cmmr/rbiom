@@ -1,4 +1,4 @@
-useDynLib(rbiom, .registration = TRUE)
+#useDynLib(rbiom, .registration = TRUE)
 
 export(alpha.div)
 export(beta.div)
