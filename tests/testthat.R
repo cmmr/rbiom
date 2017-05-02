@@ -1,4 +1,4 @@
 library(testthat)
-library(rbiom)
+#library(rbiom)
 
 test_check("rbiom")
