@@ -8,7 +8,7 @@
 # Baylor College of Medicine
 # ==========================
 #
-#   A standalone script for running UniFrac from the command line via R and rbiom.
+#   A standalone script for running UniFrac from the command line via R and phyloseq.
 #
 #=-------------------------------------------------------------------------------------------
 #============================================================================================
@@ -55,13 +55,13 @@ if (!file.exists(opt$infile))
 if (!opt$method %in% c('weighted', 'unweighted'))
   stop("Method must be 'weighted' or 'unweighted'.\n\n", call.=FALSE)
 
-
-ncores <- RcppParallel::defaultNumThreads()
+ncores <- parallel::detectCores()
+doParallel::registerDoParallel(parallel::makeCluster(ncores))
 cat(sprintf("Using %i threads.\n", ncores))
 
-biom     <- rbiom::read.biom(opt$infile)
+phy      <- phyloseq::import_biom(opt$infile, opt$tree)
 weighted <- ifelse(identical(opt$method, "weighted"), TRUE, FALSE)
-dm       <- rbiom::unifrac(biom, weighted, ape::read.tree(opt$tree))
+dm       <- phyloseq::UniFrac(phy, weighted, normalized=FALSE, parallel=TRUE, )
 write.table(as.matrix(dm), opt$outfile, sep="\t", quote=FALSE)
 
 

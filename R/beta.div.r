@@ -75,10 +75,22 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
           tree <- biom$phylogeny
         }
       }
+      if (is(tree, "character")) {
+        if (file.exists(tree)) {
+          tree <- ape::read.tree(tree)
+        }
+      }
       if (!is(tree, "phylo")) {
         stop(simpleError("No tree provided to beta.div()."))
       }
     }
+    
+    if (length(setdiff(rownames(counts), tree$tip.label)) > 0)
+      stop(simpleError("OTUs missing from reference tree."))
+    
+    if (length(setdiff(tree$tip.label, rownames(counts))) > 0)
+      tree <- ape::drop.tip(tree, setdiff(tree$tip.label, rownames(counts)))
+    
     counts <- counts[as.character(tree$tip.label),]
   }
   
