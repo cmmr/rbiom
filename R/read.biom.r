@@ -313,6 +313,9 @@ PB.JSON.Counts <- function (json) {
   if (!any(c('sparse', 'dense') %in% json$matrix_type))
     stop(simpleError("BIOM file's matrix_type must be either 'sparse' or 'dense'"))
 
+  if (length(json$data) == 0)
+    stop(simpleError("BIOM file does not have any count data."))
+
   TaxaIDs   <- sapply(json$rows,    function (x) x$id)
   SampleIDs <- sapply(json$columns, function (x) x$id)
 
