@@ -1,0 +1,9 @@
+((walrus:10,seal:12)sea:8,((monkey:100,tiger:50)jungle:20,ferret:20)land:2)all:1;
+
+ 1-24 , 26-73    (walrus:10,seal:12)sea:8 , ((monkey:100,tiger:50)jungle:20,ferret:20)land:2
+
+ 2-10 , 12-18    walrus:10 , seal:12
+
+27-56 , 58-66    (monkey:100,tiger:50)jungle:20 , ferret:20
+
+monkey:100 , tiger:50

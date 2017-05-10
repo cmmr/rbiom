@@ -33,6 +33,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_read_tree
+List rcpp_read_tree(const char* tree);
+RcppExport SEXP rbiom_rcpp_read_tree(SEXP treeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type tree(treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_tree(tree));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_unifrac
 NumericVector rcpp_unifrac(int iJob, int nJobs, List sparseMatrix, List tree, bool weighted);
 RcppExport SEXP rbiom_rcpp_unifrac(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {

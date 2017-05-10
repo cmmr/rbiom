@@ -9,6 +9,10 @@ rcpp_distance <- function(iJob, nJobs, sparseMatrix, method, weighted) {
     .Call('rbiom_rcpp_distance', PACKAGE = 'rbiom', iJob, nJobs, sparseMatrix, method, weighted)
 }
 
+rcpp_read_tree <- function(tree) {
+    .Call('rbiom_rcpp_read_tree', PACKAGE = 'rbiom', tree)
+}
+
 rcpp_unifrac <- function(iJob, nJobs, sparseMatrix, tree, weighted) {
     .Call('rbiom_rcpp_unifrac', PACKAGE = 'rbiom', iJob, nJobs, sparseMatrix, tree, weighted)
 }
