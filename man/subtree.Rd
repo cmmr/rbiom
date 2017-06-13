@@ -24,6 +24,6 @@ Create a subtree by specifying tips to keep.
     tree <- read.tree(infile)
     
     leafs   <- tips(tree)
-    subtree <- subset(tree, head(leafs))
+    subtree <- subtree(tree, head(leafs))
 
 }

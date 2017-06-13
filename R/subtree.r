@@ -11,7 +11,7 @@
 #'     tree <- read.tree(infile)
 #'     
 #'     leafs   <- tips(tree)
-#'     subtree <- subset(tree, head(leafs))
+#'     subtree <- subtree(tree, head(leafs))
 #'
 subtree <- function (tree, tips) {
   
@@ -156,7 +156,7 @@ subtree <- function (tree, tips) {
   
   if (!is.null(tree$edge.length)) tree$edge.length <- eLength[!is.na(eLength)]
   if (!is.null(tree$tip.label))   tree$tip.label   <- tree$tip.label[tips]
-  if (!is.null(tree$node.label))  tree$node.label  <- tree$tip.label[unique(sort(edge[,1]))]
+  if (!is.null(tree$node.label))  tree$node.label  <- tree$tip.label[unique(sort(tree$edge[,1]))]
   
   tree$edge <- matrix(as.numeric(factor(as.vector(tree$edge))), ncol=2)
   

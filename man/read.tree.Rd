@@ -2,7 +2,7 @@
 % Please edit documentation in R/read.tree.r
 \name{read.tree}
 \alias{read.tree}
-\title{Read newick formatted a phylogenetic tree.}
+\title{Read a newick formatted phylogenetic tree.}
 \usage{
 read.tree(file = NULL, text = NULL)
 }
