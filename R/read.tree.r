@@ -1,4 +1,4 @@
-#' Read newick formatted a phylogenetic tree.
+#' Read a newick formatted phylogenetic tree.
 #' 
 #' A phylogenetic tree is required for computing UniFrac distance matrices.
 #' You can load a tree either from a file or by providing the tree string
