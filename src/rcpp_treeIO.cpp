@@ -18,6 +18,10 @@ void readtree2(
     NumericVector   eLen,
     CharacterVector nLab, 
     CharacterVector lLab);
+char* extractname(
+    const char   *tree, 
+    unsigned int x1, 
+    unsigned int x2);
 
 
 
@@ -31,6 +35,19 @@ List rcpp_read_tree(const char* tree) {
   // Determine how many nodes are in this tree
   unsigned int nNodes = 0;
   for (unsigned int i = x1; i <= x2; i++) {
+    
+    // Ignore special characters inside single quotes
+    if (tree[i] == '\'') {
+      do { i++; } while (tree[i] != '\'' && i <= x2);
+      continue;
+    }
+    
+    // Only consider the first tree in the file
+    if (tree[i] == ';') {
+      x2 = i - 1;
+      break;
+    }
+    
     if (tree[i] == ',') nNodes++;
   }
   unsigned int nLeafs = nNodes + 1;
@@ -80,8 +97,20 @@ void readtree2(
     CharacterVector nLab, 
     CharacterVector lLab) {
   
+  unsigned int i;
+  
+  // Trim off whitespace from beginning and end of string section
+  while ((tree[x1] == ' ' || tree[x1] == '\t') && x1 <= x2) x1++;
+  while ((tree[x2] == ' ' || tree[x2] == '\t') && x1 <= x2) x2--;
+  
   // Read backwards, extracting name and length if present
-  for (unsigned int i = x2; i >= x1; i--) {
+  for (i = x2; i >= x1; i--) {
+    
+    // Ignore special characters inside single quotes
+    if (tree[i] == '\'') {
+      do { i--; } while (tree[i] != '\'' && i >= x1);
+      continue;
+    }
     
     // Text after the colon is the branch length
     if (tree[i] == ':') {
@@ -98,11 +127,9 @@ void readtree2(
     
     // Text after the end-paren is the node name
     if (tree[i] == ')') {
-      char* nodeName = new char[x2 - i + 1];
-      strncpy(nodeName, tree + i + 1, x2 - i);
-      nodeName[x2 - i] = '\0';
       
-      nLab[nIdx] = nodeName;
+      if (i < x2)
+        nLab[nIdx] = extractname(tree, i + 1, x2);
       
       if (eIdx > 0) {  
         edge(eIdx - 1, 0) = parent + lLab.size() + 1;
@@ -115,37 +142,42 @@ void readtree2(
       
       break;
     }
-    
-    // No parens means we're at a leaf
-    if (i == x1) {
-      
-      char* leafName = new char[x2 - i + 2];
-      strncpy(leafName, tree + i, x2 - i + 1);
-      leafName[x2 - i + 1]  = '\0';
-      
-      lLab[lIdx] = leafName;
-      
-      if (eIdx > 0) {
-        edge(eIdx - 1, 0) = parent + lLab.size() + 1;
-        edge(eIdx - 1, 1) = lIdx + 1;
-      }
-      
-      return;
-    }
   }
   
+  
+  // No parens means we're at a leaf
+  if (i <= x1) {
+    
+    if (x1 < x2)
+      lLab[lIdx] = extractname(tree, x1, x2);
+    
+    if (eIdx > 0) {
+      edge(eIdx - 1, 0) = parent + lLab.size() + 1;
+      edge(eIdx - 1, 1) = lIdx + 1;
+    }
+    
+    return;
+  }
   
   // Find the comma for the current block (pivot)
   // Also track how many nodes are in the first half (n)
   unsigned int level = 0;
   unsigned int pivot = 0;
   unsigned int n     = 0;
-  for (unsigned int i = x1; i <= x2; i++) {
+  for (i = x1; i <= x2; i++) {
+    
+    // Ignore special characters inside single quotes
+    if (tree[i] == '\'') {
+      do { i++; } while (tree[i] != '\'' && i <= x1);
+      continue;
+    }
+    
     if (tree[i] == '(') {
       level++;
     } else if (tree[i] == ')') {
       level--;
     }
+    
     if (tree[i] == ',') {
       if (level == 0) {
         pivot = i;
@@ -166,10 +198,29 @@ void readtree2(
 }
 
 
-/*** R
-x <- readtree("((walrus:10,seal:12)sea:8,((monkey:100,tiger:50)jungle:20,ferret:20)land:2)all:1;")
-*/
 
+char* extractname(const char *tree, unsigned int x1, unsigned int x2) {
+  
+  bool quoted = tree[x1] == '\'' && tree[x2] == '\'';
 
+  // Quoted Name ==> Strip off quote marks
+  if (quoted) {
+    x1++;
+    x2--;
+  }
+  
+  char* nodeName = new char[x2 - x1 + 2];
+  strncpy(nodeName, tree + x1, x2 - x1 + 1);
+  nodeName[x2 - x1 + 1] = '\0';
+  
+  // Unquoted Name ==> Replace underscores with spaces
+  if (!quoted) {
+    for (unsigned int j = 0; j <= x2 - x1; j++) {
+      if (nodeName[j] == '_') nodeName[j] = ' ';
+    }
+  }
+      
+  return nodeName;
+}
 
 

@@ -1,0 +1,9 @@
+	dog	bear	raccoon	weasel	seal	sea_lion	cat	monkey
+dog	0	32	48	51	50	48	98	148
+bear	32	0	26	34	29	33	84	136
+raccoon	48	26	0	42	44	44	92	152
+weasel	51	34	42	0	44	38	86	142
+seal	50	29	44	44	0	24	89	142
+sea_lion	48	33	44	38	24	0	90	142
+cat	98	84	92	86	89	90	0	148
+monkey	148	136	152	142	142	142	148	0

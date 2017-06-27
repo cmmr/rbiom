@@ -27,7 +27,11 @@ read.tree <- function (file=NULL, text=NULL) {
     text <- readChar(file, file.size(file))
   }
   
-  text <- gsub("[\\s\\t\\n\\r;]+", "", text, perl=TRUE)
+  # Remove newlines and comments
+  text <- gsub("\n",        "", text, fixed=TRUE)
+  text <- gsub("\r",        "", text, fixed=TRUE)
+  text <- gsub("\\[.*?\\]", "", text, perl=TRUE)
+  
   tree <- rcpp_read_tree(text)
   
   if (all(nchar(tree$node.label) == 0))
