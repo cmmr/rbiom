@@ -110,8 +110,11 @@ read.biom <- function (src, progressbar=FALSE) {
   # Uncompress files that are in .gz or .bz2 format
   #--------------------------------------------------------------
   
-  if (regexpr("\\.gz$",  file, TRUE) >= 0) file <- R.utils::gunzip( file, temporary=TRUE)
-  if (regexpr("\\.bz2$", file, TRUE) >= 0) file <- R.utils::bunzip2(file, temporary=TRUE)
+  if (regexpr("\\.gz$", file, ignore.case=TRUE) >= 0)
+    file <- R.utils::gunzip(file, temporary=TRUE, remove=FALSE)
+  
+  if (regexpr("\\.bz2$", file, ignore.case=TRUE) >= 0)
+    file <- R.utils::bunzip2(file, temporary=TRUE, remove=FALSE)
   
   
   #--------------------------------------------------------------
