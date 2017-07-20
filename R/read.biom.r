@@ -106,7 +106,14 @@ read.biom <- function (src, progressbar=FALSE) {
     stop(simpleError(sprintf("Cannot locate file %s", file)))
 
 
-
+  #--------------------------------------------------------------
+  # Uncompress files that are in .gz or .bz2 format
+  #--------------------------------------------------------------
+  
+  if (regexpr("\\.gz$",  file, TRUE) >= 0) file <- R.utils::gunzip( file, temporary=TRUE)
+  if (regexpr("\\.bz2$", file, TRUE) >= 0) file <- R.utils::bunzip2(file, temporary=TRUE)
+  
+  
   #--------------------------------------------------------------
   # Process the file according to it's internal format
   #--------------------------------------------------------------
