@@ -2,18 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 par_unifrac <- function(sparseMatrix, tree, weighted) {
-    .Call('rbiom_par_unifrac', PACKAGE = 'rbiom', sparseMatrix, tree, weighted)
+    .Call(rbiom_par_unifrac, sparseMatrix, tree, weighted)
 }
 
 rcpp_distance <- function(iJob, nJobs, sparseMatrix, method, weighted) {
-    .Call('rbiom_rcpp_distance', PACKAGE = 'rbiom', iJob, nJobs, sparseMatrix, method, weighted)
+    .Call(rbiom_rcpp_distance, iJob, nJobs, sparseMatrix, method, weighted)
 }
 
 rcpp_read_tree <- function(tree) {
-    .Call('rbiom_rcpp_read_tree', PACKAGE = 'rbiom', tree)
+    .Call(rbiom_rcpp_read_tree, tree)
 }
 
 rcpp_unifrac <- function(iJob, nJobs, sparseMatrix, tree, weighted) {
-    .Call('rbiom_rcpp_unifrac', PACKAGE = 'rbiom', iJob, nJobs, sparseMatrix, tree, weighted)
+    .Call(rbiom_rcpp_unifrac, iJob, nJobs, sparseMatrix, tree, weighted)
 }
 

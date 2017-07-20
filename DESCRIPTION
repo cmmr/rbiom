@@ -30,6 +30,7 @@ Imports:
     plyr,
     Rcpp,
     RcppParallel,
+    R.utils,
     rjson,
     slam
 Suggests:
