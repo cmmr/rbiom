@@ -13,7 +13,8 @@ version 1.0 (JSON) and 2.1 (HDF5)
 \href{http://biom-format.org/documentation/}{specifications} as well as
 classical tabular format. URLs must begin with \kbd{http://}, 
 \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-\code{\{} as their first non-whitespace character.}
+\code{\{} as their first non-whitespace character. Compressed (gzip or 
+bzip2) biom files are also supported.}
 
 \item{progressbar}{Whether to display a progress bar and status messages
 (logical). Will automatically tie in with \pkg{shiny} if run within a
