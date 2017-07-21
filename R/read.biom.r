@@ -6,7 +6,8 @@
 #'     \href{http://biom-format.org/documentation/}{specifications} as well as
 #'     classical tabular format. URLs must begin with \kbd{http://}, 
 #'     \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-#'     \code{\{} as their first non-whitespace character.
+#'     \code{\{} as their first non-whitespace character. Compressed (gzip or 
+#'     bzip2) biom files are also supported.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
 #'     \pkg{shiny} session.
@@ -87,49 +88,55 @@ read.biom <- function (src, progressbar=FALSE) {
 
     pb$set(0, 'Downloading BIOM file')
 
-    file <- tempfile(fileext=basename(src))
-    if (!identical(0, try(download.file(src, file, quiet=TRUE), silent=TRUE)))
+    fp <- tempfile(fileext=basename(src))
+    if (!identical(0, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(simpleError(sprintf("Cannot retrieve URL %s", src)))
 
   } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
 
-    file <- tempfile(fileext=".biom")
-    if (!is.null(try(writeChar(src, file), silent=TRUE)))
-        stop(simpleError(sprintf("Cannot write text to file %s", file)))
+    fp <- tempfile(fileext=".biom")
+    if (!is.null(try(writeChar(src, fp), silent=TRUE)))
+        stop(simpleError(sprintf("Cannot write text to file %s", fp)))
 
   } else {
 
-    file <- normalizePath(src)
+    fp <- normalizePath(src)
   }
 
-  if (!file.exists(file))
-    stop(simpleError(sprintf("Cannot locate file %s", file)))
+  if (!file.exists(fp))
+    stop(simpleError(sprintf("Cannot locate file %s", fp)))
 
 
   #--------------------------------------------------------------
-  # Uncompress files that are in .gz or .bz2 format
+  # Uncompress files that are in gzip or bzip2 format
   #--------------------------------------------------------------
   
-  if (regexpr("\\.gz$", file, ignore.case=TRUE) >= 0)
-    file <- R.utils::gunzip(file, temporary=TRUE, remove=FALSE)
+  file_con   <- file(fp)
+  file_class <- summary(file_con)$class
+  close.connection(file_con)
   
-  if (regexpr("\\.bz2$", file, ignore.case=TRUE) >= 0)
-    file <- R.utils::bunzip2(file, temporary=TRUE, remove=FALSE)
+  if (identical(file_class, "gzfile"))
+    fp <- R.utils::gunzip(fp, temporary=TRUE, remove=FALSE)
+  
+  if (identical(file_class, "bzfile"))
+    fp <- R.utils::bunzip2(fp, temporary=TRUE, remove=FALSE)
+  
+  remove("file_con", "file_class")
   
   
   #--------------------------------------------------------------
-  # Process the file according to it's internal format
+  # Process the file according to its internal format
   #--------------------------------------------------------------
 
   pb$set(0, 'Determining file type')
 
-  if (h5::is.h5file(file)) {
+  if (h5::is.h5file(fp)) {
 
     #-=-=-=-=-=-=-=-=-=-#
     # HDF5 file format  #
     #-=-=-=-=-=-=-=-=-=-#
 
-    pb$set(0.1, 'Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(file)
+    pb$set(0.1, 'Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
     pb$set(0.2, 'Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
     pb$set(0.7, 'Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
     pb$set(0.8, 'Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
@@ -139,13 +146,13 @@ read.biom <- function (src, progressbar=FALSE) {
     h5::h5close(hdf5)
     remove("hdf5")
 
-  } else if (identical("{", readChar(file, 1))) {
+  } else if (identical("{", readChar(fp, 1))) {
 
     #-=-=-=-=-=-=-=-=-=-#
     # JSON file format  #
     #-=-=-=-=-=-=-=-=-=-#
 
-    pb$set(0.1, 'Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(file)
+    pb$set(0.1, 'Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
     pb$set(0.2, 'Assembling OTU table');          counts    <- PB.JSON.Counts(json)
     pb$set(0.7, 'Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
     pb$set(0.8, 'Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
@@ -160,7 +167,7 @@ read.biom <- function (src, progressbar=FALSE) {
     # TSV file format   #
     #-=-=-=-=-=-=-=-=-=-#
 
-    pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(file)
+    pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
     pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
     pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))

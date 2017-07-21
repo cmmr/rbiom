@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // par_unifrac
 NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted);
-RcppExport SEXP rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
+RcppExport SEXP _rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // rcpp_distance
 NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* method, bool weighted);
-RcppExport SEXP rbiom_rcpp_distance(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP methodSEXP, SEXP weightedSEXP) {
+RcppExport SEXP _rbiom_rcpp_distance(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP methodSEXP, SEXP weightedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,7 +35,7 @@ END_RCPP
 }
 // rcpp_read_tree
 List rcpp_read_tree(const char* tree);
-RcppExport SEXP rbiom_rcpp_read_tree(SEXP treeSEXP) {
+RcppExport SEXP _rbiom_rcpp_read_tree(SEXP treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,7 +46,7 @@ END_RCPP
 }
 // rcpp_unifrac
 NumericVector rcpp_unifrac(int iJob, int nJobs, List sparseMatrix, List tree, bool weighted);
-RcppExport SEXP rbiom_rcpp_unifrac(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
+RcppExport SEXP _rbiom_rcpp_unifrac(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
