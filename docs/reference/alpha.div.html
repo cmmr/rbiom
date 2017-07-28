@@ -23,9 +23,10 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-
+  
+  
 <!-- mathjax -->
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -51,6 +52,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
@@ -80,7 +87,7 @@
     <p>Estimate the diversity of each sample.</p>
     
 
-    <pre><span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='kw'>rarefy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='kw'>rarefy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -134,7 +141,7 @@ a <span class="pkg">shiny</span> session.</p></td>
 #&gt; HMP06  HMP06  2269   44 1.250978 0.5103010  62.06250</div><div class='input'>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>Body.Site</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span>)
     <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
-    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><img src='alpha.div-6.png' alt='' width='540' height='400' /><div class='input'>
+    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -23,9 +23,10 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-
+  
+  
 <!-- mathjax -->
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -51,6 +52,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
@@ -80,7 +87,7 @@
     <p>Subset counts so that all samples have the same number of observations.</p>
     
 
-    <pre><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -126,9 +133,9 @@ object, set this seed value to a different number each time.</p></td>
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-    <span class='fu'>range</span>(<span class='kw'>slam</span><span class='kw'>::</span><span class='fu'>col_sums</span>(<span class='no'>biom</span>$<span class='no'>counts</span>))</div><div class='output co'>#&gt; [1] 1020 2988</div><div class='input'>
+    <span class='fu'>range</span>(<span class='kw pkg'>slam</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/slam/topics/sums'>col_sums</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>))</div><div class='output co'>#&gt; [1] 1020 2988</div><div class='input'>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span><span class='kw'>=</span><span class='fl'>1000</span>)
-    <span class='fu'>range</span>(<span class='kw'>slam</span><span class='kw'>::</span><span class='fu'>col_sums</span>(<span class='no'>biom</span>$<span class='no'>counts</span>))</div><div class='output co'>#&gt; [1] 1000 1000</div><div class='input'>
+    <span class='fu'>range</span>(<span class='kw pkg'>slam</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/slam/topics/sums'>col_sums</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>))</div><div class='output co'>#&gt; [1] 1000 1000</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

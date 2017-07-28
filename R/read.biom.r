@@ -116,10 +116,10 @@ read.biom <- function (src, progressbar=FALSE) {
   close.connection(file_con)
   
   if (identical(file_class, "gzfile"))
-    fp <- R.utils::gunzip(fp, temporary=TRUE, remove=FALSE)
+    fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
   
   if (identical(file_class, "bzfile"))
-    fp <- R.utils::bunzip2(fp, temporary=TRUE, remove=FALSE)
+    fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
   
   remove("file_con", "file_class")
   

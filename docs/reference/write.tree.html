@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarize the contents of a BIOM object — summary â€¢ rbiom</title>
+<title>Write a newick formatted phylogenetic tree. — write.tree â€¢ rbiom</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -80,45 +80,39 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarize the contents of a BIOM object</h1>
+    <h1>Write a newick formatted phylogenetic tree.</h1>
     </div>
 
     
-    <p>Summarize the contents of a BIOM object</p>
+    <p>Write a newick formatted phylogenetic tree.</p>
     
 
-    <pre class="usage"><span class='co'># S3 method for BIOM</span>
-<span class='fu'>summary</span>(<span class='no'>object</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>write.tree</span>(<span class='kw'>tree</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
+      <th>tree</th>
+      <td><p>A phylo object, as returned from <a href='read.tree.html'>read.tree</a>.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Not used.</p></td>
+      <th>file</th>
+      <td><p>Filename or connection to write the newick file to (optional).</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A distance matrix.</p>
+    <p>If file is NULL, the newick string as a character vector. Otherwise,
+        the return value from <a href='http://www.rdocumentation.org/packages/base/topics/readChar'>writeChar</a>, typically invsible(NULL).</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='fu'>library</span>(<span class='no'>rbiom</span>)
 
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='fu'>summary</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt;      50 Samples:  (HMP01, HMP02, HMP03, HMP04, HMP05, ...)
-#&gt;     577 Taxa:     (AciSp313, AcnLingn, AcnOriho, AecChri2, AncSpec2, ...)
-#&gt;       6 Ranks:    (Kingdom, Phylum, Class, Order, Family, Genus)
-#&gt;       4 Metadata: (Age, BMI, Body.Site, Sex)
-#&gt;         Tree:     Present</div><div class='input'>
+    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"newick.tre"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
+    <span class='no'>tree</span>   <span class='kw'>&lt;-</span> <span class='fu'><a href='read.tree.html'>read.tree</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='error'>Error in rcpp_read_tree(text): object '_rbiom_rcpp_read_tree' not found</span></div><div class='input'>    <span class='no'>newick</span> <span class='kw'>&lt;-</span> <span class='fu'>write.tree</span>(<span class='no'>tree</span>)</div><div class='output co'>#&gt; <span class='error'>Error in write.tree(tree): object 'tree' not found</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
