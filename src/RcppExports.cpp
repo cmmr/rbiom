@@ -59,3 +59,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_rbiom_par_unifrac", (DL_FUNC) &_rbiom_par_unifrac, 3},
+    {"_rbiom_rcpp_distance", (DL_FUNC) &_rbiom_rcpp_distance, 5},
+    {"_rbiom_rcpp_read_tree", (DL_FUNC) &_rbiom_rcpp_read_tree, 1},
+    {"_rbiom_rcpp_unifrac", (DL_FUNC) &_rbiom_rcpp_unifrac, 5},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_rbiom(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

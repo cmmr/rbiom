@@ -83,7 +83,8 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
         if (nReads < depth)
           return (NULL)
         
-        set.seed(sum(cumsum(x > 0) + seed + idx) %% 2147483647)
+        sampleID <- ifelse(is.null(colnames(counts)), paste0("Sample", idx), colnames(counts)[[idx]])
+        set.seed(sum(utf8ToInt(sampleID) + seed) %% 2147483647)
         
         breaks <- c(0, cumsum(x))
         labels <- counts$i[counts$j == idx]

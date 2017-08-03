@@ -29,8 +29,19 @@ write.tree <- function (tree=NULL, file=NULL) {
     
     nodes <- parentAt[[as.character(root)]]
     
-    if (length(nodes) == 0)
-      return (tree$tip.label[root])
+    if (length(nodes) == 0) {
+      
+      nodeLabel <- tree$tip.label[root]
+      
+      if (any(grepl(" ", nodeLabel, fixed=TRUE))) {
+        if (any(grepl("_", nodeLabel, fixed=TRUE))) {
+          nodeLabel <- paste0("'", nodeLabel, "'")
+        } else {
+          nodeLabel <- gsub(" ", "_", nodeLabel)
+        }
+      }
+      return (nodeLabel)
+    }
     
     children <- tree$edge[nodes, 2]
     children <- sapply(children, fx)
