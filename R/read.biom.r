@@ -4,9 +4,9 @@
 #'     \code{read.biom} can read BIOM files formatted according to both the
 #'     version 1.0 (JSON) and 2.1 (HDF5)
 #'     \href{http://biom-format.org/documentation/}{specifications} as well as
-#'     classical tabular format. URLs must begin with \kbd{http://}, 
+#'     classical tabular format. URLs must begin with \kbd{http://},
 #'     \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-#'     \code{\{} as their first non-whitespace character. Compressed (gzip or 
+#'     \code{\{} as their first non-whitespace character. Compressed (gzip or
 #'     bzip2) biom files are also supported.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
@@ -45,7 +45,7 @@
 #'
 #'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
 #'     biom <- read.biom(infile)
-#'     
+#'
 #'     summary(biom)
 #'
 #'     # Taxa Abundances
@@ -110,20 +110,20 @@ read.biom <- function (src, progressbar=FALSE) {
   #--------------------------------------------------------------
   # Uncompress files that are in gzip or bzip2 format
   #--------------------------------------------------------------
-  
+
   file_con   <- file(fp)
   file_class <- summary(file_con)$class
   close.connection(file_con)
-  
+
   if (identical(file_class, "gzfile"))
     fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
-  
+
   if (identical(file_class, "bzfile"))
     fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
-  
+
   remove("file_con", "file_class")
-  
-  
+
+
   #--------------------------------------------------------------
   # Process the file according to its internal format
   #--------------------------------------------------------------
@@ -160,9 +160,9 @@ read.biom <- function (src, progressbar=FALSE) {
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json)
 
     remove("json")
-    
+
   } else {
-    
+
     #-=-=-=-=-=-=-=-=-=-#
     # TSV file format   #
     #-=-=-=-=-=-=-=-=-=-#
@@ -173,14 +173,14 @@ read.biom <- function (src, progressbar=FALSE) {
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
     pb$set(1.0, 'Extracting attributes');         info      <- list()
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
-    
+
   }
-  
-  
+
+
   #--------------------------------------------------------------
   # Return everything we've computed as a BIOM class object
   #--------------------------------------------------------------
-  
+
   structure(
     class = c("BIOM", "list"),
     list( 'counts'    = counts,
@@ -198,35 +198,76 @@ read.biom <- function (src, progressbar=FALSE) {
 
 PB.TSV.ReadTSV <- function (fp) {
 
+  #--------------------------------------------------------------
+  # Read in all the lines from the file
+  #--------------------------------------------------------------
+
   lines <- try(readLines(fp, warn=FALSE), silent=TRUE)
   if (is(lines, "try-error"))
     stop(simpleError(sprintf("Unable to parse JSON file. %s", as.character(lines))))
+
+
+  #--------------------------------------------------------------
+  # Write to a temp file all the lines that have content and don't begin with '#'
+  #--------------------------------------------------------------
+
+  lines <- trimws(lines)
+  lines <- c(grep("^#SampleID", lines, value=TRUE), grep("^#", lines, value=TRUE, invert=TRUE))
+  fp <- tempfile()
+  writeLines(lines, fp, "\n")
+
+
+  #--------------------------------------------------------------
+  # See if we see a comma or a tab first, thereby deducing csv or tsv format
+  #--------------------------------------------------------------
+
+  csv <- min(gregexpr(",",   lines[[1]])[[1]], fixed=TRUE)
+  tsv <- min(gregexpr("\\t", lines[[1]])[[1]], fixed=TRUE)
+
+  if (csv > -1 & tsv > -1) { importFn <- if (csv < tsv) read.csv else read.delim
+  } else if (csv > -1)     { importFn <- read.csv
+  } else if (tsv > -1)     { importFn <- read.delim
+  } else                   { stop(simpleError("Cannot find comma or tab delimiters in file.")) }
+
+  mat <- try(importFn(fp, header=FALSE, colClasses="character"), silent=TRUE)
+  if (is(mat, "try-error"))
+    stop(simpleError(sprintf("Error parsing file: %s", as.character(mat))))
+
+  mat <- try(as.matrix(mat), silent=TRUE)
+  if (is(mat, "try-error"))
+    stop(simpleError(sprintf("Error converting to matrix: %s", as.character(mat))))
+
+
+  #--------------------------------------------------------------
+  # Ensure we have at least one taxa (row headers) and one sample (column headers)
+  #--------------------------------------------------------------
+
+  if (nrow(mat) < 2 | ncol(mat) < 2) {
+    msg <- "Unable to parse provided file: found %i rows and %i columns"
+    stop(simpleError(sprintf(msg, nrow(mat), ncol(mat))))
+  }
   
-  # Split on tabs
-  lines <- sapply(lines, strsplit, split="\t", fixed=TRUE, USE.NAMES=FALSE)
   
-  # Use the last line to deduce the number of columns that aren't headers
-  lines <- lines[which(sapply(lines, length) == length(lines[[length(lines)]]))]
+  #--------------------------------------------------------------
+  # Check for duplicate taxa or sample names
+  #--------------------------------------------------------------
   
-  # We should now have at a minimum:
-  #   - First row = Sample Names
-  #   - Second row = counts for the first taxa/otu
-  #   - First column = Taxa Names
-  #   - Second column = counts for the first sample
+  dupTaxaNames   <- unique(mat[duplicated(mat[,1]),1])
+  dupSampleNames <- unique(mat[1,duplicated(mat[1,])])
+  if (length(dupTaxaNames)   > 5) dupTaxaNames[[5]]   <- sprintf("... +%i more", length(dupTaxaNames)   - 4)
+  if (length(dupSampleNames) > 5) dupSampleNames[[5]] <- sprintf("... +%i more", length(dupSampleNames) - 4)
+  if (length(dupTaxaNames)   > 0) stop(simpleError(sprintf("Duplicate taxa names: %s", paste(collapse=",", dupTaxaNames))))
+  if (length(dupSampleNames) > 0) stop(simpleError(sprintf("Duplicate sample names: %s", paste(collapse=",", dupSampleNames))))
   
-  if (length(lines) < 2 | length(lines[[1]]) < 2)
-    stop(simpleError("Unable to parse provided file: unknown type."))
   
-  # Cram the tsv lines into a character matrix
-  mtx <- matrix(unlist(lines), nrow=length(lines), byrow=TRUE)
+  #--------------------------------------------------------------
+  # Move the Taxa and Sample names into the matrix headers
+  #--------------------------------------------------------------
   
-  if (any(duplicated(mtx[,1]))) stop(simpleError("Duplicate taxa names."))
-  if (any(duplicated(mtx[1,]))) stop(simpleError("Duplicate sample names."))
-  
-  dimnames(mtx) <- list(mtx[,1], mtx[1,])
-  mtx <- mtx[-1,-1, drop=FALSE]
-  
-  return (mtx)
+  dimnames(mat) <- list(mat[,1], mat[1,])
+  mat <- mat[-1,-1, drop=FALSE]
+
+  return (mat)
 }
 
 PB.JSON.ReadJSON <- function (fp) {
@@ -269,14 +310,14 @@ PB.JSON.Metadata <- function (json) {
       sapply(json$columns, function (x) x[['metadata']][[i]])
     }, character(length(json$columns)), USE.NAMES=TRUE)
   )
-  
+
   # Convert strings to numbers
   for (i in seq_len(ncol(df))) {
     df[[i]][which(df[[i]] == "NA")] <- NA
-    if (all(grepl("^-?(0|[1-9]\\d*)(\\.\\d*[1-9]|)$", na.omit(df[[i]]))))
+    if (all(grepl("^-?(0|[1-9]\\d*)(\\.\\d*[1-9]|)(e[\\+\\-]{0,1}[0-9]+|)$", na.omit(df[[i]]))))
       df[[i]] <- as.numeric(df[[i]])
   }
-  
+
   return (df)
 }
 
@@ -310,18 +351,18 @@ PB.HDF5.Info <- function (hdf5) {
 
 
 PB.TSV.Counts <- function (mtx) {
-  
+
   # Only keep column that are all numbers
-  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)$", x))
+  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)(e[\\+\\-]{0,1}[0-9]+|)$", x))
   mtx <- mtx[, apply(mtx, 2L, allNumbers), drop=FALSE]
   mtx <- matrix(
-    data     = as.numeric(mtx), 
+    data     = as.numeric(mtx),
     nrow     = nrow(mtx),
     dimnames = list(rownames(mtx), colnames(mtx)) )
-  
+
   if (length(mtx) == 0 | sum(mtx) == 0)
     stop(simpleError("No abundance counts."))
-  
+
   slam::as.simple_triplet_matrix(mtx)
 }
 
@@ -376,11 +417,11 @@ PB.HDF5.Counts <- function (hdf5) {
 
 
 PB.TSV.Taxonomy <- function (mtx) {
-  
+
   # Discard columns that are all numbers
-  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)$", x))
+  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)(e[\\+\\-]{0,1}[0-9]+|)$", x))
   mtx <- mtx[, !apply(mtx, 2L, allNumbers), drop=FALSE]
-  
+
   # Look for a taxonomy column, otherwise try to parse the taxa IDs
   txCol      <- head(grep("taxonomy", colnames(mtx), ignore.case=TRUE), 1)
   taxaNames  <- if (length(txCol)) mtx[,txCol] else rownames(mtx)
@@ -395,11 +436,11 @@ PB.TSV.Taxonomy <- function (mtx) {
 
   rownames(taxa_table) <- rownames(mtx)
   colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
-  
+
   # Better to return a completely empty table than one with just the taxa IDs
   if (identical(unname(taxa_table[,1]), rownames(taxa_table)))
     taxa_table <- taxa_table[,-1,drop=FALSE]
-  
+
   return (taxa_table)
 }
 
@@ -543,17 +584,17 @@ PB.TaxaLevelNames <- function (n) {
 # #  - length of less than 2 characters
 # #  - two capital letters in a row
 # #------------------------------------------------------------------
-# 
+#
 # PB.SanitizeTaxonomy <- function (tt, env=NULL) {
-# 
+#
 #   if (is.null(env)) env <- parent.frame()
-# 
+#
 #   tt <- sub("^.*?__\ *", "", tt)
 #   tt <- sub("^[a-z]_",   "", tt)
 #   tt <- sub("^[\ _]+",   "", tt)
 #   tt <- sub("[\ ]+$",    "", tt)
 #   tt[which(tt == "")] <- NA
-# 
+#
 #   invalid_case_sensi <- "([A-Z]{2})"
 #   invalid_case_insen <- paste(sep="|",
 #     "unknown",    "uncultured",      "unclassified",    "unidentified",
@@ -563,7 +604,7 @@ PB.TaxaLevelNames <- function (n) {
 #     "TM7"                  = "Saccharibacteria (TM7)",
 #     "RF9"                  = "Mollicutes RF9",
 #     "Escherichia_Shigella" = "Escherichia/Shigella")
-# 
+#
 #   # Search and replace bad names with NA
 #   taxaNames <- unique(as.vector(tt))
 #   invalids1 <- grep(invalid_case_insen, taxaNames, value=TRUE, ignore.case=TRUE)
@@ -573,14 +614,14 @@ PB.TaxaLevelNames <- function (n) {
 #   rewrites  <- c(exception_rewrites, invalids)
 #   rewrites  <- rewrites[!duplicated(names(rewrites))]
 #   tt[]      <- plyr::revalue(as.vector(as.matrix(tt)), rewrites, FALSE)
-# 
+#
 #   tt <- cbind(tt, rownames(tt))
-# 
+#
 #   # Replace NA with "<Last prior Non-NA value> (<Next Non-NA value or OTU Name>)"
 #   env$tt <- tt
-# 
+#
 #   tt <- withCluster(nTasks=nrow(tt), env=env, {
-# 
+#
 #     foreach::`%dopar%`(
 #       foreach::foreach(set=sets, .combine='cbind', .options.snow=opts),
 #       apply(tt[set,,drop=FALSE], 1, function (row) {
@@ -592,6 +633,6 @@ PB.TaxaLevelNames <- function (n) {
 #       })
 #     )
 #   })
-# 
+#
 #   return (t(tt[1:(nrow(tt) - 1),,drop=FALSE]))
 # }
