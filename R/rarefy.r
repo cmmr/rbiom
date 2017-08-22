@@ -11,7 +11,7 @@
 #'     object, set this seed value to a different number each time.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session.
+#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'     object, depending on the input object type. The type of object provided
 #'     is the same type that is returned. The retained observations are randomly

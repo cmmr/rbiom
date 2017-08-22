@@ -80,6 +80,10 @@ configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
 
 progressBar <- function (progressbar=FALSE) {
   
+  if (is(progressbar, 'Progress')) {
+    return (progressbar)
+  }
+  
   if (identical(progressbar, TRUE)) {
     
     if (!exists("getDefaultReactiveDomain"))

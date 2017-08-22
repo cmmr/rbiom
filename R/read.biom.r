@@ -10,7 +10,7 @@
 #'     bzip2) biom files are also supported.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session.
+#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \describe{

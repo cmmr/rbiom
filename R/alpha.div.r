@@ -14,7 +14,7 @@
 #'     }
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within
-#'     a \pkg{shiny} session.
+#'     a \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A data frame of four diversity values for each sample in
 #'     \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
 #'     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 

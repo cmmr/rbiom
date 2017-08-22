@@ -14,7 +14,7 @@
 #'     loaded from \code{biom}, if encoded there.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session.
+#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A distance matrix of class \code{dist}.
 #' @export
 #' @examples

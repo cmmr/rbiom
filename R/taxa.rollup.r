@@ -27,7 +27,7 @@
 #'     memory efficient in this scenario.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session.
+#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A numeric matrix with samples as column names, and taxonomic
 #'     identifiers as row names.
 #' @export

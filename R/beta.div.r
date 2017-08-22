@@ -17,7 +17,7 @@
 #'     required for computing UniFrac distance matrices.
 #' @param progressbar  Whether to display a progress bar and status messages
 #'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session.
+#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
 #' @return A distance matrix.
 #' @export
 #' @examples
