@@ -71,7 +71,7 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=FALSE) {
   
   
   pb <- progressBar(progressbar)
-  on.exit(pb$close())
+  if(!is(progressbar, 'Progress')) on.exit(pb$close())
   
   msg <- "Calculating Alpha Diversity"
   pb$set(value=0, message=msg)

@@ -77,7 +77,7 @@ read.biom <- function (src, progressbar=FALSE) {
 
 
   pb <- progressBar(progressbar=progressbar)
-  on.exit(pb$close())
+  if(!is(progressbar, 'Progress')) on.exit(pb$close())
 
 
   #--------------------------------------------------------------

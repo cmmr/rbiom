@@ -39,6 +39,9 @@ configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
     
     if (interactive())
       cat(sprintf("Setting up %i core cluster.\n", ncores))
+  
+    if (!is.null(pb)) 
+      pb$set(1, sprintf("Setting up %i core cluster.\n", ncores))
     
     doSNOW::registerDoSNOW(parallel::makeCluster(ncores))
   }
