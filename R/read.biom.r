@@ -171,7 +171,7 @@ read.biom <- function (src, progressbar=FALSE) {
     pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
     pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
-    pb$set(1.0, 'Extracting attributes');         info      <- list()
+    pb$set(1.0, 'Extracting attributes');         info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
 
   }
