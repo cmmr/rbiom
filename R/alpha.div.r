@@ -12,9 +12,7 @@
 #'       \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
 #'       \item{\emph{integer vector}}{ Rarefy ay the specified depth(s). }
 #'     }
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within
-#'     a \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A data frame of four diversity values for each sample in
 #'     \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
 #'     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 
@@ -36,7 +34,7 @@
 #'
 
 
-alpha.div <- function (biom, rarefy=FALSE, progressbar=FALSE) {
+alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
   
   #--------------------------------------------------------------
   # Get the input into a simple_triplet_matrix
@@ -70,15 +68,10 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=FALSE) {
   
   
   
-  pb <- progressBar(progressbar)
-  if(!is(progressbar, 'Progress')) on.exit(pb$close())
-  
-  msg <- "Calculating Alpha Diversity"
-  pb$set(value=0, message=msg)
-  
+  pb      <- progressBar(progressbar, "Calculating Alpha Diversity")
   nTasks  <- ncol(counts) * length(rLvls)
   cl      <- configCluster(nTasks = nTasks)
-  cl$opts <- list(progress = function (i) pb$inc(i/cl$nSets, message=msg))
+  cl$opts <- list(progress = function (i) pb$inc(i/cl$nSets))
   
   rLvl <- set <- idx <- NULL
   

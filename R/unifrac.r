@@ -12,9 +12,7 @@
 #' @param tree  A \code{phylo} object providing a phylogenetic tree for the
 #'     taxa names in \code{biom}. If \code{tree=NULL}, then the tree will be
 #'     loaded from \code{biom}, if encoded there.
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A distance matrix of class \code{dist}.
 #' @export
 #' @examples
@@ -37,7 +35,7 @@
 #'     as.matrix(dm)[1:4,1:4]
 #'     
 
-unifrac <- function (biom, weighted=TRUE, tree=NULL, progressbar=FALSE) {
+unifrac <- function (biom, weighted=TRUE, tree=NULL, progressbar=NULL) {
   
   rbiom::beta.div(biom, 'unifrac', weighted, tree, progressbar)
   

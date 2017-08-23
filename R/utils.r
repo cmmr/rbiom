@@ -1,5 +1,5 @@
 
-configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
+configCluster <- function (nTasks=NA, pb=NULL) {
   
   #--------------------------------------------------------------
   # The number of cores we should use
@@ -37,11 +37,9 @@ configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
     if (identical(cl$ready, TRUE))
       cat(file=stderr(), "Replacing existing parallel backend.\n")
     
-    if (interactive())
-      cat(sprintf("Setting up %i core cluster.\n", ncores))
-  
-    if (!is.null(pb)) 
-      pb$set(1, sprintf("Setting up %i core cluster.\n", ncores))
+    msg <- sprintf("Setting up %i core cluster.\n", ncores)
+    if (interactive()) cat(msg)
+    try(pb$set(detail=msg), silent=TRUE)
     
     doSNOW::registerDoSNOW(parallel::makeCluster(ncores))
   }
@@ -71,8 +69,10 @@ configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
     )
   }
   
-  if (!is.null(pb)) 
-    res$opts <- list(progress = function (i) pb$set(i/res$nSets, msg))
+  if (!is.null(pb)) {
+    pb$set(0)
+    res$opts <- list(progress = function (i) pb$set(i/res$nSets))
+  }
   
   
   
@@ -81,39 +81,19 @@ configCluster <- function (nTasks=NA, pb=NULL, msg=NULL) {
 }
 
 
-progressBar <- function (progressbar=FALSE) {
+progressBar <- function (progressbar=NULL, detail=NULL) {
   
-  if (is(progressbar, 'Progress')) {
-    return (progressbar)
+  if (!is(progressbar, 'Progress')) {
+    progressbar <- list(
+      'set' = function (...) { invisible(NULL) },
+      'inc' = function (...) { invisible(NULL) }
+    )
   }
   
-  if (identical(progressbar, TRUE)) {
-    
-    if (!exists("getDefaultReactiveDomain"))
-      getDefaultReactiveDomain <- function () NULL
-    
-    if (is(try(getDefaultReactiveDomain(), silent=TRUE), "ShinySession")) {
-      
-      shiny::Progress$new()
-      
-    } else {
-      
-      list(
-        'set'   = function (value=0, message="  Progress") { 
-                    cat(sprintf("%s: %3.1f%%\n", message, value * 100))
-                  },
-        'inc'   = function (...) { invisible(NULL) },
-        'close' = function (...) { invisible(NULL) }
-      )
-    }
-  } else {
-      
-      list(
-        'set'   = function (...) { invisible(NULL) },
-        'inc'   = function (...) { invisible(NULL) },
-        'close' = function (...) { invisible(NULL) }
-      )
-  }
+  if (!is.null(detail))
+    try(progressbar$set(1, detail=detail), silent=TRUE)
+  
+  return (progressbar)
 }
 
 
@@ -181,7 +161,7 @@ progressBar <- function (progressbar=FALSE) {
 
 
 
-# withProgress <- function (expr, progressbar=FALSE, env=NULL) {
+# withProgress <- function (expr, progressbar=NULL, env=NULL) {
 #   
 #   if (is.null(env)) env <- parent.frame()
 #   

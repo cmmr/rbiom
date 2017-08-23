@@ -8,9 +8,7 @@
 #'     \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
 #'     \code{\{} as their first non-whitespace character. Compressed (gzip or
 #'     bzip2) biom files are also supported.
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \describe{
@@ -66,7 +64,7 @@
 #'
 
 
-read.biom <- function (src, progressbar=FALSE) {
+read.biom <- function (src, progressbar=NULL) {
 
   #--------------------------------------------------------------
   # Sanity check input values
@@ -76,8 +74,7 @@ read.biom <- function (src, progressbar=FALSE) {
     stop(simpleError("Data source for read.biom() must be a single string."))
 
 
-  pb <- progressBar(progressbar=progressbar)
-  if(!is(progressbar, 'Progress')) on.exit(pb$close())
+  pb <- progressBar(progressbar=progressbar, "")
 
 
   #--------------------------------------------------------------
@@ -86,7 +83,7 @@ read.biom <- function (src, progressbar=FALSE) {
 
   if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
 
-    pb$set(0, 'Downloading BIOM file')
+    pb$set(0, detail='Downloading BIOM file')
 
     fp <- tempfile(fileext=basename(src))
     if (!identical(0, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
@@ -128,7 +125,7 @@ read.biom <- function (src, progressbar=FALSE) {
   # Process the file according to its internal format
   #--------------------------------------------------------------
 
-  pb$set(0, 'Determining file type')
+  pb$set(0, detail='Determining file type')
 
   if (h5::is.h5file(fp)) {
 
@@ -136,12 +133,12 @@ read.biom <- function (src, progressbar=FALSE) {
     # HDF5 file format  #
     #-=-=-=-=-=-=-=-=-=-#
 
-    pb$set(0.1, 'Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
-    pb$set(0.2, 'Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
-    pb$set(0.7, 'Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
-    pb$set(0.8, 'Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
-    pb$set(0.9, 'Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
-    pb$set(1.0, 'Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
+    pb$set(0.1, detail='Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
+    pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
+    pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
+    pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
+    pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
+    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
 
     h5::h5close(hdf5)
     remove("hdf5")
@@ -152,12 +149,12 @@ read.biom <- function (src, progressbar=FALSE) {
     # JSON file format  #
     #-=-=-=-=-=-=-=-=-=-#
 
-    pb$set(0.1, 'Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
-    pb$set(0.2, 'Assembling OTU table');          counts    <- PB.JSON.Counts(json)
-    pb$set(0.7, 'Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
-    pb$set(0.8, 'Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
-    pb$set(0.9, 'Extracting attributes');         info      <- PB.JSON.Info(json)
-    pb$set(1.0, 'Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json)
+    pb$set(0.1, detail='Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
+    pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.JSON.Counts(json)
+    pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
+    pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
+    pb$set(0.9, detail='Extracting attributes');         info      <- PB.JSON.Info(json)
+    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json)
 
     remove("json")
 

@@ -9,9 +9,7 @@
 #' @param seed  An integer to use for seeding the random number generator. If
 #'     you need to create different random rarefactions of the same \code{BIOM}
 #'     object, set this seed value to a different number each time.
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'     object, depending on the input object type. The type of object provided
 #'     is the same type that is returned. The retained observations are randomly
@@ -31,7 +29,7 @@
 #'
 
 
-rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
+rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   
   
   #--------------------------------------------------------------
@@ -66,9 +64,8 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=FALSE) {
   }
   
   
-  pb <- progressBar(progressbar)
-  cl <- configCluster(nTasks=counts$ncol, pb, "Rarefying")
-  if(!is(progressbar, 'Progress')) on.exit(pb$close())
+  pb <- progressBar(progressbar, sprintf("Rarefying to %i", depth))
+  cl <- configCluster(nTasks=counts$ncol, pb)
   
   res <- {
     

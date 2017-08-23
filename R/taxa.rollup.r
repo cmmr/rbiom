@@ -25,9 +25,7 @@
 #'     \link[slam]{simple_triplet_matrix}, otherwise returns a normal R
 #'     matrix object. Sparse matrices will likely be considerably more
 #'     memory efficient in this scenario.
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (logical). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A numeric matrix with samples as column names, and taxonomic
 #'     identifiers as row names.
 #' @export
@@ -54,7 +52,7 @@
 #'
 
 
-taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE, progressbar=FALSE) {
+taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE, progressbar=NULL) {
   
   
   #--------------------------------------------------------------
@@ -112,9 +110,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   # compute abundance matrix
   #--------------------------------------------------------------
   
-  pb <- progressBar(progressbar)
-  pb$set(1, paste('Calculating', ranks[rank], 'abundances'))
-  if(!is(progressbar, 'Progress')) on.exit(pb$close())
+  pb <- progressBar(progressbar, sprintf("Calculating %s abundances", ranks[rank]))
   
   if (identical(lineage, TRUE)) rank <- 1:rank
   

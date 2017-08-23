@@ -15,9 +15,7 @@
 #'     relationships of the taxa in \code{biom}. Will be taken from the tree
 #'     embedded in the \code{biom} object if not explicitly specified. Only
 #'     required for computing UniFrac distance matrices.
-#' @param progressbar  Whether to display a progress bar and status messages
-#'     (TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within a
-#'     \pkg{shiny} session. Also accepts object of type \code{Progress}.
+#' @param progressbar  An object of class \code{Progress}.
 #' @return A distance matrix.
 #' @export
 #' @examples
@@ -33,7 +31,7 @@
 #'     plot(hclust(dm))
 #'
 
-beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE) {
+beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) {
   
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
@@ -109,20 +107,20 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=FALSE)
   # Run C++ implemented dissimilarity algorithms multithreaded
   #--------------------------------------------------------------
 
-  pb  <- progressBar(progressbar=progressbar)
   msg <- sprintf("Calculating %s %s", ifelse(weighted, "weighted", "unweighted"), method)
-  if(!is(progressbar, 'Progress')) on.exit(pb$close())
+  pb  <- progressBar(progressbar=progressbar, detail=msg)
   
   if (identical(method, "unifrac")) {
     
-    pb$set(1, msg);
+    pb$set(value=1)
     par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
     
   } else {
     
-    cl  <- configCluster(nTasks=NA, pb, msg)
+    cl  <- configCluster(nTasks=NA, pb)
     set <- NULL
+    pb$set(value=0)
     
     foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts) %dopar% {
       nJobs <- cl$nSets
