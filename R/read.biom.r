@@ -111,73 +111,73 @@ read.biom <- function (src, progressbar=NULL) {
   file_con   <- file(fp)
   file_class <- summary(file_con)$class
   close.connection(file_con)
-
+  
   if (identical(file_class, "gzfile"))
     fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
-
+  
   if (identical(file_class, "bzfile"))
     fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
-
+  
   remove("file_con", "file_class")
-
-
+  
+  
   #--------------------------------------------------------------
   # Process the file according to its internal format
   #--------------------------------------------------------------
-
+  
   pb$set(0, detail='Determining file type')
-
-  if (h5::is.h5file(fp)) {
-
+  
+  if (identical(intToUtf8(readBin(fp, n=8, what="raw")), "\211HDF\r\n\032\n")) {
+    
     #-=-=-=-=-=-=-=-=-=-#
     # HDF5 file format  #
     #-=-=-=-=-=-=-=-=-=-#
-
+    
     pb$set(0.1, detail='Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
     pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
     pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
-
-    h5::h5close(hdf5)
+    
+    rhdf5::H5Fclose(hdf5)
     remove("hdf5")
-
+    
   } else if (identical("{", readChar(fp, 1))) {
-
+    
     #-=-=-=-=-=-=-=-=-=-#
     # JSON file format  #
     #-=-=-=-=-=-=-=-=-=-#
-
+    
     pb$set(0.1, detail='Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
     pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.JSON.Counts(json)
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.JSON.Info(json)
     pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json)
-
+    
     remove("json")
-
+    
   } else {
-
+    
     #-=-=-=-=-=-=-=-=-=-#
     # TSV file format   #
     #-=-=-=-=-=-=-=-=-=-#
-
+    
     pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
     pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
     pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
     pb$set(1.0, 'Extracting attributes');         info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
-
+    
   }
-
-
+  
+  
   #--------------------------------------------------------------
   # Return everything we've computed as a BIOM class object
   #--------------------------------------------------------------
-
+  
   structure(
     class = c("BIOM", "list"),
     list( 'counts'    = counts,
@@ -280,18 +280,23 @@ PB.JSON.ReadJSON <- function (fp) {
 }
 
 PB.HDF5.ReadHDF5 <- function (fp) {
-
-  hdf5 <- try(h5::h5file(name=fp, mode="r"), silent=TRUE)
-  if (is(hdf5, "try-error"))
+  
+  hdf5 <- try(rhdf5::H5Fopen(fp), silent=TRUE)
+  if (is(hdf5, "try-error")) {
+    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
     stop(simpleError(sprintf("Unable to parse HDF5 file. %s", as.character(hdf5))))
-
+  }
+  
+  entries  <- with(rhdf5::h5ls(hdf5), paste(sep="/", group, name))
   expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", "/observation/ids",
                  "/observation/matrix/data", "/observation/metadata/taxonomy", "/sample/ids" )
-
-  missing  <- setdiff(expected, h5::list.datasets(hdf5))
-  if (length(missing) > 0)
-      stop(simpleError(sprintf("BIOM file requires: %s", paste(collapse=",", missing))))
-
+  
+  missing  <- setdiff(expected, entries)
+  if (length(missing) > 0) {
+    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
+    stop(simpleError(sprintf("BIOM file requires: %s", paste(collapse=",", missing))))
+  }
+  
   return (hdf5)
 }
 
@@ -320,15 +325,19 @@ PB.JSON.Metadata <- function (json) {
 
 PB.HDF5.Metadata <- function (hdf5) {
 
-  fields <- grep("^/sample/metadata/", h5::list.datasets(hdf5), value=TRUE)
+  keys <- names(hdf5$sample$metadata)
+  vals <- lapply(keys, function (k) {
+    obj_class <- typeof(hdf5$sample$metadata[[k]])
+    if (!identical(obj_class, "character"))
+      obj_class <- "numeric"
+    as(hdf5$sample$metadata[[k]], obj_class)
+  })
 
   as.data.frame(
-    row.names        = h5::readDataSet(hdf5["/sample/ids"]),
+    row.names        = hdf5$sample$ids,
     check.names      = FALSE,
     stringsAsFactors = FALSE,
-    setNames(
-      lapply(fields, function (f) h5::readDataSet(hdf5[f])),
-      sub("/sample/metadata/", "", fields))
+    setNames(vals, keys)
   )
 }
 
@@ -341,8 +350,11 @@ PB.JSON.Info <- function (json) {
 }
 
 PB.HDF5.Info <- function (hdf5) {
-  fields <- sort(h5::list.attributes(hdf5))
-  sapply(fields, h5::h5attr, .Object=hdf5, USE.NAMES=TRUE)
+  attrs <- rhdf5::h5readAttributes(hdf5, "/")
+  for (i in names(attrs)) {
+    attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
+  }
+  return (attrs)
 }
 
 
@@ -397,17 +409,17 @@ PB.JSON.Counts <- function (json) {
 
 PB.HDF5.Counts <- function (hdf5) {
 
-  indptr <- h5::readDataSet(hdf5["observation/matrix/indptr"])
+  indptr <- as.numeric(hdf5$observation$matrix$indptr)
 
   slam::simple_triplet_matrix(
         i        = unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)])))),
-        j        = h5::readDataSet(hdf5["/observation/matrix/indices"]) + 1,
-        v        = h5::readDataSet(hdf5["/observation/matrix/data"]),
-        nrow     = length(h5::readDataSet(hdf5["/observation/ids"])),
-        ncol     = length(h5::readDataSet(hdf5["/sample/ids"])),
+        j        = as.numeric(hdf5$observation$matrix$indices) + 1,
+        v        = as.numeric(hdf5$observation$matrix$data),
+        nrow     = length(hdf5$observation$ids),
+        ncol     = length(hdf5$sample$ids),
         dimnames = list(
-          h5::readDataSet(hdf5["/observation/ids"]),
-          h5::readDataSet(hdf5["/sample/ids"])
+          as.character(hdf5$observation$ids),
+          as.character(hdf5$sample$ids)
       ))
 }
 
@@ -474,8 +486,8 @@ PB.JSON.Taxonomy <- function (json) {
 
 PB.HDF5.Taxonomy <- function (hdf5) {
 
-  taxa_table           <- h5::readDataSet(hdf5["/observation/metadata/taxonomy"])
-  rownames(taxa_table) <- h5::readDataSet(hdf5["/observation/ids"])
+  taxa_table           <- t(hdf5$observation$metadata$taxonomy)
+  rownames(taxa_table) <- as.character(hdf5$observation$ids)
   colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
 
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
@@ -522,41 +534,40 @@ PB.JSON.Tree <- function (json) {
 }
 
 PB.HDF5.Tree <- function (hdf5) {
-
+  
   # See if a tree is included in the BIOM file
   #------------------------------------------------------
-  hdf5Path <- "/observation/group-metadata/phylogeny"
-  if (!hdf5Path %in% h5::list.datasets(hdf5))
-    return (NULL)
-
-
+  tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
+  if (is.null(tree)) return (NULL)
+  
+  
   # Assume it's newick format unless otherwise indicated
   #------------------------------------------------------
   data_type <- "newick"
-  if ("data_type" %in% h5::list.attributes(hdf5[hdf5Path]))
-    data_type <- tolower(h5::h5attr(hdf5[hdf5Path], 'data_type'))
-
-  if (data_type != "newick")
-    return (NULL)
-
-
-  # Try to read it with ape
+  attrs     <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
+  if ("data_type" %in% names(attrs)) {
+    data_type <- tolower(as.character(attrs[['data_type']]))
+    if (!identical(data_type, "newick")) return (NULL)
+  }
+  
+  
+  # Try to read the Newick-formatted tree
   #------------------------------------------------------
-  tree <- try(ape::read.tree(text=h5::readDataSet(hdf5[hdf5Path])), silent=TRUE)
+  tree <- try(read.tree(text=as.character(tree)), silent=TRUE)
   if (is(tree, "try-error"))
     stop(simpleError(sprintf("Unable to read phylogeny. %s", as.character(tree))))
-
-
+  
+  
   # Make sure it has all the OTUs from the table
   #------------------------------------------------------
-  TaxaIDs <- h5::readDataSet(hdf5["/observation/ids"])
+  TaxaIDs <- as.character(hdf5$observation$ids)
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
     if (length(missing) > 6) missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
     stop(simpleError(sprintf("OTUs missing from tree: %s", paste(collapse=",", missing))))
   }
-
-
+  
+  
   return (tree)
 }
 

@@ -4,7 +4,7 @@
 \alias{unifrac}
 \title{Compute Weighted and Unweighted UniFrac distance matrices.}
 \usage{
-unifrac(biom, weighted = TRUE, tree = NULL, progressbar = FALSE)
+unifrac(biom, weighted = TRUE, tree = NULL, progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -18,9 +18,7 @@ rather than simply presence/absence.}
 taxa names in \code{biom}. If \code{tree=NULL}, then the tree will be
 loaded from \code{biom}, if encoded there.}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(logical). Will automatically tie in with \pkg{shiny} if run within a
-\pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A distance matrix of class \code{dist}.

@@ -14,6 +14,7 @@ fp   <- tempfile()
 #----------------------------------------------------------
 write.biom(biom, fp, format="tab")
 tsv <- read.biom(fp)
+unlink(fp)
 
 test_that("TSV Intermediate", {
   expect_equal(as.matrix(biom$counts), as.matrix(tsv$counts))
@@ -26,6 +27,7 @@ test_that("TSV Intermediate", {
 #----------------------------------------------------------
 write.biom(biom, fp, format="json")
 json <- read.biom(fp)
+unlink(fp)
 
 test_that("JSON Intermediate", {
   expect_equal(biom$counts,    json$counts)
@@ -40,6 +42,7 @@ test_that("JSON Intermediate", {
 #----------------------------------------------------------
 write.biom(biom, fp, format="hdf5")
 hdf5 <- read.biom(fp)
+unlink(fp)
 
 test_that("HDF5 Intermediate", {
   expect_equal(biom$counts,    hdf5$counts)
@@ -49,7 +52,6 @@ test_that("HDF5 Intermediate", {
 })
 
 
-unlink(fp)
 remove("fp", "tsv", "json", "hdf5")
 
 

@@ -24,13 +24,13 @@ Imports:
     ape,
     doSNOW (>= 1.0.14),
     foreach,
-    h5,
     methods,
     parallel,
     plyr,
     Rcpp,
     RcppParallel,
     R.utils,
+    rhdf5,
     rjson,
     slam
 Suggests:
@@ -38,4 +38,4 @@ Suggests:
     reshape2,
     shiny,
     testthat
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.0.2.9000
