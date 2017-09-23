@@ -22,7 +22,7 @@ import("RcppParallel")
 importFrom("Rcpp", "sourceCpp")
 importFrom("methods", "is")
 importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate")
-importFrom("utils", "download.file", "head", "write.table")
+importFrom("utils", "download.file", "head", "write.table", "read.csv", "read.delim")
 importFrom("foreach", "foreach", "%dopar%", "%do%")
 
 S3method(subset, BIOM)

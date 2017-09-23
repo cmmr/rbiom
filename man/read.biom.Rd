@@ -4,21 +4,19 @@
 \alias{read.biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read.biom(src, progressbar = FALSE)
+read.biom(src, progressbar = NULL)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
 \code{read.biom} can read BIOM files formatted according to both the
 version 1.0 (JSON) and 2.1 (HDF5)
 \href{http://biom-format.org/documentation/}{specifications} as well as
-classical tabular format. URLs must begin with \kbd{http://}, 
+classical tabular format. URLs must begin with \kbd{http://},
 \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-\code{\{} as their first non-whitespace character. Compressed (gzip or 
+\code{\{} as their first non-whitespace character. Compressed (gzip or
 bzip2) biom files are also supported.}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(logical). Will automatically tie in with \pkg{shiny} if run within a
-\pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A \code{BIOM} class object containing the parsed data. This object
@@ -58,7 +56,7 @@ Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
 
     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
     biom <- read.biom(infile)
-    
+
     summary(biom)
 
     # Taxa Abundances

@@ -5,7 +5,7 @@
 \title{Generate a matrix of samples by taxa, at the specified taxonomic rank.}
 \usage{
 taxa.rollup(biom, rank = "OTU", map = NULL, lineage = FALSE,
-  sparse = FALSE, progressbar = FALSE)
+  sparse = FALSE, progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -38,9 +38,7 @@ level ranks.}
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(logical). Will automatically tie in with \pkg{shiny} if run within a
-\pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A numeric matrix with samples as column names, and taxonomic

@@ -4,7 +4,7 @@
 \alias{beta.div}
 \title{Make a distance matrix of samples vs samples.}
 \usage{
-beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = FALSE)
+beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -26,9 +26,7 @@ relationships of the taxa in \code{biom}. Will be taken from the tree
 embedded in the \code{biom} object if not explicitly specified. Only
 required for computing UniFrac distance matrices.}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within a
-\pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A distance matrix.

@@ -4,7 +4,7 @@
 \alias{rarefy}
 \title{Subset counts so that all samples have the same number of observations.}
 \usage{
-rarefy(biom, depth = NULL, seed = 0, progressbar = FALSE)
+rarefy(biom, depth = NULL, seed = 0, progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -19,9 +19,7 @@ fewer than this number of observations will be dropped.}
 you need to create different random rarefactions of the same \code{BIOM}
 object, set this seed value to a different number each time.}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(logical). Will automatically tie in with \pkg{shiny} if run within a
-\pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 

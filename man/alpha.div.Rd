@@ -4,7 +4,7 @@
 \alias{alpha.div}
 \title{Estimate the diversity of each sample.}
 \usage{
-alpha.div(biom, rarefy = FALSE, progressbar = FALSE)
+alpha.div(biom, rarefy = FALSE, progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
@@ -21,9 +21,7 @@ diversity computations. Options are:
   \item{\emph{integer vector}}{ Rarefy ay the specified depth(s). }
 }}
 
-\item{progressbar}{Whether to display a progress bar and status messages
-(TRUE/FALSE). Will automatically tie in with \pkg{shiny} if run within
-a \pkg{shiny} session.}
+\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A data frame of four diversity values for each sample in

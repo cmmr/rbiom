@@ -166,21 +166,25 @@ write.biom.1.0 <- function (biom, file) {
 
 write.biom.2.1 <- function (biom, file) {
   
-  hdf5 <- try(h5::h5file(name = file, mode = "w"), silent = TRUE)
-  if (is(hdf5, "try-error"))
+  res <- try(rhdf5::h5createFile(file), silent = TRUE)
+  if (!(identical(res, TRUE))
     stop(simpleError(sprintf("Can't save to '%s': %s", file, hdf5)))
+    
+  rhdf5::h5createGroup(file, "sample")
+  rhdf5::h5createGroup(file, "observation")
+  
   
   
   # Attributes
   #------------------------------------------------------
-  h5::h5attr(hdf5, 'id')             <- biom$info$id
-  h5::h5attr(hdf5, 'type')           <- biom$info$type
-  h5::h5attr(hdf5, 'format-url')     <- "http://biom-format.org"
-  h5::h5attr(hdf5, 'format-version') <- c(2,1,0)
-  h5::h5attr(hdf5, 'generated-by')   <- paste("rbiom", utils::packageDescription('rbiom')$Version)
-  h5::h5attr(hdf5, 'creation-date')  <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
-  h5::h5attr(hdf5, 'shape')          <- c(biom$counts$nrow, biom$counts$ncol)
-  h5::h5attr(hdf5, 'nnz')            <- length(biom$counts$v)
+  rhdf5::h5writeAttribute(biom$info$id,                                               file, 'id')
+  rhdf5::h5writeAttribute(biom$info$type,                                             file, 'type')
+  rhdf5::h5writeAttribute("http://biom-format.org",                                   file, 'format-url')
+  rhdf5::h5writeAttribute(c(2,1,0),                                                   file, 'format-version')
+  rhdf5::h5writeAttribute(paste("rbiom", utils::packageDescription('rbiom')$Version), file, 'generated-by')
+  rhdf5::h5writeAttribute(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),       file, 'creation-date')
+  rhdf5::h5writeAttribute(c(biom$counts$nrow, biom$counts$ncol),                      file, 'shape')
+  rhdf5::h5writeAttribute(length(biom$counts$v),                                      file, 'nnz')
   
   
   
