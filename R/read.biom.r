@@ -141,6 +141,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
     
     rhdf5::H5Fclose(hdf5)
+    rhdf5::H5close()
     remove("hdf5")
     
   } else if (identical("{", readChar(fp, 1))) {
@@ -543,8 +544,7 @@ PB.HDF5.Tree <- function (hdf5) {
   
   # Assume it's newick format unless otherwise indicated
   #------------------------------------------------------
-  data_type <- "newick"
-  attrs     <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
+  attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
   if ("data_type" %in% names(attrs)) {
     data_type <- tolower(as.character(attrs[['data_type']]))
     if (!identical(data_type, "newick")) return (NULL)

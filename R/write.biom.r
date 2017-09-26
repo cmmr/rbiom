@@ -187,7 +187,6 @@ write.biom.2.1 <- function (biom, file) {
   
   
   
-  
   # Attributes
   #------------------------------------------------------
   rhdf5::h5writeAttribute.character(biom$info$id,                                               h5, 'id')
@@ -198,6 +197,7 @@ write.biom.2.1 <- function (biom, file) {
   rhdf5::h5writeAttribute.character(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),       h5, 'creation-date')
   rhdf5::h5writeAttribute.array(    c(biom$counts$nrow, biom$counts$ncol),                      h5, 'shape', 2)
   rhdf5::h5writeAttribute.integer(  length(biom$counts$v),                                      h5, 'nnz')
+
   
   
   
