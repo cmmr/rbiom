@@ -126,8 +126,9 @@ read.biom <- function (src, progressbar=NULL) {
   #--------------------------------------------------------------
   
   pb$set(0, detail='Determining file type')
+      
   
-  if (identical(intToUtf8(readBin(fp, n=8, what="raw")), "\211HDF\r\n\032\n")) {
+  if (rhdf5::H5Fis_hdf5(fp)) {
     
     #-=-=-=-=-=-=-=-=-=-#
     # HDF5 file format  #

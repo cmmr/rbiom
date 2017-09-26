@@ -107,10 +107,10 @@
     <pre class="examples"><div class='input'>    <span class='fu'>library</span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"newick.tre"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.tree.html'>read.tree</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='error'>Error in rcpp_read_tree(text): object '_rbiom_rcpp_read_tree' not found</span></div><div class='input'>
-    <span class='no'>leafs</span>   <span class='kw'>&lt;-</span> <span class='fu'>tips</span>(<span class='no'>tree</span>)</div><div class='output co'>#&gt; <span class='error'>Error in tips(tree): object 'tree' not found</span></div><div class='input'>    #subtree <- subset(tree, head(leafs))
+    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.tree.html'>read.tree</a></span>(<span class='no'>infile</span>)
 
-</div></pre>
+    <span class='no'>leafs</span>   <span class='kw'>&lt;-</span> <span class='fu'>tips</span>(<span class='no'>tree</span>)
+    <span class='co'>#subtree &lt;- subset(tree, head(leafs))</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -87,7 +87,7 @@
     <p>Subset counts so that all samples have the same number of observations.</p>
     
 
-    <pre class="usage"><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -112,9 +112,7 @@ object, set this seed value to a different number each time.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>
-      <td><p>Whether to display a progress bar and status messages
-(logical). Will automatically tie in with <span class="pkg">shiny</span> if run within a
-<span class="pkg">shiny</span> session.</p></td>
+      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
     

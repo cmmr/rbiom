@@ -87,7 +87,7 @@
     <p>Extracts counts, metadata, taxonomy, and phylogeny from a biom file.</p>
     
 
-    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -98,16 +98,14 @@
 <code>read.biom</code> can read BIOM files formatted according to both the
 version 1.0 (JSON) and 2.1 (HDF5)
 <a href='http://biom-format.org/documentation/'>specifications</a> as well as
-classical tabular format. URLs must begin with <kbd>http://</kbd>, 
+classical tabular format. URLs must begin with <kbd>http://</kbd>,
 <kbd>https://</kbd>, <kbd>ftp://</kbd>, or <kbd>ftps://</kbd>. JSON files must have
-<code>{</code> as their first non-whitespace character. Compressed (gzip or 
+<code>{</code> as their first non-whitespace character. Compressed (gzip or
 bzip2) biom files are also supported.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>
-      <td><p>Whether to display a progress bar and status messages
-(logical). Will automatically tie in with <span class="pkg">shiny</span> if run within a
-<span class="pkg">shiny</span> session.</p></td>
+      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
     

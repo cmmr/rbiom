@@ -87,7 +87,7 @@
     <p>Make a distance matrix of samples vs samples.</p>
     
 
-    <pre class="usage"><span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='no'>method</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='no'>method</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -121,9 +121,7 @@ required for computing UniFrac distance matrices.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>
-      <td><p>Whether to display a progress bar and status messages
-(TRUE/FALSE). Will automatically tie in with <span class="pkg">shiny</span> if run within a
-<span class="pkg">shiny</span> session.</p></td>
+      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
     
@@ -139,8 +137,13 @@ required for computing UniFrac distance matrices.</p></td>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)
 
-    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='st'>'unifrac'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in par_unifrac(counts, tree, ifelse(weighted, 1L, 0L)): object '_rbiom_par_unifrac' not found</span></div><div class='input'>
-    <span class='fu'>as.matrix</span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(dm): object 'dm' not found</span></div><div class='input'>    <span class='fu'>plot</span>(<span class='fu'>hclust</span>(<span class='no'>dm</span>))</div><div class='output co'>#&gt; <span class='error'>Error in hclust(dm): object 'dm' not found</span></div><div class='input'>
+    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='st'>'unifrac'</span>)
+
+    <span class='fu'>as.matrix</span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
+#&gt; HMP01 0.0000000 0.5714029 0.7262758 0.9639771
+#&gt; HMP02 0.5714029 0.0000000 0.3435511 0.5693744
+#&gt; HMP03 0.7262758 0.3435511 0.0000000 0.2639387
+#&gt; HMP04 0.9639771 0.5693744 0.2639387 0.0000000</div><div class='input'>    <span class='fu'>plot</span>(<span class='fu'>hclust</span>(<span class='no'>dm</span>))</div><div class='img'><img src='beta.div-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

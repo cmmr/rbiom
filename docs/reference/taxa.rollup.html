@@ -88,7 +88,7 @@
     
 
     <pre class="usage"><span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>, <span class='kw'>map</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -135,9 +135,7 @@ memory efficient in this scenario.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>
-      <td><p>Whether to display a progress bar and status messages
-(logical). Will automatically tie in with <span class="pkg">shiny</span> if run within a
-<span class="pkg">shiny</span> session.</p></td>
+      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
     
