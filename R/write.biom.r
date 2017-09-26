@@ -180,6 +180,7 @@ write.biom.2.1 <- function (biom, file) {
   invisible(rhdf5::h5createGroup(file, '/sample'))
   invisible(rhdf5::h5createGroup(file, '/sample/matrix'))
   invisible(rhdf5::h5createGroup(file, '/sample/metadata'))
+  invisible(rhdf5::h5createGroup(file, '/sample/group-metadata'))
   
   h5 <- try(rhdf5::H5Fopen(file), silent = TRUE)
   if (!is(h5, "H5IdComponent"))

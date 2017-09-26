@@ -329,10 +329,14 @@ PB.HDF5.Metadata <- function (hdf5) {
 
   keys <- names(hdf5$sample$metadata)
   vals <- lapply(keys, function (k) {
+    
     obj_class <- typeof(hdf5$sample$metadata[[k]])
-    if (!identical(obj_class, "character"))
-      obj_class <- "numeric"
-    as(hdf5$sample$metadata[[k]], obj_class)
+    
+    if (identical(obj_class, "character")) {
+      as(hdf5$sample$metadata[[k]], "character")
+    } else {
+      as(hdf5$sample$metadata[[k]], "numeric")
+    }
   })
 
   as.data.frame(
