@@ -140,6 +140,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
     pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
     
+    rhdf5::H5Fclose(hdf5)
     rhdf5::H5close()
     remove("hdf5")
     
@@ -283,7 +284,7 @@ PB.HDF5.ReadHDF5 <- function (fp) {
   
   hdf5 <- try(rhdf5::H5Fopen(fp), silent=TRUE)
   if (is(hdf5, "try-error")) {
-    try(rhdf5::H5close(), silent=TRUE)
+    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
     stop(simpleError(sprintf("Unable to parse HDF5 file. %s", as.character(hdf5))))
   }
   
@@ -293,7 +294,7 @@ PB.HDF5.ReadHDF5 <- function (fp) {
   
   missing  <- setdiff(expected, entries)
   if (length(missing) > 0) {
-    try(rhdf5::H5close(), silent=TRUE)
+    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
     stop(simpleError(sprintf("BIOM file requires: %s", paste(collapse=",", missing))))
   }
   
@@ -350,7 +351,11 @@ PB.JSON.Info <- function (json) {
 }
 
 PB.HDF5.Info <- function (hdf5) {
-  rhdf5::h5readAttributes(hdf5, "/")
+  attrs <- rhdf5::h5readAttributes(hdf5, "/")
+  for (i in names(attrs)) {
+    attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
+  }
+  return (attrs)
 }
 
 
@@ -405,11 +410,11 @@ PB.JSON.Counts <- function (json) {
 
 PB.HDF5.Counts <- function (hdf5) {
 
-  indptr <- hdf5$observation$matrix$indptr
+  indptr <- as.numeric(hdf5$observation$matrix$indptr)
 
   slam::simple_triplet_matrix(
         i        = unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)])))),
-        j        = hdf5$observation$matrix$indices + 1,
+        j        = as.numeric(hdf5$observation$matrix$indices) + 1,
         v        = as.numeric(hdf5$observation$matrix$data),
         nrow     = length(hdf5$observation$ids),
         ncol     = length(hdf5$sample$ids),
@@ -533,22 +538,20 @@ PB.HDF5.Tree <- function (hdf5) {
   
   # See if a tree is included in the BIOM file
   #------------------------------------------------------
-  tree <- hdf5$observation$`group-metadata`$phylogeny
+  tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
   if (is.null(tree)) return (NULL)
   
   
   # Assume it's newick format unless otherwise indicated
   #------------------------------------------------------
-  data_type <- "newick"
-  props     <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
-  if ("data_type" %in% names(props))
-    data_type <- tolower(props[['data_type']])
-
-  if (data_type != "newick")
-    return (NULL)
+  attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
+  if ("data_type" %in% names(attrs)) {
+    data_type <- tolower(as.character(attrs[['data_type']]))
+    if (!identical(data_type, "newick")) return (NULL)
+  }
   
   
-  # Try to read it, assuming it is in Newick format
+  # Try to read the Newick-formatted tree
   #------------------------------------------------------
   tree <- try(read.tree(text=as.character(tree)), silent=TRUE)
   if (is(tree, "try-error"))
