@@ -72,7 +72,7 @@ Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
 
     # Phylogenetic tree
     tree <- biom$phylogeny
-    top5.tree <- ape::drop.tip(tree, setdiff(tree$tip.label, top5))
-    plot(top5.tree)
+    top5.tree <- rbiom::subtree(tree, top5)
+    ape::plot.phylo(top5.tree)
 
 }

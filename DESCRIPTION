@@ -21,7 +21,6 @@ LinkingTo:
     Rcpp,
     RcppParallel
 Imports:
-    ape,
     doSNOW (>= 1.0.14),
     foreach,
     methods,
@@ -34,6 +33,7 @@ Imports:
     rjson,
     slam
 Suggests:
+    ape,
     optparse,
     reshape2,
     shiny,

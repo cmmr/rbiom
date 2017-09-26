@@ -123,10 +123,8 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   biom$taxonomy <- biom$taxonomy[TaxaIDs,,drop=FALSE]
   biom$metadata <- biom$metadata[SampleIDs,,drop=FALSE]
 
-  if (!is.null(biom$phylogeny)) {
-    dropped        <- setdiff(biom$phylogeny$tip.label, TaxaIDs)
-    biom$phylogeny <- ape::drop.tip(biom$phylogeny, dropped)
-  }
+  if (!is.null(biom$phylogeny))
+    biom$phylogeny <- rbiom::subtree(biom$phylogeny, TaxaIDs)
 
   return (biom)
 

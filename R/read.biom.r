@@ -59,8 +59,8 @@
 #'
 #'     # Phylogenetic tree
 #'     tree <- biom$phylogeny
-#'     top5.tree <- ape::drop.tip(tree, setdiff(tree$tip.label, top5))
-#'     plot(top5.tree)
+#'     top5.tree <- rbiom::subtree(tree, top5)
+#'     ape::plot.phylo(top5.tree)
 #'
 
 
@@ -509,9 +509,9 @@ PB.JSON.Tree <- function (json) {
   if (!nchar(newick))  return (NULL)
 
 
-  # Try to read it with ape
+  # Try to read it, assuming newick format
   #------------------------------------------------------
-  tree <- try(ape::read.tree(text=newick), silent=TRUE)
+  tree <- try(rbiom::read.tree(text=newick), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
     cat(file=stderr(), errmsg)

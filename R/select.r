@@ -30,9 +30,7 @@ select <- function (biom, samples) {
   biom$taxonomy  <- biom$taxonomy[taxa   ,,drop=FALSE]
   biom$metadata  <- biom$metadata[samples,,drop=FALSE]
   if (!is.null(biom$phylogeny)) {
-    biom$phylogeny <- ape::drop.tip(
-      phy = biom$phylogeny, 
-      tip = setdiff(biom$phylogeny$tip.label, taxa))
+    biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
   }
   biom$info$shape <- dim(biom$counts)
   biom$info$nnz   <- length(biom$counts$v)

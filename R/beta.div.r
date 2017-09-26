@@ -75,7 +75,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) 
       }
       if (is(tree, "character")) {
         if (file.exists(tree)) {
-          tree <- ape::read.tree(tree)
+          tree <- rbiom::read.tree(tree)
         }
       }
       if (!is(tree, "phylo")) {
@@ -87,7 +87,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) 
       stop(simpleError("OTUs missing from reference tree."))
     
     if (length(setdiff(tree$tip.label, rownames(counts))) > 0)
-      tree <- ape::drop.tip(tree, setdiff(tree$tip.label, rownames(counts)))
+      tree <- rbiom::subtree(tree, rownames(counts))
     
     counts <- counts[as.character(tree$tip.label),]
   }

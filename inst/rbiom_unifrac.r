@@ -61,7 +61,7 @@ cat(sprintf("Using %i threads.\n", ncores))
 
 biom     <- rbiom::read.biom(opt$infile)
 weighted <- ifelse(identical(opt$method, "weighted"), TRUE, FALSE)
-dm       <- rbiom::unifrac(biom, weighted, ape::read.tree(opt$tree))
+dm       <- rbiom::unifrac(biom, weighted, rbiom::read.tree(opt$tree))
 write.table(as.matrix(dm), opt$outfile, sep="\t", quote=FALSE)
 
 

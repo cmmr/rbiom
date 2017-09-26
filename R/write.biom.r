@@ -117,7 +117,7 @@ write.biom.1.0 <- function (biom, file) {
     
     # Phylogenetic Tree
     #------------------------------------------------------
-    phylogeny = ifelse(is.null(biom$phylogeny), "", ape::write.tree(biom$phylogeny)),
+    phylogeny = ifelse(is.null(biom$phylogeny), "", rbiom::write.tree(biom$phylogeny)),
     
     
     # Taxonomy
