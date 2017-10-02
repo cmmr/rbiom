@@ -63,8 +63,7 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
       stop(simpleError("In rarefy(), depth must be an integer."))
   }
   
-  
-  pb <- progressBar(progressbar, sprintf("Rarefying to %i", depth))
+  pb <- progressBar(progressbar, paste("Rarefying to", depth))
   cl <- configCluster(nTasks=counts$ncol, pb)
   
   res <- {

@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/bin/env Rscript
 
 
 #============================================================================================
@@ -45,7 +45,7 @@ opt_parser = optparse::OptionParser(
 opt = optparse::parse_args(opt_parser)
 
 if (is.null(opt$infile)) {
-  print_help(opt_parser)
+  optparse::print_help(opt_parser)
   stop("An input BIOM file is required.\n\n", call.=FALSE)
 }
 
