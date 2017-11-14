@@ -368,7 +368,7 @@ PB.HDF5.Info <- function (hdf5) {
 PB.TSV.Counts <- function (mtx) {
 
   # Only keep column that are all numbers
-  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)(e[\\+\\-]{0,1}[0-9]+|)$", x))
+  allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)([Ee][\\+\\-]{0,1}[0-9]+|)$", x))
   mtx <- mtx[, apply(mtx, 2L, allNumbers), drop=FALSE]
   mtx <- matrix(
     data     = as.numeric(mtx),
