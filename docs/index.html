@@ -29,7 +29,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="/index.html">
+  <a href="index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -66,7 +66,7 @@
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>rbiom is not currently available from CRAN, but you can install the development version from github with:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
-devtools::<span class="kw">install_github</span>(<span class="st">"cmmr/rbiom"</span>)</code></pre></div>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cmmr/rbiom"</span>)</code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
@@ -81,14 +81,14 @@ biom &lt;-<span class="st"> </span><span class="kw"><a href="reference/rarefy.ht
 
 <span class="co"># Summarize counts by phylum</span>
 phyla &lt;-<span class="st"> </span><span class="kw"><a href="reference/taxa.rollup.html">taxa.rollup</a></span>(biom, <span class="st">'Phylum'</span>)
-phyla[<span class="dv">1</span>:<span class="dv">4</span>,<span class="dv">1</span>:<span class="dv">6</span>]
+phyla[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]
 
 <span class="co"># Work with metadata</span>
-<span class="kw">table</span>(biom$metadata$Sex, biom$metadata$Body.Site)
-<span class="kw">sprintf</span>(<span class="st">"Mean age: %.1f"</span>, <span class="kw">mean</span>(biom$metadata$Age))
+<span class="kw">table</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Sex, biom<span class="op">$</span>metadata<span class="op">$</span>Body.Site)
+<span class="kw">sprintf</span>(<span class="st">"Mean age: %.1f"</span>, <span class="kw">mean</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Age))
 
 <span class="co"># Draw the phylogenetic tree</span>
-<span class="kw">plot</span>(biom$phylogeny)
+<span class="kw">plot</span>(biom<span class="op">$</span>phylogeny)
 
 <span class="co"># Get unifrac distance matrix</span>
 dm &lt;-<span class="st"> </span><span class="kw"><a href="reference/beta.div.html">beta.div</a></span>(biom, <span class="st">'unifrac'</span>)</code></pre></div>
@@ -126,7 +126,7 @@ dm &lt;-<span class="st"> </span><span class="kw"><a href="reference/beta.div.ht
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -176,8 +176,8 @@ bzip2) biom files are also supported.</p></td>
 #&gt;   Male                5             5          0      5     5</div><div class='input'>    <span class='fu'>sprintf</span>(<span class='st'>"Mean age: %.1f"</span>, <span class='fu'>mean</span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Age</span>))</div><div class='output co'>#&gt; [1] "Mean age: 27.8"</div><div class='input'>
     <span class='co'># Phylogenetic tree</span>
     <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>phylogeny</span>
-    <span class='no'>top5.tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ape/topics/drop.tip'>drop.tip</a></span>(<span class='no'>tree</span>, <span class='fu'>setdiff</span>(<span class='no'>tree</span>$<span class='no'>tip.label</span>, <span class='no'>top5</span>))
-    <span class='fu'>plot</span>(<span class='no'>top5.tree</span>)</div><div class='img'><img src='read.biom-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+    <span class='no'>top5.tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rbiom</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rbiom/topics/subtree'>subtree</a></span>(<span class='no'>tree</span>, <span class='no'>top5</span>)
+    <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ape/topics/plot.phylo'>plot.phylo</a></span>(<span class='no'>top5.tree</span>)</div><div class='img'><img src='read.biom-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -199,7 +199,7 @@ bzip2) biom files are also supported.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

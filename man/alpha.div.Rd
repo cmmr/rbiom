@@ -26,9 +26,9 @@ diversity computations. Options are:
 \value{
 A data frame of four diversity values for each sample in
     \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
-    diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 
-    \bold{Chao1}. The row names are the sample names, except when multiple
-    rarefactions are done.
+    diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
+    and \bold{InvSimpson}. The row names are the sample names, except when
+    multiple rarefactions are done.
 }
 \description{
 Estimate the diversity of each sample.

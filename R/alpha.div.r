@@ -15,9 +15,9 @@
 #' @param progressbar  An object of class \code{Progress}.
 #' @return A data frame of four diversity values for each sample in
 #'     \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
-#'     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Simpson}, and 
-#'     \bold{Chao1}. The row names are the sample names, except when multiple
-#'     rarefactions are done.
+#'     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
+#'     and \bold{InvSimpson}. The row names are the sample names, except when
+#'     multiple rarefactions are done.
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -102,7 +102,7 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
                 x       <- ceiling(x)
                 Chao1   <- nOTUs + (sum(x == 1) ** 2) / (2 * sum(x == 2))
                 
-                return (c(idx, nReads, nOTUs, Shannon, Simpson, Chao1))
+                return (c(idx, nReads, nOTUs, Shannon, Chao1, Simpson))
               }
             }
           }
@@ -110,9 +110,11 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
       )
     }
     
-    colnames(df)   <- c('Sample', 'Depth', 'OTUs', 'Shannon', 'Simpson', 'Chao1')
+    colnames(df)   <- c('Sample', 'Depth', 'OTUs', 'Shannon', 'Chao1', 'Simpson')
     df[['Sample']] <- otus$dimnames[[2]][df[['Sample']]]
     if (length(rLvls) == 1) rownames(df) <- df[['Sample']]
+    
+    df[['InvSimpson']] <- 1 / (1 - df[['Simpson']])
     
     return (df)
   }

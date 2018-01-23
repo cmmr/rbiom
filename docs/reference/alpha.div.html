@@ -52,7 +52,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -119,9 +119,9 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
 
     <p>A data frame of four diversity values for each sample in
     <code>biom</code>. The column names are <b>Sample</b>, <b>Depth</b> and the 
-    diversity metrics: <b>OTUs</b>, <b>Shannon</b>, <b>Simpson</b>, and 
-    <b>Chao1</b>. The row names are the sample names, except when multiple
-    rarefactions are done.</p>
+    diversity metrics: <b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, 
+    and <b>InvSimpson</b>. The row names are the sample names, except when
+    multiple rarefactions are done.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -130,13 +130,14 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; Setting up 8 core cluster.</div><div class='input'>    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon   Simpson     Chao1
-#&gt; HMP01  HMP01  2872   89 2.972967 0.9085382 123.72222
-#&gt; HMP02  HMP02  1906   41 2.223793 0.8243218  43.08333
-#&gt; HMP03  HMP03  1217   35 1.601946 0.6244216  63.16667
-#&gt; HMP04  HMP04  2578   49 1.310901 0.4622226  70.33333
-#&gt; HMP05  HMP05  1272   54 2.189982 0.7706529  79.78571
-#&gt; HMP06  HMP06  2269   44 1.250978 0.5103010  62.06250</div><div class='input'>
+    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
+    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
+#&gt; HMP01  HMP01  2872   89 2.972967 123.72222 0.9085382  10.933527
+#&gt; HMP02  HMP02  1906   41 2.223793  43.08333 0.8243218   5.692227
+#&gt; HMP03  HMP03  1217   35 1.601946  63.16667 0.6244216   2.662560
+#&gt; HMP04  HMP04  2578   49 1.310901  70.33333 0.4622226   1.859505
+#&gt; HMP05  HMP05  1272   54 2.189982  79.78571 0.7706529   4.360203
+#&gt; HMP06  HMP06  2269   44 1.250978  62.06250 0.5103010   2.042071</div><div class='input'>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>Body.Site</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span>)
     <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
     <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
@@ -161,7 +162,7 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
