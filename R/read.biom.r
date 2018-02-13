@@ -290,8 +290,8 @@ PB.HDF5.ReadHDF5 <- function (fp) {
   }
   
   entries  <- with(rhdf5::h5ls(hdf5), paste(sep="/", group, name))
-  expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", "/observation/ids",
-                 "/observation/matrix/data", "/observation/metadata/taxonomy", "/sample/ids" )
+  expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", 
+                 "/observation/ids", "/observation/matrix/data", "/sample/ids" )
   
   missing  <- setdiff(expected, entries)
   if (length(missing) > 0) {
@@ -491,13 +491,19 @@ PB.JSON.Taxonomy <- function (json) {
 }
 
 PB.HDF5.Taxonomy <- function (hdf5) {
-
-  taxa_table           <- t(hdf5$observation$metadata$taxonomy)
-  rownames(taxa_table) <- as.character(hdf5$observation$ids)
-  colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
+  
+  if ("taxonomy" %in% names(hdf5$observation$metadata)) {
+    taxa_table           <- t(hdf5$observation$metadata$taxonomy)
+    rownames(taxa_table) <- as.character(hdf5$observation$ids)
+    colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
+    
+  } else {
+    ids        <- as.character(hdf5$observation$ids)
+    taxa_table <- matrix(nrow=length(ids), ncol=0, dimnames=list(ids, character(0)))
+  }
 
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
-
+    
   return (taxa_table)
 }
 
@@ -545,6 +551,7 @@ PB.HDF5.Tree <- function (hdf5) {
   #------------------------------------------------------
   tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
   if (is.null(tree)) return (NULL)
+  if (!length(tree)) return (NULL)
   
   
   # Assume it's newick format unless otherwise indicated

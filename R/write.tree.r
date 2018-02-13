@@ -3,7 +3,7 @@
 #' @param tree  A phylo object, as returned from \link{read.tree}.
 #' @param file  Filename or connection to write the newick file to (optional).
 #' @return If file is NULL, the newick string as a character vector. Otherwise,
-#'         the return value from \link[base]{writeChar}, typically invsible(NULL).
+#'         the return value from \code{writeChar}, typically invsible(NULL).
 #' @export
 #' @examples
 #'     library(rbiom)

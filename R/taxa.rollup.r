@@ -22,7 +22,7 @@
 #'     genus names (such as \emph{Incertae_Sedis}) that map to multiple higher
 #'     level ranks.
 #' @param sparse  If true, returns a sparse matrix as described by 
-#'     \link[slam]{simple_triplet_matrix}, otherwise returns a normal R
+#'     \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 #'     matrix object. Sparse matrices will likely be considerably more
 #'     memory efficient in this scenario.
 #' @param progressbar  An object of class \code{Progress}.

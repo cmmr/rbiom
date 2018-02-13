@@ -130,8 +130,7 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
-    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
+    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; Setting up 12 core cluster.</div><div class='input'>    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
 #&gt; HMP01  HMP01  2872   89 2.972967 123.72222 0.9085382  10.933527
 #&gt; HMP02  HMP02  1906   41 2.223793  43.08333 0.8243218   5.692227
 #&gt; HMP03  HMP03  1217   35 1.601946  63.16667 0.6244216   2.662560
