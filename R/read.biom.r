@@ -126,7 +126,7 @@ read.biom <- function (src, progressbar=NULL) {
   #--------------------------------------------------------------
   
   pb$set(0, detail='Determining file type')
-      
+  
   
   if (rhdf5::H5Fis_hdf5(fp)) {
     
@@ -142,7 +142,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
     
     rhdf5::H5Fclose(hdf5)
-    rhdf5::H5close()
+    #rhdf5::H5close()
     remove("hdf5")
     
   } else if (identical("{", readChar(fp, 1))) {

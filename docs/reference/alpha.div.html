@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate the diversity of each sample. � alpha.div • rbiom</title>
+<title>Estimate the diversity of each sample. — alpha.div • rbiom</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,25 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+
+
+
+<meta property="og:title" content="Estimate the diversity of each sample. — alpha.div" />
+
+<meta property="og:description" content="Estimate the diversity of each sample." />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +59,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">rbiom</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">rbiom</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -70,6 +86,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -77,19 +94,23 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Estimate the diversity of each sample.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/alpha.div.r'><code>R/alpha.div.r</code></a></small>
+    <div class="hidden name"><code>alpha.div.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Estimate the diversity of each sample.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='kw'>rarefy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -130,7 +151,8 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; Setting up 12 core cluster.</div><div class='input'>    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
+    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
+    <span class='fu'>head</span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
 #&gt; HMP01  HMP01  2872   89 2.972967 123.72222 0.9085382  10.933527
 #&gt; HMP02  HMP02  1906   41 2.223793  43.08333 0.8243218   5.692227
 #&gt; HMP03  HMP03  1217   35 1.601946  63.16667 0.6244216   2.662560
@@ -139,7 +161,7 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
 #&gt; HMP06  HMP06  2269   44 1.250978  62.06250 0.5103010   2.042071</div><div class='input'>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>Body.Site</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span>)
     <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
-    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+    <span class='fu'>boxplot</span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -167,5 +189,8 @@ diversity computations. Options are:</p><dl class='dl-horizontal'>
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

@@ -276,7 +276,7 @@ write.biom.2.1 <- function (biom, file) {
   
   rhdf5::H5Fflush(h5)
   rhdf5::H5Fclose(h5)
-  rhdf5::H5close()
+  #rhdf5::H5close()
   
   return (invisible(NULL))
 }

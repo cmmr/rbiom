@@ -37,5 +37,8 @@ read.tree <- function (file=NULL, text=NULL) {
   if (all(nchar(tree$node.label) == 0))
     tree$node.label <- NULL
   
+  if (all(tree$edge.length == 0))
+    tree$edge.length <- NULL
+  
   return (tree)
 }

@@ -11,9 +11,9 @@ void readtree2(
     unsigned int    x1, 
     unsigned int    x2, 
     unsigned int    parent,
-    unsigned int    eIdx, 
-    unsigned int    nIdx, 
-    unsigned int    lIdx, 
+    unsigned int    *eIdx, 
+    unsigned int    *nIdx, 
+    unsigned int    *lIdx, 
     NumericMatrix   edge, 
     NumericVector   eLen,
     CharacterVector nLab, 
@@ -34,6 +34,7 @@ List rcpp_read_tree(const char* tree) {
   
   // Determine how many nodes are in this tree
   unsigned int nNodes = 0;
+  unsigned int nLeafs = 1;
   for (unsigned int i = x1; i <= x2; i++) {
     
     // Ignore special characters inside single quotes
@@ -48,28 +49,34 @@ List rcpp_read_tree(const char* tree) {
       break;
     }
     
-    if (tree[i] == ',') nNodes++;
+    if (tree[i] == '(') nNodes++;
+    if (tree[i] == ',') nLeafs++;
   }
-  unsigned int nLeafs = nNodes + 1;
-  unsigned int n = nNodes + nLeafs;
+  unsigned int nEdges = nNodes + nLeafs - 1;
   
   
   // Convert the result into a phylo-compatible data structure for R
-  NumericMatrix   retEdges(n - 1, 2);
-  NumericVector   retEdgeLengths(n - 1);
-  CharacterVector retLeafLabels(nLeafs);
+  NumericMatrix   retEdges(nEdges, 2);
+  NumericVector   retEdgeLengths(nEdges);
   CharacterVector retNodeLabels(nNodes);
+  CharacterVector retLeafLabels(nLeafs);
+  
+  // Track next open indices in output vectors using "global" counters
+  unsigned int eIdx = 0;
+  unsigned int nIdx = 0;
+  unsigned int lIdx = 0;
+  
   
   // Start recursing at the highest level of parentheses; i.e. the whole tree
-  readtree2(tree, x1, x2, 0, 0, 0, 0, retEdges, retEdgeLengths, retNodeLabels, retLeafLabels);
+  readtree2(tree, x1, x2, 0, &eIdx, &nIdx, &lIdx, retEdges, retEdgeLengths, retNodeLabels, retLeafLabels);
   
   
   List ret = List::create(
-      Named("edge")        = retEdges,
-      Named("Nnode")       = nNodes,
-      Named("tip.label")   = retLeafLabels,
-      Named("edge.length") = retEdgeLengths,
-      Named("node.label")  = retNodeLabels
+    Named("edge")        = retEdges,
+    Named("Nnode")       = nNodes,
+    Named("tip.label")   = retLeafLabels,
+    Named("edge.length") = retEdgeLengths,
+    Named("node.label")  = retNodeLabels
   );
   ret.attr("class") = "phylo";
   ret.attr("order") = "cladewise";
@@ -89,13 +96,14 @@ void readtree2(
     unsigned int    x1, 
     unsigned int    x2, 
     unsigned int    parent,
-    unsigned int    eIdx, 
-    unsigned int    nIdx, 
-    unsigned int    lIdx, 
+    unsigned int    *eIdx, 
+    unsigned int    *nIdx, 
+    unsigned int    *lIdx, 
     NumericMatrix   edge, 
     NumericVector   eLen,
     CharacterVector nLab, 
     CharacterVector lLab) {
+  
   
   unsigned int i;
   
@@ -115,11 +123,11 @@ void readtree2(
     // Text after the colon is the branch length
     if (tree[i] == ':') {
       
-      if (eIdx > 0) {
+      if ((*eIdx) > 0) {
         char* strLength = new char[x2 - i + 1];
         strncpy(strLength, tree + i + 1, x2 - i);
         strLength[x2 - i]  = '\0';
-        eLen[eIdx - 1] = atof(strLength);
+        eLen[(*eIdx) - 1] = atof(strLength);
       }
       
       x2 = i - 1;
@@ -129,12 +137,14 @@ void readtree2(
     if (tree[i] == ')') {
       
       if (i < x2)
-        nLab[nIdx] = extractname(tree, i + 1, x2);
+        nLab[(*nIdx)] = extractname(tree, i + 1, x2);
       
-      if (eIdx > 0) {  
-        edge(eIdx - 1, 0) = parent + lLab.size() + 1;
-        edge(eIdx - 1, 1) = nIdx   + lLab.size() + 1;
+      if ((*eIdx) > 0) {  
+        edge((*eIdx) - 1, 0) = parent  + lLab.size();
+        edge((*eIdx) - 1, 1) = (*nIdx) + lLab.size() + 1;
       }
+      (*nIdx)++;
+      (*eIdx)++;
       
       // Peel off parentheses
       x1++;
@@ -148,51 +158,43 @@ void readtree2(
   // No parens means we're at a leaf
   if (i <= x1) {
     
-    if (x1 < x2)
-      lLab[lIdx] = extractname(tree, x1, x2);
+    if (x1 <= x2)
+      lLab[(*lIdx)] = extractname(tree, x1, x2);
     
-    if (eIdx > 0) {
-      edge(eIdx - 1, 0) = parent + lLab.size() + 1;
-      edge(eIdx - 1, 1) = lIdx + 1;
+    if (*eIdx > 0) {
+      edge((*eIdx) - 1, 0) = parent + lLab.size();
+      edge((*eIdx) - 1, 1) = (*lIdx) + 1;
     }
+    (*lIdx)++;
+    (*eIdx)++;
     
     return;
   }
   
-  // Find the comma for the current block (pivot)
-  // Also track how many nodes are in the first half (n)
-  unsigned int level = 0;
-  unsigned int pivot = 0;
-  unsigned int n     = 0;
+  
+  // Recurse into each of the subtrees
+  parent = (*nIdx);
+  unsigned int level  = 0;
   for (i = x1; i <= x2; i++) {
     
     // Ignore special characters inside single quotes
     if (tree[i] == '\'') {
-      do { i++; } while (tree[i] != '\'' && i <= x1);
+      do { i++; } while (tree[i] != '\'' && i <= x2);
       continue;
     }
     
+    // Find the other end of the current subclade
     if (tree[i] == '(') {
       level++;
     } else if (tree[i] == ')') {
       level--;
+    } else if (tree[i] == ',' && level == 0) {
+      readtree2(tree, x1, i - 1, parent, eIdx, nIdx, lIdx, edge, eLen, nLab, lLab);
+      x1 = i + 1;
     }
     
-    if (tree[i] == ',') {
-      if (level == 0) {
-        pivot = i;
-        break;
-      }
-      n++;
-    }
   }
-  unsigned int nl = n + n + 1; // nodes and leafs in first half
-  
-  
-  // Recurse into the two subtrees
-  //        tree  x1         x2  parent
-  readtree2(tree, x1, pivot - 1, nIdx, eIdx + 1,      nIdx + 1,     lIdx + 0,     edge, eLen, nLab, lLab);
-  readtree2(tree, pivot + 1, x2, nIdx, eIdx + 1 + nl, nIdx + 1 + n, lIdx + 1 + n, edge, eLen, nLab, lLab);
+  readtree2(tree, x1, x2, parent, eIdx, nIdx, lIdx, edge, eLen, nLab, lLab);
   
   return;
 }
@@ -202,7 +204,7 @@ void readtree2(
 char* extractname(const char *tree, unsigned int x1, unsigned int x2) {
   
   bool quoted = tree[x1] == '\'' && tree[x2] == '\'';
-
+  
   // Quoted Name ==> Strip off quote marks
   if (quoted) {
     x1++;
@@ -219,7 +221,7 @@ char* extractname(const char *tree, unsigned int x1, unsigned int x2) {
       if (nodeName[j] == '_') nodeName[j] = ' ';
     }
   }
-      
+  
   return nodeName;
 }
 

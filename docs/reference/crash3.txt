@@ -1,0 +1,3 @@
+Init: x1=315	x2=438	parent=1	eIdx=25	nIdx=13	lIdx=12
+
+level=0	i=429
