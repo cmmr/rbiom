@@ -1,5 +1,22 @@
 language: r
-r:
-  - devel
-bioc_packages:
+r: devel
+r_build_args: '--no-build-vignettes'
+r_check_args: '--as-cran --ignore-vignettes'
+r_packages:
+  - doSNOW
+  - foreach
+  - methods
+  - parallel
+  - plyr
+  - Rcpp
+  - RcppParallel
+  - R.utils
   - rhdf5
+  - rjson
+  - slam
+bioc_packages: rhdf5
+cache: packages
+sudo: false
+os:
+  - linux
+  - osx

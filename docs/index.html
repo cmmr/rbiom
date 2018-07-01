@@ -75,35 +75,35 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>rbiom is not currently available from CRAN, but you can install the development version from github with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cmmr/rbiom"</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cmmr/rbiom"</span>)</a></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rbiom)
-
-infile &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"extdata"</span>, <span class="st">"hmp50.biom"</span>, <span class="dt">package =</span> <span class="st">"rbiom"</span>)
-biom &lt;-<span class="st"> </span><span class="kw"><a href="reference/read.biom.html">read.biom</a></span>(infile)
-
-<span class="co"># Rarefy to 1000 reads per sample</span>
-biom &lt;-<span class="st"> </span><span class="kw"><a href="reference/rarefy.html">rarefy</a></span>(biom, <span class="dt">depth=</span><span class="dv">1000</span>)
-
-<span class="co"># Summarize counts by phylum</span>
-phyla &lt;-<span class="st"> </span><span class="kw"><a href="reference/taxa.rollup.html">taxa.rollup</a></span>(biom, <span class="st">'Phylum'</span>)
-phyla[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]
-
-<span class="co"># Work with metadata</span>
-<span class="kw">table</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Sex, biom<span class="op">$</span>metadata<span class="op">$</span>Body.Site)
-<span class="kw">sprintf</span>(<span class="st">"Mean age: %.1f"</span>, <span class="kw">mean</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Age))
-
-<span class="co"># Draw the phylogenetic tree</span>
-<span class="kw">plot</span>(biom<span class="op">$</span>phylogeny)
-
-<span class="co"># Get unifrac distance matrix</span>
-dm &lt;-<span class="st"> </span><span class="kw"><a href="reference/beta.div.html">beta.div</a></span>(biom, <span class="st">'unifrac'</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(rbiom)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">infile &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"extdata"</span>, <span class="st">"hmp50.biom"</span>, <span class="dt">package =</span> <span class="st">"rbiom"</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">biom &lt;-<span class="st"> </span><span class="kw"><a href="reference/read.biom.html">read.biom</a></span>(infile)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co"># Rarefy to 1000 reads per sample</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">biom &lt;-<span class="st"> </span><span class="kw"><a href="reference/rarefy.html">rarefy</a></span>(biom, <span class="dt">depth=</span><span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co"># Summarize counts by phylum</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">phyla &lt;-<span class="st"> </span><span class="kw"><a href="reference/taxa.rollup.html">taxa.rollup</a></span>(biom, <span class="st">'Phylum'</span>)</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">phyla[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co"># Work with metadata</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="kw">table</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Sex, biom<span class="op">$</span>metadata<span class="op">$</span>Body.Site)</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="kw">sprintf</span>(<span class="st">"Mean age: %.1f"</span>, <span class="kw">mean</span>(biom<span class="op">$</span>metadata<span class="op">$</span>Age))</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co"># Draw the phylogenetic tree</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="kw">plot</span>(biom<span class="op">$</span>phylogeny)</a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co"># Get unifrac distance matrix</span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21">dm &lt;-<span class="st"> </span><span class="kw"><a href="reference/beta.div.html">beta.div</a></span>(biom, <span class="st">'unifrac'</span>)</a></code></pre></div>
 <p>Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the rbiom.max.threads option:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="st">'rbiom.max.threads'</span>) &lt;-<span class="st"> </span><span class="dv">6</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">options</span>(<span class="st">'rbiom.max.threads'</span>) &lt;-<span class="st"> </span><span class="dv">6</span></a></code></pre></div>
 </div>
 </div>
   </div>
@@ -132,7 +132,7 @@ dm &lt;-<span class="st"> </span><span class="kw"><a href="reference/beta.div.ht
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/dansmith01/rbiom"><img src="https://travis-ci.org/dansmith01/rbiom.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://travis-ci.org/cmmr/rbiom"><img src="https://travis-ci.org/cmmr/rbiom.svg?branch=master" alt="Travis-CI Build Status"></a></li>
 <li><a href="https://cran.r-project.org/package=rbiom"><img src="http://www.r-pkg.org/badges/version/rbiom" alt="CRAN_Status_Badge"></a></li>
 </ul>
 </div>
