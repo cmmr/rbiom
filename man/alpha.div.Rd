@@ -18,7 +18,7 @@ diversity computations. Options are:
                   applying any rarefaction. (Default) }
   \item{\code{TRUE}}{ Automatically select and apply a single rarefaction. }
   \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
-  \item{\emph{integer vector}}{ Rarefy ay the specified depth(s). }
+  \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
 }}
 
 \item{progressbar}{An object of class \code{Progress}.}

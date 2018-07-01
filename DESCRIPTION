@@ -1,22 +1,24 @@
 Package: rbiom
 Type: Package
-Title: BIOM File Processing
+Title: Read/Write, Transform, and Summarize BIOM Data
 Version: 1.0.0
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
-    role  = c("aut", "cre"))
+    role  = c("aut", "cre", "cph"))
 Description:
-    Facilitates reading and working with BIOM file data, commonly 
-    microbial community datasets. Includes multithreaded functions for 
-    rarefying, alpha diversity, and beta diversity (e.g. UniFrac)
-    calculations.
-URL: https://github.com/cmmr/rbiom
+    A toolkit for working with Biological Observation Matrix (BIOM) files.
+    Features include reading/writing all BIOM formats, rarefaction, alpha
+    diversity, beta diversity (including UniFrac), summarizing counts by 
+    taxonomic level, and sample subsetting. Standalone functions for 
+    reading, writing, and subsetting phylogenetic trees are also provided. 
+    All CPU intensive operations are encoded in C with multi-thread support.
+URL: https://cmmr.github.io/rbiom/index.html
 BugReports: https://github.com/cmmr/rbiom/issues
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.3.1)
+Depends: R (>= 3.3.0)
 LinkingTo: 
     Rcpp,
     RcppParallel
@@ -34,8 +36,6 @@ Imports:
     slam
 Suggests:
     ape,
-    optparse,
     reshape2,
-    shiny,
     testthat
-RoxygenNote: 6.0.2.9000
+RoxygenNote: 6.0.1

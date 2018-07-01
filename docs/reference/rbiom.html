@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>rbiom: A package for computating the notorious bar statistic. — rbiom • rbiom</title>
+<title>rbiom: Read/Write, Transform, and Summarize BIOM Data — rbiom • rbiom</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,10 +30,14 @@
 
 
 
-<meta property="og:title" content="rbiom: A package for computating the notorious bar statistic. — rbiom" />
+<meta property="og:title" content="rbiom: Read/Write, Transform, and Summarize BIOM Data — rbiom" />
 
-<meta property="og:description" content="The foo package provides three categories of important functions:
-foo, bar and baz." />
+<meta property="og:description" content="A toolkit for working with Biological Observation Matrix (BIOM) files.
+Features include reading/writing all BIOM formats, rarefaction, alpha
+diversity, beta diversity (including UniFrac), summarizing counts by 
+taxonomic level, and sample subsetting. Standalone functions for 
+reading, writing, and subsetting phylogenetic trees are also provided. 
+All CPU intensive operations are encoded in C with multi-thread support." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -77,15 +81,13 @@ foo, bar and baz." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/cmmr/rbiom">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -98,15 +100,19 @@ foo, bar and baz." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>rbiom: A package for computating the notorious bar statistic.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/rbiom.r'><code>R/rbiom.r</code></a></small>
+    <h1>rbiom: Read/Write, Transform, and Summarize BIOM Data</h1>
+    
     <div class="hidden name"><code>rbiom.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>The foo package provides three categories of important functions:
-foo, bar and baz.</p>
+    <p>A toolkit for working with Biological Observation Matrix (BIOM) files.
+Features include reading/writing all BIOM formats, rarefaction, alpha
+diversity, beta diversity (including UniFrac), summarizing counts by 
+taxonomic level, and sample subsetting. Standalone functions for 
+reading, writing, and subsetting phylogenetic trees are also provided. 
+All CPU intensive operations are encoded in C with multi-thread support.</p>
     
     </div>
 
@@ -125,7 +131,7 @@ instance:</p>
     <p>Alternatively, you can register a custom parallel backend, which will be
 detected and used for multithreaded functions. Please note that only the
 <code>doSNOW</code> backend currently supports progress tracking. With other
-backends, you will only be notified of beginning and end of computations.</p>
+backends, you will only be notified of the beginning and ending of computations.</p>
 <pre>
     cl &lt;- parallel::makeCluster(ncores)
     doSNOW::registerDoSNOW(cl)

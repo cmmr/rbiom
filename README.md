@@ -3,7 +3,14 @@ rbiom
 
 [![Travis-CI Build Status](https://travis-ci.org/dansmith01/rbiom.svg?branch=master)](https://travis-ci.org/dansmith01/rbiom) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
 
-rbiom provides utilities for working with biological observation matrix (BIOM) datasets. This includes reading/writing .biom files, rarefying counts, computing alpha/beta diversity metrics (e.g. Chao1, UniFrac), and more. Multithreading is built into the cpu intensive calculations.
+This package is a toolkit for working with Biological Observation Matrix
+(BIOM) files. Features include reading/writing all BIOM formats, rarefaction,
+alpha diversity, beta diversity (including UniFrac), summarizing counts by 
+taxonomic level, and sample subsetting. Standalone functions for reading,
+writing, and subsetting phylogenetic trees are also provided. All CPU
+intensive operations are encoded in C with multi-thread support.
+
+Reference material is available online at https://cmmr.github.io/rbiom/index.html
 
 
 Installation

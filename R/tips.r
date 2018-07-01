@@ -10,7 +10,7 @@
 #'     tree <- read.tree(infile)
 #'     
 #'     leafs   <- tips(tree)
-#'     #subtree <- subset(tree, head(leafs))
+#'     subtree <- subtree(tree, head(leafs))
 #'
 tips <- function (x) {
   x$tip.label

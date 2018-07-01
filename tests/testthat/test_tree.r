@@ -29,17 +29,36 @@ test_that("Newick File IO", {
 })
 
 
-# t3 <- rbiom::subtree(tree=t1, tips=1:10)
-# test_that("Subset Tree", {
-#   expect_equal(t1, t2)
-#   expect_equal(original, newick)
-#   expect_equal(original, readChar(f2, file.size(f2)) )
-# })
+t1  <- "((a,(b,c,d)),(e,f,g,(h,i)));"
+phy <- rbiom::read.tree(text=t1)
+t2  <- rbiom::write.tree(tree=phy)
+
+test_that("Newick Short Names", {
+  expect_equal(t1, t2)
+  expect_equal(phy$tip.label, letters[1:9])
+})
+
+
+
+phy <- rbiom::read.tree(text="((a,(b,c,d)),(e,f,g,(h,i)));")
+t1  <- rbiom::write.tree(subtree(phy, c('b', 'c', 'f', 'g', 'i')))
+t2  <- rbiom::write.tree(subtree(phy, c('a', 'b', 'c', 'f', 'g', 'h', 'i')))
+
+phy <- rbiom::read.tree(text=original)
+t3  <- rbiom::write.tree(rbiom::subtree(phy, c('Atl Porci', 'SteMa290', 'HelPy142')))
+t4  <- rbiom::write.tree(rbiom::subtree(phy, c('AciSp313',  'MxlBact8', 'SphSp203')))
+
+test_that("Newick Subtree", {
+  expect_equal(t1, "((b,c),(f,g,i));")
+  expect_equal(t2, "((a,(b,c)),(f,g,(h,i)));")
+  expect_equal(t3, "((Atl_Porci:0.49227,SteMa290:0.31209):0.15723,HelPy142:0.35039);")
+  expect_equal(t4, "((AciSp313:0.51812,MxlBact8:0.13088):0.28187,SphSp203:0.36271);")
+})
 
 
 
 
-remove("t1", "t2", "original", "newick")
+remove("t1", "t2", "t3", "t4", "original", "newick", "phy")
 
 
 

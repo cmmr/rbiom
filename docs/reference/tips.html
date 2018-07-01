@@ -76,15 +76,13 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/cmmr/rbiom">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -98,7 +96,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Names of a phylogenetic tree's tips/leafs.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/tips.r'><code>R/tips.r</code></a></small>
+    
     <div class="hidden name"><code>tips.Rd</code></div>
     </div>
 
@@ -131,7 +129,7 @@
     <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.tree.html'>read.tree</a></span>(<span class='no'>infile</span>)
 
     <span class='no'>leafs</span>   <span class='kw'>&lt;-</span> <span class='fu'>tips</span>(<span class='no'>tree</span>)
-    <span class='co'>#subtree &lt;- subset(tree, head(leafs))</span></div></pre>
+    <span class='no'>subtree</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subtree.html'>subtree</a></span>(<span class='no'>tree</span>, <span class='fu'>head</span>(<span class='no'>leafs</span>))</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

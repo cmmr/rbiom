@@ -22,6 +22,6 @@ Names of a phylogenetic tree's tips/leafs.
     tree <- read.tree(infile)
     
     leafs   <- tips(tree)
-    #subtree <- subset(tree, head(leafs))
+    subtree <- subtree(tree, head(leafs))
 
 }

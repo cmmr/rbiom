@@ -4,10 +4,14 @@
 \name{rbiom}
 \alias{rbiom}
 \alias{rbiom-package}
-\title{rbiom: A package for computating the notorious bar statistic.}
+\title{rbiom: Read/Write, Transform, and Summarize BIOM Data}
 \description{
-The foo package provides three categories of important functions:
-foo, bar and baz.
+A toolkit for working with Biological Observation Matrix (BIOM) files.
+Features include reading/writing all BIOM formats, rarefaction, alpha
+diversity, beta diversity (including UniFrac), summarizing counts by 
+taxonomic level, and sample subsetting. Standalone functions for 
+reading, writing, and subsetting phylogenetic trees are also provided. 
+All CPU intensive operations are encoded in C with multi-thread support.
 }
 \section{Multithreading}{
 
@@ -25,7 +29,7 @@ instance:
 Alternatively, you can register a custom parallel backend, which will be
 detected and used for multithreaded functions. Please note that only the
 \code{doSNOW} backend currently supports progress tracking. With other
-backends, you will only be notified of beginning and end of computations.
+backends, you will only be notified of the beginning and ending of computations.
 
 \preformatted{
     cl <- parallel::makeCluster(ncores)
