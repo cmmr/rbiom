@@ -1,4 +1,3 @@
 language: r
 r:
-  - devel
-  - bioc-release
+  - bioc-devel
