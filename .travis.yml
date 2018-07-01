@@ -14,6 +14,9 @@ r_packages:
   - rhdf5
   - rjson
   - slam
+  - ape
+  - reshape2
+  - testthat
 bioc_packages: rhdf5
 cache: packages
 sudo: false
