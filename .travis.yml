@@ -1,5 +1,7 @@
 language: r
-r:
-  - devel
-bioc_packages:
-  - rhdf5
+r: devel
+bioc_packages: rhdf5
+cache: packages
+os:
+  - linux
+  - osx
