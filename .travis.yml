@@ -1,3 +1,5 @@
 language: r
 r:
-  - bioc-devel
+  - devel
+bioc_packages:
+  - rhdf5
