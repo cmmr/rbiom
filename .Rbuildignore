@@ -4,4 +4,3 @@
 ^docs$              # HTML help pages
 ^NEWS\.md$          # A news file written in Markdown
 ^\.travis\.yml$     # Used for continuous integration testing with travis
-^appveyor\.yml$     # Used for continuous integration testing with appveyor
