@@ -116,7 +116,7 @@ NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* 
             amt_diff += amt[x];
           }
         }
-        for (y = y; y <= s2_last_idx; y++) {
+        for (; y <= s2_last_idx; y++) {
           amt_sum  += amt[y];
           amt_diff += amt[y];
         }
@@ -169,7 +169,7 @@ NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* 
             amt_diff += pow(amt[x], 2);
           }
         }
-        for (y = y; y <= s2_last_idx; y++) {
+        for (; y <= s2_last_idx; y++) {
           amt_diff += pow(amt[y], 2);
         }
         
@@ -221,7 +221,7 @@ NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* 
             amt_diff += amt[x];
           }
         }
-        for (y = y; y <= s2_last_idx; y++) {
+        for (; y <= s2_last_idx; y++) {
           amt_diff += amt[y];
         }
         
