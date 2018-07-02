@@ -16,8 +16,9 @@ cache:
 # Adapt as necessary starting from here
 
 build_script:
-  - Rscript -e 'source("http://bioconductor.org/biocLite.R");options(repos = BiocInstaller::biocinstallRepos());install.packages("rhdf5", dependencies=TRUE)'
+  - travis-tool.sh install_bioc rhdf5
   - travis-tool.sh install_deps
+  #- Rscript -e 'source("http://bioconductor.org/biocLite.R");options(repos = BiocInstaller::biocinstallRepos());install.packages("rhdf5", dependencies=TRUE)'
   #- travis-tool.sh install_bioc_deps
 
 test_script:
@@ -51,6 +52,5 @@ environment:
     global:
       WARNINGS_ARE_ERRORS: true
       USE_RTOOLS: true
-      BIOC_USE_DEVEL: false
     matrix:
       - R_VERSION: devel
