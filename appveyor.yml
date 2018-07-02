@@ -16,8 +16,8 @@ cache:
 # Adapt as necessary starting from here
 
 build_script:
-  - R -e install.packages('https://www.bioconductor.org/packages/release/bioc/src/contrib/Rhdf5lib_1.2.1.tar.gz',repos=NULL)
-  - R -e install.packages('https://www.bioconductor.org/packages/release/bioc/src/contrib/rhdf5_2.24.0.tar.gz',repos=NULL)
+  - R -e install.packages('https://www.bioconductor.org/packages/release/bioc/bin/windows/contrib/3.5/Rhdf5lib_1.2.1.zip',repos=NULL)
+  - R -e install.packages('https://www.bioconductor.org/packages/release/bioc/bin/windows/contrib/3.5/rhdf5_2.24.0.zip',repos=NULL)
   - travis-tool.sh install_deps
 
 test_script:
