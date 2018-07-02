@@ -17,7 +17,7 @@ cache:
 
 build_script:
   - travis-tool.sh install_deps
-  - travis-tool.sh install_bioc_deps
+#  - travis-tool.sh install_bioc_deps
 
 test_script:
   - travis-tool.sh run_tests
@@ -46,13 +46,10 @@ artifacts:
     name: Bits
 
 
-# don't check suggested packges
 environment:
     global:
       WARNINGS_ARE_ERRORS: true
-      _R_CHECK_FORCE_SUGGESTS_: false
-      R_COMPILE_AND_INSTALL_PACKAGES: always
-      R_ARCH: x64
       USE_RTOOLS: true
+      BIOC_USE_DEVEL: false
     matrix:
       - R_VERSION: devel
