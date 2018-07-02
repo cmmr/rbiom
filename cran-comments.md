@@ -6,5 +6,7 @@
 ## R CMD check results
 There were no ERRORs, WARNINGs, or NOTEs.
 
+* First submission of this package to CRAN.
+
 ## Downstream dependencies
 There are no reverse dependencies.

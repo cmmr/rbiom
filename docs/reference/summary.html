@@ -133,11 +133,12 @@
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
-    <span class='fu'>summary</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt;      50 Samples:  (HMP01, HMP02, HMP03, HMP04, HMP05, ...)
-#&gt;     577 Taxa:     (AciSp313, AcnLingn, AcnOriho, AecChri2, AncSpec2, ...)
-#&gt;       6 Ranks:    (Kingdom, Phylum, Class, Order, Family, Genus)
-#&gt;       4 Metadata: (Age, BMI, Body.Site, Sex)
-#&gt;         Tree:     Present</div><div class='input'>
+    <span class='fu'>summary</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt;           Length Class                 Mode     
+#&gt; counts       6   simple_triplet_matrix list     
+#&gt; metadata     4   data.frame            list     
+#&gt; taxonomy  3462   -none-                character
+#&gt; phylogeny    4   phylo                 list     
+#&gt; info         8   -none-                list     </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

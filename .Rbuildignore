@@ -1,6 +1,6 @@
-^.*\.Rproj$         # Automatically added by RStudio
-^\.Rproj\.user$     # Used for temporary files
-^cran-comments\.md$ # Comments for CRAN submission
-^docs$              # HTML help pages
-^NEWS\.md$          # A news file written in Markdown
-^\.travis\.yml$     # Used for continuous integration testing with travis
+^.*\.Rproj$
+^\.Rproj\.user$
+^cran-comments\.md$
+^docs$
+^NEWS\.md$
+^\.travis\.yml$
