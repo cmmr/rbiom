@@ -1,7 +1,7 @@
 rbiom
 =======
 
-[![Travis-CI Build Status](https://travis-ci.org/cmmr/rbiom.svg?branch=master)](https://travis-ci.org/cmmr/rbiom) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/cmmr/rbiom?branch=master&svg=true)](https://ci.appveyor.com/project/cmmr/rbiom) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
+[![Travis-CI Build Status](https://travis-ci.org/cmmr/rbiom.svg?branch=master)](https://travis-ci.org/cmmr/rbiom) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
 
 This package is a toolkit for working with Biological Observation Matrix
 (BIOM) files. Features include reading/writing all BIOM formats, rarefaction,
