@@ -16,8 +16,9 @@ cache:
 # Adapt as necessary starting from here
 
 build_script:
+  - Rscript -e 'source("http://bioconductor.org/biocLite.R");cat(append = TRUE, file = "~/.Rprofile.site", "options(repos = BiocInstaller::biocinstallRepos());")'
   - travis-tool.sh install_deps
-  - travis-tool.sh install_bioc_deps
+  #- travis-tool.sh install_bioc_deps
 
 test_script:
   - travis-tool.sh run_tests
