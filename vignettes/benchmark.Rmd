@@ -1,0 +1,85 @@
+---
+title: "Benchmark"
+author: "Daniel Smith, PhD"
+date: "7/2/2018"
+output: html_document
+---
+
+## Overview
+
+Here we will compare rbiom to similar packages by measuring the time taken to complete common operations on a representative dataset.
+
+## Create Test Environment
+
+For our tests, we'll use a virtual machine on Amazon Web Service's Elastic Compute Cloud. Specifically:
+* US-West region
+* AMI 482e6430 ([QIIME 2 Core](https://s3-us-west-2.amazonaws.com/qiime2-data/distro/core/aws-amis.txt))
+* c3.8xlarge instance type (32 virtual CPUs)
+* 20 GiB General Purpose SSD (GP2) Storage on Root Volume
+
+Both the username and password are 'qiime2'. On this instance, qiime2 is already configured. The following will download and install rbiom and phyloseq as well as the test dataset.
+
+```bash
+
+sudo apt-get install build-essential gfortran libssl-dev unzip
+export TAR=/bin/tar
+R -e "source('http://bioconductor.org/biocLite.R');biocLite('phyloseq')"
+R -e "install.packages('devtools', repos='http://cran.us.r-project.org');"
+R -e "devtools::install_git('https://github.com/cmmr/rbiom.git')"
+ 
+```
+
+
+
+```{r}
+
+RandomData <- matrix(runif(10000), nrow = 500)
+
+```
+
+
+
+# /usr/bin/time -v parallel_beta_diversity.py -i emp500.biom -t emp500.tre -m unweighted_unifrac -O 16 -o beta_div/
+# /usr/bin/time -v ./rbiom_unifrac.r -i emp500.biom -t emp500.tre -m weighted -o beta_div/rbiom_weighted.txt
+# /usr/bin/time -v ./phyloseq_unifrac.r -i emp500.biom -t emp500.tre -m weighted -o beta_div/phyloseq_weighted.txt
+# 
+
+
+
+# library(rbiom)
+# library(phyloseq)
+# library(doParallel)
+# 
+# infile <- system.file("extdata", "hmp500.biom", package = "rbiom")
+# 
+# biom <- read.biom(infile)
+# 
+# phy  <- import_biom(infile)
+# phy_tree(phy) <- biom$phylogeny
+# 
+# cl <- makeCluster(8)
+# registerDoParallel(cl)
+# 
+# 
+# 
+# 
+# t1 <- Sys.time()
+# x <- unifrac(biom, weighted=TRUE)
+# Sys.time() - t1
+# 
+# t1 <- Sys.time()
+# x <- UniFrac(phy, weighted=TRUE, normalized=FALSE, parallel=TRUE)
+# Sys.time() - t1
+# 
+# 
+# 
+# res <- benchmark(unifrac(biom, weighted=TRUE),
+#                  UniFrac(phy, weighted=TRUE, normalized=FALSE, parallel=TRUE),
+#                  order="relative")
+# 
+# 
+# # rbiom::write.biom(biom, "~/Desktop/hmp500.biom", "json")
+# # ape::write.tree(biom$phylogeny, "~/Desktop/hmp500.tree")
+# # time parallel_beta_diversity.py -i hmp500.biom -o beta_div/ -t hmp500.tre -O 48 -m weighted_unifrac
+# # 1m13.453s
+# 
