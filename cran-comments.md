@@ -1,7 +1,8 @@
 ## Test environments
-* local windows 10 install, R 3.5.0
-* ubuntu 14.04 (on travis-ci), R devel
-* macOS 10.12 (on travis-ci), R devel
+* Windows 10 (local machine), R 3.5.0
+* ubuntu 14.04 (travis-ci), R devel and release
+* macOS 10.12 (travis-ci), R devel and release
+* Windows Server 2008 (win-builder), R devel and release
 
 ## R CMD check results
 There were no ERRORs, WARNINGs, or NOTEs.

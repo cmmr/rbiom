@@ -1,6 +1,9 @@
-^.*\.Rproj$
+^\.git$
+^\.gitignore$
 ^\.Rproj\.user$
+^\.travis\.yml$
 ^cran-comments\.md$
 ^docs$
 ^NEWS\.md$
-^\.travis\.yml$
+^rbiom.Rproj$
+^.*\.Rproj$

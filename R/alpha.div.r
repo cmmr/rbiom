@@ -28,7 +28,7 @@
 #'     ad <- alpha.div(biom)
 #'     head(ad)
 #'     
-#'     biom <- subset(biom, Body.Site == "Saliva")
+#'     biom <- subset(biom, Body.Site == "Saliva" & Age < 26)
 #'     ad   <- alpha.div(biom, "multi")
 #'     boxplot(Shannon ~ Depth, data=ad, xlab="Reads", ylab="Diversity")
 #'
