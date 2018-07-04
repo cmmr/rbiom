@@ -52,7 +52,7 @@ write.biom.tsv <- function (biom, file) {
   mtx <- {
     rbind(
       matrix(
-        data = c("#SampleID", colnames(biom$counts)),
+        data = c("#OTU ID", colnames(biom$counts)),
         nrow = 1
       ),
       cbind(
@@ -68,15 +68,17 @@ write.biom.tsv <- function (biom, file) {
     )
   }
   
-  if (ncol(biom$taxonomy) > 0) {
-    mtx <- {
-      cbind(
-        mtx,
-        matrix(
-          data = c("Taxonomy", apply(biom$taxonomy, 1L, paste, collapse="; ")),
-          ncol = 1
+  if (!is.null(biom$taxonomy)) {
+    if (ncol(biom$taxonomy) > 0) {
+      mtx <- {
+        cbind(
+          mtx,
+          matrix(
+            data = c("Taxonomy", apply(biom$taxonomy, 1L, paste, collapse="; ")),
+            ncol = 1
+          )
         )
-      )
+      }
     }
   }
   

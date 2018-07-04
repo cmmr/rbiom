@@ -17,69 +17,74 @@ For our tests, we'll use a virtual machine on Amazon Web Service's Elastic Compu
 * c3.8xlarge instance type (32 virtual CPUs)
 * 20 GiB General Purpose SSD (GP2) Storage on Root Volume
 
-Both the username and password are 'qiime2'. On this instance, qiime2 is already configured. The following will download and install rbiom and phyloseq as well as the test dataset.
+Both the username and password are 'qiime2'. On this instance, qiime2 is already configured. The following will download and install rbiom, phyloseq, and usearch as well as the test dataset.
+
+```bash
+sudo apt-get install build-essential gfortran libssl-dev unzip
+export TAR=/bin/tar
+
+R -e 'source("http://bioconductor.org/biocLite.R"); biocLite(c("phyloseq", "rhdf5"))'
+R -e 'install.packages(c("devtools", "doParallel"), repos="http://cran.us.r-project.org");'
+R -e 'devtools::install_git("https://github.com/cmmr/rbiom.git")'
+
+wget https://s3.amazonaws.com/jplab/share/30d/usearch10.0.240
+chmod a+x usearch10.0.240
+
+wget https://raw.githubusercontent.com/cmmr/rbiom/master/vignettes/data/hmp500.biom
+R -e 'x <- rbiom::read.biom("hmp500.biom"); rbiom::write.tree(x$phylogeny, "hmp500.tre")'
+R -e 'x <- rbiom::read.biom("hmp500.biom"); x$taxonomy <- NULL; rbiom::write.biom(x, "hmp500.tab", "tab")'
+```
+
+Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file.
 
 ```bash
 
-sudo apt-get install build-essential gfortran libssl-dev unzip
-export TAR=/bin/tar
-R -e "source('http://bioconductor.org/biocLite.R');biocLite('phyloseq')"
-R -e "install.packages('devtools', repos='http://cran.us.r-project.org');"
-R -e "devtools::install_git('https://github.com/cmmr/rbiom.git')"
- 
+cat > rbiom.r << EOF
+dm <- rbiom::unifrac(
+  biom     = rbiom::read.biom("hmp500.tab"),
+  tree     = rbiom::read.tree("hmp500.tre"), 
+  weighted = TRUE )
+write.table(as.matrix(dm), "rbiom_dm.tsv", sep="\t", quote=FALSE)
+EOF
+
+
+cat > phyloseq.r << EOF
+ncores <- parallel::detectCores()
+doParallel::registerDoParallel(parallel::makeCluster(ncores))
+
+dm <- phyloseq::UniFrac(
+  phy        = phyloseq::import_biom("hmp500.tab", "hmp500.tre"), 
+  weighted   = TRUE, 
+  normalized = FALSE, 
+  parallel   = TRUE )
+write.table(as.matrix(dm), "phyloseq_dm.tsv", sep="\t", quote=FALSE)
+EOF
+
+
+cat > qiime2.sh << EOF
+qiime tools import --input-path hmp500.tab --output-path hmp500.biom --type FeatureTable[Frequency] --source-format BIOMV100Format
+qiime tools import --input-path hmp500.tre --output-path hmp500.tre --type Phylogeny[Rooted] --source-format NewickFormat
+qiime diversity beta-phylogenetic-alt --i-table hmp500.biom.qza --i-phylogeny hmp500.tre.qza --p-metric unweighted_unifrac --output-dir qiime_out --p-n-jobs 32
+qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza
+mv qiime_out/distance-matrix.tsv qiime2_dm.tsv
+rm -rf qiime_out
+EOF
+
+
+cat > usearch.sh << EOF
+./usearch10.0.240 -beta_div hmp500.tab -metrics unifrac -tree hmp500.tre
+mv unifrac.txt unifrac_dm.tsv
+rm unifrac.sorted.txt
+rm unifrac.tree
+EOF
+
 ```
 
 
-
-```{r}
-
-RandomData <- matrix(runif(10000), nrow = 500)
-
+Finally, execute and time each script.
+```bash
+/usr/bin/time Rscript rbiom.r
+/usr/bin/time Rscript phyloseq.r
+/usr/bin/time /bin/sh qiime2.sh
+/usr/bin/time /bin/sh usearch.sh
 ```
-
-
-
-# /usr/bin/time -v parallel_beta_diversity.py -i emp500.biom -t emp500.tre -m unweighted_unifrac -O 16 -o beta_div/
-# /usr/bin/time -v ./rbiom_unifrac.r -i emp500.biom -t emp500.tre -m weighted -o beta_div/rbiom_weighted.txt
-# /usr/bin/time -v ./phyloseq_unifrac.r -i emp500.biom -t emp500.tre -m weighted -o beta_div/phyloseq_weighted.txt
-# 
-
-
-
-# library(rbiom)
-# library(phyloseq)
-# library(doParallel)
-# 
-# infile <- system.file("extdata", "hmp500.biom", package = "rbiom")
-# 
-# biom <- read.biom(infile)
-# 
-# phy  <- import_biom(infile)
-# phy_tree(phy) <- biom$phylogeny
-# 
-# cl <- makeCluster(8)
-# registerDoParallel(cl)
-# 
-# 
-# 
-# 
-# t1 <- Sys.time()
-# x <- unifrac(biom, weighted=TRUE)
-# Sys.time() - t1
-# 
-# t1 <- Sys.time()
-# x <- UniFrac(phy, weighted=TRUE, normalized=FALSE, parallel=TRUE)
-# Sys.time() - t1
-# 
-# 
-# 
-# res <- benchmark(unifrac(biom, weighted=TRUE),
-#                  UniFrac(phy, weighted=TRUE, normalized=FALSE, parallel=TRUE),
-#                  order="relative")
-# 
-# 
-# # rbiom::write.biom(biom, "~/Desktop/hmp500.biom", "json")
-# # ape::write.tree(biom$phylogeny, "~/Desktop/hmp500.tree")
-# # time parallel_beta_diversity.py -i hmp500.biom -o beta_div/ -t hmp500.tre -O 48 -m weighted_unifrac
-# # 1m13.453s
-# 
