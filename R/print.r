@@ -33,7 +33,7 @@ print.BIOM <- function (x, ...) {
     sprintf("%7.0f Taxa:     (%s)", nrow(x$counts),   taxaNames),
     sprintf("%7.0f Ranks:    (%s)", ncol(x$taxonomy), taxaRanks),
     sprintf("%7.0f Metadata: (%s)", ncol(x$metadata), metadata),
-    sprintf("        Tree:     %s", tree)
+    sprintf("        Tree:     %s", tree), "\n"
   ))
   
   invisible(NULL)

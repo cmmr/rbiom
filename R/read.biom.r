@@ -203,7 +203,7 @@ PB.TSV.ReadTSV <- function (fp) {
 
   lines <- try(readLines(fp, warn=FALSE), silent=TRUE)
   if (is(lines, "try-error"))
-    stop(simpleError(sprintf("Unable to parse JSON file. %s", as.character(lines))))
+    stop(simpleError(sprintf("Unable to parse tab delimited file. %s", as.character(lines))))
 
 
   #--------------------------------------------------------------
@@ -211,7 +211,11 @@ PB.TSV.ReadTSV <- function (fp) {
   #--------------------------------------------------------------
 
   lines <- trimws(lines)
-  lines <- c(grep("^#SampleID", lines, value=TRUE), grep("^#", lines, value=TRUE, invert=TRUE))
+  lines <- c(
+    grep("^#SampleID", lines, value=TRUE),             # Keep
+    grep("^#OTU",      lines, value=TRUE),             # Keep
+    grep("^#",         lines, value=TRUE, invert=TRUE) # Discard
+  )
   fp <- tempfile()
   writeLines(lines, fp, "\n")
 

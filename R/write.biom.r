@@ -52,7 +52,7 @@ write.biom.tsv <- function (biom, file) {
   mtx <- {
     rbind(
       matrix(
-        data = c("#SampleID", colnames(biom$counts)),
+        data = c("#OTU ID", colnames(biom$counts)),
         nrow = 1
       ),
       cbind(

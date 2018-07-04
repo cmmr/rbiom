@@ -7,3 +7,4 @@
 ^NEWS\.md$
 ^rbiom.Rproj$
 ^vignettes$
+^.*\.Rproj$
