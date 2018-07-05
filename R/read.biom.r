@@ -86,7 +86,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(0, detail='Downloading BIOM file')
 
     fp <- tempfile(fileext=basename(src))
-    if (!identical(0, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
+    if (!identical(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(simpleError(sprintf("Cannot retrieve URL %s", src)))
 
   } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
