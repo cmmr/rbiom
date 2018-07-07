@@ -113,6 +113,10 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) 
   if (identical(method, "unifrac")) {
     
     pb$set(value=1)
+    
+    cl <- configCluster(nTasks=NA, pb)
+    RcppParallel::setThreadOptions(numThreads = cl$ncores)
+    
     par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
     
