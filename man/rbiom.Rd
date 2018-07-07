@@ -23,7 +23,7 @@ of simultaneous threads, set the \code{rbiom.max.threads} option. For
 instance:
 
 \preformatted{
-    options('rbiom.max.threads') <- 6
+    options('rbiom.max.threads' = 6)
 }
 
 Alternatively, you can register a custom parallel backend, which will be

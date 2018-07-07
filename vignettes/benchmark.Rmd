@@ -31,51 +31,98 @@ wget https://s3.amazonaws.com/jplab/share/30d/usearch10.0.240
 chmod a+x usearch10.0.240
 
 wget https://raw.githubusercontent.com/cmmr/rbiom/master/vignettes/data/hmp500.biom
-R -e 'x <- rbiom::read.biom("hmp500.biom"); rbiom::write.tree(x$phylogeny, "hmp500.tre")'
-R -e 'x <- rbiom::read.biom("hmp500.biom"); x$taxonomy <- NULL; rbiom::write.biom(x, "hmp500.tab", "tab")'
+
 ```
 
-Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file.
+
+## Prepare input data
+
+The example data is taken from the publicly available Human Microbiome Project. The master data set contains 4,468 samples with 4,468,000 observations of 1,140 OTUs. These samples have been rarefied to 1000 obervations per sample. The below script will randomly subset the master file to n samples, where n begins at 100 samples and is incremented by 100 all the way to 4,400. This will allow us to see how programs handle inputs of varying sizes.
+
+prep_data.r:
+```r
+library(rbiom)
+
+dir.create("in")
+dir.create("out")
+setwd("in")
+
+x <- read.biom("https://s3.amazonaws.com/jplab/projects/hmp/hmp4468.biom")
+for (i in 1:44) {
+  n <- i * 100
+  y <- select(x, sample.int(4468, n))
+  y$taxonomy <- NULL
+  write.biom(y, paste0("hmp", n, ".tab"), "tab")
+  write.tree(y$phylogeny, paste0("hmp", n, ".tre"))
+  cmd <- sprintf('biom convert -i hmp%i.tab -o hmp%i.json --table-type="OTU table" --to-json', n, n)
+  system(command = cmd, wait = FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+}
+```
+
+```bash
+Rscript prep_data.r
+```
+
+
+## Weighted UniFrac
+
+Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file. Each script will accept three arguments: (1) the number of cpu cores to use, (2) a single character 'w' or 'u' indicating whether to run weighted or unweighted unifrac, and (3) the infile size being tested, in number of samples.
 
 ```bash
 
 cat > rbiom.r << EOF
+args <- commandArgs(trailingOnly=TRUE)
+options('rbiom.max.threads' = args[1])
+
+bFile <- paste0("in/hmp", args[3],".json")
+tFile <- paste0("in/hmp", args[3],".tre")
+oFile <- paste0("out/rbiom_", args[2], "_dm", args[3],".tsv")
+
 dm <- rbiom::unifrac(
-  biom     = rbiom::read.biom("hmp500.tab"),
-  tree     = rbiom::read.tree("hmp500.tre"), 
-  weighted = TRUE )
-write.table(as.matrix(dm), "rbiom_dm.tsv", sep="\t", quote=FALSE)
+  biom     = rbiom::read.biom(bFile),
+  tree     = rbiom::read.tree(tFile), 
+  weighted = identical(args[2], 'w') )
+write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)
 EOF
 
 
 cat > phyloseq.r << EOF
-ncores <- parallel::detectCores()
-doParallel::registerDoParallel(parallel::makeCluster(ncores))
+library(methods)
+args <- commandArgs(trailingOnly=TRUE)
+
+if (args[1] > 1)
+  doParallel::registerDoParallel(parallel::makePSOCKcluster(as.integer(args[1])))
+
+bFile <- paste0("in/hmp", args[3],".json")
+tFile <- paste0("in/hmp", args[3],".tre")
+oFile <- paste0("out/phyloseq_", args[2], "_dm", args[3],".tsv")
 
 dm <- phyloseq::UniFrac(
-  phy        = phyloseq::import_biom("hmp500.tab", "hmp500.tre"), 
-  weighted   = TRUE, 
-  normalized = FALSE, 
-  parallel   = TRUE )
-write.table(as.matrix(dm), "phyloseq_dm.tsv", sep="\t", quote=FALSE)
+  phy        = phyloseq::import_biom(bFile, tFile), 
+  weighted   = identical(args[2], 'w'), 
+  parallel   = args[1] > 1, 
+  normalized = FALSE )
+write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)
 EOF
 
 
 cat > qiime2.sh << EOF
-qiime tools import --input-path hmp500.tab --output-path hmp500.biom --type FeatureTable[Frequency] --source-format BIOMV100Format
-qiime tools import --input-path hmp500.tre --output-path hmp500.tre --type Phylogeny[Rooted] --source-format NewickFormat
-qiime diversity beta-phylogenetic-alt --i-table hmp500.biom.qza --i-phylogeny hmp500.tre.qza --p-metric unweighted_unifrac --output-dir qiime_out --p-n-jobs 32
+if [ \$2 = "u" ]; then metric="unweighted_unifrac"; else metric="weighted_unifrac"; fi
+qiime tools import --input-path in/hmp\$3.json --output-path json --type FeatureTable[Frequency] --source-format BIOMV100Format
+qiime tools import --input-path in/hmp\$3.tre --output-path tree --type Phylogeny[Rooted] --source-format NewickFormat
+qiime diversity beta-phylogenetic-alt --i-table json.qza --i-phylogeny tree.qza --p-metric \$metric --output-dir qiime_out --p-n-jobs \$1
 qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza
-mv qiime_out/distance-matrix.tsv qiime2_dm.tsv
+mv qiime_out/distance-matrix.tsv out/qiime2_\$2_dm\$3.tsv
 rm -rf qiime_out
 EOF
 
 
 cat > usearch.sh << EOF
-./usearch10.0.240 -beta_div hmp500.tab -metrics unifrac -tree hmp500.tre
-mv unifrac.txt unifrac_dm.tsv
-rm unifrac.sorted.txt
-rm unifrac.tree
+if [ \$2 = "u" ]; then metric="unifrac_binary"; else metric="unifrac"; fi
+./usearch10.0.240 -beta_div in/hmp\$3.tab -metrics \$metric -tree in/hmp\$3.tre -quiet
+mv \$metric.txt out/unifrac_\$2_dm\$3.tsv
+rm \$metric.sorted.txt
+rm \$metric.tree
 EOF
 
 ```
@@ -83,8 +130,68 @@ EOF
 
 Finally, execute and time each script.
 ```bash
-/usr/bin/time Rscript rbiom.r
-/usr/bin/time Rscript phyloseq.r
-/usr/bin/time /bin/sh qiime2.sh
-/usr/bin/time /bin/sh usearch.sh
+/usr/bin/time -f 'Time: %E  Memory: %M\n' Rscript rbiom.r    8 u 500
+/usr/bin/time -f 'Time: %E  Memory: %M\n' Rscript phyloseq.r 8 u 500
+/usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh qiime2.sh  8 u 500
+/usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh usearch.sh 8 u 500
 ```
+
+Results using 8 cores and 500 samples:
+
+| Package  | Time (MM:SS)  | Memory (kb) |
+| -------- |:-------------:| -----------:|
+| rbiom    | 0:03.56       |      109736 |
+| qiime2   | 0:28.17       |      225896 |
+| usearch  | 0:40.91       |        7140 |
+| phyloseq | 1:59.55       |      445384 |
+
+Results using 1 core and 4000 samples:
+
+| Package  | Time (MM:SS)  | Memory (kb) |
+| -------- |:-------------:| -----------:|
+| rbiom    |  2:56.09      |      647860 |
+| qiime2   |  3:10.19      |      513344 |
+| usearch  | 31:53.29      |      128580 |
+
+
+Results using 20 cores and 4000 samples:
+
+| Package  | Time (MM:SS)  | Memory (kb) |
+| -------- |:-------------:| -----------:|
+| rbiom    |  2:56.09      |      647860 |
+| qiime2   |  1:52.12      |     2008160 |
+| phyloseq | 31:53.29      |      128580 |
+
+
+
+Qiime2 says: `Weighted UniFrac is not parallelizable`
+Weighted Output matrices: rbiom == phyloseq != UniFrac.
+Unweighted Output matrices: rbiom == phyloseq == qiime2 != uniFrac.
+And unifrac_binary also doesn't equal normalized unweighted phyloseq
+
+
+Set these off in a loop
+```bash
+
+for i in {100..1000..100}
+do
+  /usr/bin/time -a -o results.txt -f "qiime2   1 w $i %e %M" /bin/sh qiime2.sh  1 w $i
+  for j in {1..20}
+  do
+    /usr/bin/time -a -o results.txt -f "rbiom    $j w $i %e %M" Rscript rbiom.r    $j w $i
+    /usr/bin/time -a -o results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
+    /usr/bin/time -a -o results.txt -f "usearch  $j w $i %e %M" /bin/sh usearch.sh $j w $i
+    /usr/bin/time -a -o results.txt -f "qiime2   $j u $i %e %M" /bin/sh qiime2.sh  $j u $i
+    /usr/bin/time -a -o results.txt -f "rbiom    $j u $i %e %M" Rscript rbiom.r    $j u $i
+    /usr/bin/time -a -o results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
+    /usr/bin/time -a -o results.txt -f "usearch  $j u $i %e %M" /bin/sh usearch.sh $j u $i
+  done
+done
+
+```
+
+
+
+
+
+
