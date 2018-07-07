@@ -13,6 +13,7 @@ configCluster <- function (nTasks=NA, pb=NULL) {
   ncores    <- if (length(consensus) == 1)      consensus else 1
   ncores    <- if (is.numeric(ncores))          ncores    else 1
   ncores    <- if (ncores > 0 & ncores < Inf)   ncores    else 1
+  ncores    <- as.integer(ncores)
   
   
   #--------------------------------------------------------------
@@ -41,7 +42,7 @@ configCluster <- function (nTasks=NA, pb=NULL) {
     if (interactive()) cat(msg)
     try(pb$set(detail=msg), silent=TRUE)
     
-    doSNOW::registerDoSNOW(parallel::makeCluster(ncores))
+    doSNOW::registerDoSNOW(parallel::makePSOCKcluster(ncores))
   }
   
   
@@ -63,7 +64,7 @@ configCluster <- function (nTasks=NA, pb=NULL) {
     res <- list(
       nTasks = nTasks, 
       ncores = ncores,
-      sets   = parallel::splitIndices(nTasks, min(nTasks, ncores * 10)),
+      sets   = unlist(parallel::splitIndices(nTasks, min(nTasks, ncores * 10))),
       nSets  = min(nTasks, ncores * 10),
       opts   = NULL
     )

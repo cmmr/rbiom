@@ -54,7 +54,7 @@ dm <- beta.div(biom, 'unifrac')
 Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the rbiom.max.threads option:
 
 ``` r
-options('rbiom.max.threads') <- 6
+options('rbiom.max.threads' = 6)
 ```
 
 
