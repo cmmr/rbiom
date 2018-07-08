@@ -1,5 +1,5 @@
 
-configCluster <- function (nTasks=NA, pb=NULL) {
+cpu_count <- function () {
   
   #--------------------------------------------------------------
   # The number of cores we should use
@@ -15,6 +15,13 @@ configCluster <- function (nTasks=NA, pb=NULL) {
   ncores    <- if (ncores > 0 & ncores < Inf)   ncores    else 1
   ncores    <- as.integer(ncores)
   
+  return (ncores)
+}
+
+
+configCluster <- function (nTasks=NA, pb=NULL) {
+  
+  ncores <- cpu_count()
   
   #--------------------------------------------------------------
   # Detect the currently available cluster
