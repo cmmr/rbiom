@@ -307,7 +307,7 @@ NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted) 
   
   
   //======================================================
-  // COmpute Pairwise Distances
+  // Compute Pairwise Distances
   //======================================================
   PairwiseDist pairwiseDist(
       sampleEdgeWt,
