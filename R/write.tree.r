@@ -56,7 +56,7 @@ write.tree <- function (tree=NULL, file=NULL) {
   
   
   if (!is.null(file))
-    return (writeLines(text=newick, con=file))
+    return (writeLines(text=newick, con=file, sep=""))
   
   return (newick)
 }

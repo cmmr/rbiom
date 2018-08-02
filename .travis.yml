@@ -19,7 +19,8 @@ r_packages:
   - ape
   - reshape2
   - testthat
-bioc_packages: rhdf5
+bioc_packages:
+  - rhdf5
 cache: packages
 sudo: false
 os:

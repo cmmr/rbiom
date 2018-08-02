@@ -4,6 +4,9 @@ author: "Daniel Smith, PhD"
 date: "7/2/2018"
 output: html_document
 ---
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
 
 ## Overview
 
@@ -66,13 +69,15 @@ Rscript prep_data.r
 
 ## Weighted UniFrac
 
-Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file. Each script will accept three arguments: (1) the number of cpu cores to use, (2) a single character 'w' or 'u' indicating whether to run weighted or unweighted unifrac, and (3) the infile size being tested, in number of samples.
+Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file. Each script will accept three arguments: (1) the number of cpu cores to use, (2) a single character 'w' or 'u' indicating whether to run weighted or unweighted unifrac, and (3) the input file to use in terms of number of samples.
 
 ```bash
 
+# RScript for running rbiom
+#---------------------------------------
 cat > rbiom.r << EOF
 args <- commandArgs(trailingOnly=TRUE)
-options('rbiom.max.threads' = args[1])
+options('rbiom.max.threads' = as.integer(args[1]))
 
 bFile <- paste0("in/hmp", args[3],".json")
 tFile <- paste0("in/hmp", args[3],".tre")
@@ -86,12 +91,15 @@ write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)
 EOF
 
 
+# RScript for running phyloseq
+#---------------------------------------
 cat > phyloseq.r << EOF
 library(methods)
 args <- commandArgs(trailingOnly=TRUE)
+cpus <- as.integer(args[1])
 
-if (args[1] > 1)
-  doParallel::registerDoParallel(parallel::makePSOCKcluster(as.integer(args[1])))
+if (cpus > 1)
+  doParallel::registerDoParallel(parallel::makePSOCKcluster(cpus))
 
 bFile <- paste0("in/hmp", args[3],".json")
 tFile <- paste0("in/hmp", args[3],".tre")
@@ -100,12 +108,14 @@ oFile <- paste0("out/phyloseq_", args[2], "_dm", args[3],".tsv")
 dm <- phyloseq::UniFrac(
   phy        = phyloseq::import_biom(bFile, tFile), 
   weighted   = identical(args[2], 'w'), 
-  parallel   = args[1] > 1, 
+  parallel   = cpus > 1, 
   normalized = FALSE )
 write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)
 EOF
 
 
+# Shell script for running qiime2
+#---------------------------------------
 cat > qiime2.sh << EOF
 if [ \$2 = "u" ]; then metric="unweighted_unifrac"; else metric="weighted_unifrac"; fi
 qiime tools import --input-path in/hmp\$3.json --output-path json --type FeatureTable[Frequency] --source-format BIOMV100Format
@@ -113,10 +123,12 @@ qiime tools import --input-path in/hmp\$3.tre --output-path tree --type Phylogen
 qiime diversity beta-phylogenetic-alt --i-table json.qza --i-phylogeny tree.qza --p-metric \$metric --output-dir qiime_out --p-n-jobs \$1
 qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza
 mv qiime_out/distance-matrix.tsv out/qiime2_\$2_dm\$3.tsv
-rm -rf qiime_out
+rm -rf json.qza tree.qza qiime_out
 EOF
 
 
+# Shell script for running usearch
+#---------------------------------------
 cat > usearch.sh << EOF
 if [ \$2 = "u" ]; then metric="unifrac_binary"; else metric="unifrac"; fi
 ./usearch10.0.240 -beta_div in/hmp\$3.tab -metrics \$metric -tree in/hmp\$3.tre -quiet
@@ -136,60 +148,154 @@ Finally, execute and time each script.
 /usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh usearch.sh 8 u 500
 ```
 
-Results using 8 cores and 500 samples:
+Results using 8 cores, unweighted unifrac, and 500 samples:
 
-| Package  | Time (MM:SS)  | Memory (kb) |
-| -------- |:-------------:| -----------:|
-| rbiom    | 0:03.56       |      109736 |
-| qiime2   | 0:28.17       |      225896 |
-| usearch  | 0:40.91       |        7140 |
-| phyloseq | 1:59.55       |      445384 |
-
-Results using 1 core and 4000 samples:
-
-| Package  | Time (MM:SS)  | Memory (kb) |
-| -------- |:-------------:| -----------:|
-| rbiom    |  2:56.09      |      647860 |
-| qiime2   |  3:10.19      |      513344 |
-| usearch  | 31:53.29      |      128580 |
+| Package  | Time (sec) | Memory (kb) |
+| -------- |-----------:| -----------:|
+| qiime2   |  31        | 690176      |
+| phyloseq |  106       | 1759328     |
+| usearch  |  15        | 17488       |
+| rbiom    |  1         | 326624      |
 
 
-Results using 20 cores and 4000 samples:
+Results using 1 core, weighted unifrac, and 4400 samples:
 
-| Package  | Time (MM:SS)  | Memory (kb) |
-| -------- |:-------------:| -----------:|
-| rbiom    |  2:56.09      |      647860 |
-| qiime2   |  1:52.12      |     2008160 |
-| phyloseq | 31:53.29      |      128580 |
+| Package  | Time (sec) | Memory (kb) |
+| -------- |-----------:| -----------:|
+| rbiom    |  408       |     2938848 |
+| qiime2   |  149       |     1952272 |
+| usearch  | 1987       |      603088 |
+
+
+Results using 20 cores, unweighted unifrac, and 4400 samples:
+
+| Package  | Time (sec) | Memory (kb) |
+| -------- |-----------:| -----------:|
+| rbiom    |   51       |     3106112 |
+| qiime2   |  130       |     2300656 |
 
 
 
 Qiime2 says: `Weighted UniFrac is not parallelizable`
-Weighted Output matrices: rbiom == phyloseq != UniFrac.
-Unweighted Output matrices: rbiom == phyloseq == qiime2 != uniFrac.
+Weighted Output matrices: rbiom == phyloseq != usearch
+Unweighted Output matrices: rbiom == phyloseq == qiime2 != usearch
 And unifrac_binary also doesn't equal normalized unweighted phyloseq
 
 
 Set these off in a loop
 ```bash
 
-for i in {100..1000..100}
+for i in {100..4400..100}
 do
-  /usr/bin/time -a -o results.txt -f "qiime2   1 w $i %e %M" /bin/sh qiime2.sh  1 w $i
+  /usr/bin/time -a -o ~/results.txt -f "usearch 1 w $i %e %M" /bin/sh usearch.sh 1 w $i
+  /usr/bin/time -a -o ~/results.txt -f "usearch 1 u $i %e %M" /bin/sh usearch.sh 1 u $i
+  /usr/bin/time -a -o ~/results.txt -f  "qiime2 1 w $i %e %M" /bin/sh qiime2.sh  1 w $i
   for j in {1..20}
   do
-    /usr/bin/time -a -o results.txt -f "rbiom    $j w $i %e %M" Rscript rbiom.r    $j w $i
-    /usr/bin/time -a -o results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
-    /usr/bin/time -a -o results.txt -f "usearch  $j w $i %e %M" /bin/sh usearch.sh $j w $i
-    /usr/bin/time -a -o results.txt -f "qiime2   $j u $i %e %M" /bin/sh qiime2.sh  $j u $i
-    /usr/bin/time -a -o results.txt -f "rbiom    $j u $i %e %M" Rscript rbiom.r    $j u $i
-    /usr/bin/time -a -o results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
-    /usr/bin/time -a -o results.txt -f "usearch  $j u $i %e %M" /bin/sh usearch.sh $j u $i
+    /usr/bin/time -a -o ~/results.txt -f   "qiime2 $j u $i %e %M" /bin/sh qiime2.sh  $j u $i
+    /usr/bin/time -a -o ~/results.txt -f    "rbiom $j w $i %e %M" Rscript rbiom.r    $j w $i
+    /usr/bin/time -a -o ~/results.txt -f    "rbiom $j u $i %e %M" Rscript rbiom.r    $j u $i
+    /usr/bin/time -a -o ~/results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
+    /usr/bin/time -a -o ~/results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
   done
+done
+
+export i=4400
+for j in {1..20}
+do
+  /usr/bin/time -a -o ~/results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
+  /usr/bin/time -a -o ~/results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
 done
 
 ```
 
+Make some graphs
+```{r}
+
+suppressPackageStartupMessages(library(ggplot2))
+
+results <- read.delim(
+  file      = "C:/Users/Daniel/Desktop/results.txt",
+  sep       = ' ',
+  col.names = c('Package', 'Threads', 'Algorithm', 'Input.Size', 'Time', 'Memory'),
+  row.names = NULL )
+results[['Algorithm']] <- ifelse(results[['Algorithm']] == 'w', 'Weighted UniFrac', 'Unweighted UniFrac')
+results[['Algorithm']] <- paste(results[['Package']], "-", results[['Algorithm']])
+
+results <- plyr::ddply(results, c('Algorithm', 'Input.Size'), function (x) {
+  if (nrow(x) == 1) {
+    x <- data.frame(
+      'Package'    = x[['Package']], 
+      'Threads'    = unique(results[['Threads']]), 
+      'Algorithm'  = x[['Algorithm']], 
+      'Input.Size' = x[['Input.Size']], 
+      'Time'       = x[['Time']], 
+      'Memory'     = x[['Memory']]
+    )
+  }
+  return (x)
+})
+
+
+#==========================================
+# 4400 sample dataset, varying cpu count
+#==========================================
+
+df <- subset(results, Input.Size == 4400)
+
+ggplot(df, aes(group=Algorithm, color=Algorithm, x=Threads, y=Time/60)) +
+  geom_line() +
+  scale_y_log10(breaks = c(1:7, c(1:3)*10), minor_breaks = c()) +
+  scale_x_continuous(breaks = c(1:10) * 2, minor_breaks = 1:20) +
+  scale_colour_brewer(palette = 'Paired') +
+  ggtitle("Speed-up with Multiple CPU Cores", "Using a Dataset with 4,400 Samples") +
+  labs(x = "Number of Threads", y = "Time in Minutes (log scale)")
+
+
+#==========================================
+# Single-Core CPU, varying dataset size
+#==========================================
+
+df <- subset(results, Threads == 1)
+
+ggplot(df, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Time)) +
+  geom_line() +
+  scale_y_log10(breaks = c(1,2,3,5, c(1,2,3,5)*10, c(1,2,3,5)*100, c(1,2)*1000), minor_breaks = c()) +
+  scale_colour_brewer(palette = 'Paired') +
+  ggtitle("Single-Core CPU Processing Time") +
+  labs(x = "Size of Dataset (# Samples)", y = "Time in Seconds (log scale)")
+
+
+#==========================================
+# 4-Core CPU, varying dataset size
+#==========================================
+
+df <- subset(results, Threads == 4)
+
+ggplot(df, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Time)) +
+  geom_line() +
+  scale_y_log10(breaks = c(1,2,3,5, c(1,2,3,5)*10, c(1,2,3,5)*100, c(1,2)*1000), minor_breaks = c()) +
+  scale_colour_brewer(palette = 'Paired') +
+  ggtitle("4-Core CPU Processing Time") +
+  labs(x = "Size of Dataset (# Samples)", y = "Time in Seconds (log scale)")
+
+
+#==========================================
+# 8-Core CPU, varying dataset size
+#==========================================
+
+df <- subset(results, Threads == 8)
+
+ggplot(df, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Time)) +
+  geom_line() +
+  scale_y_log10(breaks = c(1,2,3,5, c(1,2,3,5)*10, c(1,2,3,5)*100, c(1,2)*1000), minor_breaks = c()) +
+  scale_colour_brewer(palette = 'Paired') +
+  ggtitle("8-Core CPU Processing Time") +
+  labs(x = "Size of Dataset (# Samples)", y = "Time in Seconds (log scale)")
+
+
+
+```
 
 
 

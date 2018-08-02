@@ -84,6 +84,7 @@
 
     
     
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">eval =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
@@ -94,135 +95,294 @@
 <a href="#create-test-environment" class="anchor"></a>Create Test Environment</h2>
 <p>For our tests, we’ll use a virtual machine on Amazon Web Service’s Elastic Compute Cloud. Specifically: * US-West region * AMI 482e6430 (<a href="https://s3-us-west-2.amazonaws.com/qiime2-data/distro/core/aws-amis.txt">QIIME 2 Core</a>) * c3.8xlarge instance type (32 virtual CPUs) * 20 GiB General Purpose SSD (GP2) Storage on Root Volume</p>
 <p>Both the username and password are ‘qiime2’. On this instance, qiime2 is already configured. The following will download and install rbiom, phyloseq, and usearch as well as the test dataset.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="fu">sudo</span> apt-get install build-essential gfortran libssl-dev unzip</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="bu">export</span> <span class="va">TAR=</span>/bin/tar</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="ex">R</span> -e <span class="st">'source("http://bioconductor.org/biocLite.R"); biocLite(c("phyloseq", "rhdf5"))'</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="ex">R</span> -e <span class="st">'install.packages(c("devtools", "doParallel"), repos="http://cran.us.r-project.org");'</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="ex">R</span> -e <span class="st">'devtools::install_git("https://github.com/cmmr/rbiom.git")'</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="fu">wget</span> https://s3.amazonaws.com/jplab/share/30d/usearch10.0.240</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="fu">chmod</span> a+x usearch10.0.240</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="fu">wget</span> https://raw.githubusercontent.com/cmmr/rbiom/master/vignettes/data/hmp500.biom</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="ex">R</span> -e <span class="st">'x &lt;- rbiom::read.biom("hmp500.biom"); rbiom::write.tree(x$phylogeny, "hmp500.tre")'</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="ex">R</span> -e <span class="st">'x &lt;- rbiom::read.biom("hmp500.biom"); x$taxonomy &lt;- NULL; rbiom::write.biom(x, "hmp500.tab", "tab")'</span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="ex">biom</span> convert -i hmp500.tab -o hmp500.json --table-type=<span class="st">"OTU table"</span> --to-json</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="fu">sudo</span> apt-get install build-essential gfortran libssl-dev unzip</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="bu">export</span> <span class="va">TAR=</span>/bin/tar</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="ex">R</span> -e <span class="st">'source("http://bioconductor.org/biocLite.R"); biocLite(c("phyloseq", "rhdf5"))'</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="ex">R</span> -e <span class="st">'install.packages(c("devtools", "doParallel"), repos="http://cran.us.r-project.org");'</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="ex">R</span> -e <span class="st">'devtools::install_git("https://github.com/cmmr/rbiom.git")'</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="fu">wget</span> https://s3.amazonaws.com/jplab/share/30d/usearch10.0.240</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="fu">chmod</span> a+x usearch10.0.240</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="fu">wget</span> https://raw.githubusercontent.com/cmmr/rbiom/master/vignettes/data/hmp500.biom</a></code></pre></div>
 </div>
 <div id="prepare-input-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#prepare-input-data" class="anchor"></a>Prepare input data</h2>
 <p>The example data is taken from the publicly available Human Microbiome Project. The master data set contains 4,468 samples with 4,468,000 observations of 1,140 OTUs. These samples have been rarefied to 1000 obervations per sample. The below script will randomly subset the master file to n samples, where n begins at 100 samples and is incremented by 100 all the way to 4,400. This will allow us to see how programs handle inputs of varying sizes.</p>
 <p>prep_data.r:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(rbiom)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">dir.create</span>(<span class="st">"in"</span>)</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">dir.create</span>(<span class="st">"out"</span>)</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">setwd</span>(<span class="st">"in"</span>)</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">x &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read.biom.html">read.biom</a></span>(<span class="st">"https://s3.amazonaws.com/jplab/projects/hmp/hmp4468.biom"</span>)</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">44</span>) {</a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">  n &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">  y &lt;-<span class="st"> </span><span class="kw"><a href="../reference/select.html">select</a></span>(x, <span class="kw">sample.int</span>(<span class="dv">4468</span>, n))</a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">  y<span class="op">$</span>taxonomy &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">  <span class="kw"><a href="../reference/write.biom.html">write.biom</a></span>(y, <span class="kw">paste0</span>(<span class="st">"hmp"</span>, n, <span class="st">".tab"</span>), <span class="st">"tab"</span>)</a>
-<a class="sourceLine" id="cb2-13" data-line-number="13">  <span class="kw"><a href="../reference/write.tree.html">write.tree</a></span>(y<span class="op">$</span>phylogeny, <span class="kw">paste0</span>(<span class="st">"hmp"</span>, n, <span class="st">".tre"</span>))</a>
-<a class="sourceLine" id="cb2-14" data-line-number="14">  cmd &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">'biom convert -i hmp%i.tab -o hmp%i.json --table-type="OTU table" --to-json'</span>, n, n)</a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">  <span class="kw">system</span>(<span class="dt">command =</span> cmd, <span class="dt">wait =</span> <span class="ot">FALSE</span>, <span class="dt">ignore.stdout =</span> <span class="ot">TRUE</span>, <span class="dt">ignore.stderr =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">}</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(rbiom)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw">dir.create</span>(<span class="st">"in"</span>)</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">dir.create</span>(<span class="st">"out"</span>)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">setwd</span>(<span class="st">"in"</span>)</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">x &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read.biom.html">read.biom</a></span>(<span class="st">"https://s3.amazonaws.com/jplab/projects/hmp/hmp4468.biom"</span>)</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">44</span>) {</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">  n &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">  y &lt;-<span class="st"> </span><span class="kw"><a href="../reference/select.html">select</a></span>(x, <span class="kw">sample.int</span>(<span class="dv">4468</span>, n))</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">  y<span class="op">$</span>taxonomy &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">  <span class="kw"><a href="../reference/write.biom.html">write.biom</a></span>(y, <span class="kw">paste0</span>(<span class="st">"hmp"</span>, n, <span class="st">".tab"</span>), <span class="st">"tab"</span>)</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">  <span class="kw"><a href="../reference/write.tree.html">write.tree</a></span>(y<span class="op">$</span>phylogeny, <span class="kw">paste0</span>(<span class="st">"hmp"</span>, n, <span class="st">".tre"</span>))</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">  cmd &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">'biom convert -i hmp%i.tab -o hmp%i.json --table-type="OTU table" --to-json'</span>, n, n)</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">  <span class="kw">system</span>(<span class="dt">command =</span> cmd, <span class="dt">wait =</span> <span class="ot">FALSE</span>, <span class="dt">ignore.stdout =</span> <span class="ot">TRUE</span>, <span class="dt">ignore.stderr =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">}</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">Rscript</span> prep_data.r</a></code></pre></div>
 </div>
 <div id="weighted-unifrac" class="section level2">
 <h2 class="hasAnchor">
 <a href="#weighted-unifrac" class="anchor"></a>Weighted UniFrac</h2>
-<p>Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file. Each script will accept three arguments: (1) the number of cpu cores to use, (2) a single character ‘w’ or ‘u’ indicating whether to run weighted or unweighted unifrac, and (3) the infile size being tested, in number of samples.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="fu">cat</span> <span class="op">&gt;</span> rbiom.r <span class="op">&lt;&lt; EOF</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">args &lt;- commandArgs(trailingOnly=TRUE)</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">options('rbiom.max.threads' = args[1])</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">bFile &lt;- paste0("in/hmp", args[3],".json")</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">tFile &lt;- paste0("in/hmp", args[3],".tre")</a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">oFile &lt;- paste0("out/rbiom_dm", args[3],".tsv")</a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">dm &lt;- rbiom::unifrac(</a>
-<a class="sourceLine" id="cb3-11" data-line-number="11">  biom     = rbiom::read.biom(bFile),</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12">  tree     = rbiom::read.tree(tFile), </a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">  weighted = identical(args[2], 'w') )</a>
-<a class="sourceLine" id="cb3-14" data-line-number="14">write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)</a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="op">EOF</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="fu">cat</span> <span class="op">&gt;</span> phyloseq.r <span class="op">&lt;&lt; EOF</span></a>
-<a class="sourceLine" id="cb3-19" data-line-number="19">args &lt;- commandArgs(trailingOnly=TRUE)</a>
-<a class="sourceLine" id="cb3-20" data-line-number="20">doParallel::registerDoParallel(parallel::makeCluster(args[1]))</a>
-<a class="sourceLine" id="cb3-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb3-22" data-line-number="22">bFile &lt;- paste0("in/hmp", args[3],".json")</a>
-<a class="sourceLine" id="cb3-23" data-line-number="23">tFile &lt;- paste0("in/hmp", args[3],".tre")</a>
-<a class="sourceLine" id="cb3-24" data-line-number="24">oFile &lt;- paste0("out/phyloseq_dm", args[3],".tsv")</a>
-<a class="sourceLine" id="cb3-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb3-26" data-line-number="26">dm &lt;- phyloseq::UniFrac(</a>
-<a class="sourceLine" id="cb3-27" data-line-number="27">  phy        = phyloseq::import_biom(bFile, tFile), </a>
-<a class="sourceLine" id="cb3-28" data-line-number="28">  weighted   = identical(args[2], 'w'), </a>
-<a class="sourceLine" id="cb3-29" data-line-number="29">  normalized = FALSE, </a>
-<a class="sourceLine" id="cb3-30" data-line-number="30">  parallel   = TRUE )</a>
-<a class="sourceLine" id="cb3-31" data-line-number="31">write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)</a>
-<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="op">EOF</span></a>
-<a class="sourceLine" id="cb3-33" data-line-number="33"></a>
-<a class="sourceLine" id="cb3-34" data-line-number="34"></a>
-<a class="sourceLine" id="cb3-35" data-line-number="35"><span class="fu">cat</span> <span class="op">&gt;</span> qiime2.sh <span class="op">&lt;&lt; EOF</span></a>
-<a class="sourceLine" id="cb3-36" data-line-number="36">if [ <span class="va">$2</span> = "u" ]; then metric="unweighted_unifrac"; else metric="weighted_unifrac"; fi</a>
-<a class="sourceLine" id="cb3-37" data-line-number="37">qiime tools import --input-path in/hmp<span class="va">$3</span>.json --output-path json --type FeatureTable[Frequency] --source-format BIOMV100Format</a>
-<a class="sourceLine" id="cb3-38" data-line-number="38">qiime tools import --input-path in/hmp<span class="va">$3</span>.tre --output-path tree --type Phylogeny[Rooted] --source-format NewickFormat</a>
-<a class="sourceLine" id="cb3-39" data-line-number="39">qiime diversity beta-phylogenetic --i-table json.qza --i-phylogeny tree.qza --p-metric <span class="va">$metric</span> --output-dir qiime_out --p-n-jobs <span class="va">$2</span></a>
-<a class="sourceLine" id="cb3-40" data-line-number="40">qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza</a>
-<a class="sourceLine" id="cb3-41" data-line-number="41">mv qiime_out/distance-matrix.tsv out/qiime2_dm<span class="va">$3</span>.tsv</a>
-<a class="sourceLine" id="cb3-42" data-line-number="42">rm -rf qiime_out</a>
-<a class="sourceLine" id="cb3-43" data-line-number="43"><span class="op">EOF</span></a>
-<a class="sourceLine" id="cb3-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb3-45" data-line-number="45"></a>
-<a class="sourceLine" id="cb3-46" data-line-number="46"><span class="fu">cat</span> <span class="op">&gt;</span> usearch.sh <span class="op">&lt;&lt; EOF</span></a>
-<a class="sourceLine" id="cb3-47" data-line-number="47">if [ <span class="va">$2</span> = "u" ]; then metric="unifrac_binary"; else metric="unifrac"; fi</a>
-<a class="sourceLine" id="cb3-48" data-line-number="48">./usearch10.0.240 -beta_div in/hmp<span class="va">$3</span>.tab -metrics <span class="va">$metric</span> -tree in/hmp<span class="va">$3</span>.tre -quiet</a>
-<a class="sourceLine" id="cb3-49" data-line-number="49">mv <span class="va">$metric</span>.txt out/unifrac_dm<span class="va">$3</span>.tsv</a>
-<a class="sourceLine" id="cb3-50" data-line-number="50">rm <span class="va">$metric</span>.sorted.txt</a>
-<a class="sourceLine" id="cb3-51" data-line-number="51">rm <span class="va">$metric</span>.tree</a>
-<a class="sourceLine" id="cb3-52" data-line-number="52"><span class="op">EOF</span></a></code></pre></div>
+<p>Create four scripts, one per program. These scripts will be the minimal steps needs to read in a biom file and newick, compute a distance matrix, then save the results to a tsv file. Each script will accept three arguments: (1) the number of cpu cores to use, (2) a single character ‘w’ or ‘u’ indicating whether to run weighted or unweighted unifrac, and (3) the input file to use in terms of number of samples.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># RScript for running rbiom</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#---------------------------------------</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="fu">cat</span> <span class="op">&gt;</span> rbiom.r <span class="op">&lt;&lt; EOF</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">args &lt;- commandArgs(trailingOnly=TRUE)</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">options('rbiom.max.threads' = as.integer(args[1]))</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">bFile &lt;- paste0("in/hmp", args[3],".json")</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">tFile &lt;- paste0("in/hmp", args[3],".tre")</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">oFile &lt;- paste0("out/rbiom_", args[2], "_dm", args[3],".tsv")</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">dm &lt;- rbiom::unifrac(</a>
+<a class="sourceLine" id="cb5-13" data-line-number="13">  biom     = rbiom::read.biom(bFile),</a>
+<a class="sourceLine" id="cb5-14" data-line-number="14">  tree     = rbiom::read.tree(tFile), </a>
+<a class="sourceLine" id="cb5-15" data-line-number="15">  weighted = identical(args[2], 'w') )</a>
+<a class="sourceLine" id="cb5-16" data-line-number="16">write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)</a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="op">EOF</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co"># RScript for running phyloseq</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co">#---------------------------------------</span></a>
+<a class="sourceLine" id="cb5-22" data-line-number="22"><span class="fu">cat</span> <span class="op">&gt;</span> phyloseq.r <span class="op">&lt;&lt; EOF</span></a>
+<a class="sourceLine" id="cb5-23" data-line-number="23">library(methods)</a>
+<a class="sourceLine" id="cb5-24" data-line-number="24">args &lt;- commandArgs(trailingOnly=TRUE)</a>
+<a class="sourceLine" id="cb5-25" data-line-number="25">cpus &lt;- as.integer(args[1])</a>
+<a class="sourceLine" id="cb5-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb5-27" data-line-number="27">if (cpus &gt; 1)</a>
+<a class="sourceLine" id="cb5-28" data-line-number="28">  doParallel::registerDoParallel(parallel::makePSOCKcluster(cpus))</a>
+<a class="sourceLine" id="cb5-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb5-30" data-line-number="30">bFile &lt;- paste0("in/hmp", args[3],".json")</a>
+<a class="sourceLine" id="cb5-31" data-line-number="31">tFile &lt;- paste0("in/hmp", args[3],".tre")</a>
+<a class="sourceLine" id="cb5-32" data-line-number="32">oFile &lt;- paste0("out/phyloseq_", args[2], "_dm", args[3],".tsv")</a>
+<a class="sourceLine" id="cb5-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb5-34" data-line-number="34">dm &lt;- phyloseq::UniFrac(</a>
+<a class="sourceLine" id="cb5-35" data-line-number="35">  phy        = phyloseq::import_biom(bFile, tFile), </a>
+<a class="sourceLine" id="cb5-36" data-line-number="36">  weighted   = identical(args[2], 'w'), </a>
+<a class="sourceLine" id="cb5-37" data-line-number="37">  parallel   = cpus &gt; 1, </a>
+<a class="sourceLine" id="cb5-38" data-line-number="38">  normalized = FALSE )</a>
+<a class="sourceLine" id="cb5-39" data-line-number="39">write.table(as.matrix(dm), oFile, sep="\t", quote=FALSE)</a>
+<a class="sourceLine" id="cb5-40" data-line-number="40"><span class="op">EOF</span></a>
+<a class="sourceLine" id="cb5-41" data-line-number="41"></a>
+<a class="sourceLine" id="cb5-42" data-line-number="42"></a>
+<a class="sourceLine" id="cb5-43" data-line-number="43"><span class="co"># Shell script for running qiime2</span></a>
+<a class="sourceLine" id="cb5-44" data-line-number="44"><span class="co">#---------------------------------------</span></a>
+<a class="sourceLine" id="cb5-45" data-line-number="45"><span class="fu">cat</span> <span class="op">&gt;</span> qiime2.sh <span class="op">&lt;&lt; EOF</span></a>
+<a class="sourceLine" id="cb5-46" data-line-number="46">if [ <span class="dt">\$</span>2 = "u" ]; then metric="unweighted_unifrac"; else metric="weighted_unifrac"; fi</a>
+<a class="sourceLine" id="cb5-47" data-line-number="47">qiime tools import --input-path in/hmp<span class="dt">\$</span>3.json --output-path json --type FeatureTable[Frequency] --source-format BIOMV100Format</a>
+<a class="sourceLine" id="cb5-48" data-line-number="48">qiime tools import --input-path in/hmp<span class="dt">\$</span>3.tre --output-path tree --type Phylogeny[Rooted] --source-format NewickFormat</a>
+<a class="sourceLine" id="cb5-49" data-line-number="49">qiime diversity beta-phylogenetic-alt --i-table json.qza --i-phylogeny tree.qza --p-metric <span class="dt">\$</span>metric --output-dir qiime_out --p-n-jobs <span class="dt">\$</span>1</a>
+<a class="sourceLine" id="cb5-50" data-line-number="50">qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza</a>
+<a class="sourceLine" id="cb5-51" data-line-number="51">mv qiime_out/distance-matrix.tsv out/qiime2_<span class="dt">\$</span>2_dm<span class="dt">\$</span>3.tsv</a>
+<a class="sourceLine" id="cb5-52" data-line-number="52">rm -rf json.qza tree.qza qiime_out</a>
+<a class="sourceLine" id="cb5-53" data-line-number="53"><span class="op">EOF</span></a>
+<a class="sourceLine" id="cb5-54" data-line-number="54"></a>
+<a class="sourceLine" id="cb5-55" data-line-number="55"></a>
+<a class="sourceLine" id="cb5-56" data-line-number="56"><span class="co"># Shell script for running usearch</span></a>
+<a class="sourceLine" id="cb5-57" data-line-number="57"><span class="co">#---------------------------------------</span></a>
+<a class="sourceLine" id="cb5-58" data-line-number="58"><span class="fu">cat</span> <span class="op">&gt;</span> usearch.sh <span class="op">&lt;&lt; EOF</span></a>
+<a class="sourceLine" id="cb5-59" data-line-number="59">if [ <span class="dt">\$</span>2 = "u" ]; then metric="unifrac_binary"; else metric="unifrac"; fi</a>
+<a class="sourceLine" id="cb5-60" data-line-number="60">./usearch10.0.240 -beta_div in/hmp<span class="dt">\$</span>3.tab -metrics <span class="dt">\$</span>metric -tree in/hmp<span class="dt">\$</span>3.tre -quiet</a>
+<a class="sourceLine" id="cb5-61" data-line-number="61">mv <span class="dt">\$</span>metric.txt out/unifrac_<span class="dt">\$</span>2_dm<span class="dt">\$</span>3.tsv</a>
+<a class="sourceLine" id="cb5-62" data-line-number="62">rm <span class="dt">\$</span>metric.sorted.txt</a>
+<a class="sourceLine" id="cb5-63" data-line-number="63">rm <span class="dt">\$</span>metric.tree</a>
+<a class="sourceLine" id="cb5-64" data-line-number="64"><span class="op">EOF</span></a></code></pre></div>
 <p>Finally, execute and time each script.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> Rscript rbiom.r    8 w 500</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> Rscript phyloseq.r 8 w 500</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> /bin/sh qiime2.sh  8 w 500</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> /bin/sh usearch.sh 8 w 500</a></code></pre></div>
-<p>Results on an 8-core machine:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> Rscript rbiom.r    8 u 500</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> Rscript phyloseq.r 8 u 500</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> /bin/sh qiime2.sh  8 u 500</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="ex">/usr/bin/time</span> -f <span class="st">'Time: %E  Memory: %M\n'</span> /bin/sh usearch.sh 8 u 500</a></code></pre></div>
+<p>Results using 8 cores, unweighted unifrac, and 500 samples:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Package</th>
-<th align="center">Time (MM:SS)</th>
+<th align="right">Time (sec)</th>
+<th align="right">Memory (kb)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>qiime2</td>
+<td align="right">31</td>
+<td align="right">690176</td>
+</tr>
+<tr class="even">
+<td>phyloseq</td>
+<td align="right">106</td>
+<td align="right">1759328</td>
+</tr>
+<tr class="odd">
+<td>usearch</td>
+<td align="right">15</td>
+<td align="right">17488</td>
+</tr>
+<tr class="even">
+<td>rbiom</td>
+<td align="right">1</td>
+<td align="right">326624</td>
+</tr>
+</tbody>
+</table>
+<p>Results using 1 core, weighted unifrac, and 4400 samples:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Package</th>
+<th align="right">Time (sec)</th>
 <th align="right">Memory (kb)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>rbiom</td>
-<td align="center">0:03.56</td>
-<td align="right">109736</td>
+<td align="right">408</td>
+<td align="right">2938848</td>
 </tr>
 <tr class="even">
 <td>qiime2</td>
-<td align="center">0:28.17</td>
-<td align="right">225896</td>
+<td align="right">149</td>
+<td align="right">1952272</td>
 </tr>
 <tr class="odd">
 <td>usearch</td>
-<td align="center">0:40.91</td>
-<td align="right">7140</td>
-</tr>
-<tr class="even">
-<td>phyloseq</td>
-<td align="center">1:59.55</td>
-<td align="right">445384</td>
+<td align="right">1987</td>
+<td align="right">603088</td>
 </tr>
 </tbody>
 </table>
-<p>Qiime2 says: <code>Weighted UniFrac is not parallelizable</code> Weighted Output matrices: rbiom == phyloseq != UniFrac. Unweighted Output matrices: rbiom == phyloseq == qiime2 != uniFrac. And unifrac_binary also doesn’t equal normalized unweighted phyloseq</p>
+<p>Results using 20 cores, unweighted unifrac, and 4400 samples:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Package</th>
+<th align="right">Time (sec)</th>
+<th align="right">Memory (kb)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>rbiom</td>
+<td align="right">51</td>
+<td align="right">3106112</td>
+</tr>
+<tr class="even">
+<td>qiime2</td>
+<td align="right">130</td>
+<td align="right">2300656</td>
+</tr>
+</tbody>
+</table>
+<p>Qiime2 says: <code>Weighted UniFrac is not parallelizable</code> Weighted Output matrices: rbiom == phyloseq != usearch Unweighted Output matrices: rbiom == phyloseq == qiime2 != usearch And unifrac_binary also doesn’t equal normalized unweighted phyloseq</p>
+<p>Set these off in a loop</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{100..4400..100}</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw">do</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"usearch 1 w </span><span class="va">$i</span><span class="st"> %e %M"</span> /bin/sh usearch.sh 1 w <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"usearch 1 u </span><span class="va">$i</span><span class="st"> %e %M"</span> /bin/sh usearch.sh 1 u <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">  <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f  <span class="st">"qiime2 1 w </span><span class="va">$i</span><span class="st"> %e %M"</span> /bin/sh qiime2.sh  1 w <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">  <span class="kw">for</span> <span class="ex">j</span> in <span class="dt">{1..20}</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">  <span class="kw">do</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">    <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f   <span class="st">"qiime2 </span><span class="va">$j</span><span class="st"> u </span><span class="va">$i</span><span class="st"> %e %M"</span> /bin/sh qiime2.sh  <span class="va">$j</span> u <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">    <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f    <span class="st">"rbiom </span><span class="va">$j</span><span class="st"> w </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript rbiom.r    <span class="va">$j</span> w <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11">    <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f    <span class="st">"rbiom </span><span class="va">$j</span><span class="st"> u </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript rbiom.r    <span class="va">$j</span> u <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">    <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"phyloseq </span><span class="va">$j</span><span class="st"> w </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript phyloseq.r <span class="va">$j</span> w <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">    <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"phyloseq </span><span class="va">$j</span><span class="st"> u </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript phyloseq.r <span class="va">$j</span> u <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">  <span class="kw">done</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="kw">done</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="bu">export</span> <span class="va">i=</span>4400</a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="kw">for</span> <span class="ex">j</span> in <span class="dt">{1..20}</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="kw">do</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20">  <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"phyloseq </span><span class="va">$j</span><span class="st"> w </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript phyloseq.r <span class="va">$j</span> w <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-21" data-line-number="21">  <span class="ex">/usr/bin/time</span> -a -o ~/results.txt -f <span class="st">"phyloseq </span><span class="va">$j</span><span class="st"> u </span><span class="va">$i</span><span class="st"> %e %M"</span> Rscript phyloseq.r <span class="va">$j</span> u <span class="va">$i</span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="kw">done</span></a></code></pre></div>
+<p>Make some graphs</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(ggplot2))</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">results &lt;-<span class="st"> </span><span class="kw">read.delim</span>(</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">  <span class="dt">file      =</span> <span class="st">"C:/Users/Daniel/Desktop/results.txt"</span>,</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">  <span class="dt">sep       =</span> <span class="st">' '</span>,</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">  <span class="dt">col.names =</span> <span class="kw">c</span>(<span class="st">'Package'</span>, <span class="st">'Threads'</span>, <span class="st">'Algorithm'</span>, <span class="st">'Input.Size'</span>, <span class="st">'Time'</span>, <span class="st">'Memory'</span>),</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">  <span class="dt">row.names =</span> <span class="ot">NULL</span> )</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">results[[<span class="st">'Algorithm'</span>]] &lt;-<span class="st"> </span><span class="kw">ifelse</span>(results[[<span class="st">'Algorithm'</span>]] <span class="op">==</span><span class="st"> 'w'</span>, <span class="st">'Weighted UniFrac'</span>, <span class="st">'Unweighted UniFrac'</span>)</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">results[[<span class="st">'Algorithm'</span>]] &lt;-<span class="st"> </span><span class="kw">paste</span>(results[[<span class="st">'Package'</span>]], <span class="st">"-"</span>, results[[<span class="st">'Algorithm'</span>]])</a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">results &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/plyr/topics/ddply">ddply</a></span>(results, <span class="kw">c</span>(<span class="st">'Algorithm'</span>, <span class="st">'Input.Size'</span>), <span class="cf">function</span> (x) {</a>
+<a class="sourceLine" id="cb8-12" data-line-number="12">  <span class="cf">if</span> (<span class="kw">nrow</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb8-13" data-line-number="13">    x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
+<a class="sourceLine" id="cb8-14" data-line-number="14">      <span class="st">'Package'</span>    =<span class="st"> </span>x[[<span class="st">'Package'</span>]], </a>
+<a class="sourceLine" id="cb8-15" data-line-number="15">      <span class="st">'Threads'</span>    =<span class="st"> </span><span class="kw">unique</span>(results[[<span class="st">'Threads'</span>]]), </a>
+<a class="sourceLine" id="cb8-16" data-line-number="16">      <span class="st">'Algorithm'</span>  =<span class="st"> </span>x[[<span class="st">'Algorithm'</span>]], </a>
+<a class="sourceLine" id="cb8-17" data-line-number="17">      <span class="st">'Input.Size'</span> =<span class="st"> </span>x[[<span class="st">'Input.Size'</span>]], </a>
+<a class="sourceLine" id="cb8-18" data-line-number="18">      <span class="st">'Time'</span>       =<span class="st"> </span>x[[<span class="st">'Time'</span>]], </a>
+<a class="sourceLine" id="cb8-19" data-line-number="19">      <span class="st">'Memory'</span>     =<span class="st"> </span>x[[<span class="st">'Memory'</span>]]</a>
+<a class="sourceLine" id="cb8-20" data-line-number="20">    )</a>
+<a class="sourceLine" id="cb8-21" data-line-number="21">  }</a>
+<a class="sourceLine" id="cb8-22" data-line-number="22">  <span class="kw">return</span> (x)</a>
+<a class="sourceLine" id="cb8-23" data-line-number="23">})</a>
+<a class="sourceLine" id="cb8-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-27" data-line-number="27"><span class="co"># 4400 sample dataset, varying cpu count</span></a>
+<a class="sourceLine" id="cb8-28" data-line-number="28"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb8-30" data-line-number="30">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/subset.html">subset</a></span>(results, Input.Size <span class="op">==</span><span class="st"> </span><span class="dv">4400</span>)</a>
+<a class="sourceLine" id="cb8-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb8-32" data-line-number="32"><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">group=</span>Algorithm, <span class="dt">color=</span>Algorithm, <span class="dt">x=</span>Threads, <span class="dt">y=</span>Time<span class="op">/</span><span class="dv">60</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-33" data-line-number="33"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-34" data-line-number="34"><span class="st">  </span><span class="kw">scale_y_log10</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>, <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)<span class="op">*</span><span class="dv">10</span>), <span class="dt">minor_breaks =</span> <span class="kw">c</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-35" data-line-number="35"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>) <span class="op">*</span><span class="st"> </span><span class="dv">2</span>, <span class="dt">minor_breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">20</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-36" data-line-number="36"><span class="st">  </span><span class="kw">scale_colour_brewer</span>(<span class="dt">palette =</span> <span class="st">'Paired'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-37" data-line-number="37"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Speed-up with Multiple CPU Cores"</span>, <span class="st">"Using a Dataset with 4,400 Samples"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-38" data-line-number="38"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Number of Threads"</span>, <span class="dt">y =</span> <span class="st">"Time in Minutes (log scale)"</span>)</a>
+<a class="sourceLine" id="cb8-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb8-40" data-line-number="40"></a>
+<a class="sourceLine" id="cb8-41" data-line-number="41"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-42" data-line-number="42"><span class="co"># Single-Core CPU, varying dataset size</span></a>
+<a class="sourceLine" id="cb8-43" data-line-number="43"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-44" data-line-number="44"></a>
+<a class="sourceLine" id="cb8-45" data-line-number="45">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/subset.html">subset</a></span>(results, Threads <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb8-46" data-line-number="46"></a>
+<a class="sourceLine" id="cb8-47" data-line-number="47"><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">group=</span>Algorithm, <span class="dt">color=</span>Algorithm, <span class="dt">x=</span>Input.Size, <span class="dt">y=</span>Time)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-48" data-line-number="48"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-49" data-line-number="49"><span class="st">  </span><span class="kw">scale_y_log10</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">100</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)<span class="op">*</span><span class="dv">1000</span>), <span class="dt">minor_breaks =</span> <span class="kw">c</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-50" data-line-number="50"><span class="st">  </span><span class="kw">scale_colour_brewer</span>(<span class="dt">palette =</span> <span class="st">'Paired'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-51" data-line-number="51"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Single-Core CPU Processing Time"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-52" data-line-number="52"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Size of Dataset (# Samples)"</span>, <span class="dt">y =</span> <span class="st">"Time in Seconds (log scale)"</span>)</a>
+<a class="sourceLine" id="cb8-53" data-line-number="53"></a>
+<a class="sourceLine" id="cb8-54" data-line-number="54"></a>
+<a class="sourceLine" id="cb8-55" data-line-number="55"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-56" data-line-number="56"><span class="co"># 4-Core CPU, varying dataset size</span></a>
+<a class="sourceLine" id="cb8-57" data-line-number="57"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-58" data-line-number="58"></a>
+<a class="sourceLine" id="cb8-59" data-line-number="59">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/subset.html">subset</a></span>(results, Threads <span class="op">==</span><span class="st"> </span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb8-60" data-line-number="60"></a>
+<a class="sourceLine" id="cb8-61" data-line-number="61"><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">group=</span>Algorithm, <span class="dt">color=</span>Algorithm, <span class="dt">x=</span>Input.Size, <span class="dt">y=</span>Time)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-62" data-line-number="62"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-63" data-line-number="63"><span class="st">  </span><span class="kw">scale_y_log10</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">100</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)<span class="op">*</span><span class="dv">1000</span>), <span class="dt">minor_breaks =</span> <span class="kw">c</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-64" data-line-number="64"><span class="st">  </span><span class="kw">scale_colour_brewer</span>(<span class="dt">palette =</span> <span class="st">'Paired'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-65" data-line-number="65"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"4-Core CPU Processing Time"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-66" data-line-number="66"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Size of Dataset (# Samples)"</span>, <span class="dt">y =</span> <span class="st">"Time in Seconds (log scale)"</span>)</a>
+<a class="sourceLine" id="cb8-67" data-line-number="67"></a>
+<a class="sourceLine" id="cb8-68" data-line-number="68"></a>
+<a class="sourceLine" id="cb8-69" data-line-number="69"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-70" data-line-number="70"><span class="co"># 8-Core CPU, varying dataset size</span></a>
+<a class="sourceLine" id="cb8-71" data-line-number="71"><span class="co">#==========================================</span></a>
+<a class="sourceLine" id="cb8-72" data-line-number="72"></a>
+<a class="sourceLine" id="cb8-73" data-line-number="73">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/subset.html">subset</a></span>(results, Threads <span class="op">==</span><span class="st"> </span><span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb8-74" data-line-number="74"></a>
+<a class="sourceLine" id="cb8-75" data-line-number="75"><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">group=</span>Algorithm, <span class="dt">color=</span>Algorithm, <span class="dt">x=</span>Input.Size, <span class="dt">y=</span>Time)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-76" data-line-number="76"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-77" data-line-number="77"><span class="st">  </span><span class="kw">scale_y_log10</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>)<span class="op">*</span><span class="dv">100</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)<span class="op">*</span><span class="dv">1000</span>), <span class="dt">minor_breaks =</span> <span class="kw">c</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-78" data-line-number="78"><span class="st">  </span><span class="kw">scale_colour_brewer</span>(<span class="dt">palette =</span> <span class="st">'Paired'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-79" data-line-number="79"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"8-Core CPU Processing Time"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-80" data-line-number="80"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">"Size of Dataset (# Samples)"</span>, <span class="dt">y =</span> <span class="st">"Time in Seconds (log scale)"</span>)</a></code></pre></div>
 </div>
   </div>
 

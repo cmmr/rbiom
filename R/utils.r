@@ -5,8 +5,8 @@ cpu_count <- function () {
   # The number of cores we should use
   #--------------------------------------------------------------
   
-  usercores <- getOption('rbiom.max.threads')
-  machcores <- parallel::detectCores()
+  usercores <- try(as.numeric(getOption('rbiom.max.threads')), silent=TRUE)
+  machcores <- try(parallel::detectCores(), silent=TRUE)
   consensus <- try(min(na.omit(c(usercores, machcores))), silent=TRUE)
   
   consensus <- if (!is(consensus, "try-error")) consensus else 1
