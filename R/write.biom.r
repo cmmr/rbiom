@@ -25,6 +25,20 @@ write.biom <- function (biom, file, format="hdf5") {
   
   
   #--------------------------------------------------------------
+  # Default values for required fields
+  #--------------------------------------------------------------
+  
+  if (is.null(biom$info$type))     biom$info$type <- "OTU table"
+  if (is.na(biom$info$type))       biom$info$type <- "OTU table"
+  if (length(biom$info$type) != 1) biom$info$id   <- "OTU table"
+  if (nchar(biom$info$type) == 0)  biom$info$type <- "OTU table"
+  if (is.null(biom$info$id))       biom$info$id   <- "NA"
+  if (is.na(biom$info$id))         biom$info$id   <- "NA"
+  if (length(biom$info$id) != 1)   biom$info$id   <- "NA"
+  if (nchar(biom$info$id) == 0)    biom$info$id   <- "NA"
+  
+  
+  #--------------------------------------------------------------
   # Select the approriate format engine
   #--------------------------------------------------------------
   

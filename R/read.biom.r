@@ -472,7 +472,9 @@ PB.JSON.Taxonomy <- function (json) {
 
   taxa_table <- sapply(json$rows, simplify = "array", function (x) {
     taxaNames <- if (is.null(x$metadata$taxonomy)) x$id else x$metadata$taxonomy
-    unname(sapply(taxaNames, function (y) { strsplit(y, "[\\|;]\\ *")[[1]] }))
+    unname(sapply(taxaNames, function (y) { 
+      ifelse(nchar(y) > 0, strsplit(y, "[\\|;]\\ *")[[1]], "")
+    }))
   })
 
   # Handle instances where some taxa strings have more levels than others.
