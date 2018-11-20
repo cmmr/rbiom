@@ -12,11 +12,14 @@ knitr::opts_chunk$set(eval = FALSE)
 
 Here we will compare rbiom to similar packages by measuring the time taken to complete common operations on a representative dataset.
 
+
+
+
 ## Create Test Environment
 
 For our tests, we'll use a virtual machine on Amazon Web Service's Elastic Compute Cloud. Specifically:
-* US-West region
-* AMI 482e6430 ([QIIME 2 Core](https://s3-us-west-2.amazonaws.com/qiime2-data/distro/core/aws-amis.txt))
+* US-West (Oregon) region
+* AMI 04d99b45e6d99e48e ([QIIME 2 Core](https://s3-us-west-2.amazonaws.com/qiime2-data/distro/core/aws-amis.txt))
 * c3.8xlarge instance type (32 virtual CPUs)
 * 20 GiB General Purpose SSD (GP2) Storage on Root Volume
 
@@ -42,27 +45,37 @@ wget https://raw.githubusercontent.com/cmmr/rbiom/master/vignettes/data/hmp500.b
 
 The example data is taken from the publicly available Human Microbiome Project. The master data set contains 4,468 samples with 4,468,000 observations of 1,140 OTUs. These samples have been rarefied to 1000 obervations per sample. The below script will randomly subset the master file to n samples, where n begins at 100 samples and is incremented by 100 all the way to 4,400. This will allow us to see how programs handle inputs of varying sizes.
 
-prep_data.r:
-```r
+
+### American Gut Dataset
+```bash
+wget ftp://ftp.microbio.me/AmericanGut/latest/03-otus.zip
+unzip -j 03-otus.zip 03-otus/100nt/gg-13_8-97-percent/otu_table.biom
+unzip -j 03-otus.zip 03-otus/100nt/gg-13_8-97-percent/97_otus.tree
+
+# RScript for running rbiom
+#---------------------------------------
+cat > prep_data.r << EOF
 library(rbiom)
 
 dir.create("in")
 dir.create("out")
 setwd("in")
 
-x <- read.biom("https://s3.amazonaws.com/jplab/projects/hmp/hmp4468.biom")
-for (i in 1:44) {
-  n <- i * 100
-  y <- select(x, sample.int(4468, n))
+x <- read.biom("otu_table.biom")
+x$phylogeny <- read.tree("97_otus.tree")
+
+for (nSamples in c(100, 400, 900, 1600, 2500, 3600, 4900, 6400, 8100, 10000)) {
+  y <- select(x, sample.int(ncol(x$counts), n))
   y$taxonomy <- NULL
-  write.biom(y, paste0("hmp", n, ".tab"), "tab")
-  write.tree(y$phylogeny, paste0("hmp", n, ".tre"))
-  cmd <- sprintf('biom convert -i hmp%i.tab -o hmp%i.json --table-type="OTU table" --to-json', n, n)
+  write.biom(y, paste0("ag", n, ".tab"), "tab")
+  write.tree(y$phylogeny, paste0("ag", n, ".tre"))
+  cmd <- sprintf('biom convert -i ag%i.tab -o ag%i.json --table-type="OTU table" --to-json', n, n)
+  system(command = cmd, wait = FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+  cmd <- sprintf('biom convert -i ag%i.tab -o ag%i.hdf5 --table-type="OTU table" --to-hdf5', n, n)
   system(command = cmd, wait = FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
 }
-```
+EOF
 
-```bash
 Rscript prep_data.r
 ```
 
@@ -120,10 +133,19 @@ cat > qiime2.sh << EOF
 if [ \$2 = "u" ]; then metric="unweighted_unifrac"; else metric="weighted_unifrac"; fi
 qiime tools import --input-path in/hmp\$3.json --output-path json --type FeatureTable[Frequency] --source-format BIOMV100Format
 qiime tools import --input-path in/hmp\$3.tre --output-path tree --type Phylogeny[Rooted] --source-format NewickFormat
-qiime diversity beta-phylogenetic-alt --i-table json.qza --i-phylogeny tree.qza --p-metric \$metric --output-dir qiime_out --p-n-jobs \$1
+taskset -c 0-39:2 qiime diversity beta-phylogenetic-alt --i-table json.qza --i-phylogeny tree.qza --p-metric \$metric --output-dir qiime_out --p-n-jobs \$1
 qiime tools export --output-dir qiime_out qiime_out/distance_matrix.qza
 mv qiime_out/distance-matrix.tsv out/qiime2_\$2_dm\$3.tsv
 rm -rf json.qza tree.qza qiime_out
+EOF
+
+
+# Shell script for running ssu
+# https://github.com/biocore/unifrac
+#---------------------------------------
+cat > ssu.sh << EOF
+if [ \$2 = "u" ]; then metric="unweighted"; else metric="weighted_unnormalized"; fi
+taskset -c 0-39:2 ssu -i in/hmp\$3.hdf5 -t in/hmp\$3.tre -m \$metric -o out/ssu_\$2_dm\$3.tsv -n \$1
 EOF
 
 
@@ -137,6 +159,32 @@ rm \$metric.sorted.txt
 rm \$metric.tree
 EOF
 
+
+# Shell script for running mothur
+#---------------------------------------
+cat > mothur.sh << EOF1
+
+if [ \$2 = "u" ]; then fn="unweighted"; else fn="weighted"; fi
+if [ \$2 = "u" ]; then pf="uw";         else pf="tre1.w";   fi
+
+cat > mothur\$\$.bat << EOF2
+
+biom.info(biom=in/hmp\${3}.json)
+count.seqs(shared=in/hmp\${3}.userLabel.shared)
+unifrac.\${fn}(tree=in/hmp\${3}.tre, processors=\${1}, distance=lt, count=in/hmp\${3}.userLabel.userLabel.count_table)
+
+EOF2
+
+./mothur/mothur mothur\$\$.bat > /dev/null
+mv in/hmp\${3}.tre1.\${fn}.phylip.dist out/mothur_\${2}_dm\${3}.tsv
+rm in/hmp\${3}.\${pf}summary
+rm in/hmp\${3}.userLabel.shared 
+rm in/hmp\${3}.userLabel.userLabel.count_table
+rm mothur\$\$.bat
+rm mothur.*.logfile
+
+EOF1
+
 ```
 
 
@@ -146,6 +194,7 @@ Finally, execute and time each script.
 /usr/bin/time -f 'Time: %E  Memory: %M\n' Rscript phyloseq.r 8 u 500
 /usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh qiime2.sh  8 u 500
 /usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh usearch.sh 8 u 500
+/usr/bin/time -f 'Time: %E  Memory: %M\n' /bin/sh mothur.sh  8 u 500
 ```
 
 Results using 8 cores, unweighted unifrac, and 500 samples:
@@ -156,6 +205,7 @@ Results using 8 cores, unweighted unifrac, and 500 samples:
 | phyloseq |  106       | 1759328     |
 | usearch  |  15        | 17488       |
 | rbiom    |  1         | 326624      |
+| mothur   |  11        | 823776      |
 
 
 Results using 1 core, weighted unifrac, and 4400 samples:
@@ -176,7 +226,6 @@ Results using 20 cores, unweighted unifrac, and 4400 samples:
 
 
 
-Qiime2 says: `Weighted UniFrac is not parallelizable`
 Weighted Output matrices: rbiom == phyloseq != usearch
 Unweighted Output matrices: rbiom == phyloseq == qiime2 != usearch
 And unifrac_binary also doesn't equal normalized unweighted phyloseq
@@ -185,27 +234,47 @@ And unifrac_binary also doesn't equal normalized unweighted phyloseq
 Set these off in a loop
 ```bash
 
-for i in {100..4400..100}
+for i in {200..4400..200}
 do
-  /usr/bin/time -a -o ~/results.txt -f "usearch 1 w $i %e %M" /bin/sh usearch.sh 1 w $i
-  /usr/bin/time -a -o ~/results.txt -f "usearch 1 u $i %e %M" /bin/sh usearch.sh 1 u $i
-  /usr/bin/time -a -o ~/results.txt -f  "qiime2 1 w $i %e %M" /bin/sh qiime2.sh  1 w $i
-  for j in {1..20}
+  
+  js="1 4 8"
+  if [ $i -eq 4400 ]; then js="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20"; fi
+  
+  for j in js
   do
-    /usr/bin/time -a -o ~/results.txt -f   "qiime2 $j u $i %e %M" /bin/sh qiime2.sh  $j u $i
-    /usr/bin/time -a -o ~/results.txt -f    "rbiom $j w $i %e %M" Rscript rbiom.r    $j w $i
-    /usr/bin/time -a -o ~/results.txt -f    "rbiom $j u $i %e %M" Rscript rbiom.r    $j u $i
-    /usr/bin/time -a -o ~/results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
-    /usr/bin/time -a -o ~/results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
+    for w in w u
+    do
+      /usr/bin/time -a -o ~/results.txt -f  "usearch $j $w $i %e %M" /bin/sh usearch.sh $j $w $i
+      /usr/bin/time -a -o ~/results.txt -f   "qiime2 $j $w $i %e %M" /bin/sh qiime2.sh  $j $w $i
+      /usr/bin/time -a -o ~/results.txt -f      "ssu $j $w $i %e %M" /bin/sh ssu.sh     $j $w $i
+      /usr/bin/time -a -o ~/results.txt -f    "rbiom $j $w $i %e %M" Rscript rbiom.r    $j $w $i
+      /usr/bin/time -a -o ~/results.txt -f "phyloseq $j $w $i %e %M" Rscript phyloseq.r $j $w $i
+      /usr/bin/time -a -o ~/results.txt -f   "mothur $j $w $i %e %M" /bin/sh mothur.sh  $j $w $i
+    done
   done
 done
 
-export i=4400
-for j in {1..20}
+
+for i in 4400
 do
-  /usr/bin/time -a -o ~/results.txt -f "phyloseq $j w $i %e %M" Rscript phyloseq.r $j w $i
-  /usr/bin/time -a -o ~/results.txt -f "phyloseq $j u $i %e %M" Rscript phyloseq.r $j u $i
+  for j in {1..20}
+  do
+    /usr/bin/time -a -o results.txt -f   "qiime2_aws $j w $i %e %M" /bin/sh qiime2.sh  $j w $i
+    /usr/bin/time -a -o results.txt -f   "qiime2_aws $j u $i %e %M" /bin/sh qiime2.sh  $j u $i
+  done
 done
+
+
+for i in {1500..4300..100}
+do
+  for j in 1 4 8
+  do
+    /usr/bin/time -a -o ~/results.txt -f   "mothur $j w $i %e %M" /bin/sh mothur.sh  $j w $i
+    /usr/bin/time -a -o ~/results.txt -f   "mothur $j u $i %e %M" /bin/sh mothur.sh  $j u $i
+  done
+done
+
+
 
 ```
 
@@ -213,6 +282,7 @@ Make some graphs
 ```{r eval=TRUE}
 
 suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(cowplot))
 
 results <- read.delim(
   file      = "C:/Users/Daniel/Desktop/results.txt",
@@ -236,6 +306,9 @@ results <- plyr::ddply(results, c('Algorithm', 'Input.Size'), function (x) {
   return (x)
 })
 
+# Correct for `time` bug https://bugzilla.redhat.com/show_bug.cgi?id=702826
+results[['Memory']] <- results[['Memory']] / 4
+
 
 #==========================================
 # 4400 sample dataset, varying cpu count
@@ -247,7 +320,7 @@ ggplot(df, aes(group=Algorithm, color=Algorithm, x=Threads, y=Time)) +
   geom_line() +
   geom_point() +
   scale_y_log10(
-    minor_breaks = c(), 
+    minor_breaks = c(),
     breaks = c(c(1,2,5,10,20), c(1,2,5,10,20)*60, c(1,2,5,10,24,48)*3600),
     labels = c("00:00:01","00:00:02","00:00:05","00:00:10","00:00:20",
                "00:01:00","00:02:00","00:05:00","00:10:00","00:20:00",
@@ -350,6 +423,79 @@ ggplot(df, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Time)) +
 
 ```
 
+
+
+```{r eval=TRUE}
+
+#==========================================
+# QIIME 2 summary
+#==========================================
+
+theme_set(theme_gray(base_size = 4))
+
+df <- subset(results, Package %in% c("qiime2", "ssu"))
+df[['Time']]   <- df[['Time']] / 60
+df[['Memory']] <- df[['Memory']] / 1024
+#df[['Algorithm']] <- sub("qiime2 - ", "", df[['Algorithm']])
+
+df12 <- subset(df, Input.Size == 4400)
+
+p1 <- ggplot(df12, aes(group=Algorithm, color=Algorithm, x=Threads, y=Time)) +
+  geom_line(size=.3) + geom_point(size=.3) +
+  scale_y_continuous(limits=c(0, 4)) + 
+  labs(x = "Number of Threads", y = "Runtime in Minutes")
+
+p2 <- ggplot(df12, aes(group=Algorithm, color=Algorithm, x=Threads, y=Memory)) +
+  geom_line(size=.3) + geom_point(size=.3) +
+  scale_y_continuous(limits=c(0, 600)) + 
+  labs(x = "Number of Threads", y = "Memory in Megabytes")
+
+
+df34 <- subset(df, Threads == 1)
+
+p3 <- ggplot(df34, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Time)) +
+  geom_line(size=.3) + geom_point(size=.3) +
+  scale_y_continuous(limits=c(0, 4)) + 
+  labs(x = "Dataset Size", y = "Runtime in Minutes")
+
+p4 <- ggplot(df34, aes(group=Algorithm, color=Algorithm, x=Input.Size, y=Memory)) +
+  geom_line(size=.3) + geom_point(size=.3) +
+  scale_y_continuous(limits=c(0, 600)) + 
+  labs(x = "Dataset Size", y = "Memory in Meggabytes")
+
+
+pTop <- plot_grid(
+  ncol=1, 
+  rel_heights=c(0.1, 1),
+  ggdraw() + draw_label("Dataset of 4,400 Samples; Varying the Number of Threads", fontface='bold', size=4, x=0.05, hjust=0), 
+  plot_grid( 
+    p1 + theme(legend.position="none"),
+    p2 + theme(legend.position="none"),
+    align = 'vh',
+    nrow = 1
+  )
+)
+
+pBot <- plot_grid(
+  ncol=1, 
+  rel_heights=c(0.1, 1),
+  ggdraw() + draw_label("Single-Threaded; Varying the Dataset Size", fontface='bold', size=4, x=0.05, hjust=0), 
+  plot_grid( 
+    p3 + theme(legend.position="none"),
+    p4 + theme(legend.position="none"),
+    align = 'vh',
+    nrow = 1
+  )
+)
+
+
+legend <- get_legend(p1 + scale_color_discrete(name="") + theme(legend.position="bottom", legend.key.size = unit(1,"line"), legend.key.height = unit(.2,"line")) + guides(color=guide_legend(nrow=2,byrow=TRUE)))
+
+p <- plot_grid(legend, pTop, pBot, ncol=1, rel_heights=c(.2, .8, .8))
+cowplot::ggsave("C:/Users/Daniel/Desktop/qiime2-ssu.png", p, height=2, width=2)
+
+
+```
 
 
 

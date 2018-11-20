@@ -17,8 +17,8 @@ on.exit(file.remove(c(f1,f2)))
 
 writeChar(original, f1)
 
-t1 <- rbiom::read.tree(file=f1)
-t2 <- rbiom::read.tree(text=original)
+t1 <- rbiom::read.tree(src=f1)
+t2 <- rbiom::read.tree(src=original)
 newick <- rbiom::write.tree(tree=t1)
 rbiom::write.tree(tree=t1, file=f2)
 
@@ -30,7 +30,7 @@ test_that("Newick File IO", {
 
 
 t1  <- "((a,(b,c,d)),(e,f,g,(h,i)));"
-phy <- rbiom::read.tree(text=t1)
+phy <- rbiom::read.tree(src=t1)
 t2  <- rbiom::write.tree(tree=phy)
 
 test_that("Newick Short Names", {
@@ -40,11 +40,11 @@ test_that("Newick Short Names", {
 
 
 
-phy <- rbiom::read.tree(text="((a,(b,c,d)),(e,f,g,(h,i)));")
+phy <- rbiom::read.tree(src="((a,(b,c,d)),(e,f,g,(h,i)));")
 t1  <- rbiom::write.tree(subtree(phy, c('b', 'c', 'f', 'g', 'i')))
 t2  <- rbiom::write.tree(subtree(phy, c('a', 'b', 'c', 'f', 'g', 'h', 'i')))
 
-phy <- rbiom::read.tree(text=original)
+phy <- rbiom::read.tree(src=original)
 t3  <- rbiom::write.tree(rbiom::subtree(phy, c('Atl Porci', 'SteMa290', 'HelPy142')))
 t4  <- rbiom::write.tree(rbiom::subtree(phy, c('AciSp313',  'MxlBact8', 'SphSp203')))
 

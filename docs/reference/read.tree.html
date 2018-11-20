@@ -34,7 +34,8 @@
 
 <meta property="og:description" content="A phylogenetic tree is required for computing UniFrac distance matrices.
 You can load a tree either from a file or by providing the tree string
-directly." />
+directly. This tree must be in Newick format, also known as parenthetic
+format and New Hampshire format." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -118,35 +119,45 @@ directly." />
     
     <p>A phylogenetic tree is required for computing UniFrac distance matrices.
 You can load a tree either from a file or by providing the tree string
-directly.</p>
+directly. This tree must be in Newick format, also known as parenthetic
+format and New Hampshire format.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>read.tree</span>(<span class='kw'>file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>text</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>read.tree</span>(<span class='no'>src</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>file</th>
-      <td><p>Path to the newick file.</p></td>
+      <th>src</th>
+      <td><p>Input data as either a file path, URL, or Newick string. URLs 
+must begin with <kbd>http://</kbd>, <kbd>https://</kbd>, <kbd>ftp://</kbd>, or 
+<kbd>ftps://</kbd>. Newick strings must have <code>(</code> as their first 
+non-whitespace character. Compressed (gzip or bzip2) Newick files 
+are also supported.</p></td>
     </tr>
     <tr>
-      <th>text</th>
-      <td><p>The newick tree as a string.</p></td>
+      <th>progressbar</th>
+      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>phylo</code> class object.</p>
+    <p>A <code>phylo</code> class object representing the tree.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='fu'>library</span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"newick.tre"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'>read.tree</span>(<span class='no'>infile</span>)</div></pre>
+    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'>read.tree</span>(<span class='no'>infile</span>)
+
+    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='fu'>read.tree</span>(<span class='st'>"
+        (t9:0.99,((t5:0.87,t2:0.89):0.51,(((t10:0.16,(t7:0.83,t4:0.96)
+        :0.94):0.69,(t6:0.92,(t3:0.62,t1:0.85):0.54):0.23):0.74,t8:0.1
+        2):0.43):0.67);"</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

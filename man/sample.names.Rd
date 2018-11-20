@@ -25,13 +25,10 @@ Get the sample names.
 
 }
 \seealso{
-\code{\link{sample.names}}, \code{\link{taxa.names}}, 
-    \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-    \code{\link{taxonomy}}, \code{\link{phylogeny}},
-    \code{\link{metadata}}, \code{\link{info}}
-
 Other accessor functions: \code{\link{counts}},
   \code{\link{info}}, \code{\link{metadata}},
+  \code{\link{nsamples}}, \code{\link{ntaxa}},
   \code{\link{phylogeny}}, \code{\link{taxa.names}},
   \code{\link{taxa.ranks}}, \code{\link{taxonomy}}
 }
+\concept{accessor functions}

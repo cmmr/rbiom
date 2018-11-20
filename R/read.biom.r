@@ -8,6 +8,12 @@
 #'     \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
 #'     \code{\{} as their first non-whitespace character. Compressed (gzip or
 #'     bzip2) biom files are also supported.
+#' @param tree  The default value of \code{auto} will read the tree from the 
+#'     biom file specified in \code{src}, if present. The value \code{TRUE} 
+#'     will do the same, but will generate an error message if a tree is not 
+#'     present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
+#'     without any tree data. You may also provide a file path, URL, or Newick
+#'     string to load that tree data into the final \code{BIOM} object.
 #' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
@@ -64,7 +70,7 @@
 #'
 
 
-read.biom <- function (src, progressbar=NULL) {
+read.biom <- function (src, tree='auto', progressbar=NULL) {
 
   #--------------------------------------------------------------
   # Sanity check input values
@@ -78,7 +84,7 @@ read.biom <- function (src, progressbar=NULL) {
 
 
   #--------------------------------------------------------------
-  # Get the url or text data into a file
+  # Get the url or text for the src/BIOM data into a file
   #--------------------------------------------------------------
 
   if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
@@ -86,12 +92,14 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(0, detail='Downloading BIOM file')
 
     fp <- tempfile(fileext=basename(src))
+    on.exit(unlink(fp), add=TRUE)
     if (!identical(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(simpleError(sprintf("Cannot retrieve URL %s", src)))
 
   } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
 
     fp <- tempfile(fileext=".biom")
+    on.exit(unlink(fp), add=TRUE)
     if (!is.null(try(writeChar(src, fp), silent=TRUE)))
         stop(simpleError(sprintf("Cannot write text to file %s", fp)))
 
@@ -112,11 +120,18 @@ read.biom <- function (src, progressbar=NULL) {
   file_class <- summary(file_con)$class
   close.connection(file_con)
   
-  if (identical(file_class, "gzfile"))
-    fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
-  
-  if (identical(file_class, "bzfile"))
-    fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
+  if (file_class %in% c("gzfile", "bzfile")) {
+    
+    pb$set(0, detail=paste('Decompressing', basename(fp)))
+    
+    if (identical(file_class, "gzfile"))
+      fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
+    
+    if (identical(file_class, "bzfile"))
+      fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
+    
+    on.exit(unlink(fp), add=TRUE)
+  }
   
   remove("file_con", "file_class")
   
@@ -139,7 +154,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
-    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5)
+    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5, tree)
     
     rhdf5::H5Fclose(hdf5)
     #rhdf5::H5close()
@@ -156,7 +171,7 @@ read.biom <- function (src, progressbar=NULL) {
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.JSON.Info(json)
-    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json)
+    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json, tree)
     
     remove("json")
     
@@ -166,13 +181,15 @@ read.biom <- function (src, progressbar=NULL) {
     # TSV file format   #
     #-=-=-=-=-=-=-=-=-=-#
     
+    if (isTRUE(tree))
+      stop(simpleError("It is impossible to load a phylogenetic tree from a BIOM file in tab-separated format."))
+    
     pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
     pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
     pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
     pb$set(1.0, 'Extracting attributes');         info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
     pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
-    
   }
   
   
@@ -515,21 +532,36 @@ PB.HDF5.Taxonomy <- function (hdf5) {
 
 
 
-PB.JSON.Tree <- function (json) {
-
-  # See if a tree is included in the BIOM file
+PB.JSON.Tree <- function (json, tree_mode) {
+  
+  # Obey the tree argument
   #------------------------------------------------------
-  newick <- json[['phylogeny']]
-  if (is.null(newick)) return (NULL)
-  if (is.na(newick))   return (NULL)
-  if (!nchar(newick))  return (NULL)
-
+  if (isTRUE(tree_mode)) {
+    tree <- json[['phylogeny']]
+    
+  } else if (isFALSE(tree_mode)) {
+    return (NULL)
+    
+  } else if (identical(tree_mode, 'auto')) {
+    if (!'phylogeny' %in% names(json))      return (NULL)
+    if (is.null(json[['phylogeny']]))       return (NULL)
+    if (is.na(json[['phylogeny']]))         return (NULL)
+    if (!is.character(json[['phylogeny']])) return (NULL)
+    if (!length(json[['phylogeny']]) == 1)  return (NULL)
+    if (!nchar(json[['phylogeny']]) >= 1)   return (NULL)
+    tree <- json[['phylogeny']]
+    
+  } else {
+    tree <- tree_mode
+  }
+  
 
   # Try to read it, assuming newick format
   #------------------------------------------------------
-  tree <- try(rbiom::read.tree(text=newick), silent=TRUE)
+  tree <- try(rbiom::read.tree(tree), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
+    if (!identical(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }
@@ -543,37 +575,72 @@ PB.JSON.Tree <- function (json) {
     if (length(missing) > 6)
       missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
     errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
+    if (!identical(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }
+  
+  
+  # Drop any extra taxa found in the tree
+  #------------------------------------------------------
+  if (length(tree$tip.label) > length(TaxaIDs))
+    tree <- rbiom::subtree(tree, TaxaIDs)
 
 
   return (tree)
 }
 
-PB.HDF5.Tree <- function (hdf5) {
+PB.HDF5.Tree <- function (hdf5, tree_mode) {
   
-  # See if a tree is included in the BIOM file
+  # Obey the tree argument
   #------------------------------------------------------
-  tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
-  if (is.null(tree)) return (NULL)
-  if (!length(tree)) return (NULL)
+  if (isFALSE(tree_mode)) {
+    return (NULL)
   
-  
-  # Assume it's newick format unless otherwise indicated
-  #------------------------------------------------------
-  attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
-  if ("data_type" %in% names(attrs)) {
-    data_type <- tolower(as.character(attrs[['data_type']]))
-    if (!identical(data_type, "newick")) return (NULL)
+  } else if (isTRUE(tree_mode) | identical(tree_mode, 'auto')) {
+    
+    # See if a tree is included in the BIOM file
+    #------------------------------------------------------
+    tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
+    
+    errmsg <- NULL
+    
+    if (is.null(tree)) {
+      errmsg <- "There is no tree in this BIOM file."
+      
+    } else if (!length(tree)) {
+      errmsg <- "There is no tree in this BIOM file."
+      
+    } else {
+    
+      # Assume it's newick format unless otherwise indicated
+      #------------------------------------------------------
+      attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
+      if ("data_type" %in% names(attrs)) {
+        data_type <- tolower(as.character(attrs[['data_type']]))
+        if (!identical(data_type, "newick"))
+          errmsg <- sprintf("Phylogeny is not Newick format, is '%s'.", data_type)
+      }
+    }
+    
+    if (!is.null(errmsg) & isTRUE(tree_mode)) {
+      stop(errmsg)
+    }
+    
+  } else {
+    tree <- tree_mode
   }
   
   
   # Try to read the Newick-formatted tree
   #------------------------------------------------------
-  tree <- try(read.tree(text=as.character(tree)), silent=TRUE)
-  if (is(tree, "try-error"))
-    stop(simpleError(sprintf("Unable to read phylogeny. %s", as.character(tree))))
+  tree <- try(rbiom::read.tree(tree), silent=TRUE)
+  if (is(tree, "try-error")) {
+    errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
+    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    cat(file=stderr(), errmsg)
+    return (NULL)
+  }
   
   
   # Make sure it has all the OTUs from the table
@@ -581,9 +648,19 @@ PB.HDF5.Tree <- function (hdf5) {
   TaxaIDs <- as.character(hdf5$observation$ids)
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
-    if (length(missing) > 6) missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
-    stop(simpleError(sprintf("OTUs missing from tree: %s", paste(collapse=",", missing))))
+    if (length(missing) > 6)
+      missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
+    errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
+    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    cat(file=stderr(), errmsg)
+    return (NULL)
   }
+  
+  
+  # Drop any extra taxa found in the tree
+  #------------------------------------------------------
+  if (length(tree$tip.label) > length(TaxaIDs))
+    tree <- rbiom::subtree(tree, TaxaIDs)
   
   
   return (tree)

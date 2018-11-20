@@ -3,10 +3,6 @@
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A character vector of the sample IDs / names in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -29,10 +25,6 @@ sample.names <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A character vector of the taxa IDs / names in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -40,7 +32,7 @@ sample.names <- function (biom) {
 #'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
-#'     taxa.names(biom)
+#'     taxa.names(biom) %>% head()
 #'
 
 taxa.names <- function (biom) {
@@ -55,10 +47,6 @@ taxa.names <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A character vector of the taxa ranks in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -81,10 +69,6 @@ taxa.ranks <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A numeric matrix of the sample abundance counts in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -107,10 +91,6 @@ counts <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A character matrix of the named taxonomies in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -133,10 +113,6 @@ taxonomy <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A \code{phylo} class object of the tree in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -159,10 +135,6 @@ phylogeny <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A data frame of the metadata in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -185,10 +157,6 @@ metadata <- function (biom) {
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A data frame of the metadata in \code{biom}.
 #' @family accessor functions
-#' @seealso \code{\link{sample.names}}, \code{\link{taxa.names}}, 
-#'     \code{\link{taxa.ranks}}, \code{\link{counts}}, 
-#'     \code{\link{taxonomy}}, \code{\link{phylogeny}},
-#'     \code{\link{metadata}}, \code{\link{info}}
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -206,9 +174,45 @@ info <- function (biom) {
 }
 
 
+#' Number of samples in a BIOM.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return The number of samples present.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     nsamples(biom)
+#'
+
+nsamples <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    return (simpleError('In nsamples(), biom must be a BIOM-class object.'))
+  return (ncol(biom[['counts']]))
+}
 
 
+#' Number of taxa in a BIOM.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return The number of taxa present.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     ntaxa(biom)
+#'
 
-
-
-
+ntaxa <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    return (simpleError('In ntaxa(), biom must be a BIOM-class object.'))
+  return (nrow(biom[['counts']]))
+}

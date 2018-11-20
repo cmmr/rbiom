@@ -124,7 +124,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) 
     set <- NULL
     pb$set(value=0)
     
-    foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts) %dopar% {
+    foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts, .export='rcpp_distance') %dopar% {
       nJobs <- cl$nSets
       iJob  <- set
       

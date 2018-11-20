@@ -4,7 +4,7 @@
 \alias{read.biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read.biom(src, progressbar = NULL)
+read.biom(src, tree = "auto", progressbar = NULL)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
@@ -15,6 +15,13 @@ classical tabular format. URLs must begin with \kbd{http://},
 \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
 \code{\{} as their first non-whitespace character. Compressed (gzip or
 bzip2) biom files are also supported.}
+
+\item{tree}{The default value of \code{auto} will read the tree from the 
+biom file specified in \code{src}, if present. The value \code{TRUE} 
+will do the same, but will generate an error message if a tree is not 
+present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
+without any tree data. You may also provide a file path, URL, or Newick
+string to load that tree data into the final \code{BIOM} object.}
 
 \item{progressbar}{An object of class \code{Progress}.}
 }

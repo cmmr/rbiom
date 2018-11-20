@@ -23,9 +23,9 @@ LinkingTo:
     Rcpp,
     RcppParallel
 Imports:
-    DirichletMultinomial,
     doSNOW (>= 1.0.14),
     foreach,
+    magrittr,
     methods,
     parallel,
     plyr,
@@ -39,4 +39,4 @@ Suggests:
     ape,
     reshape2,
     testthat
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

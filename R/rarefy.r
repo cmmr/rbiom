@@ -71,7 +71,7 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
     
     set <- idx <- NULL
     
-    foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts) %dopar% {
+    foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts, .packages='foreach') %dopar% {
       foreach (idx=set, .combine='rbind') %do% {
         
         x <- ceiling(counts$v[counts$j == idx])

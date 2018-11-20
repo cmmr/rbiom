@@ -88,7 +88,7 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
             
             sets <- parallel::splitIndices(ncol(otus), min(ncol(otus), cl$ncores * 10))
             
-            foreach (set=sets, .combine='c', .options.snow=cl$opts) %dopar% {
+            foreach (set=sets, .combine='c', .options.snow=cl$opts, .packages='foreach') %dopar% {
               foreach (idx=set, .combine='c') %do% {
                 
                 x       <- otus$v[otus$j == idx]

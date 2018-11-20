@@ -118,7 +118,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,6 +133,15 @@ classical tabular format. URLs must begin with <kbd>http://</kbd>,
 <kbd>https://</kbd>, <kbd>ftp://</kbd>, or <kbd>ftps://</kbd>. JSON files must have
 <code>{</code> as their first non-whitespace character. Compressed (gzip or
 bzip2) biom files are also supported.</p></td>
+    </tr>
+    <tr>
+      <th>tree</th>
+      <td><p>The default value of <code>auto</code> will read the tree from the 
+biom file specified in <code>src</code>, if present. The value <code>TRUE</code> 
+will do the same, but will generate an error message if a tree is not 
+present. Setting <code>tree=FALSE</code> will return a <code>BIOM</code> object 
+without any tree data. You may also provide a file path, URL, or Newick
+string to load that tree data into the final <code>BIOM</code> object.</p></td>
     </tr>
     <tr>
       <th>progressbar</th>

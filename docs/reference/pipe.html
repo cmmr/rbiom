@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get the taxonomy table. — taxonomy • rbiom</title>
+<title>Pipe operator — %&gt;% • rbiom</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Get the taxonomy table. — taxonomy" />
+<meta property="og:title" content="Pipe operator — %&gt;%" />
 
-<meta property="og:description" content="Get the taxonomy table." />
+<meta property="og:description" content="Pipe operator" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -107,70 +107,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get the taxonomy table.</h1>
+    <h1>Pipe operator</h1>
     
-    <div class="hidden name"><code>taxonomy.Rd</code></div>
+    <div class="hidden name"><code>pipe.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Get the taxonomy table.</p>
+    <p>Pipe operator</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>taxonomy</span>(<span class='no'>biom</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>biom</th>
-      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <pre class="usage"><span class='no'>lhs</span> <span class='kw'>%&gt;%</span> <span class='no'>rhs</span></pre>
+        
 
-    <p>A character matrix of the named taxonomies in <code>biom</code>.</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other accessor functions: <code><a href='counts.html'>counts</a></code>,
-  <code><a href='info.html'>info</a></code>, <code><a href='metadata.html'>metadata</a></code>,
-  <code><a href='nsamples.html'>nsamples</a></code>, <code><a href='ntaxa.html'>ntaxa</a></code>,
-  <code><a href='phylogeny.html'>phylogeny</a></code>, <code><a href='sample.names.html'>sample.names</a></code>,
-  <code><a href='taxa.names.html'>taxa.names</a></code>, <code><a href='taxa.ranks.html'>taxa.ranks</a></code></p></div>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'>library</span>(<span class='no'>rbiom</span>)
-
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='fu'>taxonomy</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,]</div><div class='output co'>#&gt;          Kingdom    Phylum           Class                 Order            
-#&gt; AciSp313 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pseudomonadales"
-#&gt; AcnLingn "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"
-#&gt; AcnOriho "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"
-#&gt; AecChri2 "Bacteria" "Firmicutes"     "Bacilli"             "Lactobacillales"
-#&gt;          Family             Genus          
-#&gt; AciSp313 "Moraxellaceae"    "Acinetobacter"
-#&gt; AcnLingn "Actinomycetaceae" "Actinomyces"  
-#&gt; AcnOriho "Actinomycetaceae" "Actinomyces"  
-#&gt; AecChri2 "Aerococcaceae"    "Aerococcus"   </div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>

@@ -4,7 +4,8 @@
 \alias{beta.div}
 \title{Make a distance matrix of samples vs samples.}
 \usage{
-beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = NULL)
+beta.div(biom, method, weighted = TRUE, tree = NULL,
+  progressbar = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
