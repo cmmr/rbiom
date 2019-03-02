@@ -5,7 +5,9 @@
 #'     columns are assumed to be the taxa and samples, respectively.
 #' @param depth  The number of observations to keep, per sample. If set to
 #'     \code{NULL}, a depth will be automatically selected. Samples that have
-#'     fewer than this number of observations will be dropped.
+#'     fewer than this number of observations will be dropped. If called on
+#'     data with non-integer abundances, values will be re-scaled to integers 
+#'     between 1 and \code{depth} such that they sum to \code{depth}.
 #' @param seed  An integer to use for seeding the random number generator. If
 #'     you need to create different random rarefactions of the same \code{BIOM}
 #'     object, set this seed value to a different number each time.
@@ -44,15 +46,23 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   
   
   #--------------------------------------------------------------
-  # Choose the rarefaction depths to sample at
+  # Choose the rarefaction depth to sample at
   #--------------------------------------------------------------
 
   if (is.null(depth)) {
-
-    sample_sums <- slam::col_sums(counts)
-    depth       <- (sum(sample_sums) * .1) / length(sample_sums)
-    depth       <- min(sample_sums[sample_sums >= depth])
-    remove("sample_sums")
+    
+    if (all(counts$v %% 1 == 0)) {
+      
+      sample_sums <- slam::col_sums(counts)
+      depth       <- (sum(sample_sums) * .1) / length(sample_sums)
+      depth       <- min(sample_sums[sample_sums >= depth])
+      remove("sample_sums")
+      
+    } else {
+      
+      depth <- 1000
+      
+    }
 
   } else {
 
@@ -61,55 +71,107 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
 
     if (depth %% 1 != 0)
       stop(simpleError("In rarefy(), depth must be an integer."))
+    
+    if (depth <= 0)
+      stop(simpleError("In rarefy(), depth must be positive."))
   }
   
   
-  pb <- progressBar(progressbar, paste("Rarefying to", depth))
-  cl <- configCluster(nTasks=counts$ncol, pb)
   
-  res <- {
+  
+  #--------------------------------------------------------------
+  # Integer data. Randomly select observations to keep.
+  #--------------------------------------------------------------
+  
+  if (all(counts$v %% 1 == 0)) {
     
-    set <- idx <- NULL
+    pb <- progressBar(progressbar, paste("Rarefying to", depth))
+    cl <- configCluster(nTasks=counts$ncol, pb)
     
-    foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts, .packages='foreach') %dopar% {
-      foreach (idx=set, .combine='rbind') %do% {
-        
-        x <- ceiling(counts$v[counts$j == idx])
-        nReads <- sum(x)
-        
-        if (nReads < depth)
-          return (NULL)
-        
-        sampleID <- ifelse(is.null(colnames(counts)), paste0("Sample", idx), colnames(counts)[[idx]])
-        set.seed(sum(utf8ToInt(sampleID) + seed) %% 2147483647)
-        
-        breaks <- c(0, cumsum(x))
-        labels <- counts$i[counts$j == idx]
-        retain <- sample.int(nReads, depth)
-        retain <- table(cut(retain, breaks=breaks, labels=labels))
-        retain <- retain[retain > 0]
-        
-        matrix(c(as.numeric(names(retain)), rep(idx, length(retain)), unname(retain)), ncol=3)
+    res <- {
+      
+      set <- idx <- NULL
+      
+      foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts, .packages='foreach') %dopar% {
+        foreach (idx=set, .combine='rbind') %do% {
+          
+          x <- ceiling(counts$v[counts$j == idx])
+          nReads <- sum(x)
+          
+          if (nReads < depth)
+            return (NULL)
+          
+          sampleID <- ifelse(is.null(colnames(counts)), paste0("Sample", idx), colnames(counts)[[idx]])
+          set.seed(sum(utf8ToInt(sampleID) + seed) %% 2147483647)
+          
+          breaks <- c(0, cumsum(x))
+          labels <- counts$i[counts$j == idx]
+          retain <- sample.int(nReads, depth)
+          retain <- table(cut(retain, breaks=breaks, labels=labels))
+          retain <- retain[retain > 0]
+          
+          matrix(c(as.numeric(names(retain)), rep(idx, length(retain)), unname(retain)), ncol=3)
+        }
       }
     }
-  }
-
-
-
-  #--------------------------------------------------------------
-  # Construct a new simple triplet matrix
-  #--------------------------------------------------------------
-
-  TaxaIDs   <- counts$dimnames[[1]][sort(unique(res[,1]))]
-  SampleIDs <- counts$dimnames[[2]][sort(unique(res[,2]))]
-
-  counts <- slam::simple_triplet_matrix(
-    i = as.numeric(factor(res[,1])),
-    j = as.numeric(factor(res[,2])),
-    v = res[,3],
-    dimnames = list(TaxaIDs, SampleIDs)
-  )
+    
+    
+    # Construct a new simple triplet matrix
+    #--------------------------------------------------------------
+    
+    TaxaIDs   <- counts$dimnames[[1]][sort(unique(res[,1]))]
+    SampleIDs <- counts$dimnames[[2]][sort(unique(res[,2]))]
+    
+    counts <- slam::simple_triplet_matrix(
+      i = as.numeric(factor(res[,1])),
+      j = as.numeric(factor(res[,2])),
+      v = res[,3],
+      dimnames = list(TaxaIDs, SampleIDs)
+    )
   
+    
+  #--------------------------------------------------------------
+  # Fractional data. Re-scale between 1 and depth. Total = depth.
+  #--------------------------------------------------------------
+  
+  } else {
+    
+    pb <- progressBar(progressbar, paste("Rescaling to", depth))
+    
+    counts <- as.matrix(counts)
+    
+    # Does this, but then nudges up and down until == depth:
+    # round(t((t(counts) / colSums(counts))) * depth)
+    
+    counts <- apply(counts, 2L, function (x) { 
+      x        <- x / sum(x)
+      y        <- round(x * depth)
+      maxIters <- length(x)
+      
+      while (sum(y) < depth && maxIters > 0) {
+        i        <- which.min( ((y + 1) / depth) - x )
+        y[i]     <- y[i] + 1
+        maxIters <- maxIters - 1
+      }
+      while (sum(y) > depth && maxIters > 0) {
+        i        <- which.min( x - ((y - 1) / depth) )
+        y[i]     <- y[i] - 1
+        maxIters <- maxIters - 1
+      }
+      
+      return (y)
+    })
+    
+    counts    <- slam::as.simple_triplet_matrix(counts)
+    TaxaIDs   <- rownames(counts)
+    SampleIDs <- colnames(counts)
+    
+  }
+  
+  
+  #--------------------------------------------------------------
+  # If biom isn't a BIOM object, return now.
+  #--------------------------------------------------------------
   if (is(biom, "simple_triplet_matrix")) return (counts)
   if (is(biom, "matrix")) return (as.matrix(counts))
   

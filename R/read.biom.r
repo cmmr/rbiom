@@ -181,7 +181,7 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
     # TSV file format   #
     #-=-=-=-=-=-=-=-=-=-#
     
-    if (isTRUE(tree))
+    if (identical(tree, TRUE))
       stop(simpleError("It is impossible to load a phylogenetic tree from a BIOM file in tab-separated format."))
     
     pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
@@ -388,7 +388,7 @@ PB.HDF5.Info <- function (hdf5) {
 
 PB.TSV.Counts <- function (mtx) {
 
-  # Only keep column that are all numbers
+  # Only keep columns that are all numbers
   allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)([Ee][\\+\\-]{0,1}[0-9]+|)$", x))
   mtx <- mtx[, apply(mtx, 2L, allNumbers), drop=FALSE]
   mtx <- matrix(
@@ -536,10 +536,10 @@ PB.JSON.Tree <- function (json, tree_mode) {
   
   # Obey the tree argument
   #------------------------------------------------------
-  if (isTRUE(tree_mode)) {
+  if (identical(tree_mode, TRUE)) {
     tree <- json[['phylogeny']]
     
-  } else if (isFALSE(tree_mode)) {
+  } else if (identical(tree_mode, FALSE)) {
     return (NULL)
     
   } else if (identical(tree_mode, 'auto')) {
@@ -594,10 +594,10 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
   
   # Obey the tree argument
   #------------------------------------------------------
-  if (isFALSE(tree_mode)) {
+  if (identical(tree_mode, FALSE)) {
     return (NULL)
   
-  } else if (isTRUE(tree_mode) | identical(tree_mode, 'auto')) {
+  } else if (identical(tree_mode, TRUE) | identical(tree_mode, 'auto')) {
     
     # See if a tree is included in the BIOM file
     #------------------------------------------------------
@@ -623,7 +623,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
       }
     }
     
-    if (!is.null(errmsg) & isTRUE(tree_mode)) {
+    if (!is.null(errmsg) & identical(tree_mode, TRUE)) {
       stop(errmsg)
     }
     

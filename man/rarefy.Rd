@@ -13,7 +13,9 @@ columns are assumed to be the taxa and samples, respectively.}
 
 \item{depth}{The number of observations to keep, per sample. If set to
 \code{NULL}, a depth will be automatically selected. Samples that have
-fewer than this number of observations will be dropped.}
+fewer than this number of observations will be dropped. If called on
+data with non-integer abundances, values will be re-scaled to integers 
+between 1 and \code{depth} such that they sum to \code{depth}.}
 
 \item{seed}{An integer to use for seeding the random number generator. If
 you need to create different random rarefactions of the same \code{BIOM}
