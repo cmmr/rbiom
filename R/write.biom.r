@@ -11,7 +11,7 @@
 #' @export
 
 
-write.biom <- function (biom, file, format="hdf5") {
+write.biom <- function (biom, file, format="json") {
   
   #--------------------------------------------------------------
   # Sanity Checks
