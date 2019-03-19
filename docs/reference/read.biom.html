@@ -171,10 +171,14 @@ string to load that tree data into the final <code>BIOM</code> object.</p></td>
         <code>phylogeny</code> entry with newick data, then it will be loaded
         here as well. The <span class="pkg">ape</span> package has additional functions
         for working with <code>phylo</code> objects.</p></dd>
+        <dt>sequences</dt><dd><p>A named character vector, where the names are
+        taxonomic identifiers and the values are the sequences they
+        represent. These values are not part of the official BIOM
+        specification, but will be read and written when defined.</p></dd>
         <dt>info</dt><dd><p>A list of other attributes defined in the BIOM file,
         such as <code>id</code>, <code>type</code>, <code>format</code>, <code>format_url</code>,
         <code>generated_by</code>, <code>date</code>, <code>matrix_type</code>,
-        <code>matrix_element_type</code>, and <code>shape</code></p></dd>
+        <code>matrix_element_type</code>, <code>Comment</code>, and <code>shape</code></p></dd>
        </dl>
 
 <p><code>metadata</code>, <code>taxonomy</code>, and <code>phylogeny</code> are optional
@@ -193,6 +197,7 @@ string to load that tree data into the final <code>BIOM</code> object.</p></td>
 #&gt; metadata     4   data.frame            list     
 #&gt; taxonomy  3462   -none-                character
 #&gt; phylogeny    4   phylo                 list     
+#&gt; sequences    0   -none-                NULL     
 #&gt; info         8   -none-                list     </div><div class='input'>
     <span class='co'># Taxa Abundances</span>
     <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04

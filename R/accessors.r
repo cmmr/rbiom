@@ -152,6 +152,29 @@ metadata <- function (biom) {
 }
 
 
+#' DNA sequence associated with each taxonomic identifier.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return A named character vector of sequences in \code{biom}. If this data
+#'           is not present, then returns \code{NULL}.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     sequences(biom)[1:4]
+#'
+
+sequences <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    return (simpleError('In sequences(), biom must be a BIOM-class object.'))
+  return (biom[['sequences']])
+}
+
+
 #' Get biom's misc information.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.

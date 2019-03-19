@@ -4,7 +4,7 @@
 \alias{write.biom}
 \title{Write counts, metadata, taxonomy, and phylogeny to a biom file.}
 \usage{
-write.biom(biom, file, format = "hdf5")
+write.biom(biom, file, format = "json")
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}

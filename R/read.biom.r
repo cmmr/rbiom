@@ -34,10 +34,14 @@
 #'         \code{phylogeny} entry with newick data, then it will be loaded
 #'         here as well. The \pkg{ape} package has additional functions
 #'         for working with \code{phylo} objects.}
+#'         \item{sequences}{A named character vector, where the names are
+#'         taxonomic identifiers and the values are the sequences they
+#'         represent. These values are not part of the official BIOM
+#'         specification, but will be read and written when defined.}
 #'         \item{info}{A list of other attributes defined in the BIOM file,
 #'         such as \code{id}, \code{type}, \code{format}, \code{format_url},
 #'         \code{generated_by}, \code{date}, \code{matrix_type},
-#'         \code{matrix_element_type}, and \code{shape}}
+#'         \code{matrix_element_type}, \code{Comment}, and \code{shape}}
 #'        }
 #'
 #'     \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
@@ -151,6 +155,7 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
     
     pb$set(0.1, detail='Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
     pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
+    pb$set(0.6, detail='Extracting sequences');          sequences <- PB.HDF5.Sequences(hdf5)
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
@@ -168,6 +173,7 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
     
     pb$set(0.1, detail='Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
     pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.JSON.Counts(json)
+    pb$set(0.6, detail='Extracting sequences');          sequences <- PB.JSON.Sequences(json)
     pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
     pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
     pb$set(0.9, detail='Extracting attributes');         info      <- PB.JSON.Info(json)
@@ -186,6 +192,7 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
     
     pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
     pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
+    pb$set(0.7, 'Extracting sequences');          sequences <- NULL
     pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
     pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
     pb$set(1.0, 'Extracting attributes');         info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
@@ -203,6 +210,7 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
           'metadata'  = metadata,
           'taxonomy'  = taxonomy,
           'phylogeny' = phylogeny,
+          'sequences' = sequences,
           'info'      = info
     )
   )
@@ -528,6 +536,39 @@ PB.HDF5.Taxonomy <- function (hdf5) {
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
     
   return (taxa_table)
+}
+
+
+
+
+PB.JSON.Sequences <- function (json) {
+  
+  # No sequence information
+  if (!any(sapply(json$rows, function (x) 'sequence' %in% names(x$metadata) )))
+    return (NULL)
+  
+  ids  <- sapply(json$rows, simplify = "array", function (x) { x$id })
+  seqs <- sapply(json$rows, simplify = "array", function (x) {
+    if (is.null(x$metadata$sequence)) NA else x$metadata$sequence
+  })
+  
+  res <- setNames(seqs, ids)
+  
+  return (res)
+}
+
+PB.HDF5.Sequences <- function (hdf5) {
+  
+  # No sequence information
+  if (!"sequences" %in% names(hdf5$observation$metadata))
+    return (NULL)
+  
+  ids  <- as.character(hdf5$observation$ids)
+  seqs <- as.character(hdf5$observation$metadata$sequences)
+  
+  res <- setNames(seqs, ids)
+    
+  return (res)
 }
 
 

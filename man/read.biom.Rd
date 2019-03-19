@@ -45,10 +45,14 @@ A \code{BIOM} class object containing the parsed data. This object
         \code{phylogeny} entry with newick data, then it will be loaded
         here as well. The \pkg{ape} package has additional functions
         for working with \code{phylo} objects.}
+        \item{sequences}{A named character vector, where the names are
+        taxonomic identifiers and the values are the sequences they
+        represent. These values are not part of the official BIOM
+        specification, but will be read and written when defined.}
         \item{info}{A list of other attributes defined in the BIOM file,
         such as \code{id}, \code{type}, \code{format}, \code{format_url},
         \code{generated_by}, \code{date}, \code{matrix_type},
-        \code{matrix_element_type}, and \code{shape}}
+        \code{matrix_element_type}, \code{Comment}, and \code{shape}}
        }
 
     \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional

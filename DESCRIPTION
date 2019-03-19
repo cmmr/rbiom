@@ -34,7 +34,8 @@ Imports:
     R.utils,
     rhdf5,
     rjson,
-    slam
+    slam,
+    openxlsx
 Suggests:
     ape,
     reshape2,

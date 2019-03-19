@@ -129,6 +129,7 @@ write.biom.1.0 <- function (biom, file) {
     matrix_type         = "sparse",
     matrix_element_type = ifelse(sum(biom$counts$v %% 1) == 0, "int", "float"),
     shape               = c(biom$counts$nrow, biom$counts$ncol),
+    comment             = biom$info$comment,
     
     
     # Phylogenetic Tree
@@ -138,12 +139,15 @@ write.biom.1.0 <- function (biom, file) {
     
     # Taxonomy
     #------------------------------------------------------
-    rows = lapply(1:biom$counts$nrow, function (i) list(
-      id = biom$counts$dimnames[[1]][i],
-      metadata = list(
-        taxonomy = unname(biom$taxonomy[i,])
-      )
-    )),
+    rows = lapply(1:biom$counts$nrow, function (i) {
+      TaxaID   <- biom$counts$dimnames[[1]][i]
+      Metadata <- list(taxonomy=unname(biom$taxonomy[i,]))
+      
+      if (is(biom[['sequences']], "character"))
+        Metadata[['sequence']] <- biom$sequences[[id]]
+      
+      list(id=TaxaID, metadata=Metadata)
+    }),
     
     
     # Sample IDs and Metadata
@@ -208,6 +212,7 @@ write.biom.2.1 <- function (biom, file) {
   #------------------------------------------------------
   rhdf5::h5writeAttribute.character(biom$info$id,                                               h5, 'id')
   rhdf5::h5writeAttribute.character(biom$info$type,                                             h5, 'type')
+  rhdf5::h5writeAttribute.character(if (is.null(biom$info$comment)) "" else biom$info$comment,  h5, 'comment')
   rhdf5::h5writeAttribute.character("http://biom-format.org",                                   h5, 'format-url')
   rhdf5::h5writeAttribute.array(    c(2,1,0),                                                   h5, 'format-version', 3)
   rhdf5::h5writeAttribute.character(paste("rbiom", utils::packageDescription('rbiom')$Version), h5, 'generated-by')
@@ -274,6 +279,16 @@ write.biom.2.1 <- function (biom, file) {
     x           <- t(biom$taxonomy[biom$counts$dimnames[[1]],,drop=FALSE])
     dimnames(x) <- list(NULL, NULL)
     rhdf5::h5writeDataset.matrix(x, h5, h5path)
+  }
+  
+  
+  
+  # Sequences
+  #------------------------------------------------------
+  if (is(biom[['sequences']], "character")) {
+    h5path <- 'observation/metadata/sequences'
+    x      <- unname(biom$sequences[biom$counts$dimnames[[1]]])
+    rhdf5::h5writeDataset.character(x, h5, h5path)
   }
   
   
