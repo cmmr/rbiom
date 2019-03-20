@@ -711,9 +711,9 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
 
 
 PB.TaxaLevelNames <- function (n) {
-  if (n <= 8)
+  if (n >= 6 && n <= 8)
     return(c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "Strain")[1:n])
-  sprintf("TaxLvl.%i", 1:n)
+  sprintf("Level.%i", 1:n)
 }
 
 
