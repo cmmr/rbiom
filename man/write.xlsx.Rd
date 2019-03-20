@@ -4,7 +4,7 @@
 \alias{write.xlsx}
 \title{Write data and summary information to a Microsoft Excel-compatible workbook.}
 \usage{
-write.xlsx(biom, outfile, depth = NULL, seed = 0)
+write.xlsx(biom, outfile, depth = NULL, seed = 0, rps = NULL)
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
@@ -15,6 +15,10 @@ write.xlsx(biom, outfile, depth = NULL, seed = 0)
 
 \item{seed}{Random seed to use in rarefying. See \code{rarefy} function
 for details.}
+
+\item{rps}{A \code{data frame} of additional information to include in
+the 'Reads per Sample' tab. The rownames of this 
+\code{data frame} must match the IDs in the BIOM object.}
 }
 \value{
 On success, returns \code{NULL} invisibly.
