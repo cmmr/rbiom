@@ -1,15 +1,18 @@
 #' Write data and summary information to a Microsoft Excel-compatible workbook.
 #'
-#' @param biom      The BIOM object to save to the file.
-#' @param outfile   Path to the output xlsx file.
-#' @param depth     Depth to rarefy to. See \code{rarefy} function for details.
-#' @param seed      Random seed to use in rarefying. See \code{rarefy} function
-#'                    for details.
+#' @param biom     The BIOM object to save to the file.
+#' @param outfile  Path to the output xlsx file.
+#' @param depth    Depth to rarefy to. See \code{rarefy} function for details.
+#' @param seed     Random seed to use in rarefying. See \code{rarefy} function
+#'                   for details.
+#' @param rps    A \code{data frame} of additional information to include in
+#'                 the 'Reads per Sample' tab. The rownames of this 
+#'                 \code{data frame} must match the IDs in the BIOM object.
 #' @return On success, returns \code{NULL} invisibly.
 #' @export
 
 
-write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
+write.xlsx <- function (biom, outfile, depth=NULL, seed=0, rps=NULL) {
   
   #========================================================
   # Sanity Checks
@@ -27,10 +30,10 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   wb <- openxlsx::createWorkbook(creator="CMMR", title=biom$info$id)
   
   openxlsx::addWorksheet(wb, 'Reads Per Sample')
-  openxlsx::addWorksheet(wb, "Raw OTU Counts")
+  openxlsx::addWorksheet(wb, "Mapped OTU Counts")
   openxlsx::addWorksheet(wb, "Rarefied OTU Counts")
   openxlsx::addWorksheet(wb, 'Alpha Diversity')
-  openxlsx::addWorksheet(wb, 'Taxonomy')
+  openxlsx::addWorksheet(wb, 'Centroid Taxonomy')
   
   
   
@@ -41,14 +44,16 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   RawCounts <- data.frame(rbiom::counts(biom),   check.names=FALSE)
   Taxonomy  <- data.frame(rbiom::taxonomy(biom), check.names=FALSE)
   
-  if (is(biom[['sequences']], "character")) {
-    Taxonomy[['Sequence']] <- unname(biom[['sequences']][rownames(Taxonomy)])
-    if (ncol(Taxonomy) > 1)
-      Taxonomy <- Taxonomy[,c(ncol(Taxonomy), 1:(ncol(Taxonomy) - 1)),drop=FALSE]
-  }
+  # Set the full taxonomy string as the first column of RawCounts
+  TaxaStrings <- data.frame(Taxonomy=apply(biom$taxonomy, 1L, paste, collapse="; "))
+  RawCounts   <- cbind(TaxaStrings, RawCounts[rownames(TaxaStrings),,F])
   
-  openxlsx::writeData(wb, "Raw OTU Counts", RawCounts, rowNames=TRUE)
-  openxlsx::writeData(wb, 'Taxonomy',       Taxonomy,  rowNames=TRUE)
+  # Set the centroid sequence as the first column of Taxonomy
+  if (is(biom[['sequences']], "character"))
+    Taxonomy <- cbind(Sequence=biom[['sequences']], Taxonomy)
+  
+  openxlsx::writeData(wb, "Mapped OTU Counts", RawCounts, rowNames=TRUE)
+  openxlsx::writeData(wb, 'Centroid Taxonomy', Taxonomy,  rowNames=TRUE)
   
   
   
@@ -58,8 +63,15 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   
   rare <- rbiom::rarefy(biom, depth, seed)
   
-  openxlsx::writeData(wb, "Rarefied OTU Counts", data.frame(rbiom::counts(rare),  check.names=FALSE), rowNames=TRUE)
-  openxlsx::writeData(wb, 'Alpha Diversity',     rbiom::alpha.div(rare),                              rowNames=TRUE)
+  RareCounts <- data.frame(rbiom::counts(rare), check.names=FALSE)
+  AlphaDiv   <- rbiom::alpha.div(rare)
+  
+  # Set the full taxonomy string as the first column of RareCounts
+  TaxaStrings <- data.frame(Taxonomy=apply(rare$taxonomy, 1L, paste, collapse="; "))
+  RareCounts  <- cbind(TaxaStrings, RareCounts[rownames(TaxaStrings),,F])
+  
+  openxlsx::writeData(wb, "Rarefied OTU Counts", RareCounts, rowNames=TRUE)
+  openxlsx::writeData(wb, 'Alpha Diversity',     AlphaDiv,   rowNames=FALSE)
   
   
   
@@ -67,18 +79,17 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   # Track the each sample's read counts before and after
   #========================================================
   
-  df <- merge(
-    data.frame(slam::col_sums(biom$counts)),
-    data.frame(slam::col_sums(rare$counts)),
-    by="row.names", all=TRUE)
-  names(df) <- c("Sample", "Raw", "Rarefied")
-  df <- df[order(df$Sample),]
-  df[which(is.na(df[['Rarefied']])), 'Rarefied'] <- 0
-  openxlsx::writeData(wb, 'Reads Per Sample', df, rowNames=FALSE)
+  if (is.null(rps))
+    rps <- data.frame(Mapped=slam::col_sums(biom$counts))
+  
+  rps <- rps[order(rownames(rps)),,drop=FALSE]
+  rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
+  rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
+  openxlsx::writeData(wb, 'Reads Per Sample', rps, rowNames=TRUE)
   
   biom <- rare
   
-  remove("df", "rare")
+  remove("rare")
   
   
   
@@ -102,35 +113,8 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   
   
   #========================================================
-  # Skip Distance Matrices and Ordinations unless >1 sample
+  # Write everything to the specified output file
   #========================================================
-  if (rbiom::nsamples(biom) >= 2) {
-    
-    
-    #========================================================
-    # Distance Matrices
-    #========================================================
-    
-    if (is(biom[['phylogeny']], 'character')) {
-      distance_matrices <- list( U.UniFrac    = rbiom::beta.div(biom, 'unifrac',     FALSE),
-                                 W.UniFrac    = rbiom::beta.div(biom, 'unifrac',     TRUE) )
-    } else {
-      distance_matrices <- list( W.BrayCurtis = rbiom::beta.div(biom, 'bray-curtis', TRUE),
-                                 W.Jaccard    = rbiom::beta.div(biom, 'jaccard',     TRUE) )
-    }
-  
-    for (sheetName in names(distance_matrices)) {
-      df <- data.frame(as.matrix(distance_matrices[[sheetName]]), check.names=FALSE)
-      df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
-      sheetName <- paste(sheetName, " DM")
-      openxlsx::addWorksheet(wb, sheetName)
-      openxlsx::writeData(wb, sheetName, df, rowNames=TRUE)
-    }
-    
-    remove("df", "sheetName", "distance_matrices")
-    
-  }
-  
   
   openxlsx::saveWorkbook(wb, file=outfile, overwrite=TRUE)
   
