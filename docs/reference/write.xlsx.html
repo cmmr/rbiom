@@ -120,7 +120,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>write.xlsx</span>(<span class='no'>biom</span>, <span class='no'>outfile</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>write.xlsx</span>(<span class='no'>biom</span>, <span class='no'>outfile</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>rps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,6 +141,12 @@
       <th>seed</th>
       <td><p>Random seed to use in rarefying. See <code>rarefy</code> function
 for details.</p></td>
+    </tr>
+    <tr>
+      <th>rps</th>
+      <td><p>A <code>data frame</code> of additional information to include in
+the 'Reads per Sample' tab. The rownames of this 
+<code>data frame</code> must match the IDs in the BIOM object.</p></td>
     </tr>
     </table>
     
