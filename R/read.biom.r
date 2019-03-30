@@ -340,7 +340,7 @@ PB.JSON.Metadata <- function (json) {
     check.names      = FALSE,
     stringsAsFactors = FALSE,
     vapply(names(json$columns[[1]]$metadata), function (i) {
-      sapply(json$columns, function (x) x[['metadata']][[i]])
+      sapply(json$columns, function (x) as.character(x[['metadata']][[i]]))
     }, character(length(json$columns)), USE.NAMES=TRUE)
   )
 
