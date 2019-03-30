@@ -166,6 +166,12 @@ metadata <- function (biom) {
 #'     biom <- read.biom(infile)
 #'     
 #'     sequences(biom)[1:4]
+#'     
+#'     # Write to a compressed fasta file in the temporary directory:
+#'     seqs <- sequences(biom)
+#'     conn <- bzfile(file.path(tempdir(), "Sequences.fa.bz2"), "w")
+#'     cat(sprintf(">%s\n%s", names(seqs), seqs), file=conn, sep="\n")
+#'     close(conn)
 #'
 
 sequences <- function (biom) {

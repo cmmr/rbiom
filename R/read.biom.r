@@ -496,21 +496,37 @@ PB.JSON.Taxonomy <- function (json) {
 
 
   taxa_table <- sapply(json$rows, simplify = "array", function (x) {
-    taxaNames <- if (is.null(x$metadata$taxonomy)) x$id else x$metadata$taxonomy
-    unname(sapply(taxaNames, function (y) { 
-      ifelse(nchar(y) > 0, strsplit(y, "[\\|;]\\ *")[[1]], "")
-    }))
+    taxaNames <- x$metadata$taxonomy
+    
+    if (is.null(taxaNames))
+      return (x$id)
+    
+    if (length(taxaNames) == 1) {
+      if (nchar(taxaNames) == 0) return (x$id)
+      return (strsplit(taxaNames, "[\\|;]\\ *")[[1]])
+    }
+    
+    return (taxaNames)
   })
 
-  # Handle instances where some taxa strings have more levels than others.
-  if (class(taxa_table) == "list") {
+  if (class(taxa_table) == "matrix") {
+    # 'Normal' situation of same number of ranks (>1) per taxa string.
+    
+    taxa_table <- t(taxa_table)
+    
+  } else if (class(taxa_table) == "list") {
+    # Handle instances where some taxa strings have more levels than others.
+    
     n <- sapply(taxa_table, length)
     m <- max(n)
     i <- which(n < m)
     taxa_table[i] <- lapply(taxa_table[i], function (x) c(x, rep(NA, m - length(x))))
     taxa_table    <- t(simplify2array(taxa_table))
+    
   } else {
-    taxa_table <- t(taxa_table)
+    # There are no taxa strings, just the ID.
+    
+    taxa_table <- as.matrix(taxa_table, ncol=1)
   }
 
   rownames(taxa_table) <- sapply(json$rows, function (x) x$id)
