@@ -82,7 +82,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0, rps=NULL) {
   if (is.null(rps))
     rps <- data.frame(Mapped=slam::col_sums(biom$counts))
   
-  rps <- rps[order(rownames(rps)),,drop=FALSE]
+  rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
   rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
   rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
   openxlsx::writeData(wb, 'Reads Per Sample', rps, rowNames=TRUE)

@@ -4,7 +4,7 @@
 \alias{select}
 \title{Reduce samples to a specific list}
 \usage{
-select(biom, samples)
+select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
 }
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read.biom}.}
@@ -12,6 +12,21 @@ select(biom, samples)
 \item{samples}{Sample names, indices, or a logical vector identifying
 the samples to keep. The latter two should be based on the order of
 sample names given by \code{colnames(biom$counts)}.}
+
+\item{nTop}{Selects this number of samples, taking the sample with the most
+observations first, then the sample with the second-most observations,
+etc. If \code{nTop} is higher than the number of samples in the dataset, 
+the entire dataset will be returned. See note.}
+
+\item{nRandom}{Randomly selects this number of samples. If higher than the
+number of samples in the dataset, the entire dataset will be returned.
+See note.}
+
+\item{seed}{Random seed, used when selecting \code{nRandom} samples.
+
+Note: Generally, you will specify only one of the filters: \code{samples},
+\code{nTop}, or \code{nRandom}. However, specifying multiple filters is
+allowed; they will be applied in the order listed above.}
 }
 \value{
 A \code{BIOM} object.
@@ -28,6 +43,9 @@ Reduce samples to a specific list
     ex1 <- select(biom, c('HMP14', 'HMP22', 'HMP03'))
     ex2 <- select(biom, c(32, 11, 28, 16, 46, 5))
     ex3 <- select(biom, 1:50 \%\% 6 == 0)
+    ex4 <- select(biom, nRandom = 10)
+    ex5 <- select(biom, nTop = 5)
+    ex6 <- select(biom, samples = 10:40, nTop = 20, nRandom = 10)
 
 }
 \seealso{
