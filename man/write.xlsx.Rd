@@ -4,7 +4,7 @@
 \alias{write.xlsx}
 \title{Write data and summary information to a Microsoft Excel-compatible workbook.}
 \usage{
-write.xlsx(biom, outfile, depth = NULL, seed = 0, rps = NULL)
+write.xlsx(biom, outfile, depth = NULL, seed = 0)
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
@@ -15,10 +15,6 @@ write.xlsx(biom, outfile, depth = NULL, seed = 0, rps = NULL)
 
 \item{seed}{Random seed to use in rarefying. See \code{rarefy} function
 for details.}
-
-\item{rps}{A \code{data frame} of additional information to include in
-the 'Reads per Sample' tab. The rownames of this 
-\code{data frame} must match the IDs in the BIOM object.}
 }
 \value{
 On success, returns \code{NULL} invisibly.
@@ -26,3 +22,11 @@ On success, returns \code{NULL} invisibly.
 \description{
 Write data and summary information to a Microsoft Excel-compatible workbook.
 }
+\section{Note}{
+
+Any data frame attributes on \code{biom} will be included as separate 
+worksheets. An attribute named 'Reads Per Step' is treated specially and 
+merged with the usual 'Reads Per Sample' tab - if provided, its row names 
+should match those in \code{biom} exactly.
+}
+

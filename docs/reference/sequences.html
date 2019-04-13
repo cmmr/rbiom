@@ -153,7 +153,11 @@
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
     <span class='fu'>sequences</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; NULL</div><div class='input'>
-</div></pre>
+    <span class='co'># Write to a compressed fasta file in the temporary directory:</span>
+    <span class='no'>seqs</span> <span class='kw'>&lt;-</span> <span class='fu'>sequences</span>(<span class='no'>biom</span>)
+    <span class='no'>conn</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/connections'>bzfile</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"Sequences.fa.bz2"</span>), <span class='st'>"w"</span>)
+    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cat'>cat</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sprintf'>sprintf</a></span>(<span class='st'>"&gt;%s\n%s"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>seqs</span>), <span class='no'>seqs</span>), <span class='kw'>file</span><span class='kw'>=</span><span class='no'>conn</span>, <span class='kw'>sep</span><span class='kw'>=</span><span class='st'>"\n"</span>)
+    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/connections'>close</a></span>(<span class='no'>conn</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

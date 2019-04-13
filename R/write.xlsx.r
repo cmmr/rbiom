@@ -5,14 +5,18 @@
 #' @param depth    Depth to rarefy to. See \code{rarefy} function for details.
 #' @param seed     Random seed to use in rarefying. See \code{rarefy} function
 #'                   for details.
-#' @param rps    A \code{data frame} of additional information to include in
-#'                 the 'Reads per Sample' tab. The rownames of this 
-#'                 \code{data frame} must match the IDs in the BIOM object.
 #' @return On success, returns \code{NULL} invisibly.
+#' 
+#' @section Note:
+#' Any data frame attributes on \code{biom} will be included as separate 
+#' worksheets. An attribute named 'Reads Per Step' is treated specially and 
+#' merged with the usual 'Reads Per Sample' tab - if provided, its row names 
+#' should match those in \code{biom} exactly.
+#' 
 #' @export
 
 
-write.xlsx <- function (biom, outfile, depth=NULL, seed=0, rps=NULL) {
+write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   
   #========================================================
   # Sanity Checks
@@ -76,11 +80,14 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0, rps=NULL) {
   
   
   #========================================================
-  # Track the each sample's read counts before and after
+  # Track each sample's read counts before and after
   #========================================================
   
-  if (is.null(rps))
+  if ('Reads Per Step' %in% names(attributes(biom))) {
+    rps <- attr(biom, 'Reads Per Step')
+  } else {
     rps <- data.frame(Mapped=slam::col_sums(biom$counts))
+  }
   
   rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
   rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
@@ -90,6 +97,24 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0, rps=NULL) {
   biom <- rare
   
   remove("rare")
+  
+  
+  
+  #========================================================
+  # Create worksheets for any other attributes on biom
+  #========================================================
+  
+  for (key in names(attributes(biom))) {
+    if (key %in% c("names", "class", "Reads Per Step"))   next
+    if (!identical(class(attr(biom, key)), "data.frame")) next
+    val <- attr(biom, key)
+    rn <- !identical(rownames(val), as.character(1:nrow(val)))
+    openxlsx::addWorksheet(wb, key)
+    openxlsx::writeData(wb, key, val, rowNames = rn)
+    remove("val", "rn")
+  }
+  
+  remove("key")
   
   
   
