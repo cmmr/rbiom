@@ -195,7 +195,6 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Rename a few of the Alpha Div columns
     names(AlphaDiv) <- sub("Depth", "Total",   names(AlphaDiv))
     names(AlphaDiv) <- sub("OTUs", ranks[[1]], names(AlphaDiv))
-    AlphaDiv <- AlphaDiv[,!names(AlphaDiv) == "Chao1"]
     
     openxlsx::writeData(wb, 'Alpha Diversity',   AlphaDiv, rowNames=FALSE)
     openxlsx::writeData(wb, paste(type, 'List'), Taxonomy, rowNames=TRUE)
