@@ -11,7 +11,9 @@ write.xlsx(biom, outfile, depth = NULL, seed = 0)
 
 \item{outfile}{Path to the output xlsx file.}
 
-\item{depth}{Depth to rarefy to. See \code{rarefy} function for details.}
+\item{depth}{Depth to rarefy to. See \code{rarefy} function for details.
+Only use \code{depth} with \code{BIOM} files of type
+'OTU table' and integer count values.}
 
 \item{seed}{Random seed to use in rarefying. See \code{rarefy} function
 for details.}
