@@ -29,6 +29,9 @@ DNA sequence associated with each taxonomic identifier.
     conn <- bzfile(file.path(tempdir(), "Sequences.fa.bz2"), "w")
     cat(sprintf(">\%s\\n\%s", names(seqs), seqs), file=conn, sep="\\n")
     close(conn)
+    
+    # You can also use the write.fasta function for this task:
+    write.fasta(biom, file.path(tempdir(), "Sequences.fa.gz"))
 
 }
 \seealso{

@@ -22,6 +22,7 @@ export(taxa.rollup)
 export(tips)
 export(unifrac)
 export(write.biom)
+export(write.fasta)
 export(write.tree)
 export(write.xlsx)
 

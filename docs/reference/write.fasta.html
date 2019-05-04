@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DNA sequence associated with each taxonomic identifier. — sequences • rbiom</title>
+<title>Write sequences from a BIOM object to a file in fasta format. — write.fasta • rbiom</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="DNA sequence associated with each taxonomic identifier. — sequences" />
+<meta property="og:title" content="Write sequences from a BIOM object to a file in fasta format. — write.fasta" />
 
-<meta property="og:description" content="DNA sequence associated with each taxonomic identifier." />
+<meta property="og:description" content="Write sequences from a BIOM object to a file in fasta format." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -109,59 +109,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>DNA sequence associated with each taxonomic identifier.</h1>
+    <h1>Write sequences from a BIOM object to a file in fasta format.</h1>
     
-    <div class="hidden name"><code>sequences.Rd</code></div>
+    <div class="hidden name"><code>write.fasta.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>DNA sequence associated with each taxonomic identifier.</p>
+    <p>Write sequences from a BIOM object to a file in fasta format.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sequences</span>(<span class='no'>biom</span>)</pre>
+    <pre class="usage"><span class='fu'>write.fasta</span>(<span class='no'>biom</span>, <span class='no'>outfile</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
+      <td><p>A BIOM object containing sequences.</p></td>
+    </tr>
+    <tr>
+      <th>outfile</th>
+      <td><p>Path to the output fasta file. Files ending in <code>.gz</code> or
+<code>.bz2</code> will be compressed accordingly.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named character vector of sequences in <code>biom</code>. If this data
-          is not present, then returns <code>NULL</code>.</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other accessor functions: <code><a href='counts.html'>counts</a></code>,
-  <code><a href='info.html'>info</a></code>, <code><a href='metadata.html'>metadata</a></code>,
-  <code><a href='nsamples.html'>nsamples</a></code>, <code><a href='ntaxa.html'>ntaxa</a></code>,
-  <code><a href='phylogeny.html'>phylogeny</a></code>, <code><a href='sample.names.html'>sample.names</a></code>,
-  <code><a href='taxa.names.html'>taxa.names</a></code>, <code><a href='taxa.ranks.html'>taxa.ranks</a></code>,
-  <code><a href='taxonomy.html'>taxonomy</a></code></p></div>
+    <p>On success, returns <code>NULL</code> invisibly.</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>rbiom</span>)
-
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='fu'>sequences</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; NULL</div><div class='input'>
-    <span class='co'># Write to a compressed fasta file in the temporary directory:</span>
-    <span class='no'>seqs</span> <span class='kw'>&lt;-</span> <span class='fu'>sequences</span>(<span class='no'>biom</span>)
-    <span class='no'>conn</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/connections'>bzfile</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"Sequences.fa.bz2"</span>), <span class='st'>"w"</span>)
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cat'>cat</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sprintf'>sprintf</a></span>(<span class='st'>"&gt;%s\n%s"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>seqs</span>), <span class='no'>seqs</span>), <span class='kw'>file</span><span class='kw'>=</span><span class='no'>conn</span>, <span class='kw'>sep</span><span class='kw'>=</span><span class='st'>"\n"</span>)
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/connections'>close</a></span>(<span class='no'>conn</span>)
-
-    <span class='co'># You can also use the write.fasta function for this task:</span>
-    <span class='fu'><a href='write.fasta.html'>write.fasta</a></span>(<span class='no'>biom</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"Sequences.fa.gz"</span>))</div><div class='output co'>#&gt; &lt;simpleError: There are no sequences in this BIOM object.&gt;</div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -169,11 +148,7 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
   </div>
 </div>
