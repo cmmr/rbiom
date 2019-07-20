@@ -201,6 +201,20 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
   
   
   #--------------------------------------------------------------
+  # Discard samples/taxa with zero observations
+  #--------------------------------------------------------------
+  
+  pb$set(1.0, 'Dropping unobserved taxa and samples')
+  counts   <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
+  taxonomy <- taxonomy[rownames(counts),,drop=FALSE]
+  metadata <- metadata[colnames(counts),,drop=FALSE]
+  if (!is.null(sequences))
+    sequences <- sequences[rownames(counts)]
+  if (!is.null(phylogeny))
+    phylogeny <- subtree(phylogeny, rownames(counts))
+  
+  
+  #--------------------------------------------------------------
   # Return everything we've computed as a BIOM class object
   #--------------------------------------------------------------
   
