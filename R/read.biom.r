@@ -662,7 +662,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
     
     errmsg <- NULL
     
-    if (is.null(tree)) {
+    if (is.null(tree) || identical(tree, character(0))) {
       errmsg <- "There is no tree in this BIOM file."
       
     } else if (!length(tree)) {
