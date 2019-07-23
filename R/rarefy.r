@@ -187,6 +187,9 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
 
   if (!is.null(biom$phylogeny))
     biom$phylogeny <- rbiom::subtree(biom$phylogeny, TaxaIDs)
+  
+  if (!is.null(biom$sequences))
+    biom$sequences <- biom$sequences[TaxaIDs]
 
   return (biom)
 
