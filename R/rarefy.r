@@ -190,7 +190,10 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   
   if (!is.null(biom$sequences))
     biom$sequences <- biom$sequences[TaxaIDs]
+  
+  biom$info$shape <- c(length(TaxaIDs), length(SampleIDs))
 
+  
   return (biom)
 
 }

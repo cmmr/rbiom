@@ -144,7 +144,7 @@ write.biom.1.0 <- function (biom, file) {
       Metadata <- list(taxonomy=unname(biom$taxonomy[i,]))
       
       if (is(biom[['sequences']], "character"))
-        Metadata[['sequence']] <- biom$sequences[[id]]
+        Metadata[['sequence']] <- biom$sequences[[TaxaID]]
       
       list(id=TaxaID, metadata=Metadata)
     }),
