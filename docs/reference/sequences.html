@@ -149,7 +149,7 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>rbiom</span>)
 
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
+    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"ag200.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
     <span class='fu'>sequences</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; NULL</div><div class='input'>
@@ -160,7 +160,7 @@
     <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/connections'>close</a></span>(<span class='no'>conn</span>)
 
     <span class='co'># You can also use the write.fasta function for this task:</span>
-    <span class='fu'><a href='write.fasta.html'>write.fasta</a></span>(<span class='no'>biom</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"Sequences.fa.gz"</span>))</div><div class='output co'>#&gt; &lt;simpleError: There are no sequences in this BIOM object.&gt;</div><div class='input'>
+    <span class='fu'><a href='write.fasta.html'>write.fasta</a></span>(<span class='no'>biom</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>(), <span class='st'>"Sequences.fa.gz"</span>))</div><div class='output co'>#&gt; <span class='error'>Error: In write.fasta(), seqs must be a named character vector or a BIOM-class object.</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

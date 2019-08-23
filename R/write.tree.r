@@ -1,6 +1,7 @@
 #' Write a newick formatted phylogenetic tree.
 #' 
-#' @param tree  A phylo object, as returned from \link{read.tree}.
+#' @param tree  A \code{phylo} object, as returned from \link{read.tree}. Also 
+#'         accepts a \code{BIOM} object if it has a phylogentic tree.
 #' @param file  Filename or connection to write the newick file to (optional).
 #' @return If file is NULL, the newick string as a character vector. Otherwise,
 #'         the return value from \code{writeChar}, typically invsible(NULL).
@@ -17,8 +18,11 @@ write.tree <- function (tree=NULL, file=NULL) {
   if (is.null(tree))
     stop(simpleError("Please provide a value for tree to write.tree()"))
   
+  if (is(tree, "BIOM"))
+    tree <- rbiom::phylogeny(biom)
+  
   if (!is(tree, "phylo"))
-    stop(simpleError("Provided tree is not a phylo class object."))
+    stop(simpleError("Provided tree is not a 'phylo' or 'BIOM' class object."))
   
   
   rootNode <- setdiff(tree$edge[,1], tree$edge[,2])

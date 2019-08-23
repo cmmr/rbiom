@@ -7,7 +7,8 @@
 write.tree(tree = NULL, file = NULL)
 }
 \arguments{
-\item{tree}{A phylo object, as returned from \link{read.tree}.}
+\item{tree}{A \code{phylo} object, as returned from \link{read.tree}. Also 
+accepts a \code{BIOM} object if it has a phylogentic tree.}
 
 \item{file}{Filename or connection to write the newick file to (optional).}
 }

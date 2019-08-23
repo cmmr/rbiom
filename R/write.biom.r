@@ -3,7 +3,7 @@
 #' @param biom  The BIOM object to save to the file.
 #' @param file  Path to the output file.
 #' @param format  Options are \bold{\dQuote{tab}}, 
-#'     \bold{\dQuote{json}}, and \bold{\dQuote{hdfs}}, 
+#'     \bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
 #'     corresponding to classic tabular format, biom format version 1.0 and 
 #'     biom version 2.1, respectively. Abbreviations are also accepted. See
 #'     \url{http://biom-format.org/documentation/} for details.

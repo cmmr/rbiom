@@ -12,7 +12,7 @@ write.biom(biom, file, format = "json")
 \item{file}{Path to the output file.}
 
 \item{format}{Options are \bold{\dQuote{tab}}, 
-\bold{\dQuote{json}}, and \bold{\dQuote{hdfs}}, 
+\bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
 corresponding to classic tabular format, biom format version 1.0 and 
 biom version 2.1, respectively. Abbreviations are also accepted. See
 \url{http://biom-format.org/documentation/} for details.}

@@ -4,10 +4,12 @@
 \alias{write.fasta}
 \title{Write sequences from a BIOM object to a file in fasta format.}
 \usage{
-write.fasta(biom, outfile)
+write.fasta(seqs, outfile)
 }
 \arguments{
-\item{biom}{A BIOM object containing sequences.}
+\item{seqs}{A named character vector where names are sequence names and
+values are the sequences. Also accepts a \code{BIOM}
+object which contains sequences.}
 
 \item{outfile}{Path to the output fasta file. Files ending in \code{.gz} or
 \code{.bz2} will be compressed accordingly.}

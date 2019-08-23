@@ -1,6 +1,8 @@
 #' Write sequences from a BIOM object to a file in fasta format.
 #'
-#' @param biom     A BIOM object containing sequences.
+#' @param seqs     A named character vector where names are sequence names and
+#'                   values are the sequences. Also accepts a \code{BIOM}
+#'                   object which contains sequences.
 #' @param outfile  Path to the output fasta file. Files ending in \code{.gz} or
 #'                   \code{.bz2} will be compressed accordingly.
 #' @return On success, returns \code{NULL} invisibly.
@@ -8,17 +10,20 @@
 #' @export
 
 
-write.fasta <- function (biom, outfile) {
+write.fasta <- function (seqs, outfile) {
   
-  if (!is(biom, 'BIOM'))
-    return (simpleError('In write.fasta(), biom must be a BIOM-class object.'))
+  if (is(seqs, 'BIOM'))
+    seqs <- rbiom::sequences(seqs)
+  
+  if (!(is(seqs, 'character') && !is(names(seqs), 'character')))
+    stop (simpleError('In write.fasta(), seqs must be a named character vector or a BIOM-class object.'))
   
   if (!is.character(outfile) || !identical(nchar(outfile) >= 3, TRUE) || length(outfile) != 1)
-    return (simpleError('In write.fasta(), outfile must be a single filename at least 3 characters in length.'))
+    stop (simpleError('In write.fasta(), outfile must be a single filename at least 3 characters in length.'))
   
-  seqs <- rbiom::sequences(biom)
+  
   if (length(seqs) == 0)
-    return (simpleError("There are no sequences in this BIOM object."))
+    stop (simpleError("There are no sequences in this object."))
   
   
   suffix <- substr(outfile, nchar(outfile) - 2, nchar(outfile))

@@ -120,14 +120,16 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>write.fasta</span>(<span class='no'>biom</span>, <span class='no'>outfile</span>)</pre>
+    <pre class="usage"><span class='fu'>write.fasta</span>(<span class='no'>seqs</span>, <span class='no'>outfile</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>biom</th>
-      <td><p>A BIOM object containing sequences.</p></td>
+      <th>seqs</th>
+      <td><p>A named character vector where names are sequence names and
+values are the sequences. Also accepts a <code>BIOM</code>
+object which contains sequences.</p></td>
     </tr>
     <tr>
       <th>outfile</th>

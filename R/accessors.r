@@ -15,7 +15,7 @@
 
 sample.names <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In sample.names(), biom must be a BIOM-class object.'))
+    stop (simpleError('In sample.names(), biom must be a BIOM-class object.'))
   return (colnames(biom[['counts']]))
 }
 
@@ -37,7 +37,7 @@ sample.names <- function (biom) {
 
 taxa.names <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In taxa.names(), biom must be a BIOM-class object.'))
+    stop (simpleError('In taxa.names(), biom must be a BIOM-class object.'))
   return (rownames(biom[['counts']]))
 }
 
@@ -59,7 +59,7 @@ taxa.names <- function (biom) {
 
 taxa.ranks <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In taxa.ranks(), biom must be a BIOM-class object.'))
+    stop (simpleError('In taxa.ranks(), biom must be a BIOM-class object.'))
   return (colnames(biom[['taxonomy']]))
 }
 
@@ -81,7 +81,7 @@ taxa.ranks <- function (biom) {
 
 counts <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In counts(), biom must be a BIOM-class object.'))
+    stop (simpleError('In counts(), biom must be a BIOM-class object.'))
   return (as.matrix(biom[['counts']]))
 }
 
@@ -103,7 +103,7 @@ counts <- function (biom) {
 
 taxonomy <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In taxonomy(), biom must be a BIOM-class object.'))
+    stop (simpleError('In taxonomy(), biom must be a BIOM-class object.'))
   return (biom[['taxonomy']])
 }
 
@@ -125,7 +125,7 @@ taxonomy <- function (biom) {
 
 phylogeny <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In phylogeny(), biom must be a BIOM-class object.'))
+    stop (simpleError('In phylogeny(), biom must be a BIOM-class object.'))
   return (biom[['phylogeny']])
 }
 
@@ -147,7 +147,7 @@ phylogeny <- function (biom) {
 
 metadata <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In metadata(), biom must be a BIOM-class object.'))
+    stop (simpleError('In metadata(), biom must be a BIOM-class object.'))
   return (biom[['metadata']])
 }
 
@@ -162,7 +162,7 @@ metadata <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "ag200.biom", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     sequences(biom)[1:4]
@@ -179,7 +179,7 @@ metadata <- function (biom) {
 
 sequences <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In sequences(), biom must be a BIOM-class object.'))
+    stop (simpleError('In sequences(), biom must be a BIOM-class object.'))
   return (biom[['sequences']])
 }
 
@@ -201,7 +201,7 @@ sequences <- function (biom) {
 
 info <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In info(), biom must be a BIOM-class object.'))
+    stop (simpleError('In info(), biom must be a BIOM-class object.'))
   return (biom[['info']])
 }
 
@@ -223,7 +223,7 @@ info <- function (biom) {
 
 nsamples <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In nsamples(), biom must be a BIOM-class object.'))
+    stop (simpleError('In nsamples(), biom must be a BIOM-class object.'))
   return (ncol(biom[['counts']]))
 }
 
@@ -245,6 +245,6 @@ nsamples <- function (biom) {
 
 ntaxa <- function (biom) {
   if (!is(biom, 'BIOM'))
-    return (simpleError('In ntaxa(), biom must be a BIOM-class object.'))
+    stop (simpleError('In ntaxa(), biom must be a BIOM-class object.'))
   return (nrow(biom[['counts']]))
 }
