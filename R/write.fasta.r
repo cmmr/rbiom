@@ -15,7 +15,7 @@ write.fasta <- function (seqs, outfile) {
   if (is(seqs, 'BIOM'))
     seqs <- rbiom::sequences(seqs)
   
-  if (!(is(seqs, 'character') && !is(names(seqs), 'character')))
+  if (!is(seqs, 'character') || !is(names(seqs), 'character'))
     stop (simpleError('In write.fasta(), seqs must be a named character vector or a BIOM-class object.'))
   
   if (!is.character(outfile) || !identical(nchar(outfile) >= 3, TRUE) || length(outfile) != 1)

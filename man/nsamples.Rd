@@ -25,11 +25,16 @@ Number of samples in a BIOM.
 
 }
 \seealso{
-Other accessor functions: \code{\link{counts}},
-  \code{\link{info}}, \code{\link{metadata}},
-  \code{\link{ntaxa}}, \code{\link{phylogeny}},
-  \code{\link{sample.names}}, \code{\link{sequences}},
-  \code{\link{taxa.names}}, \code{\link{taxa.ranks}},
-  \code{\link{taxonomy}}
+Other accessor functions: 
+\code{\link{counts}()},
+\code{\link{info}()},
+\code{\link{metadata}()},
+\code{\link{ntaxa}()},
+\code{\link{phylogeny}()},
+\code{\link{sample.names}()},
+\code{\link{sequences}()},
+\code{\link{taxa.names}()},
+\code{\link{taxa.ranks}()},
+\code{\link{taxonomy}()}
 }
 \concept{accessor functions}

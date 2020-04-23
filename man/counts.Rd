@@ -25,11 +25,16 @@ Get the abundance counts.
 
 }
 \seealso{
-Other accessor functions: \code{\link{info}},
-  \code{\link{metadata}}, \code{\link{nsamples}},
-  \code{\link{ntaxa}}, \code{\link{phylogeny}},
-  \code{\link{sample.names}}, \code{\link{sequences}},
-  \code{\link{taxa.names}}, \code{\link{taxa.ranks}},
-  \code{\link{taxonomy}}
+Other accessor functions: 
+\code{\link{info}()},
+\code{\link{metadata}()},
+\code{\link{nsamples}()},
+\code{\link{ntaxa}()},
+\code{\link{phylogeny}()},
+\code{\link{sample.names}()},
+\code{\link{sequences}()},
+\code{\link{taxa.names}()},
+\code{\link{taxa.ranks}()},
+\code{\link{taxonomy}()}
 }
 \concept{accessor functions}

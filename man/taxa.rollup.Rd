@@ -4,8 +4,14 @@
 \alias{taxa.rollup}
 \title{Generate a matrix of samples by taxa, at the specified taxonomic rank.}
 \usage{
-taxa.rollup(biom, rank = "OTU", map = NULL, lineage = FALSE,
-  sparse = FALSE, progressbar = NULL)
+taxa.rollup(
+  biom,
+  rank = "OTU",
+  map = NULL,
+  lineage = FALSE,
+  sparse = FALSE,
+  progressbar = NULL
+)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 

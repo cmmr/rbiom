@@ -3,7 +3,6 @@
 \docType{package}
 \name{rbiom}
 \alias{rbiom}
-\alias{rbiom-package}
 \title{rbiom: Read/Write, Transform, and Summarize BIOM Data}
 \description{
 A toolkit for working with Biological Observation Matrix (BIOM) files.

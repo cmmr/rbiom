@@ -27,7 +27,7 @@ DNA sequence associated with each taxonomic identifier.
     # Write to a compressed fasta file in the temporary directory:
     seqs <- sequences(biom)
     conn <- bzfile(file.path(tempdir(), "Sequences.fa.bz2"), "w")
-    cat(sprintf(">\%s\\n\%s", names(seqs), seqs), file=conn, sep="\\n")
+    cat(sprintf(">\%s\n\%s", names(seqs), seqs), file=conn, sep="\n")
     close(conn)
     
     # You can also use the write.fasta function for this task:
@@ -35,11 +35,16 @@ DNA sequence associated with each taxonomic identifier.
 
 }
 \seealso{
-Other accessor functions: \code{\link{counts}},
-  \code{\link{info}}, \code{\link{metadata}},
-  \code{\link{nsamples}}, \code{\link{ntaxa}},
-  \code{\link{phylogeny}}, \code{\link{sample.names}},
-  \code{\link{taxa.names}}, \code{\link{taxa.ranks}},
-  \code{\link{taxonomy}}
+Other accessor functions: 
+\code{\link{counts}()},
+\code{\link{info}()},
+\code{\link{metadata}()},
+\code{\link{nsamples}()},
+\code{\link{ntaxa}()},
+\code{\link{phylogeny}()},
+\code{\link{sample.names}()},
+\code{\link{taxa.names}()},
+\code{\link{taxa.ranks}()},
+\code{\link{taxonomy}()}
 }
 \concept{accessor functions}
