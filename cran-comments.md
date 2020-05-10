@@ -1,5 +1,5 @@
 ## Test environments
-* Windows 10 (local machine), R 3.6.2
+* Windows 10 (local machine), R 4.0.0
 * ubuntu 14.04 (travis-ci), R devel and release
 * macOS 10.12 (travis-ci), R devel and release
 * Windows Server 2008 (win-builder), R devel and release

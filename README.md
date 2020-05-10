@@ -16,11 +16,17 @@ Reference material is available online at https://cmmr.github.io/rbiom/index.htm
 Installation
 ------------
 
-rbiom is not currently available from CRAN, but you can install the development version from github with:
+The latest stable version can be downloaded from CRAN.
+
+```r
+install.packages("rbiom")
+```
+
+The development version is available on GitHub.
 
 ``` r
-install.packages("devtools")
-devtools::install_github("cmmr/rbiom")
+install.packages("remotes")
+remotes::install_github("cmmr/rbiom")
 ```
 
 

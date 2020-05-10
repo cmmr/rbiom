@@ -6,5 +6,5 @@
 ^docs$
 ^NEWS\.md$
 ^rbiom.Rproj$
-^vignettes$
+^\.vignettes$
 ^.*\.Rproj$

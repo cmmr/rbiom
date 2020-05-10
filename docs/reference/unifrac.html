@@ -89,18 +89,6 @@ first convert them to BIOM objects." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/benchmark.html">Benchmark</a>
-    </li>
-  </ul>
-</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -176,7 +164,7 @@ loaded from <code>biom</code>, if encoded there.</p></td>
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)
 
     <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>biom</span>)
-    <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>), <span class='kw'>cex</span><span class='kw'>=</span><span class='fl'>.8</span>)</div><div class='img'><img src='unifrac-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
+    <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>), <span class='kw'>cex</span><span class='kw'>=</span><span class='fl'>.8</span>)</div><div class='img'><img src='unifrac-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
 #&gt; HMP01 0.0000000 0.5714029 0.7262758 0.9639771
 #&gt; HMP02 0.5714029 0.0000000 0.3435511 0.5693744
 #&gt; HMP03 0.7262758 0.3435511 0.0000000 0.2639387
@@ -184,14 +172,12 @@ loaded from <code>biom</code>, if encoded there.</p></td>
     <span class='co'># Using a custom matrix and tree</span>
     <span class='no'>mtx</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample.int</a></span>(<span class='fl'>12</span>*<span class='fl'>20</span>), <span class='kw'>ncol</span><span class='kw'>=</span><span class='fl'>20</span>)
     <span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span>(<span class='no'>mtx</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>LETTERS</span>[<span class='fl'>1</span>:<span class='fl'>12</span>], <span class='no'>letters</span>[<span class='fl'>1</span>:<span class='fl'>20</span>])
-    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/as.phylo.html'>as.phylo</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/dist.html'>dist</a></span>(<span class='no'>mtx</span>)))
-
-    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>mtx</span>, <span class='kw'>tree</span><span class='kw'>=</span><span class='no'>tree</span>)
-    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          a        b        c        d
-#&gt; a   0.0000 148.9849 190.9240 187.6669
-#&gt; b 148.9849   0.0000 213.4126 134.2024
-#&gt; c 190.9240 213.4126   0.0000 171.8943
-#&gt; d 187.6669 134.2024 171.8943   0.0000</div><div class='input'>    
+    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'>as.phylo</span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/dist.html'>dist</a></span>(<span class='no'>mtx</span>)))</div><div class='output co'>#&gt; <span class='error'>Error in loadNamespace(name): there is no package called 'ape'</span></div><div class='input'>
+    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>mtx</span>, <span class='kw'>tree</span><span class='kw'>=</span><span class='no'>tree</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(tree, "phylo"): object 'tree' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
+#&gt; HMP01 0.0000000 0.5714029 0.7262758 0.9639771
+#&gt; HMP02 0.5714029 0.0000000 0.3435511 0.5693744
+#&gt; HMP03 0.7262758 0.3435511 0.0000000 0.2639387
+#&gt; HMP04 0.9639771 0.5693744 0.2639387 0.0000000</div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
