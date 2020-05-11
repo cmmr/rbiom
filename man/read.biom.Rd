@@ -4,7 +4,7 @@
 \alias{read.biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read.biom(src, tree = "auto", progressbar = NULL)
+read.biom(src, tree = "auto", prune = FALSE, progressbar = NULL)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
@@ -22,6 +22,8 @@ will do the same, but will generate an error message if a tree is not
 present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
 without any tree data. You may also provide a file path, URL, or Newick
 string to load that tree data into the final \code{BIOM} object.}
+
+\item{prune}{Should samples and taxa with zero observations be discarded?}
 
 \item{progressbar}{An object of class \code{Progress}.}
 }
@@ -78,7 +80,7 @@ Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
     as.matrix(biom$counts[top5, 1:6])
 
     # Metadata
-    table(biom$metadata$Sex, biom$metadata$Body.Site)
+    table(biom$metadata$Sex, biom$metadata$`Body Site`)
     sprintf("Mean age: \%.1f", mean(biom$metadata$Age))
 
     # Phylogenetic tree

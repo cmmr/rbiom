@@ -1,6 +1,5 @@
 
 biom <- readRDS("inputs/biom.rds")
-biom <- rarefy(biom, 100)
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Alpha Diversity
@@ -30,7 +29,7 @@ context("Taxa Rollup")
 
 tr <- readRDS("outputs/taxa.rollup.rds")
 
-for (txRank in c(colnames(biom$taxonomy), 'OTU')) {
+for (txRank in c(taxa.ranks(biom), 'OTU')) {
   test_that(txRank, {
     expect_equal(tr[[txRank]], taxa.rollup(biom, txRank))
   })
@@ -38,7 +37,7 @@ for (txRank in c(colnames(biom$taxonomy), 'OTU')) {
 
 remove("tr", "txRank")
 
-
+remove("biom")
 
 
 

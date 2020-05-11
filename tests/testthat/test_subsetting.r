@@ -34,6 +34,7 @@ test_that("Rarefaction", {
   expect_is(y, "simple_triplet_matrix")
   expect_gt(r2, .3)
   
+  remove("x", "y", "z", "r2")
   # ggplot(z, aes(x=value.x, y=value.y)) + geom_smooth(method = "lm") + geom_point()
 })
 
@@ -69,3 +70,5 @@ test_that("Selecting", {
 })
 remove("ex1", "ex2", "ex3")
 
+
+remove("biom")

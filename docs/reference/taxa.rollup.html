@@ -191,27 +191,27 @@ memory efficient in this scenario.</p></td>
 
     <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>biom</span>$<span class='no'>taxonomy</span>)</div><div class='output co'>#&gt; [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </div><div class='input'>
     <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='st'>'Phylum'</span>)
-    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
-#&gt; Acidobacteria      0     0     0     0     0     0
-#&gt; Actinobacteria    46    41    11    33    65  1573
-#&gt; Bacteroidetes    798   181   102   141    97    32
-#&gt; BD1_5              1     0     0     0     1     0</div><div class='input'>
+    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                       HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; __Actinobacteria         18    60   126   120    30    71
+#&gt; __Bacteroidetes         276   221   313   218   144   880
+#&gt; __Cyanobacteria           0     0     0     0     0     0
+#&gt; __Deinococcus_Thermus     0     0     0     0     0     0</div><div class='input'>
     <span class='co'># Custom matrices should be formatted like so:</span>
     <span class='no'>counts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>)
     <span class='no'>map</span>    <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>taxonomy</span>
 
     <span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
-#&gt; AciSp313     0     0     0     0     0     0
-#&gt; AcnLingn     0     0     0     1     0     0
-#&gt; AcnOriho     0     0     0     0     0     0</div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          Kingdom    Phylum           Class                 Order            
-#&gt; AciSp313 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pseudomonadales"
-#&gt; AcnLingn "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"
-#&gt; AcnOriho "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"</div><div class='input'>
+#&gt; UncO2713     0     0     0     0     0     0
+#&gt; UncO4101     1     5     6    18     5    15
+#&gt; AnmMass2     0     0     0     0     0     0</div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
+#&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
+#&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
+#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"</div><div class='input'>
     <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>counts</span>, <span class='st'>'Phylum'</span>, <span class='kw'>map</span><span class='kw'>=</span><span class='no'>map</span>)
-    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
-#&gt; Acidobacteria      0     0     0     0     0     0
-#&gt; Actinobacteria    46    41    11    33    65  1573
-#&gt; Bacteroidetes    798   181   102   141    97    32</div><div class='input'>
+    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                  HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; __Actinobacteria    18    60   126   120    30    71
+#&gt; __Bacteroidetes    276   221   313   218   144   880
+#&gt; __Cyanobacteria      0     0     0     0     0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

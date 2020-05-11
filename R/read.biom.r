@@ -14,6 +14,7 @@
 #'     present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
 #'     without any tree data. You may also provide a file path, URL, or Newick
 #'     string to load that tree data into the final \code{BIOM} object.
+#' @param prune  Should samples and taxa with zero observations be discarded?
 #' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
@@ -64,7 +65,7 @@
 #'     as.matrix(biom$counts[top5, 1:6])
 #'
 #'     # Metadata
-#'     table(biom$metadata$Sex, biom$metadata$Body.Site)
+#'     table(biom$metadata$Sex, biom$metadata$`Body Site`)
 #'     sprintf("Mean age: %.1f", mean(biom$metadata$Age))
 #'
 #'     # Phylogenetic tree
@@ -74,7 +75,7 @@
 #'
 
 
-read.biom <- function (src, tree='auto', progressbar=NULL) {
+read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
 
   #--------------------------------------------------------------
   # Sanity check input values
@@ -204,14 +205,18 @@ read.biom <- function (src, tree='auto', progressbar=NULL) {
   # Discard samples/taxa with zero observations
   #--------------------------------------------------------------
   
-  pb$set(1.0, 'Dropping unobserved taxa and samples')
-  counts   <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
-  taxonomy <- taxonomy[rownames(counts),,drop=FALSE]
-  metadata <- metadata[colnames(counts),,drop=FALSE]
-  if (!is.null(sequences))
-    sequences <- sequences[rownames(counts)]
-  if (!is.null(phylogeny))
-    phylogeny <- subtree(phylogeny, rownames(counts))
+  if (identical(prune, TRUE)) {
+    pb$set(1.0, 'Dropping unobserved taxa and samples')
+    counts   <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
+    taxonomy <- taxonomy[rownames(counts),,drop=FALSE]
+    metadata <- metadata[colnames(counts),,drop=FALSE]
+    if (!is.null(sequences))
+      sequences <- sequences[rownames(counts)]
+    if (!is.null(phylogeny))
+      phylogeny <- subtree(phylogeny, rownames(counts))
+  } else {
+    pb$set(1.0, 'Complete')
+  }
   
   
   #--------------------------------------------------------------
@@ -523,12 +528,12 @@ PB.JSON.Taxonomy <- function (json) {
     return (taxaNames)
   })
 
-  if (class(taxa_table) == "matrix") {
+  if (is(taxa_table, "matrix")) {
     # 'Normal' situation of same number of ranks (>1) per taxa string.
     
     taxa_table <- t(taxa_table)
     
-  } else if (class(taxa_table) == "list") {
+  } else if (is(taxa_table, "list")) {
     # Handle instances where some taxa strings have more levels than others.
     
     n <- sapply(taxa_table, length)

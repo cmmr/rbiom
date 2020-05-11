@@ -25,7 +25,7 @@ Subset samples using the BIOM object's metadata
     biom <- read.biom(infile)
     
     ex1 <- subset(biom, Age > 30)
-    ex2 <- subset(biom, Body.Site \%in\% c("Saliva", "Stool"))
+    ex2 <- subset(biom, `Body Site` \%in\% c("Saliva", "Stool"))
     ex3 <- subset(biom, Age < 25 & BMI > 22)
 
 }

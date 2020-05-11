@@ -120,7 +120,7 @@
     <p>Extracts counts, metadata, taxonomy, and phylogeny from a biom file.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>read.biom</span>(<span class='no'>src</span>, <span class='kw'>tree</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>prune</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,6 +144,10 @@ will do the same, but will generate an error message if a tree is not
 present. Setting <code>tree=FALSE</code> will return a <code>BIOM</code> object 
 without any tree data. You may also provide a file path, URL, or Newick
 string to load that tree data into the final <code>BIOM</code> object.</p></td>
+    </tr>
+    <tr>
+      <th>prune</th>
+      <td><p>Should samples and taxa with zero observations be discarded?</p></td>
     </tr>
     <tr>
       <th>progressbar</th>
@@ -194,38 +198,38 @@ string to load that tree data into the final <code>BIOM</code> object.</p></td>
 
     <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt;           Length Class                 Mode     
 #&gt; counts       6   simple_triplet_matrix list     
-#&gt; metadata     4   data.frame            list     
-#&gt; taxonomy  3114   -none-                character
+#&gt; metadata     6   data.frame            list     
+#&gt; taxonomy  2940   -none-                character
 #&gt; phylogeny    4   phylo                 list     
-#&gt; sequences    0   -none-                NULL     
-#&gt; info         8   -none-                list     </div><div class='input'>
+#&gt; sequences  490   -none-                character
+#&gt; info         9   -none-                list     </div><div class='input'>
     <span class='co'># Taxa Abundances</span>
     <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04
-#&gt; AciSp313     0     0     0     0
-#&gt; AcnLingn     0     0     0     1
-#&gt; AcnOriho     0     0     0     0
-#&gt; AecChri2     0     0     0     0</div><div class='input'>
+#&gt; UncO2713     0     0     0     0
+#&gt; UncO4101     1     5     6    18
+#&gt; AnmMass2     0     0     0     0
+#&gt; PreBivi6     0     0     0     0</div><div class='input'>
     <span class='no'>top5</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span>(<span class='kw pkg'>slam</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slam/man/sums.html'>row_sums</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>))), <span class='fl'>5</span>))
-    <span class='no'>biom</span>$<span class='no'>taxonomy</span>[<span class='no'>top5</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'Family'</span>, <span class='st'>'Genus'</span>)]</div><div class='output co'>#&gt;          Family               Genus            
-#&gt; Unc01ryi "Streptococcaceae"   "Streptococcus"  
-#&gt; Unc02o28 "Corynebacteriaceae" "Corynebacterium"
-#&gt; Unc50382 "Lactobacillaceae"   "Lactobacillus"  
-#&gt; Unc50364 "Lactobacillaceae"   "Lactobacillus"  
-#&gt; Unc01pmq "Pasteurellaceae"    "Haemophilus"    </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='no'>top5</span>, <span class='fl'>1</span>:<span class='fl'>6</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
-#&gt; Unc01ryi   407   627   713  1874   205    13
-#&gt; Unc02o28     0     0     0     0     0  1533
-#&gt; Unc50382     0     0     0     0     0     0
-#&gt; Unc50364     0     0     0     0     0     0
-#&gt; Unc01pmq   515   245   187   199   549     2</div><div class='input'>
+    <span class='no'>biom</span>$<span class='no'>taxonomy</span>[<span class='no'>top5</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'Family'</span>, <span class='st'>'Genus'</span>)]</div><div class='output co'>#&gt;          Family                 Genus                
+#&gt; Unc01yki "__Lactobacillaceae"   "__Lactobacillus"    
+#&gt; Unc53100 "__Streptococcaceae"   "__Streptococcus"    
+#&gt; LtbAci52 "__Lactobacillaceae"   "__Lactobacillus"    
+#&gt; CnbTube3 "__Corynebacteriaceae" "__Corynebacterium_1"
+#&gt; Unc02qsf "__Staphylococcaceae"  "__Staphylococcus"   </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='no'>top5</span>, <span class='fl'>1</span>:<span class='fl'>6</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; Unc01yki     0     0     0     0     0     0
+#&gt; Unc53100  1083   543   301   223  2672   748
+#&gt; LtbAci52     0     0     0     0     0     0
+#&gt; CnbTube3     0     0     0     0     0     0
+#&gt; Unc02qsf     0     0     0     0     0     0</div><div class='input'>
     <span class='co'># Metadata</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Sex</span>, <span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Body.Site</span>)</div><div class='output co'>#&gt;         
+    <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Sex</span>, <span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>`Body Site`</span>)</div><div class='output co'>#&gt;         
 #&gt;          Anterior nares Buccal mucosa Mid vagina Saliva Stool
 #&gt;   Female              5             5         10      5     5
 #&gt;   Male                5             5          0      5     5</div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"Mean age: %.1f"</span>, <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Age</span>))</div><div class='output co'>#&gt; [1] "Mean age: 27.8"</div><div class='input'>
     <span class='co'># Phylogenetic tree</span>
     <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>phylogeny</span>
     <span class='no'>top5.tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rbiom</span><span class='kw ns'>::</span><span class='fu'><a href='subtree.html'>subtree</a></span>(<span class='no'>tree</span>, <span class='no'>top5</span>)
-    <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'>plot.phylo</span>(<span class='no'>top5.tree</span>)</div><div class='output co'>#&gt; <span class='error'>Error in loadNamespace(name): there is no package called 'ape'</span></div><div class='input'>
+    <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/plot.phylo.html'>plot.phylo</a></span>(<span class='no'>top5.tree</span>)</div><div class='img'><img src='read.biom-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

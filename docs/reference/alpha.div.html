@@ -165,13 +165,13 @@ diversity computations. Options are:</p><dl'>
 
     <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
     <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
-#&gt; HMP01  HMP01  2872   89 2.972967 123.72222 0.9085382  10.933527
-#&gt; HMP02  HMP02  1906   41 2.223793  43.08333 0.8243218   5.692227
-#&gt; HMP03  HMP03  1217   35 1.601946  63.16667 0.6244216   2.662560
-#&gt; HMP04  HMP04  2578   49 1.310901  70.33333 0.4622226   1.859505
-#&gt; HMP05  HMP05  1272   54 2.189982  79.78571 0.7706529   4.360203
-#&gt; HMP06  HMP06  2269   44 1.250978  62.06250 0.5103010   2.042071</div><div class='input'>
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>Body.Site</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span> <span class='kw'>&amp;</span> <span class='no'>Age</span> <span class='kw'>&lt;</span> <span class='fl'>26</span>)
+#&gt; HMP01  HMP01  1660   49 1.741152  59.08333 0.5668413   2.308623
+#&gt; HMP02  HMP02  1371   75 2.587403 104.38889 0.8133915   5.358813
+#&gt; HMP03  HMP03  1353   75 2.950982  90.04167 0.8936622   9.403990
+#&gt; HMP04  HMP04  1895   83 3.255785  93.32143 0.9323644  14.785121
+#&gt; HMP05  HMP05  3939   67 1.462650 127.75000 0.5252254   2.106262
+#&gt; HMP06  HMP06  4150  105 3.087615 131.88889 0.9103916  11.159673</div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>`Body Site`</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span> <span class='kw'>&amp;</span> <span class='no'>Age</span> <span class='kw'>&lt;</span> <span class='fl'>26</span>)
     <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
     <span class='fu'><a href='https://rdrr.io/r/graphics/boxplot.html'>boxplot</a></span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>

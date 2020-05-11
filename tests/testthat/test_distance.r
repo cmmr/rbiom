@@ -23,7 +23,7 @@ for (method in c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac"))
   })
 }
 
-remove("method", "prev", "udm", "wdm")
+remove("biom", "method", "prev", "udm", "wdm")
 
 
 

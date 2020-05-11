@@ -17,8 +17,8 @@ tsv <- read.biom(fp)
 unlink(fp)
 
 test_that("TSV Intermediate", {
-  expect_equal(as.matrix(biom$counts), as.matrix(tsv$counts))
-  expect_equal(biom$taxonomy, tsv$taxonomy)
+  expect_equivalent(as.matrix(biom$counts), as.matrix(tsv$counts))
+  expect_equivalent(biom$taxonomy, tsv$taxonomy)
 })
 
 
@@ -30,10 +30,10 @@ json <- read.biom(fp)
 unlink(fp)
 
 test_that("JSON Intermediate", {
-  expect_equal(biom$counts,    json$counts)
-  expect_equal(biom$phylogeny, json$phylogeny)
-  expect_equal(biom$metadata,  json$metadata)
-  expect_equal(biom$taxonomy,  json$taxonomy)
+  expect_equivalent(biom$counts,    json$counts)
+  expect_equivalent(biom$phylogeny, json$phylogeny)
+  expect_equivalent(biom$metadata,  json$metadata)
+  expect_equivalent(biom$taxonomy,  json$taxonomy)
 })
 
 
@@ -45,14 +45,14 @@ hdf5 <- read.biom(fp)
 unlink(fp)
 
 test_that("HDF5 Intermediate", {
-  expect_equal(biom$counts,    hdf5$counts)
-  expect_equal(biom$phylogeny, hdf5$phylogeny)
-  expect_equal(biom$metadata,  hdf5$metadata)
-  expect_equal(biom$taxonomy,  hdf5$taxonomy)
+  expect_equivalent(biom$counts,    hdf5$counts)
+  expect_equivalent(biom$phylogeny, hdf5$phylogeny)
+  expect_equivalent(biom$metadata,  hdf5$metadata)
+  expect_equivalent(biom$taxonomy,  hdf5$taxonomy)
 })
 
 
-remove("fp", "tsv", "json", "hdf5")
+remove("biom", "fp", "tsv", "json", "hdf5")
 
 
 

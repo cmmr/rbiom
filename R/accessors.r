@@ -162,7 +162,7 @@ metadata <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "ag200.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     sequences(biom)[1:4]

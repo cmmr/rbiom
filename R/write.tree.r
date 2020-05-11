@@ -19,7 +19,7 @@ write.tree <- function (tree=NULL, file=NULL) {
     stop(simpleError("Please provide a value for tree to write.tree()"))
   
   if (is(tree, "BIOM"))
-    tree <- rbiom::phylogeny(biom)
+    tree <- rbiom::phylogeny(tree)
   
   if (!is(tree, "phylo"))
     stop(simpleError("Provided tree is not a 'phylo' or 'BIOM' class object."))

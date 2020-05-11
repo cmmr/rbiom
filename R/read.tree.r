@@ -106,7 +106,7 @@ read.tree <- function (src, progressbar=NULL) {
     #--------------------------------------------------------------
     # Read file contents into 'text' variable
     #--------------------------------------------------------------
-    text <- try(readChar(con = fp, nchars = file.size(fp)), silent = TRUE)
+    text <- try(readLines(con = fp, warn = FALSE), silent = TRUE)
     
   }
   
