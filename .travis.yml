@@ -5,10 +5,7 @@ r:
 r_build_args: '--no-build-vignettes'
 r_check_args: '--as-cran --ignore-vignettes'
 r_packages:
-  - doSNOW
-  - foreach
   - methods
-  - parallel
   - plyr
   - Rcpp
   - RcppParallel
@@ -22,6 +19,7 @@ r_packages:
 bioc_packages:
   - rhdf5
 cache: packages
+warnings_are_errors: true
 sudo: false
 os:
   - linux

@@ -15,7 +15,6 @@
 #'     without any tree data. You may also provide a file path, URL, or Newick
 #'     string to load that tree data into the final \code{BIOM} object.
 #' @param prune  Should samples and taxa with zero observations be discarded?
-#' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \describe{
@@ -75,7 +74,7 @@
 #'
 
 
-read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
+read.biom <- function (src, tree='auto', prune=FALSE) {
 
   #--------------------------------------------------------------
   # Sanity check input values
@@ -85,16 +84,11 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
     stop(simpleError("Data source for read.biom() must be a single string."))
 
 
-  pb <- progressBar(progressbar=progressbar, "")
-
-
   #--------------------------------------------------------------
   # Get the url or text for the src/BIOM data into a file
   #--------------------------------------------------------------
 
   if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
-
-    pb$set(0, detail='Downloading BIOM file')
 
     fp <- tempfile(fileext=basename(src))
     on.exit(unlink(fp), add=TRUE)
@@ -127,8 +121,6 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
   
   if (file_class %in% c("gzfile", "bzfile")) {
     
-    pb$set(0, detail=paste('Decompressing', basename(fp)))
-    
     if (identical(file_class, "gzfile"))
       fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
     
@@ -145,25 +137,21 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
   # Process the file according to its internal format
   #--------------------------------------------------------------
   
-  pb$set(0, detail='Determining file type')
-  
-  
   if (rhdf5::H5Fis_hdf5(fp)) {
     
     #-=-=-=-=-=-=-=-=-=-#
     # HDF5 file format  #
     #-=-=-=-=-=-=-=-=-=-#
     
-    pb$set(0.1, detail='Reading HDF5 BIOM file');        hdf5      <- PB.HDF5.ReadHDF5(fp)
-    pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.HDF5.Counts(hdf5)
-    pb$set(0.6, detail='Extracting sequences');          sequences <- PB.HDF5.Sequences(hdf5)
-    pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.HDF5.Taxonomy(hdf5)
-    pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.HDF5.Metadata(hdf5)
-    pb$set(0.9, detail='Extracting attributes');         info      <- PB.HDF5.Info(hdf5)
-    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.HDF5.Tree(hdf5, tree)
+    hdf5      <- PB.HDF5.ReadHDF5(fp)
+    counts    <- PB.HDF5.Counts(hdf5)
+    sequences <- PB.HDF5.Sequences(hdf5)
+    taxonomy  <- PB.HDF5.Taxonomy(hdf5)
+    metadata  <- PB.HDF5.Metadata(hdf5)
+    info      <- PB.HDF5.Info(hdf5)
+    phylogeny <- PB.HDF5.Tree(hdf5, tree)
     
     rhdf5::H5Fclose(hdf5)
-    #rhdf5::H5close()
     remove("hdf5")
     
   } else if (identical("{", readChar(fp, 1))) {
@@ -172,13 +160,13 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
     # JSON file format  #
     #-=-=-=-=-=-=-=-=-=-#
     
-    pb$set(0.1, detail='Reading JSON BIOM file');        json      <- PB.JSON.ReadJSON(fp)
-    pb$set(0.2, detail='Assembling OTU table');          counts    <- PB.JSON.Counts(json)
-    pb$set(0.6, detail='Extracting sequences');          sequences <- PB.JSON.Sequences(json)
-    pb$set(0.7, detail='Processing taxonomic lineages'); taxonomy  <- PB.JSON.Taxonomy(json)
-    pb$set(0.8, detail='Extracting metadata');           metadata  <- PB.JSON.Metadata(json)
-    pb$set(0.9, detail='Extracting attributes');         info      <- PB.JSON.Info(json)
-    pb$set(1.0, detail='Extracting phylogeny');          phylogeny <- PB.JSON.Tree(json, tree)
+    json      <- PB.JSON.ReadJSON(fp)
+    counts    <- PB.JSON.Counts(json)
+    sequences <- PB.JSON.Sequences(json)
+    taxonomy  <- PB.JSON.Taxonomy(json)
+    metadata  <- PB.JSON.Metadata(json)
+    info      <- PB.JSON.Info(json)
+    phylogeny <- PB.JSON.Tree(json, tree)
     
     remove("json")
     
@@ -191,13 +179,13 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
     if (identical(tree, TRUE))
       stop(simpleError("It is impossible to load a phylogenetic tree from a BIOM file in tab-separated format."))
     
-    pb$set(0.1, 'Reading tabular data file');     mtx       <- PB.TSV.ReadTSV(fp)
-    pb$set(0.3, 'Assembling OTU table');          counts    <- PB.TSV.Counts(mtx)
-    pb$set(0.7, 'Extracting sequences');          sequences <- NULL
-    pb$set(0.8, 'Processing taxonomic lineages'); taxonomy  <- PB.TSV.Taxonomy(mtx)
-    pb$set(0.9, 'Extracting metadata');           metadata  <- data.frame(row.names=colnames(counts))
-    pb$set(1.0, 'Extracting attributes');         info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
-    pb$set(1.0, 'Extracting phylogeny');          phylogeny <- NULL
+    mtx       <- PB.TSV.ReadTSV(fp)
+    counts    <- PB.TSV.Counts(mtx)
+    sequences <- NULL
+    taxonomy  <- PB.TSV.Taxonomy(mtx)
+    metadata  <- data.frame(row.names=colnames(counts))
+    info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
+    phylogeny <- NULL
   }
   
   
@@ -206,7 +194,6 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
   #--------------------------------------------------------------
   
   if (identical(prune, TRUE)) {
-    pb$set(1.0, 'Dropping unobserved taxa and samples')
     counts   <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
     taxonomy <- taxonomy[rownames(counts),,drop=FALSE]
     metadata <- metadata[colnames(counts),,drop=FALSE]
@@ -214,8 +201,6 @@ read.biom <- function (src, tree='auto', prune=FALSE, progressbar=NULL) {
       sequences <- sequences[rownames(counts)]
     if (!is.null(phylogeny))
       phylogeny <- subtree(phylogeny, rownames(counts))
-  } else {
-    pb$set(1.0, 'Complete')
   }
   
   

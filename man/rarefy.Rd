@@ -4,7 +4,7 @@
 \alias{rarefy}
 \title{Subset counts so that all samples have the same number of observations.}
 \usage{
-rarefy(biom, depth = NULL, seed = 0, progressbar = NULL)
+rarefy(biom, depth = NULL, seed = 0)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -20,8 +20,6 @@ between 1 and \code{depth} such that they sum to \code{depth}.}
 \item{seed}{An integer to use for seeding the random number generator. If
 you need to create different random rarefactions of the same \code{BIOM}
 object, set this seed value to a different number each time.}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 

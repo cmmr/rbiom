@@ -4,14 +4,7 @@
 \alias{taxa.rollup}
 \title{Generate a matrix of samples by taxa, at the specified taxonomic rank.}
 \usage{
-taxa.rollup(
-  biom,
-  rank = "OTU",
-  map = NULL,
-  lineage = FALSE,
-  sparse = FALSE,
-  progressbar = NULL
-)
+taxa.rollup(biom, rank = "OTU", map = NULL, lineage = FALSE, sparse = FALSE)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -43,8 +36,6 @@ level ranks.}
 \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A numeric matrix with samples as column names, and taxonomic

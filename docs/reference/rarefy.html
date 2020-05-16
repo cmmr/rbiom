@@ -120,7 +120,7 @@
     <p>Subset counts so that all samples have the same number of observations.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>rarefy</span>(<span class='no'>biom</span>, <span class='kw'>depth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,10 +144,6 @@ between 1 and <code>depth</code> such that they sum to <code>depth</code>.</p></
       <td><p>An integer to use for seeding the random number generator. If
 you need to create different random rarefactions of the same <code>BIOM</code>
 object, set this seed value to a different number each time.</p></td>
-    </tr>
-    <tr>
-      <th>progressbar</th>
-      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
 

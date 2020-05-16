@@ -11,7 +11,6 @@
 #' @param seed  An integer to use for seeding the random number generator. If
 #'     you need to create different random rarefactions of the same \code{BIOM}
 #'     object, set this seed value to a different number each time.
-#' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'     object, depending on the input object type. The type of object provided
 #'     is the same type that is returned. The retained observations are randomly
@@ -31,7 +30,7 @@
 #'
 
 
-rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
+rarefy <- function (biom, depth=NULL, seed=0) {
   
   
   #--------------------------------------------------------------
@@ -85,49 +84,7 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   
   if (all(counts$v %% 1 == 0)) {
     
-    pb <- progressBar(progressbar, paste("Rarefying to", depth))
-    cl <- configCluster(nTasks=counts$ncol, pb)
-    
-    res <- {
-      
-      set <- idx <- NULL
-      
-      foreach (set=cl$sets, .combine='rbind', .options.snow=cl$opts, .packages='foreach') %dopar% {
-        foreach (idx=set, .combine='rbind') %do% {
-          
-          x <- ceiling(counts$v[counts$j == idx])
-          nReads <- sum(x)
-          
-          if (nReads < depth)
-            return (NULL)
-          
-          sampleID <- ifelse(is.null(colnames(counts)), paste0("Sample", idx), colnames(counts)[[idx]])
-          set.seed(sum(utf8ToInt(sampleID) + seed) %% 2147483647)
-          
-          breaks <- c(0, cumsum(x))
-          labels <- counts$i[counts$j == idx]
-          retain <- sample.int(nReads, depth)
-          retain <- table(cut(retain, breaks=breaks, labels=labels))
-          retain <- retain[retain > 0]
-          
-          matrix(c(as.numeric(names(retain)), rep(idx, length(retain)), unname(retain)), ncol=3)
-        }
-      }
-    }
-    
-    
-    # Construct a new simple triplet matrix
-    #--------------------------------------------------------------
-    
-    TaxaIDs   <- counts$dimnames[[1]][sort(unique(res[,1]))]
-    SampleIDs <- counts$dimnames[[2]][sort(unique(res[,2]))]
-    
-    counts <- slam::simple_triplet_matrix(
-      i = as.numeric(factor(res[,1])),
-      j = as.numeric(factor(res[,2])),
-      v = res[,3],
-      dimnames = list(TaxaIDs, SampleIDs)
-    )
+    counts <- rcpp_rarefy(counts, depth, seed)
   
     
   #--------------------------------------------------------------
@@ -135,8 +92,6 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
   #--------------------------------------------------------------
   
   } else {
-    
-    pb <- progressBar(progressbar, paste("Rescaling to", depth))
     
     counts <- as.matrix(counts)
     
@@ -163,10 +118,11 @@ rarefy <- function (biom, depth=NULL, seed=0, progressbar=NULL) {
     })
     
     counts    <- slam::as.simple_triplet_matrix(counts)
-    TaxaIDs   <- rownames(counts)
-    SampleIDs <- colnames(counts)
     
   }
+  
+  TaxaIDs   <- rownames(counts)
+  SampleIDs <- colnames(counts)
   
   
   #--------------------------------------------------------------

@@ -10,7 +10,6 @@
 #'     \kbd{ftps://}. Newick strings must have \code{(} as their first 
 #'     non-whitespace character. Compressed (gzip or bzip2) Newick files 
 #'     are also supported.
-#' @param progressbar  An object of class \code{Progress}.
 #' @return A \code{phylo} class object representing the tree.
 #' @export
 #' @examples
@@ -24,9 +23,7 @@
 #'         :0.94):0.69,(t6:0.92,(t3:0.62,t1:0.85):0.54):0.23):0.74,t8:0.1
 #'         2):0.43):0.67);")
 #'
-read.tree <- function (src, progressbar=NULL) {
-  
-  pb <- progressBar(progressbar=progressbar, "")
+read.tree <- function (src) {
   
   #--------------------------------------------------------------
   # Sanity check src value
@@ -62,8 +59,6 @@ read.tree <- function (src, progressbar=NULL) {
     
     if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
       
-      pb$set(0, detail='Downloading Newick file')
-      
       fp <- tempfile(fileext=basename(src))
       on.exit(unlink(fp), add=TRUE)
       if (!identical(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
@@ -88,8 +83,6 @@ read.tree <- function (src, progressbar=NULL) {
     close.connection(file_con)
     
     if (file_class %in% c("gzfile", "bzfile")) {
-      
-      pb$set(0, detail=paste('Decompressing', basename(fp)))
       
       if (identical(file_class, "gzfile"))
         fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)

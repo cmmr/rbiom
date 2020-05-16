@@ -23,11 +23,8 @@ LinkingTo:
     Rcpp,
     RcppParallel
 Imports:
-    doSNOW (>= 1.0.14),
-    foreach,
     magrittr,
     methods,
-    parallel,
     plyr,
     Rcpp,
     RcppParallel,

@@ -5,6 +5,19 @@
 
 using namespace Rcpp;
 
+// par_beta_div
+NumericMatrix par_beta_div(NumericMatrix mat, const char* method, bool weighted);
+RcppExport SEXP _rbiom_par_beta_div(SEXP matSEXP, SEXP methodSEXP, SEXP weightedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< const char* >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< bool >::type weighted(weightedSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_beta_div(mat, method, weighted));
+    return rcpp_result_gen;
+END_RCPP
+}
 // par_unifrac
 NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted);
 RcppExport SEXP _rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
@@ -18,18 +31,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_distance
-NumericVector rcpp_distance(int iJob, int nJobs, List sparseMatrix, const char* method, bool weighted);
-RcppExport SEXP _rbiom_rcpp_distance(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP methodSEXP, SEXP weightedSEXP) {
+// rcpp_alpha_div
+List rcpp_alpha_div(List sparseMatrix);
+RcppExport SEXP _rbiom_rcpp_alpha_div(SEXP sparseMatrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type iJob(iJobSEXP);
-    Rcpp::traits::input_parameter< int >::type nJobs(nJobsSEXP);
     Rcpp::traits::input_parameter< List >::type sparseMatrix(sparseMatrixSEXP);
-    Rcpp::traits::input_parameter< const char* >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< bool >::type weighted(weightedSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_distance(iJob, nJobs, sparseMatrix, method, weighted));
+    rcpp_result_gen = Rcpp::wrap(rcpp_alpha_div(sparseMatrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_rarefy
+List rcpp_rarefy(List sparseMatrix, int depth, int seed);
+RcppExport SEXP _rbiom_rcpp_rarefy(SEXP sparseMatrixSEXP, SEXP depthSEXP, SEXP seedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type sparseMatrix(sparseMatrixSEXP);
+    Rcpp::traits::input_parameter< int >::type depth(depthSEXP);
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_rarefy(sparseMatrix, depth, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -44,27 +66,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_unifrac
-NumericVector rcpp_unifrac(int iJob, int nJobs, List sparseMatrix, List tree, bool weighted);
-RcppExport SEXP _rbiom_rcpp_unifrac(SEXP iJobSEXP, SEXP nJobsSEXP, SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type iJob(iJobSEXP);
-    Rcpp::traits::input_parameter< int >::type nJobs(nJobsSEXP);
-    Rcpp::traits::input_parameter< List >::type sparseMatrix(sparseMatrixSEXP);
-    Rcpp::traits::input_parameter< List >::type tree(treeSEXP);
-    Rcpp::traits::input_parameter< bool >::type weighted(weightedSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_unifrac(iJob, nJobs, sparseMatrix, tree, weighted));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rbiom_par_beta_div", (DL_FUNC) &_rbiom_par_beta_div, 3},
     {"_rbiom_par_unifrac", (DL_FUNC) &_rbiom_par_unifrac, 3},
-    {"_rbiom_rcpp_distance", (DL_FUNC) &_rbiom_rcpp_distance, 5},
+    {"_rbiom_rcpp_alpha_div", (DL_FUNC) &_rbiom_rcpp_alpha_div, 1},
+    {"_rbiom_rcpp_rarefy", (DL_FUNC) &_rbiom_rcpp_rarefy, 3},
     {"_rbiom_rcpp_read_tree", (DL_FUNC) &_rbiom_rcpp_read_tree, 1},
-    {"_rbiom_rcpp_unifrac", (DL_FUNC) &_rbiom_rcpp_unifrac, 5},
     {NULL, NULL, 0}
 };
 

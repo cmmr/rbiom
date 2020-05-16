@@ -57,10 +57,10 @@ plot(biom$phylogeny)
 dm <- beta.div(biom, 'unifrac')
 ```
 
-Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the rbiom.max.threads option:
+Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:
 
 ``` r
-options('rbiom.max.threads' = 6)
+RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
 

@@ -12,7 +12,6 @@
 #'       \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
 #'       \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
 #'     }
-#' @param progressbar  An object of class \code{Progress}.
 #' @return A data frame of four diversity values for each sample in
 #'     \code{biom}. The column names are \bold{Sample}, \bold{Depth} and the 
 #'     diversity metrics: \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
@@ -31,10 +30,10 @@
 #'     biom <- subset(biom, `Body Site` == "Saliva" & Age < 26)
 #'     ad   <- alpha.div(biom, "multi")
 #'     boxplot(Shannon ~ Depth, data=ad, xlab="Reads", ylab="Diversity")
-#'
+#'     
 
 
-alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
+alpha.div <- function (biom, rarefy=FALSE) {
   
   #--------------------------------------------------------------
   # Get the input into a simple_triplet_matrix
@@ -67,56 +66,21 @@ alpha.div <- function (biom, rarefy=FALSE, progressbar=NULL) {
   }
   
   
+  result <- NULL
   
-  pb      <- progressBar(progressbar, "Calculating Alpha Diversity")
-  nTasks  <- ncol(counts) * length(rLvls)
-  cl      <- configCluster(nTasks = nTasks)
-  cl$opts <- list(progress = function (i) pb$inc(i/cl$nSets))
-  
-  rLvl <- set <- idx <- NULL
-  
-  foreach (rLvl=rLvls, .combine='rbind') %do% {
+  for (rLvl in rLvls) {
     
     otus <- if (is.na(rLvl)) counts else rbiom::rarefy(counts, rLvl)
     
-    df <- {
-      data.frame(
-        matrix(
-          ncol     = 6,
-          byrow    = TRUE,
-          data     = {
-            
-            sets <- parallel::splitIndices(ncol(otus), min(ncol(otus), cl$ncores * 10))
-            
-            foreach (set=sets, .combine='c', .options.snow=cl$opts, .packages='foreach') %dopar% {
-              foreach (idx=set, .combine='c') %do% {
-                
-                x       <- otus$v[otus$j == idx]
-                nReads  <- sum(x)
-                nOTUs   <- length(x)
-              
-                x_p     <- x / nReads
-                Shannon <- -sum(x_p * log(x_p))
-                Simpson <- 1 - sum(x_p ** 2)
-                
-                x       <- ceiling(x)
-                Chao1   <- nOTUs + (sum(x == 1) ** 2) / (2 * sum(x == 2))
-                
-                return (c(idx, nReads, nOTUs, Shannon, Chao1, Simpson))
-              }
-            }
-          }
-        )
-      )
-    }
+    df <- rcpp_alpha_div(otus)
     
-    colnames(df)   <- c('Sample', 'Depth', 'OTUs', 'Shannon', 'Chao1', 'Simpson')
-    df[['Sample']] <- otus$dimnames[[2]][df[['Sample']]]
     if (length(rLvls) == 1) rownames(df) <- df[['Sample']]
     
-    df[['InvSimpson']] <- 1 / (1 - df[['Simpson']])
+    if (is.null(result)) { result <- df
+    } else {               result <- rbind(result, df) }
     
-    return (df)
   }
+    
+  return (result)
   
 }

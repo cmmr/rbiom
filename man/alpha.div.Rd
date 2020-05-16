@@ -4,7 +4,7 @@
 \alias{alpha.div}
 \title{Estimate the diversity of each sample.}
 \usage{
-alpha.div(biom, rarefy = FALSE, progressbar = NULL)
+alpha.div(biom, rarefy = FALSE)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
@@ -20,8 +20,6 @@ diversity computations. Options are:
   \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
   \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
 }}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A data frame of four diversity values for each sample in
@@ -45,5 +43,5 @@ Estimate the diversity of each sample.
     biom <- subset(biom, `Body Site` == "Saliva" & Age < 26)
     ad   <- alpha.div(biom, "multi")
     boxplot(Shannon ~ Depth, data=ad, xlab="Reads", ylab="Diversity")
-
+    
 }

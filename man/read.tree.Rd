@@ -4,7 +4,7 @@
 \alias{read.tree}
 \title{Read a newick formatted phylogenetic tree.}
 \usage{
-read.tree(src, progressbar = NULL)
+read.tree(src)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or Newick string. URLs 
@@ -12,8 +12,6 @@ must begin with \kbd{http://}, \kbd{https://}, \kbd{ftp://}, or
 \kbd{ftps://}. Newick strings must have \code{(} as their first 
 non-whitespace character. Compressed (gzip or bzip2) Newick files 
 are also supported.}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A \code{phylo} class object representing the tree.

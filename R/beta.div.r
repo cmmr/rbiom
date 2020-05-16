@@ -15,7 +15,6 @@
 #'     relationships of the taxa in \code{biom}. Will be taken from the tree
 #'     embedded in the \code{biom} object if not explicitly specified. Only
 #'     required for computing UniFrac distance matrices.
-#' @param progressbar  An object of class \code{Progress}.
 #' @return A distance matrix.
 #' @export
 #' @examples
@@ -31,7 +30,7 @@
 #'     plot(hclust(dm))
 #'
 
-beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) {
+beta.div <- function (biom, method, weighted=TRUE, tree=NULL) {
   
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
@@ -106,30 +105,23 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, progressbar=NULL) 
   #--------------------------------------------------------------
   # Run C++ implemented dissimilarity algorithms multithreaded
   #--------------------------------------------------------------
-
-  msg <- sprintf("Calculating %s %s", ifelse(weighted, "weighted", "unweighted"), method)
-  pb  <- progressBar(progressbar=progressbar, detail=msg)
   
   if (identical(method, "unifrac")) {
-    
-    pb$set(value=1)
-    RcppParallel::setThreadOptions(numThreads = cpu_count())
     
     par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
     
   } else {
     
-    cl  <- configCluster(nTasks=NA, pb)
-    set <- NULL
-    pb$set(value=0)
+    counts <- t(as.matrix(counts))
+    dm <- par_beta_div(counts, method, ifelse(weighted, 1L, 0L))
+    dm <- as.dist(dm)
+    attr(dm, 'Labels') <- rownames(counts)
     
-    foreach (set=cl$sets, .combine='+', .inorder=FALSE, .options.snow=cl$opts, .export='rcpp_distance') %dopar% {
-      nJobs <- cl$nSets
-      iJob  <- set
-      
-      rcpp_distance(iJob, nJobs, counts, method, weighted)
-    }
+    return (dm)
+    
+    # rcpp_parallel_js_distance(as.matrix(counts))
+    
   }
   
   

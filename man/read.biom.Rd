@@ -4,7 +4,7 @@
 \alias{read.biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read.biom(src, tree = "auto", prune = FALSE, progressbar = NULL)
+read.biom(src, tree = "auto", prune = FALSE)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
@@ -24,8 +24,6 @@ without any tree data. You may also provide a file path, URL, or Newick
 string to load that tree data into the final \code{BIOM} object.}
 
 \item{prune}{Should samples and taxa with zero observations be discarded?}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A \code{BIOM} class object containing the parsed data. This object

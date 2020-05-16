@@ -4,6 +4,7 @@
 ^\.travis\.yml$
 ^cran-comments\.md$
 ^docs$
+^alt$
 ^NEWS\.md$
 ^rbiom.Rproj$
 ^\.vignettes$

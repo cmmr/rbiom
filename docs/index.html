@@ -114,8 +114,9 @@
 
 <span class="co"># Get unifrac distance matrix</span>
 <span class="no">dm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/beta.div.html">beta.div</a></span>(<span class="no">biom</span>, <span class="st">'unifrac'</span>)</pre></div>
-<p>Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the rbiom.max.threads option:</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="st">'rbiom.max.threads'</span> <span class="kw">=</span> <span class="fl">6</span>)</pre></div>
+<p>Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:</p>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="kw pkg">RcppParallel</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html">setThreadOptions</a></span>(<span class="kw">numThreads</span> <span class="kw">=</span> <span class="fl">4</span>)
+<span class="co">#options('rbiom.max.threads' = 6)</span></pre></div>
 </div>
 </div>
   </div>

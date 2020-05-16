@@ -120,14 +120,7 @@
     <p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>taxa.rollup</span>(
-  <span class='no'>biom</span>,
-  <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>,
-  <span class='kw'>map</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>progressbar</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>, <span class='kw'>map</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,10 +164,6 @@ level ranks.</p></td>
 <code><a href='https://rdrr.io/pkg/slam/man/matrix.html'>slam::simple_triplet_matrix</a></code>, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.</p></td>
-    </tr>
-    <tr>
-      <th>progressbar</th>
-      <td><p>An object of class <code>Progress</code>.</p></td>
     </tr>
     </table>
 

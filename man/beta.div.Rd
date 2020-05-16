@@ -4,7 +4,7 @@
 \alias{beta.div}
 \title{Make a distance matrix of samples vs samples.}
 \usage{
-beta.div(biom, method, weighted = TRUE, tree = NULL, progressbar = NULL)
+beta.div(biom, method, weighted = TRUE, tree = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -25,8 +25,6 @@ names are also accepted. A phylogentic tree must be present in
 relationships of the taxa in \code{biom}. Will be taken from the tree
 embedded in the \code{biom} object if not explicitly specified. Only
 required for computing UniFrac distance matrices.}
-
-\item{progressbar}{An object of class \code{Progress}.}
 }
 \value{
 A distance matrix.

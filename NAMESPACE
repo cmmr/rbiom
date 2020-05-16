@@ -36,7 +36,6 @@ importFrom("magrittr","%>%")
 importFrom("methods", "is", "as")
 importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate")
 importFrom("utils", "download.file", "head", "write.table", "read.csv", "read.delim", "packageDescription")
-importFrom("foreach", "foreach", "%dopar%", "%do%")
 
 S3method(print, BIOM)
 S3method(subset, BIOM)
