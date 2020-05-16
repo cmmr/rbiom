@@ -24,3 +24,4 @@ sudo: true
 os:
   - linux
   - osx
+  - windows
