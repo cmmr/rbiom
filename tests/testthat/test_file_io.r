@@ -53,6 +53,3 @@ test_that("HDF5 Intermediate", {
 
 
 remove("biom", "fp", "tsv", "json", "hdf5")
-
-
-

@@ -24,6 +24,3 @@ for (method in c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac"))
 }
 
 remove("biom", "method", "prev", "udm", "wdm")
-
-
-

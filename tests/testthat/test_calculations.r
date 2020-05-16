@@ -38,7 +38,3 @@ for (txRank in c(taxa.ranks(biom), 'OTU')) {
 remove("tr", "txRank")
 
 remove("biom")
-
-
-
-

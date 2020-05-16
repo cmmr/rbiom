@@ -59,9 +59,3 @@ test_that("Newick Subtree", {
 
 
 remove("t1", "t2", "t3", "t4", "original", "newick", "phy")
-
-
-
-
-
-
