@@ -20,7 +20,7 @@ bioc_packages:
   - rhdf5
 cache: packages
 warnings_are_errors: true
-sudo: true
 os:
   - linux
   - osx
+osx_image: xcode9.2
