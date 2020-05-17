@@ -22,5 +22,3 @@ cache: packages
 warnings_are_errors: true
 os:
   - linux
-  - osx
-osx_image: xcode9.2
