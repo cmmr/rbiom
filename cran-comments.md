@@ -1,12 +1,12 @@
 ## Test environments
-* Windows 10 (local machine), R 4.0.0
-* ubuntu 14.04 (travis-ci), R devel and release
-* macOS 10.12 (travis-ci), R devel and release
-* Windows Server 2008 (win-builder), R devel and release
+* Windows Server 2008 (win-builder), R devel, 4.0.0, and 3.6.3
+* ubuntu 16.04 (travis-ci), R devel and 4.0.0
+* macOS 10.13.6 (rhub), R 4.0.0
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs.
+There were no ERRORs or WARNINGs.
 
+NOTEs:
 * First submission of this package to CRAN.
 
 ## Downstream dependencies
