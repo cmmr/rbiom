@@ -5,7 +5,8 @@ Version: 1.0.0
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
-    role  = c("aut", "cre", "cph"))
+    role  = c("aut", "cre", "cph"),
+    comment = c(ORCID = "0000-0002-2479-2044"))
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Features include reading/writing all 'BIOM' formats, rarefaction, alpha
