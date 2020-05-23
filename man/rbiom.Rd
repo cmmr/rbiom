@@ -18,21 +18,11 @@ Many \code{rbiom} functions support multithreading:
 
 The default behavior of these function is to run on as many cores as are
 available in the local compute environment. If you wish to limit the number
-of simultaneous threads, set the \code{rbiom.max.threads} option. For
-instance:
+of simultaneous threads, set \code{RcppParallel}'s \code{numThreads} option.
+For instance:
 
 \preformatted{
-    options('rbiom.max.threads' = 6)
-}
-
-Alternatively, you can register a custom parallel backend, which will be
-detected and used for multithreaded functions. Please note that only the
-\code{doSNOW} backend currently supports progress tracking. With other
-backends, you will only be notified of the beginning and ending of computations.
-
-\preformatted{
-    cl <- parallel::makeCluster(ncores)
-    doSNOW::registerDoSNOW(cl)
+    RcppParallel::setThreadOptions(numThreads = 4)
 }
 }
 

@@ -77,7 +77,7 @@ All CPU intensive operations are encoded in C with multi-thread support." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
       </span>
     </div>
 
@@ -139,18 +139,10 @@ All CPU intensive operations are encoded in C with multi-thread support.</p>
 <p>Many <code>rbiom</code> functions support multithreading:</p>
 <p>The default behavior of these function is to run on as many cores as are
 available in the local compute environment. If you wish to limit the number
-of simultaneous threads, set the <code>rbiom.max.threads</code> option. For
-instance:</p>
+of simultaneous threads, set <code>RcppParallel</code>'s <code>numThreads</code> option.
+For instance:</p>
 <pre>
-    <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='st'>'rbiom.max.threads'</span> <span class='kw'>=</span> <span class='fl'>6</span>)</pre>
-
-<p>Alternatively, you can register a custom parallel backend, which will be
-detected and used for multithreaded functions. Please note that only the
-<code>doSNOW</code> backend currently supports progress tracking. With other
-backends, you will only be notified of the beginning and ending of computations.</p>
-<pre>
-    <span class='no'>cl</span> <span class='kw'>&amp;</span><span class='no'>lt</span>;- <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/makeCluster.html'>makeCluster</a></span>(<span class='no'>ncores</span>)
-    <span class='kw pkg'>doSNOW</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/doSNOW/man/registerDoSNOW.html'>registerDoSNOW</a></span>(<span class='no'>cl</span>)</pre>
+    <span class='kw pkg'>RcppParallel</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html'>setThreadOptions</a></span>(<span class='kw'>numThreads</span> <span class='kw'>=</span> <span class='fl'>4</span>)</pre>
 
 
   </div>
