@@ -63,6 +63,9 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
   if (!is.null(biom$phylogeny)) {
     biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
   }
+  if (!is.null(biom$sequences)) {
+    biom$sequences <- biom$sequences[taxa]
+  }
   biom$info$shape <- dim(biom$counts)
   biom$info$nnz   <- length(biom$counts$v)
   
