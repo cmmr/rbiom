@@ -1,5 +1,5 @@
 // [[Rcpp::depends(RcppParallel)]]
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include <Rcpp.h>
 #include <RcppParallel.h>
@@ -149,7 +149,9 @@ struct PairwiseDist : public Worker
     // Which two samples are we comparing first?
     int i  = begin + 1;
     int n  = nSamples;
-    int s1 = ceil(.5 * (-1 * pow(-8 * (i - 1) + 4 * pow(n, 2) - 4 * n - 7, .5) + 2 * n - 1) - 1) + 1;
+    double i_dbl = static_cast<double>(i);
+    double n_dbl = static_cast<double>(n);
+    int s1 = ceil(.5 * (-1.0 * pow(-8.0 * (i_dbl - 1.0) + 4.0 * pow(n_dbl, 2.0) - 4.0 * n_dbl - 7.0, .5) + 2.0 * n_dbl - 1.0) - 1.0) + 1;
     int s2 = n - (s1 * (n - 1 - s1) + (s1 * (s1 + 1)) / 2) + i;
     
     // Convert from 1-based to 0-based indexing
