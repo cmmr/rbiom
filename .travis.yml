@@ -19,6 +19,6 @@ r_packages:
 bioc_packages:
   - rhdf5
 cache: packages
-warnings_are_errors: true
+warnings_are_errors: false
 os:
   - linux
