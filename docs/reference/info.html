@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -151,29 +151,32 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.biom"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
+    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
     <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
 
     <span class='fu'>info</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; $comment
 #&gt; [1] ""
 #&gt; 
-#&gt; $`creation-date`
-#&gt; [1] "2020-05-11T16:05:08Z"
+#&gt; $date
+#&gt; [1] "2020-05-27T19:11:53Z"
 #&gt; 
-#&gt; $`format-url`
+#&gt; $format
+#&gt; [1] "1.0.0"
+#&gt; 
+#&gt; $format_url
 #&gt; [1] "http://biom-format.org"
 #&gt; 
-#&gt; $`format-version`
-#&gt; [1] 2 1 0
-#&gt; 
-#&gt; $`generated-by`
-#&gt; [1] "rbiom 1.0.0"
+#&gt; $generated_by
+#&gt; [1] "rbiom 1.0.0.9000"
 #&gt; 
 #&gt; $id
 #&gt; [1] "Human Microbiome Project - 50 Sample Demo"
 #&gt; 
-#&gt; $nnz
-#&gt; [1] 2487
+#&gt; $matrix_element_type
+#&gt; [1] "int"
+#&gt; 
+#&gt; $matrix_type
+#&gt; [1] "sparse"
 #&gt; 
 #&gt; $shape
 #&gt; [1] 490  50

@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -81,6 +81,7 @@
 
 <p>This package is a toolkit for working with Biological Observation Matrix (BIOM) files. Features include reading/writing all BIOM formats, rarefaction, alpha diversity, beta diversity (including UniFrac), summarizing counts by taxonomic level, and sample subsetting. Standalone functions for reading, writing, and subsetting phylogenetic trees are also provided. All CPU intensive operations are encoded in C with multi-thread support.</p>
 <p>Reference material is available online at <a href="https://cmmr.github.io/rbiom/index.html" class="uri">https://cmmr.github.io/rbiom/index.html</a></p>
+<p>Source code can be found at <a href="https://github.com/cmmr/rbiom" class="uri">https://github.com/cmmr/rbiom</a></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -95,7 +96,7 @@
 <a href="#usage" class="anchor"></a>Usage</h2>
 <div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">rbiom</span>)
 
-<span class="no">infile</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"hmp50.biom"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"rbiom"</span>)
+<span class="no">infile</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"rbiom"</span>)
 <span class="no">biom</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/read.biom.html">read.biom</a></span>(<span class="no">infile</span>)
 
 <span class="co"># Rarefy to 1000 reads per sample</span>

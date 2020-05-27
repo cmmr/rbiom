@@ -51,7 +51,7 @@
 #' @examples
 #'     library(rbiom)
 #'
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'
 #'     summary(biom)
@@ -137,11 +137,26 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
   # Process the file according to its internal format
   #--------------------------------------------------------------
   
-  if (rhdf5::H5Fis_hdf5(fp)) {
+  if (identical(as.numeric(readBin(fp, "raw", 4)), c(137, 72, 68, 70))) {
     
     #-=-=-=-=-=-=-=-=-=-#
     # HDF5 file format  #
     #-=-=-=-=-=-=-=-=-=-#
+    
+    if (!requireNamespace("rhdf5", quietly = TRUE)) {
+      stop(simpleError(paste0(
+        "\n",
+        "Error: rbiom requires the R package 'rhdf5' to be installed\n",
+        "in order to read and write HDF5 formatted BIOM files.\n\n",
+        "Please run the following commands to install 'rhdf5':\n",
+        "   install.packages('BiocManager')\n",
+        "   BiocManager::install('rhdf5')\n\n" )))
+    }
+    
+    if (!rhdf5::H5Fis_hdf5(fp)) {
+      stop(simpleError("HDF5 file not recognized by rhdf5."))
+    }
+    
     
     hdf5      <- PB.HDF5.ReadHDF5(fp)
     counts    <- PB.HDF5.Counts(hdf5)

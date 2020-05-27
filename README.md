@@ -12,6 +12,8 @@ intensive operations are encoded in C with multi-thread support.
 
 Reference material is available online at https://cmmr.github.io/rbiom/index.html
 
+Source code can be found at https://github.com/cmmr/rbiom
+
 
 Installation
 ------------
@@ -36,7 +38,7 @@ Usage
 ``` r
 library(rbiom)
 
-infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 biom <- read.biom(infile)
 
 # Rarefy to 1000 reads per sample

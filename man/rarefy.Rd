@@ -35,7 +35,7 @@ Subset counts so that all samples have the same number of observations.
 \examples{
     library(rbiom)
 
-    infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
     biom <- read.biom(infile)
     range(slam::col_sums(biom$counts))
 

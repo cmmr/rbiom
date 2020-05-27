@@ -39,7 +39,7 @@ write.biom <- function (biom, file, format="json") {
   
   
   #--------------------------------------------------------------
-  # Select the approriate format engine
+  # Select the appropriate format engine
   #--------------------------------------------------------------
   
   opts   <- c("tab", "json", "hdf5")
@@ -188,6 +188,16 @@ write.biom.1.0 <- function (biom, file) {
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 write.biom.2.1 <- function (biom, file) {
+  
+  if (!requireNamespace("rhdf5", quietly = TRUE)) {
+    stop(simpleError(paste0(
+      "\n",
+      "Error: rbiom requires the R package 'rhdf5' to be installed\n",
+      "in order to read and write HDF5 formatted BIOM files.\n\n",
+      "Please run the following commands to install 'rhdf5':\n",
+      "   install.packages('BiocManager')\n",
+      "   BiocManager::install('rhdf5')\n\n" )))
+  }
   
   res <- try(rhdf5::h5createFile(file), silent = TRUE)
   if (!identical(res, TRUE))

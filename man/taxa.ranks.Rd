@@ -18,7 +18,7 @@ Get the taxa ranks.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
     biom <- read.biom(infile)
     
     taxa.ranks(biom)

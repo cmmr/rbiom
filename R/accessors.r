@@ -7,7 +7,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     sample.names(biom)
@@ -29,7 +29,7 @@ sample.names <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     taxa.names(biom) %>% head()
@@ -51,7 +51,7 @@ taxa.names <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     taxa.ranks(biom)
@@ -73,7 +73,7 @@ taxa.ranks <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     counts(biom)[1:4,1:5]
@@ -95,7 +95,7 @@ counts <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     taxonomy(biom)[1:4,]
@@ -117,7 +117,7 @@ taxonomy <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     summary(phylogeny(biom))
@@ -139,7 +139,7 @@ phylogeny <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     metadata(biom)[1:4,1:3]
@@ -162,7 +162,7 @@ metadata <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     sequences(biom)[1:4]
@@ -193,7 +193,7 @@ sequences <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     info(biom)
@@ -215,7 +215,7 @@ info <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     nsamples(biom)
@@ -237,7 +237,7 @@ nsamples <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
 #'     biom <- read.biom(infile)
 #'     
 #'     ntaxa(biom)

@@ -1,6 +1,7 @@
-# rbiom 1.0.1.9000
+# rbiom 1.0.2
 
-* Also subset sequences now as part of select() and subset() functions.
+* Make the 'rhdf5' package an optional dependency.
+* Subset sequences now as part of select() and subset() functions.
 * Removed man page references to foreach/parallel/doSnow.
 
 
