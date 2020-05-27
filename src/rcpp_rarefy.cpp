@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-#include <stdint.h> // uint64_t uint32_t UINT32_MAX
+#include <stdint.h> // uint64_t uint32_t
 
 
 // [[Rcpp::export]]
@@ -97,8 +97,9 @@ List rcpp_rarefy(List sparseMatrix, int depth, int seed = 8675309) {
     uint64_t prng_x = 0;
     uint64_t prng_w = 0;
     uint64_t prng_s = 0xb5ad4eceda1ce2a9;
+    // UINT32_MAX = 0xFFFFFFFF = 4294967295;
     
-    prng_x = ((uint64_t)nSeqs * (uint64_t)seed) % UINT32_MAX;
+    prng_x = ((uint64_t)nSeqs * (uint64_t)seed) % 4294967295;
 
 
     //======================================================
