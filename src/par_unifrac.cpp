@@ -1,6 +1,5 @@
 // [[Rcpp::depends(RcppParallel)]]
 #include <cmath>
-#include <stdio.h>
 #include <Rcpp.h>
 #include <RcppParallel.h>
 using namespace Rcpp;
