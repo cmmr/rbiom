@@ -19,7 +19,6 @@ BugReports: https://github.com/cmmr/rbiom/issues
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.5.3)
 LinkingTo: 
     Rcpp,
     RcppParallel
