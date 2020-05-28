@@ -14,10 +14,11 @@ version 1.0 (JSON) and 2.1 (HDF5)
 classical tabular format. URLs must begin with \kbd{http://},
 \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
 \code{\{} as their first non-whitespace character. Compressed (gzip or
-bzip2) biom files are also supported.}
+bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted BIOM
+files, the BioConductor R package \code{rhdf5} must be installed.}
 
 \item{tree}{The default value of \code{auto} will read the tree from the 
-biom file specified in \code{src}, if present. The value \code{TRUE} 
+BIOM file specified in \code{src}, if present. The value \code{TRUE} 
 will do the same, but will generate an error message if a tree is not 
 present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
 without any tree data. You may also provide a file path, URL, or Newick

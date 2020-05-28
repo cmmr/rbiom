@@ -15,7 +15,9 @@ write.biom(biom, file, format = "json")
 \bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
 corresponding to classic tabular format, biom format version 1.0 and 
 biom version 2.1, respectively. Abbreviations are also accepted. See
-\url{http://biom-format.org/documentation/} for details.}
+\url{http://biom-format.org/documentation/} for details. NOTE: to write
+HDF5 formatted BIOM files, the BioConductor R package \code{rhdf5} must
+be installed.}
 }
 \value{
 On success, returns \code{NULL} invisibly.

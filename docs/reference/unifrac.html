@@ -156,15 +156,8 @@ loaded from <code>biom</code>, if encoded there.</p></td>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)
-
-    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>biom</span>)
-    <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>), <span class='kw'>cex</span><span class='kw'>=</span><span class='fl'>.8</span>)</div><div class='img'><img src='unifrac-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
-#&gt; HMP01 0.0000000 0.1950253 0.3687298 0.4239831
-#&gt; HMP02 0.1950253 0.0000000 0.2101679 0.3187533
-#&gt; HMP03 0.3687298 0.2101679 0.0000000 0.3040937
-#&gt; HMP04 0.4239831 0.3187533 0.3040937 0.0000000</div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)</div><div class='output co'>#&gt; <span class='error'>Error in select(biom, 1:10): object 'biom' not found</span></div><div class='input'>
+    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "simple_triplet_matrix"): object 'biom' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>), <span class='kw'>cex</span><span class='kw'>=</span><span class='fl'>.8</span>)</div><div class='output co'>#&gt; <span class='error'>Error in hclust(dm): object 'dm' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(dm): object 'dm' not found</span></div><div class='input'>
     <span class='co'># Using a custom matrix and tree</span>
     <span class='no'>mtx</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample.int</a></span>(<span class='fl'>12</span>*<span class='fl'>20</span>), <span class='kw'>ncol</span><span class='kw'>=</span><span class='fl'>20</span>)
     <span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span>(<span class='no'>mtx</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>LETTERS</span>[<span class='fl'>1</span>:<span class='fl'>12</span>], <span class='no'>letters</span>[<span class='fl'>1</span>:<span class='fl'>20</span>])
@@ -172,10 +165,10 @@ loaded from <code>biom</code>, if encoded there.</p></td>
 
     <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>unifrac</span>(<span class='no'>mtx</span>, <span class='kw'>tree</span><span class='kw'>=</span><span class='no'>tree</span>)
     <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          a        b        c        d
-#&gt; a   0.0000 148.9849 190.9240 187.6669
-#&gt; b 148.9849   0.0000 213.4126 134.2024
-#&gt; c 190.9240 213.4126   0.0000 171.8943
-#&gt; d 187.6669 134.2024 171.8943   0.0000</div><div class='input'>    
+#&gt; a   0.0000 157.9202 152.5597 198.9709
+#&gt; b 157.9202   0.0000 191.7306 236.7631
+#&gt; c 152.5597 191.7306   0.0000 167.7476
+#&gt; d 198.9709 236.7631 167.7476   0.0000</div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

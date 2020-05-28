@@ -134,12 +134,13 @@ version 1.0 (JSON) and 2.1 (HDF5)
 classical tabular format. URLs must begin with <kbd>http://</kbd>,
 <kbd>https://</kbd>, <kbd>ftp://</kbd>, or <kbd>ftps://</kbd>. JSON files must have
 <code>{</code> as their first non-whitespace character. Compressed (gzip or
-bzip2) biom files are also supported.</p></td>
+bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted BIOM
+files, the BioConductor R package <code>rhdf5</code> must be installed.</p></td>
     </tr>
     <tr>
       <th>tree</th>
       <td><p>The default value of <code>auto</code> will read the tree from the 
-biom file specified in <code>src</code>, if present. The value <code>TRUE</code> 
+BIOM file specified in <code>src</code>, if present. The value <code>TRUE</code> 
 will do the same, but will generate an error message if a tree is not 
 present. Setting <code>tree=FALSE</code> will return a <code>BIOM</code> object 
 without any tree data. You may also provide a file path, URL, or Newick
@@ -190,42 +191,15 @@ string to load that tree data into the final <code>BIOM</code> object.</p></td>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'>read.biom</span>(<span class='no'>infile</span>)
-
-    <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt;           Length Class                 Mode     
-#&gt; counts       6   simple_triplet_matrix list     
-#&gt; metadata     6   data.frame            list     
-#&gt; taxonomy  2940   -none-                character
-#&gt; phylogeny    4   phylo                 list     
-#&gt; sequences  490   -none-                character
-#&gt; info        10   -none-                list     </div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'>read.biom</span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>
+    <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>biom</span>)</div><div class='output co'>#&gt; <span class='error'>Error in summary(biom): object 'biom' not found</span></div><div class='input'>
     <span class='co'># Taxa Abundances</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04
-#&gt; UncO2713     0     0     0     0
-#&gt; UncO4101     1     5     6    18
-#&gt; AnmMass2     0     0     0     0
-#&gt; PreBivi6     0     0     0     0</div><div class='input'>
-    <span class='no'>top5</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span>(<span class='kw pkg'>slam</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slam/man/sums.html'>row_sums</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>))), <span class='fl'>5</span>))
-    <span class='no'>biom</span>$<span class='no'>taxonomy</span>[<span class='no'>top5</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'Family'</span>, <span class='st'>'Genus'</span>)]</div><div class='output co'>#&gt;          Family                 Genus                
-#&gt; Unc01yki "__Lactobacillaceae"   "__Lactobacillus"    
-#&gt; Unc53100 "__Streptococcaceae"   "__Streptococcus"    
-#&gt; LtbAci52 "__Lactobacillaceae"   "__Lactobacillus"    
-#&gt; CnbTube3 "__Corynebacteriaceae" "__Corynebacterium_1"
-#&gt; Unc02qsf "__Staphylococcaceae"  "__Staphylococcus"   </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='no'>top5</span>, <span class='fl'>1</span>:<span class='fl'>6</span>])</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
-#&gt; Unc01yki     0     0     0     0     0     0
-#&gt; Unc53100  1083   543   301   223  2672   748
-#&gt; LtbAci52     0     0     0     0     0     0
-#&gt; CnbTube3     0     0     0     0     0     0
-#&gt; Unc02qsf     0     0     0     0     0     0</div><div class='input'>
+    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>])</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(biom$counts[1:4, 1:4]): object 'biom' not found</span></div><div class='input'>
+    <span class='no'>top5</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span>(<span class='kw pkg'>slam</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slam/man/sums.html'>row_sums</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>))), <span class='fl'>5</span>))</div><div class='output co'>#&gt; <span class='error'>Error in slam::row_sums(biom$counts): object 'biom' not found</span></div><div class='input'>    <span class='no'>biom</span>$<span class='no'>taxonomy</span>[<span class='no'>top5</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'Family'</span>, <span class='st'>'Genus'</span>)]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'biom' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>[<span class='no'>top5</span>, <span class='fl'>1</span>:<span class='fl'>6</span>])</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(biom$counts[top5, 1:6]): object 'biom' not found</span></div><div class='input'>
     <span class='co'># Metadata</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Sex</span>, <span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>`Body Site`</span>)</div><div class='output co'>#&gt;         
-#&gt;          Anterior nares Buccal mucosa Mid vagina Saliva Stool
-#&gt;   Female              5             5         10      5     5
-#&gt;   Male                5             5          0      5     5</div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"Mean age: %.1f"</span>, <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Age</span>))</div><div class='output co'>#&gt; [1] "Mean age: 27.8"</div><div class='input'>
+    <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Sex</span>, <span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>`Body Site`</span>)</div><div class='output co'>#&gt; <span class='error'>Error in table(biom$metadata$Sex, biom$metadata$`Body Site`): object 'biom' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"Mean age: %.1f"</span>, <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>biom</span>$<span class='no'>metadata</span>$<span class='no'>Age</span>))</div><div class='output co'>#&gt; <span class='error'>Error in mean(biom$metadata$Age): object 'biom' not found</span></div><div class='input'>
     <span class='co'># Phylogenetic tree</span>
-    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>phylogeny</span>
-    <span class='no'>top5.tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rbiom</span><span class='kw ns'>::</span><span class='fu'><a href='subtree.html'>subtree</a></span>(<span class='no'>tree</span>, <span class='no'>top5</span>)
-    <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/plot.phylo.html'>plot.phylo</a></span>(<span class='no'>top5.tree</span>)</div><div class='img'><img src='read.biom-1.png' alt='' width='700' height='433' /></div><div class='input'>
+    <span class='no'>tree</span> <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>phylogeny</span></div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'biom' not found</span></div><div class='input'>    <span class='no'>top5.tree</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rbiom</span><span class='kw ns'>::</span><span class='fu'><a href='subtree.html'>subtree</a></span>(<span class='no'>tree</span>, <span class='no'>top5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(tree, "phylo"): object 'tree' not found</span></div><div class='input'>    <span class='kw pkg'>ape</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/plot.phylo.html'>plot.phylo</a></span>(<span class='no'>top5.tree</span>)</div><div class='output co'>#&gt; <span class='error'>Error in ape::plot.phylo(top5.tree): object 'top5.tree' not found</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
