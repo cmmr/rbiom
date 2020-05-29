@@ -1,19 +1,10 @@
-RELEASE HISTORY OF THE "rbiom" PACKAGE
-==============================================
+# rbiom 1.0.2 [2020-05-28]
 
-CHANGES IN rbiom VERSION 1.0.2 [2020-05]:
-----------------------------------------------------
-
-MODIFICATIONS
-
-* Make the 'rhdf5' package an optional dependency.
-* Subset sequences as part of select() and subset() functions.
-* Removed man page references to foreach/parallel/doSnow.
+* Improved compatibility with Debian and Solaris.
+* The 'rhdf5' package is now an optional dependency.
+* The select() and subset() functions now subset sequences too.
 
 
-CHANGES IN rbiom VERSION 1.3.3-1 [2020-05]:
-----------------------------------------------------
-
-MODIFICATIONS
+# rbiom 1.0.0 [2020-05-22]
 
 * Initial Release
