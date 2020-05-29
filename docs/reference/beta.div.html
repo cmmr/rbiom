@@ -162,9 +162,16 @@ required for computing UniFrac distance matrices.</p></td>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)</div><div class='output co'>#&gt; <span class='error'>Error in select(biom, 1:10): object 'biom' not found</span></div><div class='input'>
-    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='st'>'unifrac'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "simple_triplet_matrix"): object 'biom' not found</span></div><div class='input'>
-    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(dm): object 'dm' not found</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>))</div><div class='output co'>#&gt; <span class='error'>Error in hclust(dm): object 'dm' not found</span></div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='no'>biom</span>, <span class='fl'>1</span>:<span class='fl'>10</span>)
+
+    <span class='no'>dm</span> <span class='kw'>&lt;-</span> <span class='fu'>beta.div</span>(<span class='no'>biom</span>, <span class='st'>'unifrac'</span>)
+
+    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>dm</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
+#&gt; HMP01 0.0000000 0.1950253 0.3687298 0.4239831
+#&gt; HMP02 0.1950253 0.0000000 0.2101679 0.3187533
+#&gt; HMP03 0.3687298 0.2101679 0.0000000 0.3040937
+#&gt; HMP04 0.4239831 0.3187533 0.3040937 0.0000000</div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span>(<span class='no'>dm</span>))</div><div class='img'><img src='beta.div-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

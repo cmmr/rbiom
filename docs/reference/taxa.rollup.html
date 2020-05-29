@@ -176,13 +176,31 @@ memory efficient in this scenario.</p></td>
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>
-    <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>biom</span>$<span class='no'>taxonomy</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is.data.frame(x): object 'biom' not found</span></div><div class='input'>
-    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='st'>'Phylum'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "simple_triplet_matrix"): object 'biom' not found</span></div><div class='input'>    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'phyla' not found</span></div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
+
+    <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>biom</span>$<span class='no'>taxonomy</span>)</div><div class='output co'>#&gt; [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </div><div class='input'>
+    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='st'>'Phylum'</span>)
+    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                       HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; __Actinobacteria         18    60   126   120    30    71
+#&gt; __Bacteroidetes         276   221   313   218   144   880
+#&gt; __Cyanobacteria           0     0     0     0     0     0
+#&gt; __Deinococcus_Thermus     0     0     0     0     0     0</div><div class='input'>
     <span class='co'># Custom matrices should be formatted like so:</span>
-    <span class='no'>counts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(biom$counts): object 'biom' not found</span></div><div class='input'>    <span class='no'>map</span>    <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>taxonomy</span></div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'biom' not found</span></div><div class='input'>
-    <span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt; <span class='error'>Error in counts[1:3, 1:6]: object of type 'closure' is not subsettable</span></div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'map' not found</span></div><div class='input'>
-    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>counts</span>, <span class='st'>'Phylum'</span>, <span class='kw'>map</span><span class='kw'>=</span><span class='no'>map</span>)</div><div class='output co'>#&gt; <span class='error'>Error: biom must be a matrix, simple_triplet_matrix, or BIOM object.</span></div><div class='input'>    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'phyla' not found</span></div><div class='input'>
+    <span class='no'>counts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>)
+    <span class='no'>map</span>    <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>taxonomy</span>
+
+    <span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; UncO2713     0     0     0     0     0     0
+#&gt; UncO4101     1     5     6    18     5    15
+#&gt; AnmMass2     0     0     0     0     0     0</div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
+#&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
+#&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
+#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"</div><div class='input'>
+    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>counts</span>, <span class='st'>'Phylum'</span>, <span class='kw'>map</span><span class='kw'>=</span><span class='no'>map</span>)
+    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                  HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; __Actinobacteria    18    60   126   120    30    71
+#&gt; __Bacteroidetes    276   221   313   218   144   880
+#&gt; __Cyanobacteria      0     0     0     0     0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

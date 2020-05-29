@@ -152,8 +152,18 @@
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>
-    <span class='fu'>taxonomy</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,]</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "BIOM"): object 'biom' not found</span></div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
+
+    <span class='fu'>taxonomy</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,]</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
+#&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
+#&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
+#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"
+#&gt; PreBivi6 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
+#&gt;          Family               Genus                  
+#&gt; UncO2713 "__Rikenellaceae"    "__Alistipes"          
+#&gt; UncO4101 "__Lachnospiraceae"  "__Lachnoanaerobaculum"
+#&gt; AnmMass2 "__Actinomycetaceae" "__Actinomyces"        
+#&gt; PreBivi6 "__Prevotellaceae"   "__Prevotella"         </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

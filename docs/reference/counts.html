@@ -152,8 +152,13 @@
     <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
 
     <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": The filename, directory name, or volume label syntax is incorrect</span></div><div class='output co'>#&gt; <span class='error'>Error: Cannot locate file </span></div><div class='input'>
-    <span class='fu'>counts</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>5</span>]</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "BIOM"): object 'biom' not found</span></div><div class='input'>
+    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
+
+    <span class='fu'>counts</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>5</span>]</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05
+#&gt; UncO2713     0     0     0     0     0
+#&gt; UncO4101     1     5     6    18     5
+#&gt; AnmMass2     0     0     0     0     0
+#&gt; PreBivi6     0     0     0     0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
