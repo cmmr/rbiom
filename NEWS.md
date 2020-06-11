@@ -1,3 +1,7 @@
+# Development Version
+
+* Rarefy now handles samples and taxa with zero observations.
+
 # rbiom 1.0.2
 
 * Improved compatibility with Debian and Solaris.

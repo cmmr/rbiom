@@ -149,8 +149,8 @@ List rcpp_rarefy(List sparseMatrix, int depth, int seed = 8675309) {
   
   mtxSize = returnAbundance.size();
 
-  int nInitSample = max(mtxSample);
-  int nInitTaxa   = max(mtxTaxa);
+  int nInitSample = sampleNames.size();
+  int nInitTaxa   = taxaNames.size();
 
 
   //======================================================

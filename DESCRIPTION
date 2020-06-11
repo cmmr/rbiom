@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.2
+Version: 1.0.2.9001
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
