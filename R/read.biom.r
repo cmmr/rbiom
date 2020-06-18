@@ -510,16 +510,21 @@ PB.TSV.Taxonomy <- function (mtx) {
 
 PB.JSON.Taxonomy <- function (json) {
 
-  # No taxonomic information
-  if (!any(sapply(json$rows, function (x) 'taxonomy' %in% names(x$metadata) )))
-    return (NULL)
-
-
   taxa_table <- sapply(json$rows, simplify = "array", function (x) {
+    
     taxaNames <- x$metadata$taxonomy
     
-    if (is.null(taxaNames))
-      return (x$id)
+    # The taxa names aren't where they're supposed to be
+    if (is.null(taxaNames)) {
+      
+      # Decontam is known to omit the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
+      if (is.null(names(x$metadata)) && length(x$metadata) == 1) {
+        taxaNames <- x$metadata[[1]]
+        
+      } else {
+        return (x$id)
+      }
+    }
     
     if (length(taxaNames) == 1) {
       if (nchar(taxaNames) == 0) return (x$id)
