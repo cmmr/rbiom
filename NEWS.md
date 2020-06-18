@@ -1,5 +1,6 @@
 # Development Version
 
+* Support for 'Decontam' generated BIOM files.
 * Rarefy now handles samples and taxa with zero observations.
 
 # rbiom 1.0.2
