@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9003</span>
       </span>
     </div>
 
@@ -136,8 +136,10 @@
     <tr>
       <th>depth</th>
       <td><p>Depth to rarefy to. See <code>rarefy</code> function for details.
-Only use <code>depth</code> with <code>BIOM</code> files of type
-'OTU table' and integer count values.</p></td>
+<code>depth = NULL</code> auto-selects a rarefaction level.
+<code>depth = 0</code> disables rarefaction.
+  Only use <code>depth</code> with <code>BIOM</code> files of type
+  'OTU table' and integer count values.</p></td>
     </tr>
     <tr>
       <th>seed</th>

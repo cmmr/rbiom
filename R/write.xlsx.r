@@ -3,6 +3,8 @@
 #' @param biom     The BIOM object to save to the file.
 #' @param outfile  Path to the output xlsx file.
 #' @param depth    Depth to rarefy to. See \code{rarefy} function for details.
+#'                 \code{depth = NULL} auto-selects a rarefaction level.
+#'                 \code{depth = 0} disables rarefaction.
 #'                   Only use \code{depth} with \code{BIOM} files of type
 #'                   'OTU table' and integer count values.
 #' @param seed     Random seed to use in rarefying. See \code{rarefy} function
@@ -73,7 +75,12 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Rarefy, then output counts again and alpha.div
     #--------------------------------------------------------
     
-    rare <- rbiom::rarefy(biom, depth, seed)
+    # Allow the user to override rarefaction by setting depth = 0.
+    if (identical(depth, 0)) {
+      rare <- biom
+    } else {
+      rare <- rbiom::rarefy(biom, depth, seed)
+    }
     
     RareCounts <- data.frame(rbiom::counts(rare), check.names=FALSE)
     AlphaDiv   <- rbiom::alpha.div(rare)
