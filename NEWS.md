@@ -1,8 +1,9 @@
-# rbiom 1.0.2.9003
+# rbiom 1.0.2.9004
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' generated BIOM files.
 * Rarefy now handles samples and taxa with zero observations.
+* write.xlsx exports 'dist' and 'matrix' attributes in addition to 'data.frame's
 
 # rbiom 1.0.2
 

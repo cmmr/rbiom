@@ -12,12 +12,24 @@
 #' @return On success, returns \code{NULL} invisibly.
 #' 
 #' @section Note:
-#' Any data frame attributes on \code{biom} will be included as separate 
-#' worksheets. An attribute named 'Reads Per Step' is treated specially and 
-#' merged with the usual 'Reads Per Sample' tab - if provided, its row names 
-#' should match those in \code{biom} exactly.
+#' Any \code{data frame}, \code{matrix}, or \code{dist} attributes on 
+#' \code{biom} will be included as separate worksheets. An attribute named 
+#' 'Reads Per Step' is treated specially and merged with the usual 'Reads Per 
+#' Sample' tab.
 #' 
 #' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom   <- read.biom(infile) %>% select(1:10) %>% rarefy()
+#'     
+#'     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+#'     attr(biom, "Unweighted Jaccard") <- beta.div(biom, 'jaccard', weighted=FALSE)
+#'     
+#'     outfile <- tempfile(fileext = ".xlsx")
+#'     write.xlsx(biom, outfile)
+#'
 
 
 write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
@@ -111,7 +123,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     biom <- rare
     
-    remove("rare")
+    remove(list = intersect(ls(), "rare"))
     
     
     
@@ -121,15 +133,20 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     for (key in names(attributes(biom))) {
       if (key %in% c("names", "class", "Reads Per Step"))   next
-      if (!identical(class(attr(biom, key)), "data.frame")) next
+      
       val <- attr(biom, key)
+      
+      if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
+      if (identical(class(val), "matrix")) val <- data.frame(val)
+      if (!identical(class(val), "data.frame")) next
+      
       rn <- !identical(rownames(val), as.character(1:nrow(val)))
       openxlsx::addWorksheet(wb, key)
       openxlsx::writeData(wb, key, val, rowNames = rn)
       remove("val", "rn")
     }
     
-    remove("key")
+    remove(list = intersect(ls(), "key"))
     
     
     
@@ -148,7 +165,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
       openxlsx::writeData(wb, rank, df, rowNames=TRUE)
     }
     
-    remove("df", "rank", "ranks")
+    remove(list = intersect(ls(), c("df", "rank", "ranks")))
     
     
     
@@ -213,16 +230,21 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     #--------------------------------------------------------
     
     for (key in names(attributes(biom))) {
-      if (key %in% c("names", "class"))                     next
-      if (!identical(class(attr(biom, key)), "data.frame")) next
+      if (key %in% c("names", "class")) next
+      
       val <- attr(biom, key)
+      
+      if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
+      if (identical(class(val), "matrix")) val <- data.frame(val)
+      if (!identical(class(val), "data.frame")) next
+      
       rn <- !identical(rownames(val), as.character(1:nrow(val)))
       openxlsx::addWorksheet(wb, key)
       openxlsx::writeData(wb, key, val, rowNames = rn)
       remove("val", "rn")
     }
     
-    remove("key")
+    remove(list = intersect(ls(), "key"))
     
     
     
@@ -244,7 +266,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
       openxlsx::writeData(wb, ranks[[i]], df, rowNames=TRUE)
     }
     
-    remove("df", "i")
+    remove(list = intersect(ls(), c("df", "i")))
     
     
     

@@ -28,9 +28,22 @@ Write data and summary information to a Microsoft Excel-compatible workbook.
 }
 \section{Note}{
 
-Any data frame attributes on \code{biom} will be included as separate 
-worksheets. An attribute named 'Reads Per Step' is treated specially and 
-merged with the usual 'Reads Per Sample' tab - if provided, its row names 
-should match those in \code{biom} exactly.
+Any \code{data frame}, \code{matrix}, or \code{dist} attributes on 
+\code{biom} will be included as separate worksheets. An attribute named 
+'Reads Per Step' is treated specially and merged with the usual 'Reads Per 
+Sample' tab.
 }
 
+\examples{
+    library(rbiom)
+    
+    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+    biom   <- read.biom(infile) \%>\% select(1:10) \%>\% rarefy()
+    
+    attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+    attr(biom, "Unweighted Jaccard") <- beta.div(biom, 'jaccard', weighted=FALSE)
+    
+    outfile <- tempfile(fileext = ".xlsx")
+    write.xlsx(biom, outfile)
+
+}

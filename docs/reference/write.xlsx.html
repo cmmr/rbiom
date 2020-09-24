@@ -155,11 +155,22 @@ for details.</p></td>
 
     
 
-<p>Any data frame attributes on <code>biom</code> will be included as separate 
-worksheets. An attribute named 'Reads Per Step' is treated specially and 
-merged with the usual 'Reads Per Sample' tab - if provided, its row names 
-should match those in <code>biom</code> exactly.</p>
+<p>Any <code>data frame</code>, <code>matrix</code>, or <code>dist</code> attributes on 
+<code>biom</code> will be included as separate worksheets. An attribute named 
+'Reads Per Step' is treated specially and merged with the usual 'Reads Per 
+Sample' tab.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
+
+    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
+    <span class='no'>biom</span>   <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='select.html'>select</a></span>(<span class='fl'>1</span>:<span class='fl'>10</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='rarefy.html'>rarefy</a></span>()
+
+    <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>biom</span>, <span class='st'>"Weighted UniFrac"</span>)   <span class='kw'>&lt;-</span> <span class='fu'><a href='unifrac.html'>unifrac</a></span>(<span class='no'>biom</span>)
+    <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>biom</span>, <span class='st'>"Unweighted Jaccard"</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='beta.div.html'>beta.div</a></span>(<span class='no'>biom</span>, <span class='st'>'jaccard'</span>, <span class='kw'>weighted</span><span class='kw'>=</span><span class='fl'>FALSE</span>)
+
+    <span class='no'>outfile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='kw'>fileext</span> <span class='kw'>=</span> <span class='st'>".xlsx"</span>)
+    <span class='fu'>write.xlsx</span>(<span class='no'>biom</span>, <span class='no'>outfile</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
