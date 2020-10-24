@@ -86,28 +86,6 @@ counts <- function (biom) {
 }
 
 
-#' Get the taxonomy table.
-#' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @return A character matrix of the named taxonomies in \code{biom}.
-#' @family accessor functions
-#' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     taxonomy(biom)[1:4,]
-#'
-
-taxonomy <- function (biom) {
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxonomy(), biom must be a BIOM-class object.'))
-  return (biom[['taxonomy']])
-}
-
-
 #' Get the phylogenetic tree.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.

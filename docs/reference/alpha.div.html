@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9005</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Estimate the diversity of each sample.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='kw'>rarefy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, rarefy <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -134,7 +134,7 @@ columns are assumed to be the taxa and samples, respectively.</p></td>
     <tr>
       <th>rarefy</th>
       <td><p>Control how/whether rarefactions are done prior to alpha 
-diversity computations. Options are:</p><dl'>
+diversity computations. Options are:</p><dl>
   <dt><code>FALSE</code></dt><dd><p>Use each sample's current set of observations without
                   applying any rarefaction. (Default)</p></dd>
   <dt><code>TRUE</code></dt><dd><p>Automatically select and apply a single rarefaction.</p></dd>
@@ -154,22 +154,24 @@ diversity computations. Options are:</p><dl'>
     multiple rarefactions are done.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
-
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='no'>ad</span> <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>)
-    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>ad</span>)</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
+    <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
+    
+    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    
+    <span class='va'>ad</span> <span class='op'>&lt;-</span> <span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ad</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;       Sample Depth OTUs  Shannon     Chao1   Simpson InvSimpson
 #&gt; HMP01  HMP01  1660   49 1.741153  59.08333 0.5668414   2.308623
 #&gt; HMP02  HMP02  1371   75 2.587403 104.38889 0.8133914   5.358811
 #&gt; HMP03  HMP03  1353   75 2.950982  90.04167 0.8936622   9.403996
 #&gt; HMP04  HMP04  1895   83 3.255785  93.32143 0.9323645  14.785121
 #&gt; HMP05  HMP05  3939   67 1.462651 127.75000 0.5252255   2.106263
-#&gt; HMP06  HMP06  4150  105 3.087615 131.88889 0.9103916  11.159668</div><div class='input'>
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span>(<span class='no'>biom</span>, <span class='no'>`Body Site`</span> <span class='kw'>==</span> <span class='st'>"Saliva"</span> <span class='kw'>&amp;</span> <span class='no'>Age</span> <span class='kw'>&lt;</span> <span class='fl'>26</span>)
-    <span class='no'>ad</span>   <span class='kw'>&lt;-</span> <span class='fu'>alpha.div</span>(<span class='no'>biom</span>, <span class='st'>"multi"</span>)
-    <span class='fu'><a href='https://rdrr.io/r/graphics/boxplot.html'>boxplot</a></span>(<span class='no'>Shannon</span> ~ <span class='no'>Depth</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='no'>ad</span>, <span class='kw'>xlab</span><span class='kw'>=</span><span class='st'>"Reads"</span>, <span class='kw'>ylab</span><span class='kw'>=</span><span class='st'>"Diversity"</span>)</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='433' /></div><div class='input'>    
+#&gt; HMP06  HMP06  4150  105 3.087615 131.88889 0.9103916  11.159668</div><div class='input'>    
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='subset.html'>subset</a></span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>`Body Site`</span> <span class='op'>==</span> <span class='st'>"Saliva"</span> <span class='op'>&amp;</span> <span class='va'>Age</span> <span class='op'>&lt;</span> <span class='fl'>26</span><span class='op'>)</span>
+    <span class='va'>ad</span>   <span class='op'>&lt;-</span> <span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"multi"</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/graphics/boxplot.html'>boxplot</a></span><span class='op'>(</span><span class='va'>Shannon</span> <span class='op'>~</span> <span class='va'>Depth</span>, data<span class='op'>=</span><span class='va'>ad</span>, xlab<span class='op'>=</span><span class='st'>"Reads"</span>, ylab<span class='op'>=</span><span class='st'>"Diversity"</span><span class='op'>)</span>
+</div><div class='img'><img src='alpha.div-1.png' alt='' width='700' height='433' /></div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -186,7 +188,7 @@ diversity computations. Options are:</p><dl'>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9005</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='kw'>rank</span> <span class='kw'>=</span> <span class='st'>"OTU"</span>, <span class='kw'>map</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lineage</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>taxa.rollup</span><span class='op'>(</span><span class='va'>biom</span>, rank <span class='op'>=</span> <span class='st'>"OTU"</span>, map <span class='op'>=</span> <span class='cn'>NULL</span>, lineage <span class='op'>=</span> <span class='cn'>FALSE</span>, sparse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -173,31 +173,36 @@ memory efficient in this scenario.</p></td>
     identifiers as row names.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
-
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>biom</span>$<span class='no'>taxonomy</span>)</div><div class='output co'>#&gt; [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </div><div class='input'>
-    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>biom</span>, <span class='st'>'Phylum'</span>)
-    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>4</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                       HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+    <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
+    
+    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    
+    <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>biom</span><span class='op'>$</span><span class='va'>taxonomy</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </div><div class='input'>    
+    <span class='va'>phyla</span> <span class='op'>&lt;-</span> <span class='fu'>taxa.rollup</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'Phylum'</span><span class='op'>)</span>
+    <span class='va'>phyla</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;                       HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
 #&gt; __Actinobacteria         18    60   126   120    30    71
 #&gt; __Bacteroidetes         276   221   313   218   144   880
 #&gt; __Cyanobacteria           0     0     0     0     0     0
-#&gt; __Deinococcus_Thermus     0     0     0     0     0     0</div><div class='input'>
+#&gt; __Deinococcus_Thermus     0     0     0     0     0     0</div><div class='input'>    
     <span class='co'># Custom matrices should be formatted like so:</span>
-    <span class='no'>counts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>biom</span>$<span class='no'>counts</span>)
-    <span class='no'>map</span>    <span class='kw'>&lt;-</span> <span class='no'>biom</span>$<span class='no'>taxonomy</span>
-
-    <span class='no'>counts</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+    <span class='va'>counts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>biom</span><span class='op'>$</span><span class='va'>counts</span><span class='op'>)</span>
+    <span class='va'>map</span>    <span class='op'>&lt;-</span> <span class='va'>biom</span><span class='op'>$</span><span class='va'>taxonomy</span>
+    
+    <span class='va'>counts</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
 #&gt; UncO2713     0     0     0     0     0     0
 #&gt; UncO4101     1     5     6    18     5    15
-#&gt; AnmMass2     0     0     0     0     0     0</div><div class='input'>    <span class='no'>map</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>4</span>]</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
+#&gt; AnmMass2     0     0     0     0     0     0</div><div class='input'>    <span class='va'>map</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
 #&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
 #&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
-#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"</div><div class='input'>
-    <span class='no'>phyla</span> <span class='kw'>&lt;-</span> <span class='fu'>taxa.rollup</span>(<span class='no'>counts</span>, <span class='st'>'Phylum'</span>, <span class='kw'>map</span><span class='kw'>=</span><span class='no'>map</span>)
-    <span class='no'>phyla</span>[<span class='fl'>1</span>:<span class='fl'>3</span>,<span class='fl'>1</span>:<span class='fl'>6</span>]</div><div class='output co'>#&gt;                  HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
+#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"</div><div class='input'>    
+    <span class='va'>phyla</span> <span class='op'>&lt;-</span> <span class='fu'>taxa.rollup</span><span class='op'>(</span><span class='va'>counts</span>, <span class='st'>'Phylum'</span>, map<span class='op'>=</span><span class='va'>map</span><span class='op'>)</span>
+    <span class='va'>phyla</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;                  HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
 #&gt; __Actinobacteria    18    60   126   120    30    71
 #&gt; __Bacteroidetes    276   221   313   218   144   880
 #&gt; __Cyanobacteria      0     0     0     0     0     0</div><div class='input'>
@@ -217,7 +222,7 @@ memory efficient in this scenario.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

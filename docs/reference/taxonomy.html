@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9005</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get the taxonomy table.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/accessors.r'><code>R/accessors.r</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/taxonomy.r'><code>R/taxonomy.r</code></a></small>
     <div class="hidden name"><code>taxonomy.Rd</code></div>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Get the taxonomy table.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>taxonomy</span>(<span class='no'>biom</span>)</pre>
+    <pre class="usage"><span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span>, fix.names <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -129,11 +129,19 @@
       <th>biom</th>
       <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
     </tr>
+    <tr>
+      <th>fix.names</th>
+      <td><p>Clean up taxa names. See example below. (Default: 
+<code>FALSE</code>)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A character matrix of the named taxonomies in <code>biom</code>.</p>
+    <p>A character matrix of the named taxonomies in <code>biom</code>.
+        When <code>fix.names = TRUE</code>, a second matrix is attached as an
+        attribute called 'fixed' and notes which taxa names were
+        rewritten.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other accessor functions: 
@@ -149,12 +157,13 @@
 <code><a href='taxa.ranks.html'>taxa.ranks</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rbiom</span>)
-
-    <span class='no'>infile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"rbiom"</span>)
-    <span class='no'>biom</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span>(<span class='no'>infile</span>)
-
-    <span class='fu'>taxonomy</span>(<span class='no'>biom</span>)[<span class='fl'>1</span>:<span class='fl'>4</span>,]</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
+    <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
+    
+    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    
+    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='op'>]</span>
+</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
 #&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
 #&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
 #&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"
@@ -163,7 +172,23 @@
 #&gt; UncO2713 "__Rikenellaceae"    "__Alistipes"          
 #&gt; UncO4101 "__Lachnospiraceae"  "__Lachnoanaerobaculum"
 #&gt; AnmMass2 "__Actinomycetaceae" "__Actinomyces"        
-#&gt; PreBivi6 "__Prevotellaceae"   "__Prevotella"         </div><div class='input'>
+#&gt; PreBivi6 "__Prevotellaceae"   "__Prevotella"         </div><div class='input'>    
+    <span class='co'># Sometimes taxonomic names are incomplete</span>
+    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>129</span>,<span class='fl'>194</span><span class='op'>)</span>,<span class='fl'>5</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          Family             Genus           
+#&gt; GcbBacte "__f"              "__g"           
+#&gt; Unc00q8d "__Prevotellaceae" "__Prevotella_9"
+#&gt; Unc01skg "__Family_XIII"    "__uncultured"  </div><div class='input'>    
+    <span class='co'># rbiom can insert more descriptive placeholders</span>
+    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span>, fix.names <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>129</span>,<span class='fl'>194</span><span class='op'>)</span>,<span class='fl'>5</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          Family                             
+#&gt; GcbBacte "Phylum Gracilibacteria (c o f)"   
+#&gt; Unc00q8d "Prevotellaceae"                   
+#&gt; Unc01skg "Order Clostridiales (Family_XIII)"
+#&gt;          Genus                                         
+#&gt; GcbBacte "Phylum Gracilibacteria (c o f g)"            
+#&gt; Unc00q8d "Family Prevotellaceae (Prevotella_9)"        
+#&gt; Unc01skg "Order Clostridiales (Family_XIII uncultured)"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -180,7 +205,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

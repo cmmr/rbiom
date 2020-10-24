@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9005</span>
       </span>
     </div>
 
@@ -86,37 +86,41 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>The latest stable version can be downloaded from CRAN.</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"rbiom"</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"rbiom"</span><span class="op">)</span></pre></div>
 <p>The development version is available on GitHub.</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"cmmr/rbiom"</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"cmmr/rbiom"</span><span class="op">)</span></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">rbiom</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span>
 
-<span class="no">infile</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"rbiom"</span>)
-<span class="no">biom</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/read.biom.html">read.biom</a></span>(<span class="no">infile</span>)
+<span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, package <span class="op">=</span> <span class="st">"rbiom"</span><span class="op">)</span>
+<span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read.biom.html">read.biom</a></span><span class="op">(</span><span class="va">infile</span><span class="op">)</span>
 
 <span class="co"># Rarefy to 1000 reads per sample</span>
-<span class="no">biom</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/rarefy.html">rarefy</a></span>(<span class="no">biom</span>, <span class="kw">depth</span><span class="kw">=</span><span class="fl">1000</span>)
+<span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">biom</span>, depth<span class="op">=</span><span class="fl">1000</span><span class="op">)</span>
 
 <span class="co"># Summarize counts by phylum</span>
-<span class="no">phyla</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/taxa.rollup.html">taxa.rollup</a></span>(<span class="no">biom</span>, <span class="st">'Phylum'</span>)
-<span class="no">phyla</span>[<span class="fl">1</span>:<span class="fl">4</span>,<span class="fl">1</span>:<span class="fl">6</span>]
+<span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/taxa.rollup.html">taxa.rollup</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Phylum'</span><span class="op">)</span>
+<span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span>
 
 <span class="co"># Work with metadata</span>
-<span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">biom</span>$<span class="no">metadata</span>$<span class="no">Sex</span>, <span class="no">biom</span>$<span class="no">metadata</span>$<span class="no">Body.Site</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">"Mean age: %.1f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">biom</span>$<span class="no">metadata</span>$<span class="no">Age</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Sex</span>, <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Body.Site</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"Mean age: %.1f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Draw the phylogenetic tree</span>
-<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">biom</span>$<span class="no">phylogeny</span>)
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">phylogeny</span><span class="op">)</span>
 
 <span class="co"># Get unifrac distance matrix</span>
-<span class="no">dm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/beta.div.html">beta.div</a></span>(<span class="no">biom</span>, <span class="st">'unifrac'</span>)</pre></div>
+<span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/beta.div.html">beta.div</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></pre></div>
 <p>Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="kw pkg">RcppParallel</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html">setThreadOptions</a></span>(<span class="kw">numThreads</span> <span class="kw">=</span> <span class="fl">4</span>)</pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html">setThreadOptions</a></span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></pre></div>
 </div>
 </div>
   </div>
@@ -162,7 +166,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

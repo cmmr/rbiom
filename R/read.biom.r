@@ -93,6 +93,8 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
 
     fp <- tempfile(fileext=basename(src))
     on.exit(unlink(fp), add=TRUE)
+    
+    # To do: switch to curl::curl_download
     if (!identical(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(simpleError(sprintf("Cannot retrieve URL %s", src)))
 
