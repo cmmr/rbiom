@@ -17,11 +17,12 @@
 #'     
 #'     taxonomy(biom)[1:4,]
 #'     
+#'     
 #'     # Sometimes taxonomic names are incomplete
-#'     taxonomy(biom)[c(107,129,194),5:6]
+#'     taxonomy(biom)[c(107,170,194), 'Genus', drop=FALSE]
 #'     
 #'     # rbiom can insert more descriptive placeholders
-#'     taxonomy(biom, fix.names = TRUE)[c(107,129,194),5:6]
+#'     taxonomy(biom, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
 #'
 
 taxonomy <- function (biom, fix.names = FALSE) {

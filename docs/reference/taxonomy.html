@@ -173,21 +173,18 @@
 #&gt; UncO4101 "__Lachnospiraceae"  "__Lachnoanaerobaculum"
 #&gt; AnmMass2 "__Actinomycetaceae" "__Actinomyces"        
 #&gt; PreBivi6 "__Prevotellaceae"   "__Prevotella"         </div><div class='input'>    
+    
     <span class='co'># Sometimes taxonomic names are incomplete</span>
-    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>129</span>,<span class='fl'>194</span><span class='op'>)</span>,<span class='fl'>5</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;          Family             Genus           
-#&gt; GcbBacte "__f"              "__g"           
-#&gt; Unc00q8d "__Prevotellaceae" "__Prevotella_9"
-#&gt; Unc01skg "__Family_XIII"    "__uncultured"  </div><div class='input'>    
+    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>170</span>,<span class='fl'>194</span><span class='op'>)</span>, <span class='st'>'Genus'</span>, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          Genus             
+#&gt; GcbBacte "__g"             
+#&gt; Unc0434x "__Incertae_Sedis"
+#&gt; Unc01skg "__uncultured"    </div><div class='input'>    
     <span class='co'># rbiom can insert more descriptive placeholders</span>
-    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span>, fix.names <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>129</span>,<span class='fl'>194</span><span class='op'>)</span>,<span class='fl'>5</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;          Family                             
-#&gt; GcbBacte "Phylum Gracilibacteria (c o f)"   
-#&gt; Unc00q8d "Prevotellaceae"                   
-#&gt; Unc01skg "Order Clostridiales (Family_XIII)"
-#&gt;          Genus                                         
+    <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span>, fix.names <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>170</span>,<span class='fl'>194</span><span class='op'>)</span>, <span class='st'>'Genus'</span>, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          Genus                                         
 #&gt; GcbBacte "Phylum Gracilibacteria (c o f g)"            
-#&gt; Unc00q8d "Family Prevotellaceae (Prevotella_9)"        
+#&gt; Unc0434x "Family Lachnospiraceae (Incertae_Sedis)"     
 #&gt; Unc01skg "Order Clostridiales (Family_XIII uncultured)"</div><div class='input'>
 </div></pre>
   </div>
