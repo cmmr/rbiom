@@ -119,7 +119,7 @@ List rcpp_rarefy(List sparseMatrix, int depth, int seed = 8675309) {
       taxa[j] = taxa(nSeqs - i - 1);
     }
 
-    IntegerVector tabulated = IntegerVector(max(taxa) + 1);
+    IntegerVector tabulated = IntegerVector(mtxSize + 1);
     for (int i = 0; i < depth; i++) {
       tabulated(kept[i])++;
     }
