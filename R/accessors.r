@@ -111,7 +111,9 @@ phylogeny <- function (biom) {
 #' Get the sample metadata.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @return A data frame of the metadata in \code{biom}.
+#' @param field  The name of the metadata field to retrieve (optional).
+#' @return A data frame of the metadata in \code{biom}. If \code{field} is
+#'    given, will return a named vector of the field's values.
 #' @family accessor functions
 #' @export
 #' @examples
@@ -123,10 +125,17 @@ phylogeny <- function (biom) {
 #'     metadata(biom)[1:4,1:3]
 #'
 
-metadata <- function (biom) {
+metadata <- function (biom, field=NULL) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In metadata(), biom must be a BIOM-class object.'))
-  return (biom[['metadata']])
+  
+  if (is.null(field))
+    return (biom[['metadata']])
+  
+  if (!field %in% names(biom[['metadata']]))
+    stop(paste0("Field '", field, "' is not present in the metadata."))
+  
+  return (setNames(biom[['metadata']][[field]], rownames(biom[['metadata']])))
 }
 
 
