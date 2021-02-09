@@ -1,7 +1,8 @@
 #' Write counts, metadata, taxonomy, and phylogeny to a biom file.
 #'
 #' @param biom  The BIOM object to save to the file.
-#' @param file  Path to the output file.
+#' @param file  Path to the output file. If the file name ends in \code{.gz} 
+#'     or \code{.bz2}, the file contents will be compressed accordingly.
 #' @param format  Options are \bold{\dQuote{tab}}, 
 #'     \bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
 #'     corresponding to classic tabular format, biom format version 1.0 and 
@@ -98,7 +99,13 @@ write.biom.tsv <- function (biom, file) {
     }
   }
   
-  write.table(mtx, file, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+  if        (grepl("\\.gz$",  tolower(file))) { con <- gzfile(file, "w")
+  } else if (grepl("\\.bz2$", tolower(file))) { con <- bzfile(file, "w")
+  } else                                      { con <- base::file(file, "w") }
+  
+  write.table(mtx, con, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+  
+  close(con)
   
   return (invisible(NULL))
 }
@@ -117,7 +124,9 @@ write.biom.1.0 <- function (biom, file) {
       biom$metadata[[i]] <- as.character(biom$metadata[[i]])
   
   
-  json <- rjson::toJSON(list(
+  json <- jsonlite::toJSON(
+    auto_unbox = TRUE, 
+    x          = list(
     
     
     # Attributes
@@ -159,7 +168,7 @@ write.biom.1.0 <- function (biom, file) {
       metadata = {
         md_fields <- names(biom$metadata)
         if (length(md_fields) > 0) {
-          sapply(md_fields, function (k) biom$metadata[j,k])
+          as.list(biom$metadata[j,,drop=FALSE])
         } else {
           NULL
         }
@@ -175,9 +184,15 @@ write.biom.1.0 <- function (biom, file) {
   ))
   
   
-  res <- try(writeChar(json, file, eos=NULL), silent = TRUE)
+  if        (grepl("\\.gz$",  tolower(file))) { con <- gzfile(file, "w")
+  } else if (grepl("\\.bz2$", tolower(file))) { con <- bzfile(file, "w")
+  } else                                      { con <- base::file(file, "w") }
+  
+  res <- try(writeChar(json, con, eos=NULL), silent = TRUE)
   if (is(res, "try-error"))
     stop(simpleError(sprintf("Can't save to '%s': %s", file, res)))
+  
+  close(con)
   
   return (invisible(NULL))
 }

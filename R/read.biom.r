@@ -81,7 +81,7 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
   # Sanity check input values
   #--------------------------------------------------------------
 
-  if (length(src) != 1 | !is(src, "character"))
+  if (length(src) != 1 || !is(src, "character"))
     stop(simpleError("Data source for read.biom() must be a single string."))
 
 
@@ -268,16 +268,16 @@ PB.TSV.ReadTSV <- function (fp) {
 
 
   #--------------------------------------------------------------
-  # See if we see a comma or a tab first, thereby deducing csv or tsv format
+  # Comma or a tab first? To infer csv vs tsv format.
   #--------------------------------------------------------------
 
   csv <- min(gregexpr(",",   lines[[1]])[[1]], fixed=TRUE)
   tsv <- min(gregexpr("\\t", lines[[1]])[[1]], fixed=TRUE)
 
-  if (csv > -1 & tsv > -1) { importFn <- if (csv < tsv) read.csv else read.delim
-  } else if (csv > -1)     { importFn <- read.csv
-  } else if (tsv > -1)     { importFn <- read.delim
-  } else                   { stop(simpleError("Cannot find comma or tab delimiters in file.")) }
+  if (csv > -1 && tsv > -1) { importFn <- if (csv < tsv) read.csv else read.delim
+  } else if (csv > -1)      { importFn <- read.csv
+  } else if (tsv > -1)      { importFn <- read.delim
+  } else                    { stop(simpleError("Cannot find comma or tab delimiters in file.")) }
 
   mat <- try(importFn(fp, header=FALSE, colClasses="character"), silent=TRUE)
   if (is(mat, "try-error"))
@@ -292,7 +292,7 @@ PB.TSV.ReadTSV <- function (fp) {
   # Ensure we have at least one taxa (row headers) and one sample (column headers)
   #--------------------------------------------------------------
 
-  if (nrow(mat) < 2 | ncol(mat) < 2) {
+  if (nrow(mat) < 2 || ncol(mat) < 2) {
     msg <- "Unable to parse provided file: found %i rows and %i columns"
     stop(simpleError(sprintf(msg, nrow(mat), ncol(mat))))
   }
@@ -322,7 +322,7 @@ PB.TSV.ReadTSV <- function (fp) {
 
 PB.JSON.ReadJSON <- function (fp) {
 
-  json <- try(rjson::fromJSON(file=fp), silent=TRUE)
+  json <- try(jsonlite::read_json(path=fp), silent=TRUE)
   if (is(json, "try-error"))
     stop(simpleError(sprintf("Unable to parse JSON file. %s", as.character(json))))
 
@@ -356,15 +356,22 @@ PB.HDF5.ReadHDF5 <- function (fp) {
 
 
 PB.JSON.Metadata <- function (json) {
-
+  
   df <- as.data.frame(
-    row.names        = sapply(json$columns, function (x) x[['id']]),
     check.names      = FALSE,
     stringsAsFactors = FALSE,
     vapply(names(json$columns[[1]]$metadata), function (i) {
-      sapply(json$columns, function (x) as.character(x[['metadata']][[i]]))
+      sapply(json$columns, function (x) {
+        val <- as.character(x[['metadata']][[i]])
+        ifelse(is.null(val), NA_character_, val)
+      })
     }, character(length(json$columns)), USE.NAMES=TRUE)
   )
+  
+  rowIDs <- sapply(json$columns, function (x) unlist(x$id))
+  if (length(rowIDs) == 1) df <- data.frame(t(df))
+  rownames(df) <- rowIDs
+  
 
   # Convert strings to numbers
   for (i in seq_len(ncol(df))) {
@@ -403,6 +410,7 @@ PB.HDF5.Metadata <- function (hdf5) {
 PB.JSON.Info <- function (json) {
   fields <- sort(names(json))
   fields <- fields[!fields %in% c("rows", "columns", "data", "phylogeny")]
+  if ('shape' %in% fields) json[['shape']] <- unlist(json[['shape']])
   json[fields]
 }
 
@@ -426,7 +434,7 @@ PB.TSV.Counts <- function (mtx) {
     nrow     = nrow(mtx),
     dimnames = list(rownames(mtx), colnames(mtx)) )
 
-  if (length(mtx) == 0 | sum(mtx) == 0)
+  if (length(mtx) == 0 || sum(mtx) == 0)
     stop(simpleError("No abundance counts."))
 
   slam::as.simple_triplet_matrix(mtx)
@@ -440,8 +448,8 @@ PB.JSON.Counts <- function (json) {
   if (length(json$data) == 0)
     stop(simpleError("BIOM file does not have any count data."))
 
-  TaxaIDs   <- sapply(json$rows,    function (x) x$id)
-  SampleIDs <- sapply(json$columns, function (x) x$id)
+  TaxaIDs   <- sapply(json$rows,    function (x) unlist(x$id))
+  SampleIDs <- sapply(json$columns, function (x) unlist(x$id))
 
   if (json$matrix_type == "sparse")
     counts <- slam::simple_triplet_matrix(
@@ -514,22 +522,22 @@ PB.JSON.Taxonomy <- function (json) {
 
   taxa_table <- sapply(json$rows, simplify = "array", function (x) {
     
-    taxaNames <- x$metadata$taxonomy
+    taxaNames <- unlist(x$metadata$taxonomy)
     
     # The taxa names aren't where they're supposed to be
     if (is.null(taxaNames)) {
       
       # Decontam is known to omit the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
       if (is.null(names(x$metadata)) && length(x$metadata) == 1) {
-        taxaNames <- x$metadata[[1]]
+        taxaNames <- unlist(x$metadata[[1]])
         
       } else {
-        return (x$id)
+        return (unlist(x$id))
       }
     }
     
     if (length(taxaNames) == 1) {
-      if (nchar(taxaNames) == 0) return (x$id)
+      if (nchar(taxaNames) == 0) return (unlist(x$id))
       return (strsplit(taxaNames, "[\\|;]\\ *")[[1]])
     }
     
@@ -556,7 +564,7 @@ PB.JSON.Taxonomy <- function (json) {
     taxa_table <- as.matrix(taxa_table, ncol=1)
   }
 
-  rownames(taxa_table) <- sapply(json$rows, function (x) x$id)
+  rownames(taxa_table) <- sapply(json$rows, function (x) unlist(x$id))
   colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
 
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
@@ -590,9 +598,9 @@ PB.JSON.Sequences <- function (json) {
   if (!any(sapply(json$rows, function (x) 'sequence' %in% names(x$metadata) )))
     return (NULL)
   
-  ids  <- sapply(json$rows, simplify = "array", function (x) { x$id })
+  ids  <- sapply(json$rows, simplify = "array", function (x) { unlist(x$id) })
   seqs <- sapply(json$rows, simplify = "array", function (x) {
-    if (is.null(x$metadata$sequence)) NA else x$metadata$sequence
+    if (is.null(x$metadata$sequence)) NA else unlist(x$metadata$sequence)
   })
   
   res <- setNames(seqs, ids)
@@ -621,19 +629,18 @@ PB.JSON.Tree <- function (json, tree_mode) {
   # Obey the tree argument
   #------------------------------------------------------
   if (identical(tree_mode, TRUE)) {
-    tree <- json[['phylogeny']]
+    tree <- unlist(json[['phylogeny']])
     
   } else if (identical(tree_mode, FALSE)) {
     return (NULL)
     
   } else if (identical(tree_mode, 'auto')) {
-    if (!'phylogeny' %in% names(json))      return (NULL)
-    if (is.null(json[['phylogeny']]))       return (NULL)
-    if (is.na(json[['phylogeny']]))         return (NULL)
-    if (!is.character(json[['phylogeny']])) return (NULL)
-    if (!length(json[['phylogeny']]) == 1)  return (NULL)
-    if (!nchar(json[['phylogeny']]) >= 1)   return (NULL)
-    tree <- json[['phylogeny']]
+    tree <- unlist(json[['phylogeny']])
+    if (is.null(tree))       return (NULL)
+    if (is.na(tree))         return (NULL)
+    if (!is.character(tree)) return (NULL)
+    if (!length(tree) == 1)  return (NULL)
+    if (!nchar(tree) >= 1)   return (NULL)
     
   } else {
     tree <- tree_mode
@@ -653,7 +660,7 @@ PB.JSON.Tree <- function (json, tree_mode) {
 
   # Make sure it has all the OTUs from the table
   #------------------------------------------------------
-  TaxaIDs <- sapply(json$rows, function (x) x$id)
+  TaxaIDs <- sapply(json$rows, function (x) unlist(x$id))
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
     if (length(missing) > 6)
@@ -681,7 +688,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
   if (identical(tree_mode, FALSE)) {
     return (NULL)
   
-  } else if (identical(tree_mode, TRUE) | identical(tree_mode, 'auto')) {
+  } else if (identical(tree_mode, TRUE) || identical(tree_mode, 'auto')) {
     
     # See if a tree is included in the BIOM file
     #------------------------------------------------------
@@ -707,8 +714,9 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
       }
     }
     
-    if (!is.null(errmsg) & identical(tree_mode, TRUE)) {
-      stop(errmsg)
+    if (!is.null(errmsg)) {
+      if (identical(tree_mode, TRUE)) stop(errmsg)
+      return (NULL)
     }
     
   } else {

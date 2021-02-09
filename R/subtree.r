@@ -125,7 +125,7 @@ subtree <- function (tree, tips) {
     tipIdx <- childAt[tip]
     parent <- tree$edge[tipIdx,1]
     
-    if (nChildren[parent] == 1 & parent != root) {
+    if (nChildren[parent] == 1 && parent != root) {
       
       parentIdx                   <- childAt[parent]
       tree$edge[parentIdx, 2]     <- tree$edge[tipIdx, 2]

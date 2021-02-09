@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.2.9006
+Version: 1.0.2.9010
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
@@ -24,17 +24,18 @@ LinkingTo:
     Rcpp,
     RcppParallel
 Imports:
+    jsonlite,
     magrittr,
     methods,
+    openxlsx,
     plyr,
     Rcpp,
     RcppParallel,
     R.utils,
-    rjson,
-    slam,
-    openxlsx
+    slam
 Suggests:
     ape,
+    ggplot2,
     reshape2,
     rhdf5,
     testthat

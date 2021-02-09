@@ -4,13 +4,16 @@
 \alias{metadata}
 \title{Get the sample metadata.}
 \usage{
-metadata(biom)
+metadata(biom, field = NULL)
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
+
+\item{field}{The name of the metadata field to retrieve (optional).}
 }
 \value{
-A data frame of the metadata in \code{biom}.
+A data frame of the metadata in \code{biom}. If \code{field} is
+   given, will return a named vector of the field's values.
 }
 \description{
 Get the sample metadata.

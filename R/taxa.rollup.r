@@ -65,17 +65,17 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
     stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
   }
   
-  if (is.null(map) & is(biom, "BIOM")) map <- biom$taxonomy
+  if (is.null(map) && is(biom, "BIOM")) map <- biom$taxonomy
   
   
   #--------------------------------------------------------------
   # Sanity Checks
   #--------------------------------------------------------------
   
-  if (!is(biom, "BIOM") & is.null(map))
+  if (!is(biom, "BIOM") && is.null(map))
     stop(simpleError("Please provide a taxonomy map."))
   
-  if (!is(map, "matrix") | !identical(typeof(map), "character"))
+  if (!is(map, "matrix") || !identical(typeof(map), "character"))
     stop(simpleError("Taxonomy map must be a character matrix."))
   
   if (!all(rownames(counts) %in% rownames(map)))
@@ -85,7 +85,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   if (is(rank, "character"))
     rank <- grep(rank, c('OTU', ranks), ignore.case=TRUE) - 1
   
-  if (length(rank) != 1 | !is(rank, "numeric"))
+  if (length(rank) != 1 || !is(rank, "numeric"))
       stop(simpleError("Invalid taxonomic rank specified."))
   
   if (rank > ncol(map))

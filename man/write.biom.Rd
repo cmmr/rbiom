@@ -9,7 +9,8 @@ write.biom(biom, file, format = "json")
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
 
-\item{file}{Path to the output file.}
+\item{file}{Path to the output file. If the file name ends in \code{.gz} 
+or \code{.bz2}, the file contents will be compressed accordingly.}
 
 \item{format}{Options are \bold{\dQuote{tab}}, 
 \bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
