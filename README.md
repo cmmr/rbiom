@@ -65,5 +65,7 @@ Several functions will by default use all available CPU cores. To limit the numb
 RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
+When the `memoise` R package is also installed, `rbiom` automatically caches its results in a 50 MB in-memory cache. You can disable this behavior by setting `options(rbiom.cache = NA)`. You can also increase `rbiom`'s cache size by providing your own `cachem` object, as in `options(rbiom.cache = cachem::cache_mem(max_size = 200 * 1024^2))`. Be sure to set the new cache option BEFORE calling `library(rbiom)`.
+
 
 

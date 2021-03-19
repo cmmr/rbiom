@@ -408,10 +408,10 @@ PB.HDF5.Metadata <- function (hdf5) {
 
 
 PB.JSON.Info <- function (json) {
-  fields <- sort(names(json))
-  fields <- fields[!fields %in% c("rows", "columns", "data", "phylogeny")]
-  if ('shape' %in% fields) json[['shape']] <- unlist(json[['shape']])
-  json[fields]
+  info <- list()
+  for (i in setdiff(names(json), c("rows", "columns", "data", "phylogeny")))
+    info[[i]] <- if (is.null(unlist(json[[i]]))) NA else unlist(json[[i]])
+  return (info)
 }
 
 PB.HDF5.Info <- function (hdf5) {

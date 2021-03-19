@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9010
+# rbiom 1.0.2.9011
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' generated BIOM files.
@@ -10,6 +10,7 @@
 * Added apcoa function for covariate adjusted principal coordinates analysis.
 * Switched from rjson to jsonlite for better handling of non-UTF characters.
 * Support for writing out biom files compressed with gzip or bzip2.
+* Memoised the functions that do heavy-lifting.
 
 
 # rbiom 1.0.2

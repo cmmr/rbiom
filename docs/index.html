@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9011</span>
       </span>
     </div>
 
@@ -121,6 +121,7 @@
 <p>Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html">setThreadOptions</a></span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
+<p>When the <code>memoise</code> R package is also installed, <code>rbiom</code> automatically caches its results in a 50 MB in-memory cache. You can disable this behavior by setting <code><a href="https://rdrr.io/r/base/options.html">options(rbiom.cache = NA)</a></code>. You can also increase <code>rbiom</code>’s cache size by providing your own <code>cachem</code> object, as in <code><a href="https://rdrr.io/r/base/options.html">options(rbiom.cache = cachem::cache_mem(max_size = 200 * 1024^2))</a></code>. Be sure to set the new cache option BEFORE calling <code><a href="https://cmmr.github.io/rbiom/index.html">library(rbiom)</a></code>.</p>
 </div>
 </div>
   </div>

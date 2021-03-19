@@ -59,7 +59,7 @@ rarefy <- function (biom, depth=NULL, seed=0) {
       
     } else {
       
-      depth <- 1000
+      depth <- 10000
       
     }
 
