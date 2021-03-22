@@ -91,7 +91,7 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
 
   if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
 
-    fp <- tempfile(fileext=basename(src))
+    fp <- tempfile()
     on.exit(unlink(fp), add=TRUE)
     
     # To do: switch to curl::curl_download
@@ -102,7 +102,7 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
 
     fp <- tempfile(fileext=".biom")
     on.exit(unlink(fp), add=TRUE)
-    if (!is.null(try(writeChar(src, fp), silent=TRUE)))
+    if (!is.null(try(writeChar(src, fp, eos=NULL), silent=TRUE)))
         stop(simpleError(sprintf("Cannot write text to file %s", fp)))
 
   } else {
@@ -115,7 +115,7 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
 
 
   #--------------------------------------------------------------
-  # Uncompress files that are in gzip or bzip2 format
+  # Decompress files that are in gzip or bzip2 format
   #--------------------------------------------------------------
 
   file_con   <- file(fp)
