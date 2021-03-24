@@ -99,7 +99,7 @@ alpha.div <- function (biom, rarefy=FALSE, metrics="all", md=NULL) {
     
     
     if (!identical(metrics, 'all'))
-      df <- df[,metrics,drop=F]
+      df <- df[,c('Sample', metrics),drop=F]
     
     
     if (identical(md, 'wide')) {

@@ -18,8 +18,10 @@
 #'
 subset.BIOM <- function (x, ...) {
   
-  res <- try(eval(substitute(...), x$metadata), silent=TRUE)
-  if (is(res, "try-error"))
+  stopifnot(is(x, 'BIOM'))
+  
+  res <- try(eval(expr = substitute(...), envir = x$metadata), silent=TRUE)
+  if (is(res, "try-error") || is(res, 'error'))
     stop(simpleError(sprintf("Subset failed: %s", res)))
   
   select(x, res)
