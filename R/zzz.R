@@ -14,7 +14,7 @@
   # memoise covers all the necessary dependencies
   # This lookup style is faster than rownames(installed.packages())
   if (!nzchar(system.file(package = 'memoise'))) {
-    cat("The 'memoise' R package is needed to use caching.", file = stderr())
+    warning("The 'memoise' R package is needed to use caching.")
     return (invisible(NULL))
   }
 

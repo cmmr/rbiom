@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9014</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9015</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Estimate the diversity of each sample.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, rarefy <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, rarefy <span class='op'>=</span> <span class='cn'>FALSE</span>, metrics <span class='op'>=</span> <span class='st'>"all"</span>, md <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +140,23 @@ diversity computations. Options are:</p><dl>
   <dt><code>TRUE</code></dt><dd><p>Automatically select and apply a single rarefaction.</p></dd>
   <dt><code>"multi"</code></dt><dd><p>Automatically select and apply multiple rarefactions.</p></dd>
   <dt><em>integer vector</em></dt><dd><p>Rarefy at the specified depth(s).</p></dd>
+
+</dl></td>
+    </tr>
+    <tr>
+      <th>metrics</th>
+      <td><p>Character vector of one or more of the following: <code>Depth</code>, 
+<code>OTUs</code>, <code>Shannon</code>, <code>Chao1</code>, <code>Simpson</code>, <code>InvSimpson</code>.
+Non-ambiguous abbreviations are also accepted. The default, <code>all</code>,
+returns all of them.</p></td>
+    </tr>
+    <tr>
+      <th>md</th>
+      <td><p>How to include metadata in the output data frame. Options are:</p><dl>
+  <dt><code>NULL</code></dt><dd><p>Don't include metadata (Default)</p></dd>
+  <dt><code>"wide"</code></dt><dd><p>Add a separate column for each alpha diversity metric.</p></dd>
+  <dt><code>"long"</code></dt><dd><p>Add two columns, "Metric" and "Diversity", and add more
+                  rows to attain all combinations of samples x metric.</p></dd>
 
 </dl></td>
     </tr>

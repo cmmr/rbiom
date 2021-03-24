@@ -4,7 +4,7 @@
 \alias{alpha.div}
 \title{Estimate the diversity of each sample.}
 \usage{
-alpha.div(biom, rarefy = FALSE)
+alpha.div(biom, rarefy = FALSE, metrics = "all", md = NULL)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
@@ -17,8 +17,21 @@ diversity computations. Options are:
   \item{\code{FALSE}}{ Use each sample's current set of observations without
                   applying any rarefaction. (Default) }
   \item{\code{TRUE}}{ Automatically select and apply a single rarefaction. }
-  \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions. }
+  \item{\code{"multi"}}{ Automatically select and apply multiple rarefactions.}
   \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
+}}
+
+\item{metrics}{Character vector of one or more of the following: \code{Depth}, 
+\code{OTUs}, \code{Shannon}, \code{Chao1}, \code{Simpson}, \code{InvSimpson}.
+Non-ambiguous abbreviations are also accepted. The default, \code{all},
+returns all of them.}
+
+\item{md}{How to include metadata in the output data frame. Options are: 
+\describe{
+  \item{\code{NULL}}{ Don't include metadata (Default) }
+  \item{\code{"wide"}}{ Add a separate column for each alpha diversity metric. }
+  \item{\code{"long"}}{ Add two columns, "Metric" and "Diversity", and add more
+                  rows to attain all combinations of samples x metric. }
 }}
 }
 \value{
