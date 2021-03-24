@@ -52,7 +52,7 @@ alpha.div <- function (biom, rarefy=FALSE, metrics="all", md=NULL) {
   if (!identical(metrics, 'all')) {
     metricList <- c("Depth", "OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
     metrics    <- metricList[pmatch(tolower(metrics), tolower(metricList))]
-    metrics    <- metrics[is.na(metrics)]
+    metrics    <- metrics[!is.na(metrics)]
     if (length(metrics) == 0) stop(simpleError("Invalid 'alpha.div(metric=' argument"))
   }
   
