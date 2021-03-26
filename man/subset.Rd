@@ -5,12 +5,17 @@
 \alias{subset.BIOM}
 \title{Subset samples using the BIOM object's metadata}
 \usage{
-\method{subset}{BIOM}(x, ...)
+\method{subset}{BIOM}(x, ..., drop.na = TRUE, refactor = TRUE)
 }
 \arguments{
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
 \item{...}{Test to run on the metadata to identify samples to retain.}
+
+\item{drop.na}{When \code{...} is e.g. \code{Age > 30}, should \code{!is.na(Age)} be automatically applied too?}
+
+\item{refactor}{When \code{...} is e.g. \code{`Body Site` \%in\% c("Stool", "Saliva")}, should
+\code{`Body Site`} be redefined as \code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?}
 }
 \value{
 A \code{BIOM} object.

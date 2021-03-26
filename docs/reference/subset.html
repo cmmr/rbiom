@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9016</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for BIOM</span>
-<span class='fu'>subset</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>subset</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, drop.na <span class='op'>=</span> <span class='cn'>TRUE</span>, refactor <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,6 +133,15 @@
     <tr>
       <th>...</th>
       <td><p>Test to run on the metadata to identify samples to retain.</p></td>
+    </tr>
+    <tr>
+      <th>drop.na</th>
+      <td><p>When <code>...</code> is e.g. <code>Age &gt; 30</code>, should <code>!is.na(Age)</code> be automatically applied too?</p></td>
+    </tr>
+    <tr>
+      <th>refactor</th>
+      <td><p>When <code>...</code> is e.g. <code>`Body Site` %in% c("Stool", "Saliva")</code>, should
+<code>`Body Site`</code> be redefined as <code><a href='https://rdrr.io/r/base/factor.html'>factor(`Body Site`, levels=c('Stool', 'Saliva'))</a></code>?</p></td>
     </tr>
     </table>
 
