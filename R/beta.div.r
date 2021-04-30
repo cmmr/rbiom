@@ -15,22 +15,48 @@
 #'     relationships of the taxa in \code{biom}. Will be taken from the tree
 #'     embedded in the \code{biom} object if not explicitly specified. Only
 #'     required for computing UniFrac distance matrices.
-#' @return A distance matrix.
+#' @param long  Pivot the returned data to long format?
+#'     \describe{
+#'       \item{\bold{FALSE}}{ Return a \bold{dist} object. (Default) }
+#'       \item{\bold{TRUE}}{  A \bold{data.frame} with columns "Sample1", 
+#'                            "Sample2" and "Distance" is returned. }
+#'     }
+#' @param md  Include metadata in the output data frame? Options are: 
+#'     \describe{
+#'       \item{\code{FALSE}}{ Don't include metadata. (Default) }
+#'       \item{\code{TRUE}}{ Include all metadata. }
+#'       \item{\emph{character vector}}{ Include only the specified metadata columns.
+#'              Column names can be prefixed with \bold{==} or \bold{!=} to indicate
+#'              that only within or between groupings, respectively, are to be kept.
+#'              See examples below. }
+#'     }
+#' @return If both \code{long} and \code{md} are \bold{FALSE}, returns a distance 
+#'         matrix, otherwise a data.frame.
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
 #'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     biom <- select(biom, 1:10)
+#'     fullbiom <- read.biom(infile)
+#'     biom <- select(fullbiom, 1:10)
 #'     
 #'     dm <- beta.div(biom, 'unifrac')
 #'     
 #'     as.matrix(dm)[1:4,1:4]
 #'     plot(hclust(dm))
+#'     
+#'     # Return in long format with metadata
+#'     biom <- select(fullbiom, 18:21)
+#'     beta.div(biom, 'unifrac', md = c("Body Site", "Sex"))
+#'     
+#'     # Only look at distances among the stool sample
+#'     beta.div(biom, 'unifrac', md = c("==Body Site", "Sex"))
+#'     
+#'     # Or between males and females
+#'     beta.div(biom, 'unifrac', md = c("Body Site", "!=Sex"))
 #'
 
-beta.div <- function (biom, method, weighted=TRUE, tree=NULL) {
+beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FALSE) {
   
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
@@ -108,7 +134,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL) {
   
   if (identical(method, "unifrac")) {
     
-    par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
+    dm <- par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
     
   } else {
@@ -118,12 +144,68 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL) {
     dm <- as.dist(dm)
     attr(dm, 'Labels') <- rownames(counts)
     
-    return (dm)
-    
-    # rcpp_parallel_js_distance(as.matrix(counts))
-    
   }
   
+  if (isFALSE(long) && isFALSE(md))
+    return (dm)
+  
+  
+  #--------------------------------------------------------------
+  # Convert to long form
+  #--------------------------------------------------------------
+  df <- as.matrix(dm)
+  df <- data.frame(
+    stringsAsFactors = FALSE,
+    Sample1  = rownames(df)[row(df)],
+    Sample2  = colnames(df)[col(df)],
+    Distance = as.numeric(df)
+  )
+  df <- subset(df, Sample1 < Sample2)
+  
+  
+  #--------------------------------------------------------------
+  # Add metadata columns
+  #--------------------------------------------------------------
+  if (!isFALSE(md)) {
+    
+    if (isTRUE(md))        md <- names(metadata(biom))
+    if (!is.character(md)) md <- names(metadata(biom))[md]
+    
+    for (i in unique(md)) {
+      
+      op <- substr(i, 1, 2)
+      if (op %in% c("==", "!=")) {
+        
+        # Limit to only within or between comparisons.
+        #--------------------------------------------------------------
+        i   <- substr(i, 3, nchar(i))
+        map <- metadata(biom, i)
+        df  <- df[get(op)(map[df$Sample1], map[df$Sample2]),,drop=F]
+        
+      } else {
+        map <- metadata(biom, i)
+      }
+      
+      v1 <- as.character(map[df$Sample1])
+      v2 <- as.character(map[df$Sample2])
+      
+      
+      # Change "Male vs Female" to "Female vs Male" (alphabetical).
+      #--------------------------------------------------------------
+      df[[i]] <- paste(
+        ifelse(v1 < v2, v1, v2), 
+        "vs", 
+        ifelse(v1 < v2, v2, v1) )
+      
+      
+      # Change "Male vs Male" to "Male".
+      #--------------------------------------------------------------
+      df[[i]] <- ifelse(v1 == v2, v1, df[[i]])
+      
+    }
+  }
+  
+  return (df)
   
 }
 

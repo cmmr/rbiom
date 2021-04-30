@@ -22,9 +22,7 @@ loaded from \code{biom}, if encoded there.}
 A distance matrix of class \code{dist}.
 }
 \description{
-This is the function called internally by \link{beta.div}, but is made
-visible here so you can use it with matrices and trees without having to
-first convert them to \code{BIOM} objects.
+This is a wrapper around \link{beta.div} for a common use case.
 }
 \examples{
     library(rbiom)

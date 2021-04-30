@@ -6,8 +6,8 @@
 #' @param rank  The taxonomic rank. E.g. \bold{\dQuote{OTU}}, 
 #'     \bold{\dQuote{Phylum}}, etc. May also be given numerically: 0 for
 #'     OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
-#'     of taxonomic ranks encoded in the original biom file. See example below
-#'     to fetch the names of all available ranks.
+#'     of taxonomic ranks encoded in the original biom file. Run 
+#'     \code{taxa.ranks(biom)} to fetch the names of all available ranks.
 #' @param map  A character matrix defining the value that each taxa IDs is
 #'     assigned for each taxonomic rank. If \code{map=NULL} and \code{biom} is a
 #'     \code{BIOM} class object, the map will be automatically loaded from 
@@ -25,8 +25,21 @@
 #'     \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 #'     matrix object. Sparse matrices will likely be considerably more
 #'     memory efficient in this scenario.
+#' @param long  Pivot the returned data to long format?
+#'     \describe{
+#'       \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
+#'       \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
+#'                       returned. Rows are added to attain all combinations of 
+#'                       samples x metrics. }
+#'     }
+#' @param md  Include metadata in the output data frame? Options are: 
+#'     \describe{
+#'       \item{\code{FALSE}}{ Don't include metadata. (Default) }
+#'       \item{\code{TRUE}}{ Include all metadata. }
+#'       \item{\emph{character vector}}{ Include only the specified metadata columns. }
+#'     }
 #' @return A numeric matrix with samples as column names, and taxonomic
-#'     identifiers as row names.
+#'     identifiers as row names. Or a data.frame is \code{md} is not \bold{NULL}.
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -51,7 +64,7 @@
 #'
 
 
-taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE) {
+taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE, long=FALSE, md=FALSE) {
   
   
   #--------------------------------------------------------------
@@ -81,46 +94,44 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   if (!all(rownames(counts) %in% rownames(map)))
     stop(simpleError("Taxonomy map does not include all taxa IDs."))
   
-  ranks <- colnames(map)
   if (is(rank, "character"))
-    rank <- grep(rank, c('OTU', ranks), ignore.case=TRUE) - 1
+    rank <- pmatch(tolower(rank), tolower(c('OTU', colnames(map)))) - 1
   
-  if (length(rank) != 1 || !is(rank, "numeric"))
-      stop(simpleError("Invalid taxonomic rank specified."))
+  if (length(rank) != 1 || !is(rank, "numeric") || is.na(rank))
+    stop(simpleError("Invalid taxonomic rank specified."))
   
   if (rank > ncol(map))
-      stop(simpleError("Invalid taxonomic rank specified."))
+    stop(simpleError("Invalid taxonomic rank specified."))
   
-  
-  #--------------------------------------------------------------
-  # The OTU table is easy
-  #--------------------------------------------------------------
   
   if (rank == 0) {
-    if (identical(sparse, TRUE)) {
-      return (biom[['counts']])
-    } else {
-      return (as.matrix(biom[['counts']]))
-    }
+    
+    #--------------------------------------------------------------
+    # The OTU table is easy
+    #--------------------------------------------------------------
+    
+    res <- biom[['counts']]
+    
+  } else {
+  
+    
+    #--------------------------------------------------------------
+    # compute abundance matrix
+    #--------------------------------------------------------------
+    
+    if (identical(lineage, TRUE)) rank <- 1:rank
+    
+    res <- try(silent=TRUE, {
+      otuNames <- counts$dimnames[[1]]
+      otu2taxa <- map[otuNames, rank, drop=FALSE]
+      otu2taxa <- apply(otu2taxa, 1L, paste, collapse="; ")
+      slam::rollup(counts, 1L, otu2taxa, sum)
+    })
+    if (!is(res, "simple_triplet_matrix"))
+      stop(simpleError("Unable to group by taxonomic level."))
+    
+    res <- res[order(tolower(rownames(res))), colnames(counts), drop=FALSE]
   }
-  
-  
-  #--------------------------------------------------------------
-  # compute abundance matrix
-  #--------------------------------------------------------------
-  
-  if (identical(lineage, TRUE)) rank <- 1:rank
-  
-  res <- try(silent=TRUE, {
-    otuNames <- counts$dimnames[[1]]
-    otu2taxa <- map[otuNames, rank, drop=FALSE]
-    otu2taxa <- apply(otu2taxa, 1L, paste, collapse="; ")
-    slam::rollup(counts, 1L, otu2taxa, sum)
-  })
-  if (!is(res, "simple_triplet_matrix"))
-    stop(simpleError("Unable to group by taxonomic level."))
-  
-  res <- res[order(tolower(rownames(res))), colnames(counts), drop=FALSE]
   
   
   #--------------------------------------------------------------
@@ -130,6 +141,46 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   if (identical(sparse, FALSE))
     res <- as.matrix(res)
   
+  
+  #--------------------------------------------------------------
+  # Pivot Longer
+  #--------------------------------------------------------------
+  if (isTRUE(long)) {
+    res <- as.matrix(res)
+    res <- data.frame(
+      Sample    = colnames(res)[col(res)],
+      Taxa      = rownames(res)[row(res)],
+      Abundance = as.numeric(res)
+    )
+  }
+  
+  
+  #--------------------------------------------------------------
+  # Add Metadata
+  #--------------------------------------------------------------
+  if (!isFALSE(md)) {
+    
+    md <- unique(md)
+    md <- metadata(biom)[,md,drop=F]
+    
+    if (isTRUE(long)) {
+      res <- merge(res, md, by.x = "Sample", by.y = "row.names")
+      
+    } else {
+      res <- data.frame(
+        check.names = FALSE,
+        Sample = colnames(res),
+        t(as.matrix(res)) )
+      
+      res <- merge(md, res, by.x = "row.names", by.y = "Sample")
+      names(res)[1] <- "Sample"
+    }
+      
+  }
+  
+  if (isTRUE(long))
+    if (length(unique(res[['Taxa']])) > 1)
+      attr(res, 'facet') <- "Taxa"
   
   
   return (res)

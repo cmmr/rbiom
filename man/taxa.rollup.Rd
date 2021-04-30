@@ -4,7 +4,15 @@
 \alias{taxa.rollup}
 \title{Generate a matrix of samples by taxa, at the specified taxonomic rank.}
 \usage{
-taxa.rollup(biom, rank = "OTU", map = NULL, lineage = FALSE, sparse = FALSE)
+taxa.rollup(
+  biom,
+  rank = "OTU",
+  map = NULL,
+  lineage = FALSE,
+  sparse = FALSE,
+  long = FALSE,
+  md = FALSE
+)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -14,8 +22,8 @@ columns are assumed to be the taxa and samples, respectively.}
 \item{rank}{The taxonomic rank. E.g. \bold{\dQuote{OTU}}, 
 \bold{\dQuote{Phylum}}, etc. May also be given numerically: 0 for
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
-of taxonomic ranks encoded in the original biom file. See example below
-to fetch the names of all available ranks.}
+of taxonomic ranks encoded in the original biom file. Run 
+\code{taxa.ranks(biom)} to fetch the names of all available ranks.}
 
 \item{map}{A character matrix defining the value that each taxa IDs is
 assigned for each taxonomic rank. If \code{map=NULL} and \code{biom} is a
@@ -36,10 +44,25 @@ level ranks.}
 \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.}
+
+\item{long}{Pivot the returned data to long format?
+\describe{
+  \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
+  \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
+                  returned. Rows are added to attain all combinations of 
+                  samples x metrics. }
+}}
+
+\item{md}{Include metadata in the output data frame? Options are: 
+\describe{
+  \item{\code{FALSE}}{ Don't include metadata. (Default) }
+  \item{\code{TRUE}}{ Include all metadata. }
+  \item{\emph{character vector}}{ Include only the specified metadata columns. }
+}}
 }
 \value{
 A numeric matrix with samples as column names, and taxonomic
-    identifiers as row names.
+    identifiers as row names. Or a data.frame is \code{md} is not \bold{NULL}.
 }
 \description{
 Generate a matrix of samples by taxa, at the specified taxonomic rank.

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9018</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Make a distance matrix of samples vs samples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>method</span>, weighted <span class='op'>=</span> <span class='cn'>TRUE</span>, tree <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>method</span>, weighted <span class='op'>=</span> <span class='cn'>TRUE</span>, tree <span class='op'>=</span> <span class='cn'>NULL</span>, long <span class='op'>=</span> <span class='cn'>FALSE</span>, md <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,18 +152,40 @@ relationships of the taxa in <code>biom</code>. Will be taken from the tree
 embedded in the <code>biom</code> object if not explicitly specified. Only
 required for computing UniFrac distance matrices.</p></td>
     </tr>
+    <tr>
+      <th>long</th>
+      <td><p>Pivot the returned data to long format?</p><dl>
+  <dt><b>FALSE</b></dt><dd><p>Return a <b>dist</b> object. (Default)</p></dd>
+  <dt><b>TRUE</b></dt><dd><p>A <b>data.frame</b> with columns "Sample1", 
+                       "Sample2" and "Distance" is returned.</p></dd>
+
+</dl></td>
+    </tr>
+    <tr>
+      <th>md</th>
+      <td><p>Include metadata in the output data frame? Options are:</p><dl>
+  <dt><code>FALSE</code></dt><dd><p>Don't include metadata. (Default)</p></dd>
+  <dt><code>TRUE</code></dt><dd><p>Include all metadata.</p></dd>
+  <dt><em>character vector</em></dt><dd><p>Include only the specified metadata columns.
+         Column names can be prefixed with <b>==</b> or <b>!=</b> to indicate
+         that only within or between groupings, respectively, are to be kept.
+         See examples below.</p></dd>
+
+</dl></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A distance matrix.</p>
+    <p>If both <code>long</code> and <code>md</code> are <b>FALSE</b>, returns a distance 
+        matrix, otherwise a data.frame.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     
     <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span><span class='op'>(</span><span class='va'>biom</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
+    <span class='va'>fullbiom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span><span class='op'>(</span><span class='va'>fullbiom</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
     
     <span class='va'>dm</span> <span class='op'>&lt;-</span> <span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'unifrac'</span><span class='op'>)</span>
     
@@ -172,8 +194,31 @@ required for computing UniFrac distance matrices.</p></td>
 #&gt; HMP01 0.0000000 0.1950253 0.3687298 0.4239831
 #&gt; HMP02 0.1950253 0.0000000 0.2101679 0.3187533
 #&gt; HMP03 0.3687298 0.2101679 0.0000000 0.3040937
-#&gt; HMP04 0.4239831 0.3187533 0.3040937 0.0000000</div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='beta.div-1.png' alt='' width='700' height='433' /></div><div class='input'>
+#&gt; HMP04 0.4239831 0.3187533 0.3040937 0.0000000</div><div class='input'>    <span class='fu'><a href='plot.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='beta.div-1.png' alt='' width='700' height='433' /></div><div class='input'>    
+    <span class='co'># Return in long format with metadata</span>
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span><span class='op'>(</span><span class='va'>fullbiom</span>, <span class='fl'>18</span><span class='op'>:</span><span class='fl'>21</span><span class='op'>)</span>
+    <span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'unifrac'</span>, md <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Body Site"</span>, <span class='st'>"Sex"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    Sample1 Sample2  Distance       Body Site            Sex
+#&gt; 5    HMP18   HMP19 0.6651627 Saliva vs Stool Female vs Male
+#&gt; 9    HMP18   HMP20 0.6810017 Saliva vs Stool Female vs Male
+#&gt; 10   HMP19   HMP20 0.4183059           Stool         Female
+#&gt; 13   HMP18   HMP21 0.7170374 Saliva vs Stool           Male
+#&gt; 14   HMP19   HMP21 0.3896741           Stool Female vs Male
+#&gt; 15   HMP20   HMP21 0.1490926           Stool Female vs Male</div><div class='input'>    
+    <span class='co'># Only look at distances among the stool sample</span>
+    <span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'unifrac'</span>, md <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"==Body Site"</span>, <span class='st'>"Sex"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    Sample1 Sample2  Distance Body Site            Sex
+#&gt; 10   HMP19   HMP20 0.4183059     Stool         Female
+#&gt; 14   HMP19   HMP21 0.3896741     Stool Female vs Male
+#&gt; 15   HMP20   HMP21 0.1490926     Stool Female vs Male</div><div class='input'>    
+    <span class='co'># Or between males and females</span>
+    <span class='fu'>beta.div</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'unifrac'</span>, md <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Body Site"</span>, <span class='st'>"!=Sex"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    Sample1 Sample2  Distance       Body Site            Sex
+#&gt; 5    HMP18   HMP19 0.6651627 Saliva vs Stool Female vs Male
+#&gt; 9    HMP18   HMP20 0.6810017 Saliva vs Stool Female vs Male
+#&gt; 14   HMP19   HMP21 0.3896741           Stool Female vs Male
+#&gt; 15   HMP20   HMP21 0.1490926           Stool Female vs Male</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

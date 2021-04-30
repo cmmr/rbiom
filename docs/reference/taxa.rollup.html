@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9018</span>
       </span>
     </div>
 
@@ -120,7 +120,15 @@
     <p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>taxa.rollup</span><span class='op'>(</span><span class='va'>biom</span>, rank <span class='op'>=</span> <span class='st'>"OTU"</span>, map <span class='op'>=</span> <span class='cn'>NULL</span>, lineage <span class='op'>=</span> <span class='cn'>FALSE</span>, sparse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>taxa.rollup</span><span class='op'>(</span>
+  <span class='va'>biom</span>,
+  rank <span class='op'>=</span> <span class='st'>"OTU"</span>,
+  map <span class='op'>=</span> <span class='cn'>NULL</span>,
+  lineage <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  sparse <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  long <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  md <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -136,8 +144,8 @@ columns are assumed to be the taxa and samples, respectively.</p></td>
       <td><p>The taxonomic rank. E.g. <b>&#8220;OTU&#8221;</b>, 
 <b>&#8220;Phylum&#8221;</b>, etc. May also be given numerically: 0 for
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
-of taxonomic ranks encoded in the original biom file. See example below
-to fetch the names of all available ranks.</p></td>
+of taxonomic ranks encoded in the original biom file. Run 
+<code><a href='taxa.ranks.html'>taxa.ranks(biom)</a></code> to fetch the names of all available ranks.</p></td>
     </tr>
     <tr>
       <th>map</th>
@@ -165,12 +173,31 @@ level ranks.</p></td>
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.</p></td>
     </tr>
+    <tr>
+      <th>long</th>
+      <td><p>Pivot the returned data to long format?</p><dl>
+  <dt><b>FALSE</b></dt><dd><p>Each metric has its own column. (Default)</p></dd>
+  <dt><b>TRUE</b></dt><dd><p>"Sample", "Metric" and "Diversity" are the columns 
+                  returned. Rows are added to attain all combinations of 
+                  samples x metrics.</p></dd>
+
+</dl></td>
+    </tr>
+    <tr>
+      <th>md</th>
+      <td><p>Include metadata in the output data frame? Options are:</p><dl>
+  <dt><code>FALSE</code></dt><dd><p>Don't include metadata. (Default)</p></dd>
+  <dt><code>TRUE</code></dt><dd><p>Include all metadata.</p></dd>
+  <dt><em>character vector</em></dt><dd><p>Include only the specified metadata columns.</p></dd>
+
+</dl></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A numeric matrix with samples as column names, and taxonomic
-    identifiers as row names.</p>
+    identifiers as row names. Or a data.frame is <code>md</code> is not <b>NULL</b>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>

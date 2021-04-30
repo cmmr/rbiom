@@ -1,8 +1,6 @@
 #' Compute Weighted and Unweighted UniFrac distance matrices.
 #' 
-#' This is the function called internally by \link{beta.div}, but is made
-#' visible here so you can use it with matrices and trees without having to
-#' first convert them to \code{BIOM} objects.
+#' This is a wrapper around \link{beta.div} for a common use case.
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'     object, as returned from \link{read.biom}. For matrices, the rows and 

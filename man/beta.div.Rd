@@ -4,7 +4,7 @@
 \alias{beta.div}
 \title{Make a distance matrix of samples vs samples.}
 \usage{
-beta.div(biom, method, weighted = TRUE, tree = NULL)
+beta.div(biom, method, weighted = TRUE, tree = NULL, long = FALSE, md = FALSE)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
@@ -25,9 +25,27 @@ names are also accepted. A phylogenetic tree must be present in
 relationships of the taxa in \code{biom}. Will be taken from the tree
 embedded in the \code{biom} object if not explicitly specified. Only
 required for computing UniFrac distance matrices.}
+
+\item{long}{Pivot the returned data to long format?
+\describe{
+  \item{\bold{FALSE}}{ Return a \bold{dist} object. (Default) }
+  \item{\bold{TRUE}}{  A \bold{data.frame} with columns "Sample1", 
+                       "Sample2" and "Distance" is returned. }
+}}
+
+\item{md}{Include metadata in the output data frame? Options are: 
+\describe{
+  \item{\code{FALSE}}{ Don't include metadata. (Default) }
+  \item{\code{TRUE}}{ Include all metadata. }
+  \item{\emph{character vector}}{ Include only the specified metadata columns.
+         Column names can be prefixed with \bold{==} or \bold{!=} to indicate
+         that only within or between groupings, respectively, are to be kept.
+         See examples below. }
+}}
 }
 \value{
-A distance matrix.
+If both \code{long} and \code{md} are \bold{FALSE}, returns a distance 
+        matrix, otherwise a data.frame.
 }
 \description{
 Make a distance matrix of samples vs samples.
@@ -36,12 +54,22 @@ Make a distance matrix of samples vs samples.
     library(rbiom)
     
     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    biom <- select(biom, 1:10)
+    fullbiom <- read.biom(infile)
+    biom <- select(fullbiom, 1:10)
     
     dm <- beta.div(biom, 'unifrac')
     
     as.matrix(dm)[1:4,1:4]
     plot(hclust(dm))
+    
+    # Return in long format with metadata
+    biom <- select(fullbiom, 18:21)
+    beta.div(biom, 'unifrac', md = c("Body Site", "Sex"))
+    
+    # Only look at distances among the stool sample
+    beta.div(biom, 'unifrac', md = c("==Body Site", "Sex"))
+    
+    # Or between males and females
+    beta.div(biom, 'unifrac', md = c("Body Site", "!=Sex"))
 
 }

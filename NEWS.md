@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9016
+# rbiom 1.0.2.9018
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' generated BIOM files.
@@ -14,8 +14,11 @@
 * Set memoise to be off by default.
 * Can now download files with odd characters in their name.
 * Prevent NUL from being appended to read.biom's text inputs.
-* alpha.div can now return metadata and/or subset of adiv metrics.
+* alpha.div can now return metadata and/or subset of adiv metrics in wide or long format.
 * Automagically remove NAs and update factors when using subset().
+* taxa.rollup can now return with metadata in wide or long format.
+* beta.div can now return with metadata in long format.
+* Added stats.table function to compute p-vals for alpha, beta, and taxa metrics.
 
 
 # rbiom 1.0.2

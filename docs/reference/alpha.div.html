@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9018</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Estimate the diversity of each sample.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, rarefy <span class='op'>=</span> <span class='cn'>FALSE</span>, metrics <span class='op'>=</span> <span class='st'>"all"</span>, md <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>alpha.div</span><span class='op'>(</span><span class='va'>biom</span>, rarefy <span class='op'>=</span> <span class='cn'>FALSE</span>, metrics <span class='op'>=</span> <span class='st'>"all"</span>, long <span class='op'>=</span> <span class='cn'>FALSE</span>, md <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,12 +151,21 @@ Non-ambiguous abbreviations are also accepted. The default, <code>all</code>,
 returns all of them.</p></td>
     </tr>
     <tr>
+      <th>long</th>
+      <td><p>Pivot the returned data to long format?</p><dl>
+  <dt><b>FALSE</b></dt><dd><p>Each metric has its own column. (Default)</p></dd>
+  <dt><b>TRUE</b></dt><dd><p>"Sample", "Metric" and "Diversity" are the columns 
+                  returned. Rows are added to attain all combinations of 
+                  samples x metrics.</p></dd>
+
+</dl></td>
+    </tr>
+    <tr>
       <th>md</th>
-      <td><p>How to include metadata in the output data frame. Options are:</p><dl>
-  <dt><code>NULL</code></dt><dd><p>Don't include metadata (Default)</p></dd>
-  <dt><code>"wide"</code></dt><dd><p>Add a separate column for each alpha diversity metric.</p></dd>
-  <dt><code>"long"</code></dt><dd><p>Add two columns, "Metric" and "Diversity", and add more
-                  rows to attain all combinations of samples x metric.</p></dd>
+      <td><p>Include metadata in the output data frame? Options are:</p><dl>
+  <dt><code>FALSE</code></dt><dd><p>Don't include metadata. (Default)</p></dd>
+  <dt><code>TRUE</code></dt><dd><p>Include all metadata.</p></dd>
+  <dt><em>character vector</em></dt><dd><p>Include only the specified metadata columns.</p></dd>
 
 </dl></td>
     </tr>

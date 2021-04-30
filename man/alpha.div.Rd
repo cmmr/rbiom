@@ -4,7 +4,7 @@
 \alias{alpha.div}
 \title{Estimate the diversity of each sample.}
 \usage{
-alpha.div(biom, rarefy = FALSE, metrics = "all", md = NULL)
+alpha.div(biom, rarefy = FALSE, metrics = "all", long = FALSE, md = FALSE)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
@@ -26,12 +26,19 @@ diversity computations. Options are:
 Non-ambiguous abbreviations are also accepted. The default, \code{all},
 returns all of them.}
 
-\item{md}{How to include metadata in the output data frame. Options are: 
+\item{long}{Pivot the returned data to long format?
 \describe{
-  \item{\code{NULL}}{ Don't include metadata (Default) }
-  \item{\code{"wide"}}{ Add a separate column for each alpha diversity metric. }
-  \item{\code{"long"}}{ Add two columns, "Metric" and "Diversity", and add more
-                  rows to attain all combinations of samples x metric. }
+  \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
+  \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
+                  returned. Rows are added to attain all combinations of 
+                  samples x metrics. }
+}}
+
+\item{md}{Include metadata in the output data frame? Options are: 
+\describe{
+  \item{\code{FALSE}}{ Don't include metadata. (Default) }
+  \item{\code{TRUE}}{ Include all metadata. }
+  \item{\emph{character vector}}{ Include only the specified metadata columns. }
 }}
 }
 \value{

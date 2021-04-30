@@ -40,9 +40,7 @@
 
 
 <meta property="og:title" content="Compute Weighted and Unweighted UniFrac distance matrices. — unifrac" />
-<meta property="og:description" content="This is the function called internally by beta.div, but is made
-visible here so you can use it with matrices and trees without having to
-first convert them to BIOM objects." />
+<meta property="og:description" content="This is a wrapper around beta.div for a common use case." />
 
 
 
@@ -74,7 +72,7 @@ first convert them to BIOM objects." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9016</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9018</span>
       </span>
     </div>
 
@@ -119,9 +117,7 @@ first convert them to BIOM objects." />
     </div>
 
     <div class="ref-description">
-    <p>This is the function called internally by <a href='beta.div.html'>beta.div</a>, but is made
-visible here so you can use it with matrices and trees without having to
-first convert them to <code>BIOM</code> objects.</p>
+    <p>This is a wrapper around <a href='beta.div.html'>beta.div</a> for a common use case.</p>
     </div>
 
     <pre class="usage"><span class='fu'>unifrac</span><span class='op'>(</span><span class='va'>biom</span>, weighted <span class='op'>=</span> <span class='cn'>TRUE</span>, tree <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
@@ -160,7 +156,7 @@ loaded from <code>biom</code>, if encoded there.</p></td>
     <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='select.html'>select</a></span><span class='op'>(</span><span class='va'>biom</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
     
     <span class='va'>dm</span> <span class='op'>&lt;-</span> <span class='fu'>unifrac</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span>, cex<span class='op'>=</span><span class='fl'>.8</span><span class='op'>)</span>
+    <span class='fu'><a href='plot.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span>, cex<span class='op'>=</span><span class='fl'>.8</span><span class='op'>)</span>
 </div><div class='img'><img src='unifrac-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>]</span>
 </div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
 #&gt; HMP01 0.0000000 0.1950253 0.3687298 0.4239831

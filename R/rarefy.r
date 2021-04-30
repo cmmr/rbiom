@@ -45,6 +45,12 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   
   
   #--------------------------------------------------------------
+  # Remove rows/cols with zero observations
+  #--------------------------------------------------------------
+  counts <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
+  
+  
+  #--------------------------------------------------------------
   # Choose the rarefaction depth to sample at
   #--------------------------------------------------------------
 
