@@ -527,14 +527,19 @@ PB.JSON.Taxonomy <- function (json) {
     # The taxa names aren't where they're supposed to be
     if (is.null(taxaNames)) {
       
-      # Decontam is known to omit the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
-      if (is.null(names(x$metadata)) && length(x$metadata) == 1) {
+      # MicrobiomeDB puts the taxa string in the 'ID' field, e.g, {"metadata":null,"id":"Archaea;Euryarchaeota;...
+      if (identical(json[['generated_by']], "MicrobiomeDB")) {
+        taxaNames <- x[['id']]
+      
+      # Decontam omits the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
+      } else if (is.null(names(x$metadata)) && length(x$metadata) == 1) {
         taxaNames <- unlist(x$metadata[[1]])
         
       } else {
         return (unlist(x$id))
       }
     }
+    
     
     if (length(taxaNames) == 1) {
       if (nchar(taxaNames) == 0) return (unlist(x$id))
