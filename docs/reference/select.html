@@ -127,7 +127,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
+      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>. Objects of
+class <code>matrix</code> or <code>simple_triplet_matrix</code> are also accepted.</p></td>
     </tr>
     <tr>
       <th>samples</th>
@@ -139,8 +140,9 @@ sample names given by <code><a href='https://rdrr.io/r/base/colnames.html'>colna
       <th>nTop</th>
       <td><p>Selects this number of samples, taking the sample with the most
 observations first, then the sample with the second-most observations,
-etc. If <code>nTop</code> is higher than the number of samples in the dataset, 
-the entire dataset will be returned. See note.</p></td>
+etc. Ties will be randomly ordered. If <code>nTop</code> is higher than the 
+number of samples in the dataset, the entire dataset will be returned. 
+See note.</p></td>
     </tr>
     <tr>
       <th>nRandom</th>
@@ -159,7 +161,7 @@ allowed; they will be applied in the order listed above.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>BIOM</code> object.</p>
+    <p>An object of the same class as <code>biom</code>, subsetted as requested.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='subset.html'>subset</a></code></p></div>

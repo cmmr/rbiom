@@ -7,7 +7,8 @@
 select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read.biom}. Objects of
+class \code{matrix} or \code{simple_triplet_matrix} are also accepted.}
 
 \item{samples}{Sample names, indices, or a logical vector identifying
 the samples to keep. The latter two should be based on the order of
@@ -15,8 +16,9 @@ sample names given by \code{colnames(biom$counts)}.}
 
 \item{nTop}{Selects this number of samples, taking the sample with the most
 observations first, then the sample with the second-most observations,
-etc. If \code{nTop} is higher than the number of samples in the dataset, 
-the entire dataset will be returned. See note.}
+etc. Ties will be randomly ordered. If \code{nTop} is higher than the 
+number of samples in the dataset, the entire dataset will be returned. 
+See note.}
 
 \item{nRandom}{Randomly selects this number of samples. If higher than the
 number of samples in the dataset, the entire dataset will be returned.
@@ -29,7 +31,7 @@ Note: Generally, you will specify only one of the filters: \code{samples},
 allowed; they will be applied in the order listed above.}
 }
 \value{
-A \code{BIOM} object.
+An object of the same class as \code{biom}, subsetted as requested.
 }
 \description{
 Reduce samples to a specific list

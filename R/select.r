@@ -1,6 +1,7 @@
 #' Reduce samples to a specific list
 #' 
-#' @param biom  A BIOM object, as returned from \link{read.biom}.
+#' @param biom  A BIOM object, as returned from \link{read.biom}. Objects of
+#'     class \code{matrix} or \code{simple_triplet_matrix} are also accepted.
 #' @param samples  Sample names, indices, or a logical vector identifying
 #'     the samples to keep. The latter two should be based on the order of
 #'     sample names given by \code{colnames(biom$counts)}.
@@ -18,7 +19,7 @@
 #' \code{nTop}, or \code{nRandom}. However, specifying multiple filters is
 #' allowed; they will be applied in the order listed above.
 #' 
-#' @return A \code{BIOM} object.
+#' @return An object of the same class as \code{biom}, subsetted as requested.
 #' @export
 #' @seealso \code{\link{subset}}
 #' @examples
@@ -36,7 +37,14 @@
 #'
 select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
   
-  res <- biom$counts
+  #--------------------------------------------------------------
+  # Accept multiple types of input: BIOM, slam matrix, R matrix
+  #--------------------------------------------------------------
+  if (is(biom, 'BIOM'))                         { res <- biom$counts
+  } else if (is(biom, 'simple_triplet_matrix')) { res <- biom
+  } else if (is(biom, 'matrix')) { res <- slam::as.simple_triplet_matrix(biom)
+  } else { stop("Invalid object type passed to rbiom::select()") }
+  
   
   if (!is.null(samples)) {
     res <- try(res[,samples], silent=TRUE)
@@ -48,7 +56,7 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
     nTop <- min(ncol(res), nTop)
     set.seed(seed)
     ranking <- rank(slam::col_sums(res), ties.method="random")
-    res <- res[,ranking > ncol(res) - nTop]
+    res     <- res[,ranking > ncol(res) - nTop]
   }
   
   if (!is.null(nRandom)) {
@@ -57,20 +65,33 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
     res <- res[,sort(sample(seq_len(ncol(res)), nRandom))]
   }
   
-  samples <- colnames(res)
-  taxa    <- names(which(slam::row_sums(res) > 0))
+  res <- res[slam::row_sums(res) > 0, ]
   
-  biom$counts    <- biom$counts[taxa, samples]
-  biom$taxonomy  <- biom$taxonomy[taxa   ,,drop=FALSE]
-  biom$metadata  <- biom$metadata[samples,,drop=FALSE]
-  if (!is.null(biom$phylogeny)) {
+  
+  #--------------------------------------------------------------
+  # Input was a matrix, so return a matrix.
+  #--------------------------------------------------------------
+  if (is(biom, 'simple_triplet_matrix')) return (res)
+  if (is(biom, 'matrix'))                return (as.matrix(res))
+  
+  
+  #--------------------------------------------------------------
+  # Alter the rest of the BIOM to match this new subset
+  #--------------------------------------------------------------
+  samples          <- colnames(res)
+  taxa             <- rownames(res)
+  
+  biom$counts      <- biom$counts[taxa, samples]
+  biom$taxonomy    <- biom$taxonomy[taxa   ,,drop=FALSE]
+  biom$metadata    <- biom$metadata[samples,,drop=FALSE]
+  biom$info$shape  <- dim(biom$counts)
+  biom$info$nnz    <- length(biom$counts$v)
+  
+  if (!is.null(biom$phylogeny))
     biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
-  }
-  if (!is.null(biom$sequences)) {
+  
+  if (!is.null(biom$sequences))
     biom$sequences <- biom$sequences[taxa]
-  }
-  biom$info$shape <- dim(biom$counts)
-  biom$info$nnz   <- length(biom$counts$v)
   
   return (biom)
 }
