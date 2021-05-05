@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9019
+# rbiom 1.0.2.9020
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -19,6 +19,7 @@
 * taxa.rollup can now return with metadata in wide or long format.
 * beta.div can now return with metadata in long format.
 * Added stats.table function to compute p-vals for alpha, beta, and taxa metrics.
+* Added sample.sums function to count the number of observations per sample.
 
 
 # rbiom 1.0.2

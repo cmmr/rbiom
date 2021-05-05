@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reduce a distance matrix to two or three dimensions — ordinate • rbiom</title>
+<title>Sum the observations in each sample. — sample.sums • rbiom</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Reduce a distance matrix to two or three dimensions — ordinate" />
-<meta property="og:description" content="Reduce a distance matrix to two or three dimensions" />
+<meta property="og:title" content="Sum the observations in each sample. — sample.sums" />
+<meta property="og:description" content="Sum the observations in each sample." />
 
 
 
@@ -111,105 +111,65 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reduce a distance matrix to two or three dimensions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/ordinate.r'><code>R/ordinate.r</code></a></small>
-    <div class="hidden name"><code>ordinate.Rd</code></div>
+    <h1>Sum the observations in each sample.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/accessors.r'><code>R/accessors.r</code></a></small>
+    <div class="hidden name"><code>sample.sums.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Reduce a distance matrix to two or three dimensions</p>
+    <p>Sum the observations in each sample.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ordinate</span><span class='op'>(</span>
-  <span class='va'>biom</span>,
-  <span class='va'>ord</span>,
-  <span class='va'>method</span>,
-  weighted <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  tree <span class='op'>=</span> <span class='cn'>NULL</span>,
-  md <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  k <span class='op'>=</span> <span class='fl'>2</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>. Alternatively,
-a distance matrix, such as from <a href='beta.div.html'>beta.div</a>.</p></td>
-    </tr>
-    <tr>
-      <th>ord</th>
-      <td><p>Options are:</p><dl>
-    <dt>pcoa</dt><dd><p>Principal coordinate analysis, via <code><a href='https://rdrr.io/pkg/ape/man/pcoa.html'>pcoa</a></code>.</p></dd>
-    <dt>nmds</dt><dd><p>Nonmetric multidimensional scaling, via <code><a href='https://rdrr.io/pkg/vegan/man/metaMDS.html'>metaMDS</a></code>.</p></dd>
-    <dt>tsne</dt><dd><p>t-distributed stochastic neighbor embedding, via <code><a href='https://rdrr.io/pkg/tsne/man/tsne.html'>tsne</a></code>.</p></dd>
-   
-</dl></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>The distance algorithm to use. Options are:
-<b>&#8220;manhattan&#8221;</b>, <b>&#8220;euclidean&#8221;</b>, 
-<b>&#8220;bray-curtis&#8221;</b>, <b>&#8220;jaccard&#8221;</b>, and
-<b>&#8220;unifrac&#8221;</b>. Non-ambiguous abbreviations of the method 
-names are also accepted. A phylogenetic tree must be present in 
-<code>biom</code> or explicitly provided via <code>tree=</code> to use the UniFrac methods.</p></td>
-    </tr>
-    <tr>
-      <th>weighted</th>
-      <td><p>Take relative abundances into account. When 
-<code>weighted=FALSE</code>, only presence/absence is considered.</p></td>
-    </tr>
-    <tr>
-      <th>tree</th>
-      <td><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-embedded in the <code>biom</code> object if not explicitly specified. Only
-required for computing UniFrac distance matrices.</p></td>
-    </tr>
-    <tr>
-      <th>md</th>
-      <td><p>Include metadata in the output data frame? Options are:</p><dl>
-  <dt><code>FALSE</code></dt><dd><p>Don't include metadata. (Default)</p></dd>
-  <dt><code>TRUE</code></dt><dd><p>Include all metadata.</p></dd>
-  <dt><em>character vector</em></dt><dd><p>Include only the specified metadata columns.</p></dd>
-
-</dl></td>
-    </tr>
-    <tr>
-      <th>k</th>
-      <td><p>Number of dimensions to return. (Default: 2)</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Additional arguments to pass on to <code><a href='https://rdrr.io/pkg/ape/man/pcoa.html'>pcoa</a></code>, 
-<code><a href='https://rdrr.io/pkg/vegan/man/metaMDS.html'>metaMDS</a></code>, or <code><a href='https://rdrr.io/pkg/tsne/man/tsne.html'>tsne</a></code>.</p></td>
+      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data.frame with columns Axis.1, Axis.2, ..., Axis.k as well as columns
-        given by <code>md</code>. Rownames are the sample IDs. For pcoa ordinations, 
-        <code><a href='https://rdrr.io/r/base/attr.html'>attr(, 'eig')</a></code> will contain the eigenvalues useful for construction 
-        of ".. <!-- % variation explained" labels. --></p>
+    <p>A named numeric vector of the number of observations in each 
+        sample. The names are the sample IDs.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other accessor functions: 
+<code><a href='counts.html'>counts</a>()</code>,
+<code><a href='info.html'>info</a>()</code>,
+<code><a href='metadata.html'>metadata</a>()</code>,
+<code><a href='nsamples.html'>nsamples</a>()</code>,
+<code><a href='ntaxa.html'>ntaxa</a>()</code>,
+<code><a href='phylogeny.html'>phylogeny</a>()</code>,
+<code><a href='sample.names.html'>sample.names</a>()</code>,
+<code><a href='sequences.html'>sequences</a>()</code>,
+<code><a href='taxa.names.html'>taxa.names</a>()</code>,
+<code><a href='taxa.ranks.html'>taxa.ranks</a>()</code>,
+<code><a href='taxonomy.html'>taxonomy</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     
     <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    <span class='va'>ord</span>    <span class='op'>&lt;-</span> <span class='fu'>ordinate</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"pcoa"</span>, <span class='st'>"bray-curtis"</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ord</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           Axis.1       Axis.2
-#&gt; HMP01 -0.3575401  0.002362419
-#&gt; HMP02 -0.4203019  0.010404374
-#&gt; HMP03 -0.3819160  0.013483401
-#&gt; HMP04 -0.3876548  0.004854090
-#&gt; HMP05 -0.4154969 -0.011498409
-#&gt; HMP06 -0.4135847 -0.007029588</div><div class='input'>    
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    
+    <span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 HMP11 HMP12 HMP13 
+#&gt;  1660  1371  1353  1895  3939  4150  3283  1695  2069  2509  7820  3685  3280 
+#&gt; HMP14 HMP15 HMP16 HMP17 HMP18 HMP19 HMP20 HMP21 HMP22 HMP23 HMP24 HMP25 HMP26 
+#&gt;  2614  2450  1696  1579  2202  2423  2874  8667  3045  3493  1183 22117  2263 
+#&gt; HMP27 HMP28 HMP29 HMP30 HMP31 HMP32 HMP33 HMP34 HMP35 HMP36 HMP37 HMP38 HMP39 
+#&gt;  1720  1695  2423  3938  1839  3429  1610  8959  2496   182  3323  3044  2191 
+#&gt; HMP40 HMP41 HMP42 HMP43 HMP44 HMP45 HMP46 HMP47 HMP48 HMP49 HMP50 
+#&gt;  3031  3119  1489  3954 16241  1703  4068  2796  3577  3250  3965 </div><div class='input'>    
+    <span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; HMP36 HMP24 HMP03 HMP02 HMP42 HMP17 
+#&gt;   182  1183  1353  1371  1489  1579 </div><div class='input'>    
+    <span class='fu'><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></span><span class='op'>(</span><span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='sample.sums-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

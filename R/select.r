@@ -6,8 +6,9 @@
 #'     sample names given by \code{colnames(biom$counts)}.
 #' @param nTop  Selects this number of samples, taking the sample with the most
 #'     observations first, then the sample with the second-most observations,
-#'     etc. If \code{nTop} is higher than the number of samples in the dataset, 
-#'     the entire dataset will be returned. See note.
+#'     etc. Ties will be randomly ordered. If \code{nTop} is higher than the 
+#'     number of samples in the dataset, the entire dataset will be returned. 
+#'     See note.
 #' @param nRandom  Randomly selects this number of samples. If higher than the
 #'     number of samples in the dataset, the entire dataset will be returned.
 #'     See note.
@@ -45,7 +46,9 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
   
   if (!is.null(nTop)) {
     nTop <- min(ncol(res), nTop)
-    res <- res[,rank(slam::col_sums(res)) > ncol(res) - nTop]
+    set.seed(seed)
+    ranking <- rank(slam::col_sums(res), ties.method="random")
+    res <- res[,ranking > ncol(res) - nTop]
   }
   
   if (!is.null(nRandom)) {

@@ -32,6 +32,7 @@ Other accessor functions:
 \code{\link{nsamples}()},
 \code{\link{ntaxa}()},
 \code{\link{sample.names}()},
+\code{\link{sample.sums}()},
 \code{\link{sequences}()},
 \code{\link{taxa.names}()},
 \code{\link{taxa.ranks}()},

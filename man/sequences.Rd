@@ -43,6 +43,7 @@ Other accessor functions:
 \code{\link{ntaxa}()},
 \code{\link{phylogeny}()},
 \code{\link{sample.names}()},
+\code{\link{sample.sums}()},
 \code{\link{taxa.names}()},
 \code{\link{taxa.ranks}()},
 \code{\link{taxonomy}()}

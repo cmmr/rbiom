@@ -20,6 +20,33 @@ sample.names <- function (biom) {
 }
 
 
+#' Sum the observations in each sample.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return A named numeric vector of the number of observations in each 
+#'         sample. The names are the sample IDs.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     sample.sums(biom)
+#'     
+#'     sample.sums(biom) %>% sort() %>% head()
+#'     
+#'     hist(sample.sums(biom))
+#'
+
+sample.sums <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In sample.names(), biom must be a BIOM-class object.'))
+  return (slam::col_sums(biom[['counts']]))
+}
+
+
 #' Get the taxa names.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
