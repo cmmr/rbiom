@@ -36,10 +36,7 @@ validate_md_cols <- function (biom, md_cols) {
   ignore  <- c(".", "pcoa", "tsne", "nmds")
   md_cols <- md_cols[!md_cols %in% ignore]
   
-  missing <- setdiff(
-    sub("^[!=]=", "", md_cols), 
-    names(metadata(biom)) )
-  
+  missing <- setdiff(sub("^[!=]=", "", md_cols), names(metadata(biom)))
   if (length(missing) > 0)
     stop("Invalid metadata columns: ", paste(collapse = ", ", missing))
   

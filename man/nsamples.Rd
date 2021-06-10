@@ -27,7 +27,11 @@ Number of samples in a BIOM.
 \seealso{
 Other accessor functions: 
 \code{\link{counts}()},
+\code{\link{depth}()},
+\code{\link{has.phylogeny}()},
+\code{\link{has.sequences}()},
 \code{\link{info}()},
+\code{\link{is.rarefied}()},
 \code{\link{metadata}()},
 \code{\link{ntaxa}()},
 \code{\link{phylogeny}()},

@@ -173,17 +173,21 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
     
     for (i in unique(md)) {
       
-      op <- substr(i, 1, 2)
-      if (op %in% c("==", "!=")) {
-        
-        # Limit to only within or between comparisons.
-        #--------------------------------------------------------------
-        i   <- substr(i, 3, nchar(i))
-        map <- metadata(biom, i)
-        df  <- df[get(op)(map[df$Sample1], map[df$Sample2]),,drop=F]
-        
-      } else {
-        map <- metadata(biom, i)
+      # Convert '==' or '!=' prefix to an attribute
+      #--------------------------------------------------------------
+      if (isTRUE(substr(i, 1, 2) %in% c("==", "!="))) {
+        op <- substr(i, 1, 2)
+        i  <- substr(i, 3, nchar(i))
+        attr(i, 'op') <- op
+      }
+      
+      map <- metadata(biom, i)
+      
+      # Limit to only within or between comparisons.
+      #--------------------------------------------------------------
+      if (!is.null(attr(i, 'op'))) {
+        op <- attr(i, 'op')
+        df <- df[get(op)(map[df$Sample1], map[df$Sample2]),,drop=F]
       }
       
       v1 <- as.character(map[df$Sample1])

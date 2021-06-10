@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9020
+# rbiom 1.0.2.9023
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -20,6 +20,8 @@
 * beta.div can now return with metadata in long format.
 * Added stats.table function to compute p-vals for alpha, beta, and taxa metrics.
 * Added sample.sums function to count the number of observations per sample.
+* New functions: depth(), is.rarefied(), has.phylogeny(), and has.sequences().
+* Added plot function - provides stat brackets, patterned fills, overlaid geoms and more.
 
 
 # rbiom 1.0.2

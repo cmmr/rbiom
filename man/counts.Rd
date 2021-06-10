@@ -26,7 +26,11 @@ Get the abundance counts.
 }
 \seealso{
 Other accessor functions: 
+\code{\link{depth}()},
+\code{\link{has.phylogeny}()},
+\code{\link{has.sequences}()},
 \code{\link{info}()},
+\code{\link{is.rarefied}()},
 \code{\link{metadata}()},
 \code{\link{nsamples}()},
 \code{\link{ntaxa}()},

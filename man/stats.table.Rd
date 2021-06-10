@@ -13,7 +13,8 @@ stats.table(
   pairwise = FALSE,
   weighted = TRUE,
   digits = 3,
-  y.pos = NULL
+  y.pos = NULL,
+  y.pos.facet = "Metric"
 )
 }
 \arguments{

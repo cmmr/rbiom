@@ -10,8 +10,14 @@
   formula,
   layers = "box",
   color.by = NULL,
+  pattern.by = NULL,
+  shape.by = NULL,
   facet.by = NULL,
-  stats = TRUE,
+  colors = NULL,
+  patterns = NULL,
+  shapes = NULL,
+  p.min = 0.05,
+  p.adj = "fdr",
   vline = "ci95",
   xlab.angle = "auto",
   ...
@@ -20,69 +26,105 @@
 \arguments{
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
-\item{formula}{Definition of the y-axis metric and metadata column to plot along the x-axis. 
-            For example, \bold{Shannon ~ `Body Site`}. Y-axis options are:
+\item{formula}{Definition of what to plot on the x- and y- axes, given as 
+\code{y ~ x}. For example, \bold{Shannon ~ `Body Site`}. X-axis 
+options are:
+\describe{
+    \item{Metadata}{
+      The name of a column from \code{metadata(biom)}.
+    }
+    \item{Ordination Method}{
+      \bold{PCoA}, \bold{tSNE}, or \bold{NMDS}.
+    }
+}
+Y-axis options are:
 \describe{
     \item{Alpha Diversity Metrics (one or more)}{
-      \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, and/or 
-      \bold{InvSimpson}. Use \bold{Diversity} to get all five metrics.
+      \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
+      and/or \bold{InvSimpson}. Use \bold{Diversity} to get all five 
+      metrics.
     }
     \item{Beta Diversity Metrics (one only)}{
-      \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, \bold{jaccard}, 
-      or \bold{unifrac}. \bold{Distance} will use \bold{unifrac} if a phylogenetic 
-      tree is present, or \bold{bray-curtis} otherwise. Use in combination with
-      the \code{weighted} parameter. Metadata column names can be prefixed with
-      \bold{==} or \bold{!=} to limit distance calculations to \emph{within} or
-      \emph{between}, respectively, those categories. See examples below.
+      \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
+      \bold{jaccard}, or \bold{unifrac}. \bold{Distance} will use 
+      \bold{unifrac} if a phylogenetic tree is present, or 
+      \bold{bray-curtis} otherwise. Use in combination with the 
+      \code{weighted} parameter. Metadata column names can be 
+      prefixed with \bold{==} or \bold{!=} to limit distance 
+      calculations to \emph{within} or \emph{between}, respectively, 
+      those categories. See examples below.
     }
     \item{Taxa Abundances (one only)}{
-      \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, \bold{Family}, 
-      \bold{Genus}, \bold{Species}, \bold{Strain}, or \bold{OTU}. Supported ranks 
-      will vary by biom. Run \code{taxa.ranks(biom)} to see the available options. 
-      Specifying \bold{Abundance} will default to the most precise rank possible.
+      \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
+      \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
+      \bold{OTU}. Supported ranks will vary by biom. Run 
+      \code{taxa.ranks(biom)} to see the available options. 
+      Specifying \bold{Abundance} will default to the most precise 
+      rank possible.
     }
    }}
 
-\item{layers}{What kind of plot to create. Options are \bold{box}, \bold{violin}, \bold{dot}, 
-\bold{strip}, \bold{crossbar}, \bold{errorbar}, \bold{linerange}, and/or 
-\bold{pointrange}. Single letter abbreviations are also accepted. For instance,
-\code{c("box", "dot")} is equivalent to \code{c("b", "d")} and \code{"bd"}.}
+\item{layers}{What kind of plot to create. Options are \bold{box}, 
+\bold{violin}, \bold{dot}, \bold{strip}, \bold{crossbar}, 
+\bold{errorbar}, \bold{linerange}, and/or \bold{pointrange}. 
+Single letter abbreviations are also accepted. For instance,
+\code{c("box", "dot")} is equivalent to \code{c("b", "d")} and 
+\code{"bd"}.}
 
-\item{color.by}{Metadata column to color by. If that column is a \code{factor}, the ordering of levels
-will be maintained in the plot.}
+\item{color.by, pattern.by, shape.by, facet.by}{Metadata column to color, 
+pattern, shape, and/or facet by. If that column is a \code{factor}, 
+the ordering of levels will be maintained in the plot.}
 
-\item{facet.by}{A character vector of one or two metadata columns to facet by. Ordering of \code{factor}
-levels will be maintained in the plot.}
+\item{colors, patterns, shapes}{Names of the colors, patterns, and/or shapes
+to use in the plot. Available names can be found by running 
+\code{colors()}, \code{ggpattern::magick_pattern_names}, and 
+\code{0:25}, respectively. Use a named character vector to map them 
+to specific factor levels in the metadata.}
 
-\item{stats}{How to display significance brackets and p-values on the plot. Options are: 
-\describe{
-  \item{\code{TRUE}}{ Auto-select \bold{pairwise} or \bold{group}. (Default) }
-  \item{\code{FALSE}}{ Do not display significance values on the plot. }
-  \item{\bold{"p"} or \bold{"pairwise"}}{ Compare all against all. }
-  \item{\bold{"g"} or \bold{"group"}}{ Compute a single p-value per group. }
-  \item{\emph{data.frame}}{ Data to use for statistical annotations. I.e. from \link{stats.table}. }
-}}
+\item{p.min}{Minimum adjusted p-value to display on the plot with a bracket.
+Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
+If a numeric vector with more than one value is provided, they will be
+used as breaks for asterisk notation. (Default: \code{0.05})}
 
-\item{vline}{How to calculate min/max of the \bold{crossbar}, \bold{errorbar}, \bold{linerange},
-and \bold{pointrange} layers. Options are \bold{ci} (confidence interval), \bold{sd} 
-(standard deviation), \bold{se} (standard error), and \bold{mad} (median absolute 
-deviation). You may optionally append a number to \bold{ci} to specify the confidence
-level, for instance \code{vline = "ci95"} (the default), will calculate the 95%
-confidence interval, whereas \code{vline = "ci99"} will give the 99% confidence
-interval.}
+\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
+Run \code{p.adjust.methods} for a list of available options.
+(Default: \code{fdr})}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis. \bold{'auto'} (the default), 
-automatically selects a rotation value. \bold{0}, \bold{30}, and \bold{90} sets the 
-angle to horizontal, angled, and vertical, respectively.}
+\item{vline}{How to calculate min/max of the \bold{crossbar}, 
+\bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers. 
+Options are \bold{range}, \bold{ci} (confidence interval), \bold{sd}
+(standard deviation), \bold{se} (standard error), and \bold{mad}
+(median absolute deviation). You may optionally append a number to 
+\bold{ci} to specify the confidence level, for instance 
+\code{vline = "ci95"} will calculate the 95% confidence interval, 
+whereas \code{vline = "ci99"} will give the 99% confidence interval.
+The center mark of \code{crossbar} and \code{pointrange} represents
+the mean, except when \code{vline="mad"} in which case it represents
+the median.
+Default: \code{ci95}}
 
-\item{...}{Parameters passed on to ggplot2 functions. Prefixing a parameter name with \bold{b.}, 
-\bold{v.}, \bold{d.}, or \bold{s.} forces that parameter to be passed to, and only to,
-\bold{geom_boxplot}, \bold{geom_violin}, \bold{geom_dotplot}, or \bold{geom_jitter},
-respectively. Otherwise, parameters are passed along by matching against formal arguments.}
+\item{xlab.angle}{How to rotate the tick labels on the x-axis. 
+\bold{'auto'} (the default), automatically selects a rotation value. 
+\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
+angled, and vertical, respectively.}
+
+\item{...}{Parameters passed on to ggplot2 functions. Prefixing a 
+parameter name with \bold{b.}, \bold{v.}, \bold{d.}, or \bold{s.} 
+forces that parameter to be passed to, and only to, 
+\bold{geom_boxplot}, \bold{geom_violin}, \bold{geom_dotplot}, or 
+\bold{geom_jitter}, respectively. Otherwise, parameters are passed 
+along by matching against formal arguments.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics will be attached as
-        \code{attr(p, 'data')} and \code{attr(p, 'stats')}, respectively.
+A \code{ggplot2} plot. The computed data points and statistics will 
+        be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
+        respectively.
+        
+Shapes can also be given as their string values, defined in pch_table here:
+https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
+some shapes have a colored outline given by `color`, some are filled with 
+`color`, and some are outlined in `color` and filled with `fill`. See
+https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
 }
 \description{
 Visualize diversity or abundance as a boxplot, dotplot, etc.

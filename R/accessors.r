@@ -113,6 +113,75 @@ counts <- function (biom) {
 }
 
 
+#' Checks if a BIOM object is rarefied.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return \code{TRUE} if the BIOM object is rarefied, \code{FALSE} otherwise.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     is.rarefied(biom)
+#'
+
+is.rarefied <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In is.rarefied(), biom must be a BIOM-class object.'))
+  return (length(unique(sample.sums(biom))) == 1)
+}
+
+
+#' The rarefaction depth of a BIOM object.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return The rarefaction depth. If the BIOM object is not rarefied, this will be 
+#'         a sorted vector of all the unique depths.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     depth(biom) %>% head()
+#'     
+#'     rarefy(biom) %>% depth()
+#'
+
+depth <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In depth(), biom must be a BIOM-class object.'))
+  return (sort(unique(sample.sums(biom))))
+}
+
+
+#' Checks if a phylogenetic tree is present.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return \code{TRUE} if a phylogenetic tree is present, \code{FALSE} otherwise.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     has.phylogeny(biom)
+#'
+
+has.phylogeny <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In has.phylogeny(), biom must be a BIOM-class object.'))
+  return (is(biom[['phylogeny']], 'phylo'))
+}
+
+
 #' Get the phylogenetic tree.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
@@ -163,6 +232,28 @@ metadata <- function (biom, field=NULL) {
     stop(paste0("Field '", field, "' is not present in the metadata."))
   
   return (setNames(biom[['metadata']][[field]], rownames(biom[['metadata']])))
+}
+
+
+#' Checks if a DNA sequences are present.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return \code{TRUE} if DNA sequences are present, \code{FALSE} otherwise.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     has.sequences(biom)
+#'
+
+has.sequences <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In has.sequences(), biom must be a BIOM-class object.'))
+  return (!is.null(biom[['sequences']]))
 }
 
 

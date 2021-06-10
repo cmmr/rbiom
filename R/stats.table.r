@@ -93,7 +93,7 @@
 #'     #  ('Male', 'Female', 'Female vs Male').
 #'     stats.table(biom, x = "Sex", y = "unifrac", by = "Body Site")
 #'
-stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, weighted = TRUE, digits = 3, y.pos = NULL) {
+stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, weighted = TRUE, digits = 3, y.pos = NULL, y.pos.facet="Metric") {
   
   #--------------------------------------------------------------
   # Sanity checks
@@ -160,7 +160,7 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
       #--------------------------------------------------------------
       # wilcox-style stats
       #--------------------------------------------------------------
-      groups <- as.character(unique(z[[x]]))
+      groups <- if (is.factor(z[[x]])) levels(z[[x]]) else sort(unique(z[[x]]))
       
       if (length(groups) < 2) {
         
@@ -231,7 +231,7 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
     
     
     if (isTRUE(any(y.pos %in% c("max", "box", "violin")))) {
-      if (y.pos == "max")    result[['y.pos']] <- max(z[[y]])
+      if (y.pos == "max")    result[['y.pos']] <- max(z[[y]][is.finite(z[[y]])])
       if (y.pos == "box")    result[['y.pos']] <- IQR(z[[y]]) * 1.5
       if (y.pos == "violin") result[['y.pos']] <- max(density(z[[y]])[['x']])
     }
@@ -246,8 +246,9 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   
   results[['adj.p']] <- p.adjust(results[['p.val']], method = adj)
   
-  # Order by p-value, most to least significant
-  results <- results[order(results[['p.val']]),,drop=F]
+  # Order by p-value, most to least significant (unless plotting)
+  if (is.null(y.pos))
+    results <- results[order(results[['p.val']]),,drop=F]
   
   # Round the p.val and adj.p numbers
   if (!is.null(digits)) {
@@ -257,7 +258,22 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   
   # Make y.pos the last column
   if (!is.null(y.pos) && "y.pos" %in% names(results)) {
-    results[['y.pos']] <- signif(results[['y.pos']], digits = 2)
+    
+    y.pos.facet <- intersect(y.pos.facet, by)
+    
+    if (is.null(y.pos.facet)) {
+      
+      results[['y.pos']] <- signif(max(results[['y.pos']]), digits = 2)
+      
+    } else {
+      plyby <- NULL
+      for (i in rev(y.pos.facet)) plyby <- c(plyr::as.quoted(as.name(i)), plyby)
+      results <- plyr::ddply(results, plyby, function (z) {
+        z[['y.pos']] <- signif(max(z[['y.pos']]), digits = 2)
+        return (z)
+      })
+    }
+    
     results <- results[,order(names(results) == "y.pos"),drop=F]
   }
   
