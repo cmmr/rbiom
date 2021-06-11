@@ -26,7 +26,6 @@ LinkingTo:
 Imports:
     ape,
     ggbeeswarm,
-    ggpattern,
     ggplot2,
     glue,
     jsonlite,
