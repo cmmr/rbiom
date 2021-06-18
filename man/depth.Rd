@@ -28,6 +28,8 @@ The rarefaction depth of a BIOM object.
 
 }
 \seealso{
+[sample.sums()]
+
 Other accessor functions: 
 \code{\link{counts}()},
 \code{\link{has.phylogeny}()},

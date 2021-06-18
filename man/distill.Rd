@@ -4,7 +4,7 @@
 \alias{distill}
 \title{Convert to a data.frame with metadata and diversity/abundance values.}
 \usage{
-distill(biom, metric, weighted = TRUE, long = TRUE, md = TRUE)
+distill(biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE)
 }
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read.biom}.}
@@ -34,12 +34,15 @@ distill(biom, metric, weighted = TRUE, long = TRUE, md = TRUE)
 \item{weighted}{When \bold{metric} is a beta diversity metric, should it be run in in weighted
 mode? (Default: TRUE)}
 
+\item{rarefy}{When \bold{metric} is an alpha diversity metric, what 'rarefy' parameter should be 
+given to \code{alpha.div()}? (Default: FALSE)}
+
 \item{long}{Pivot the returned data to long format?
 \describe{
   \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
-  \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
-                  returned. Rows are added to attain all combinations of 
-                  samples x metrics. }
+  \item{\bold{TRUE}}{  "Sample", "Metric" and "Diversity" are the columns 
+                       returned. Rows are added to attain all combinations of 
+                       samples x metrics. }
 }}
 
 \item{md}{Include metadata in the output data frame? Options are: 
@@ -60,7 +63,7 @@ A \code{data.frame} object. The first column will be named \bold{Sample},
 Convert to a data.frame with metadata and diversity/abundance values.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
     biom <- read.biom(infile)

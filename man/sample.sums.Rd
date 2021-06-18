@@ -4,7 +4,7 @@
 \alias{sample.sums}
 \title{Sum the observations in each sample.}
 \usage{
-sample.sums(biom)
+sample.sums(biom, long = FALSE, md = FALSE)
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}

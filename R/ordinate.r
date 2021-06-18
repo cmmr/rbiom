@@ -52,18 +52,20 @@
 
 ordinate <- function (biom, ord, method, weighted=TRUE, tree=NULL, md=FALSE, k=2, ...) {
   
-  dm <- beta.div(biom = biom, method = method, weighted = weighted, tree = tree)
+  ord    <- validate_metrics(biom, ord,    mode = "ord")
+  method <- validate_metrics(biom, method, mode = "bdiv")
+  dm     <- beta.div(biom = biom, method = method, weighted = weighted, tree = tree)
   
-  if (ord == "pcoa") {
+  if (ord == "PCoA") {
     res <- ape::pcoa(dm, ...)
     ord <- res$vectors[,1:k]
     attr(ord, 'eig') <- res$values$Relative_eig[1:k]
     
-  } else if (ord == "tsne") {
+  } else if (ord == "tSNE") {
     ord <- suppressMessages(tsne::tsne(dm, k=k, ...))
     rownames(ord) <- attr(dm, "Labels")
     
-  } else if (ord == "nmds") {
+  } else if (ord == "NMDS") {
     res <- vegan::metaMDS(dm, k=k, trace=0, ...)
     ord <- res$points
     

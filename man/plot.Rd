@@ -20,6 +20,7 @@
   p.adj = "fdr",
   vline = "ci95",
   xlab.angle = "auto",
+  rline = NULL,
   ...
 )
 }
@@ -27,8 +28,8 @@
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
 \item{formula}{Definition of what to plot on the x- and y- axes, given as 
-\code{y ~ x}. For example, \bold{Shannon ~ `Body Site`}. X-axis 
-options are:
+\code{y ~ x}. For example, \bold{Shannon ~ `Body Site`}. 
+X-axis options are:
 \describe{
     \item{Metadata}{
       The name of a column from \code{metadata(biom)}.
@@ -41,8 +42,7 @@ Y-axis options are:
 \describe{
     \item{Alpha Diversity Metrics (one or more)}{
       \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
-      and/or \bold{InvSimpson}. Use \bold{Diversity} to get all five 
-      metrics.
+      and/or \bold{InvSimpson}.
     }
     \item{Beta Diversity Metrics (one only)}{
       \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
@@ -108,6 +108,9 @@ Default: \code{ci95}}
 \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 angled, and vertical, respectively.}
 
+\item{rline}{For plots with \code{Reads} as the \code{x} or \code{y} axis,
+highlight this rarefaction depth with a dashed line.}
+
 \item{...}{Parameters passed on to ggplot2 functions. Prefixing a 
 parameter name with \bold{b.}, \bold{v.}, \bold{d.}, or \bold{s.} 
 forces that parameter to be passed to, and only to, 
@@ -138,11 +141,22 @@ Visualize diversity or abundance as a boxplot, dotplot, etc.
     plot(biom, Shannon ~ `Body Site`)
     plot(biom, Shannon ~ Sex, layers="vb", color.by="Body Site")
     
-    plot(biom, Diversity ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
+    plot(biom, Simpson ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
     
+    # Dissimilarity boxplots
     #plot(biom, UniFrac ~ `==Body Site`)
     
+    # Ordination
     plot(biom, bray ~ nmds)
+    
+    # Abundance Heatmap
+    #plot(biom, Phylum ~ heatmap)
+    
+    # Dissimilarity Heatmap
+    #plot(biom, UniFrac ~ heatmap)
+    
+    # Taxa abundance boxplots
+    #plot(biom, Abundance ~ Phylum)
     
 
 }

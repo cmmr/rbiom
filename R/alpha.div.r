@@ -103,23 +103,50 @@ alpha.div <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE) 
     
     
     #--------------------------------------------------------------
-    # Only keep metrics of interest
+    # Convert 'all' to actual names of all adiv metrics
     #--------------------------------------------------------------
-    if (!identical(metrics, 'all'))
-      df <- df[,c('Sample', metrics),drop=F]
+    if ('all' %in%  metrics)
+      metrics <- colnames(df)[-1]
     
     
     #--------------------------------------------------------------
     # Pivot Longer
     #--------------------------------------------------------------
     if (isTRUE(long)) {
-      rownames(df) <- df[['Sample']]
-      df <- as.matrix(df[,-1,drop=F])
-      df <- data.frame(
-        Sample    = rownames(df)[row(df)],
-        Metric    = colnames(df)[col(df)],
-        Diversity = as.numeric(df)
-      )
+      
+      if (length(rLvls) > 1 && length(metrics) == 1) {
+        
+        df <- df[,unique(c('Sample', 'Depth', metrics)),drop=F]
+        
+      } else if (length(metrics) > 1) {
+      
+        mtx <- as.matrix(df[,metrics,drop=F])
+        df  <- data.frame(
+          stringsAsFactors = FALSE,
+          Sample    = df[['Sample']][row(mtx)],
+          Depth     = df[['Depth']][row(mtx)],
+          Metric    = colnames(mtx)[col(mtx)],
+          Diversity = as.numeric(mtx)
+        )
+        
+        if (length(rLvls) == 1)
+          df <- df[,-2,drop=F]
+        
+      } else {
+        
+        df <- df[,c('Sample', metrics),drop=F]
+      }
+      
+    } else {
+      
+      #--------------------------------------------------------------
+      # The metrics of interest in wide format
+      #--------------------------------------------------------------
+      if (length(rLvls) == 1) {
+        df <- df[,c('Sample', metrics),drop=F]
+      } else {
+        df <- df[,unique(c('Sample', 'Depth', metrics)),drop=F]
+      }
     }
     
     
@@ -132,11 +159,10 @@ alpha.div <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE) 
   #--------------------------------------------------------------
   # Add Metadata
   #--------------------------------------------------------------
-  if (!isFALSE(md)) {
-    md     <- unique(md)
-    md     <- metadata(biom)[,md,drop=F]
-    result <- merge(result, md, by.x = 'Sample', by.y = "row.names")
-  }
+  if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
+  if (identical(md, FALSE)) md <- c()
+  for (i in unique(md))
+    result[[i]] <- metadata(biom, i)[result[['Sample']]]
   
   
   
@@ -146,6 +172,9 @@ alpha.div <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE) 
   if (isTRUE(long))
     if (length(unique(result[['Metric']])) > 1)
       attr(result, 'facet') <- "Metric"
+  
+  if (length(metrics) == 1) { attr(result, 'response') <- metrics 
+  } else                    { attr(result, 'response') <- "Diversity" }
   
   return (result)
   

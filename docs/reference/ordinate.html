@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9023</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9024</span>
       </span>
     </div>
 
@@ -202,14 +202,8 @@ required for computing UniFrac distance matrices.</p></td>
     <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
     <span class='va'>biom</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
     <span class='va'>ord</span>    <span class='op'>&lt;-</span> <span class='fu'>ordinate</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"pcoa"</span>, <span class='st'>"bray-curtis"</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ord</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           Axis.1       Axis.2
-#&gt; HMP01 -0.3575401  0.002362419
-#&gt; HMP02 -0.4203019  0.010404374
-#&gt; HMP03 -0.3819160  0.013483401
-#&gt; HMP04 -0.3876548  0.004854090
-#&gt; HMP05 -0.4154969 -0.011498409
-#&gt; HMP06 -0.4135847 -0.007029588</div><div class='input'>    
+</div><div class='output co'>#&gt; <span class='error'>Error in validate_metrics(biom, ord, mode = "bdiv"): Invalid or ambiguous metric(s): PCoA</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ord</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in head(ord): object 'ord' not found</span></div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

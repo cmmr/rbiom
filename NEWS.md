@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9023
+# rbiom 1.0.2.9024
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.

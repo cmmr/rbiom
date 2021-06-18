@@ -4,9 +4,9 @@
 #'     object, as returned from \link{read.biom}. For matrices, the rows and 
 #'     columns are assumed to be the taxa and samples, respectively.
 #' @param method  The distance algorithm to use. Options are:
-#'     \bold{\dQuote{manhattan}}, \bold{\dQuote{euclidean}}, 
-#'     \bold{\dQuote{bray-curtis}}, \bold{\dQuote{jaccard}}, and
-#'     \bold{\dQuote{unifrac}}. Non-ambiguous abbreviations of the method 
+#'     \bold{manhattan}, \bold{euclidean}, 
+#'     \bold{bray-curtis}, \bold{jaccard}, and
+#'     \bold{unifrac}. Non-ambiguous abbreviations of the method 
 #'     names are also accepted. A phylogenetic tree must be present in 
 #'     \code{biom} or explicitly provided via \code{tree=} to use the UniFrac methods.
 #' @param weighted  Take relative abundances into account. When 

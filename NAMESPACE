@@ -40,11 +40,12 @@ export(write.xlsx)
 
 importClassesFrom("slam")
 
+import("ggplot2")
 import("RcppParallel")
-importFrom("Rcpp", "sourceCpp")
-importFrom("ggplot2", "ggplot", "aes", "aes_string", "geom_boxplot", "geom_violin", "geom_dotplot", "geom_jitter", "geom_point", "scale_color_discrete", "position_dodge", "position_jitterdodge")
+importFrom("glue", "backtick")
 importFrom("magrittr","%>%")
 importFrom("methods", "is", "as")
+importFrom("Rcpp", "sourceCpp")
 importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate", "model.frame", "model.matrix", "terms", "reformulate")
 importFrom("utils", "download.file", "head", "write.table", "read.csv", "read.delim", "packageDescription")
 

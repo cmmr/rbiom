@@ -40,10 +40,36 @@ sample.names <- function (biom) {
 #'     hist(sample.sums(biom))
 #'
 
-sample.sums <- function (biom) {
+sample.sums <- function (biom, long=FALSE, md=FALSE) {
+  
   if (!is(biom, 'BIOM'))
     stop (simpleError('In sample.names(), biom must be a BIOM-class object.'))
-  return (slam::col_sums(biom[['counts']]))
+  
+  result <- slam::col_sums(biom[['counts']])
+  
+  if (isTRUE(long) || !isFALSE(md)) {
+    
+    #--------------------------------------------------------------
+    # Convert to long format
+    #--------------------------------------------------------------
+    result <- data.frame(
+      stringsAsFactors = FALSE,
+      'Sample' = names(result),
+      'Reads'  = unname(result)
+      )
+    
+    #--------------------------------------------------------------
+    # Add Metadata
+    #--------------------------------------------------------------
+    if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
+    if (identical(md, FALSE)) md <- c()
+    for (i in unique(md))
+      result[[i]] <- metadata(biom, i)[result[['Sample']]]
+    
+  }
+  
+  return (result)
+  
 }
 
 
@@ -141,6 +167,7 @@ is.rarefied <- function (biom) {
 #' @return The rarefaction depth. If the BIOM object is not rarefied, this will be 
 #'         a sorted vector of all the unique depths.
 #' @family accessor functions
+#' @seealso [sample.sums()]
 #' @export
 #' @examples
 #'     library(rbiom)

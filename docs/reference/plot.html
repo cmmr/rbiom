@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9023</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9024</span>
       </span>
     </div>
 
@@ -136,6 +136,7 @@
   p.adj <span class='op'>=</span> <span class='st'>"fdr"</span>,
   vline <span class='op'>=</span> <span class='st'>"ci95"</span>,
   xlab.angle <span class='op'>=</span> <span class='st'>"auto"</span>,
+  rline <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -149,15 +150,14 @@
     <tr>
       <th>formula</th>
       <td><p>Definition of what to plot on the x- and y- axes, given as 
-<code>y ~ x</code>. For example, <b>Shannon ~ `Body Site`</b>. X-axis 
-options are:</p><dl>
+<code>y ~ x</code>. For example, <b>Shannon ~ `Body Site`</b>. 
+X-axis options are:</p><dl>
     <dt>Metadata</dt><dd><p>The name of a column from <code><a href='metadata.html'>metadata(biom)</a></code>.</p></dd>
     <dt>Ordination Method</dt><dd><p><b>PCoA</b>, <b>tSNE</b>, or <b>NMDS</b>.</p></dd>
 
 </dl><p>Y-axis options are:</p><dl>
     <dt>Alpha Diversity Metrics (one or more)</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, 
-      and/or <b>InvSimpson</b>. Use <b>Diversity</b> to get all five 
-      metrics.</p></dd>
+      and/or <b>InvSimpson</b>.</p></dd>
     <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, 
       <b>jaccard</b>, or <b>unifrac</b>. <b>Distance</b> will use 
       <b>unifrac</b> if a phylogenetic tree is present, or 
@@ -234,6 +234,11 @@ Default: <code>ci95</code></p></td>
 angled, and vertical, respectively.</p></td>
     </tr>
     <tr>
+      <th>rline</th>
+      <td><p>For plots with <code>Reads</code> as the <code>x</code> or <code>y</code> axis,
+highlight this rarefaction depth with a dashed line.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>Parameters passed on to ggplot2 functions. Prefixing a 
 parameter name with <b>b.</b>, <b>v.</b>, <b>d.</b>, or <b>s.</b> 
@@ -267,12 +272,23 @@ https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.</p>
     <span class='fu'>plot</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>Shannon</span> <span class='op'>~</span> <span class='va'>`Body Site`</span><span class='op'>)</span>
 </div><div class='img'><img src='plot-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>Shannon</span> <span class='op'>~</span> <span class='va'>Sex</span>, layers<span class='op'>=</span><span class='st'>"vb"</span>, color.by<span class='op'>=</span><span class='st'>"Body Site"</span><span class='op'>)</span>
 </div><div class='img'><img src='plot-2.png' alt='' width='700' height='433' /></div><div class='input'>    
-    <span class='fu'>plot</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>Diversity</span> <span class='op'>~</span> <span class='va'>`Body Site`</span>, layers<span class='op'>=</span><span class='st'>"p"</span>, color.by<span class='op'>=</span><span class='st'>"Sex"</span>, xlab.angle<span class='op'>=</span><span class='fl'>30</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 2 rows containing missing values (geom_pointrange).</span></div><div class='img'><img src='plot-3.png' alt='' width='700' height='433' /></div><div class='input'>    
+    <span class='fu'>plot</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>Simpson</span> <span class='op'>~</span> <span class='va'>`Body Site`</span>, layers<span class='op'>=</span><span class='st'>"p"</span>, color.by<span class='op'>=</span><span class='st'>"Sex"</span>, xlab.angle<span class='op'>=</span><span class='fl'>30</span><span class='op'>)</span>
+</div><div class='img'><img src='plot-3.png' alt='' width='700' height='433' /></div><div class='input'>    
+    <span class='co'># Dissimilarity boxplots</span>
     <span class='co'>#plot(biom, UniFrac ~ `==Body Site`)</span>
     
+    <span class='co'># Ordination</span>
     <span class='fu'>plot</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>bray</span> <span class='op'>~</span> <span class='va'>nmds</span><span class='op'>)</span>
 </div><div class='img'><img src='plot-4.png' alt='' width='700' height='433' /></div><div class='input'>    
+    <span class='co'># Abundance Heatmap</span>
+    <span class='co'>#plot(biom, Phylum ~ heatmap)</span>
+    
+    <span class='co'># Dissimilarity Heatmap</span>
+    <span class='co'>#plot(biom, UniFrac ~ heatmap)</span>
+    
+    <span class='co'># Taxa abundance boxplots</span>
+    <span class='co'>#plot(biom, Abundance ~ Phylum)</span>
+    
 
 </div></pre>
   </div>
