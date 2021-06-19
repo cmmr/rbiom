@@ -1,6 +1,14 @@
-plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, shapes = NULL, rline = NULL, ...) {
+plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, shapes = NULL, rline = NULL, ...) {
   
   dots <- list(...)
+  
+  
+  #===============================================
+  # Validate metadata fields
+  #===============================================
+  if (!is.null(color.by)) color.by <- validate_metrics(biom, color.by, mode="meta")
+  if (!is.null(shape.by)) shape.by <- validate_metrics(biom, shape.by, mode="meta")
+  if (!is.null(facet.by)) facet.by <- validate_metrics(biom, facet.by, mode="meta")
   
   
   #===============================================
@@ -10,11 +18,22 @@ plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by
   elements <- list('theme_bw' = list())
   
   
-  
-  
   #===============================================
   # Log scale labels
   #===============================================
+  siunit <- function (x) {
+    sapply(as.numeric(x), function (n) {
+      if (is.na(n))       return ("")
+      if (abs(n) < 10^3 ) return (as.character(n))
+      if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
+      if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
+      if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
+      if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
+      if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
+      if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
+      return (as.character(scientific(n)))
+    })
+  }
   loglabels <- function (values) {
     force(values)
     limits <- 10 ** c(0, ceiling(log10(max(values))))
@@ -24,28 +43,17 @@ plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by
       'breaks' = breaks, 
       'labels' = function (x) {
         x[which(1:length(x) %% 10 != 0)] <- NA
-        sapply(as.numeric(x), function (n) {
-          if (is.na(n))       return ("")
-          if (abs(n) < 10^3 ) return (as.character(n))
-          if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
-          if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
-          if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
-          if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
-          if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
-          if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
-          return (as.character(scientific(n)))
-      })
+        siunit(x)
     })
-    
   }
   
   
-  #===============================================
-  # Reads Retained: Sample (x) vs Depth (y)
-  #===============================================
   
-  if (isTRUE(tolower(y) == "rarefied" && tolower(x) == "reads")) {
-    
+  if (identical(tolower(x), "reads")) {
+  
+    #===============================================
+    # Reads Retained: Sample (x) vs Depth (y)
+    #===============================================
     
     ss <- sort(sample.sums(biom))
     df <- data.frame(
@@ -106,13 +114,11 @@ plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by
     }
     
     
-  }
-  
-  #===============================================
-  # Samples Retained: Depth (x) vs Rank (y)
-  #===============================================
-  
-  if (isTRUE(tolower(y) == "rarefied" && tolower(x) == "samples")) {
+  } else if (identical(tolower(x), "samples")) {
+    
+    #===============================================
+    # Samples Retained: Depth (x) vs Rank (y)
+    #===============================================
     
     ss <- sort(sample.sums(biom))
     df <- data.frame(
@@ -189,7 +195,38 @@ plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by
       remove("nTotal", "nKept", "nPct")
     }
     
+  } else {
+    
+    adiv_metric <- try(validate_metrics(biom, x, mode="adiv"), silent = TRUE)
+    
+    if (is.character(adiv_metric)) {
+  
+      #===============================================
+      # Rarefaction Curve
+      #===============================================
+      
+      df <- alpha.div(biom, rarefy = "multi", metrics = adiv_metric, long = TRUE )
+      colnames(df) <- c(".sample", ".depth", ".diversity")
+      
+      aes_args                         <- list('x' = ".depth", 'y' = ".diversity")
+      elements[['labs']]               <- list('x' = "Rarefaction Depth", 'y' = adiv_metric)
+      elements[['stat_smooth']]        <- list('method' = "lm", 'formula' = "y ~ log(x)")
+      elements[['scale_x_continuous']] <- list('labels' = siunit)
+      
+      if (!is.null(color.by)) {
+        df[[color.by]] <- metadata(biom, color.by)[df[['.sample']]]
+        aes_args[['fill']]  <- backtick(color.by)
+        aes_args[['color']] <- backtick(color.by)
+      }
+      
+      if (!is.null(rline))
+        elements[['geom_vline']] = list('xintercept' = rline, 'linetype' = "dotted")
+      
+    } else {
+      stop("Don't know how to plot Rarefied ~ ", backtick(x), ".")
+    }
   }
+  
   
   
   #===============================================
@@ -224,6 +261,15 @@ plot_rarefied <- function(biom, x, y, color.by = NULL, shape.by = NULL, facet.by
     elements[['theme']] <- elements[['theme']][!del]
     remove("del")
   }
+  
+  
+  #===============================================
+  # Add in additional dots arguments
+  #===============================================
+  for (fn in names(elements))
+    for (i in intersect(names(dots), formalArgs(fn)))
+      if (!i %in% c('y', 'formula'))
+        elements[[fn]][[i]] <- dots[[i]]
   
   
   #===============================================

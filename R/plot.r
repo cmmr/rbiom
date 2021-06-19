@@ -218,17 +218,17 @@ plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by =
   fn <-  if (mode == "Rarefied ~ Reads")   { plot_rarefied
   } else if (mode == "Rarefied ~ Samples") { plot_rarefied
   } else if (mode == "Rarefied ~ adiv")    { plot_rarefied
-  } else if (mode == "adiv ~ factor")      { plot_factor
+  } else if (mode == "adiv ~ factor")      { plot_factor     ##
   } else if (mode == "adiv ~ numeric")     { plot_numeric
-  } else if (mode == "adiv ~ .")           { plot_factor
+  } else if (mode == "adiv ~ .")           { plot_factor     ##
   } else if (mode == "bdiv ~ ord")         { plot_ordination
-  } else if (mode == "bdiv ~ factor")      { plot_factor
+  } else if (mode == "bdiv ~ factor")      { plot_factor     ##
   } else if (mode == "bdiv ~ Samples")     { plot_heatmap
-  } else if (mode == "PctReads ~ rank")    { plot_factor
+  } else if (mode == "PctReads ~ rank")    { plot_factor     ##
   } else if (mode == "PctReads ~ Samples") { plot_stacked
   } else if (mode == "rank ~ Samples")     { plot_heatmap
   } else if (mode == "rank ~ factor")      { plot_heatmap
-  } else if (mode == "taxon ~ factor")     { plot_factor
+  } else if (mode == "taxon ~ factor")     { plot_factor     ##
   } else if (mode == "taxon ~ numeric")    { plot_numeric
   } else { stop("Invalid formula of form '", mode, "'") }
   

@@ -33,7 +33,7 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   #--------------------------------------------------------------
   # Convert biom object to a data.frame
   #--------------------------------------------------------------
-  df <- distill(biom = biom, metric = y, md = unique(c(x, groupvars)))
+  df <- distill(biom = biom, metric = y, md = unique(c(x, groupvars)), safe=TRUE)
   y  <- attr(df, 'response')
   
   
@@ -50,11 +50,67 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   #--------------------------------------------------------------
   # Example `layers` argument: "box", c("BOX", "dot"), "V", "vbs"
   #--------------------------------------------------------------
+  layers <- tolower(layers)
   layerlist <- c(
-    "violin", "box", "dot", "strip", 
+    "violin", "box", "dot", "strip", "bar",
     "crossbar", "errorbar", "linerange", "pointrange" )
-  if (length(layers) == 1) layers <- strsplit(layers, "")[[1]]
-  layers <- layerlist[pmatch(tolower(layers), layerlist)]
+  if (length(layers) == 1 && !layers %in% layerlist)
+    layers <- strsplit(layers, "")[[1]]
+  layers <- layerlist[pmatch(layers, layerlist)]
+  if (!isTRUE(length(layers) > 0)) layers <- "box"
+  
+  
+  #--------------------------------------------------------------
+  # Mappings to/from short, full, and regex forms.
+  #--------------------------------------------------------------
+  full2short <- c("facet_grid" = "facet", "facet_wrap" = "facet")
+  
+  short2full <- c(
+    "bar"        = "geom_col",      "linerange"  = "geom_linerange",
+    "violin"     = "geom_violin",   "pointrange" = "geom_pointrange",
+    "strip"      = "geom_jitter",   "fill"       = "scale_fill_manual",
+    "box"        = "geom_boxplot",  "color"      = "scale_color_manual",
+    "dot"        = "geom_beeswarm", "shape"      = "scale_shape_manual",
+    "errorbar"   = "geom_errorbar", "pattern"    = "scale_pattern_type_manual",
+    "crossbar"   = "geom_crossbar", "theme"      = "theme" )
+  
+  short2regx <- c(
+    "violin" = "^v(|iolin)\\.", "crossbar"   = "^c(|rossbar)\\.", 
+    "box"    = "^b(|ox)\\.",    "errorbar"   = "^e(|rrorbar)\\.",
+    "dot"    = "^d(|ot)\\.",    "linerange"  = "^l(|inerange)\\.",
+    "strip"  = "^s(|trip)\\.",  "pointrange" = "^p(|ointrange)\\.",
+    "theme"  = "^t(|heme)\\.",  "facet"      = "^f(|acet)\\.",
+    "bar"    = "^(|ba)r\\." )
+  
+  
+  #--------------------------------------------------------------
+  # Arguments that can be passed to a given function.
+  #--------------------------------------------------------------
+  short2args <- function (short) {
+    full <- short2full[[short]]
+    x    <- list('ggplot2', full)
+    if (short == "dot")     x <- list("ggbeeswarm", full)
+    if (short == "pattern") x <- list("ggpattern",  full)
+    return(formalArgs(do.call(`::`, x)))
+  }
+  
+  
+  #--------------------------------------------------------------
+  # Return a ggpattern function only when necessary
+  #--------------------------------------------------------------
+  short2func <- function (short) {
+    full <- short2full[[short]]
+    x    <- list('ggplot2', full)
+    if (short == "dot")     x <- list("ggbeeswarm", full)
+    if (short == "pattern") x <- list("ggpattern",  full)
+    if (!is.null(pattern.by)) {
+      if (short %in% c("bar", "box", "crossbar", "violin"))
+        x <- list('ggpattern', paste0(full, "_pattern"))
+      if (short %in% c("fill", "color", "shape"))
+        x <- list('ggpattern', paste0("scale_pattern_", short, "_manual"))
+    }
+    return(do.call(`::`, x))
+  }
   
   
   #--------------------------------------------------------------
@@ -63,39 +119,19 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   #  2. `plot` arguments matching formalArgs: plot(`fill`="red")
   #  3. `withdots` arguments: withdots("box", `fill`="red")
   #--------------------------------------------------------------
-  full2short <- c("facet_grid" = "facet", "facet_wrap" = "facet")
-  
-  short2full <- c("violin" = "geom_violin",   "crossbar"   = "geom_crossbar", 
-                  "box"    = "geom_boxplot",  "errorbar"   = "geom_errorbar",
-                  "dot"    = "geom_dotplot",  "linerange"  = "geom_linerange",
-                  "strip"  = "geom_jitter",   "pointrange" = "geom_pointrange")
-  
-  short2regx <- c("violin" = "^v(|iolin)\\.", "crossbar"   = "^c(|rossbar)\\.", 
-                  "box"    = "^b(|ox)\\.",    "errorbar"   = "^e(|rrorbar)\\.",
-                  "dot"    = "^d(|ot)\\.",    "linerange"  = "^l(|inerange)\\.",
-                  "strip"  = "^s(|trip)\\.",  "pointrange" = "^p(|ointrange)\\.",
-                  "theme"  = "^t(|heme)\\.",  "facet"      = "^f(|acet)\\.")
-  
   alldots <- function (fn, ...) {
     
     defaults <- list(...)
     
     full  <- ifelse(fn %in% names(short2full), short2full[[fn]], fn)
     short <- ifelse(fn %in% names(full2short), full2short[[fn]], fn)
-    
-    if (!is.null(defaults[['pattern']])) {
-      func <- do.call(`::`, list("ggpattern", paste0(full, "_pattern")))
-    } else if (full == "geom_dotplot") {
-      func <- ggbeeswarm::geom_beeswarm
-    } else {
-      func <- do.call(`::`, list("ggplot2", full))
-    }
+    func  <- short2func(short)
     
     regx                 <- short2regx[[short]]
     specific_dots        <- dots[grep(regx, names(dots))]
     names(specific_dots) <- sub(regx, "", names(specific_dots), perl = TRUE)
     
-    generic_dots <- dots[intersect(names(dots), formalArgs(func))]
+    generic_dots <- dots[intersect(names(dots), short2args(short))]
     generic_dots <- generic_dots[setdiff(names(generic_dots), names(specific_dots))]
     args         <- c(generic_dots, specific_dots)
     args         <- c(args, defaults[setdiff(names(defaults), names(args))])
@@ -120,12 +156,6 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   if ("violin" %in% layers)        {      b_args[['fill']]    <- "white"
   } else if (!is.null(pattern.by)) {      b_args[['pattern']] <- "magick"  }
   if (any(c("dot", "strip") %in% layers)) b_args[['outlier.shape']] <- NA
-  
-  # Dotplot arguments for ggplot2::geom_dotplot
-  # d_args <- list(fn = "dot", position = dodge, binaxis = "y", stackdir = "center")
-  # d_args[['binwidth']] <- diff(range(df[[y]])) / 30
-  # if (any(c("violin", "box") %in% layers))
-  #   d_args <- c(d_args, color = "black", fill = "black", dotsize = 0.7)
   
   # Dotplot arguments for ggbeeswarm::geom_beeswarm
   d_args <- list(fn = "dot", dodge.width = 0.8)
@@ -249,14 +279,8 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   #--------------------------------------------------------------
   if (!is.null(color.by)) {
     colors <- assign_colors(colors, df[[color.by]])
-    
-    if (is.null(pattern.by)) {
-      p <- p + ggplot2::scale_fill_manual(values = colors)
-      p <- p + ggplot2::scale_color_manual(values = colors)
-    } else {
-      p <- p + ggpattern::scale_pattern_fill_manual(values = colors)
-      p <- p + ggpattern::scale_pattern_color_manual(values = colors)
-    }
+    p <- p + short2func("fill")(values = colors)
+    p <- p + short2func("color")(values = colors)
   }
   
   if (!is.null(pattern.by)) {
@@ -266,12 +290,7 @@ plot_factor <- function (biom, x, y, layers = "box", color.by = NULL, pattern.by
   
   if (!is.null(shape.by)) {
     shapes <- assign_shapes(shapes, df[[shape.by]])
-    
-    if (is.null(pattern.by)) {
-      p <- p + ggplot2::scale_shape_manual(values = shapes)
-    } else {
-      p <- p + ggpattern::scale_pattern_shape_manual(values = shapes)
-    }
+    p <- p + short2func("shape")(values = shapes)
   }
   
   
