@@ -95,6 +95,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
     attr(df, 'response') <- ifelse(isTRUE(safe), ".abundance", "Abundance")
     
   } else if (mode == "bdiv") {
+    if (is.character(md)) md <- paste0(attr(md, 'op'), md)
     df <- beta.div(biom, method = vals, weighted = weighted, long = long, md = md, safe = safe)
     
     if (isFALSE(long) && isFALSE(md))

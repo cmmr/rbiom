@@ -173,22 +173,25 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
     if (isTRUE(md))        md <- names(metadata(biom))
     if (!is.character(md)) md <- names(metadata(biom))[md]
     
-    for (i in unique(md)) {
+    for (i in which(!duplicated(md))) {
+      
+      col <- md[[i]]
+      op  <- attr(md, 'op')[[i]]
       
       # Convert '==' or '!=' prefix to an attribute
       #--------------------------------------------------------------
-      if (isTRUE(substr(i, 1, 2) %in% c("==", "!="))) {
-        op <- substr(i, 1, 2)
-        i  <- substr(i, 3, nchar(i))
-        attr(i, 'op') <- op
+      if (isTRUE(substr(col, 1, 2) %in% c("==", "!="))) {
+        op  <- substr(col, 1, 2)
+        col <- substr(col, 3, nchar(col))
+        attr(col, 'op') <- op
       }
       
-      map <- metadata(biom, i)
+      map <- metadata(biom, col)
       
       # Limit to only within or between comparisons.
       #--------------------------------------------------------------
-      if (!is.null(attr(i, 'op'))) {
-        op <- attr(i, 'op')
+      if (!is.null(attr(col, 'op'))) {
+        op <- attr(col, 'op')
         df <- df[get(op)(map[df$.sample1], map[df$.sample2]),,drop=F]
       }
       
@@ -198,7 +201,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
       
       # Change "Male vs Female" to "Female vs Male" (alphabetical).
       #--------------------------------------------------------------
-      df[[i]] <- paste(
+      df[[col]] <- paste(
         ifelse(v1 < v2, v1, v2), 
         "vs", 
         ifelse(v1 < v2, v2, v1) )
@@ -206,7 +209,13 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
       
       # Change "Male vs Male" to "Male".
       #--------------------------------------------------------------
-      df[[i]] <- ifelse(v1 == v2, v1, df[[i]])
+      df[[col]] <- ifelse(v1 == v2, v1, df[[col]])
+      
+      
+      # Keep factors as factors when possible
+      #--------------------------------------------------------------
+      if (identical(op, "==") && is.factor(map))
+        df[[col]] <- factor(df[[col]], levels = levels(map))
       
     }
   }
