@@ -63,7 +63,7 @@ ordinate <- function (biom, ord, method, weighted=TRUE, tree=NULL, md=FALSE, k=2
     
   } else if (ord == "tSNE") {
     ord <- suppressMessages(tsne::tsne(dm, k=k, ...))
-    rownames(ord) <- attr(dm, "Labels")
+    rownames(ord) <- attr(dm, "Labels", exact = TRUE)
     
   } else if (ord == "NMDS") {
     res <- vegan::metaMDS(dm, k=k, trace=0, ...)

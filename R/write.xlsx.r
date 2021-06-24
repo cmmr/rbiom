@@ -111,7 +111,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     #--------------------------------------------------------
     
     if ('Reads Per Step' %in% names(attributes(biom))) {
-      rps <- attr(biom, 'Reads Per Step')
+      rps <- attr(biom, 'Reads Per Step', exact = TRUE)
     } else {
       rps <- data.frame(Mapped=slam::col_sums(biom$counts))
     }
@@ -134,7 +134,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     for (key in names(attributes(biom))) {
       if (key %in% c("names", "class", "Reads Per Step"))   next
       
-      val <- attr(biom, key)
+      val <- attr(biom, key, exact = TRUE)
       
       if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
       if (identical(class(val), "matrix")) val <- data.frame(val)
@@ -232,7 +232,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     for (key in names(attributes(biom))) {
       if (key %in% c("names", "class")) next
       
-      val <- attr(biom, key)
+      val <- attr(biom, key, exact = TRUE)
       
       if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
       if (identical(class(val), "matrix")) val <- data.frame(val)

@@ -63,9 +63,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
   #--------------------------------------------------------------
-  
-  methodList <- c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac")
-  method <- methodList[pmatch(tolower(method), methodList)]
+  method <- validate_metrics(biom, method, mode="bdiv")
   
   
   #--------------------------------------------------------------
@@ -93,7 +91,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   # Find the UniFrac tree
   #--------------------------------------------------------------
   
-  if (identical(method, "unifrac")) {
+  if (method == "UniFrac") {
     if (!is(tree, "phylo")) {
       if (is(biom, "BIOM")) {
         if (is(biom$phylogeny, "phylo")) {
@@ -134,7 +132,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   # Run C++ implemented dissimilarity algorithms multithreaded
   #--------------------------------------------------------------
   
-  if (identical(method, "unifrac")) {
+  if (method == "UniFrac") {
     
     dm <- par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
@@ -142,7 +140,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   } else {
     
     counts <- t(as.matrix(counts))
-    dm <- par_beta_div(counts, method, ifelse(weighted, 1L, 0L))
+    dm <- par_beta_div(counts, tolower(method), ifelse(weighted, 1L, 0L))
     dm <- as.dist(dm)
     attr(dm, 'Labels') <- rownames(counts)
     
@@ -176,7 +174,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
     for (i in which(!duplicated(md))) {
       
       col <- md[[i]]
-      op  <- attr(md, 'op')[[i]]
+      op  <- attr(md, 'op', exact = TRUE)[[i]]
       
       # Convert '==' or '!=' prefix to an attribute
       #--------------------------------------------------------------
@@ -190,8 +188,8 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
       
       # Limit to only within or between comparisons.
       #--------------------------------------------------------------
-      if (!is.null(attr(col, 'op'))) {
-        op <- attr(col, 'op')
+      if (!is.null(attr(col, 'op', exact = TRUE))) {
+        op <- attr(col, 'op', exact = TRUE)
         df <- df[get(op)(map[df$.sample1], map[df$.sample2]),,drop=F]
       }
       
@@ -222,7 +220,6 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   
   if (isFALSE(safe))
     colnames(df)[1:3] <- c("Sample1", "Sample2", "Distance")
-    
   
   return (df)
   

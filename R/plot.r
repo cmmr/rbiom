@@ -183,7 +183,7 @@ plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by =
   if (identical(tolower(y), "abundance")) y <- tail(c('OTU', taxa.ranks(biom)), 1)
   if (identical(tolower(x), "distance"))  x <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
   if (identical(tolower(y), "distance"))  y <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
-  
+  if (identical(x, "."))                { x <- ".all"; biom$metadata[['.all']] <- ".all" }
   
   
   #-----------------------------------------------
@@ -193,7 +193,7 @@ plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by =
   #-----------------------------------------------
   x    <- x %>% validate_metrics(biom, .)
   y    <- y %>% validate_metrics(biom, .)
-  mode <- paste(attr(y, 'mode'), "~", attr(x, 'mode'))
+  mode <- paste(attr(y, 'mode', exact = TRUE), "~", attr(x, 'mode', exact = TRUE))
   
   
   

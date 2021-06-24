@@ -108,7 +108,7 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   if (is(biom, 'BIOM')) {
     
     df <- distill(biom, metric = y, weighted = weighted, long = TRUE, md = c(x, by))
-    y  <- attr(df, 'response')
+    y  <- attr(df, 'response', exact = TRUE)
     
     if (y == 'Diversity') {
       by <- c("Metric", by)

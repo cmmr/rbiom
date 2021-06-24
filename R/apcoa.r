@@ -37,7 +37,7 @@ apcoa <- function (distmat, covariates)  {
   names(covariates) <- paste0("CV", seq_len(ncol(covariates)))
   
   # Force the order of row names to match
-  rn_distmat    <- attr(distmat, "Labels")
+  rn_distmat    <- attr(distmat, "Labels", exact = TRUE)
   rn_covariates <- rownames(covariates)
   rn_intersect  <- intersect(rn_distmat, rn_covariates)
   
@@ -58,7 +58,7 @@ apcoa <- function (distmat, covariates)  {
   
   rhs <- model.matrix(formula, rhs.frame)
   
-  grps   <- attr(rhs, "assign")
+  grps   <- attr(rhs, "assign", exact = TRUE)
   qrhs   <- qr(rhs)
   rhs    <- rhs[, qrhs$pivot,  drop = FALSE]
   rhs    <- rhs[, 1:qrhs$rank, drop = FALSE]

@@ -15,7 +15,8 @@ all_metrics   <- function (biom=NULL) {
     X         = c("ord", "adiv", "bdiv", "rank", "taxon", "meta", "other"), 
     FUN       = function (i) {
       k <- do.call(paste0(i, "_metrics"), list(biom=biom))
-      n <- if (is.null(attr(k, 'mode'))) rep_len(i, length(k)) else attr(k, 'mode')
+      n <- attr(k, 'mode', exact = TRUE)
+      n <- if (is.null(n)) rep_len(i, length(k)) 
       setNames(n, as.vector(k))
     }))
   structure(names(v), mode=unname(v))
@@ -35,8 +36,11 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
   if (length(missing) > 0)
     stop("Invalid or ambiguous metric(s): ", paste(collapse = ", ", metrics[missing]))
   
-  if (is.null(attr(opts, 'mode'))) { attr(vals, 'mode') <- rep_len(mode, length(vals))
-  } else                           { attr(vals, 'mode') <- attr(opts, 'mode')[okay] }
+  if (is.null(attr(opts, 'mode', exact = TRUE))) {
+    attr(vals, 'mode') <- rep_len(mode, length(vals))
+  } else {
+    attr(vals, 'mode') <- attr(opts, 'mode', exact = TRUE)[okay]
+  }
   
   
   #-----------------------------------------------
@@ -45,7 +49,7 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
   if (!multi && length(vals) > 1) 
     stop("Only a single metric is allowed. Found: ", paste0(collaspe=", ", vals))
   
-  uModes <- unique(attr(vals, 'mode'))
+  uModes <- unique(attr(vals, 'mode', exact = TRUE))
   if (!mixed && length(uModes) > 1)
     stop("All metrics must be the same type. Found: ", paste0(collaspe=", ", uModes))
   
@@ -53,12 +57,12 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
   #-----------------------------------------------
   # Solo metadata columns get further attributes
   #-----------------------------------------------
-  if (identical(attr(vals, 'mode'), "meta")) {
+  if (identical(attr(vals, 'mode', exact = TRUE), "meta")) {
     
     #-----------------------------------------------
     # Look for '==' or '!=' prefixes
     #-----------------------------------------------
-    attr(vals, 'op') <- attr(metrics, 'op')
+    attr(vals, 'op') <- attr(metrics, 'op', exact = TRUE)
     if (substr(metrics, 1, 2) %in% c("==", "!="))
       attr(vals, 'op') <- substr(metrics, 1, 2)
     
