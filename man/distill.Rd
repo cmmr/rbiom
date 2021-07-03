@@ -8,7 +8,7 @@ distill(
   biom,
   metric,
   weighted = TRUE,
-  rarefy = FALSE,
+  rarefy = TRUE,
   long = TRUE,
   md = TRUE,
   safe = FALSE
@@ -19,38 +19,35 @@ distill(
 
 \item{metric}{The diversity/abundance values of interest. Options are:
 \describe{
-    \item{Alpha Diversity Metrics (one or more)}{
+    \item{Alpha Diversity Metrics}{
       \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, and/or \bold{InvSimpson}.
-      You may also set \code{metric = "Diversity"} to get all five metrics.
     }
-    \item{Beta Diversity Metrics (one only)}{
+    \item{Beta Diversity Metrics}{
       \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, \bold{jaccard}, 
       or \bold{unifrac}. Use in combination with the \code{weighted} parameter.
       Metadata column names can be prefixed with \bold{==} or \bold{!=} to limit distance
       calculations to \emph{within} or \emph{between}, respectively, those categories. See
-      examples below. Setting \code{metric = "Distance"} will use \bold{unifrac} if a 
-      phylogenetic tree is present, or \bold{bray-curtis} otherwise.
+      examples below.
     }
-    \item{Taxa Abundances (one only)}{
+    \item{Taxa Abundances}{
       \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, \bold{Family}, \bold{Genus}, 
       \bold{Species}, \bold{Strain}, or \bold{OTU}. Supported ranks will vary by biom. Run
-      \code{taxa.ranks(biom)} to see the available options. Specifying 
-      \code{metric = "Abundance"} will default to the most precise rank possible.
+      \code{taxa.ranks(biom)} to see the available options.
     }
    }}
 
 \item{weighted}{When \bold{metric} is a beta diversity metric, should it be run in in weighted
 mode? (Default: TRUE)}
 
-\item{rarefy}{When \bold{metric} is an alpha diversity metric, what 'rarefy' parameter should be 
-given to \code{alpha.div()}? (Default: FALSE)}
+\item{rarefy}{Should the dataset be rarefied first? When \bold{metric} is an alpha diversity 
+metric, this 'rarefy' parameter is passed on directly to \code{alpha.div()}. (Default: TRUE)}
 
 \item{long}{Pivot the returned data to long format?
 \describe{
-  \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
+  \item{\bold{FALSE}}{ Each metric has its own column. }
   \item{\bold{TRUE}}{  "Sample", "Metric" and "Diversity" are the columns 
                        returned. Rows are added to attain all combinations of 
-                       samples x metrics. }
+                       samples x metrics. (Default) }
 }}
 
 \item{md}{Include metadata in the output data frame? Options are: 

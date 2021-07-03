@@ -22,10 +22,10 @@
 #'              and/or \bold{InvSimpson}.
 #'            }
 #'            \item{Beta Diversity Metrics (one only)}{
-#'              \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
-#'              \bold{jaccard}, or \bold{unifrac}. \bold{Distance} will use 
-#'              \bold{unifrac} if a phylogenetic tree is present, or 
-#'              \bold{bray-curtis} otherwise. Use in combination with the 
+#'              \bold{Manhattan}, \bold{Euclidean}, \bold{Bray-Curtis}, 
+#'              \bold{Jaccard}, or \bold{UniFrac}. \bold{Distance} will use 
+#'              \bold{UniFrac} if a phylogenetic tree is present, or 
+#'              \bold{Bray-Curtis} otherwise. Use in combination with the 
 #'              \code{weighted} parameter. Metadata column names can be 
 #'              prefixed with \bold{==} or \bold{!=} to limit distance 
 #'              calculations to \emph{within} or \emph{between}, respectively, 
@@ -46,7 +46,7 @@
 #'        \bold{errorbar}, \bold{linerange}, and/or \bold{pointrange}. 
 #'        Single letter abbreviations are also accepted. For instance,
 #'        \code{c("box", "dot")} is equivalent to \code{c("b", "d")} and 
-#'        \code{"bd"}.
+#'        \code{"bd"}. Default: "rls".
 #'                 
 #' @param color.by,pattern.by,shape.by,facet.by   Metadata column to color, 
 #'        pattern, shape, and/or facet by. If that column is a \code{factor}, 
@@ -104,7 +104,13 @@
 #' some shapes have a colored outline given by `color`, some are filled with 
 #' `color`, and some are outlined in `color` and filled with `fill`. See
 #' https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
-#'         
+#' 
+#' To expand the low end of the y axis, you can set \code{y.trans = "sqrt"} or
+#' \code{y.trans = "log1p"}. The former applies a square-root transformation, 
+#' and the latter plots log(y + 1). Both of these methods work well with data
+#' that contains zeroes. 
+#' 
+#' 
 #' @export
 #' @seealso \code{\link{stats.table}}
 #' @examples
@@ -134,7 +140,7 @@
 #'     #plot(biom, Abundance ~ Phylum)
 #'     
 #'
-plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, patterns = NULL, shapes = NULL, p.min = 0.05, p.adj = "fdr", vline = "ci95", xlab.angle = 'auto', rline = NULL, ...) {
+plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, patterns = NULL, shapes = NULL, p.min = 0.05, p.adj = "fdr", vline = "ci95", xlab.angle = 'auto', rline = NULL, ...) {
   
   biom <- x
   dots <- list(...)
@@ -189,7 +195,7 @@ plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by =
   #-----------------------------------------------
   # Assign a 'mode' attribute to x and y.
   # Possible modes: taxa, adiv, bdiv, meta, ord,
-  #                 Reads, Samples, PctReads, .
+  #                 Reads, Samples, .
   #-----------------------------------------------
   x    <- x %>% validate_metrics(biom, .)
   y    <- y %>% validate_metrics(biom, .)
@@ -207,28 +213,27 @@ plot.BIOM <- function (x, formula, layers = "box", color.by = NULL, pattern.by =
   # UniFrac  ~ PCoA          = scatter
   # UniFrac  ~ `==Body Site` = between/within boxplots
   # UniFrac  ~ Samples       = heatmap (samples vs samples)
-  # PctReads ~ Phylum        = boxplot
-  # PctReads ~ Samples       = stacked barplot (color.by='Phylum')
+  # Reads    ~ Phylum        = boxplot
+  # Reads    ~ Samples       = stacked barplot (color.by='Phylum')
   # Phylum   ~ Samples       = heatmap (taxa vs samples)
   # Phylum   ~ `Body Site`   = heatmap (taxa vs groups of samples)
   #
   # *should work without any metadata column
   #==================================================================
   
-  fn <-  if (mode == "Rarefied ~ Reads")   { plot_rarefied
-  } else if (mode == "Rarefied ~ Samples") { plot_rarefied
-  } else if (mode == "Rarefied ~ adiv")    { plot_rarefied
-  } else if (mode == "adiv ~ factor")      { plot_factor     ##
+  fn <-  if (mode == "Rarefied ~ Reads")   { plot_rarefied   #o
+  } else if (mode == "Rarefied ~ Samples") { plot_rarefied   #o
+  } else if (mode == "Rarefied ~ adiv")    { plot_rarefied   #o
+  } else if (mode == "adiv ~ factor")      { plot_factor     #-
   } else if (mode == "adiv ~ numeric")     { plot_numeric
-  } else if (mode == "adiv ~ .")           { plot_factor     ##
+  } else if (mode == "adiv ~ .")           { plot_factor     #-
   } else if (mode == "bdiv ~ ord")         { plot_ordination
-  } else if (mode == "bdiv ~ factor")      { plot_factor     ##
-  } else if (mode == "bdiv ~ Samples")     { plot_heatmap
-  } else if (mode == "PctReads ~ rank")    { plot_factor     ##
-  } else if (mode == "PctReads ~ Samples") { plot_stacked
-  } else if (mode == "rank ~ Samples")     { plot_heatmap
-  } else if (mode == "rank ~ factor")      { plot_heatmap
-  } else if (mode == "taxon ~ factor")     { plot_factor     ##
+  } else if (mode == "bdiv ~ factor")      { plot_factor     #-
+  } else if (mode == "bdiv ~ Samples")     { plot_heatmap    #>
+  } else if (mode == "Reads ~ rank")       { plot_factor     #-
+  } else if (mode == "Reads ~ Samples")    { plot_stacked
+  } else if (mode == "rank ~ Samples")     { plot_heatmap    #>
+  } else if (mode == "taxon ~ factor")     { plot_factor     #-
   } else if (mode == "taxon ~ numeric")    { plot_numeric
   } else { stop("Invalid formula of form '", mode, "'") }
   
@@ -256,8 +261,8 @@ assign_colors <- function (vals, keys) {
   if (is.null(vals)) {
     vals <- if (n <= 2) { # Colorblind friendly palette
       c('#00B9EB', '#ED5F16')
-    } else if (n <= 8) {    # RColorBrewer's Set1
-      c('#EE2C2C', '#4682B4', '#548B54', '#8B4789', '#FF7F00', '#FFFF00', '#A0522D', '#FF82AB')
+    } else if (n <= 8) {  # Colorblind friendly palette of 8 (jfly.iam.u-tokyo.ac.jp/color/)
+      c("#0072B2", "#D55E00", "#CC79A7", "#009E73", "#F0E442", "#56B4E9", "#E69F00", "#999999")
     } else if (n <= 11) {   # Andrea's set of 11
       c('#66CDAA', '#FF8C69', '#8DB6CD', '#008B8B', '#FF6EB4', '#A2CD5A', '#FF6347', '#FFC125', 
         '#EEC591', '#BEBEBE', '#CD96CD')

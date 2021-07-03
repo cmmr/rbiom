@@ -8,7 +8,7 @@
 \method{plot}{BIOM}(
   x,
   formula,
-  layers = "box",
+  layers = "rls",
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
@@ -45,10 +45,10 @@ Y-axis options are:
       and/or \bold{InvSimpson}.
     }
     \item{Beta Diversity Metrics (one only)}{
-      \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
-      \bold{jaccard}, or \bold{unifrac}. \bold{Distance} will use 
-      \bold{unifrac} if a phylogenetic tree is present, or 
-      \bold{bray-curtis} otherwise. Use in combination with the 
+      \bold{Manhattan}, \bold{Euclidean}, \bold{Bray-Curtis}, 
+      \bold{Jaccard}, or \bold{UniFrac}. \bold{Distance} will use 
+      \bold{UniFrac} if a phylogenetic tree is present, or 
+      \bold{Bray-Curtis} otherwise. Use in combination with the 
       \code{weighted} parameter. Metadata column names can be 
       prefixed with \bold{==} or \bold{!=} to limit distance 
       calculations to \emph{within} or \emph{between}, respectively, 
@@ -69,7 +69,7 @@ Y-axis options are:
 \bold{errorbar}, \bold{linerange}, and/or \bold{pointrange}. 
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("b", "d")} and 
-\code{"bd"}.}
+\code{"bd"}. Default: "rls".}
 
 \item{color.by, pattern.by, shape.by, facet.by}{Metadata column to color, 
 pattern, shape, and/or facet by. If that column is a \code{factor}, 
@@ -128,6 +128,11 @@ https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
 some shapes have a colored outline given by `color`, some are filled with 
 `color`, and some are outlined in `color` and filled with `fill`. See
 https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
+
+To expand the low end of the y axis, you can set \code{y.trans = "sqrt"} or
+\code{y.trans = "log1p"}. The former applies a square-root transformation, 
+and the latter plots log(y + 1). Both of these methods work well with data
+that contains zeroes.
 }
 \description{
 Visualize diversity or abundance as a boxplot, dotplot, etc.

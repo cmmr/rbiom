@@ -158,7 +158,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     for (rank in ranks) {
       
-      df <- data.frame(rbiom::taxa.rollup(biom, rank, lineage = TRUE), check.names=FALSE)
+      df <- t(rbiom::taxa.rollup(biom, rank, lineage = TRUE, safe=NA))
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
       
       openxlsx::addWorksheet(wb, rank)
@@ -254,7 +254,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
       
     for (i in seq_along(ranks)) {
       
-      df <- data.frame(rbiom::taxa.rollup(biom, i - 1, lineage=TRUE), check.names=FALSE)
+      df <- t(rbiom::taxa.rollup(biom, i - 1, lineage=TRUE, safe=NA))
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
       
       # Set the full taxonomy string as the first column

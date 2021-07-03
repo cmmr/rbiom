@@ -156,9 +156,9 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   df <- as.matrix(dm)
   df <- data.frame(
     stringsAsFactors = FALSE,
-    .sample1  = rownames(df)[row(df)],
-    .sample2  = colnames(df)[col(df)],
-    .distance = as.numeric(df)
+    '.sample1'       = rownames(df)[row(df)],
+    '.sample2'       = colnames(df)[col(df)],
+    '.value'         = as.numeric(df)
   )
   df <- subset(df, .sample1 < .sample2)
   

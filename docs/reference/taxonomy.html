@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9024</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9027</span>
       </span>
     </div>
 
@@ -168,29 +168,29 @@
     <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
     
     <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='op'>]</span>
-</div><div class='output co'>#&gt;          Kingdom    Phylum             Class              Order              
-#&gt; UncO2713 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
-#&gt; UncO4101 "Bacteria" "__Firmicutes"     "__Clostridia"     "__Clostridiales"  
-#&gt; AnmMass2 "Bacteria" "__Actinobacteria" "__Actinobacteria" "__Actinomycetales"
-#&gt; PreBivi6 "Bacteria" "__Bacteroidetes"  "__Bacteroidia"    "__Bacteroidales"  
-#&gt;          Family               Genus                  
-#&gt; UncO2713 "__Rikenellaceae"    "__Alistipes"          
-#&gt; UncO4101 "__Lachnospiraceae"  "__Lachnoanaerobaculum"
-#&gt; AnmMass2 "__Actinomycetaceae" "__Actinomyces"        
-#&gt; PreBivi6 "__Prevotellaceae"   "__Prevotella"         </div><div class='input'>    
+</div><div class='output co'>#&gt;          Kingdom    Phylum           Class            Order            
+#&gt; UncO2713 "Bacteria" "Bacteroidetes"  "Bacteroidia"    "Bacteroidales"  
+#&gt; UncO4101 "Bacteria" "Firmicutes"     "Clostridia"     "Clostridiales"  
+#&gt; AnmMass2 "Bacteria" "Actinobacteria" "Actinobacteria" "Actinomycetales"
+#&gt; PreBivi6 "Bacteria" "Bacteroidetes"  "Bacteroidia"    "Bacteroidales"  
+#&gt;          Family             Genus                
+#&gt; UncO2713 "Rikenellaceae"    "Alistipes"          
+#&gt; UncO4101 "Lachnospiraceae"  "Lachnoanaerobaculum"
+#&gt; AnmMass2 "Actinomycetaceae" "Actinomyces"        
+#&gt; PreBivi6 "Prevotellaceae"   "Prevotella"         </div><div class='input'>    
     
     <span class='co'># Sometimes taxonomic names are incomplete</span>
     <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>170</span>,<span class='fl'>194</span><span class='op'>)</span>, <span class='st'>'Genus'</span>, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;          Genus             
-#&gt; GcbBacte "__g"             
-#&gt; Unc0434x "__Incertae_Sedis"
-#&gt; Unc01skg "__uncultured"    </div><div class='input'>    
+</div><div class='output co'>#&gt;          Genus           
+#&gt; GcbBacte "g"             
+#&gt; Unc0434x "Incertae Sedis"
+#&gt; Unc01skg "uncultured"    </div><div class='input'>    
     <span class='co'># rbiom can insert more descriptive placeholders</span>
     <span class='fu'>taxonomy</span><span class='op'>(</span><span class='va'>biom</span>, fix.names <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>107</span>,<span class='fl'>170</span>,<span class='fl'>194</span><span class='op'>)</span>, <span class='st'>'Genus'</span>, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>
 </div><div class='output co'>#&gt;          Genus                                         
 #&gt; GcbBacte "Phylum Gracilibacteria (c o f g)"            
-#&gt; Unc0434x "Family Lachnospiraceae (Incertae_Sedis)"     
-#&gt; Unc01skg "Order Clostridiales (Family_XIII uncultured)"</div><div class='input'>
+#&gt; Unc0434x "Family Lachnospiraceae (Incertae Sedis)"     
+#&gt; Unc01skg "Order Clostridiales (Family XIII uncultured)"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

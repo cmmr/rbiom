@@ -6,38 +6,35 @@
 #' 
 #' @param metric   The diversity/abundance values of interest. Options are:
 #'        \describe{
-#'            \item{Alpha Diversity Metrics (one or more)}{
+#'            \item{Alpha Diversity Metrics}{
 #'              \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, and/or \bold{InvSimpson}.
-#'              You may also set \code{metric = "Diversity"} to get all five metrics.
 #'            }
-#'            \item{Beta Diversity Metrics (one only)}{
+#'            \item{Beta Diversity Metrics}{
 #'              \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, \bold{jaccard}, 
 #'              or \bold{unifrac}. Use in combination with the \code{weighted} parameter.
 #'              Metadata column names can be prefixed with \bold{==} or \bold{!=} to limit distance
 #'              calculations to \emph{within} or \emph{between}, respectively, those categories. See
-#'              examples below. Setting \code{metric = "Distance"} will use \bold{unifrac} if a 
-#'              phylogenetic tree is present, or \bold{bray-curtis} otherwise.
+#'              examples below.
 #'            }
-#'            \item{Taxa Abundances (one only)}{
+#'            \item{Taxa Abundances}{
 #'              \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, \bold{Family}, \bold{Genus}, 
 #'              \bold{Species}, \bold{Strain}, or \bold{OTU}. Supported ranks will vary by biom. Run
-#'              \code{taxa.ranks(biom)} to see the available options. Specifying 
-#'              \code{metric = "Abundance"} will default to the most precise rank possible.
+#'              \code{taxa.ranks(biom)} to see the available options.
 #'            }
 #'           }
 #'           
-#' @param rarefy   When \bold{metric} is an alpha diversity metric, what 'rarefy' parameter should be 
-#'        given to \code{alpha.div()}? (Default: FALSE)
+#' @param rarefy   Should the dataset be rarefied first? When \bold{metric} is an alpha diversity 
+#'        metric, this 'rarefy' parameter is passed on directly to \code{alpha.div()}. (Default: TRUE)
 #'        
 #' @param weighted   When \bold{metric} is a beta diversity metric, should it be run in in weighted
 #'        mode? (Default: TRUE)
 #'        
 #' @param long  Pivot the returned data to long format?
 #'        \describe{
-#'          \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
+#'          \item{\bold{FALSE}}{ Each metric has its own column. }
 #'          \item{\bold{TRUE}}{  "Sample", "Metric" and "Diversity" are the columns 
 #'                               returned. Rows are added to attain all combinations of 
-#'                               samples x metrics. }
+#'                               samples x metrics. (Default) }
 #'        }
 #'        
 #' @param md  Include metadata in the output data frame? Options are: 
@@ -72,36 +69,46 @@
 #'     
 #'     distill(biom, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
 #'
-distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE, safe = FALSE) {
+distill <- function (biom, metric, weighted = TRUE, rarefy = TRUE, long = TRUE, md = TRUE, safe = FALSE) {
   
   if (!is(biom, 'BIOM'))
     stop ("Input for 'biom' must be a BIOM object.")
   
   
-  vals <- validate_metrics(biom, metric)
-  mode <- attr(vals, 'mode')
+  metric <- validate_metrics(biom, metric)
+  mode <- attr(metric, 'mode', exact = TRUE)
+  
+  if (isTRUE(rarefy) && !mode %in% c('adiv'))
+    biom <- rbiom::rarefy(biom)
+  
   
   if (mode == "adiv") {
-    df <- alpha.div(biom, metrics = vals, rarefy = rarefy, long = long, md = md, safe = safe)
+    df <- alpha.div(biom, metrics = metric, rarefy = rarefy, long = long, md = md, safe = safe)
     
   } else if (mode == "rank") {
-    df <- taxa.rollup(biom, rank = vals, long = long, md = md, safe = safe)
     
-    if (isFALSE(long) && isFALSE(md)) {
-      df <- data.frame(check.names = FALSE, Sample = colnames(df), t(df))
-      if (isTRUE(safe)) colnames(df)[1] <- ".sample"
+    df <- taxa.rollup(biom, rank = metric, long = long, md = md, safe = safe)
+    
+  } else if (mode == "taxon") {
+    
+    rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x == metric))))
+    df   <- taxa.rollup(biom, rank = rank, long = long, md = md, safe = safe)
+    
+    # Only return the single requested taxon
+    if (long) {
+      df <- df[df[[ifelse(safe, ".taxa", "Taxa")]] == metric,,drop=FALSE]
+    } else {
+      keep <- c('Sample', '.sample', colnames(metadata(biom)), metric)
+      df   <- df[,colnames(df) %in% keep,drop=FALSE]
     }
     
-    attr(df, 'response') <- ifelse(isTRUE(safe), ".abundance", "Abundance")
-    
   } else if (mode == "bdiv") {
+    
     if (is.character(md)) md <- paste0(attr(md, 'op'), md)
-    df <- beta.div(biom, method = vals, weighted = weighted, long = long, md = md, safe = safe)
+    df <- beta.div(biom, method = metric, weighted = weighted, long = long, md = md, safe = safe)
     
-    if (isFALSE(long) && isFALSE(md))
-      df <- df %>% as.matrix() %>% as.data.frame()
-    
-    attr(df, 'response') <- ifelse(isTRUE(safe), ".distance", "Distance")
+  } else {
+    stop("Don't know how to distill metric '", metric, "'.")
   }
   
   

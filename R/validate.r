@@ -8,7 +8,7 @@ bdiv_metrics  <- function (biom=NULL) c("Manhattan", "Euclidean", "Bray-Curtis",
 rank_metrics  <- function (biom=NULL) c(taxa.ranks(biom), 'OTU')
 taxon_metrics <- function (biom=NULL) unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
 meta_metrics  <- function (biom=NULL) colnames(metadata(biom))
-other_metrics <- function (biom=NULL) c("Rarefied", "Reads", "Samples", "PctReads", ".") %>% structure(., mode=.)
+other_metrics <- function (biom=NULL) c("Rarefied", "Reads", "Samples", ".") %>% structure(., mode=.)
 all_metrics   <- function (biom=NULL) {
   v <- unlist(sapply(
     USE.NAMES = FALSE, 
@@ -16,7 +16,7 @@ all_metrics   <- function (biom=NULL) {
     FUN       = function (i) {
       k <- do.call(paste0(i, "_metrics"), list(biom=biom))
       n <- attr(k, 'mode', exact = TRUE)
-      n <- if (is.null(n)) rep_len(i, length(k)) 
+      if (is.null(n)) n <- rep_len(i, length(k))
       setNames(n, as.vector(k))
     }))
   structure(names(v), mode=unname(v))

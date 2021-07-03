@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9024</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9027</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@
   <span class='va'>biom</span>,
   <span class='va'>metric</span>,
   weighted <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  rarefy <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  rarefy <span class='op'>=</span> <span class='cn'>TRUE</span>,
   long <span class='op'>=</span> <span class='cn'>TRUE</span>,
   md <span class='op'>=</span> <span class='cn'>TRUE</span>,
   safe <span class='op'>=</span> <span class='cn'>FALSE</span>
@@ -140,18 +140,15 @@
     <tr>
       <th>metric</th>
       <td><p>The diversity/abundance values of interest. Options are:</p><dl>
-    <dt>Alpha Diversity Metrics (one or more)</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, and/or <b>InvSimpson</b>.
-      You may also set <code>metric = "Diversity"</code> to get all five metrics.</p></dd>
-    <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, <b>jaccard</b>, 
+    <dt>Alpha Diversity Metrics</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, and/or <b>InvSimpson</b>.</p></dd>
+    <dt>Beta Diversity Metrics</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, <b>jaccard</b>, 
       or <b>unifrac</b>. Use in combination with the <code>weighted</code> parameter.
       Metadata column names can be prefixed with <b>==</b> or <b>!=</b> to limit distance
       calculations to <em>within</em> or <em>between</em>, respectively, those categories. See
-      examples below. Setting <code>metric = "Distance"</code> will use <b>unifrac</b> if a 
-      phylogenetic tree is present, or <b>bray-curtis</b> otherwise.</p></dd>
-    <dt>Taxa Abundances (one only)</dt><dd><p><b>Kingdom</b>, <b>Phylum</b>, <b>Class</b>, <b>Order</b>, <b>Family</b>, <b>Genus</b>, 
+      examples below.</p></dd>
+    <dt>Taxa Abundances</dt><dd><p><b>Kingdom</b>, <b>Phylum</b>, <b>Class</b>, <b>Order</b>, <b>Family</b>, <b>Genus</b>, 
       <b>Species</b>, <b>Strain</b>, or <b>OTU</b>. Supported ranks will vary by biom. Run
-      <code><a href='taxa.ranks.html'>taxa.ranks(biom)</a></code> to see the available options. Specifying 
-      <code>metric = "Abundance"</code> will default to the most precise rank possible.</p></dd>
+      <code><a href='taxa.ranks.html'>taxa.ranks(biom)</a></code> to see the available options.</p></dd>
    
 </dl></td>
     </tr>
@@ -162,16 +159,16 @@ mode? (Default: TRUE)</p></td>
     </tr>
     <tr>
       <th>rarefy</th>
-      <td><p>When <b>metric</b> is an alpha diversity metric, what 'rarefy' parameter should be 
-given to <code><a href='alpha.div.html'>alpha.div()</a></code>? (Default: FALSE)</p></td>
+      <td><p>Should the dataset be rarefied first? When <b>metric</b> is an alpha diversity 
+metric, this 'rarefy' parameter is passed on directly to <code><a href='alpha.div.html'>alpha.div()</a></code>. (Default: TRUE)</p></td>
     </tr>
     <tr>
       <th>long</th>
       <td><p>Pivot the returned data to long format?</p><dl>
-  <dt><b>FALSE</b></dt><dd><p>Each metric has its own column. (Default)</p></dd>
+  <dt><b>FALSE</b></dt><dd><p>Each metric has its own column.</p></dd>
   <dt><b>TRUE</b></dt><dd><p>"Sample", "Metric" and "Diversity" are the columns 
                        returned. Rows are added to attain all combinations of 
-                       samples x metrics.</p></dd>
+                       samples x metrics. (Default)</p></dd>
 
 </dl></td>
     </tr>
@@ -210,26 +207,26 @@ with metadata column names? (Default: FALSE)</p></td>
     
     <span class='fu'>distill</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"UniFrac"</span>, md<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"==Body Site"</span>, <span class='st'>"!=Sex"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;     Sample1 Sample2  Distance     Body Site            Sex
-#&gt; 51    HMP01   HMP02 0.1950253 Buccal mucosa Female vs Male
-#&gt; 202   HMP02   HMP05 0.2509451 Buccal mucosa Female vs Male
-#&gt; 301   HMP01   HMP07 0.1395698 Buccal mucosa Female vs Male
-#&gt; 305   HMP05   HMP07 0.1057077 Buccal mucosa Female vs Male
-#&gt; 353   HMP03   HMP08 0.3257210        Saliva Female vs Male
-#&gt; 354   HMP04   HMP08 0.2328171        Saliva Female vs Male</div><div class='input'>    
+#&gt; 50    HMP01   HMP02 0.1904022 Buccal mucosa Female vs Male
+#&gt; 198   HMP02   HMP05 0.2570789 Buccal mucosa Female vs Male
+#&gt; 295   HMP01   HMP07 0.1423764 Buccal mucosa Female vs Male
+#&gt; 299   HMP05   HMP07 0.1027058 Buccal mucosa Female vs Male
+#&gt; 346   HMP03   HMP08 0.3302257        Saliva Female vs Male
+#&gt; 347   HMP04   HMP08 0.2307100        Saliva Female vs Male</div><div class='input'>    
     <span class='fu'>distill</span><span class='op'>(</span><span class='va'>biom</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Shannon"</span>, <span class='st'>"OTUs"</span><span class='op'>)</span>, md<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BMI"</span>, <span class='st'>"Sex"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in validate_metrics(biom, metric): Only a single metric is allowed. Found: , Shannon, OTUs</span></div><div class='input'>    
     <span class='fu'>distill</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Phylum"</span>, long<span class='op'>=</span><span class='cn'>FALSE</span>, md<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;       Sample __Actinobacteria __Bacteroidetes __Cyanobacteria
-#&gt; HMP01  HMP01               18             276               0
-#&gt; HMP02  HMP02               60             221               0
-#&gt; HMP03  HMP03              126             313               0
-#&gt; HMP04  HMP04              120             218               0</div><div class='input'>    
+</div><div class='output co'>#&gt;       Sample Actinobacteria Bacteroidetes Cyanobacteria
+#&gt; HMP01  HMP01             13           192             0
+#&gt; HMP02  HMP02             53           186             0
+#&gt; HMP03  HMP03            121           271             0
+#&gt; HMP04  HMP04             78           127             0</div><div class='input'>    
     <span class='fu'>distill</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Phylum"</span>, long<span class='op'>=</span><span class='cn'>FALSE</span>, md<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Age"</span>, <span class='st'>"Body Site"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;   Sample Age     Body Site __Actinobacteria __Bacteroidetes __Cyanobacteria
-#&gt; 1  HMP01  22 Buccal mucosa               18             276               0
-#&gt; 2  HMP02  24 Buccal mucosa               60             221               0
-#&gt; 3  HMP03  28        Saliva              126             313               0
-#&gt; 4  HMP04  25        Saliva              120             218               0</div><div class='input'>
+</div><div class='output co'>#&gt;       Sample Age     Body Site Actinobacteria Bacteroidetes Cyanobacteria
+#&gt; HMP01  HMP01  22 Buccal mucosa             13           192             0
+#&gt; HMP02  HMP02  24 Buccal mucosa             53           186             0
+#&gt; HMP03  HMP03  28        Saliva            121           271             0
+#&gt; HMP04  HMP04  25        Saliva             78           127             0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

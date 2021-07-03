@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9024</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9027</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@
 <span class='fu'>plot</span><span class='op'>(</span>
   <span class='va'>x</span>,
   <span class='va'>formula</span>,
-  layers <span class='op'>=</span> <span class='st'>"box"</span>,
+  layers <span class='op'>=</span> <span class='st'>"rls"</span>,
   color.by <span class='op'>=</span> <span class='cn'>NULL</span>,
   pattern.by <span class='op'>=</span> <span class='cn'>NULL</span>,
   shape.by <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -158,10 +158,10 @@ X-axis options are:</p><dl>
 </dl><p>Y-axis options are:</p><dl>
     <dt>Alpha Diversity Metrics (one or more)</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, 
       and/or <b>InvSimpson</b>.</p></dd>
-    <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, 
-      <b>jaccard</b>, or <b>unifrac</b>. <b>Distance</b> will use 
-      <b>unifrac</b> if a phylogenetic tree is present, or 
-      <b>bray-curtis</b> otherwise. Use in combination with the 
+    <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>Manhattan</b>, <b>Euclidean</b>, <b>Bray-Curtis</b>, 
+      <b>Jaccard</b>, or <b>UniFrac</b>. <b>Distance</b> will use 
+      <b>UniFrac</b> if a phylogenetic tree is present, or 
+      <b>Bray-Curtis</b> otherwise. Use in combination with the 
       <code>weighted</code> parameter. Metadata column names can be 
       prefixed with <b>==</b> or <b>!=</b> to limit distance 
       calculations to <em>within</em> or <em>between</em>, respectively, 
@@ -182,7 +182,7 @@ X-axis options are:</p><dl>
 <b>errorbar</b>, <b>linerange</b>, and/or <b>pointrange</b>. 
 Single letter abbreviations are also accepted. For instance,
 <code><a href='https://rdrr.io/r/base/c.html'>c("box", "dot")</a></code> is equivalent to <code><a href='https://rdrr.io/r/base/c.html'>c("b", "d")</a></code> and 
-<code>"bd"</code>.</p></td>
+<code>"bd"</code>. Default: "rls".</p></td>
     </tr>
     <tr>
       <th>color.by, pattern.by, shape.by, facet.by</th>
@@ -259,6 +259,10 @@ https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
 some shapes have a colored outline given by `color`, some are filled with 
 `color`, and some are outlined in `color` and filled with `fill`. See
 https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.</p>
+<p>To expand the low end of the y axis, you can set <code>y.trans = "sqrt"</code> or
+<code>y.trans = "log1p"</code>. The former applies a square-root transformation, 
+and the latter plots log(y + 1). Both of these methods work well with data
+that contains zeroes.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='stats.table.html'>stats.table</a></code></p></div>
