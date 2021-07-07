@@ -5,14 +5,16 @@
 ord_metrics   <- function (biom=NULL) c("PCoA", "tSNE", "NMDS")
 adiv_metrics  <- function (biom=NULL) c("Depth", "OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
 bdiv_metrics  <- function (biom=NULL) c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
+dist_metrics  <- function (biom=NULL) c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski")
 rank_metrics  <- function (biom=NULL) c(taxa.ranks(biom), 'OTU')
 taxon_metrics <- function (biom=NULL) unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
 meta_metrics  <- function (biom=NULL) colnames(metadata(biom))
-other_metrics <- function (biom=NULL) c("Rarefied", "Reads", "Samples", ".") %>% structure(., mode=.)
+clust_metrics <- function (biom=NULL) c("heatmap", "average", "UPGMA", "ward", "mcquitty", "WPGMA", "single", "median", "WPGMC", "complete", "centroid", "UPGMC")
+other_metrics <- function (biom=NULL) c("Rarefied", "Reads", "Samples", ".", "stacked") %>% structure(., mode=.)
 all_metrics   <- function (biom=NULL) {
   v <- unlist(sapply(
     USE.NAMES = FALSE, 
-    X         = c("ord", "adiv", "bdiv", "rank", "taxon", "meta", "other"), 
+    X         = c("ord", "adiv", "bdiv", "rank", "taxon", "meta", "clust", "other"), 
     FUN       = function (i) {
       k <- do.call(paste0(i, "_metrics"), list(biom=biom))
       n <- attr(k, 'mode', exact = TRUE)
@@ -80,6 +82,7 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
       attr(vals, 'mode') <- head(cl, 1)
     }
   }
+  
   
   return (vals)
 }

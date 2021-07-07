@@ -148,20 +148,23 @@ Visualize diversity or abundance as a boxplot, dotplot, etc.
     
     plot(biom, Simpson ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
     
-    # Dissimilarity boxplots
-    #plot(biom, UniFrac ~ `==Body Site`)
-    
     # Ordination
     plot(biom, bray ~ nmds)
     
-    # Abundance Heatmap
-    #plot(biom, Phylum ~ heatmap)
+    # Dissimilarity boxplots
+    #plot(biom, UniFrac ~ `==Body Site`)
     
     # Dissimilarity Heatmap
     #plot(biom, UniFrac ~ heatmap)
     
     # Taxa abundance boxplots
-    #plot(biom, Abundance ~ Phylum)
+    #plot(biom, Phylum ~ .)
+    
+    # Taxa stacked abundance
+    #plot(biom, Phylum ~ stacked)
+    
+    # Taxa abundance heatmap
+    #plot(biom, Phylum ~ heatmap)
     
 
 }

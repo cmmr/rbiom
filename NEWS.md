@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9027
+# rbiom 1.0.2.9028
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -22,6 +22,7 @@
 * Added sample.sums function to count the number of observations per sample.
 * New functions: depth(), is.rarefied(), has.phylogeny(), and has.sequences().
 * Added plot function - provides stat brackets, patterned fills, overlaid geoms and more.
+* plot() can now create heatmaps.
 
 ### Breaking Changes
 

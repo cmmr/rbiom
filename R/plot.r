@@ -124,20 +124,23 @@
 #'     
 #'     plot(biom, Simpson ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
 #'     
-#'     # Dissimilarity boxplots
-#'     #plot(biom, UniFrac ~ `==Body Site`)
-#'     
 #'     # Ordination
 #'     plot(biom, bray ~ nmds)
 #'     
-#'     # Abundance Heatmap
-#'     #plot(biom, Phylum ~ heatmap)
+#'     # Dissimilarity boxplots
+#'     #plot(biom, UniFrac ~ `==Body Site`)
 #'     
 #'     # Dissimilarity Heatmap
 #'     #plot(biom, UniFrac ~ heatmap)
 #'     
 #'     # Taxa abundance boxplots
-#'     #plot(biom, Abundance ~ Phylum)
+#'     #plot(biom, Phylum ~ .)
+#'     
+#'     # Taxa stacked abundance
+#'     #plot(biom, Phylum ~ stacked)
+#'     
+#'     # Taxa abundance heatmap
+#'     #plot(biom, Phylum ~ heatmap)
 #'     
 #'
 plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, patterns = NULL, shapes = NULL, p.min = 0.05, p.adj = "fdr", vline = "ci95", xlab.angle = 'auto', rline = NULL, ...) {
@@ -197,8 +200,8 @@ plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by =
   # Possible modes: taxa, adiv, bdiv, meta, ord,
   #                 Reads, Samples, .
   #-----------------------------------------------
-  x    <- x %>% validate_metrics(biom, .)
-  y    <- y %>% validate_metrics(biom, .)
+  x    <- validate_metrics(biom, x)
+  y    <- validate_metrics(biom, y)
   mode <- paste(attr(y, 'mode', exact = TRUE), "~", attr(x, 'mode', exact = TRUE))
   
   
@@ -224,15 +227,15 @@ plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by =
   fn <-  if (mode == "Rarefied ~ Reads")   { plot_rarefied   #o
   } else if (mode == "Rarefied ~ Samples") { plot_rarefied   #o
   } else if (mode == "Rarefied ~ adiv")    { plot_rarefied   #o
+  } else if (mode == "adiv ~ .")           { plot_factor     #-
   } else if (mode == "adiv ~ factor")      { plot_factor     #-
   } else if (mode == "adiv ~ numeric")     { plot_numeric
-  } else if (mode == "adiv ~ .")           { plot_factor     #-
   } else if (mode == "bdiv ~ ord")         { plot_ordination
   } else if (mode == "bdiv ~ factor")      { plot_factor     #-
-  } else if (mode == "bdiv ~ Samples")     { plot_heatmap    #>
-  } else if (mode == "Reads ~ rank")       { plot_factor     #-
-  } else if (mode == "Reads ~ Samples")    { plot_stacked
-  } else if (mode == "rank ~ Samples")     { plot_heatmap    #>
+  } else if (mode == "bdiv ~ clust")       { plot_heatmap    #>
+  } else if (mode == "rank ~ .")           { plot_factor     #-
+  } else if (mode == "rank ~ stacked")     { plot_stacked
+  } else if (mode == "rank ~ clust")       { plot_heatmap    #>
   } else if (mode == "taxon ~ factor")     { plot_factor     #-
   } else if (mode == "taxon ~ numeric")    { plot_numeric
   } else { stop("Invalid formula of form '", mode, "'") }

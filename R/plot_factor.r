@@ -14,8 +14,8 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
   group.by  <- NULL
   
   params <- c("color.by", "shape.by", "pattern.by", "facet.by")
-  if (isTRUE(y == "Reads")) { y <- x; x <- ".taxa"
-  } else                    { params <- c("x", params) }
+  if (isTRUE(mode == "rank")) { x <- ".taxa"
+  } else                      { params <- c("x", params) }
   
   for (param in params) {
     arg <- get(param)
@@ -61,7 +61,7 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
   #--------------------------------------------------------------
   # Control the values displayed on the y axis
   #--------------------------------------------------------------
-  if (is.rarefied(biom) && mode %in% c('Reads', 'taxon')) {
+  if (is.rarefied(biom) && mode %in% c('rank', 'taxon')) {
     df[['.value']] <- df[['.value']] / depth(biom)
     breaks <- base::pretty(df[['.value']])
     labels <- paste0(breaks * 100, "%")
@@ -88,9 +88,7 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
     ylab <- paste(y, "Diversity")
   } else if (mode == "bdiv") {
     ylab <- paste(ifelse(dots[['weighted']], "Weighted", "Unweighted"), y, "Distance")
-  } else if (mode == "Reads") {
-    ylab <- paste(ifelse(is.rarefied(biom), "Relative", "Raw"), "Abundance")
-  } else if (mode == "taxon") {
+  } else if (mode %in% c("rank", "taxon")) {
     if (is.rarefied(biom)) { ylab <- paste(y, "\nRelative Abundance")
     } else                 { ylab <- paste(y, "\nRaw Abundance")      }
   }
@@ -102,7 +100,7 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
   
   
   #--------------------------------------------------------------
-  # Special case of Reads ~ rank
+  # Special case of "rank ~ ."
   #--------------------------------------------------------------
   if (isTRUE(x == ".taxa")) {
     elements[['labs']] <- c(elements[['labs']], list(x = NULL))
