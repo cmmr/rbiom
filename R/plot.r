@@ -117,7 +117,7 @@
 #'     library(rbiom)
 #'     
 #'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
+#'     biom <- read.biom(infile) %>% rarefy()
 #'     
 #'     plot(biom, Shannon ~ `Body Site`)
 #'     plot(biom, Shannon ~ Sex, layers="vb", color.by="Body Site")
@@ -128,19 +128,19 @@
 #'     plot(biom, bray ~ nmds)
 #'     
 #'     # Dissimilarity boxplots
-#'     #plot(biom, UniFrac ~ `==Body Site`)
+#'     plot(biom, UniFrac ~ `==Body Site`)
 #'     
 #'     # Dissimilarity Heatmap
-#'     #plot(biom, UniFrac ~ heatmap)
+#'     plot(biom, UniFrac ~ heatmap)
 #'     
 #'     # Taxa abundance boxplots
-#'     #plot(biom, Phylum ~ .)
+#'     plot(biom, Phylum ~ .)
 #'     
 #'     # Taxa stacked abundance
-#'     #plot(biom, Phylum ~ stacked)
+#'     plot(biom, Phylum ~ stacked)
 #'     
 #'     # Taxa abundance heatmap
-#'     #plot(biom, Phylum ~ heatmap)
+#'     plot(biom, Phylum ~ heatmap)
 #'     
 #'
 plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, patterns = NULL, shapes = NULL, p.min = 0.05, p.adj = "fdr", vline = "ci95", xlab.angle = 'auto', rline = NULL, ...) {
@@ -234,6 +234,7 @@ plot.BIOM <- function (x, formula, layers = "rls", color.by = NULL, pattern.by =
   } else if (mode == "bdiv ~ factor")      { plot_factor     #-
   } else if (mode == "bdiv ~ clust")       { plot_heatmap    #>
   } else if (mode == "rank ~ .")           { plot_factor     #-
+  } else if (mode == "rank ~ factor")      { plot_factor     #-
   } else if (mode == "rank ~ stacked")     { plot_stacked
   } else if (mode == "rank ~ clust")       { plot_heatmap    #>
   } else if (mode == "taxon ~ factor")     { plot_factor     #-

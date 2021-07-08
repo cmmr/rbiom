@@ -141,7 +141,7 @@ Visualize diversity or abundance as a boxplot, dotplot, etc.
     library(rbiom)
     
     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
+    biom <- read.biom(infile) \%>\% rarefy()
     
     plot(biom, Shannon ~ `Body Site`)
     plot(biom, Shannon ~ Sex, layers="vb", color.by="Body Site")
@@ -152,19 +152,19 @@ Visualize diversity or abundance as a boxplot, dotplot, etc.
     plot(biom, bray ~ nmds)
     
     # Dissimilarity boxplots
-    #plot(biom, UniFrac ~ `==Body Site`)
+    plot(biom, UniFrac ~ `==Body Site`)
     
     # Dissimilarity Heatmap
-    #plot(biom, UniFrac ~ heatmap)
+    plot(biom, UniFrac ~ heatmap)
     
     # Taxa abundance boxplots
-    #plot(biom, Phylum ~ .)
+    plot(biom, Phylum ~ .)
     
     # Taxa stacked abundance
-    #plot(biom, Phylum ~ stacked)
+    plot(biom, Phylum ~ stacked)
     
     # Taxa abundance heatmap
-    #plot(biom, Phylum ~ heatmap)
+    plot(biom, Phylum ~ heatmap)
     
 
 }
