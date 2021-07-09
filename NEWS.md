@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9029
+# rbiom 1.0.2.9030
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -24,6 +24,7 @@
 * Added plot function - provides stat brackets, patterned fills, overlaid geoms and more.
 * plot() can now create heatmaps.
 * plot() can now create stacked barplots.
+* Fleshed out plot()'s ordination abilities.
 
 ### Breaking Changes
 

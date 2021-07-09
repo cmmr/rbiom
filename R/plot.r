@@ -125,7 +125,7 @@
 #'     plot(biom, Simpson ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
 #'     
 #'     # Ordination
-#'     plot(biom, bray ~ nmds)
+#'     plot(biom, bray ~ nmds, color.by="Body Site")
 #'     
 #'     # Dissimilarity boxplots
 #'     plot(biom, UniFrac ~ `==Body Site`)
@@ -309,8 +309,10 @@ assign_shapes <- function (vals, keys) {
   keys <- levels(keys)
   n    <- length(keys)
   
-  if (is.null(vals))
-    vals <- if (n <= 4) 15:18 else 0:14
+  vals <- c(16, 17, 15, 3, 7, 8)
+  if (n > 6)  vals <- c(0:14)
+  if (n > 15) vals <- c(65:90, 97:122)
+  if (n > 52) vals <- rep(vals, ceiling(n / 52))
   
   assign_cleanup("shapes", vals, keys)
 }

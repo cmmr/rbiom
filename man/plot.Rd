@@ -149,7 +149,7 @@ Visualize diversity or abundance as a boxplot, dotplot, etc.
     plot(biom, Simpson ~ `Body Site`, layers="p", color.by="Sex", xlab.angle=30)
     
     # Ordination
-    plot(biom, bray ~ nmds)
+    plot(biom, bray ~ nmds, color.by="Body Site")
     
     # Dissimilarity boxplots
     plot(biom, UniFrac ~ `==Body Site`)
