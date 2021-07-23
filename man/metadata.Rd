@@ -4,12 +4,15 @@
 \alias{metadata}
 \title{Get the sample metadata.}
 \usage{
-metadata(biom, field = NULL)
+metadata(biom, field = NULL, id = FALSE)
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
 
 \item{field}{The name of the metadata field to retrieve (optional).}
+
+\item{id}{Include the sample names in an 'id' column in addition to 
+rownames (Default: FALSE).}
 }
 \value{
 A data frame of the metadata in \code{biom}. If \code{field} is

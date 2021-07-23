@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9030</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9032</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Get the sample metadata.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>metadata</span><span class='op'>(</span><span class='va'>biom</span>, field <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>metadata</span><span class='op'>(</span><span class='va'>biom</span>, field <span class='op'>=</span> <span class='cn'>NULL</span>, id <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,6 +132,11 @@
     <tr>
       <th>field</th>
       <td><p>The name of the metadata field to retrieve (optional).</p></td>
+    </tr>
+    <tr>
+      <th>id</th>
+      <td><p>Include the sample names in an 'id' column in addition to 
+rownames (Default: FALSE).</p></td>
     </tr>
     </table>
 

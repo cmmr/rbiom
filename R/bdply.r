@@ -1,0 +1,78 @@
+#' Split BIOM by metadata, apply function, and return results in a data frame.
+#' 
+#' @name bdply
+#' 
+#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' 
+#' @param vars   A character vector of metadata fields. Each unique combination
+#'        of values in these columns will be used to create a subsetted BIOM
+#'        object to pass to \code{FUN}. If \code{NULL}, \code{biom} will be
+#'        passed to \code{FUN} unaltered. Unambiguous abbreviations of metadata
+#'        fields are also accepted.
+#'           
+#' @param FUN   The function to execute on each BIOM subset. \code{FUN} should
+#'        return a data.frame, all of which will be \code{rbind}-ed together
+#'        before being returned from \code{bdply}.
+#'                 
+#' @param ...   Additional arguments to pass on to \code{FUN}.
+#'        
+#' @param fast   If \code{TRUE} (the default), the subsetted BIOM objects will
+#'        still contain the full taxa table and phylogenetic tree. Set 
+#'        \code{fast = FALSE} to run the slow steps of subsetting these 
+#'        elements as well.
+#'        
+#' @return A data.frame comprising the merged outputs of \code{FUN}, along with
+#'         the columns specified by \code{vars}.
+#' 
+#' 
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     biom <- read.biom(infile)
+#'     
+#'     bdply(biom, "Sex", nsamples)
+#'     
+#'     bdply(biom, c("Body Site", "Sex"), function (b) {
+#'       ad <- alpha.div(b)[,c("Shannon", "Simpson")]
+#'       apply(ad, 2L, mean)
+#'     })
+#'     
+#'     bdply(biom, "Body Site", function (b) {
+#'       r <- range(beta.div(b, "bray"))
+#'       data.frame(bray.min = r[[1]], bray.max = r[[2]])
+#'     })
+#'     
+#'     
+#'
+bdply <- function (biom, vars, FUN, ..., fast = TRUE) {
+  
+  #--------------------------------------------------------------
+  # Sanity checks
+  #--------------------------------------------------------------
+  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+  if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
+  vars <- validate_metrics(biom, vars, mode = "meta", multi = TRUE)
+  
+  
+  #--------------------------------------------------------------
+  # Pass-through for case of no variables to ply by
+  #--------------------------------------------------------------
+  if (length(vars) < 1)
+    return (do.call(FUN, c(list(biom), list(...))))
+  
+  
+  #--------------------------------------------------------------
+  # Run user's function on subsetted BIOM objects
+  #--------------------------------------------------------------
+  .data <- metadata(biom, id = TRUE)
+  .vars <- backtick(vars)
+  .fun  <- function (df, ...) {
+    subBIOM <- select(biom, df[['.id']], fast = TRUE)
+    do.call(FUN, c(list(subBIOM), list(...)))
+  }
+  plyr::ddply(.data, .vars, .fun, ...)
+  
+}

@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9030
+# rbiom 1.0.2.9032
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -25,6 +25,8 @@
 * plot() can now create heatmaps.
 * plot() can now create stacked barplots.
 * Fleshed out plot()'s ordination abilities.
+* plot() can now graph regressions (continuous x variable).
+* Added bdply() function for working piecemeal on a BIOM object, a la the plyr R package.
 
 ### Breaking Changes
 

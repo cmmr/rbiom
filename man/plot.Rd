@@ -3,7 +3,7 @@
 \name{plot}
 \alias{plot}
 \alias{plot.BIOM}
-\title{Visualize diversity or abundance as a boxplot, dotplot, etc.}
+\title{Visualize the BIOM data.}
 \usage{
 \method{plot}{BIOM}(
   x,
@@ -12,73 +12,57 @@
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
+  label.by = NULL,
+  sort.by = NULL,
   facet.by = NULL,
   colors = NULL,
   patterns = NULL,
   shapes = NULL,
   p.min = 0.05,
   p.adj = "fdr",
-  vline = "ci95",
-  xlab.angle = "auto",
+  se = "ci95",
   rline = NULL,
+  xlab.angle = "auto",
+  weighted = TRUE,
+  rank = "auto",
+  taxa = NULL,
+  abbr = TRUE,
+  other = FALSE,
+  anno = "tmprf",
+  gradient = heat.colors(20),
+  normalize.rows = TRUE,
+  dist = "euclidean",
+  model = y ~ x,
+  method = lm,
   ...
 )
 }
 \arguments{
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
-\item{formula}{Definition of what to plot on the x- and y- axes, given as 
-\code{y ~ x}. For example, \bold{Shannon ~ `Body Site`}. 
-X-axis options are:
-\describe{
-    \item{Metadata}{
-      The name of a column from \code{metadata(biom)}.
-    }
-    \item{Ordination Method}{
-      \bold{PCoA}, \bold{tSNE}, or \bold{NMDS}.
-    }
-}
-Y-axis options are:
-\describe{
-    \item{Alpha Diversity Metrics (one or more)}{
-      \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
-      and/or \bold{InvSimpson}.
-    }
-    \item{Beta Diversity Metrics (one only)}{
-      \bold{Manhattan}, \bold{Euclidean}, \bold{Bray-Curtis}, 
-      \bold{Jaccard}, or \bold{UniFrac}. \bold{Distance} will use 
-      \bold{UniFrac} if a phylogenetic tree is present, or 
-      \bold{Bray-Curtis} otherwise. Use in combination with the 
-      \code{weighted} parameter. Metadata column names can be 
-      prefixed with \bold{==} or \bold{!=} to limit distance 
-      calculations to \emph{within} or \emph{between}, respectively, 
-      those categories. See examples below.
-    }
-    \item{Taxa Abundances (one only)}{
-      \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
-      \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
-      \bold{OTU}. Supported ranks will vary by biom. Run 
-      \code{taxa.ranks(biom)} to see the available options. 
-      Specifying \bold{Abundance} will default to the most precise 
-      rank possible.
-    }
-   }}
+\item{formula}{Combination of terms to plot, either in \code{y ~ x} or
+\code{c("x", "y")} form.}
 
-\item{layers}{What kind of plot to create. Options are \bold{box}, 
-\bold{violin}, \bold{dot}, \bold{strip}, \bold{crossbar}, 
-\bold{errorbar}, \bold{linerange}, and/or \bold{pointrange}. 
+\item{layers}{See "Layers" section for details. Options for super box
+plots are \bold{box}, \bold{bar} (r), \bold{violin}, \bold{dot},
+\bold{strip}, \bold{crossbar}, \bold{errorbar}, \bold{linerange}, and
+\bold{pointrange}. Options for ordination plots are: \bold{point},
+\bold{centroid}, \bold{ellipse}, and \bold{name} for samples,
+and \bold{mean}, \bold{taxon}, and \bold{arrow} for taxa biplots.
 Single letter abbreviations are also accepted. For instance,
-\code{c("box", "dot")} is equivalent to \code{c("b", "d")} and 
-\code{"bd"}. Default: "rls".}
+\code{c("box", "dot")} is equivalent to \code{c("b", "d")} and
+\code{"bd"}. Default: "rls" for super box plots and "pce"/"p" for
+ordinations with/without a \code{color.by} argument.}
 
-\item{color.by, pattern.by, shape.by, facet.by}{Metadata column to color, 
-pattern, shape, and/or facet by. If that column is a \code{factor}, 
-the ordering of levels will be maintained in the plot.}
+\item{color.by, pattern.by, shape.by, label.by, sort.by, facet.by}{Metadata
+column to color, pattern, shape, label, sort, and/or facet by. If
+that column is a \code{factor}, the ordering of levels will be
+maintained in the plot.}
 
 \item{colors, patterns, shapes}{Names of the colors, patterns, and/or shapes
-to use in the plot. Available names can be found by running 
-\code{colors()}, \code{ggpattern::magick_pattern_names}, and 
-\code{0:25}, respectively. Use a named character vector to map them 
+to use in the plot. Available names can be found by running
+\code{colors()}, \code{ggpattern::magick_pattern_names}, and
+\code{0:25}, respectively. Use a named character vector to map them
 to specific factor levels in the metadata.}
 
 \item{p.min}{Minimum adjusted p-value to display on the plot with a bracket.
@@ -90,53 +74,170 @@ used as breaks for asterisk notation. (Default: \code{0.05})}
 Run \code{p.adjust.methods} for a list of available options.
 (Default: \code{fdr})}
 
-\item{vline}{How to calculate min/max of the \bold{crossbar}, 
-\bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers. 
+\item{se}{How to calculate min/max of the \bold{crossbar},
+\bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
 Options are \bold{range}, \bold{ci} (confidence interval), \bold{sd}
 (standard deviation), \bold{se} (standard error), and \bold{mad}
-(median absolute deviation). You may optionally append a number to 
-\bold{ci} to specify the confidence level, for instance 
-\code{vline = "ci95"} will calculate the 95% confidence interval, 
-whereas \code{vline = "ci99"} will give the 99% confidence interval.
+(median absolute deviation). You may optionally append a number to
+\bold{ci} to specify the confidence level, for instance
+\code{se = "ci95"} will calculate the 95\% confidence interval,
+whereas \code{se = "ci99"} will give the 99\% confidence interval.
 The center mark of \code{crossbar} and \code{pointrange} represents
-the mean, except when \code{vline="mad"} in which case it represents
-the median.
-Default: \code{ci95}}
+the mean, except when \code{se="mad"} in which case it represents
+the median. In the case of trendlines, \code{se} must be in "ciXX"
+form. Set to \code{NULL} to disable. Default: \code{ci95}}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis. 
-\bold{'auto'} (the default), automatically selects a rotation value. 
-\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
+\item{rline}{On rarefaction plots, highlight this rarefaction depth with a
+dashed line. (Default: NULL)}
+
+\item{xlab.angle}{How to rotate the tick labels on the x-axis.
+\bold{'auto'} (the default), automatically selects a rotation value.
+\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal,
 angled, and vertical, respectively.}
 
-\item{rline}{For plots with \code{Reads} as the \code{x} or \code{y} axis,
-highlight this rarefaction depth with a dashed line.}
+\item{weighted}{When employing a beta diversity metric, use the weighted
+version. (Default: \code{TRUE})}
 
-\item{...}{Parameters passed on to ggplot2 functions. Prefixing a 
-parameter name with \bold{b.}, \bold{v.}, \bold{d.}, or \bold{s.} 
-forces that parameter to be passed to, and only to, 
-\bold{geom_boxplot}, \bold{geom_violin}, \bold{geom_dotplot}, or 
-\bold{geom_jitter}, respectively. Otherwise, parameters are passed 
-along by matching against formal arguments.}
+\item{rank}{What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
+\code{taxa.ranks()} to see all options for a given BIOM object. The
+default, \code{"auto"}, selects the lowest level.}
+
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with at
+least that level of statistical significance. A character vector of
+taxon names will show only those taxa. (Default: \code{5} for
+ordination biplots, \code{10} for heatmaps.)}
+
+\item{abbr}{When selecting taxa by name, allow abbreviated 'taxa' values,
+e.g. \code{c('staph', 'lact')}. (Default: TRUE).}
+
+\item{other}{Should non-selected taxa be displayed as an "Other" group?
+(Default: \code{FALSE})}
+
+\item{anno}{Annotations to include on the plot. Options are: \bold{title},
+\bold{method}, \bold{p.value}, \bold{r.squared}, \bold{statistic},
+\bold{aic}, \bold{bic}, and \bold{axes}. See the 'stats' attribute of
+the returned plot for the complete list, which changes based on the
+test function used. Single letter abbreviations are also accepted.
+(Default: \code{"tmpr"})}
+
+\item{gradient}{For heatmaps, the color gradient to use for the cells.
+(Default: \code{heat.colors(20)})}
+
+\item{normalize.rows}{For heatmaps, should each row (taxon) have its
+values rescaled from min-max to 0-1. (Default: \code{TRUE})}
+
+\item{dist}{For \code{RANK ~ CLUST}, the distance metric to use.
+(Default: \code{"euclidean"})}
+
+\item{model}{For regressions, the formula to use in the smoothing function.
+For example: \code{y ~ x}, \code{y ~ log(x)}, or \code{y ~ poly(x,2)}.
+(Default: \code{y ~ x})}
+
+\item{...}{Parameters for underlying functions.
+See "Additional Parameters" section for details.
+For heatmaps, \code{...} is handled by \code{pheatmap::pheatmap()}.
+Otherwise, parameters are matched to formal arguments of ggplot2
+functions. Prefixing parameter names with a layer name ensures that
+a particular parameter is passed to, and only to, that layer. For
+instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the
+dotplot layer has its size set to \code{2}.}
+
+\item{regr}{For regressions, the smoothing function to use.
+For example: \code{"lm"}, \code{"glm"}, \code{"gam"}, \code{"loess"},
+or a function with similar input parameters.
+(Default: \code{"lm"})}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics will 
-        be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
-        respectively.
-        
+A \code{ggplot2} plot. The computed data points and statistics will
+be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')},
+respectively.
+
 Shapes can also be given as their string values, defined in pch_table here:
 https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
-some shapes have a colored outline given by `color`, some are filled with 
-`color`, and some are outlined in `color` and filled with `fill`. See
+some shapes have a colored outline given by \code{color}, some are filled with
+\code{color}, and some are outlined in \code{color} and filled with \code{fill}. See
 https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
 
 To expand the low end of the y axis, you can set \code{y.trans = "sqrt"} or
-\code{y.trans = "log1p"}. The former applies a square-root transformation, 
+\code{y.trans = "log1p"}. The former applies a square-root transformation,
 and the latter plots log(y + 1). Both of these methods work well with data
 that contains zeroes.
 }
 \description{
-Visualize diversity or abundance as a boxplot, dotplot, etc.
+Provide two terms to \code{plot()} and it will automatically produce the
+appropriate chart type. The terms that \code{plot} understands and valid
+combinations are listed in the Details section. Not all parameters used by
+all chart types.
 }
+\section{Terms}{
+
+Terms come in the nine categories given below. The values are
+case-insensitive and can be unambiguously abbreviated.
+\itemize{
+\item{\bold{Ordination Method (ORD): }}{
+\code{PCoA}, \code{tSNE}, or \code{NMDS}.
+}
+\item{\bold{Alpha Diversity Metric (ADIV): }}{
+\code{OTUs}, \code{Shannon}, \code{Chao1}, \code{Simpson},
+or \code{InvSimpson}.
+}
+\item{\bold{Beta Diversity Metric (BDIV): }}{
+\code{Manhattan}, \code{Euclidean}, \code{Bray-Curtis}, \code{Jaccard},
+or \code{UniFrac}.
+}
+\item{\bold{Distance Formula (DIST): }}{
+\code{correlation}, \code{euclidean}, \code{maximum}, \code{manhattan},
+\code{canberra}, \code{binary}, or \code{minkowski}.
+}
+\item{\bold{Taxonomic Rank (RANK): }}{
+\code{Kingdom}, \code{Phylum}, \code{Class}, \code{Order},
+\code{Family}, \code{Genus}, \code{Species}, \code{Strain}, or
+\code{OTU}. Supported ranks will vary by BIOM. Run
+\code{taxa.ranks(biom)} to see the available options.
+}
+\item{\bold{Individual Taxon (TAXON): }}{
+The name of a taxon from the BIOM's \code{taxonomy()}.
+For instance, \code{Firmicutes} or \code{Prevotella}.
+}
+\item{\bold{Metadata (FACTOR or NUMERIC): }}{
+The name of a column from the BIOM's \code{metadata()}.
+For instance, \code{`Body Site`} or \code{Age}.
+}
+\item{\bold{Clustering Method (CLUST): }}{
+\code{average}, \code{ward}, \code{mcquitty}, \code{single},
+\code{median}, \code{complete}, or \code{centroid}. The following
+aliases are also understood: \code{heatmap} = \code{complete},
+\code{UPGMA} = \code{average}, \code{WPGMA} = \code{mcquitty},
+\code{WPGMC} = \code{median}, and \code{UPGMC} = \code{centroid}.
+}
+\item{\bold{Special: }}{
+\code{Rarefied}, \code{Reads}, \code{Samples}, \code{.}, \code{stacked}
+}
+}
+}
+
+\section{Term Combinations}{
+\tabular{lll}{
+   Combination \tab Chart Type \tab Example \cr
+   ADIV ~ . \tab Super box \tab \code{plot(biom, Shannon ~ .)          } \cr
+   ADIV ~ FACTOR \tab Super box \tab \code{plot(biom, Shannon ~ `Body Site`)} \cr
+   BDIV ~ FACTOR \tab Super box \tab \code{plot(biom, Bray ~ Sex)           } \cr
+   RANK ~ . \tab Super box \tab \code{plot(biom, Phylum ~ .)           } \cr
+   RANK ~ FACTOR \tab Super box \tab \code{plot(biom, Phylum ~ `Body Site`) } \cr
+   TAXON ~ FACTOR \tab Super box \tab \code{plot(biom, Firmicutes ~ Sex)     } \cr
+   ADIV ~ NUMERIC \tab Line chart \tab \code{plot(biom, Shannon ~ Age)        } \cr
+   TAXON ~ NUMERIC \tab Line chart \tab \code{plot(biom, Prevoltella ~ BMI)    } \cr
+   BDIV ~ CLUST \tab Heatmap \tab \code{plot(biom, UniFrac ~ ward)       } \cr
+   RANK ~ CLUST \tab Heatmap \tab \code{plot(biom, Genus ~ heatmap)      } \cr
+   BDIV ~ ORD \tab Ordination \tab \code{plot(biom, Bray ~ NMDS)          } \cr
+   RANK ~ stacked \tab Stacked bar \tab \code{plot(biom, Family ~ stacked)     } \cr
+   Rarefied ~ Reads \tab Rarefaction \tab \code{plot(biom, Rarefied ~ Reads)     } \cr
+   Rarefied ~ Samples \tab Rarefaction \tab \code{plot(biom, Rarefied ~ Samples)   } \cr
+   Rarefied ~ ADIV \tab Rarefaction \tab \code{plot(biom, Rarefied ~ Shannon)   } \cr
+}
+}
+
 \examples{
     library(rbiom)
     

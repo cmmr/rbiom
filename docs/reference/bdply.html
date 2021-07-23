@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reduce a distance matrix to two or three dimensions — ordinate • rbiom</title>
+<title>Split BIOM by metadata, apply function, and return results in a data frame. — bdply • rbiom</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Reduce a distance matrix to two or three dimensions — ordinate" />
-<meta property="og:description" content="Reduce a distance matrix to two or three dimensions" />
+<meta property="og:title" content="Split BIOM by metadata, apply function, and return results in a data frame. — bdply" />
+<meta property="og:description" content="Split BIOM by metadata, apply function, and return results in a data frame." />
 
 
 
@@ -111,120 +111,92 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reduce a distance matrix to two or three dimensions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/ordinate.r'><code>R/ordinate.r</code></a></small>
-    <div class="hidden name"><code>ordinate.Rd</code></div>
+    <h1>Split BIOM by metadata, apply function, and return results in a data frame.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/cmmr/rbiom/blob/master/R/bdply.r'><code>R/bdply.r</code></a></small>
+    <div class="hidden name"><code>bdply.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Reduce a distance matrix to two or three dimensions</p>
+    <p>Split BIOM by metadata, apply function, and return results in a data frame.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ordinate</span><span class='op'>(</span>
-  <span class='va'>biom</span>,
-  ord <span class='op'>=</span> <span class='st'>"nmds"</span>,
-  method <span class='op'>=</span> <span class='st'>"bray-curtis"</span>,
-  weighted <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  tree <span class='op'>=</span> <span class='cn'>NULL</span>,
-  md <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  k <span class='op'>=</span> <span class='fl'>2</span>,
-  safe <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='va'>vars</span>, <span class='va'>FUN</span>, <span class='va'>...</span>, fast <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>.
-Alternatively, a distance matrix, such as from <a href='beta.div.html'>beta.div</a>.</p></td>
+      <td><p>A BIOM object, as returned from <a href='read.biom.html'>read.biom</a>.</p></td>
     </tr>
     <tr>
-      <th>ord</th>
-      <td><p>Method for reducing the dimensionality of a distance matrix.
-Default: "nmds". Options are:</p><dl>
-    <dt>pcoa</dt><dd><p>Principal coordinate analysis, via <code><a href='https://rdrr.io/pkg/ape/man/pcoa.html'>pcoa</a></code>.</p></dd>
-    <dt>nmds</dt><dd><p>Nonmetric multidimensional scaling, via <code><a href='https://rdrr.io/pkg/vegan/man/metaMDS.html'>metaMDS</a></code>.</p></dd>
-    <dt>tsne</dt><dd><p>t-distributed stochastic neighbor embedding, via <code><a href='https://rdrr.io/pkg/tsne/man/tsne.html'>tsne</a></code>.</p></dd>
-   
-</dl></td>
+      <th>vars</th>
+      <td><p>A character vector of metadata fields. Each unique combination
+of values in these columns will be used to create a subsetted BIOM
+object to pass to <code>FUN</code>. If <code>NULL</code>, <code>biom</code> will be
+passed to <code>FUN</code> unaltered. Unambiguous abbreviations of metadata
+fields are also accepted.</p></td>
     </tr>
     <tr>
-      <th>method</th>
-      <td><p>The distance algorithm to use. Options are:
-<b>"manhattan"</b>, <b>"euclidean"</b>, 
-<b>"bray-curtis"</b>, <b>"jaccard"</b>, and
-<b>"unifrac"</b>. Non-ambiguous abbreviations of the method 
-names are also accepted. A phylogenetic tree must be present in 
-<code>biom</code> or explicitly provided via <code>tree=</code> to use the 
-UniFrac methods. Ignored if <code>biom</code> is a distance matrix.
-Default: "bray-curtis"</p></td>
-    </tr>
-    <tr>
-      <th>weighted</th>
-      <td><p>Take relative abundances into account. When 
-<code>weighted=FALSE</code>, only presence/absence is considered.
- Ignored if <code>biom</code> is a distance matrix.
-(Default: <code>TRUE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>tree</th>
-      <td><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-embedded in the <code>biom</code> object if not explicitly specified. Only
-required for computing UniFrac distance matrices.  Ignored if 
-<code>biom</code> is a distance matrix.</p></td>
-    </tr>
-    <tr>
-      <th>md</th>
-      <td><p>Include metadata in the output data frame? Ignored if 
-<code>biom</code> is a distance matrix. Options are:</p><dl>
-  <dt><code>FALSE</code></dt><dd><p>Don't include metadata. (Default)</p></dd>
-  <dt><code>TRUE</code></dt><dd><p>Include all metadata.</p></dd>
-  <dt><em>character vector</em></dt><dd><p>Include only the specified metadata columns.</p></dd>
-
-</dl></td>
-    </tr>
-    <tr>
-      <th>k</th>
-      <td><p>Number of dimensions to return. (Default: 2)</p></td>
-    </tr>
-    <tr>
-      <th>safe</th>
-      <td><p>If <code>FALSE</code> (the default) autogenerated columns be named
-"Axis.1", "Axis.2", ..., "Axis.k". If <code>TRUE</code>, they will be named
-".axis.1", ".axis.2", ..., ".axis.k" to avoid conflicting with
-metadata column names.</p></td>
+      <th>FUN</th>
+      <td><p>The function to execute on each BIOM subset. <code>FUN</code> should
+return a data.frame, all of which will be <code>rbind</code>-ed together
+before being returned from <code>bdply</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments to pass on to <code><a href='https://rdrr.io/pkg/ape/man/pcoa.html'>pcoa</a></code>, 
-<code><a href='https://rdrr.io/pkg/vegan/man/metaMDS.html'>metaMDS</a></code>, or <code><a href='https://rdrr.io/pkg/tsne/man/tsne.html'>tsne</a></code>.</p></td>
+      <td><p>Additional arguments to pass on to <code>FUN</code>.</p></td>
+    </tr>
+    <tr>
+      <th>fast</th>
+      <td><p>If <code>TRUE</code> (the default), the subsetted BIOM objects will
+still contain the full taxa table and phylogenetic tree. Set 
+<code>fast = FALSE</code> to run the slow steps of subsetting these 
+elements as well.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data.frame with columns Axis.1, Axis.2, ..., Axis.k as well as columns
-        given by <code>md</code>. Rownames are the sample IDs. For pcoa ordinations, 
-        <code><a href='https://rdrr.io/r/base/attr.html'>attr(, 'eig')</a></code> will contain the eigenvalues useful for construction 
-        of ".. <!-- % variation explained" labels. --></p>
+    <p>A data.frame comprising the merged outputs of <code>FUN</code>, along with
+        the columns specified by <code>vars</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     
     <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    <span class='va'>ord</span>    <span class='op'>&lt;-</span> <span class='fu'>ordinate</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"pcoa"</span>, <span class='st'>"bray-curtis"</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>ord</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;          .axis.1      .axis.2
-#&gt; HMP01 -0.3575401  0.002362419
-#&gt; HMP02 -0.4203019  0.010404374
-#&gt; HMP03 -0.3819160  0.013483401
-#&gt; HMP04 -0.3876548  0.004854090
-#&gt; HMP05 -0.4154969 -0.011498409
-#&gt; HMP06 -0.4135847 -0.007029588</div><div class='input'>    
+    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
+    
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Sex"</span>, <span class='va'>nsamples</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      Sex V1
+#&gt; 1 Female 30
+#&gt; 2   Male 20</div><div class='input'>    
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Body Site"</span>, <span class='st'>"Sex"</span><span class='op'>)</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
+      <span class='va'>ad</span> <span class='op'>&lt;-</span> <span class='fu'><a href='alpha.div.html'>alpha.div</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>[</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Shannon"</span>, <span class='st'>"Simpson"</span><span class='op'>)</span><span class='op'>]</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>ad</span>, <span class='fl'>2L</span>, <span class='va'>mean</span><span class='op'>)</span>
+    <span class='op'>}</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        Body Site    Sex   Shannon   Simpson
+#&gt; 1 Anterior nares Female 1.4318071 0.6814534
+#&gt; 2 Anterior nares   Male 1.5053133 0.6650060
+#&gt; 3  Buccal mucosa Female 1.1739844 0.4080621
+#&gt; 4  Buccal mucosa   Male 1.7128815 0.6016869
+#&gt; 5     Mid vagina Female 0.4070774 0.1670592
+#&gt; 6         Saliva Female 2.9304968 0.8934531
+#&gt; 7         Saliva   Male 3.1718522 0.9132980
+#&gt; 8          Stool Female 2.4288307 0.8496172
+#&gt; 9          Stool   Male 2.5126148 0.8347696</div><div class='input'>    
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Body Site"</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
+      <span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/range.html'>range</a></span><span class='op'>(</span><span class='fu'><a href='beta.div.html'>beta.div</a></span><span class='op'>(</span><span class='va'>b</span>, <span class='st'>"bray"</span><span class='op'>)</span><span class='op'>)</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>bray.min <span class='op'>=</span> <span class='va'>r</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>, bray.max <span class='op'>=</span> <span class='va'>r</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+    <span class='op'>}</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        Body Site   bray.min  bray.max
+#&gt; 1 Anterior nares 0.21357850 0.8957952
+#&gt; 2  Buccal mucosa 0.11132016 0.7878359
+#&gt; 3     Mid vagina 0.04589041 1.0000000
+#&gt; 4         Saliva 0.37105391 0.6975318
+#&gt; 5          Stool 0.40223744 0.9739696</div><div class='input'>    
+    
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

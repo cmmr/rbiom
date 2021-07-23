@@ -1,19 +1,26 @@
 #' Reduce samples to a specific list
 #' 
 #' @param biom  A BIOM object, as returned from \link{read.biom}. Objects of
-#'     class \code{matrix} or \code{simple_triplet_matrix} are also accepted.
+#'        class \code{matrix} or \code{simple_triplet_matrix} are also accepted.
+#'        
 #' @param samples  Sample names, indices, or a logical vector identifying
-#'     the samples to keep. The latter two should be based on the order of
-#'     sample names given by \code{colnames(biom$counts)}.
+#'        the samples to keep. The latter two should be based on the order of
+#'        sample names given by \code{colnames(biom$counts)}.
+#'        
 #' @param nTop  Selects this number of samples, taking the sample with the most
-#'     observations first, then the sample with the second-most observations,
-#'     etc. Ties will be randomly ordered. If \code{nTop} is higher than the 
-#'     number of samples in the dataset, the entire dataset will be returned. 
-#'     See note.
+#'        observations first, then the sample with the second-most observations,
+#'        etc. Ties will be randomly ordered. If \code{nTop} is higher than the 
+#'        number of samples in the dataset, the entire dataset will be returned. 
+#'        See note.
+#'        
 #' @param nRandom  Randomly selects this number of samples. If higher than the
-#'     number of samples in the dataset, the entire dataset will be returned.
-#'     See note.
+#'        number of samples in the dataset, the entire dataset will be returned.
+#'        See note.
+#'        
 #' @param seed  Random seed, used when selecting \code{nRandom} samples.
+#'        
+#' @param fast  Should subsetting the taxa table and phylogenetic tree be 
+#'        skipped? These slow steps are often not necessary. (Default: FALSE)
 #' 
 #' Note: Generally, you will specify only one of the filters: \code{samples},
 #' \code{nTop}, or \code{nRandom}. However, specifying multiple filters is
@@ -35,7 +42,7 @@
 #'     ex5 <- select(biom, nTop = 5)
 #'     ex6 <- select(biom, samples = 10:40, nTop = 20, nRandom = 10)
 #'
-select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
+select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FALSE) {
   
   #--------------------------------------------------------------
   # Accept multiple types of input: BIOM, slam matrix, R matrix
@@ -65,7 +72,12 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
     res <- res[,sort(sample(seq_len(ncol(res)), nRandom))]
   }
   
-  res <- res[slam::row_sums(res) > 0, ]
+  
+  #--------------------------------------------------------------
+  # Drop taxa with zero observations
+  #--------------------------------------------------------------
+  if (isFALSE(fast))
+    res <- res[slam::row_sums(res) > 0, ]
   
   
   #--------------------------------------------------------------
@@ -78,20 +90,27 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0) {
   #--------------------------------------------------------------
   # Alter the rest of the BIOM to match this new subset
   #--------------------------------------------------------------
-  samples          <- colnames(res)
-  taxa             <- rownames(res)
+  samples         <- colnames(res)
+  taxa            <- rownames(res)
   
-  biom$counts      <- biom$counts[taxa, samples]
-  biom$taxonomy    <- biom$taxonomy[taxa   ,,drop=FALSE]
-  biom$metadata    <- biom$metadata[samples,,drop=FALSE]
-  biom$info$shape  <- dim(biom$counts)
-  biom$info$nnz    <- length(biom$counts$v)
+  biom$counts     <- biom$counts[taxa, samples]
+  biom$metadata   <- biom$metadata[samples,,drop=FALSE]
+  biom$info$shape <- dim(biom$counts)
+  biom$info$nnz   <- length(biom$counts$v)
   
-  if (!is.null(biom$phylogeny))
-    biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
   
-  if (!is.null(biom$sequences))
-    biom$sequences <- biom$sequences[taxa]
+  # These steps are noncritical and can be skipped for speed
+  if (isFALSE(fast)) {
+    
+    biom$taxonomy <- biom$taxonomy[taxa,,drop=FALSE]
+    
+    if (!is.null(biom$phylogeny))
+      biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
+    
+    if (!is.null(biom$sequences))
+      biom$sequences <- biom$sequences[taxa]
+  }
+  
   
   return (biom)
 }

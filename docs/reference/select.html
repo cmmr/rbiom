@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9030</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9032</span>
       </span>
     </div>
 
@@ -120,7 +120,14 @@
     <p>Reduce samples to a specific list</p>
     </div>
 
-    <pre class="usage"><span class='fu'>select</span><span class='op'>(</span><span class='va'>biom</span>, samples <span class='op'>=</span> <span class='cn'>NULL</span>, nTop <span class='op'>=</span> <span class='cn'>NULL</span>, nRandom <span class='op'>=</span> <span class='cn'>NULL</span>, seed <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>select</span><span class='op'>(</span>
+  <span class='va'>biom</span>,
+  samples <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nTop <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nRandom <span class='op'>=</span> <span class='cn'>NULL</span>,
+  seed <span class='op'>=</span> <span class='fl'>0</span>,
+  fast <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,7 +159,12 @@ See note.</p></td>
     </tr>
     <tr>
       <th>seed</th>
-      <td><p>Random seed, used when selecting <code>nRandom</code> samples.</p>
+      <td><p>Random seed, used when selecting <code>nRandom</code> samples.</p></td>
+    </tr>
+    <tr>
+      <th>fast</th>
+      <td><p>Should subsetting the taxa table and phylogenetic tree be 
+       skipped? These slow steps are often not necessary. (Default: FALSE)</p>
 <p>Note: Generally, you will specify only one of the filters: <code>samples</code>,
 <code>nTop</code>, or <code>nRandom</code>. However, specifying multiple filters is
 allowed; they will be applied in the order listed above.</p></td>

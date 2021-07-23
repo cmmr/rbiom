@@ -5,7 +5,7 @@
 ord_metrics   <- function (biom=NULL) c("PCoA", "tSNE", "NMDS")
 adiv_metrics  <- function (biom=NULL) c("Depth", "OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
 bdiv_metrics  <- function (biom=NULL) c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
-dist_metrics  <- function (biom=NULL) c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski")
+dist_metrics  <- function (biom=NULL) c("correlation", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski")
 rank_metrics  <- function (biom=NULL) c(taxa.ranks(biom), 'OTU')
 taxon_metrics <- function (biom=NULL) unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
 meta_metrics  <- function (biom=NULL) colnames(metadata(biom))

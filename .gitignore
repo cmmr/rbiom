@@ -4,6 +4,7 @@
 .Ruserdata
 .vignettes
 rbiom.Rproj
+TODO.txt
 src/*.o
 src/*.so
 src/*.dll

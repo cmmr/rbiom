@@ -1,6 +1,10 @@
 
 
-plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, patterns = NULL, shapes = NULL, p.min = 0.05, p.adj = "fdr", vline = "ci95", xlab.angle = 'auto', ...) {
+plot_factor <- function (
+  biom, x, y, layers = "rls", 
+  color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
+  colors   = NULL, patterns   = NULL, shapes   = NULL, 
+  p.min = 0.05, p.adj = "fdr", se = "ci95", xlab.angle = 'auto', ...) {
   
   dots <- list(...)
   mode <- attr(y, 'mode', exact = TRUE)
@@ -290,8 +294,8 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
   #--------------------------------------------------------------
   if (any(c("crossbar", "errorbar", "linerange", "pointrange") %in% layers)) {
     
-    if (substr(vline, 1, 2) == "ci") {
-      cl <- ifelse(vline == "ci", "95", substr(vline, 3, nchar(vline)))
+    if (substr(se, 1, 2) == "ci") {
+      cl <- ifelse(se == "ci", "95", substr(se, 3, nchar(se)))
       cl <- as.numeric(cl) / 100
       vlineFn <- function (vals) {
         tt <- try(t.test(vals, conf.level = cl), silent = TRUE)
@@ -302,27 +306,27 @@ plot_factor <- function (biom, x, y, layers = "rls", color.by = NULL, pattern.by
           ymax = ifelse(isTRUE(tt$conf.int[2]      >= 0), tt$conf.int[2],      0)
         )
       }
-    } else if (vline == "range") {
+    } else if (se == "range") {
       vlineFn <- function (vals) {
         data.frame(y = mean(vals), ymin = min(vals), ymax = max(vals))
       }
-    } else if (vline == "mad") {
+    } else if (se == "mad") {
       vlineFn <- function (vals) {
         med <- median(vals); dev <- mad(vals, med)
         data.frame(y = med, ymin = med - dev, ymax = med + dev)
       }
-    } else if (vline == "sd") {
+    } else if (se == "sd") {
       vlineFn <- function (vals) {
         avg <- mean(vals); dev <- sd(vals)
         data.frame(y = avg, ymin = avg - dev, ymax = avg + dev)
       }
-    } else if (vline == "se") {
+    } else if (se == "se") {
       vlineFn <- function (vals) {
         avg <- mean(vals); dev <- sqrt(var(vals)/length(vals))
         data.frame(y = avg, ymin = avg - dev, ymax = avg + dev)
       }
     } else {
-      stop("vline must be one of 'ci95', 'mad', 'sd', 'se', or 'range'.")
+      stop("`se` must be one of 'ci95', 'mad', 'sd', 'se', or 'range'.")
     }
     
     

@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // par_beta_div
 NumericMatrix par_beta_div(NumericMatrix mat, const char* method, bool weighted);
 RcppExport SEXP _rbiom_par_beta_div(SEXP matSEXP, SEXP methodSEXP, SEXP weightedSEXP) {

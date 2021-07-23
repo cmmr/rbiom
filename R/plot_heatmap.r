@@ -5,9 +5,8 @@
 # colors   = How to color the tracks above the heatmap (annotation_colors).
 
 # clustering_method overrides x
-# clust = alias for clustering_method
 # dist  = alias for clustering_distance_rows and clustering_distance_cols
-#   - accepts "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski"
+#   - accepts "correlation", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski"
 
 
 # "rank ~ heatmap" ONLY:
@@ -19,9 +18,8 @@
 
 plot_heatmap <- function (
   biom, x, y, 
-  color.by = NULL, colors = NULL, gradient = heat.colors(20), 
-  normalize.rows = TRUE, taxa = 10, other = FALSE, abbr = TRUE, weighted = TRUE, 
-  clust = as.vector(x), clustering_method = clust, 
+  color.by = NULL, colors = NULL, gradient = heat.colors(20), normalize.rows = TRUE, 
+  taxa = 10, other = FALSE, abbr = TRUE, weighted = TRUE, clustering_method = as.vector(x), 
   dist = "euclidean", clustering_distance_rows = dist, clustering_distance_cols = dist, ...) {
   
   params <- c(as.list(environment()), list(...))

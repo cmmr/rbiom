@@ -4,7 +4,14 @@
 \alias{select}
 \title{Reduce samples to a specific list}
 \usage{
-select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
+select(
+  biom,
+  samples = NULL,
+  nTop = NULL,
+  nRandom = NULL,
+  seed = 0,
+  fast = FALSE
+)
 }
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read.biom}. Objects of
@@ -24,7 +31,10 @@ See note.}
 number of samples in the dataset, the entire dataset will be returned.
 See note.}
 
-\item{seed}{Random seed, used when selecting \code{nRandom} samples.
+\item{seed}{Random seed, used when selecting \code{nRandom} samples.}
+
+\item{fast}{Should subsetting the taxa table and phylogenetic tree be 
+       skipped? These slow steps are often not necessary. (Default: FALSE)
 
 Note: Generally, you will specify only one of the filters: \code{samples},
 \code{nTop}, or \code{nRandom}. However, specifying multiple filters is
