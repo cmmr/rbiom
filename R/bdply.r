@@ -67,7 +67,7 @@ bdply <- function (biom, vars, FUN, ..., fast = TRUE) {
   #--------------------------------------------------------------
   # Run user's function on subsetted BIOM objects
   #--------------------------------------------------------------
-  .data <- metadata(biom, id = TRUE)
+  .data <- metadata(biom, id = ".id")
   .vars <- backtick(vars)
   .fun  <- function (df, ...) {
     subBIOM <- select(biom, df[['.id']], fast = TRUE)

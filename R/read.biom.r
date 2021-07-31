@@ -1,21 +1,31 @@
 #' Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
 #'
 #' @param src  Input data as either a file path, URL, or JSON string.
-#'     \code{read.biom} can read BIOM files formatted according to both the
-#'     version 1.0 (JSON) and 2.1 (HDF5)
-#'     \href{http://biom-format.org/documentation/}{specifications} as well as
-#'     classical tabular format. URLs must begin with \kbd{http://},
-#'     \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-#'     \code{\{} as their first non-whitespace character. Compressed (gzip or
-#'     bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted BIOM
-#'     files, the BioConductor R package \code{rhdf5} must be installed.
+#'        \code{read.biom} can read BIOM files formatted according to both the
+#'        version 1.0 (JSON) and 2.1 (HDF5)
+#'        \href{http://biom-format.org/documentation/}{specifications} as well
+#'        as classical tabular format. URLs must begin with \kbd{http://},
+#'        \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
+#'        \code{\{} as their first non-whitespace character. Compressed (gzip
+#'        or bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted
+#'        BIOM files, the BioConductor R package \code{rhdf5} must be 
+#'        installed.
+#'     
 #' @param tree  The default value of \code{auto} will read the tree from the 
-#'     BIOM file specified in \code{src}, if present. The value \code{TRUE} 
-#'     will do the same, but will generate an error message if a tree is not 
-#'     present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
-#'     without any tree data. You may also provide a file path, URL, or Newick
-#'     string to load that tree data into the final \code{BIOM} object.
+#'        BIOM file specified in \code{src}, if present. The value \code{TRUE} 
+#'        will do the same, but will generate an error message if a tree is not 
+#'        present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
+#'        without any tree data. You may also provide a file path, URL, or
+#'        Newick string to load that tree data into the final \code{BIOM} 
+#'        object.
+#'     
 #' @param prune  Should samples and taxa with zero observations be discarded?
+#'        (Default: \code{cleanup})
+#' 
+#' @param cleanup  Renames ambiguous taxons and removes leading underscores. 
+#'        Also converts character metadata into factors and dates based on 
+#'        heuristics. (Default: FALSE)
+#' 
 #' @return A \code{BIOM} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \describe{
@@ -75,7 +85,7 @@
 #'
 
 
-read.biom <- function (src, tree='auto', prune=FALSE) {
+read.biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
 
   #--------------------------------------------------------------
   # Sanity check input values
@@ -208,25 +218,10 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
   
   
   #--------------------------------------------------------------
-  # Discard samples/taxa with zero observations
+  # Return everything we've computed as a BIOM class object.
   #--------------------------------------------------------------
   
-  if (identical(prune, TRUE)) {
-    counts   <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
-    taxonomy <- taxonomy[rownames(counts),,drop=FALSE]
-    metadata <- metadata[colnames(counts),,drop=FALSE]
-    if (!is.null(sequences))
-      sequences <- sequences[rownames(counts)]
-    if (!is.null(phylogeny))
-      phylogeny <- subtree(phylogeny, rownames(counts))
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Return everything we've computed as a BIOM class object
-  #--------------------------------------------------------------
-  
-  structure(
+  biom <- structure(
     class = c("BIOM", "list"),
     list( 'counts'    = counts,
           'metadata'  = metadata,
@@ -236,8 +231,38 @@ read.biom <- function (src, tree='auto', prune=FALSE) {
           'info'      = info
     )
   )
-
-
+  
+  
+  #--------------------------------------------------------------
+  # Clean up taxa names and metadata column classes.
+  #--------------------------------------------------------------
+  if (isTRUE(cleanup)) {
+    biom[['taxonomy']] <- rbiom::taxonomy(biom, fix.names = TRUE)
+    biom[['metadata']] <- rbiom::metadata(biom, cleanup   = TRUE)
+  }
+  
+  #--------------------------------------------------------------
+  # Discard samples/taxa with zero observations
+  #--------------------------------------------------------------
+  if (isTRUE(prune)) {
+    biom <- repair(biom, prune=TRUE)
+  }
+  
+  
+  #--------------------------------------------------------------
+  # Attach read.biom() call to provenance tracking
+  #--------------------------------------------------------------
+  cl <- match.call()
+  cl[[1]] <- as.name("read.biom")
+  for (i in seq_along(cl)[-1]) {
+    val <- eval.parent(cl[[i]])
+    if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
+      cl[[i]] <- val
+  }
+  attr(biom, 'history') <- paste("biom <-", deparse1(cl))
+  
+  
+  return (biom)
 }
 
 

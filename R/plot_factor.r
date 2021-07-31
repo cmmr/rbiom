@@ -208,7 +208,7 @@ plot_factor <- function (
       if (layer %in% c("fill", "color", "shape"))
         func <- list('ggpattern', paste0("scale_pattern_", layer, "_manual"))
     }
-    return(do.call(`::`, func))
+    return (do.call(`::`, func))
   }
   
   
@@ -228,9 +228,9 @@ plot_factor <- function (
   # Violin arguments
   if ("violin" %in% layers) {
     elements[['violin']] <- list(color = "black")
-    if (dodged)            elements[['violin']][['position']] = dodge
-    if (patterned)         elements[['violin']][['pattern']]  = "magick"
-    if ("bar" %in% layers) elements[['violin']][['alpha']]    = 0.5
+    if (dodged)            elements[['violin']][['position']] <- dodge
+    if (patterned)         elements[['violin']][['pattern']]  <- "magick"
+    if ("bar" %in% layers) elements[['violin']][['alpha']]    <- 0.5
   }
   
   # Bar plot arguments
@@ -238,6 +238,7 @@ plot_factor <- function (
     elements[['bar']] <- list(stat = "summary", fun = "mean")
     if (dodged)             elements[['bar']][['position']] <- dodge
     if (dodged)             elements[['bar']][['width']]    <- 0.7
+    if (patterned)          elements[['bar']][['pattern']]  <- "magick"
     if (length(layers) > 1) elements[['bar']][['alpha']]    <- 0.6
     
     # Bar charts need extra help on non-linear axes
@@ -611,10 +612,9 @@ plot_factor <- function (
     #--------------------------------------------------------------
     for (i in grep(regx, names(dots), value = TRUE))
       elements[[layer]][[sub(regx, "", i, perl = TRUE)]] <- dots[[i]]
-    
+      
     p <- p + do.call(func, elements[[layer]])
   }
-  
   
   
   attr(p, 'data')  <- df

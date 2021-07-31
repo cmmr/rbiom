@@ -2,20 +2,6 @@
 # See also ggpmisc package
 # https://docs.r4photobiology.info/ggpmisc/articles/model-based-annotations.html
 
-# r = r.squared
-#  = adj.r.squared
-#  = sigma
-# f = statistic
-# p = p.value
-#  = df
-#  = logLik
-# a = AIC
-# b = BIC
-#  = deviance
-#  = df.residual
-#  = nobs
-# q = adj.p.value
-
 
 plot_numeric <- function (
   biom, x, y, layers = "pr", 
@@ -257,6 +243,12 @@ plot_numeric <- function (
     p <- p + do.call(func, args)
     
   }
+  
+  
+  # Attach table of stats
+  if ("glances" %in% ls())
+    attr(p, 'stats') <- glances
+  
   
   return (p)
 }

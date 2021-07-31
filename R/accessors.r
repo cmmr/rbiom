@@ -231,44 +231,6 @@ phylogeny <- function (biom) {
 }
 
 
-#' Get the sample metadata.
-#' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @param field  The name of the metadata field to retrieve (optional).
-#' @param id  Include the sample names in an 'id' column in addition to 
-#'        rownames (Default: FALSE).
-#' @return A data frame of the metadata in \code{biom}. If \code{field} is
-#'    given, will return a named vector of the field's values.
-#' @family accessor functions
-#' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     metadata(biom)[1:4,1:3]
-#'
-
-metadata <- function (biom, field=NULL, id=FALSE) {
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In metadata(), biom must be a BIOM-class object.'))
-  
-  df <- biom[['metadata']]
-  
-  if (isTRUE(id))
-    df <- data.frame(check.names = FALSE, '.id' = rownames(df), df)
-  
-  if (is.null(field))
-    return (df)
-  
-  if (!field %in% names(df))
-    stop(paste0("Field '", field, "' is not present in the metadata."))
-  
-  return (setNames(df[[field]], rownames(df)))
-}
-
-
 #' Checks if a DNA sequences are present.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
