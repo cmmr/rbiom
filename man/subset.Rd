@@ -5,17 +5,24 @@
 \alias{subset.BIOM}
 \title{Subset samples using the BIOM object's metadata}
 \usage{
-\method{subset}{BIOM}(x, ..., drop.na = TRUE, refactor = TRUE)
+\method{subset}{BIOM}(x, expr, env = parent.frame(), drop.na = TRUE, refactor = TRUE)
 }
 \arguments{
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
-\item{...}{Test to run on the metadata to identify samples to retain.}
+\item{expr}{Logical expression to run on the metadata to identify samples
+to retain.}
 
-\item{drop.na}{When \code{...} is e.g. \code{Age > 30}, should \code{!is.na(Age)} be automatically applied too?}
+\item{env}{The environment to search for variables used in \code{expr}.
+(Default: \code{parent.frame()})}
 
-\item{refactor}{When \code{...} is e.g. \code{`Body Site` \%in\% c("Stool", "Saliva")}, should
-\code{`Body Site`} be redefined as \code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?}
+\item{drop.na}{When \code{expr} is e.g. \code{Age > 30}, should 
+\code{!is.na(Age)} be automatically applied too?}
+
+\item{refactor}{When \code{expr} is e.g. 
+\code{`Body Site` \%in\% c("Stool", "Saliva")}, should
+\code{`Body Site`} be redefined as 
+\code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?}
 }
 \value{
 A \code{BIOM} object.
@@ -31,7 +38,8 @@ Subset samples using the BIOM object's metadata
     
     ex1 <- subset(biom, Age > 30)
     ex2 <- subset(biom, `Body Site` \%in\% c("Saliva", "Stool"))
-    ex3 <- subset(biom, Age < 25 & BMI > 22)
+    ex3 <- subset(biom, a == b, list(a = as.name("Body Site"), b ="Saliva"))
+    ex4 <- subset(biom, Age < 25 & BMI > 22)
 
 }
 \seealso{

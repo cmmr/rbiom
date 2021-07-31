@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9032
+# rbiom 1.0.2.9033
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -27,6 +27,7 @@
 * Fleshed out plot()'s ordination abilities.
 * plot() can now graph regressions (continuous x variable).
 * Added bdply() function for working piecemeal on a BIOM object, a la the plyr R package.
+* Provenance tracking in BIOM object's 'history' attribute.
 
 ### Breaking Changes
 

@@ -4,27 +4,34 @@
 \alias{read.biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read.biom(src, tree = "auto", prune = FALSE)
+read.biom(src, tree = "auto", prune = cleanup, cleanup = FALSE)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
 \code{read.biom} can read BIOM files formatted according to both the
 version 1.0 (JSON) and 2.1 (HDF5)
-\href{http://biom-format.org/documentation/}{specifications} as well as
-classical tabular format. URLs must begin with \kbd{http://},
+\href{http://biom-format.org/documentation/}{specifications} as well
+as classical tabular format. URLs must begin with \kbd{http://},
 \kbd{https://}, \kbd{ftp://}, or \kbd{ftps://}. JSON files must have
-\code{\{} as their first non-whitespace character. Compressed (gzip or
-bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted BIOM
-files, the BioConductor R package \code{rhdf5} must be installed.}
+\code{\{} as their first non-whitespace character. Compressed (gzip
+or bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted
+BIOM files, the BioConductor R package \code{rhdf5} must be 
+installed.}
 
 \item{tree}{The default value of \code{auto} will read the tree from the 
 BIOM file specified in \code{src}, if present. The value \code{TRUE} 
 will do the same, but will generate an error message if a tree is not 
 present. Setting \code{tree=FALSE} will return a \code{BIOM} object 
-without any tree data. You may also provide a file path, URL, or Newick
-string to load that tree data into the final \code{BIOM} object.}
+without any tree data. You may also provide a file path, URL, or
+Newick string to load that tree data into the final \code{BIOM} 
+object.}
 
-\item{prune}{Should samples and taxa with zero observations be discarded?}
+\item{prune}{Should samples and taxa with zero observations be discarded?
+(Default: \code{cleanup})}
+
+\item{cleanup}{Renames ambiguous taxons and removes leading underscores. 
+Also converts character metadata into factors and dates based on 
+heuristics. (Default: FALSE)}
 }
 \value{
 A \code{BIOM} class object containing the parsed data. This object
