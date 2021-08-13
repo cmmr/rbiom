@@ -7,7 +7,7 @@ plot_numeric <- function (
   biom, x, y, layers = "pr", 
   color.by = NULL, shape.by = NULL, facet.by = NULL, 
   colors   = NULL, shapes   = NULL, 
-  se = "ci95", model = y ~ x, regr = "lm", 
+  se = "ci95", model = y ~ x, regr = lm, 
   p.adj = "fdr", anno = "mpr", ...) {
   
   dots <- list(...)
@@ -15,52 +15,22 @@ plot_numeric <- function (
   
   
   #-----------------------------------------------
-  # ggplot2 layers
+  # Layers to include in the plot
   #-----------------------------------------------
-  layerspecs <- list(
-      'point'      = list('.fun' = ggplot2::geom_point,         '.regex' = "^p(|oint)\\."),
-      'regression' = list('.fun' = ggplot2::stat_smooth,        '.regex' = "^r(|egression)\\."),
-      'xaxis'      = list('.fun' = ggplot2::scale_x_continuous, '.regex' = "^x(|axis)\\."),
-      'yaxis'      = list('.fun' = ggplot2::scale_y_continuous, '.regex' = "^y(|axis)\\."),
-      'labs'       = list('.fun' = ggplot2::labs,               '.regex' = "^labs\\."),
-      'theme'      = list('.fun' = ggplot2::theme,              '.regex' = "^t(|heme)\\."),
-      'fill'       = list('.fun' = ggplot2::scale_fill_manual,  '.regex' = "^fill\\."),
-      'color'      = list('.fun' = ggplot2::scale_color_manual, '.regex' = "^color\\."),
-      'shape'      = list('.fun' = ggplot2::scale_shape_manual, '.regex' = "^shape\\."),
-      'facet'      = list('.fun' = ggplot2::facet_wrap,         '.regex' = "^f(|acet)\\.") )
-  
-  
   layers <- layer_match(layers, c("p" = "point", "r" = "regression"), "pr")
-  layers <- c(layers, 'xaxis', 'yaxis', 'labs', 'theme')
   
   if (!is.null(color.by)) layers <- c(layers, 'fill', 'color')
   if (!is.null(shape.by)) layers <- c(layers, 'shape')
   if (!is.null(facet.by)) layers <- c(layers, 'facet')
   
-  layers <- layerspecs[layers]
+  layers <- c('ggplot', layers, 'x_cont', 'y_cont', 'labs', 'theme', 'theme_bw')
+  layers <- sapply(layers, function (x) list())
   
+  
+  #-----------------------------------------------
+  # Default arguments for the layers
+  #-----------------------------------------------
   layers[['labs']][['y']] <- as.vector(y)
-  
-  
-  #-----------------------------------------------
-  # Add dot arguments to layers
-  #-----------------------------------------------
-  for (layer in names(layers)) {
-    
-    func <- layers[[layer]][['.fun']]
-    regx <- layers[[layer]][['.regex']]
-    
-    # Unprefixed dot arguments, e.g. 'scales'="free_x"
-    #--------------------------------------------------------------
-    for (i in intersect(names(dots), formalArgs(func)))
-      layers[[layer]][[i]] <- dots[[i]]
-    
-    # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
-    #--------------------------------------------------------------
-    for (i in grep(regx, names(dots), value = TRUE))
-      layers[[layer]][[sub(regx, "", i, perl = TRUE)]] <- dots[[i]]
-  }
-  remove(list = intersect(ls(), c("layer", "func", "regx", "i")))
   
   
   
@@ -71,9 +41,14 @@ plot_numeric <- function (
   for (i in unique(c(color.by, shape.by, facet.by)))
     biom[['metadata']][[i]] %<>% as.factor()
   
-  md <- unique(c(x, color.by, shape.by, facet.by))
-  df <- distill(biom = biom, metric = y, md = md, safe = TRUE)
+  md     <- unique(c(x, color.by, shape.by, facet.by))
+  ggdata <- distill(biom = biom, metric = y, md = md, safe = TRUE)
   
+  
+  #-----------------------------------------------
+  # All the layers will share a single data frame
+  #-----------------------------------------------
+  ggdata[['.src']] <- "points"
   
   
   #-----------------------------------------------
@@ -82,6 +57,7 @@ plot_numeric <- function (
   if ("regression" %in% names(layers)) {
     
     
+    #-----------------------------------------------
     # Parse the formula from 'model'
     #-----------------------------------------------
     tryCatch({
@@ -90,35 +66,22 @@ plot_numeric <- function (
     }, error = function (e) stop("Invalid value for `formula`. ", e) )
     
     
-    # Parse the regression function from 'regr'
+    #-----------------------------------------------
+    # Does 'regr' looks like a regression function?
     #-----------------------------------------------
     tryCatch({
-      
-      if (is.character(regr)) {
-        if (any(grepl("::", regr, fixed = TRUE))) { # regr = "stats::lm"
-          method <- do.call(`::`, as.list(strsplit(regr, "::")[[1]]))
-          
-        } else { # regr = "lm"
-          method <- get(regr)
-        }
-        
-      } else { # regr = lm  or  regr = function(f,data) { ... }
-        method <- regr
-        regr   <- substr(deparse(substitute(regr)), 1, 10)
-      }
-      stopifnot(is(method, 'function'))
-      
-      if (!all(c('formula', 'data') %in% formalArgs(method)))
+      stopifnot(is(regr, 'function'))
+      if (!all(c('formula', 'data') %in% formalArgs(regr)))
         stop("function does not have parameters 'formula' and 'data'.")
-      
     }, error = function (e) stop("Invalid value for `regr`. ", e) )
     
     
     
+    #-----------------------------------------------
     # Parameters for stat_smooth()
     #-----------------------------------------------
     layers[['regression']][['formula']] <- formula
-    layers[['regression']][['method']]  <- method
+    layers[['regression']][['method']]  <- regr
     
     if (is.null(se)) {
       layers[['regression']][['se']] <- FALSE
@@ -133,56 +96,88 @@ plot_numeric <- function (
     }
     
     
+    #-----------------------------------------------
     # Run Statistics
     #-----------------------------------------------
     
     # change `y ~ x` into `Shannon ~ BMI`
     formula <- do.call(substitute, list(expr = model, env = list(x=as.name(x), y=as.name(y))))
     
-    ply_by <- unique(intersect(names(df), c(color.by, shape.by, facet.by)))
-    ply_df <- df[,intersect(names(df), c(".value", all.vars(formula), ply_by)),drop=F]
+    ply_by <- unique(intersect(names(ggdata), c(color.by, shape.by, facet.by)))
+    ply_df <- ggdata[,intersect(names(ggdata), c(".value", all.vars(formula), ply_by)),drop=F]
     names(ply_df) <- sub(".value", y, names(ply_df))
     
-    # broomable <- methods(broom::glance) %>% as.character() %>% sub("glance.", "", .)
-    
-    glances <- plyr::ddply(ply_df, backtick(ply_by), function(x) {
+    stats_df <- plyr::ddply(ply_df, backtick(ply_by), function(x) {
       tryCatch(
         error   = function (e) return (NULL),
         warning = function (w) return (NULL),
         {
-          method(formula, data = x) %>% broom::glance() %>% signif(3)
+          regr(formula, data = x) %>% broom::glance() %>% signif(3)
         })
     })
-    if ('p.value' %in% names(glances))
-      glances[['adj.p.value']] <- p.adjust(glances[['p.value']], method = p.adj)
+    if ('p.value' %in% names(stats_df))
+      stats_df[['adj.p.value']] <- p.adjust(stats_df[['p.value']], method = p.adj)
     
     
+    #-----------------------------------------------
     # Add Annotations
     #-----------------------------------------------
-    anno <- layer_match(anno, c(names(glances), "method"), "mpr")
+    anno <- layer_match(anno, c(names(stats_df), "method"), "mpr")
     
     if ('method' %in% anno)
-      layers[['labs']][['caption']] <- paste0("Regression formula: ", regr, "(", format(formula), ")" )
+      layers[['labs']][['caption']] <- paste0("Regression formula: ", fun_toString(regr), "(", format(formula), ")" )
+    
     
     anno <- setdiff(anno, "method")
-    if (isTRUE(length(anno) > 0 && nrow(glances) > 0)) {
-      glances[['.label']] <- apply(glances[,anno,drop=F], 1L, function (x) paste(names(x), sep=" = ", x, collapse="; "))
+    if (isTRUE(length(anno) > 0 && nrow(stats_df) > 0)) {
+      stats_df[['.label']] <- apply(stats_df[,anno,drop=F], 1L, function (x) paste(names(x), sep=" = ", x, collapse="; "))
       
       if (is.null(facet.by)) {
-        layers[['labs']][['subtitle']] <- glances[['.label']]
+        layers[['labs']][['subtitle']] <- stats_df[['.label']]
         
       } else {
-        layers[['stats_anno']] <- list(
-          .fun    = ggplot2::geom_text,
-          data    = glances[,c(ply_by, '.label')],
-          mapping = aes(label = .label),
+        
+        #-----------------------------------------------
+        # Add stats to overall data frame
+        #-----------------------------------------------
+        layers[['stats_text']] <- list(
+          data    = ~ subset(.x, .src == "stats"),
+          mapping = list(label = ".label"),
           x       = -Inf, 
           y       =  Inf,
-          hjust   = -0.04, 
-          vjust   = 1.5
+          hjust   = -0.04
         )
-        layers[['yaxis']][['expand']] <- expansion(mult = c(0, 0.08))
+        
+        
+        #-----------------------------------------------
+        # df will be appended to ggdata
+        #-----------------------------------------------
+        df <- stats_df[,c(ply_by, '.label')]
+        df[['.src']] <- "stats"
+        
+        
+        #-----------------------------------------------
+        # Prevent labels from colliding with each other
+        #-----------------------------------------------
+        if (!is.null(color.by) && !identical(color.by, facet.by)) {
+          ypos <- as.numeric(df[[color.by]])
+          df[['.vjust']] <- 1.5 * ypos
+          layers[['stats_text']][['mapping']] %<>% c(list(vjust = ".vjust"))
+          layers[['y_cont']][['expand']] <- structure(
+            expansion(mult = c(0, 0.08) * max(ypos)), 
+            'display' = sprintf("expansion(mult = c(0, %.2f))", 0.08 * max(ypos)) )
+          
+        } else {
+          layers[['stats_text']][['vjust']] <- 1.5
+          layers[['y_cont']][['expand']] <- structure(
+            expansion(mult = c(0, 0.08)), 
+            'display' = sprintf("expansion(mult = c(0, 0.08))") )
+        }
+        
+        ggdata %<>% append_df(df)
       }
+      
+      stats_df <- stats_df[,setdiff(names(stats_df), '.label'),drop=F]
     }
   }
   
@@ -194,6 +189,7 @@ plot_numeric <- function (
     layers[['facet']][['facets']] = backtick(facet.by)
     
   } else if (length(facet.by) > 1) {
+    layers[['facet']][['.fn']]  <- "facet_grid"
     layers[['facet']][['.fun']] <- ggplot2::facet_grid
     rows <- rows %>% head(2) %>% rev() %>% backtick()
     rows <- as.formula(paste(rows, collapse = " ~ "))
@@ -213,7 +209,7 @@ plot_numeric <- function (
   # Define which color and shape names to use
   #--------------------------------------------------------------
   if (!is.null(color.by)) {
-    colors <- assign_colors(colors, df[[color.by]])
+    colors <- assign_colors(colors, ggdata[[color.by]])
     aes_args[['color']] <- as.name(color.by)
     aes_args[['fill']]  <- as.name(color.by)
     layers[['fill']][['values']]  <- colors
@@ -221,7 +217,7 @@ plot_numeric <- function (
   }
   
   if (!is.null(shape.by)) {
-    shapes <- assign_shapes(shapes, df[[shape.by]])
+    shapes <- assign_shapes(shapes, ggdata[[shape.by]])
     aes_args[['shape']] <- as.name(shape.by)
     layers[['shape']][['values']] <- shapes
   }
@@ -229,25 +225,28 @@ plot_numeric <- function (
   
   
   #--------------------------------------------------------------
-  # Create the plot and add each layer with its arguments
+  # One-off tweaks
   #--------------------------------------------------------------
-  p <- ggplot(df, do.call(aes_string, aes_args, quote = TRUE)) + 
-    theme_bw()
-  
-  for (layer in names(layers)) {
-    
-    func <- layers[[layer]][['.fun']]
-    args <- layers[[layer]]
-    args <- args[grep("^\\.", names(args), invert = TRUE)]
-    
-    p <- p + do.call(func, args)
-    
-  }
+  layers[['labs']][['y']] %<>% sub(
+    fixed       = TRUE,
+    pattern     = "OTUs Diversity", 
+    replacement = "Observed OTUs" )
   
   
+  
+  #--------------------------------------------------------------
+  # Create the plot and add each layer with its arguments.
+  # Also attach a human-readable version of the plot command.
+  #--------------------------------------------------------------
+  layers[['ggplot']] %<>% c(list(data = ggdata, mapping = aes_args))
+  p <- layers_toPlot(layers, dots)
+  
+  
+  #--------------------------------------------------------------
   # Attach table of stats
-  if ("glances" %in% ls())
-    attr(p, 'stats') <- glances
+  #--------------------------------------------------------------
+  if ("stats_df" %in% ls())
+    attr(p, 'stats') <- stats_df
   
   
   return (p)

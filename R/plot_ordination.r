@@ -38,68 +38,80 @@ plot_ordination <- function (
   
   
   #-----------------------------------------------
-  # User-editable layers
+  # ggplot2 layers
   #-----------------------------------------------
-  layers <- tolower(layers)
-  layerlist <- c(
-    "point" = "p", "centroid" = "c", "ellipse" = "e", "name" = "n", 
-    "mean"  = "m", "taxon" = "t",    "arrow" = "a" )
-  if (all(is.na(pmatch(layers, names(layerlist)))))
-    layers <- strsplit(layers, '')[[1]]
-  layers <- unname(layerlist[pmatch(tolower(layers), names(layerlist))])
-  layers <- layers[!is.na(layers)]
+  layerspecs <- list(
+    'point'      = list('.fn' = "geom_point",         '.regex' = "^p(|oint)\\."),
+    'centroid'   = list('.fn' = "geom_segment",       '.regex' = "^c(|entroid)\\."),
+    'ellipse'    = list('.fn' = "stat_ellipse",       '.regex' = "^e(|llipse)\\."),
+    'name'       = list('.fn' = "geom_text",          '.regex' = "^n(|ame)\\."),
+    'stats_text' = list('.fn' = "geom_text",          '.regex' = "^s(|tats)\\."),
+    'mean'       = list('.fn' = "geom_point",         '.regex' = "^m(|ean)\\."),
+    'arrow'      = list('.fn' = "geom_segment",       '.regex' = "^a(|rrow)\\."),
+    'taxon'      = list('.fn' = "geom_label",         '.regex' = "^t(|axon)\\."),
+    'xaxis'      = list('.fn' = "scale_x_continuous", '.regex' = "^x(|axis)\\."),
+    'yaxis'      = list('.fn' = "scale_y_continuous", '.regex' = "^y(|axis)\\."),
+    'labs'       = list('.fn' = "labs",               '.regex' = "^labs\\."),
+    'theme'      = list('.fn' = "theme",              '.regex' = "^theme\\."),
+    'fill'       = list('.fn' = "scale_fill_manual",  '.regex' = "^fill\\."),
+    'color'      = list('.fn' = "scale_color_manual", '.regex' = "^color\\."),
+    'shape'      = list('.fn' = "scale_shape_manual", '.regex' = "^shape\\."),
+    'size'       = list('.fn' = "scale_size_manual",  '.regex' = "^size\\."),
+    'facet'      = list('.fn' = "facet_wrap",         '.regex' = "^f(|acet)\\.") )
+  for (i in seq_along(layerspecs))
+    layerspecs[[i]][['.fun']] <- do.call(`::`, list("ggplot2", layerspecs[[i]][['.fn']]))
   
-  if (is.null(layers))
-    layers <- if(is.null(color.by)) "p" else c("p", "c", "e")
-  
-  layers <- sapply(layers, simplify = F, function (i) {
-      list(
-        'fun' = list(
-          'p' = ggplot2::geom_point,   'm' = ggplot2::geom_point,
-          'n' = ggplot2::geom_text,    't' = ggrepel::geom_label_repel,
-          'c' = ggplot2::geom_segment, 'a' = ggplot2::geom_segment,
-          'e' = ggplot2::stat_ellipse )[[i]],
-        'args' = list()
-      )
-    })
+  layerspecs[['taxon']][['.fn']]  <- "ggrepel::geom_label_repel"
+  layerspecs[['taxon']][['.fun']] <- ggrepel::geom_label_repel
   
   
   #-----------------------------------------------
-  # Annotations
+  # Layers requested by user
   #-----------------------------------------------
-  anno <- tolower(anno)
-  annolist <- c(
-    "title" = "t", "method" = "m", "p-value" = "p", 
-    "r-squared"  = "r", "f-statistic" = "f", "axes" = "a" )
-  if (all(is.na(pmatch(anno, names(annolist)))))
-    anno <- strsplit(anno, '')[[1]]
-  anno <- unname(annolist[pmatch(tolower(anno), names(annolist))])
-  anno <- anno[!is.na(anno)]
-  
-  if (is.null(anno))
-    anno <- c("t", "m", "p", "r", "f")
+  layers <- layer_match(
+    x       = layers, 
+    choices = c("point", "centroid", "ellipse", "name", "mean", "taxon", "arrow"), 
+    default = if (is.null(color.by)) "p" else c("p", "c", "e") )
   
   
-  elements <- list(
-    'scale_x_continuous' = list(),
-    'scale_y_continuous' = list(),
-    'labs'               = list('x' = NULL, 'y' = NULL),
-    'theme'              = list(
+  #-----------------------------------------------
+  # Required layers  
+  #-----------------------------------------------
+  layers <- c(layers, 'xaxis', 'yaxis', 'labs', 'theme')
+  
+  
+  #-----------------------------------------------
+  # Annotations requested by user
+  #-----------------------------------------------
+  anno <- layer_match(
+    x       = layers, 
+    choices = c("title", "method", "p-value", "r-squared", "f-statistic", "axes"), 
+    default = c("t", "m", "p", "r", "f") )
+  
+  
+  #-----------------------------------------------
+  # Default arguments for layers
+  #-----------------------------------------------
+  layers[['labs']]  %<>% c(list('x' = NULL, 'y' = NULL))
+  
+  layers[['theme']] %<>% c(list(
       'panel.border'     = element_rect(color = "black", fill = FALSE, size = 1),
       'panel.grid.major' = element_blank(), # remove major grid
       'panel.grid.minor' = element_blank(), # remove minor grid
-      'panel.background' = element_rect(fill = "white") )
-  )
-  if (isFALSE("a" %in% anno)) {
-    elements[['theme']][['axis.text']]  <- element_blank()
-    elements[['theme']][['axis.ticks']] <- element_blank()
+      'panel.background' = element_rect(fill = "white") ))
+  
+  if (isFALSE("axis" %in% anno)) {
+    layers[['theme']][['axis.text']]  <- element_blank()
+    layers[['theme']][['axis.ticks']] <- element_blank()
   }
+  
+  layers[['facet']][['scales']] <- "free"
   
   
   #-----------------------------------------------
   # Determine which taxonomic rank to overlay
   #-----------------------------------------------
-  if (any(c("m", "a", "t") %in% names(layers))) {
+  if (any(c("mean", "arrow", "taxon") %in% names(layers))) {
     
     if (is.null(rank) || rank %in% c("", "auto")) {
       if (is.character(taxa)) {
@@ -119,6 +131,7 @@ plot_ordination <- function (
   #-----------------------------------------------
   ggdata <- bdply(biom, facet.by, function (b) {
     
+    
     #-----------------------------------------------
     # Compute distance matrix and ordination.
     #-----------------------------------------------
@@ -137,7 +150,7 @@ plot_ordination <- function (
     #-----------------------------------------------
     # Adonis / PERMANOVA
     #-----------------------------------------------
-    if (!is.null(color.by) && any(c("p", "r", "f") %in% anno)) {
+    if (!is.null(color.by) && any(c("p-value", "r-squared", "f-statistic") %in% anno)) {
       
       ids   <- sample.names(b)
       mtx   <- as.matrix(dm)[ids, ids]
@@ -151,9 +164,9 @@ plot_ordination <- function (
             '.src'    = "stats",
             '.sample' = NA,
             '.label'  = paste(collapse="; ", c(
-                if ("p" %in% anno) paste("P-Value:",     signif(obj$aov.tab[['Pr(>F)']][[1]],  3)) else NULL,
-                if ("r" %in% anno) paste("R-Squared:",   signif(obj$aov.tab[['R2']][[1]],      3)) else NULL,
-                if ("f" %in% anno) paste("F-Statistic:", signif(obj$aov.tab[['F.Model']][[1]], 3)) else NULL
+                if ("p-value"     %in% anno) paste("P-Value:",     signif(obj$aov.tab[['Pr(>F)']][[1]],  3)) else NULL,
+                if ("r-squared"   %in% anno) paste("R-Squared:",   signif(obj$aov.tab[['R2']][[1]],      3)) else NULL,
+                if ("f-statistic" %in% anno) paste("F-Statistic:", signif(obj$aov.tab[['F.Model']][[1]], 3)) else NULL
               )),
             '.x' = NA, '.y' = NA, '.xend' = NA, '.yend' = NA, '.size' = NA
           ))
@@ -165,7 +178,7 @@ plot_ordination <- function (
     #-----------------------------------------------
     # Centroids
     #-----------------------------------------------
-    if ("c" %in% names(layers))
+    if ("centroid" %in% names(layers))
       dat <- rbind(dat,
         plyr::ddply(
           .data      = data.frame(
@@ -191,7 +204,7 @@ plot_ordination <- function (
     #-----------------------------------------------
     # BiPlot
     #-----------------------------------------------
-    if (any(c("m", "a", "t") %in% names(layers))) {
+    if (any(c("mean", "arrow", "taxon") %in% names(layers))) {
       
       # Calculate Weighted average for each taxon
       biplot             <- distill(b, rank, safe = TRUE, md = FALSE)
@@ -297,9 +310,9 @@ plot_ordination <- function (
   #-----------------------------------------------
   # How to fetch specific sub datasets from ggdata
   #-----------------------------------------------
-  ord_data       <- function (x) subset(x, .src == "ord")
-  stats_data     <- function (x) subset(x, .src == "stats")
-  centroids_data <- function (x) subset(x, .src == "centroids")
+  ord_data       <- ~ subset(.x, .src == "ord")
+  stats_data     <- ~ subset(.x, .src == "stats")
+  centroids_data <- ~ subset(.x, .src == "centroids")
   biplot_data    <- function (x) {
     x <- subset(x, .src == "biplot")
     x[['point.size']] <- x[['.size']]
@@ -324,11 +337,10 @@ plot_ordination <- function (
   }
   
   
-  
   #-----------------------------------------------
   # Plot Title
   #-----------------------------------------------
-  if ("t" %in% anno)
+  if ("title" %in% anno)
     elements[['labs']][['title']] <- paste(
       ifelse(weighted, "Weighted", "Unweighted"), y, x)
   
@@ -336,64 +348,64 @@ plot_ordination <- function (
   #-----------------------------------------------
   # Sample points
   #-----------------------------------------------
-  if ("p" %in% names(layers))
-    layers[['p']][['args']] <- list(
+  if ("point" %in% names(layers))
+    layers[['point']] %<>% c(list(
       data    = ord_data,
       mapping = curr_aes(x, y, color, shape)
-    )
+    ))
   
   
   #-----------------------------------------------
   # Sample Names (IDs)
   #-----------------------------------------------
-  if ("n" %in% names(layers))
-    layers[['n']][['args']] <- list(
+  if ("name" %in% names(layers))
+    layers[['name']] %<>% c(list(
       data    = ord_data,
       mapping = curr_aes(x, y, color, label)
-    )
+    ))
   
   
   #-----------------------------------------------
   # Ellipses
   #-----------------------------------------------
-  if ("e" %in% names(layers))
-    layers[['e']][['args']] <- list(
+  if ("ellipse" %in% names(layers))
+    layers[['ellipse']] %<>% c(list(
       data    = ord_data,
       mapping = curr_aes(x, y, color)
-    )
+    ))
   
   
   #-----------------------------------------------
   # BiPlot Arrows
   #-----------------------------------------------
-  if ("a" %in% names(layers))
-    layers[['a']][['args']] <- list(
+  if ("arrow" %in% names(layers))
+    layers[['arrow']] %<>% c(list(
       'data'    = biplot_data,
       'mapping' = aes(x=.x, xend=.xend, y=.y, yend=.yend),
       'color'   = "darkgray", 
       'size'    = 0.75, 
       'alpha'   = 0.4,
       'arrow'   = arrow(ends="first", length=unit(.5,"cm"))
-    )
+    ))
 
   
   #-----------------------------------------------
   # BiPlot Means (Points)
   #-----------------------------------------------
-  if ("m" %in% names(layers))
-    layers[['m']][['args']] <- list(
+  if ("mean" %in% names(layers))
+    layers[['mean']] %<>% c(list(
       'data'    = biplot_data,
       'mapping' = aes(x=.x, y=.y, size=point.size),
       'color'   = "darkgray", 
       'alpha'   = 0.5
-    )
+    ))
   
 
   #-----------------------------------------------
   # BiPlot Taxa Names
   #-----------------------------------------------
-  if ("t" %in% names(layers))
-    layers[['t']][['args']] <- list(
+  if ("taxon" %in% names(layers))
+    layers[['taxon']] %<>% c(list(
       'data'    = biplot_data(ggdata),
       'mapping' = aes(
         'x'          = .x, 
@@ -407,19 +419,19 @@ plot_ordination <- function (
       'segment.curvature'  = -0.1, 
       'segment.linetype'   = 8, 
       'seed'               = 0
-    )
+    ))
   
   
   #-----------------------------------------------
   # Centroids Layer
   #-----------------------------------------------
   if (any(ggdata[['.src']] == "centroids"))
-    layers[['c']][['args']] <- list (
+    layers[['centroid']] %<>% c(list(
       'data'    = centroids_data,
       'mapping' = curr_aes(x, y, xend, yend, color),
       'size'    = 0.75,
       'alpha'   = 0.4
-    )
+    ))
   
   
   #-----------------------------------------------
@@ -427,24 +439,28 @@ plot_ordination <- function (
   #-----------------------------------------------
   if (any(ggdata[['.src']] == "stats")) {
     
-    if ("m" %in% anno) {
-      elements[['labs']][['caption']] <- "Statistics computed with Adonis (1000 permutations)."
-      elements[['theme']][['plot.caption']] <- element_text(face = "italic")
+    if ("method" %in% anno) {
+      layers[['labs']][['caption']] <- "Statistics computed with Adonis (1000 permutations)."
+      layers[['theme']][['plot.caption']] <- element_text(face = "italic")
     }
     
-    if (is.null(facet.by)) {
-      elements[['labs']][['subtitle']] <- ggdata[ggdata[['.src']] == "adonis", '.label']
+    if (sum(ggdata[['.src']] == "stats") == 1) {
+      layers[['labs']][['subtitle']] <- ggdata[ggdata[['.src']] == "stats", '.label']
       
     } else {
-      elements[['geom_text']] <- list(
-        data    = stats_data,
+      layers %<>% c('stats_text')
+      
+      layers[['stats_text']] %<>% c(list(
+        data    = ~ subset(.x, .src == "stats"),
         mapping = aes(label = .label),
         x       = -Inf, 
         y       =  Inf,
         hjust   = -0.04, 
         vjust   = 1.5
-      )
-      elements[['scale_y_continuous']][['expand']] <- expansion(mult = c(0, 0.08))
+      ))
+      layers[['yaxis']][['expand']] <- structure(
+        expansion(mult = c(0, 0.08)), 
+        'display' = sprintf("expansion(mult = c(0, 0.08))") )
     }
   }
   
@@ -455,44 +471,43 @@ plot_ordination <- function (
   
   if (!is.null(color.by)) {
     colors <- assign_colors(colors, ggdata[[color.by]])
-    elements[['scale_color_manual']] <- list('values' = colors)
-    elements[['scale_fill_manual']]  <- list('values' = colors)
+    layers[['color']] %<>% c(list('values' = colors))
+    layers[['fill']]  %<>% c(list('values' = colors))
   }
   
   if (!is.null(shape.by)) {
     shapes <- assign_shapes(shapes, ggdata[[shape.by]])
-    elements[['scale_shape_manual']] <- list('values' = shapes)
+    layers[['shape']] %<>% c(list('values' = shapes))
   }
   
   if (any(c("m", "t") %in% names(layers)))
-    elements[['scale_size_continuous']] <- list(
+    layers[['size']] %<>% c(list(
       'range'  = c(3, ifelse("m" %in% names(layers), 15, 5)),
       'name'   = "Taxa Abundance",
-      'labels' = function (x) paste0(x * 100, "%") )
-  
-  
-  
-  #-----------------------------------------------
-  # Load all layer datasets into ggplot
-  #-----------------------------------------------
-  p <- ggplot2::ggplot(ggdata) + theme_bw()
-  
+      'labels' = function (x) paste0(x * 100, "%") ))
   
   
   #--------------------------------------------------------------
   # Facet arguments
   #--------------------------------------------------------------
   if (length(facet.by) == 1) {
-    elements[['facet_wrap']] <- list(
-      'facets' = backtick(facet.by),
-      'scales' = "free")
+    layers[['facet']][['facets']] = backtick(facet.by)
     
   } else if (length(facet.by) > 1) {
-    elements[['facet_grid']] <- list(
-      'rows' = as.formula(paste(
-        backtick(facet.by[[2]]), "~", backtick(facet.by[[1]]) )),
-      'scales' = "free")
+    layers[['facet']][['.fn']]  <- "facet_grid"
+    layers[['facet']][['.fun']] <- ggplot2::facet_grid
+    rows <- rows %>% head(2) %>% rev() %>% backtick()
+    rows <- as.formula(paste(rows, collapse = " ~ "))
+    layers[['facet']][['rows']] <- rows
+    remove("rows")
   }
+  
+  
+  
+  #-----------------------------------------------
+  # Load all layer datasets into ggplot
+  #-----------------------------------------------
+  p <- ggplot(ggdata) + theme_bw()
   
   
   

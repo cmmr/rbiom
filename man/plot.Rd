@@ -144,9 +144,9 @@ instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the
 dotplot layer has its size set to \code{2}.}
 
 \item{regr}{For regressions, the smoothing function to use.
-For example: \code{"lm"}, \code{"glm"}, \code{"gam"}, \code{"loess"},
+For example: \code{lm}, \code{glm}, \code{gam}, \code{loess},
 or a function with similar input parameters.
-(Default: \code{"lm"})}
+(Default: \code{lm})}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will
