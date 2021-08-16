@@ -145,7 +145,7 @@ plot_stacked <- function (biom, x, y, facet.by = NULL, label.by = NULL, sort.by 
       'panel.grid'  = element_blank(),
       'axis.text.x' = element_text(angle=-90, vjust=0.3, hjust=0)
   )
-  if (isTRUE(xlab.angle == 30))
+  if (isTRUE(xlab.angle == 30 || tolower(xlab.angle) == "angled"))
     elements[['theme']][['axis.text.x']] <- element_text(angle=-30, vjust=1, hjust=0)
   
   

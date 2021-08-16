@@ -313,6 +313,7 @@ plot_factor <- function (
     args <- list()
     
     if (dodged)                                     args[['position']] <- dodge
+    if (patterned)                                  args[['color']]    <- "black"
     if (any(c("violin", "box") %in% names(layers))) args[['color']]    <- "black"
     
     if ("errorbar"   %in% names(layers)) layers[['errorbar']]   %<>% c(args)
@@ -418,16 +419,16 @@ plot_factor <- function (
   } else {
     
     # x-axis Text Angle
-    if (xlab.angle == 'auto') {
+    if (tolower(xlab.angle) == 'auto') {
       if (!is.null(x))
         if (sum(nchar(as.character(unique(ggdata[[x]])))) > 40)
           xlab.angle <- 30
     }
     
-    if (xlab.angle == 90) {
+    if (xlab.angle == 90 || tolower(xlab.angle) == "vertical") {
       args[['axis.text.x']] <- as.cmd(element_text(angle=-90, vjust=0.3, hjust=0))
       
-    } else if (xlab.angle == 30) {
+    } else if (xlab.angle == 30 || tolower(xlab.angle) == "angled") {
       args[['axis.text.x']] <- as.cmd(element_text(angle=-30, vjust=1, hjust=0))
       
       # Ensure long x-axis labels don't get truncated at the figure's edge
@@ -450,128 +451,130 @@ plot_factor <- function (
   #--------------------------------------------------------------
   y.pos <- ifelse(isTRUE("voilin" %in% names(layers)), "violin", "max")
   
-  if (length(unique(c(x, color.by, pattern.by, shape.by))) == 1) {
-    if (isFALSE(x == ".taxa")) {
-      
-      #--------------------------------------------------------------
-      # Brackets between x-values
-      #--------------------------------------------------------------
-      stats <- stats.table(ggdata, x, ".y", by = facet.by, pairwise = TRUE, adj = p.adj, y.pos = y.pos)
-      stats[['Group1']] %<>% factor(levels = levels(ggdata[[x]]))
-      stats[['Group2']] %<>% factor(levels = levels(ggdata[[x]]))
-      
-      pvals <- stats[stats[['adj.p']] <= max(p.min),]
-      
-      
-      if (nrow(pvals) > 0) {
+  if (isTRUE(is.numeric(p.min) && p.min >= 0)) {
+    if (length(unique(c(x, color.by, pattern.by, shape.by))) == 1) {
+      if (isFALSE(x == ".taxa")) {
         
-        xpos <- as.factor(ggdata[[x]])
-        xpos <- setNames(seq_along(levels(xpos)), levels(xpos))
-        pvals[['.xmin']] <- as.numeric(xpos[pvals[['Group1']]])
-        pvals[['.xmax']] <- as.numeric(xpos[pvals[['Group2']]])
-        remove("xpos")
+        #--------------------------------------------------------------
+        # Brackets between x-values
+        #--------------------------------------------------------------
+        stats <- stats.table(ggdata, x, ".y", by = facet.by, pairwise = TRUE, adj = p.adj, y.pos = y.pos)
+        stats[['Group1']] %<>% factor(levels = levels(ggdata[[x]]))
+        stats[['Group2']] %<>% factor(levels = levels(ggdata[[x]]))
+        
+        pvals <- stats[stats[['adj.p']] <= max(p.min),]
         
         
-        if (length(p.min) == 1) {
-          asterisks <- FALSE
-          pvals[['.label']] <- paste("italic(p)==", pvals[['adj.p']])
-        } else {
-          asterisks <- TRUE
-          pvals[['.label']] <- ""
-          for (i in p.min)
-            pvals[['.label']] <- pvals[['.label']] %>%
-            paste0(ifelse(pvals[['adj.p']] <= i, "*", ""))
-        }
-        
-        
-        if (is.null(facet.by)) {
-          pvals[['.step']] <- pvals[['y.pos']] * .12
-          pvals[['y.pos']] <- pvals[['y.pos']] + (pvals[['.step']] * seq_len(nrow(pvals)))
+        if (nrow(pvals) > 0) {
           
-        } else {
-          pvals <- plyr::ddply(
-            .data      = pvals, 
-            .variables = plyr::as.quoted(as.name(facet.by)), 
-            .fun       = function (z) {
-              z[['.step']] <- z[['y.pos']] * .12
-              z[['y.pos']] <- z[['y.pos']] + (z[['.step']] * seq_len(nrow(z)))
-              return (z)
-            })
+          xpos <- as.factor(ggdata[[x]])
+          xpos <- setNames(seq_along(levels(xpos)), levels(xpos))
+          pvals[['.xmin']] <- as.numeric(xpos[pvals[['Group1']]])
+          pvals[['.xmax']] <- as.numeric(xpos[pvals[['Group2']]])
+          remove("xpos")
+          
+          
+          if (length(p.min) == 1) {
+            asterisks <- FALSE
+            pvals[['.label']] <- paste("italic(p)==", pvals[['adj.p']])
+          } else {
+            asterisks <- TRUE
+            pvals[['.label']] <- ""
+            for (i in p.min)
+              pvals[['.label']] <- pvals[['.label']] %>%
+              paste0(ifelse(pvals[['adj.p']] <= i, "*", ""))
+          }
+          
+          
+          if (is.null(facet.by)) {
+            pvals[['.step']] <- pvals[['y.pos']] * .12
+            pvals[['y.pos']] <- pvals[['y.pos']] + (pvals[['.step']] * seq_len(nrow(pvals)))
+            
+          } else {
+            pvals <- plyr::ddply(
+              .data      = pvals, 
+              .variables = plyr::as.quoted(as.name(facet.by)), 
+              .fun       = function (z) {
+                z[['.step']] <- z[['y.pos']] * .12
+                z[['y.pos']] <- z[['y.pos']] + (z[['.step']] * seq_len(nrow(z)))
+                return (z)
+              })
+          }
+          pvals[['.tick']] <- pvals[['y.pos']] - pvals[['.step']] / 4
+          
+          pvals_df <- pvals[,intersect(names(pvals), groupvars),drop=FALSE]
+          
+          ggdata %<>% append_df(data.frame(
+            check.names = FALSE, 
+            pvals_df,
+            .src   = "stats",
+            .x     = (pvals[['.xmin']] + pvals[['.xmax']]) / 2,
+            .y     = pvals[['y.pos']] + ifelse(asterisks, 0, pvals[['.step']] / 5),
+            .label = pvals[['.label']] ))
+          
+          
+          if (nrow(pvals_df) == 0 || ncol(pvals_df) == 0) {
+            pvals_df <- data.frame(row.names = seq_len(nrow(pvals) * 3))
+          } else {
+            pvals_df <- pvals_df %>% rbind(pvals_df) %>% rbind(pvals_df)
+          }
+          
+          ggdata %<>% append_df(data.frame(
+            check.names = FALSE, 
+            pvals_df,
+            .src  = "brackets",
+            .x    = c(pvals[['Group1']], pvals[['Group1']], pvals[['Group2']]) %>% as.numeric(),
+            .xend = c(pvals[['Group2']], pvals[['Group1']], pvals[['Group2']]) %>% as.numeric(),
+            .y    = c(pvals[['y.pos']],  pvals[['y.pos']],  pvals[['y.pos']]),
+            .yend = c(pvals[['y.pos']],  pvals[['.tick']],  pvals[['.tick']]) ))
+          
+          layers[['stats_text']] <- list('size' = 3, 'vjust' = 0, 'parse' = !asterisks)
+          layers[['brackets']]   <- list()
+          layers[['y_cont']][['limits']][[2]] <- max(pvals[['y.pos']]) * 1.1
+          
         }
-        pvals[['.tick']] <- pvals[['y.pos']] - pvals[['.step']] / 4
-        
-        pvals_df <- pvals[,intersect(names(pvals), groupvars),drop=FALSE]
-        
-        ggdata %<>% append_df(data.frame(
-          check.names = FALSE, 
-          pvals_df,
-          .src   = "stats",
-          .x     = (pvals[['.xmin']] + pvals[['.xmax']]) / 2,
-          .y     = pvals[['y.pos']] + ifelse(asterisks, 0, pvals[['.step']] / 5),
-          .label = pvals[['.label']] ))
-        
-        
-        if (nrow(pvals_df) == 0 || ncol(pvals_df) == 0) {
-          pvals_df <- data.frame(row.names = seq_len(nrow(pvals) * 3))
-        } else {
-          pvals_df <- pvals_df %>% rbind(pvals_df) %>% rbind(pvals_df)
-        }
-        
-        ggdata %<>% append_df(data.frame(
-          check.names = FALSE, 
-          pvals_df,
-          .src  = "brackets",
-          .x    = c(pvals[['Group1']], pvals[['Group1']], pvals[['Group2']]) %>% as.numeric(),
-          .xend = c(pvals[['Group2']], pvals[['Group1']], pvals[['Group2']]) %>% as.numeric(),
-          .y    = c(pvals[['y.pos']],  pvals[['y.pos']],  pvals[['y.pos']]),
-          .yend = c(pvals[['y.pos']],  pvals[['.tick']],  pvals[['.tick']]) ))
-        
-        layers[['stats_text']] <- list('size' = 3, 'vjust' = 0, 'parse' = !asterisks)
-        layers[['brackets']]   <- list()
-        layers[['y_cont']][['limits']][[2]] <- max(pvals[['y.pos']]) * 1.1
-        
       }
+      
+      
+    } else {
+      
+      #--------------------------------------------------------------
+      # P-value for each x position
+      #--------------------------------------------------------------
+      statcol <- setdiff(c(color.by, pattern.by, shape.by), x)
+      if (length(statcol) > 1) {
+        ggdata[['.stat']] <- interaction(lapply(statcol, function (i) { ggdata[[i]] }))
+        statcol <- ".stat"
+      }
+      stats <- stats.table(ggdata, statcol, ".y", by = c(x, facet.by), adj = p.adj, y.pos = y.pos)
+      remove("statcol")
+      
+      stats_df <- stats[,intersect(names(stats), groupvars),drop=FALSE]
+      
+      
+      ggdata %<>% append_df(data.frame(
+        check.names = FALSE, 
+        stats_df,
+        .src   = "stats",
+        .x     = as.numeric(stats[[x]]),
+        .y     = stats[['y.pos']] * 1.10,
+        .label = paste("italic(p)==", stats[['adj.p']]) ))
+      
+      ggdata %<>% append_df(data.frame(
+        check.names = FALSE, 
+        stats_df,
+        .src  = "brackets",
+        .x    = as.numeric(stats[[x]]) - .4,
+        .xend = as.numeric(stats[[x]]) + .4,
+        .y    = stats[['y.pos']] * 1.08,
+        .yend = stats[['y.pos']] * 1.08 ))
+      
+      
+      layers[['stats_text']] <- list(size = 3, vjust = 0, parse = TRUE)
+      layers[['brackets']]   <- list()
+      layers[['y_cont']][['limits']][[2]] <- max(stats[['y.pos']]) * 1.2
+      
     }
-    
-    
-  } else {
-    
-    #--------------------------------------------------------------
-    # P-value for each x position
-    #--------------------------------------------------------------
-    statcol <- setdiff(c(color.by, pattern.by, shape.by), x)
-    if (length(statcol) > 1) {
-      ggdata[['.stat']] <- interaction(lapply(statcol, function (i) { ggdata[[i]] }))
-      statcol <- ".stat"
-    }
-    stats <- stats.table(ggdata, statcol, ".y", by = c(x, facet.by), adj = p.adj, y.pos = y.pos)
-    remove("statcol")
-    
-    stats_df <- stats[,intersect(names(stats), groupvars),drop=FALSE]
-    
-    
-    ggdata %<>% append_df(data.frame(
-      check.names = FALSE, 
-      stats_df,
-      .src   = "stats",
-      .x     = as.numeric(stats[[x]]),
-      .y     = stats[['y.pos']] * 1.10,
-      .label = paste("italic(p)==", stats[['adj.p']]) ))
-    
-    ggdata %<>% append_df(data.frame(
-      check.names = FALSE, 
-      stats_df,
-      .src  = "brackets",
-      .x    = as.numeric(stats[[x]]) - .4,
-      .xend = as.numeric(stats[[x]]) + .4,
-      .y    = stats[['y.pos']] * 1.08,
-      .yend = stats[['y.pos']] * 1.08 ))
-    
-    
-    layers[['stats_text']] <- list(size = 3, vjust = 0, parse = TRUE)
-    layers[['brackets']]   <- list()
-    layers[['y_cont']][['limits']][[2]] <- max(stats[['y.pos']]) * 1.2
-    
   }
   
   
