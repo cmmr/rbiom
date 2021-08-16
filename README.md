@@ -65,9 +65,23 @@ Several functions will by default use all available CPU cores. To limit the numb
 RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
-To add caching to rbiom, specify a `cachem` object before loading. For instance:
+rbiom uses a 50MB cache to speed up repeat calculations. You can customize this cache (or disable it completely) by setting options prior to loading rbiom. For instance:
 ```r
-options(rbiom.cache = cachem::cache_mem(max_size = 50 * 1024^2))
+# 1GB cache instead
+options(rbiom.cache = 1024^3)
+
+# Disk cache rather than in memory
+options(rbiom.cache = cachem::cache_disk())
+
+# Layered cache - 100MB in memory + 2GB disk
+options(rbiom.cache = cachem::cache_layered(
+  cachem::cache_mem(max_size = 100 * 1024^2), 
+  cachem::cache_disk(max_size = 2 * 1024^3) ))
+
+# No caching
+options(rbiom.cache = 0)
+
+# Load rbiom after tweaking the caching settings
 library(rbiom)
 ```
 

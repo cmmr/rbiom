@@ -32,6 +32,7 @@ Imports:
     glue,
     jsonlite,
     magrittr,
+    memoise,
     methods,
     openxlsx,
     pheatmap,
@@ -45,7 +46,6 @@ Imports:
     tsne,
     vegan
 Suggests:
-    memoise,
     reshape2,
     rhdf5,
     testthat
