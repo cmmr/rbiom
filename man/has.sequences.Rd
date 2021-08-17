@@ -17,11 +17,7 @@ Checks if a DNA sequences are present.
 }
 \examples{
     library(rbiom)
-    
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    has.sequences(biom)
+    has.sequences(hmp50)
 
 }
 \seealso{

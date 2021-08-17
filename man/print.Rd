@@ -21,9 +21,6 @@ Summarize the contents of a BIOM object
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    print(biom)
+    print(hmp50)
 
 }

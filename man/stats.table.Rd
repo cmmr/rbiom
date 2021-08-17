@@ -75,9 +75,8 @@ Compute p-values for data vs metadata.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom   <- rarefy(read.biom(infile))
-    biom   <- subset(biom, `Body Site` \%in\% c('Saliva', 'Stool', 'Buccal mucosa'))
+    biom <- rarefy(hmp50)
+    biom <- subset(biom, `Body Site` \%in\% c('Saliva', 'Stool', 'Buccal mucosa'))
       
     
     # Overall, do the three body sites different have different Shannon

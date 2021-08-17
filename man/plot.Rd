@@ -33,7 +33,7 @@
   normalize.rows = TRUE,
   dist = "euclidean",
   model = y ~ x,
-  method = lm,
+  regr = lm,
   ...
 )
 }
@@ -134,6 +134,11 @@ values rescaled from min-max to 0-1. (Default: \code{TRUE})}
 For example: \code{y ~ x}, \code{y ~ log(x)}, or \code{y ~ poly(x,2)}.
 (Default: \code{y ~ x})}
 
+\item{regr}{For regressions, the smoothing function to use.
+For example: \code{lm}, \code{glm}, \code{gam}, \code{loess},
+or a function with similar input parameters.
+(Default: \code{lm})}
+
 \item{...}{Parameters for underlying functions.
 See "Additional Parameters" section for details.
 For heatmaps, \code{...} is handled by \code{pheatmap::pheatmap()}.
@@ -142,11 +147,6 @@ functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the
 dotplot layer has its size set to \code{2}.}
-
-\item{regr}{For regressions, the smoothing function to use.
-For example: \code{lm}, \code{glm}, \code{gam}, \code{loess},
-or a function with similar input parameters.
-(Default: \code{lm})}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will
@@ -224,7 +224,6 @@ aliases are also understood: \code{heatmap} = \code{complete},
    ADIV ~ FACTOR \tab Super box \tab \code{plot(biom, Shannon ~ `Body Site`)} \cr
    BDIV ~ FACTOR \tab Super box \tab \code{plot(biom, Bray ~ Sex)           } \cr
    RANK ~ . \tab Super box \tab \code{plot(biom, Phylum ~ .)           } \cr
-   RANK ~ FACTOR \tab Super box \tab \code{plot(biom, Phylum ~ `Body Site`) } \cr
    TAXON ~ FACTOR \tab Super box \tab \code{plot(biom, Firmicutes ~ Sex)     } \cr
    ADIV ~ NUMERIC \tab Line chart \tab \code{plot(biom, Shannon ~ Age)        } \cr
    TAXON ~ NUMERIC \tab Line chart \tab \code{plot(biom, Prevoltella ~ BMI)    } \cr
@@ -241,8 +240,7 @@ aliases are also understood: \code{heatmap} = \code{complete},
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile) \%>\% rarefy()
+    biom <- rarefy(hmp50)
     
     plot(biom, Shannon ~ `Body Site`)
     plot(biom, Shannon ~ Sex, layers="vb", color.by="Body Site")

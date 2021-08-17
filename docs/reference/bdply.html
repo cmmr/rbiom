@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9034</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9035</span>
       </span>
     </div>
 
@@ -164,14 +164,11 @@ elements as well.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     
-    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    
-    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Sex"</span>, <span class='va'>nsamples</span><span class='op'>)</span>
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>"Sex"</span>, <span class='va'>nsamples</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      Sex V1
 #&gt; 1 Female 30
 #&gt; 2   Male 20</div><div class='input'>    
-    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Body Site"</span>, <span class='st'>"Sex"</span><span class='op'>)</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Body Site"</span>, <span class='st'>"Sex"</span><span class='op'>)</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
       <span class='va'>ad</span> <span class='op'>&lt;-</span> <span class='fu'><a href='alpha.div.html'>alpha.div</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>[</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Shannon"</span>, <span class='st'>"Simpson"</span><span class='op'>)</span><span class='op'>]</span>
       <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>ad</span>, <span class='fl'>2L</span>, <span class='va'>mean</span><span class='op'>)</span>
     <span class='op'>}</span><span class='op'>)</span>
@@ -185,7 +182,7 @@ elements as well.</p></td>
 #&gt; 7         Saliva   Male 3.1718522 0.9132980
 #&gt; 8          Stool Female 2.4288307 0.8496172
 #&gt; 9          Stool   Male 2.5126148 0.8347696</div><div class='input'>    
-    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>"Body Site"</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'>bdply</span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>"Body Site"</span>, <span class='kw'>function</span> <span class='op'>(</span><span class='va'>b</span><span class='op'>)</span> <span class='op'>{</span>
       <span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/range.html'>range</a></span><span class='op'>(</span><span class='fu'><a href='beta.div.html'>beta.div</a></span><span class='op'>(</span><span class='va'>b</span>, <span class='st'>"bray"</span><span class='op'>)</span><span class='op'>)</span>
       <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>bray.min <span class='op'>=</span> <span class='va'>r</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>, bray.max <span class='op'>=</span> <span class='va'>r</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
     <span class='op'>}</span><span class='op'>)</span>

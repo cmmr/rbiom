@@ -26,7 +26,7 @@ install.packages("rbiom")
 
 The development version is available on GitHub.
 
-``` r
+```r
 install.packages("remotes")
 remotes::install_github("cmmr/rbiom")
 ```
@@ -35,7 +35,7 @@ remotes::install_github("cmmr/rbiom")
 Usage
 -----
 
-``` r
+```r
 library(rbiom)
 
 infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
@@ -61,28 +61,14 @@ dm <- beta.div(biom, 'unifrac')
 
 Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:
 
-``` r
+```r
 RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
-rbiom uses a 50MB cache to speed up repeat calculations. You can customize this cache (or disable it completely) by setting options prior to loading rbiom. For instance:
+To enable caching to speed up repeat operations, call `init.cache()`. For instance:
 ```r
-# 1GB cache instead
-options(rbiom.cache = 1024^3)
-
-# Disk cache rather than in memory
-options(rbiom.cache = cachem::cache_disk())
-
-# Layered cache - 100MB in memory + 2GB disk
-options(rbiom.cache = cachem::cache_layered(
-  cachem::cache_mem(max_size = 100 * 1024^2), 
-  cachem::cache_disk(max_size = 2 * 1024^3) ))
-
-# No caching
-options(rbiom.cache = 0)
-
-# Load rbiom after tweaking the caching settings
 library(rbiom)
+init.cache()
 ```
 
 

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9034</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9035</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Run after manually editing a BIOM object's content.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>repair</span><span class='op'>(</span><span class='va'>biom</span>, prune <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>repair</span><span class='op'>(</span><span class='va'>biom</span>, prune <span class='op'>=</span> <span class='cn'>TRUE</span>, fast <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,6 +132,11 @@
     <tr>
       <th>prune</th>
       <td><p>Remove taxa and samples with zero observations. (Default: TRUE)</p></td>
+    </tr>
+    <tr>
+      <th>fast</th>
+      <td><p>Should subsetting the phylogenetic tree and sequences be 
+skipped? These slow steps are often not necessary. (Default: FALSE)</p></td>
     </tr>
     </table>
 

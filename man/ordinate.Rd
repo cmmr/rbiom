@@ -84,9 +84,7 @@ Reduce a distance matrix to two or three dimensions
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom   <- read.biom(infile)
-    ord    <- ordinate(biom, "pcoa", "bray-curtis")
+    ord <- ordinate(hmp50, "pcoa", "bray-curtis")
     head(ord)
     
 }

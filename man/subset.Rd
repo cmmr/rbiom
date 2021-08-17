@@ -3,15 +3,22 @@
 \name{subset}
 \alias{subset}
 \alias{subset.BIOM}
-\title{Subset samples using the BIOM object's metadata}
+\title{Subset samples using the BIOM's metadata or taxonomy.}
 \usage{
-\method{subset}{BIOM}(x, expr, env = parent.frame(), drop.na = TRUE, refactor = TRUE)
+\method{subset}{BIOM}(
+  x,
+  expr,
+  env = parent.frame(),
+  drop.na = TRUE,
+  refactor = TRUE,
+  fast = FALSE
+)
 }
 \arguments{
 \item{x}{A BIOM object, as returned from \link{read.biom}.}
 
-\item{expr}{Logical expression to run on the metadata to identify samples
-to retain.}
+\item{expr}{Logical expression to run on the metadata or taxonomy (not both)
+to identify samples or taxa to retain.}
 
 \item{env}{The environment to search for variables used in \code{expr}.
 (Default: \code{parent.frame()})}
@@ -22,24 +29,26 @@ to retain.}
 \item{refactor}{When \code{expr} is e.g. 
 \code{`Body Site` \%in\% c("Stool", "Saliva")}, should
 \code{`Body Site`} be redefined as 
-\code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?}
+\code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?
+Applies to non-numeric metadata only.}
+
+\item{fast}{Should subsetting the phylogenetic tree and sequences be 
+skipped? These slow steps are often not necessary. (Default: FALSE)}
 }
 \value{
 A \code{BIOM} object.
 }
 \description{
-Subset samples using the BIOM object's metadata
+Subset samples using the BIOM's metadata or taxonomy.
 }
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    ex1 <- subset(biom, Age > 30)
-    ex2 <- subset(biom, `Body Site` \%in\% c("Saliva", "Stool"))
-    ex3 <- subset(biom, a == b, list(a = as.name("Body Site"), b ="Saliva"))
-    ex4 <- subset(biom, Age < 25 & BMI > 22)
+    ex1 <- subset(hmp50, Age > 30)
+    ex2 <- subset(hmp50, Phylum \%in\% c("Firmicutes", "Actinobacteria"))
+    ex3 <- subset(hmp50, `Body Site` \%in\% c("Saliva", "Stool"))
+    ex4 <- subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
+    ex5 <- subset(hmp50, Age < 25 & BMI > 22)
 
 }
 \seealso{

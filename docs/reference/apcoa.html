@@ -74,7 +74,7 @@ adjusted principal coordinates analysis. Bioinformatics. 2020 Jul
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9034</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9035</span>
       </span>
     </div>
 
@@ -150,18 +150,15 @@ names of this data frame should match the labels of the distance matrix.</p></td
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
     
-    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    
-    <span class='va'>dm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='unifrac.html'>unifrac</a></span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
+    <span class='va'>dm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='unifrac.html'>unifrac</a></span><span class='op'>(</span><span class='va'>hmp50</span><span class='op'>)</span>
     <span class='va'>reg_pcoa</span> <span class='op'>&lt;-</span> <span class='fu'>ape</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/pcoa.html'>pcoa</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>[[</span><span class='st'>'vectors'</span><span class='op'>]</span><span class='op'>]</span>
     <span class='va'>adj_pcoa</span> <span class='op'>&lt;-</span> <span class='fu'>apcoa</span><span class='op'>(</span><span class='va'>dm</span>, <span class='fu'><a href='metadata.html'>metadata</a></span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>[</span>,<span class='st'>'Sex'</span>,drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span><span class='op'>)</span>
-    
-    <span class='va'>ids</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='sample.names.html'>sample.names</a></span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
-    <span class='va'>color</span> <span class='op'>&lt;-</span> <span class='fu'><a href='metadata.html'>metadata</a></span><span class='op'>(</span><span class='va'>biom</span>, <span class='st'>'Sex'</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in is(biom, "BIOM"): object 'biom' not found</span></div><div class='input'>    
+    <span class='va'>ids</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='sample.names.html'>sample.names</a></span><span class='op'>(</span><span class='va'>hmp50</span><span class='op'>)</span>
+    <span class='va'>color</span> <span class='op'>&lt;-</span> <span class='fu'><a href='metadata.html'>metadata</a></span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>'Sex'</span><span class='op'>)</span>
     <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>mapping<span class='op'>=</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>reg_pcoa</span><span class='op'>[</span><span class='va'>ids</span>, <span class='fl'>1</span><span class='op'>]</span>, y<span class='op'>=</span><span class='va'>reg_pcoa</span><span class='op'>[</span><span class='va'>ids</span>, <span class='fl'>2</span><span class='op'>]</span>, color<span class='op'>=</span><span class='va'>color</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='img'><img src='apcoa-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>mapping<span class='op'>=</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>adj_pcoa</span><span class='op'>[</span><span class='va'>ids</span>, <span class='fl'>1</span><span class='op'>]</span>, y<span class='op'>=</span><span class='va'>adj_pcoa</span><span class='op'>[</span><span class='va'>ids</span>, <span class='fl'>2</span><span class='op'>]</span>, color<span class='op'>=</span><span class='va'>color</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='img'><img src='apcoa-2.png' alt='' width='700' height='433' /></div><div class='input'>    
+</div><div class='output co'>#&gt; <span class='error'>Error in FUN(X[[i]], ...): object 'adj_pcoa' not found</span></div><div class='img'><img src='apcoa-2.png' alt='' width='700' height='433' /></div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

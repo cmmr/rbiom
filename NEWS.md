@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9034
+# rbiom 1.0.2.9035
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -10,8 +10,7 @@
 * Added apcoa function for covariate adjusted principal coordinates analysis.
 * Switched from rjson to jsonlite for better handling of non-UTF characters.
 * Support for writing out biom files compressed with gzip or bzip2.
-* Memoised the functions that do heavy-lifting.
-* Set memoise to be off by default.
+* Added init.cache() function to memoise the functions that do heavy-lifting.
 * Can now download files with odd characters in their name.
 * Prevent NUL from being appended to read.biom's text inputs.
 * alpha.div can now return metadata and/or subset of adiv metrics in wide or long format.
@@ -28,6 +27,8 @@
 * plot() can now graph regressions (continuous x variable).
 * Added bdply() function for working piecemeal on a BIOM object, a la the plyr R package.
 * Provenance tracking in BIOM object's 'history' attribute.
+* 'hmp50' dataset now loads with rbiom.
+* subset() can now also subset taxa.
 
 ### Breaking Changes
 

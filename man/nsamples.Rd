@@ -17,11 +17,7 @@ Number of samples in a BIOM.
 }
 \examples{
     library(rbiom)
-    
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    nsamples(biom)
+    nsamples(hmp50)
 
 }
 \seealso{

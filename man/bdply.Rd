@@ -36,17 +36,14 @@ Split BIOM by metadata, apply function, and return results in a data frame.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
+    bdply(hmp50, "Sex", nsamples)
     
-    bdply(biom, "Sex", nsamples)
-    
-    bdply(biom, c("Body Site", "Sex"), function (b) {
+    bdply(hmp50, c("Body Site", "Sex"), function (b) {
       ad <- alpha.div(b)[,c("Shannon", "Simpson")]
       apply(ad, 2L, mean)
     })
     
-    bdply(biom, "Body Site", function (b) {
+    bdply(hmp50, "Body Site", function (b) {
       r <- range(beta.div(b, "bray"))
       data.frame(bray.min = r[[1]], bray.max = r[[2]])
     })

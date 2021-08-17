@@ -33,7 +33,7 @@ See note.}
 
 \item{seed}{Random seed, used when selecting \code{nRandom} samples.}
 
-\item{fast}{Should subsetting the taxa table and phylogenetic tree be 
+\item{fast}{Should subsetting the phylogenetic tree and sequences be 
        skipped? These slow steps are often not necessary. (Default: FALSE)
 
 Note: Generally, you will specify only one of the filters: \code{samples},
@@ -49,15 +49,12 @@ Reduce samples to a specific list
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    ex1 <- select(biom, c('HMP14', 'HMP22', 'HMP03'))
-    ex2 <- select(biom, c(32, 11, 28, 16, 46, 5))
-    ex3 <- select(biom, 1:50 \%\% 6 == 0)
-    ex4 <- select(biom, nRandom = 10)
-    ex5 <- select(biom, nTop = 5)
-    ex6 <- select(biom, samples = 10:40, nTop = 20, nRandom = 10)
+    ex1 <- select(hmp50, c('HMP14', 'HMP22', 'HMP03'))
+    ex2 <- select(hmp50, c(32, 11, 28, 16, 46, 5))
+    ex3 <- select(hmp50, 1:50 \%\% 6 == 0)
+    ex4 <- select(hmp50, nRandom = 10)
+    ex5 <- select(hmp50, nTop = 5)
+    ex6 <- select(hmp50, samples = 10:40, nTop = 20, nRandom = 10)
 
 }
 \seealso{

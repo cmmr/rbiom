@@ -27,9 +27,7 @@ This is a wrapper around \link{beta.div} for a common use case.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    biom <- select(biom, 1:10)
+    biom <- select(hmp50, 1:10)
     
     dm <- unifrac(biom)
     plot(hclust(dm), cex=.8)

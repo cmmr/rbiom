@@ -19,19 +19,16 @@ DNA sequence associated with each taxonomic identifier.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    sequences(biom)[1:4]
+    sequences(hmp50)[1:4]
     
     # Write to a compressed fasta file in the temporary directory:
-    seqs <- sequences(biom)
+    seqs <- sequences(hmp50)
     conn <- bzfile(file.path(tempdir(), "Sequences.fa.bz2"), "w")
     cat(sprintf(">\%s\n\%s", names(seqs), seqs), file=conn, sep="\n")
     close(conn)
     
     # You can also use the write.fasta function for this task:
-    write.fasta(biom, file.path(tempdir(), "Sequences.fa.gz"))
+    write.fasta(hmp50, file.path(tempdir(), "Sequences.fa.gz"))
 
 }
 \seealso{

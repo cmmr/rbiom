@@ -4,12 +4,15 @@
 \alias{repair}
 \title{Run after manually editing a BIOM object's content.}
 \usage{
-repair(biom, prune = TRUE)
+repair(biom, prune = TRUE, fast = FALSE)
 }
 \arguments{
 \item{biom}{The \code{BIOM} object to repair.}
 
 \item{prune}{Remove taxa and samples with zero observations. (Default: TRUE)}
+
+\item{fast}{Should subsetting the phylogenetic tree and sequences be 
+skipped? These slow steps are often not necessary. (Default: FALSE)}
 }
 \value{
 A \code{BIOM} object.

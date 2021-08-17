@@ -64,13 +64,10 @@ Estimate the diversity of each sample.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    ad <- alpha.div(biom)
+    ad <- alpha.div(hmp50)
     head(ad)
     
-    biom <- subset(biom, `Body Site` == "Saliva" & Age < 26)
+    biom <- subset(hmp50, `Body Site` == "Saliva" & Age < 26)
     ad   <- alpha.div(biom, "multi")
     boxplot(Shannon ~ Depth, data=ad, xlab="Reads", ylab="Diversity")
     
