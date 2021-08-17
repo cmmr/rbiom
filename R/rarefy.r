@@ -1,31 +1,35 @@
 #' Subset counts so that all samples have the same number of observations.
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'     object, as returned from \link{read.biom}. For matrices, the rows and 
-#'     columns are assumed to be the taxa and samples, respectively.
+#'        object, as returned from \link{read.biom}. For matrices, the rows and
+#'        columns are assumed to be the taxa and samples, respectively.
+#'     
 #' @param depth  The number of observations to keep, per sample. If set to
-#'     \code{NULL}, a depth will be automatically selected. Samples that have
-#'     fewer than this number of observations will be dropped. If called on
-#'     data with non-integer abundances, values will be re-scaled to integers 
-#'     between 1 and \code{depth} such that they sum to \code{depth}.
+#'        \code{NULL}, a depth will be automatically selected. Samples that 
+#'        have fewer than this number of observations will be dropped. If 
+#'        called on data with non-integer abundances, values will be re-scaled 
+#'        to integers between 1 and \code{depth} such that they sum to 
+#'        \code{depth}.
+#'     
 #' @param seed  An integer to use for seeding the random number generator. If
-#'     you need to create different random rarefactions of the same \code{BIOM}
-#'     object, set this seed value to a different number each time.
+#'        you need to create different random rarefactions of the same 
+#'        \code{BIOM} object, set this seed value to a different number each 
+#'        time.
+#'     
 #' @return A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'     object, depending on the input object type. The type of object provided
-#'     is the same type that is returned. The retained observations are randomly
-#'     selected, based on a seed value derived from the \code{BIOM} object. 
-#'     Therefore, rarefying the same biom to the same depth will always produce
-#'     the same resultant rarification.
+#'         object, depending on the input object type. The type of object 
+#'         provided is the same type that is returned. The retained 
+#'         observations are randomly selected, based on a seed value derived 
+#'         from the \code{BIOM} object. Therefore, rarefying the same biom to 
+#'         the same depth will always produce the same resultant rarefaction.
+#'         
 #' @export
 #' @examples
 #'     library(rbiom)
 #'
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     range(slam::col_sums(biom$counts))
+#'     range(slam::col_sums(hmp50$counts))
 #'
-#'     biom <- rarefy(biom, depth=1000)
+#'     biom <- rarefy(hmp50, depth=1000)
 #'     range(slam::col_sums(biom$counts))
 #'
 

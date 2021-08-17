@@ -21,8 +21,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom   <- read.biom(infile) %>% select(1:10) %>% rarefy()
+#'     biom <- select(hmp50, 1:10) %>% rarefy()
 #'     
 #'     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
 #'     attr(biom, "Unweighted Jaccard") <- beta.div(biom, 'jaccard', weighted=FALSE)

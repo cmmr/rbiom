@@ -20,11 +20,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     metrics(biom, 'adiv')
-#'     metrics(biom, 'dist')
+#'     metrics(hmp50, 'adiv')
+#'     metrics(hmp50, 'dist')
 #'
 metrics <- function (biom, mode) {
   

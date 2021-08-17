@@ -19,7 +19,7 @@
 #'        
 #' @param seed  Random seed, used when selecting \code{nRandom} samples.
 #'        
-#' @param fast  Should subsetting the taxa table and phylogenetic tree be 
+#' @param fast  Should subsetting the phylogenetic tree and sequences be 
 #'        skipped? These slow steps are often not necessary. (Default: FALSE)
 #' 
 #' Note: Generally, you will specify only one of the filters: \code{samples},
@@ -32,15 +32,12 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     ex1 <- select(biom, c('HMP14', 'HMP22', 'HMP03'))
-#'     ex2 <- select(biom, c(32, 11, 28, 16, 46, 5))
-#'     ex3 <- select(biom, 1:50 %% 6 == 0)
-#'     ex4 <- select(biom, nRandom = 10)
-#'     ex5 <- select(biom, nTop = 5)
-#'     ex6 <- select(biom, samples = 10:40, nTop = 20, nRandom = 10)
+#'     ex1 <- select(hmp50, c('HMP14', 'HMP22', 'HMP03'))
+#'     ex2 <- select(hmp50, c(32, 11, 28, 16, 46, 5))
+#'     ex3 <- select(hmp50, 1:50 %% 6 == 0)
+#'     ex4 <- select(hmp50, nRandom = 10)
+#'     ex5 <- select(hmp50, nTop = 5)
+#'     ex6 <- select(hmp50, samples = 10:40, nTop = 20, nRandom = 10)
 #'
 select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FALSE) {
   
@@ -76,8 +73,7 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FA
   #--------------------------------------------------------------
   # Drop taxa with zero observations
   #--------------------------------------------------------------
-  if (isFALSE(fast))
-    res <- res[slam::row_sums(res) > 0, ]
+  res <- res[slam::row_sums(res) > 0, ]
   
   
   #--------------------------------------------------------------
@@ -97,12 +93,11 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FA
   biom$metadata   <- biom$metadata[samples,,drop=FALSE]
   biom$info$shape <- dim(biom$counts)
   biom$info$nnz   <- length(biom$counts$v)
+  biom$taxonomy   <- biom$taxonomy[taxa,,drop=FALSE]
   
   
   # These steps are noncritical and can be skipped for speed
   if (isFALSE(fast)) {
-    
-    biom$taxonomy <- biom$taxonomy[taxa,,drop=FALSE]
     
     if (!is.null(biom$phylogeny))
       biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)

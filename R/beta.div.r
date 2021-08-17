@@ -38,17 +38,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     fullbiom <- read.biom(infile)
-#'     biom <- select(fullbiom, 1:10)
-#'     
+#'     biom <- select(hmp50, 1:10)
 #'     dm <- beta.div(biom, 'unifrac')
-#'     
 #'     as.matrix(dm)[1:4,1:4]
 #'     plot(hclust(dm))
 #'     
 #'     # Return in long format with metadata
-#'     biom <- select(fullbiom, 18:21)
+#'     biom <- select(hmp50, 18:21)
 #'     beta.div(biom, 'unifrac', md = c("Body Site", "Sex"))
 #'     
 #'     # Only look at distances among the stool sample

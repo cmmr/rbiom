@@ -12,17 +12,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     taxonomy(biom)[1:4,]
-#'     
+#'     taxonomy(hmp50)[1:4,]
 #'     
 #'     # Sometimes taxonomic names are incomplete
-#'     taxonomy(biom)[c(107,170,194), 'Genus', drop=FALSE]
+#'     taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
 #'     
 #'     # rbiom can insert more descriptive placeholders
-#'     taxonomy(biom, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
+#'     taxonomy(hmp50, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
 #'
 
 taxonomy <- function (biom, fix.names = FALSE) {

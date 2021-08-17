@@ -15,15 +15,12 @@
 #'     library(rbiom)
 #'     library(ggplot2)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     dm <- unifrac(biom)
+#'     dm <- unifrac(hmp50)
 #'     reg_pcoa <- ape::pcoa(dm)[['vectors']]
 #'     adj_pcoa <- apcoa(dm, metadata(biom)[,'Sex',drop=FALSE])
 #'     
-#'     ids   <- sample.names(biom)
-#'     color <- metadata(biom, 'Sex')
+#'     ids   <- sample.names(hmp50)
+#'     color <- metadata(hmp50, 'Sex')
 #'     ggplot(mapping=aes(x=reg_pcoa[ids, 1], y=reg_pcoa[ids, 2], color=color)) + geom_point()
 #'     ggplot(mapping=aes(x=adj_pcoa[ids, 1], y=adj_pcoa[ids, 2], color=color)) + geom_point()
 #'     

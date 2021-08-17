@@ -25,14 +25,11 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
+#'     metadata(hmp50)[1:4,1:3]
 #'     
-#'     metadata(biom)[1:4,1:3]
+#'     head(metadata(hmp50, "Body Site"))
 #'     
-#'     head(metadata(biom, "Body Site"))
-#'     
-#'     head(metadata(biom, "Body Site", cleanup=TRUE))
+#'     head(metadata(hmp50, "Body Site", cleanup=TRUE))
 #'
 
 metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {

@@ -205,8 +205,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile) %>% rarefy()
+#'     biom <- rarefy(hmp50)
 #'     
 #'     plot(biom, Shannon ~ `Body Site`)
 #'     plot(biom, Shannon ~ Sex, layers="vb", color.by="Body Site")

@@ -58,16 +58,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
+#'     distill(hmp50, "UniFrac", md=c("==Body Site", "!=Sex")) %>% head()
 #'     
-#'     distill(biom, "UniFrac", md=c("==Body Site", "!=Sex")) %>% head()
+#'     distill(hmp50, c("Shannon", "OTUs"), md=c("BMI", "Sex")) %>% head()
 #'     
-#'     distill(biom, c("Shannon", "OTUs"), md=c("BMI", "Sex")) %>% head()
+#'     distill(hmp50, "Phylum", long=FALSE, md=FALSE)[1:4,1:4]
 #'     
-#'     distill(biom, "Phylum", long=FALSE, md=FALSE)[1:4,1:4]
-#'     
-#'     distill(biom, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
+#'     distill(hmp50, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
 #'
 distill <- function (biom, metric, weighted = TRUE, rarefy = TRUE, long = TRUE, md = TRUE, safe = FALSE) {
   

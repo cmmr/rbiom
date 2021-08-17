@@ -1,12 +1,17 @@
 #' Run after manually editing a BIOM object's content.
 #'
 #' @param biom  The \code{BIOM} object to repair.
+#' 
 #' @param prune  Remove taxa and samples with zero observations. (Default: TRUE)
+#'
+#' @param fast  Should subsetting the phylogenetic tree and sequences be 
+#'        skipped? These slow steps are often not necessary. (Default: FALSE)
+#'        
 #' @return A \code{BIOM} object.
 #' @export
 
 
-repair <- function (biom, prune=TRUE) {
+repair <- function (biom, prune=TRUE, fast=FALSE) {
   
   #--------------------------------------------------------------
   # Sanity Pre-checks
@@ -21,11 +26,14 @@ repair <- function (biom, prune=TRUE) {
   sn <- intersect(colnames(biom[['counts']]), rownames(biom[['metadata']]))
   tn <- intersect(rownames(biom[['counts']]), rownames(biom[['taxonomy']]))
   
-  if (!is.null(biom[['phylogeny']]))
-    tn <- intersect(tn, tips(biom[['phylogeny']]))
-  
-  if (!is.null(biom[['sequences']]))
-    tn <- intersect(tn, names(biom[['sequences']]))
+  if (isFALSE(fast)) {
+    
+    if (!is.null(biom[['phylogeny']]))
+      tn <- intersect(tn, tips(biom[['phylogeny']]))
+    
+    if (!is.null(biom[['sequences']]))
+      tn <- intersect(tn, names(biom[['sequences']]))
+  }
   
   
   #--------------------------------------------------------------
@@ -45,16 +53,19 @@ repair <- function (biom, prune=TRUE) {
   biom[['metadata']] <- biom[['metadata']][sn,,drop=F]
   biom[['taxonomy']] <- biom[['taxonomy']][tn,,drop=F]
   
-  if (!is.null(biom[['phylogeny']])) {
-    if (length(tn) > 1) {
-      biom[['phylogeny']] <- subtree(biom[['phylogeny']], tn)
-    } else {
-      biom[['phylogeny']] <- NULL
+  if (isFALSE(fast)) {
+    
+    if (!is.null(biom[['phylogeny']])) {
+      if (length(tn) > 1) {
+        biom[['phylogeny']] <- subtree(biom[['phylogeny']], tn)
+      } else {
+        biom[['phylogeny']] <- NULL
+      }
     }
-  }
   
   if (!is.null(biom[['sequences']]))
     biom[['sequences']] <- biom[['sequences']][tn]
+  }
   
   
   #--------------------------------------------------------------
