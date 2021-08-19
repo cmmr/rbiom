@@ -1,5 +1,31 @@
 #' Subset samples using the BIOM's metadata or taxonomy.
 #' 
+#' @md
+#' @section Taxonomic abundance filtering:
+#' 
+#' For taxonomic subsetting, several functions are added or overridden to
+#' behave as expected within the subsetting expression. They are:
+#' 
+#' \code{mean()}, \code{median()}, \code{min()}, \code{max()}, \code{n()}, 
+#' \code{count()}, and \code{pct()}.
+#' 
+#' Therefore you can write 
+#' \code{subset(hmp50, mean(Genus) >= 0.1)} and the returned BIOM object will 
+#' contain only the genera that average at least 10% relative abundance across
+#' all the samples.
+#' 
+#' If you want only orders that are present in three or more samples, you can 
+#' do: \code{subset(hmp50, count(Order) >= 3)}. To require presence in 25% of 
+#' samples, you'd use: \code{subset(hmp50, pct(Order) >= 0.25)}.
+#' 
+#' Both \code{count()} and \code{pct()} have default arguments of 
+#' \code{gt=0, le=1, ge=NULL, lt=NULL}, which can be overridden to find, e.g., 
+#' which genera comprise at least 2% of the community in 10% or more of the 
+#' samples: \code{subset(hmp50, pct(Genus, ge=0.02) >= 0.10)}. 
+#' 
+#' \emph{gt = greater than, ge = greater than or equal to. lt/le similarly with 
+#' 'less than'.}
+#' 
 #' @name subset
 #' @param x   A BIOM object, as returned from \link{read.biom}.
 #' 
@@ -25,13 +51,15 @@
 #' @export
 #' @seealso \code{\link{select}}
 #' @examples
+#'   \dontrun{
 #'     library(rbiom)
 #'     
-#'     ex1 <- subset(hmp50, Age > 30)
-#'     ex2 <- subset(hmp50, Phylum %in% c("Firmicutes", "Actinobacteria"))
-#'     ex3 <- subset(hmp50, `Body Site` %in% c("Saliva", "Stool"))
-#'     ex4 <- subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
-#'     ex5 <- subset(hmp50, Age < 25 & BMI > 22)
+#'     subset(hmp50, `Body Site` %in% c("Saliva", "Stool"))
+#'     subset(hmp50, Age < 25 & BMI > 22)
+#'     subset(hmp50, Phylum %in% c("Firmicutes", "Actinobacteria"))
+#'     subset(hmp50, mean(Genus) > 0.1)
+#'     subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
+#'  }
 #'
 subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor = TRUE, fast = FALSE) {
   
@@ -61,27 +89,64 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   if (!all(vars %in% ranks) && !all(vars %in% mdcols))
     stop("subset expression must be either all metadata or all taxonomy.")
   mode  <- ifelse(all(vars %in% mdcols), "metadata", "taxonomy")
-  envir <- if (mode == "metadata") metadata(biom) else as.data.frame(taxonomy(biom))
   remove("vars", "ranks", "mdcols")
-  
-  
-  #--------------------------------------------------------------
-  # Evaluate expr to determine which samples to keep
-  #--------------------------------------------------------------
-  keep <- try(eval(expr, envir = envir), silent=TRUE)
-  if (is(keep, "try-error") || is(keep, 'error'))
-    stop(simpleError(sprintf("Subset failed: %s", keep)))
   
   
   #--------------------------------------------------------------
   # Taxonomy vs metadata subsetting are done differently
   #--------------------------------------------------------------
   if (mode == "taxonomy") {
+    envir <- c(
+      as.list(as.data.frame(taxonomy(biom))),
+      list(OTU = taxa.names(biom)) )
+    
+    
+    #--------------------------------------------------------------
+    # Formula functions that operate on relative abundances
+    #--------------------------------------------------------------
+    RelAbFunc <- function (fun, x, ...) {
+      assign(as.character(substitute(fun)),fun)
+      rank <- as.character(substitute(x))
+      raw  <- taxa.rollup(biom, rank)
+      rel  <- raw / rowSums(raw)
+      res  <- apply(rel, 2L, fun, ...)
+      res[x]
+    }
+    envir[['mean']]     <- function (...) RelAbFunc(mean,   ...)
+    envir[['median']]   <- function (...) RelAbFunc(median, ...)
+    envir[['min']]      <- function (...) RelAbFunc(min,    ...)
+    envir[['max']]      <- function (...) RelAbFunc(max,    ...)
+    envir[['n']]        <- function (...) RelAbFunc(length, ...)
+    
+    count <- function (x, gt=0, le=1, ge=NULL, lt=NULL, pct=FALSE) {
+      lower_pass <- if (is.null(ge)) x >  gt else x >= ge
+      upper_pass <- if (is.null(lt)) x <= le else x >  lt
+      sum(lower_pass & upper_pass) / ifelse(isTRUE(pct), length(x), 1)
+    }
+    envir[['count']] <- function (...) RelAbFunc(count, ...)
+    envir[['pct']]   <- function (...) RelAbFunc(count, ..., pct=TRUE)
+    
+    
+    #--------------------------------------------------------------
+    # Evaluate expr to determine which taxa to keep
+    #--------------------------------------------------------------
+    keep <- try(eval(expr, envir = envir), silent=TRUE)
+    if (is(keep, "try-error") || is(keep, 'error'))
+      stop(simpleError(sprintf("Subset failed: %s", keep)))
+    
     
     biom$taxonomy <- biom$taxonomy[keep,,drop=F]
     biom <- repair(biom, fast=fast)
     
   } else {
+    envir <- metadata(biom)
+    
+    #--------------------------------------------------------------
+    # Evaluate expr to determine which samples to keep
+    #--------------------------------------------------------------
+    keep <- try(eval(expr, envir = envir), silent=TRUE)
+    if (is(keep, "try-error") || is(keep, 'error'))
+      stop(simpleError(sprintf("Subset failed: %s", keep)))
     
     #--------------------------------------------------------------
     # Keep only the indicated samples

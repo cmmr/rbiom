@@ -43,7 +43,7 @@
 #'        \code{long=FALSE} to omit the 'Sample' column entirely, leaving the sample
 #'        names only as the row names.
 #' @return A numeric matrix with samples as column names, and taxonomic
-#'         identifiers as row names. Or a data.frame is \code{md} is not \bold{NULL}.
+#'         identifiers as row names. Or a data.frame is \code{md} is not \bold{FALSE}.
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -159,6 +159,11 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
       '.taxa'          = colnames(res)[col(res)],
       '.value'         = as.numeric(res)
     )
+    
+  } else if (isFALSE(md)) {
+    
+    # Just a simple numeric matrix. rownames = samples, colnames = taxa
+    return (res)
     
   } else {
     

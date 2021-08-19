@@ -18,56 +18,67 @@ stats.table(
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}. Alternatively,
-a data.frame with column names expected by \code{x}, \code{y}, and \code{by}.}
+\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}. 
+Alternatively, a data.frame with column names expected by \code{x}, 
+\code{y}, and \code{by}.}
 
 \item{x}{The metadata column name of the category to use for comparisons.}
 
-\item{y}{A \emph{character vector} with values from one of the following sets:
+\item{y}{A \emph{character vector} with values from one of the following 
+sets:
 \describe{
     \item{Alpha Diversity Metrics (one or more)}{
-      \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, and/or \bold{InvSimpson}.
-      You may also set \code{y = "Diversity"} to get all five metrics.
+      \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
+      and/or \bold{InvSimpson}. You may also set 
+      \code{y = "Diversity"} to get all five metrics.
     }
     \item{Beta Diversity Metrics (one only)}{
-      \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, \bold{jaccard}, 
-      or \bold{unifrac}. Use in combination with the \code{weighted} parameter.
-      Metadata column names can be prefixed with \bold{==} or \bold{!=} to limit distance
-      calculations to \emph{within} or \emph{between}, respectively, those categories. See
-      examples below. Setting \code{y = "Distance"} will use \bold{unifrac} if a 
+      \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
+      \bold{jaccard}, or \bold{unifrac}. Use in combination with the
+      \code{weighted} parameter. Metadata column names can be 
+      prefixed with \bold{==} or \bold{!=} to limit distance
+      calculations to \emph{within} or \emph{between}, respectively, 
+      those categories. See examples below. Setting 
+      \code{y = "Distance"} will use \bold{unifrac} if a 
       phylogenetic tree is present, or \bold{bray-curtis} otherwise.
     }
     \item{Taxa Abundances (one only)}{
-      \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, \bold{Family}, \bold{Genus}, 
-      \bold{Species}, \bold{Strain}, or \bold{OTU}. Supported ranks will vary by biom. Run
-      \code{taxa.ranks(biom)} to see the available options. Specifying \code{y = "Taxa"}
-      will default to the most precise rank possible.
+      \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
+      \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
+      \bold{OTU}. Supported ranks will vary by biom. Run
+      \code{taxa.ranks(biom)} to see the available options. 
+      Specifying \code{y = "Taxa"} will default to the most precise 
+      rank possible.
     }
    }}
 
 \item{by}{Additional metadata columns to group by (e.g. facets in a plot).}
 
-\item{adj}{Adjustment to use for multiple comparisons. See \code{stats::p.adjust.methods} 
-for available options. Default: \bold{fdr}.}
+\item{adj}{Adjustment to use for multiple comparisons. See 
+\code{stats::p.adjust.methods} for available options. 
+Default: \bold{fdr}.}
 
-\item{pairwise}{If \bold{FALSE} (the default), one p-value is generated for each \code{by} 
-group, or 1 p-value when \code{by = NULL}. If \bold{TRUE}, unique values in
-\code{x} are compared pairwise against each other.}
+\item{pairwise}{If \bold{FALSE} (the default), one p-value is generated 
+for each \code{by} group, or 1 p-value when \code{by = NULL}. If 
+\bold{TRUE}, unique values in \code{x} are compared pairwise against 
+each other.}
 
-\item{weighted}{If \bold{TRUE}(the default), run beta diversity metrics in weighted mode. 
-Set to \bold{FALSE} to use unweighted mode.}
+\item{weighted}{If \bold{TRUE}(the default), run beta diversity metrics in 
+weighted mode. Set to \bold{FALSE} to use unweighted mode.}
 
 \item{digits}{Round p-values to this many significant figures (default 3). 
 Set to \bold{NULL} to disable rounding.}
 
-\item{y.pos}{Add an extra column to the results to indicate the upper most value of each group.
-Added for ggpubr::geom_bracket(). Options are \bold{NULL} for no y.pos column 
-(the default), \bold{max} for the maximum value, \bold{box} for a box plot's the 
-whisker upper bound, or \bold{violin} for the highest point of a violin plot.}
+\item{y.pos}{Add an extra column to the results to indicate the upper most 
+value of each group. Added for ggpubr::geom_bracket(). Options are 
+\bold{NULL} for no y.pos column (the default), \bold{max} for the 
+maximum value, \bold{box} for a box plot's the whisker upper bound, 
+or \bold{violin} for the highest point of a violin plot.}
 }
 \value{
-A data.frame with columns \bold{p.val}, \bold{adj.p}, \bold{adj.sig}, as well as
-                columns for tracking for \code{x}, \code{y}, and \code{by} categories.
+A data.frame with columns \bold{p.val}, \bold{adj.p}, 
+        \bold{adj.sig}, as well as columns for tracking for \code{x}, 
+        \code{y}, and \code{by} categories.
 }
 \description{
 Compute p-values for data vs metadata.

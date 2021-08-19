@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9035</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9036</span>
       </span>
     </div>
 
@@ -138,8 +138,9 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>. Alternatively,
-a data.frame with column names expected by <code>x</code>, <code>y</code>, and <code>by</code>.</p></td>
+      <td><p>A <code>BIOM</code> object, as returned from <a href='read.biom.html'>read.biom</a>. 
+Alternatively, a data.frame with column names expected by <code>x</code>, 
+<code>y</code>, and <code>by</code>.</p></td>
     </tr>
     <tr>
       <th>x</th>
@@ -147,19 +148,25 @@ a data.frame with column names expected by <code>x</code>, <code>y</code>, and <
     </tr>
     <tr>
       <th>y</th>
-      <td><p>A <em>character vector</em> with values from one of the following sets:</p><dl>
-    <dt>Alpha Diversity Metrics (one or more)</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, and/or <b>InvSimpson</b>.
-      You may also set <code>y = "Diversity"</code> to get all five metrics.</p></dd>
-    <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, <b>jaccard</b>, 
-      or <b>unifrac</b>. Use in combination with the <code>weighted</code> parameter.
-      Metadata column names can be prefixed with <b>==</b> or <b>!=</b> to limit distance
-      calculations to <em>within</em> or <em>between</em>, respectively, those categories. See
-      examples below. Setting <code>y = "Distance"</code> will use <b>unifrac</b> if a 
+      <td><p>A <em>character vector</em> with values from one of the following 
+sets:</p><dl>
+    <dt>Alpha Diversity Metrics (one or more)</dt><dd><p><b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, <b>Simpson</b>, 
+      and/or <b>InvSimpson</b>. You may also set 
+      <code>y = "Diversity"</code> to get all five metrics.</p></dd>
+    <dt>Beta Diversity Metrics (one only)</dt><dd><p><b>manhattan</b>, <b>euclidean</b>, <b>bray-curtis</b>, 
+      <b>jaccard</b>, or <b>unifrac</b>. Use in combination with the
+      <code>weighted</code> parameter. Metadata column names can be 
+      prefixed with <b>==</b> or <b>!=</b> to limit distance
+      calculations to <em>within</em> or <em>between</em>, respectively, 
+      those categories. See examples below. Setting 
+      <code>y = "Distance"</code> will use <b>unifrac</b> if a 
       phylogenetic tree is present, or <b>bray-curtis</b> otherwise.</p></dd>
-    <dt>Taxa Abundances (one only)</dt><dd><p><b>Kingdom</b>, <b>Phylum</b>, <b>Class</b>, <b>Order</b>, <b>Family</b>, <b>Genus</b>, 
-      <b>Species</b>, <b>Strain</b>, or <b>OTU</b>. Supported ranks will vary by biom. Run
-      <code><a href='taxa.ranks.html'>taxa.ranks(biom)</a></code> to see the available options. Specifying <code>y = "Taxa"</code>
-      will default to the most precise rank possible.</p></dd>
+    <dt>Taxa Abundances (one only)</dt><dd><p><b>Kingdom</b>, <b>Phylum</b>, <b>Class</b>, <b>Order</b>, 
+      <b>Family</b>, <b>Genus</b>, <b>Species</b>, <b>Strain</b>, or 
+      <b>OTU</b>. Supported ranks will vary by biom. Run
+      <code><a href='taxa.ranks.html'>taxa.ranks(biom)</a></code> to see the available options. 
+      Specifying <code>y = "Taxa"</code> will default to the most precise 
+      rank possible.</p></dd>
    
 </dl></td>
     </tr>
@@ -169,19 +176,21 @@ a data.frame with column names expected by <code>x</code>, <code>y</code>, and <
     </tr>
     <tr>
       <th>adj</th>
-      <td><p>Adjustment to use for multiple comparisons. See <code><a href='https://rdrr.io/r/stats/p.adjust.html'>stats::p.adjust.methods</a></code> 
-for available options. Default: <b>fdr</b>.</p></td>
+      <td><p>Adjustment to use for multiple comparisons. See 
+<code><a href='https://rdrr.io/r/stats/p.adjust.html'>stats::p.adjust.methods</a></code> for available options. 
+Default: <b>fdr</b>.</p></td>
     </tr>
     <tr>
       <th>pairwise</th>
-      <td><p>If <b>FALSE</b> (the default), one p-value is generated for each <code>by</code> 
-group, or 1 p-value when <code>by = NULL</code>. If <b>TRUE</b>, unique values in
-<code>x</code> are compared pairwise against each other.</p></td>
+      <td><p>If <b>FALSE</b> (the default), one p-value is generated 
+for each <code>by</code> group, or 1 p-value when <code>by = NULL</code>. If 
+<b>TRUE</b>, unique values in <code>x</code> are compared pairwise against 
+each other.</p></td>
     </tr>
     <tr>
       <th>weighted</th>
-      <td><p>If <b>TRUE</b>(the default), run beta diversity metrics in weighted mode. 
-Set to <b>FALSE</b> to use unweighted mode.</p></td>
+      <td><p>If <b>TRUE</b>(the default), run beta diversity metrics in 
+weighted mode. Set to <b>FALSE</b> to use unweighted mode.</p></td>
     </tr>
     <tr>
       <th>digits</th>
@@ -190,17 +199,19 @@ Set to <b>NULL</b> to disable rounding.</p></td>
     </tr>
     <tr>
       <th>y.pos</th>
-      <td><p>Add an extra column to the results to indicate the upper most value of each group.
-Added for ggpubr::geom_bracket(). Options are <b>NULL</b> for no y.pos column 
-(the default), <b>max</b> for the maximum value, <b>box</b> for a box plot's the 
-whisker upper bound, or <b>violin</b> for the highest point of a violin plot.</p></td>
+      <td><p>Add an extra column to the results to indicate the upper most 
+value of each group. Added for ggpubr::geom_bracket(). Options are 
+<b>NULL</b> for no y.pos column (the default), <b>max</b> for the 
+maximum value, <b>box</b> for a box plot's the whisker upper bound, 
+or <b>violin</b> for the highest point of a violin plot.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data.frame with columns <b>p.val</b>, <b>adj.p</b>, <b>adj.sig</b>, as well as
-                columns for tracking for <code>x</code>, <code>y</code>, and <code>by</code> categories.</p>
+    <p>A data.frame with columns <b>p.val</b>, <b>adj.p</b>, 
+        <b>adj.sig</b>, as well as columns for tracking for <code>x</code>, 
+        <code>y</code>, and <code>by</code> categories.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
@@ -212,30 +223,52 @@ whisker upper bound, or <b>violin</b> for the highest point of a violin plot.</p
     <span class='co'># Overall, do the three body sites different have different Shannon</span>
     <span class='co'>#  diversity indices (alpha diversity)? - YES</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;    Metric  n           Test    p.val    adj.p
+#&gt; 1 Shannon 29 Kruskal-Wallis 4.68e-05 4.68e-05</div><div class='input'>    
     <span class='co'># Which body sites have the most different Shannon diversity</span>
     <span class='co'>#  indices? - Buccal mucosa vs. Saliva</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span>, pairwise <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;    Metric  n         Test Group1        Group2    p.val    adj.p
+#&gt; 1 Shannon 20 Mann-Whitney Saliva Buccal mucosa 2.17e-05 0.000065
+#&gt; 2 Shannon 19 Mann-Whitney  Stool Buccal mucosa 1.45e-03 0.002180
+#&gt; 3 Shannon 19 Mann-Whitney Saliva         Stool 2.99e-03 0.002990</div><div class='input'>    
     <span class='co'># Do males or females have more alpha diversity variation among </span>
     <span class='co'>#  body sites? - Females</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span>, by <span class='op'>=</span> <span class='st'>"Sex"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;    Metric    Sex  n           Test   p.val   adj.p
+#&gt; 1 Shannon Female 15 Kruskal-Wallis 0.00374 0.00747
+#&gt; 2 Shannon   Male 14 Kruskal-Wallis 0.00821 0.00821</div><div class='input'>    
     <span class='co'># Which phylum is most different overall between males and females?</span>
     <span class='co'>#  - Saccharibacteria</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"Phylum"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;               Taxa  n         Test  p.val adj.p
+#&gt; 1 Saccharibacteria 29 Mann-Whitney 0.0416 0.375
+#&gt; 2     Spirochaetae 29 Mann-Whitney 0.0762 0.375
+#&gt; 3      Tenericutes 29 Mann-Whitney 0.0938 0.375
+#&gt; 4    Cyanobacteria 29 Mann-Whitney 0.3340 0.851
+#&gt; 5  Verrucomicrobia 29 Mann-Whitney 0.3630 0.851
+#&gt; 6   Proteobacteria 29 Mann-Whitney 0.4250 0.851</div><div class='input'>    
     <span class='co'># Which phyla is the most differentially abundant between males and </span>
     <span class='co'>#  females on a particular body site? - Tenericutes in Saliva</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"Phylum"</span>, by <span class='op'>=</span> <span class='st'>"Body Site"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;               Taxa     Body Site  n         Test  p.val adj.p
+#&gt; 1      Tenericutes        Saliva 10 Mann-Whitney 0.0442 0.787
+#&gt; 2 Saccharibacteria        Saliva 10 Mann-Whitney 0.1000 0.787
+#&gt; 3     Spirochaetae        Saliva 10 Mann-Whitney 0.1300 0.787
+#&gt; 4  Gracilibacteria        Saliva 10 Mann-Whitney 0.1800 0.787
+#&gt; 5     Spirochaetae Buccal mucosa 10 Mann-Whitney 0.1800 0.787
+#&gt; 6     Fusobacteria        Saliva 10 Mann-Whitney 0.2220 0.787</div><div class='input'>    
     <span class='co'># Overall, are males and females characterized by their OTU </span>
     <span class='co'>#  abundances? - NO</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"unifrac"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;     n           Test p.val adj.p
+#&gt; 1 406 Kruskal-Wallis  0.49  0.49</div><div class='input'>    
     <span class='co'># What about on a particular body site? - Yes, Buccal mucosa.</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"==Sex"</span>, y <span class='op'>=</span> <span class='st'>"unifrac"</span>, by <span class='op'>=</span> <span class='st'>"==Body Site"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>    
+</div><div class='output co'>#&gt;       Body Site  n         Test    p.val    adj.p
+#&gt; 1 Buccal mucosa 20 Mann-Whitney 0.000206 0.000617
+#&gt; 2        Saliva 20 Mann-Whitney 0.579000 0.868000
+#&gt; 3         Stool 16 Mann-Whitney 0.958000 0.958000</div><div class='input'>    
     <span class='co'># Recall that for distance metrics such as unifrac, the value of</span>
     <span class='co'>#  interest (the distance) is calculated from a pair of samples.</span>
     <span class='co'>#  Sometimes both samples will be from males, sometimes both from</span>
@@ -251,7 +284,13 @@ whisker upper bound, or <b>violin</b> for the highest point of a violin plot.</p
     <span class='co'>#  ('Male', 'Female') we are now comparing three groups </span>
     <span class='co'>#  ('Male', 'Female', 'Female vs Male').</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"unifrac"</span>, by <span class='op'>=</span> <span class='st'>"Body Site"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (y == "Diversity") {    by &lt;- c("Metric", by)} else if (y == "Abundance") {    by &lt;- c(names(df)[[2]], by)} else if (y == "Distance") {    by &lt;- sub("^[\\!=]=", "", by)    x &lt;- sub("^[\\!=]=", "", x)}: argument is of length zero</span></div><div class='input'>
+</div><div class='output co'>#&gt;                 Body Site   n           Test   p.val  adj.p
+#&gt; 1           Buccal mucosa  45 Kruskal-Wallis 0.00319 0.0191
+#&gt; 2         Saliva vs Stool  90 Kruskal-Wallis 0.15100 0.3260
+#&gt; 3 Buccal mucosa vs Saliva 100 Kruskal-Wallis 0.16300 0.3260
+#&gt; 4  Buccal mucosa vs Stool  90 Kruskal-Wallis 0.79700 0.9580
+#&gt; 5                  Saliva  45 Kruskal-Wallis 0.80700 0.9580
+#&gt; 6                   Stool  36 Kruskal-Wallis 0.95800 0.9580</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

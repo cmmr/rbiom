@@ -1,23 +1,25 @@
 #' Initialize caching for expensive biom operations.
 #' 
-#' \code{init.cache()} can only be called once. Subsequent calls return an 
-#' error. Speeds up repetitive computations by storing results of calls to 
-#' functions. Applies to \code{alpha.div}, \code{apcoa}, \code{bdply}, 
-#' \code{beta.div}, \code{distill}, \code{ordinate}, \code{plot}, 
-#' \code{rarefy}, \code{select}, \code{stats.table}, \code{subtree}, 
-#' \code{taxa.rollup}, and \code{unifrac}.
+#' Speeds up repetitive computations by storing results of functions calls. 
+#' This cache initialization function can only be called once. Subsequent calls 
+#' return an error. 
+#' 
+#' Applies to \code{alpha.div()}, \code{apcoa()}, \code{bdply()}, 
+#' \code{beta.div()}, \code{distill()}, \code{ordinate()}, \code{plot()}, 
+#' \code{rarefy()}, \code{select()}, \code{stats.table()}, \code{subtree()}, 
+#' \code{taxa.rollup()}, and \code{unifrac()}.
 #' 
 #' @param cm  A memoise-compatible cache object. 
 #'        E.g. \code{cachem::cache_mem()}, \code{cachem::cache_disk()}, or 
 #'        \code{cachem::cache_layered()}. If \code{cm} is numeric, it will
-#'        be maximum cache size, in bytes for an in-memory cache.
-#'        Default: \code{50 * 1024^2} \emph{(50 MB)}
+#'        be used to define the maximum cache size (in bytes) for an in-memory 
+#'        cache. Default: \code{50 * 1024^2} \emph{(50 MB)}
 #' 
 #' @param ...  Other arguments passed on to \code{cachem::cache_mem}. 
 #'        For example: \code{max_size = 512 * 1024^2}, 
 #'        \code{max_age = Inf}, \code{max_n = Inf}, etc.
 #' 
-#' @return \code{NULL}, invisibly.
+#' @return The cache object, invisibly.
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -50,5 +52,5 @@ init.cache <- function (cm = 50 * 1024^2, ...) {
   assignInMyNamespace("taxa.rollup", memoise::memoise(taxa.rollup, cache = cm))
   assignInMyNamespace("unifrac",     memoise::memoise(unifrac,     cache = cm))
   
-  return (invisible(NULL))
+  return (invisible(cm))
 }

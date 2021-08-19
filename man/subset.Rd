@@ -23,16 +23,16 @@ to identify samples or taxa to retain.}
 \item{env}{The environment to search for variables used in \code{expr}.
 (Default: \code{parent.frame()})}
 
-\item{drop.na}{When \code{expr} is e.g. \code{Age > 30}, should 
+\item{drop.na}{When \code{expr} is e.g. \code{Age > 30}, should
 \code{!is.na(Age)} be automatically applied too?}
 
-\item{refactor}{When \code{expr} is e.g. 
+\item{refactor}{When \code{expr} is e.g.
 \code{`Body Site` \%in\% c("Stool", "Saliva")}, should
-\code{`Body Site`} be redefined as 
+\code{`Body Site`} be redefined as
 \code{factor(`Body Site`, levels=c('Stool', 'Saliva'))}?
 Applies to non-numeric metadata only.}
 
-\item{fast}{Should subsetting the phylogenetic tree and sequences be 
+\item{fast}{Should subsetting the phylogenetic tree and sequences be
 skipped? These slow steps are often not necessary. (Default: FALSE)}
 }
 \value{
@@ -41,14 +41,43 @@ A \code{BIOM} object.
 \description{
 Subset samples using the BIOM's metadata or taxonomy.
 }
+\section{Taxonomic abundance filtering}{
+
+
+For taxonomic subsetting, several functions are added or overridden to
+behave as expected within the subsetting expression. They are:
+
+\code{mean()}, \code{median()}, \code{min()}, \code{max()}, \code{n()},
+\code{count()}, and \code{pct()}.
+
+Therefore you can write
+\code{subset(hmp50, mean(Genus) >= 0.1)} and the returned BIOM object will
+contain only the genera that average at least 10\% relative abundance across
+all the samples.
+
+If you want only orders that are present in three or more samples, you can
+do: \code{subset(hmp50, count(Order) >= 3)}. To require presence in 25\% of
+samples, you'd use: \code{subset(hmp50, pct(Order) >= 0.25)}.
+
+Both \code{count()} and \code{pct()} have default arguments of
+\code{gt=0, le=1, ge=NULL, lt=NULL}, which can be overridden to find, e.g.,
+which genera comprise at least 2\% of the community in 10\% or more of the
+samples: \code{subset(hmp50, pct(Genus, ge=0.02) >= 0.10)}.
+
+\emph{gt = greater than, ge = greater than or equal to. lt/le similarly with
+'less than'.}
+}
+
 \examples{
+  \dontrun{
     library(rbiom)
     
-    ex1 <- subset(hmp50, Age > 30)
-    ex2 <- subset(hmp50, Phylum \%in\% c("Firmicutes", "Actinobacteria"))
-    ex3 <- subset(hmp50, `Body Site` \%in\% c("Saliva", "Stool"))
-    ex4 <- subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
-    ex5 <- subset(hmp50, Age < 25 & BMI > 22)
+    subset(hmp50, `Body Site` \%in\% c("Saliva", "Stool"))
+    subset(hmp50, Age < 25 & BMI > 22)
+    subset(hmp50, Phylum \%in\% c("Firmicutes", "Actinobacteria"))
+    subset(hmp50, mean(Genus) > 0.1)
+    subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
+ }
 
 }
 \seealso{

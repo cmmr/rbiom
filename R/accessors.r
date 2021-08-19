@@ -113,7 +113,7 @@ taxa.names <- function (biom) {
 taxa.ranks <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In taxa.ranks(), biom must be a BIOM-class object.'))
-  return (colnames(biom[['taxonomy']]))
+  return (c(colnames(biom[['taxonomy']]), 'OTU'))
 }
 
 

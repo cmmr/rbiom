@@ -68,7 +68,7 @@ names only as the row names.}
 }
 \value{
 A numeric matrix with samples as column names, and taxonomic
-        identifiers as row names. Or a data.frame is \code{md} is not \bold{NULL}.
+        identifiers as row names. Or a data.frame is \code{md} is not \bold{FALSE}.
 }
 \description{
 Generate a matrix of samples by taxa, at the specified taxonomic rank.
