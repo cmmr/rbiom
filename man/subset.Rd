@@ -48,7 +48,7 @@ For taxonomic subsetting, several functions are added or overridden to
 behave as expected within the subsetting expression. They are:
 
 \code{mean()}, \code{median()}, \code{min()}, \code{max()}, \code{n()},
-\code{count()}, and \code{pct()}.
+\code{count()}, \code{percent()}, \code{rank()}, and \code{apply()}.
 
 Therefore you can write
 \code{subset(hmp50, mean(Genus) >= 0.1)} and the returned BIOM object will
@@ -57,15 +57,26 @@ all the samples.
 
 If you want only orders that are present in three or more samples, you can
 do: \code{subset(hmp50, count(Order) >= 3)}. To require presence in 25\% of
-samples, you'd use: \code{subset(hmp50, pct(Order) >= 0.25)}.
+samples, you'd use: \code{subset(hmp50, percent(Order) >= 0.25)}.
 
-Both \code{count()} and \code{pct()} have default arguments of
+Both \code{count()} and \code{percent()} have default arguments of
 \code{gt=0, le=1, ge=NULL, lt=NULL}, which can be overridden to find, e.g.,
 which genera comprise at least 2\% of the community in 10\% or more of the
-samples: \code{subset(hmp50, pct(Genus, ge=0.02) >= 0.10)}.
+samples: \code{subset(hmp50, percent(Genus, ge=0.02) >= 0.10)}.
 
 \emph{gt = greater than, ge = greater than or equal to. lt/le similarly with
 'less than'.}
+
+To keep only the top 5 most abundant genera (based on mean), run:
+\code{subset(hmp50, rank(Genus) <= 5)}.
+
+\code{apply()} allows you to run any function on a per-taxon basis. For
+example, to filter genera by the root mean square of their relative abundances:
+\code{rms <- function(x) sqrt(mean(x^2)); subset(hmp50, apply(Genus, rms) >= 0.1)}.
+
+If you prefer to work on the raw values (e.g. read counts) instead of
+relative abundances, set \code{apply(..., raw = TRUE)}. For instance:
+\code{subset(hmp50, apply(Genus, mean, raw=TRUE) >= 100)}.
 }
 
 \examples{
@@ -76,6 +87,7 @@ samples: \code{subset(hmp50, pct(Genus, ge=0.02) >= 0.10)}.
     subset(hmp50, Age < 25 & BMI > 22)
     subset(hmp50, Phylum \%in\% c("Firmicutes", "Actinobacteria"))
     subset(hmp50, mean(Genus) > 0.1)
+    subset(hmp50, rank(Genus) <= 5)
     subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
  }
 

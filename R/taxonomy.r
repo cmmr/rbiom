@@ -1,12 +1,18 @@
 #' Get the taxonomy table.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' 
+#' @param rank  Return just a named character vector of this rank. (Default: 
+#'        \code{NULL})
+#' 
 #' @param fix.names  Clean up taxa names. See example below. (Default: 
-#'                   \code{FALSE})
+#'        \code{FALSE})
+#'                   
 #' @return A character matrix of the named taxonomies in \code{biom}.
 #'         When \code{fix.names = TRUE}, a second matrix is attached as an
 #'         attribute called 'fixed' and notes which taxa names were
 #'         rewritten.
+#'         
 #' @family accessor functions
 #' @export
 #' @examples
@@ -21,12 +27,12 @@
 #'     taxonomy(hmp50, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
 #'
 
-taxonomy <- function (biom, fix.names = FALSE) {
+taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In taxonomy(), biom must be a BIOM-class object.'))
   
   if (!identical(fix.names, TRUE) || ncol(biom[['taxonomy']]) == 0)
-    return (biom[['taxonomy']])
+    return (biom[['taxonomy']][,rank])
   
   
   # Fix all taxa names that are ambiguous keywords or not an 
@@ -62,6 +68,7 @@ taxonomy <- function (biom, fix.names = FALSE) {
     }
   }
   
+  x <- x[,rank]
   attr(x, 'fixed') <- isValid
   
   return (x)

@@ -4,10 +4,13 @@
 \alias{taxonomy}
 \title{Get the taxonomy table.}
 \usage{
-taxonomy(biom, fix.names = FALSE)
+taxonomy(biom, rank = NULL, fix.names = FALSE)
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
+
+\item{rank}{Return just a named character vector of this rank. (Default: 
+\code{NULL})}
 
 \item{fix.names}{Clean up taxa names. See example below. (Default: 
 \code{FALSE})}

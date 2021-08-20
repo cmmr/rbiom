@@ -7,7 +7,7 @@
 #' behave as expected within the subsetting expression. They are:
 #' 
 #' \code{mean()}, \code{median()}, \code{min()}, \code{max()}, \code{n()}, 
-#' \code{count()}, and \code{pct()}.
+#' \code{count()}, \code{percent()}, \code{rank()}, and \code{apply()}.
 #' 
 #' Therefore you can write 
 #' \code{subset(hmp50, mean(Genus) >= 0.1)} and the returned BIOM object will 
@@ -16,15 +16,27 @@
 #' 
 #' If you want only orders that are present in three or more samples, you can 
 #' do: \code{subset(hmp50, count(Order) >= 3)}. To require presence in 25% of 
-#' samples, you'd use: \code{subset(hmp50, pct(Order) >= 0.25)}.
+#' samples, you'd use: \code{subset(hmp50, percent(Order) >= 0.25)}.
 #' 
-#' Both \code{count()} and \code{pct()} have default arguments of 
+#' Both \code{count()} and \code{percent()} have default arguments of 
 #' \code{gt=0, le=1, ge=NULL, lt=NULL}, which can be overridden to find, e.g., 
 #' which genera comprise at least 2% of the community in 10% or more of the 
-#' samples: \code{subset(hmp50, pct(Genus, ge=0.02) >= 0.10)}. 
+#' samples: \code{subset(hmp50, percent(Genus, ge=0.02) >= 0.10)}. 
 #' 
 #' \emph{gt = greater than, ge = greater than or equal to. lt/le similarly with 
 #' 'less than'.}
+#' 
+#' To keep only the top 5 most abundant genera (based on mean), run: 
+#' \code{subset(hmp50, rank(Genus) <= 5)}.
+#' 
+#' \code{apply()} allows you to run any function on a per-taxon basis. For 
+#' example, to filter genera by the root mean square of their relative abundances:
+#' \code{rms <- function(x) sqrt(mean(x^2)); subset(hmp50, apply(Genus, rms) >= 0.1)}.
+#' 
+#' If you prefer to work on the raw values (e.g. read counts) instead of 
+#' relative abundances, set \code{apply(..., raw = TRUE)}. For instance: 
+#' \code{subset(hmp50, apply(Genus, mean, raw=TRUE) >= 100)}.
+#' 
 #' 
 #' @name subset
 #' @param x   A BIOM object, as returned from \link{read.biom}.
@@ -47,7 +59,7 @@
 #' @param fast  Should subsetting the phylogenetic tree and sequences be 
 #'        skipped? These slow steps are often not necessary. (Default: FALSE)
 #'        
-#' @return A \code{BIOM} object.
+#' @return A \code{BIOM} object. 
 #' @export
 #' @seealso \code{\link{select}}
 #' @examples
@@ -58,6 +70,7 @@
 #'     subset(hmp50, Age < 25 & BMI > 22)
 #'     subset(hmp50, Phylum %in% c("Firmicutes", "Actinobacteria"))
 #'     subset(hmp50, mean(Genus) > 0.1)
+#'     subset(hmp50, rank(Genus) <= 5)
 #'     subset(hmp50, a == b, list(a = as.name("Body Site"), b ="Saliva"))
 #'  }
 #'
@@ -84,11 +97,9 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   vars   <- all.vars(expr)
   ranks  <- taxa.ranks(biom)
   mdcols <- colnames(metadata(biom))
-  if (length(missing <- setdiff(vars, c(ranks, mdcols))) > 0)
-    stop("Unknown object(s): ", paste(missing, collapse = ", "))
-  if (!all(vars %in% ranks) && !all(vars %in% mdcols))
+  if (any(vars %in% ranks) && any(vars %in% mdcols))
     stop("subset expression must be either all metadata or all taxonomy.")
-  mode  <- ifelse(all(vars %in% mdcols), "metadata", "taxonomy")
+  mode  <- ifelse(any(vars %in% mdcols), "metadata", "taxonomy")
   remove("vars", "ranks", "mdcols")
   
   
@@ -102,29 +113,56 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
     
     
     #--------------------------------------------------------------
-    # Formula functions that operate on relative abundances
+    # These functions get mapped to new apply; remember originals
     #--------------------------------------------------------------
-    RelAbFunc <- function (fun, x, ...) {
-      assign(as.character(substitute(fun)),fun)
-      rank <- as.character(substitute(x))
-      raw  <- taxa.rollup(biom, rank)
-      rel  <- raw / rowSums(raw)
-      res  <- apply(rel, 2L, fun, ...)
-      res[x]
-    }
-    envir[['mean']]     <- function (...) RelAbFunc(mean,   ...)
-    envir[['median']]   <- function (...) RelAbFunc(median, ...)
-    envir[['min']]      <- function (...) RelAbFunc(min,    ...)
-    envir[['max']]      <- function (...) RelAbFunc(max,    ...)
-    envir[['n']]        <- function (...) RelAbFunc(length, ...)
+    funcs <- c(
+      'mean'  = mean, 'median' = median, 'n'     = length,
+      'min'   = min,  'max'    = max,    'apply' = apply,
+      'count' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
+        lower_pass <- if (is.null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is.null(lt)) x <= le else x >  lt
+        sum(lower_pass & upper_pass) },
+      'percent' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
+        lower_pass <- if (is.null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is.null(lt)) x <= le else x >  lt
+        sum(lower_pass & upper_pass) / length(x) })
     
-    count <- function (x, gt=0, le=1, ge=NULL, lt=NULL, pct=FALSE) {
-      lower_pass <- if (is.null(ge)) x >  gt else x >= ge
-      upper_pass <- if (is.null(lt)) x <= le else x >  lt
-      sum(lower_pass & upper_pass) / ifelse(isTRUE(pct), length(x), 1)
+    #--------------------------------------------------------------
+    # Take any function and run it on each taxon's rel. abundances.
+    # `f` should take a vector of numbers and return one value.
+    #--------------------------------------------------------------
+    envir[['apply']] <- function (x, f = NULL, raw = FALSE, ...) {
+      for (i in names(funcs)) assign(i, funcs[[i]])
+      
+      if (missing(f)) f <- as.character(match.call()[[1]])
+      fn  <- ifelse(is.character(f), f, capture.output(substitute(f)))
+      fun <- funcs[[fn]] %||% ifelse(is.function(f), f, get(fn))
+      if (!is.function(fun)) stop("unknown function: ", fn)
+      
+      rank <- capture.output(substitute(x))
+      if (!rank %in% taxa.ranks(biom))
+        return (fun(x, ...))
+        
+      mtx  <- taxa.rollup(biom, rank)
+      mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
+      res  <- apply(mtx, 2L, fun, ...)
+      res[taxonomy(biom, rank)]
     }
-    envir[['count']] <- function (...) RelAbFunc(count, ...)
-    envir[['pct']]   <- function (...) RelAbFunc(count, ..., pct=TRUE)
+    for (i in names(funcs)) envir[[i]] <- envir[['apply']]
+    
+    
+    #--------------------------------------------------------------
+    # Rank calls apply then does additional post-processing.
+    #--------------------------------------------------------------
+    funcs %<>% c('rank' = rank)
+    envir[['rank']] <- function (...) {
+      for (i in names(funcs)) assign(i, funcs[[i]])
+      means    <- envir[['apply']](f = mean, ...)
+      rankings <- rank(-means, ties.method = "min")
+      gapfill  <- sort(unique(rankings))
+      gapfill  <- setNames(rank(gapfill), as.character(gapfill))
+      gapfill[as.character(rankings)]
+    }
     
     
     #--------------------------------------------------------------
