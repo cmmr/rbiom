@@ -153,7 +153,7 @@ write.xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Roll up abundances at each taxonomic level
     #--------------------------------------------------------
     
-    ranks <- c('OTU', rbiom::taxa.ranks(biom))
+    ranks <- unique(c('OTU', rbiom::taxa.ranks(biom)))
     
     for (rank in ranks) {
       

@@ -33,7 +33,7 @@ metrics <- function (biom, mode) {
   } else if (mode == 'adiv')  { c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson") 
   } else if (mode == 'dist')  { c("correlation", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
   } else if (mode == 'clust') { c("average", "ward", "mcquitty", "single", "median", "complete", "centroid") 
-  } else if (mode == 'rank')  { c(taxa.ranks(biom), 'OTU')
+  } else if (mode == 'rank')  { taxa.ranks(biom)
   } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
   } else if (mode == 'meta')  { colnames(metadata(biom))
   } else if (mode == 'bdiv')  { 

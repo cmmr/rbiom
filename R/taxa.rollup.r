@@ -28,7 +28,7 @@
 #' @param long  Pivot the returned data to long format?
 #'        \describe{
 #'          \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
-#'          \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
+#'          \item{\bold{TRUE}}{ "Sample", "Metric" and "Abundance" are the columns 
 #'                          returned. Rows are added to attain all combinations of 
 #'                          samples x metrics. }
 #'        }
@@ -157,7 +157,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
       stringsAsFactors = FALSE,
       '.sample'        = rownames(res)[row(res)],
       '.taxa'          = colnames(res)[col(res)],
-      '.value'         = as.numeric(res)
+      '.abundance'     = as.numeric(res)
     )
     
   } else if (isFALSE(md)) {

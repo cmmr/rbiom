@@ -34,7 +34,7 @@ orig_LCC <- Sys.getlocale("LC_COLLATE")
 on.exit(Sys.setlocale("LC_COLLATE", orig_LCC))
 Sys.setlocale("LC_COLLATE", "C")
 
-for (txRank in c(taxa.ranks(biom), 'OTU')) {
+for (txRank in taxa.ranks(biom)) {
   test_that(txRank, {
     expect_equal(tr[[txRank]], taxa.rollup(biom, txRank))
   })

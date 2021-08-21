@@ -422,7 +422,7 @@ fun_toString <- function (x) {
         return (fn)
       }
   
-  chr <- capture.output(x)
+  chr <- paste0(capture.output(x), collapse = "")
   if (nchar(chr) < 50) return (chr)
   
   return ("_Custom_Function")

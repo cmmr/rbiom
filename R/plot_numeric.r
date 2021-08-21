@@ -43,6 +43,7 @@ plot_numeric <- function (
   
   md     <- unique(c(x, color.by, shape.by, facet.by))
   ggdata <- distill(biom = biom, metric = y, md = md, safe = TRUE)
+  names(ggdata) <- sub(attr(ggdata, 'response'), ".y", names(ggdata))
   
   
   #-----------------------------------------------

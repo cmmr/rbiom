@@ -117,7 +117,7 @@ plot_ordination <- function (
       if (is.character(taxa)) {
         rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
       } else {
-        rank <- tail(c('OTU', taxa.ranks(biom)), 1)
+        rank <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
       }
     } else {
       rank <- validate_metrics(biom, rank, mode="rank")

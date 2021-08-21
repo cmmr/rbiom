@@ -283,8 +283,8 @@ plot.BIOM <- function (
   #--------------------------------------------------------------
   # Replace shortcut keywords
   #--------------------------------------------------------------
-  if (identical(tolower(x), "abundance")) x <- tail(c('OTU', taxa.ranks(biom)), 1)
-  if (identical(tolower(y), "abundance")) y <- tail(c('OTU', taxa.ranks(biom)), 1)
+  if (identical(tolower(x), "abundance")) x <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
+  if (identical(tolower(y), "abundance")) y <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
   if (identical(tolower(x), "distance"))  x <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
   if (identical(tolower(y), "distance"))  y <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
   if (identical(x, "."))                { x <- ".all"; biom$metadata[['.all']] <- ".all" }
@@ -295,10 +295,12 @@ plot.BIOM <- function (
   # Possible modes: taxa, adiv, bdiv, meta, ord,
   #                 Reads, Samples, .
   #-----------------------------------------------
-  x    <- validate_metrics(biom, x)
-  y    <- validate_metrics(biom, y)
-  mode <- paste(attr(y, 'mode', exact = TRUE), "~", attr(x, 'mode', exact = TRUE))
-  
+  x     <- validate_metrics(biom, x)
+  y     <- validate_metrics(biom, y)
+  xmode <- attr(x, 'mode', exact = TRUE)
+  ymode <- attr(y, 'mode', exact = TRUE)
+  mode  <- paste(ymode, "~", ifelse(x == ".all", ".", xmode))
+  remove("xmode", "ymode")
   
   
   #==================================================================

@@ -128,16 +128,17 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   #--------------------------------------------------------------
   if (is(biom, 'BIOM')) {
     
-    df <- distill(biom, metric = y, weighted = weighted, long = TRUE, md = c(x, by))
+    md <- intersect(c(x, by), colnames(metadata(biom)))
+    df <- distill(biom, metric = y, weighted = weighted, long = TRUE, md = md, safe = TRUE)
     y  <- attr(df, 'response', exact = TRUE)
     
-    if (y == 'Diversity') {
-      by <- c("Metric", by)
+    if (y == '.diversity') {
+      by <- c(".metric", by)
       
-    } else if (y == 'Abundance') {
+    } else if (y == '.abundance') {
       by <- c(names(df)[[2]], by)
       
-    } else if (y == 'Distance') {
+    } else if (y == '.distance') {
       by <- sub("^[\\!=]=", "", by)
       x  <- sub("^[\\!=]=", "", x)
       

@@ -72,7 +72,7 @@ plot_factor <- function (
   # Convert biom object to a data.frame
   #--------------------------------------------------------------
   ggdata <- distill(biom = biom, metric = y, md = opvars, safe=TRUE)
-  names(ggdata) <- sub(".value", ".y", names(ggdata))
+  names(ggdata) <- sub(attr(ggdata, 'response'), ".y", names(ggdata))
   ggdata[['.src']] <- "points"
   
   
@@ -541,14 +541,15 @@ plot_factor <- function (
       #--------------------------------------------------------------
       # P-value for each x position
       #--------------------------------------------------------------
-      statcol <- setdiff(c(color.by, pattern.by, shape.by), x)
-      if (length(statcol) > 1) {
-        ggdata[['.stat']] <- interaction(lapply(statcol, function (i) { ggdata[[i]] }))
-        statcol <- ".stat"
-      }
-      stats <- stats.table(ggdata, statcol, ".y", by = c(x, facet.by), adj = p.adj, y.pos = y.pos)
-      remove("statcol")
+      stats <- stats.table(
+        biom  = biom, 
+        x     = setdiff(c(color.by, pattern.by, shape.by), x), 
+        y     = y, 
+        by    = c(x, facet.by), 
+        adj   = p.adj, 
+        y.pos = y.pos )
       
+      stats[[x]] <- factor(stats[[x]], levels = levels(ggdata[[x]]))
       stats_df <- stats[,intersect(names(stats), groupvars),drop=FALSE]
       
       

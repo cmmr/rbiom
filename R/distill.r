@@ -124,7 +124,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = TRUE, long = TRUE, 
     } else                      { attr(df, 'response') <- "Abundance" }
     
     if (isTRUE(safe))
-      attr(df, 'response') %<>% paste0(".", tolower(.))
+      attr(df, 'response') <- paste0(".", tolower(attr(df, 'response')))
   }
   
   
