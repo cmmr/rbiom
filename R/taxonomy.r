@@ -28,48 +28,56 @@
 #'
 
 taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxonomy(), biom must be a BIOM-class object.'))
   
-  if (!identical(fix.names, TRUE) || ncol(biom[['taxonomy']]) == 0)
-    return (biom[['taxonomy']][,rank])
+  if (!is(biom, 'BIOM'))
+    stop('In taxonomy(), biom must be a BIOM-class object.')
+  
+  if (length(missing <- setdiff(NULL, taxa.ranks(hmp50))) > 0)
+    stop("Invalid ranks(s): ", paste(collapse = ", ", missing))
+  
+  
+  x <- biom[['taxonomy']]
+  
+  
   
   
   # Fix all taxa names that are ambiguous keywords or not an 
   # upper-case letter followed by one or more lower case letters.
   #----------------------------------------------------------------
-  canonical <- "^[A-Z][a-z\ ]+$"
-  ambiguous <- "unknown|uncultured|unclassified|unidentified|group|subsection|family|lineage|candidate"
-  
-  x <- biom[['taxonomy']]
-  x <- sub("^.__", "", x) # Remove leading p__ c__ etc
-  x <- sub("^_+", "", x)  # Remove leading underscores
-  x <- sub(";$", "", x)   # Remove trailing semicolons
-  
-  isCanonical <- grepl(canonical, x, ignore.case = FALSE)
-  isAmbiguous <- grepl(ambiguous, x, ignore.case = TRUE)
-  isValid     <- matrix(nrow = nrow(x), isCanonical & !isAmbiguous)
-  
-  for (row in seq_len(nrow(x))) {
+  if (isTRUE(fix.names)) {
     
-    lastValid <- "Root"
-    parenText <- NULL
+    canonical <- "^[A-Z][a-z\ ]+$"
+    ambiguous <- "unknown|uncultured|unclassified|unidentified|group|subsection|family|lineage|candidate"
     
-    for (col in seq_len(ncol(x))) {
+    x <- sub("^.__", "", x) # Remove leading p__ c__ etc
+    x <- sub("^_+", "", x)  # Remove leading underscores
+    x <- sub(";$", "", x)   # Remove trailing semicolons
+    
+    isCanonical <- grepl(canonical, x, ignore.case = FALSE)
+    isAmbiguous <- grepl(ambiguous, x, ignore.case = TRUE)
+    isValid     <- matrix(nrow = nrow(x), isCanonical & !isAmbiguous)
+    
+    for (row in seq_len(nrow(x))) {
       
-      if (isValid[row, col]) {
-        lastValid <- paste(colnames(x)[col], x[row, col])
-        parenText <- NULL
+      lastValid <- "Root"
+      parenText <- NULL
+      
+      for (col in seq_len(ncol(x))) {
         
-      } else {
-        parenText   <- paste(c(parenText, x[row, col]), collapse = " ")
-        x[row, col] <- sprintf("%s (%s)", lastValid, parenText)
+        if (isValid[row, col]) {
+          lastValid <- paste(colnames(x)[col], x[row, col])
+          parenText <- NULL
+          
+        } else {
+          parenText   <- paste(c(parenText, x[row, col]), collapse = " ")
+          x[row, col] <- sprintf("%s (%s)", lastValid, parenText)
+        }
       }
     }
   }
   
-  x <- x[,rank]
-  attr(x, 'fixed') <- isValid
+  x <- cbind(x, 'OTU' = taxa.names(biom))
+  if (!is.null(rank)) x <- x[,rank]
   
   return (x)
 }

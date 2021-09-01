@@ -49,7 +49,7 @@ memory efficient in this scenario.}
 \item{long}{Pivot the returned data to long format?
 \describe{
   \item{\bold{FALSE}}{ Each metric has its own column. (Default) }
-  \item{\bold{TRUE}}{ "Sample", "Metric" and "Diversity" are the columns 
+  \item{\bold{TRUE}}{ "Sample", "Metric" and "Abundance" are the columns 
                   returned. Rows are added to attain all combinations of 
                   samples x metrics. }
 }}

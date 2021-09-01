@@ -42,7 +42,7 @@
 <meta property="og:title" content="Initialize caching for expensive biom operations. — init.cache" />
 <meta property="og:description" content="Speeds up repetitive computations by storing results of functions calls. 
 This cache initialization function can only be called once. Subsequent calls 
-return an error." />
+return a warning." />
 
 
 
@@ -74,7 +74,7 @@ return an error." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9036</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9037</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@ return an error." />
     <div class="ref-description">
     <p>Speeds up repetitive computations by storing results of functions calls. 
 This cache initialization function can only be called once. Subsequent calls 
-return an error.</p>
+return a warning.</p>
     </div>
 
     <pre class="usage"><span class='fu'>init.cache</span><span class='op'>(</span>cm <span class='op'>=</span> <span class='fl'>50</span> <span class='op'>*</span> <span class='fl'>1024</span><span class='op'>^</span><span class='fl'>2</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -161,9 +161,9 @@ For example: <code>max_size = 512 * 1024^2</code>,
     <span class='fu'>init.cache</span><span class='op'>(</span><span class='op'>)</span>
     <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='alpha.div.html'>alpha.div</a></span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>"multi"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.04    0.00    0.05 </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='alpha.div.html'>alpha.div</a></span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>"multi"</span><span class='op'>)</span><span class='op'>)</span>
+#&gt;    0.03    0.00    0.03 </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='alpha.div.html'>alpha.div</a></span><span class='op'>(</span><span class='va'>hmp50</span>, <span class='st'>"multi"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.02    0.00    0.01 </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
+#&gt;    0.01    0.00    0.01 </div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 </div></pre>
   </div>

@@ -8,7 +8,7 @@ distill(
   biom,
   metric,
   weighted = TRUE,
-  rarefy = TRUE,
+  rarefy = FALSE,
   long = TRUE,
   md = TRUE,
   safe = FALSE
@@ -44,7 +44,7 @@ be run in in weighted mode? (Default: TRUE)}
 
 \item{rarefy}{Should the dataset be rarefied first? When \bold{metric} is 
 an alpha diversity metric, this 'rarefy' parameter is passed on 
-directly to \code{alpha.div()}. (Default: TRUE)}
+directly to \code{alpha.div()}. (Default: FALSE)}
 
 \item{long}{Pivot the returned data to long format?
 \describe{

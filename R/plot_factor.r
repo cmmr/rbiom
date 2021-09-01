@@ -69,6 +69,13 @@ plot_factor <- function (
   
   
   #--------------------------------------------------------------
+  # Convert biom values to relative abundances.
+  #--------------------------------------------------------------
+  if (is.rarefied(biom) && mode %in% c('rank', 'taxon'))
+    biom[['counts']][['v']] <- biom[['counts']][['v']] / attr(biom, 'rarefaction')
+  
+  
+  #--------------------------------------------------------------
   # Convert biom object to a data.frame
   #--------------------------------------------------------------
   ggdata <- distill(biom = biom, metric = y, md = opvars, safe=TRUE)
@@ -92,7 +99,6 @@ plot_factor <- function (
   # Control the values displayed on the y axis
   #--------------------------------------------------------------
   if (is.rarefied(biom) && mode %in% c('rank', 'taxon')) {
-    ggdata[['.y']]                 <- ggdata[['.y']] / depth(biom)
     layers[['y_cont']][['labels']] <- ~ paste0(. * 100, "%")
   }
   layers[['y_cont']][['breaks']] <- base::pretty(ggdata[['.y']])

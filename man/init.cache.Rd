@@ -23,7 +23,7 @@ The cache object, invisibly.
 \description{
 Speeds up repetitive computations by storing results of functions calls. 
 This cache initialization function can only be called once. Subsequent calls 
-return an error.
+return a warning.
 }
 \details{
 Applies to \code{alpha.div()}, \code{apcoa()}, \code{bdply()}, 

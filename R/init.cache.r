@@ -2,7 +2,7 @@
 #' 
 #' Speeds up repetitive computations by storing results of functions calls. 
 #' This cache initialization function can only be called once. Subsequent calls 
-#' return an error. 
+#' return a warning. 
 #' 
 #' Applies to \code{alpha.div()}, \code{apcoa()}, \code{bdply()}, 
 #' \code{beta.div()}, \code{distill()}, \code{ordinate()}, \code{plot()}, 
@@ -33,7 +33,7 @@
 init.cache <- function (cm = 50 * 1024^2, ...) {
   
   if (memoise::is.memoised(alpha.div))
-    stop("rbiom is already memoised.\n")
+    return(warning("rbiom is already memoised.\n"))
   
   if (is.numeric(cm)) cm <- cachem::cache_mem(max_size = cm, ...)
   if (is.null(cm))    cm <- cachem::cache_mem(...)

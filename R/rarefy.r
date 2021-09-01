@@ -171,6 +171,12 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   }
   names(cl)[[2]] <- ""
   attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
+  
+  
+  #--------------------------------------------------------------
+  # Record rarefaction level
+  #--------------------------------------------------------------
+  attr(biom, 'rarefaction') <- depth
 
   
   return (biom)

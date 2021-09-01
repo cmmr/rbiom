@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9036</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9037</span>
       </span>
     </div>
 
@@ -223,41 +223,33 @@ or <b>violin</b> for the highest point of a violin plot.</p></td>
     <span class='co'># Overall, do the three body sites different have different Shannon</span>
     <span class='co'>#  diversity indices (alpha diversity)? - YES</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    Metric  n           Test    p.val    adj.p
-#&gt; 1 Shannon 29 Kruskal-Wallis 4.68e-05 4.68e-05</div><div class='input'>    
+</div><div class='output co'>#&gt;    n           Test    p.val    adj.p
+#&gt; 1 29 Kruskal-Wallis 4.68e-05 4.68e-05</div><div class='input'>    
     <span class='co'># Which body sites have the most different Shannon diversity</span>
     <span class='co'>#  indices? - Buccal mucosa vs. Saliva</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span>, pairwise <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    Metric  n         Test Group1        Group2    p.val    adj.p
-#&gt; 1 Shannon 20 Mann-Whitney Saliva Buccal mucosa 2.17e-05 0.000065
-#&gt; 2 Shannon 19 Mann-Whitney  Stool Buccal mucosa 1.45e-03 0.002180
-#&gt; 3 Shannon 19 Mann-Whitney Saliva         Stool 2.99e-03 0.002990</div><div class='input'>    
+</div><div class='output co'>#&gt;    n         Test Group1        Group2    p.val    adj.p
+#&gt; 1 20 Mann-Whitney Saliva Buccal mucosa 2.17e-05 0.000065
+#&gt; 2 19 Mann-Whitney  Stool Buccal mucosa 1.45e-03 0.002180
+#&gt; 3 19 Mann-Whitney Saliva         Stool 2.99e-03 0.002990</div><div class='input'>    
     <span class='co'># Do males or females have more alpha diversity variation among </span>
     <span class='co'>#  body sites? - Females</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Body Site"</span>, y <span class='op'>=</span> <span class='st'>"Shannon"</span>, by <span class='op'>=</span> <span class='st'>"Sex"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    Metric    Sex  n           Test   p.val   adj.p
-#&gt; 1 Shannon Female 15 Kruskal-Wallis 0.00374 0.00747
-#&gt; 2 Shannon   Male 14 Kruskal-Wallis 0.00821 0.00821</div><div class='input'>    
+</div><div class='output co'>#&gt;      Sex  n           Test   p.val   adj.p
+#&gt; 1 Female 15 Kruskal-Wallis 0.00374 0.00747
+#&gt; 2   Male 14 Kruskal-Wallis 0.00821 0.00821</div><div class='input'>    
     <span class='co'># Which phylum is most different overall between males and females?</span>
     <span class='co'>#  - Saccharibacteria</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"Phylum"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;               Taxa  n         Test  p.val adj.p
-#&gt; 1 Saccharibacteria 29 Mann-Whitney 0.0416 0.375
-#&gt; 2     Spirochaetae 29 Mann-Whitney 0.0762 0.375
-#&gt; 3      Tenericutes 29 Mann-Whitney 0.0938 0.375
-#&gt; 4    Cyanobacteria 29 Mann-Whitney 0.3340 0.851
-#&gt; 5  Verrucomicrobia 29 Mann-Whitney 0.3630 0.851
-#&gt; 6   Proteobacteria 29 Mann-Whitney 0.4250 0.851</div><div class='input'>    
+</div><div class='output co'>#&gt;     n         Test p.val adj.p
+#&gt; 1 348 Mann-Whitney 0.242 0.242</div><div class='input'>    
     <span class='co'># Which phyla is the most differentially abundant between males and </span>
     <span class='co'>#  females on a particular body site? - Tenericutes in Saliva</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"Phylum"</span>, by <span class='op'>=</span> <span class='st'>"Body Site"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;               Taxa     Body Site  n         Test  p.val adj.p
-#&gt; 1      Tenericutes        Saliva 10 Mann-Whitney 0.0442 0.787
-#&gt; 2 Saccharibacteria        Saliva 10 Mann-Whitney 0.1000 0.787
-#&gt; 3     Spirochaetae        Saliva 10 Mann-Whitney 0.1300 0.787
-#&gt; 4  Gracilibacteria        Saliva 10 Mann-Whitney 0.1800 0.787
-#&gt; 5     Spirochaetae Buccal mucosa 10 Mann-Whitney 0.1800 0.787
-#&gt; 6     Fusobacteria        Saliva 10 Mann-Whitney 0.2220 0.787</div><div class='input'>    
+</div><div class='output co'>#&gt;       Body Site   n         Test p.val adj.p
+#&gt; 1        Saliva 120 Mann-Whitney 0.232 0.695
+#&gt; 2 Buccal mucosa 120 Mann-Whitney 0.819 0.909
+#&gt; 3         Stool 108 Mann-Whitney 0.909 0.909</div><div class='input'>    
     <span class='co'># Overall, are males and females characterized by their OTU </span>
     <span class='co'>#  abundances? - NO</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"Sex"</span>, y <span class='op'>=</span> <span class='st'>"unifrac"</span><span class='op'>)</span>
@@ -265,10 +257,7 @@ or <b>violin</b> for the highest point of a violin plot.</p></td>
 #&gt; 1 406 Kruskal-Wallis  0.49  0.49</div><div class='input'>    
     <span class='co'># What about on a particular body site? - Yes, Buccal mucosa.</span>
     <span class='fu'>stats.table</span><span class='op'>(</span><span class='va'>biom</span>, x <span class='op'>=</span> <span class='st'>"==Sex"</span>, y <span class='op'>=</span> <span class='st'>"unifrac"</span>, by <span class='op'>=</span> <span class='st'>"==Body Site"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;       Body Site  n         Test    p.val    adj.p
-#&gt; 1 Buccal mucosa 20 Mann-Whitney 0.000206 0.000617
-#&gt; 2        Saliva 20 Mann-Whitney 0.579000 0.868000
-#&gt; 3         Stool 16 Mann-Whitney 0.958000 0.958000</div><div class='input'>    
+</div><div class='output co'>#&gt; <span class='error'>Error in FUN(X[[i]], ...): object '==Body Site' not found</span></div><div class='input'>    
     <span class='co'># Recall that for distance metrics such as unifrac, the value of</span>
     <span class='co'>#  interest (the distance) is calculated from a pair of samples.</span>
     <span class='co'>#  Sometimes both samples will be from males, sometimes both from</span>

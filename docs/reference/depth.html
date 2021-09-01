@@ -40,7 +40,9 @@
 
 
 <meta property="og:title" content="The rarefaction depth of a BIOM object. — depth" />
-<meta property="og:description" content="The rarefaction depth of a BIOM object." />
+<meta property="og:description" content="The returned values reflect changes made after any subset() commands. 
+To get the rarefaction level immediately after read.biom() or
+rarefy() use attr(biom, 'rarefaction') instead." />
 
 
 
@@ -72,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9036</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9037</span>
       </span>
     </div>
 
@@ -117,7 +119,9 @@
     </div>
 
     <div class="ref-description">
-    <p>The rarefaction depth of a BIOM object.</p>
+    <p>The returned values reflect changes made after any <code><a href='subset.html'>subset()</a></code> commands. 
+To get the rarefaction level immediately after <code><a href='read.biom.html'>read.biom()</a></code> or
+<code><a href='rarefy.html'>rarefy()</a></code> use <code><a href='https://rdrr.io/r/base/attr.html'>attr(biom, 'rarefaction')</a></code> instead.</p>
     </div>
 
     <pre class="usage"><span class='fu'>depth</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span></pre>
@@ -133,8 +137,8 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The rarefaction depth. If the BIOM object is not rarefied, this will be 
-        a sorted vector of all the unique depths.</p>
+    <p>The rarefaction depth. If the BIOM object is not rarefied, this will 
+        be a sorted vector of all the unique depths.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>[sample.sums()]</p>

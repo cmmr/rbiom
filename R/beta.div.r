@@ -84,10 +84,19 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   
   
   #--------------------------------------------------------------
+  # Sanity check the matrix
+  #--------------------------------------------------------------
+  if (!is.numeric(counts[['v']]))     stop("The abundance matrix must be numeric.")
+  if (!all(is.finite(counts[['v']]))) stop("Non-finite values in abundance matrix.")
+  
+  
+  #--------------------------------------------------------------
   # Find the UniFrac tree
   #--------------------------------------------------------------
   
   if (method == "UniFrac") {
+    
+    # Find a tree for the UniFrac algorithm
     if (!is(tree, "phylo")) {
       if (is(biom, "BIOM")) {
         if (is(biom$phylogeny, "phylo")) {
@@ -104,9 +113,29 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
       }
     }
     
-    if (length(setdiff(rownames(counts), tree$tip.label)) > 0)
-      stop(simpleError("OTUs missing from reference tree."))
     
+    # Make sure the matrix has rownames set
+    if (is.null(rownames(counts)))
+      stop("The abundance matrix does not have rownames set to Taxa IDs.")
+    
+    
+    # Abundance matrix's Taxa IDs aren't all in the tree
+    if (length(missing <- setdiff(rownames(counts), tree$tip.label)) > 0) {
+      
+      # Try swapping spaces/underscores in tip labels
+      if (any(grepl("_", missing, fixed = TRUE))) {
+        tree$tip.label %<>% gsub(" ", "_", ., fixed = TRUE)
+      } else if (any(grepl(" ", missing, fixed = TRUE))) {
+        tree$tip.label %<>% gsub("_", " ", ., fixed = TRUE)
+      }
+      
+      if (!all(rownames(counts) %in% tree$tip.label))missing %>%
+        glue::glue_collapse(sep = ", ", width = 30, last = " and ") %>%
+        paste("OTUs missing from reference tree:", .) %>%
+        stop()
+    }
+    
+    # Prune the tree down to only what we need
     if (length(setdiff(tree$tip.label, rownames(counts))) > 0)
       tree <- rbiom::subtree(tree, rownames(counts))
     

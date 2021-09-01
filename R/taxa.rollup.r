@@ -157,7 +157,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
       stringsAsFactors = FALSE,
       '.sample'        = rownames(res)[row(res)],
       '.taxa'          = colnames(res)[col(res)],
-      '.abundance'     = as.numeric(res)
+      '.value'         = as.numeric(res)
     )
     
   } else if (isFALSE(md)) {

@@ -157,15 +157,19 @@ counts <- function (biom) {
 is.rarefied <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In is.rarefied(), biom must be a BIOM-class object.'))
-  return (length(unique(sample.sums(biom))) == 1)
+  return (isTRUE(attr(biom, 'rarefaction') > 0))
 }
 
 
 #' The rarefaction depth of a BIOM object.
 #' 
+#' The returned values reflect changes made after any \code{subset()} commands. 
+#' To get the rarefaction level immediately after \code{read.biom()} or
+#' \code{rarefy()} use \code{attr(biom, 'rarefaction')} instead.
+#' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @return The rarefaction depth. If the BIOM object is not rarefied, this will be 
-#'         a sorted vector of all the unique depths.
+#' @return The rarefaction depth. If the BIOM object is not rarefied, this will 
+#'         be a sorted vector of all the unique depths.
 #' @family accessor functions
 #' @seealso [sample.sums()]
 #' @export

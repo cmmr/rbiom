@@ -28,7 +28,7 @@
 #'           
 #' @param rarefy   Should the dataset be rarefied first? When \bold{metric} is 
 #'        an alpha diversity metric, this 'rarefy' parameter is passed on 
-#'        directly to \code{alpha.div()}. (Default: TRUE)
+#'        directly to \code{alpha.div()}. (Default: FALSE)
 #'        
 #' @param weighted   When \bold{metric} is a beta diversity metric, should it 
 #'        be run in in weighted mode? (Default: TRUE)
@@ -72,7 +72,7 @@
 #'     
 #'     distill(hmp50, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
 #'
-distill <- function (biom, metric, weighted = TRUE, rarefy = TRUE, long = TRUE, md = TRUE, safe = FALSE) {
+distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE, safe = FALSE) {
   
   if (!is(biom, 'BIOM'))
     stop ("Input for 'biom' must be a BIOM object.")
@@ -124,7 +124,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = TRUE, long = TRUE, 
     } else                      { attr(df, 'response') <- "Abundance" }
     
     if (isTRUE(safe))
-      attr(df, 'response') <- paste0(".", tolower(attr(df, 'response')))
+      attr(df, 'response') <- ".value"
   }
   
   

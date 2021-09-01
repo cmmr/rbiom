@@ -46,6 +46,7 @@ importClassesFrom("slam")
 
 import("ggplot2")
 import("RcppParallel")
+importFrom("ape", "print.phylo")
 importFrom("glue", "backtick")
 importFrom("ggrepel", "geom_text_repel", "geom_label_repel")
 importFrom("magrittr","%>%", "%<>%")
