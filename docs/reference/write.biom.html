@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9037</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9038</span>
       </span>
     </div>
 
@@ -127,7 +127,9 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>biom</th>
-      <td><p>The BIOM object to save to the file.</p></td>
+      <td><p>The BIOM object to save to the file. If another class of
+object is given, it will be coerced to matrix and output in
+tabular format, provided it is numeric with rownames and colnames.</p></td>
     </tr>
     <tr>
       <th>file</th>
@@ -136,13 +138,12 @@ or <code>.bz2</code>, the file contents will be compressed accordingly.</p></td>
     </tr>
     <tr>
       <th>format</th>
-      <td><p>Options are <b>&#8220;tab&#8221;</b>, 
-<b>&#8220;json&#8221;</b>, and <b>&#8220;hdf5&#8221;</b>, 
+      <td><p>Options are <b>tab</b>, <b>json</b>, and <b>hdf5</b>, 
 corresponding to classic tabular format, biom format version 1.0 and 
-biom version 2.1, respectively. Abbreviations are also accepted. See
-<a href='http://biom-format.org/documentation/'>http://biom-format.org/documentation/</a> for details. NOTE: to write
-HDF5 formatted BIOM files, the BioConductor R package <code>rhdf5</code> must
-be installed.</p></td>
+biom version 2.1, respectively. Abbreviations are also accepted. See 
+<a href='http://biom-format.org/documentation/'>http://biom-format.org/documentation/</a> for details. NOTE: to 
+write HDF5 formatted BIOM files, the BioConductor R package 
+<code>rhdf5</code> must be installed.</p></td>
     </tr>
     </table>
 

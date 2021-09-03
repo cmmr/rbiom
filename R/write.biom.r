@@ -1,30 +1,56 @@
 #' Write counts, metadata, taxonomy, and phylogeny to a biom file.
 #'
-#' @param biom  The BIOM object to save to the file.
+#' @param biom  The BIOM object to save to the file. If another class of
+#'        object is given, it will be coerced to matrix and output in
+#'        tabular format, provided it is numeric with rownames and colnames.
+#'        
 #' @param file  Path to the output file. If the file name ends in \code{.gz} 
-#'     or \code{.bz2}, the file contents will be compressed accordingly.
-#' @param format  Options are \bold{\dQuote{tab}}, 
-#'     \bold{\dQuote{json}}, and \bold{\dQuote{hdf5}}, 
-#'     corresponding to classic tabular format, biom format version 1.0 and 
-#'     biom version 2.1, respectively. Abbreviations are also accepted. See
-#'     \url{http://biom-format.org/documentation/} for details. NOTE: to write
-#'     HDF5 formatted BIOM files, the BioConductor R package \code{rhdf5} must
-#'     be installed.
+#'        or \code{.bz2}, the file contents will be compressed accordingly.
+#'        
+#' @param format  Options are \bold{tab}, \bold{json}, and \bold{hdf5}, 
+#'        corresponding to classic tabular format, biom format version 1.0 and 
+#'        biom version 2.1, respectively. Abbreviations are also accepted. See 
+#'        \url{http://biom-format.org/documentation/} for details. NOTE: to 
+#'        write HDF5 formatted BIOM files, the BioConductor R package 
+#'        \code{rhdf5} must be installed.
+#'        
 #' @return On success, returns \code{NULL} invisibly.
 #' @export
 
 
 write.biom <- function (biom, file, format="json") {
   
+  
   #--------------------------------------------------------------
-  # Sanity Checks
+  # Accept abbreviations of tab, json, and hdf5
   #--------------------------------------------------------------
   
-  if (!is(biom, "BIOM"))
-      stop(simpleError("Invalid BIOM object."))
+  opts   <- c("tab", "json", "hdf5")
+  format <- tolower(head(format, 1))
+  format <- c(opts, format)[pmatch(format, opts, nomatch=4)]
+  
+  
+  #--------------------------------------------------------------
+  # Refuse to overwrite existing files.
+  #--------------------------------------------------------------
   
   if (file.exists(file))
       stop(simpleError(sprintf("Output file already exists: '%s'", file)))
+  
+  
+  #--------------------------------------------------------------
+  # Try to convert non-BIOM objects to a matrix for tsv output.
+  #--------------------------------------------------------------
+  
+  if (!is(biom, "BIOM")) {
+    
+    mtx <- try(as.matrix(biom), silent = TRUE)
+    if (is.matrix(mtx) && is.numeric(mtx))
+      if (!is.null(rownames(mtx)) && !is.null(colnames(mtx)))
+        return (write.biom.tsv(mtx, file))
+    
+    stop(simpleError("Invalid BIOM object."))
+  }
   
   
   #--------------------------------------------------------------
@@ -39,15 +65,6 @@ write.biom <- function (biom, file, format="json") {
   if (is.na(biom$info$id))         biom$info$id   <- "NA"
   if (length(biom$info$id) != 1)   biom$info$id   <- "NA"
   if (nchar(biom$info$id) == 0)    biom$info$id   <- "NA"
-  
-  
-  #--------------------------------------------------------------
-  # Select the appropriate format engine
-  #--------------------------------------------------------------
-  
-  opts   <- c("tab", "json", "hdf5")
-  format <- tolower(head(format, 1))
-  format <- c(opts, format)[pmatch(format, opts, nomatch=4)]
   
   switch (format, 
     "hdf5" = write.biom.2.1(biom, file),
@@ -66,32 +83,36 @@ write.biom <- function (biom, file, format="json") {
 
 write.biom.tsv <- function (biom, file) {
   
+  # biom could be either a BIOM or matrix object
+  counts   <- if (is(biom, "BIOM")) biom$counts   else biom
+  taxonomy <- if (is(biom, "BIOM")) biom$taxonomy else NULL
+  
   mtx <- {
     rbind(
       matrix(
-        data = c("#OTU ID", colnames(biom$counts)),
+        data = c("#OTU ID", colnames(counts)),
         nrow = 1
       ),
       cbind(
         matrix(
-          data = rownames(biom$counts),
+          data = rownames(counts),
           ncol = 1
         ),
         matrix(
-          data = as.character(as.matrix(biom$counts)), 
-          nrow = nrow(biom$counts)
+          data = as.character(as.matrix(counts)), 
+          nrow = nrow(counts)
         )
       )
     )
   }
   
-  if (!is.null(biom$taxonomy)) {
-    if (ncol(biom$taxonomy) > 0) {
+  if (!is.null(taxonomy)) {
+    if (ncol(taxonomy) > 0) {
       mtx <- {
         cbind(
           mtx,
           matrix(
-            data = c("Taxonomy", apply(biom$taxonomy, 1L, paste, collapse="; ")),
+            data = c("Taxonomy", apply(taxonomy, 1L, paste, collapse="; ")),
             ncol = 1
           )
         )
@@ -115,7 +136,6 @@ write.biom.tsv <- function (biom, file) {
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # BIOM v1.0 - JSON
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 
 write.biom.1.0 <- function (biom, file) {
   
