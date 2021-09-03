@@ -249,11 +249,6 @@ plot_factor <- function (
     if (any(c("violin", "box", "bar") %in% names(layers)))
       args %<>% c(color = "black", fill = "black")
     layers[['strip']] %<>% c(args)
-    # layers[['strip']][['position']] <- if (dodged) jdodge else jitter
-    # if (any(c("violin", "box", "bar") %in% names(layers))) {
-    #   layers[['strip']][['color']] = "black"
-    #   layers[['strip']][['size']]  = 0.1
-    # }
   }
   
   
@@ -394,17 +389,20 @@ plot_factor <- function (
   # Define which color, pattern, and shape names to use
   #--------------------------------------------------------------
   if (!is.null(color.by)) {
+    ggdata[[color.by]] %<>% as.factor()
     colors <- assign_colors(colors, ggdata[[color.by]])
     layers[['fill']][['values']]  <- colors
     layers[['color']][['values']] <- colors
   }
   
   if (!is.null(pattern.by)) {
+    ggdata[[pattern.by]] %<>% as.factor()
     patterns <- assign_patterns(patterns, ggdata[[pattern.by]])
     layers[['pattern']][['values']] <- patterns
   }
   
   if (!is.null(shape.by)) {
+    ggdata[[shape.by]] %<>% as.factor()
     shapes <- assign_shapes(shapes, ggdata[[shape.by]])
     layers[['shape']][['values']] <- shapes
   }
@@ -548,9 +546,9 @@ plot_factor <- function (
       # P-value for each x position
       #--------------------------------------------------------------
       stats <- stats.table(
-        biom  = biom, 
+        biom  = ggdata, 
         x     = setdiff(c(color.by, pattern.by, shape.by), x), 
-        y     = y, 
+        y     = ".y", 
         by    = c(x, facet.by), 
         adj   = p.adj, 
         y.pos = y.pos )
