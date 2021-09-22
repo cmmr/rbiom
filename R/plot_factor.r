@@ -1,9 +1,9 @@
 
 
 plot_factor <- function (
-  biom, x, y, layers = "rls", 
+  biom, x, y, layers = "rls", xvals = NULL,
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
-  colors   = NULL, patterns   = NULL, shapes   = NULL, 
+  colors   = NULL, patterns   = NULL, shapes   = NULL, facets   = NULL, 
   p.min = 0.05, p.adj = "fdr", se = "ci95", xlab.angle = 'auto', ...) {
   
   dots <- list(...)
@@ -33,16 +33,6 @@ plot_factor <- function (
     if (arg %in% groupvars) next
     groupvars <- c(groupvars, as.vector(arg))
     opvars    <- c(opvars, paste0(attr(arg, 'op', exact = TRUE), as.vector(arg)))
-  }
-  
-  if (length(groupvars) > 1) {
-    group.by <- ".group"
-    biom$metadata[[group.by]] <- interaction(
-      lapply(groupvars, function (i) { biom$metadata[[i]] }) )
-    groupvars <- c(groupvars, group.by)
-    opvars    <- c(opvars,    group.by)
-  } else {
-    group.by <- groupvars
   }
   
   for (i in groupvars)
@@ -84,6 +74,49 @@ plot_factor <- function (
   
   
   #--------------------------------------------------------------
+  # Drop values not named in colors, patterns, or shapes.
+  # Useful for filtering displayed combinations in beta div BPs.
+  #
+  # plot(hmp50, Bray ~ `==Sex`, color.by="Body Site", colors=c(
+  #    'Saliva' = "green", 
+  #    'Saliva vs Stool' = "red", 
+  #    'Buccal mucosa vs Saliva' = "blue" ))
+  #--------------------------------------------------------------
+  ggdata <- local({
+    conf <- list(
+      "x"          = unname(xvals), 
+      "facet.by"   = unname(facets), 
+      "color.by"   = names(colors), 
+      "pattern.by" = names(patterns), 
+      "shape.by"   = names(shapes) )
+    for (i in seq_along(conf)) {
+      col  <- get(names(conf)[[i]])        %||% next
+      keep <- conf[[i]]                    %||% next
+      curr <- as.character(ggdata[[col]]) %||% next
+      if (isTRUE(length(intersect(keep, curr)) > 0)) {
+        ggdata        <- ggdata[curr %in% keep,,drop=F]
+        ggdata[[col]] <- factor(curr[curr %in% keep], levels = keep)
+      }
+    }
+    ggdata
+  })
+  
+  
+  #--------------------------------------------------------------
+  # Add a group column to ensure groups are always separated
+  #--------------------------------------------------------------
+  if (length(groupvars) > 1) {
+    group.by <- ".group"
+    ggdata[[group.by]] <- interaction(
+      lapply(groupvars, function (i) { ggdata[[i]] }) )
+    groupvars <- c(groupvars, group.by)
+    opvars    <- c(opvars,    group.by)
+  } else {
+    group.by <- groupvars
+  }
+  
+  
+  #--------------------------------------------------------------
   # Remove and report NA/NaN/Inf values
   #--------------------------------------------------------------
   err <- finite_check(ggdata)
@@ -92,6 +125,20 @@ plot_factor <- function (
     errMsg <- err[['msg']]
   }
   remove("err")
+  
+  
+  #--------------------------------------------------------------
+  # Add a column of alternate facet labels when `facets`= is used
+  #--------------------------------------------------------------
+  if (!is.null(facet.by) && !is.null(names(facets))) {
+    if (!identical(names(facets), unname(facets))) {
+      if (length(intersect(names(facets), as.character(ggdata[[facet.by]]))) > 0) {
+        ggdata[['.facet']] <- facets[as.character(ggdata[[facet.by]])] %>%
+          factor(levels = unname(facets))
+        facet.by <- '.facet'
+      }
+    }
+  }
   
   
   
@@ -200,6 +247,7 @@ plot_factor <- function (
       layers[['bar']][['fill']]    <- "white"
       layers[['bar']][['color']]   <- "black"
     }
+    layers[['y_cont']][['breaks']] <- base::pretty(c(0, ggdata[['.y']]))
     
     # Bar charts need extra help on non-linear axes
     if (length(trans <- grep("\\.*trans$", names(dots), value=T)) == 1) {

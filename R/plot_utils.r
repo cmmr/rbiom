@@ -35,13 +35,18 @@ assign_colors <- function (vals, keys) {
 # Assign patterns to categorical values.
 #--------------------------------------------------------------
 assign_patterns <- function (vals, keys) {
-  keys <- levels(keys)
+  keys  <- levels(keys)
+  
+  dvals <- unique(c(
+    'bricks', 'fishscales', 'right45', 'horizonal_saw', 
+    'hs_cross', 'crosshatch45', 'crosshatch',
+    ggpattern::magick_pattern_names ))
   
   if (is.null(vals)) {
-    vals <- unique(c(
-      'bricks', 'fishscales', 'right45', 'horizonal_saw', 
-      'hs_cross', 'crosshatch45', 'crosshatch',
-      ggpattern::magick_pattern_names ))
+    vals <- dvals
+    
+  } else if (is.null(names(vals)) && all(vals %in% keys)) {
+    keys <- setNames(dvals[seq_along(vals)], vals)
   }
   
   assign_cleanup("patterns", vals, keys)
@@ -259,7 +264,7 @@ layers_toPlot <- function (layers, dots) {
   
   
   p    <- NULL
-  cmds <- c()
+  cmds <- c("library(ggplot2)")
   
   for (layer in names(layers)) {
     
@@ -387,6 +392,10 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     } else if (is(val, 'uneval'))               { aes_toString(val)
     } else if (is.factor(val))                  { as.character(val)
     } else                                      { capture.output(val) }
+    
+    
+    if (isTRUE(is.character(val) && !is.null(names(val))))
+      val <- paste(glue::single_quote(names(val)), "=", unname(val))
     
     if (length(val) > 1)
       val <- paste0("c(", paste(collapse=", ", val), ")")
