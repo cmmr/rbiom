@@ -59,7 +59,7 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
   #--------------------------------------------------------------
-  method <- validate_metrics(biom, method, mode="bdiv")
+  method <- validate_metrics(biom, method, mode="bdiv", tree=tree)
   
   
   #--------------------------------------------------------------
@@ -237,8 +237,13 @@ beta.div <- function (biom, method, weighted=TRUE, tree=NULL, long=FALSE, md=FAL
       
       # Keep factors as factors when possible
       #--------------------------------------------------------------
-      if (identical(op, "==") && is.factor(map))
-        df[[col]] <- factor(df[[col]], levels = levels(map))
+      if (is.factor(map)) {
+        if (identical(op, "==")) {
+          df[[col]] <- factor(df[[col]], levels = levels(map))
+        } else {
+          df[[col]] <- factor(df[[col]])
+        }
+      }
       
     }
   }

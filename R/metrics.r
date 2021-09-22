@@ -23,7 +23,7 @@
 #'     metrics(hmp50, 'adiv')
 #'     metrics(hmp50, 'dist')
 #'
-metrics <- function (biom, mode) {
+metrics <- function (biom, mode, tree=NULL) {
   
   mode <- tolower(mode)[[1]]
   if (!is(biom, 'BIOM') && mode %in% c('rank', 'taxon', 'meta'))
@@ -36,31 +36,32 @@ metrics <- function (biom, mode) {
   } else if (mode == 'rank')  { taxa.ranks(biom)
   } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
   } else if (mode == 'meta')  { colnames(metadata(biom))
-  } else if (mode == 'bdiv')  { 
-    if (has.phylogeny(biom)) { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
-    } else                   { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard") }
-  } else                      { NULL }
+  } else if (mode == 'bdiv')  {
+    hasTree <- ifelse(is(biom, 'BIOM'), has.phylogeny(biom), FALSE) || is(tree, 'phylo')
+    if (hasTree) { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
+    } else       { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard") }
+  } else { NULL }
 }
 
 
 #===============================================
 # Cleanup dynamic options that we can recognize
 #===============================================
-validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALSE) {
+validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALSE, ...) {
   
   #-----------------------------------------------
   # Return a list of recognized options
   #-----------------------------------------------
-  ord_metrics   <- function (biom) metrics(biom, 'ord')
-  adiv_metrics  <- function (biom) metrics(biom, 'adiv') %>% c("Depth")
-  bdiv_metrics  <- function (biom) metrics(biom, 'bdiv')
-  dist_metrics  <- function (biom) metrics(biom, 'dist')
-  rank_metrics  <- function (biom) metrics(biom, 'rank')
-  taxon_metrics <- function (biom) metrics(biom, 'taxon')
-  meta_metrics  <- function (biom) metrics(biom, 'meta')
-  clust_metrics <- function (biom) metrics(biom, 'clust') %>% c("heatmap", "UPGMA", "WPGMA", "WPGMC", "UPGMC")
-  other_metrics <- function (biom) c("Rarefied", "Reads", "Samples", ".", "stacked") %>% structure(., mode=.)
-  all_metrics   <- function (biom) {
+  ord_metrics   <- function (biom, ...) metrics(biom, 'ord',   ...)
+  adiv_metrics  <- function (biom, ...) metrics(biom, 'adiv',  ...) %>% c("Depth")
+  bdiv_metrics  <- function (biom, ...) metrics(biom, 'bdiv',  ...)
+  dist_metrics  <- function (biom, ...) metrics(biom, 'dist',  ...)
+  rank_metrics  <- function (biom, ...) metrics(biom, 'rank',  ...)
+  taxon_metrics <- function (biom, ...) metrics(biom, 'taxon', ...)
+  meta_metrics  <- function (biom, ...) metrics(biom, 'meta',  ...)
+  clust_metrics <- function (biom, ...) metrics(biom, 'clust', ...) %>% c("heatmap", "UPGMA", "WPGMA", "WPGMC", "UPGMC")
+  other_metrics <- function (biom, ...) c("Rarefied", "Reads", "Samples", ".", "stacked") %>% structure(., mode=.)
+  all_metrics   <- function (biom, ...) {
     v <- unlist(sapply(
       USE.NAMES = FALSE, 
       X         = c("ord", "adiv", "bdiv", "rank", "taxon", "meta", "clust", "other"), 
@@ -73,7 +74,7 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
     structure(names(v), mode=unname(v))
   }
   
-  opts <- do.call(paste0(mode, "_metrics"), list(biom=biom))
+  opts <- do.call(paste0(mode, "_metrics"), c(list(biom=biom), list(...)))
   okay <- pmatch(tolower(sub("^[!=]=", "", metrics)), tolower(opts))
   vals <- opts[okay]
   
