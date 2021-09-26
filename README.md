@@ -2,6 +2,7 @@ rbiom
 =======
 
 [![Travis-CI Build Status](https://travis-ci.org/cmmr/rbiom.svg?branch=master)](https://travis-ci.org/cmmr/rbiom) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/r-rbiom/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 
 This package is a toolkit for working with Biological Observation Matrix
 (BIOM) files. Features include reading/writing all BIOM formats, rarefaction,
