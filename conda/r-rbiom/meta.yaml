@@ -65,16 +65,20 @@ test:
 about:
   home: https://cmmr.github.io/rbiom/index.html
 
-  license: AGPL-3.0-or-later
+  license: AGPL-3.0-only
   license_family: AGPL
-  license_file: LICENSE
+  license_file:
+    - {{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3
   
-  summary: A toolkit for working with Biological Observation Matrix ('BIOM') files. Features
+  summary: Read/Write, Transform, and Summarize 'BIOM' Data
+  description: A toolkit for working with Biological Observation Matrix ('BIOM') files. Features
     include reading/writing all 'BIOM' formats, rarefaction, alpha diversity, beta diversity
     (including 'UniFrac'), summarizing counts by taxonomic level, and sample subsetting.
     Standalone functions for reading, writing, and subsetting phylogenetic trees are
     also provided. All CPU intensive operations are encoded in C with multi-thread support.
+  
 
 extra:
   recipe-maintainers:
+    - conda-forge/r
     - dansmith01
