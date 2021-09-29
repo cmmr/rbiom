@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9038</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9040</span>
       </span>
     </div>
 
@@ -167,12 +167,12 @@ loaded from <code>biom</code>, if encoded there.</p></td>
     <span class='va'>tree</span> <span class='op'>&lt;-</span> <span class='fu'>ape</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ape/man/as.phylo.html'>as.phylo</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/dist.html'>dist</a></span><span class='op'>(</span><span class='va'>mtx</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
     
     <span class='va'>dm</span> <span class='op'>&lt;-</span> <span class='fu'>unifrac</span><span class='op'>(</span><span class='va'>mtx</span>, tree<span class='op'>=</span><span class='va'>tree</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error: In has.phylogeny(), biom must be a BIOM-class object.</span></div><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;           HMP01     HMP02     HMP03     HMP04
-#&gt; HMP01 0.0000000 0.1950253 0.3687298 0.4239831
-#&gt; HMP02 0.1950253 0.0000000 0.2101679 0.3187533
-#&gt; HMP03 0.3687298 0.2101679 0.0000000 0.3040937
-#&gt; HMP04 0.4239831 0.3187533 0.3040937 0.0000000</div><div class='input'>    
+    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>dm</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>,<span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>]</span>
+</div><div class='output co'>#&gt;          a        b        c        d
+#&gt; a   0.0000 148.9849 190.9240 187.6669
+#&gt; b 148.9849   0.0000 213.4126 134.2024
+#&gt; c 190.9240 213.4126   0.0000 171.8943
+#&gt; d 187.6669 134.2024 171.8943   0.0000</div><div class='input'>    
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

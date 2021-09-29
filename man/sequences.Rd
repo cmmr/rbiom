@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.r
 \name{sequences}
 \alias{sequences}
-\title{DNA sequence associated with each taxonomic identifier.}
+\title{Nucleotide sequences associated with each taxonomic identifier.}
 \usage{
 sequences(biom)
 }
@@ -14,7 +14,7 @@ A named character vector of sequences in \code{biom}. If this data
           is not present, then returns \code{NULL}.
 }
 \description{
-DNA sequence associated with each taxonomic identifier.
+Nucleotide sequences associated with each taxonomic identifier.
 }
 \examples{
     library(rbiom)
@@ -37,6 +37,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

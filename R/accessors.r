@@ -7,10 +7,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     sample.names(biom)
+#'     sample.names(hmp50)
 #'
 
 sample.names <- function (biom) {
@@ -30,14 +27,9 @@ sample.names <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
+#'     sample.sums(hmp50) %>% sort() %>% head()
 #'     
-#'     sample.sums(biom)
-#'     
-#'     sample.sums(biom) %>% sort() %>% head()
-#'     
-#'     hist(sample.sums(biom))
+#'     hist(sample.sums(hmp50))
 #'
 
 sample.sums <- function (biom, long=FALSE, md=FALSE) {
@@ -82,10 +74,7 @@ sample.sums <- function (biom, long=FALSE, md=FALSE) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     taxa.names(biom) %>% head()
+#'     taxa.names(hmp50) %>% head()
 #'
 
 taxa.names <- function (biom) {
@@ -104,10 +93,7 @@ taxa.names <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     taxa.ranks(biom)
+#'     taxa.ranks(hmp50)
 #'
 
 taxa.ranks <- function (biom) {
@@ -126,10 +112,7 @@ taxa.ranks <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     counts(biom)[1:4,1:5]
+#'     counts(hmp50)[1:4,1:5]
 #'
 
 counts <- function (biom) {
@@ -148,10 +131,9 @@ counts <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
+#'     is.rarefied(hmp50)
 #'     
-#'     is.rarefied(biom)
+#'     rarefy(hmp50, 1000) %>% is.rarefied()
 #'
 
 is.rarefied <- function (biom) {
@@ -176,12 +158,8 @@ is.rarefied <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     depth(biom) %>% head()
-#'     
-#'     rarefy(biom) %>% depth()
+#'     depth(hmp50) %>% head()
+#'     rarefy(hmp50) %>% depth()
 #'
 
 depth <- function (biom) {
@@ -200,10 +178,7 @@ depth <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     has.phylogeny(biom)
+#'     has.phylogeny(hmp50)
 #'
 
 has.phylogeny <- function (biom) {
@@ -222,10 +197,7 @@ has.phylogeny <- function (biom) {
 #' @examples
 #'     library(rbiom)
 #'     
-#'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read.biom(infile)
-#'     
-#'     summary(phylogeny(biom))
+#'     summary(phylogeny(hmp50))
 #'
 
 phylogeny <- function (biom) {
@@ -235,7 +207,7 @@ phylogeny <- function (biom) {
 }
 
 
-#' Checks if a DNA sequences are present.
+#' Checks if DNA sequences are present.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return \code{TRUE} if DNA sequences are present, \code{FALSE} otherwise.
@@ -253,7 +225,7 @@ has.sequences <- function (biom) {
 }
 
 
-#' DNA sequence associated with each taxonomic identifier.
+#' Nucleotide sequences associated with each taxonomic identifier.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
 #' @return A named character vector of sequences in \code{biom}. If this data
@@ -282,10 +254,10 @@ sequences <- function (biom) {
 }
 
 
-#' Get biom's misc information.
+#' Get \code{BIOM} object's miscellaneous information.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @return A data frame of the metadata in \code{biom}.
+#' @return A list of the top-level metadata in \code{biom}.
 #' @family accessor functions
 #' @export
 #' @examples
@@ -296,7 +268,25 @@ sequences <- function (biom) {
 info <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In info(), biom must be a BIOM-class object.'))
-  return (biom[['info']])
+  return (c(biom[['info']], comment(biom)))
+}
+
+
+#' Get \code{BIOM} object's identifier / title.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @return A data frame of the metadata in \code{biom}.
+#' @family accessor functions
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     id(hmp50)
+#'
+
+id <- function (biom) {
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In id(), biom must be a BIOM-class object.'))
+  return (biom[['info']][['id']])
 }
 
 

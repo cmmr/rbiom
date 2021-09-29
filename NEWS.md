@@ -1,4 +1,4 @@
-# rbiom 1.0.2.9039
+# rbiom 1.0.2.9040
 
 * Can now disable rarefaction in write.xlsx().
 * Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
@@ -29,6 +29,7 @@
 * Provenance tracking in BIOM object's 'history' attribute.
 * 'hmp50' dataset now loads with rbiom.
 * subset() can now also subset taxa.
+* Added setter functions for many BIOM object attributes.
 
 ### Breaking Changes
 

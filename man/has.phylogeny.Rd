@@ -18,10 +18,7 @@ Checks if a phylogenetic tree is present.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    has.phylogeny(biom)
+    has.phylogeny(hmp50)
 
 }
 \seealso{
@@ -29,6 +26,7 @@ Other accessor functions:
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

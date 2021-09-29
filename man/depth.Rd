@@ -21,12 +21,8 @@ To get the rarefaction level immediately after \code{read.biom()} or
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    depth(biom) \%>\% head()
-    
-    rarefy(biom) \%>\% depth()
+    depth(hmp50) \%>\% head()
+    rarefy(hmp50) \%>\% depth()
 
 }
 \seealso{
@@ -36,6 +32,7 @@ Other accessor functions:
 \code{\link{counts}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

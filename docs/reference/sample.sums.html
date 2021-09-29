@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9038</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9040</span>
       </span>
     </div>
 
@@ -142,6 +142,7 @@
 <code><a href='depth.html'>depth</a>()</code>,
 <code><a href='has.phylogeny.html'>has.phylogeny</a>()</code>,
 <code><a href='has.sequences.html'>has.sequences</a>()</code>,
+<code><a href='id.html'>id</a>()</code>,
 <code><a href='info.html'>info</a>()</code>,
 <code><a href='is.rarefied.html'>is.rarefied</a>()</code>,
 <code><a href='metadata.html'>metadata</a>()</code>,
@@ -157,22 +158,10 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://cmmr.github.io/rbiom/index.html'>rbiom</a></span><span class='op'>)</span>
     
-    <span class='va'>infile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"hmp50.bz2"</span>, package <span class='op'>=</span> <span class='st'>"rbiom"</span><span class='op'>)</span>
-    <span class='va'>biom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read.biom.html'>read.biom</a></span><span class='op'>(</span><span class='va'>infile</span><span class='op'>)</span>
-    
-    <span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 HMP11 HMP12 HMP13 
-#&gt;  1660  1371  1353  1895  3939  4150  3283  1695  2069  2509  7820  3685  3280 
-#&gt; HMP14 HMP15 HMP16 HMP17 HMP18 HMP19 HMP20 HMP21 HMP22 HMP23 HMP24 HMP25 HMP26 
-#&gt;  2614  2450  1696  1579  2202  2423  2874  8667  3045  3493  1183 22117  2263 
-#&gt; HMP27 HMP28 HMP29 HMP30 HMP31 HMP32 HMP33 HMP34 HMP35 HMP36 HMP37 HMP38 HMP39 
-#&gt;  1720  1695  2423  3938  1839  3429  1610  8959  2496   182  3323  3044  2191 
-#&gt; HMP40 HMP41 HMP42 HMP43 HMP44 HMP45 HMP46 HMP47 HMP48 HMP49 HMP50 
-#&gt;  3031  3119  1489  3954 16241  1703  4068  2796  3577  3250  3965 </div><div class='input'>    
-    <span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
+    <span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>hmp50</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; HMP36 HMP24 HMP03 HMP02 HMP42 HMP17 
 #&gt;   182  1183  1353  1371  1489  1579 </div><div class='input'>    
-    <span class='fu'><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></span><span class='op'>(</span><span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>biom</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></span><span class='op'>(</span><span class='fu'>sample.sums</span><span class='op'>(</span><span class='va'>hmp50</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='sample.sums-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

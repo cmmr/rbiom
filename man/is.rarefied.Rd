@@ -18,10 +18,9 @@ Checks if a BIOM object is rarefied.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
+    is.rarefied(hmp50)
     
-    is.rarefied(biom)
+    rarefy(hmp50, 1000) \%>\% is.rarefied()
 
 }
 \seealso{
@@ -30,6 +29,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{metadata}()},
 \code{\link{nsamples}()},

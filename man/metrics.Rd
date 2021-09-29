@@ -4,7 +4,7 @@
 \alias{metrics}
 \title{List all the options for each type of metric.}
 \usage{
-metrics(biom, mode)
+metrics(biom, mode, tree = NULL)
 }
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read.biom}.}

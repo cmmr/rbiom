@@ -1,0 +1,8 @@
+Package: ggpattern
+Version: 0.2.0
+Imports: ggplot2, glue, grid, gridpattern (>= 0.2.1), rlang, scales,
+Suggests: ambient, dplyr, gganimate, knitr, magick, mapproj, maps, memoise, png, readr, rmarkdown, sf (>= 0.7-3), testthat
+              (>= 2.1.0), vdiffr
+License: MIT + file LICENSE
+MD5sum: 535669ac1144a5e01eda1f9b2d1dd8ee
+NeedsCompilation: no

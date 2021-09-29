@@ -81,3 +81,41 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   
   return (x)
 }
+
+
+
+
+#' Set the taxonomy table.
+#' 
+#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' 
+#' @param value  A character matrix with rownames \code{taxa.names(x)}. If
+#'        there are more rownames than taxa names, the matrix will be subset.
+#'         
+#' @family setters
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     taxonomy(hmp50)[1:4,]
+#'     
+#'     # Sometimes taxonomic names are incomplete
+#'     taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
+#'     
+#'     # rbiom can insert more descriptive placeholders
+#'     taxonomy(hmp50, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
+#'
+
+`taxonomy<-` <- function (x, value) {
+  
+  stopifnot(is(x, 'BIOM'))
+  stopifnot(is.matrix(value))
+  stopifnot(typeof(value) == "character")
+  stopifnot(!all(taxa.names(x) %in% rownames(value)))
+  
+  x[['taxonomy']] <- value[taxa.names(x),]
+  
+  return (x) 
+}
+
+

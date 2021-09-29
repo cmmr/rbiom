@@ -42,6 +42,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

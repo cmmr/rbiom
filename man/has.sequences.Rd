@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.r
 \name{has.sequences}
 \alias{has.sequences}
-\title{Checks if a DNA sequences are present.}
+\title{Checks if DNA sequences are present.}
 \usage{
 has.sequences(biom)
 }
@@ -13,7 +13,7 @@ has.sequences(biom)
 \code{TRUE} if DNA sequences are present, \code{FALSE} otherwise.
 }
 \description{
-Checks if a DNA sequences are present.
+Checks if DNA sequences are present.
 }
 \examples{
     library(rbiom)
@@ -25,6 +25,7 @@ Other accessor functions:
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

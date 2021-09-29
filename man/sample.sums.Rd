@@ -19,14 +19,9 @@ Sum the observations in each sample.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
+    sample.sums(hmp50) \%>\% sort() \%>\% head()
     
-    sample.sums(biom)
-    
-    sample.sums(biom) \%>\% sort() \%>\% head()
-    
-    hist(sample.sums(biom))
+    hist(sample.sums(hmp50))
 
 }
 \seealso{
@@ -35,6 +30,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

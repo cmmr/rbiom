@@ -18,10 +18,7 @@ Get the taxa ranks.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    taxa.ranks(biom)
+    taxa.ranks(hmp50)
 
 }
 \seealso{
@@ -30,6 +27,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

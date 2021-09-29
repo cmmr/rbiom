@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.r
 \name{info}
 \alias{info}
-\title{Get biom's misc information.}
+\title{Get \code{BIOM} object's miscellaneous information.}
 \usage{
 info(biom)
 }
@@ -10,10 +10,10 @@ info(biom)
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
 }
 \value{
-A data frame of the metadata in \code{biom}.
+A list of the top-level metadata in \code{biom}.
 }
 \description{
-Get biom's misc information.
+Get \code{BIOM} object's miscellaneous information.
 }
 \examples{
     library(rbiom)
@@ -26,6 +26,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},
 \code{\link{nsamples}()},

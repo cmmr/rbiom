@@ -238,7 +238,7 @@
 plot.BIOM <- function (
   x, formula, layers = "rls", 
   color.by = NULL, pattern.by = NULL, shape.by = NULL, label.by = NULL, 
-  sort.by = NULL, facet.by = NULL, xvals = nuLL, colors = NULL, 
+  sort.by = NULL, facet.by = NULL, xvals = NULL, colors = NULL, 
   patterns = NULL, shapes = NULL, facets = NULL, p.min = 0.05, p.adj = "fdr", 
   se = "ci95", rline = NULL, xlab.angle = 'auto', weighted = TRUE, 
   rank = "auto", taxa = NULL, abbr = TRUE, other = FALSE, anno = "tmprf", 

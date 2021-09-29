@@ -222,13 +222,14 @@ read.biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   #--------------------------------------------------------------
   
   biom <- structure(
-    class = c("BIOM", "list"),
+    class   = c("BIOM", "list"),
+    comment = info[['comment']] %||% "",
     list( 'counts'    = counts,
           'metadata'  = metadata,
           'taxonomy'  = taxonomy,
           'phylogeny' = phylogeny,
           'sequences' = sequences,
-          'info'      = info
+          'info'      = info[names(info) != "comment"]
     )
   )
   

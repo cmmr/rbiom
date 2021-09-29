@@ -18,10 +18,7 @@ Get the abundance counts.
 \examples{
     library(rbiom)
     
-    infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-    biom <- read.biom(infile)
-    
-    counts(biom)[1:4,1:5]
+    counts(hmp50)[1:4,1:5]
 
 }
 \seealso{
@@ -29,6 +26,7 @@ Other accessor functions:
 \code{\link{depth}()},
 \code{\link{has.phylogeny}()},
 \code{\link{has.sequences}()},
+\code{\link{id}()},
 \code{\link{info}()},
 \code{\link{is.rarefied}()},
 \code{\link{metadata}()},

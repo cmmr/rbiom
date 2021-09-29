@@ -86,3 +86,45 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
   
   return (setNames(md[[field]], rownames(md)))
 }
+
+
+
+
+
+#' Set the \code{BIOM} object's metadata.
+#' 
+#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' 
+#' @param value  A data.frame with the metadata. All the \code{rownames()} must 
+#'        be in \code{sample.names(biom)}. If there are fewer rows of 
+#'        \code{data} than samples, then the \code{biom} object will be subset.
+#'    
+#' @family setters
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     md <- metadata(hmp50)
+#'     md <- md[,c('Sex', 'Body Site')]
+#'     metadata(hmp50) <- md
+#'     head(metadata(hmp50))
+#'
+`metadata<-` <- function(x, value) {
+  
+  biom_ids <- sample.names(x)
+  data_ids <- rownames(value)
+  
+  stopifnot(is(x, 'BIOM'))
+  stopifnot(all(class(value) == "data.frame"))
+  stopifnot(length(data_ids) > 0)
+  stopifnot(!any(duplicated(data_ids)))
+  stopifnot(all(data_ids %in% biom_ids))
+  
+  # Different number or order of IDs
+  if (length(data_ids) != length(biom_ids)) { x %<>% select(data_ids)
+  } else if (any(data_ids != biom_ids))     { x %<>% select(data_ids) }
+  
+  x[['metadata']] <- value
+  
+  return (x)
+}

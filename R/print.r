@@ -13,25 +13,20 @@
 
 print.BIOM <- function (x, ...) {
   
-  shortlist <- function (object, n) {
-    res <- head(object, n)
-    res <- if (length(object) > n) c(res, "...") else res
-    res <- paste(collapse=", ", res)
-  }
+  w  <- getOption("width") * 0.75
+  gc <- function (vals) glue_collapse(vals, sep=", ", width=w - 20, last=" and ")
+  i  <- x[['info']]
   
-  sampleNames <- shortlist(colnames(x$counts),   5)
-  taxaNames   <- shortlist(rownames(x$counts),   5)
-  taxaRanks   <- shortlist(colnames(x$taxonomy), 9)
-  metadata    <- shortlist(colnames(x$metadata), 5)
-  tree        <- ifelse(is.null(x$phylogeny), "Absent", "Present")
-  
-  cat(paste(sep="\n", 
-    sprintf("%7.0f Samples:  (%s)", ncol(x$counts),   sampleNames),
-    sprintf("%7.0f Taxa:     (%s)", nrow(x$counts),   taxaNames),
-    sprintf("%7.0f Ranks:    (%s)", ncol(x$taxonomy), taxaRanks),
-    sprintf("%7.0f Metadata: (%s)", ncol(x$metadata), metadata),
-    sprintf("        Tree:     %s", tree), "\n"
-  ))
+  cat(paste(collapse="\n", c(
+    if (isTRUE(nchar(i[['id']])  > 0)) glue('{i$id} ({substr(i$date, 1, 10)})') else NULL,
+    if (isTRUE(nchar(comment(x)) > 0)) c(strwrap(comment(x), w), "-----------") else NULL,
+    sprintf("%7.0f Samples:  (%s)", nsamples(x),           gc(sample.names(x))),
+    sprintf("%7.0f Taxa:     (%s)", ntaxa(x),              gc(taxa.names(x))),
+    sprintf("%7.0f Ranks:    (%s)", length(taxa.ranks(x)), gc(taxa.ranks(x))),
+    sprintf("%7.0f Metadata: (%s)", ncol(metadata(x)),     gc(colnames(metadata(x)))),
+    sprintf("        Tree:     %s", ifelse(has.phylogeny(x), "Absent", "Present")), 
+    "\n"
+  )))
   
   invisible(NULL)
 }

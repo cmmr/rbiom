@@ -15,9 +15,11 @@
   label.by = NULL,
   sort.by = NULL,
   facet.by = NULL,
+  xvals = NULL,
   colors = NULL,
   patterns = NULL,
   shapes = NULL,
+  facets = NULL,
   p.min = 0.05,
   p.adj = "fdr",
   se = "ci95",
@@ -59,11 +61,15 @@ column to color, pattern, shape, label, sort, and/or facet by. If
 that column is a \code{factor}, the ordering of levels will be
 maintained in the plot.}
 
-\item{colors, patterns, shapes}{Names of the colors, patterns, and/or shapes
-to use in the plot. Available names can be found by running
-\code{colors()}, \code{ggpattern::magick_pattern_names}, and
-\code{0:25}, respectively. Use a named character vector to map them
-to specific factor levels in the metadata.}
+\item{colors, patterns, shapes, facets, xvals}{Names of the colors, patterns,
+shapes, facets, and/or x values to use in the plot. Available values
+for colors, patterns, and shapes are given by \code{colors()},
+\code{ggpattern::magick_pattern_names}, and \code{0:25},
+respectively. Use a named character vector to map them  to specific
+factor levels in the metadata. \code{facets} and \code{xvals} are
+coerced to unnamed character vectors. If the length of these vectors
+is less than the values present in their corresponding metadata
+column, then the data set will be subseted accordingly.}
 
 \item{p.min}{Minimum adjusted p-value to display on the plot with a bracket.
 Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.

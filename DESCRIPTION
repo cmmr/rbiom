@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.2.9039
+Version: 1.0.2.9040
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
@@ -20,6 +20,7 @@ License: AGPL-3.0-or-later
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
+Additional_repositories: https://cmmr.github.io/rbiom
 LinkingTo: 
     Rcpp,
     RcppParallel
@@ -46,7 +47,8 @@ Imports:
     tsne,
     vegan
 Suggests:
+    ggpattern,
     reshape2,
     rhdf5,
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
