@@ -55,20 +55,20 @@
 #' 
 #' | Combination        | Chart Type  | Example                                 | 
 #' | ------------------ | ----------- | --------------------------------------- | 
-#' | ADIV ~ .           | Super box   | `` plot(biom, Shannon ~ .)           `` |
-#' | ADIV ~ FACTOR      | Super box   | `` plot(biom, Shannon ~ `Body Site`) `` |
-#' | BDIV ~ FACTOR      | Super box   | `` plot(biom, Bray ~ Sex)            `` |
-#' | RANK ~ .           | Super box   | `` plot(biom, Phylum ~ .)            `` |
-#' | TAXON ~ FACTOR     | Super box   | `` plot(biom, Firmicutes ~ Sex)      `` |
-#' | ADIV ~ NUMERIC     | Line chart  | `` plot(biom, Shannon ~ Age)         `` |
-#' | TAXON ~ NUMERIC    | Line chart  | `` plot(biom, Prevoltella ~ BMI)     `` |
-#' | BDIV ~ CLUST       | Heatmap     | `` plot(biom, UniFrac ~ ward)        `` |
-#' | RANK ~ CLUST       | Heatmap     | `` plot(biom, Genus ~ heatmap)       `` |
-#' | BDIV ~ ORD         | Ordination  | `` plot(biom, Bray ~ NMDS)           `` |
-#' | RANK ~ stacked     | Stacked bar | `` plot(biom, Family ~ stacked)      `` |
-#' | Rarefied ~ Reads   | Rarefaction | `` plot(biom, Rarefied ~ Reads)      `` |
-#' | Rarefied ~ Samples | Rarefaction | `` plot(biom, Rarefied ~ Samples)    `` |
-#' | Rarefied ~ ADIV    | Rarefaction | `` plot(biom, Rarefied ~ Shannon)    `` |
+#' | ADIV ~ .           | Super box   | `` plot(hmp50, Shannon ~ .)           `` |
+#' | ADIV ~ FACTOR      | Super box   | `` plot(hmp50, Shannon ~ `Body Site`) `` |
+#' | BDIV ~ FACTOR      | Super box   | `` plot(hmp50, Bray ~ Sex)            `` |
+#' | RANK ~ .           | Super box   | `` plot(hmp50, Phylum ~ .)            `` |
+#' | TAXON ~ FACTOR     | Super box   | `` plot(hmp50, Firmicutes ~ Sex)      `` |
+#' | ADIV ~ NUMERIC     | Line chart  | `` plot(hmp50, Shannon ~ Age)         `` |
+#' | TAXON ~ NUMERIC    | Line chart  | `` plot(hmp50, Prevoltella ~ BMI)     `` |
+#' | BDIV ~ CLUST       | Heatmap     | `` plot(hmp50, UniFrac ~ ward)        `` |
+#' | RANK ~ CLUST       | Heatmap     | `` plot(hmp50, Genus ~ heatmap)       `` |
+#' | BDIV ~ ORD         | Ordination  | `` plot(hmp50, Bray ~ NMDS)           `` |
+#' | RANK ~ stacked     | Stacked bar | `` plot(hmp50, Family ~ stacked)      `` |
+#' | Rarefied ~ Reads   | Rarefaction | `` plot(hmp50, Rarefied ~ Reads)      `` |
+#' | Rarefied ~ Samples | Rarefaction | `` plot(hmp50, Rarefied ~ Samples)    `` |
+#' | Rarefied ~ ADIV    | Rarefaction | `` plot(hmp50, Rarefied ~ Shannon)    `` |
 #' 
 #' 
 #' 
@@ -98,7 +98,7 @@
 #' @param colors,patterns,shapes,facets,xvals   Names of the colors, patterns,
 #'        shapes, facets, and/or x values to use in the plot. Available values 
 #'        for colors, patterns, and shapes are given by \code{colors()}, 
-#'        \code{ggpattern::magick_pattern_names}, and \code{0:25},
+#'        \code{gridpattern::names_magick}, and \code{0:25},
 #'        respectively. Use a named character vector to map them  to specific
 #'        factor levels in the metadata. \code{facets} and \code{xvals} are
 #'        coerced to unnamed character vectors. If the length of these vectors

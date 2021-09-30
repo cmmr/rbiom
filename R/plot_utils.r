@@ -40,7 +40,7 @@ assign_patterns <- function (vals, keys) {
   dvals <- unique(c(
     'bricks', 'fishscales', 'right45', 'horizonal_saw', 
     'hs_cross', 'crosshatch45', 'crosshatch',
-    ggpattern::magick_pattern_names ))
+    gridpattern::names_magick ))
   
   if (is.null(vals)) {
     vals <- dvals
@@ -57,13 +57,15 @@ assign_patterns <- function (vals, keys) {
 # Assign shapes to categorical values.
 #--------------------------------------------------------------
 assign_shapes <- function (vals, keys) {
-  keys <- levels(keys)
-  n    <- length(keys)
   
-  vals <- c(16, 17, 15, 3, 7, 8)
-  if (n > 6)  vals <- c(0:14)
-  if (n > 15) vals <- c(65:90, 97:122)
-  if (n > 52) vals <- rep(vals, ceiling(n / 52))
+  if (is.null(vals)) {
+    keys <- levels(keys)
+    vals <- c(16, 17, 15, 3, 7, 8)
+    n    <- length(keys)
+    if (n > 6)  vals <- c(0:14)
+    if (n > 15) vals <- c(65:90, 97:122)
+    if (n > 52) vals <- rep(vals, ceiling(n / 52))
+  }
   
   assign_cleanup("shapes", vals, keys)
 }
@@ -383,14 +385,14 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     val <- if (is.null(val))                    { "NULL"
     } else if (!is.null(attr(val, 'display')))  { attr(val, 'display') 
     } else if (is.character(val))               { glue::double_quote(val) 
-    } else if (is.logical(val))                 { as.character(val)
-    } else if (is.numeric(val))                 { as.character(val)
+    } else if (is.logical(val))                 { as.character(val) %>% setNames(names(val))
+    } else if (is.numeric(val))                 { as.character(val) %>% setNames(names(val))
     } else if (is(val, 'BIOM'))                 { "biom"
     } else if (is.data.frame(val))              { "data"
     } else if (is(val, 'formula'))              { capture.output(val)[[1]]
     } else if (is.function(val))                { fun_toString(val)
     } else if (is(val, 'uneval'))               { aes_toString(val)
-    } else if (is.factor(val))                  { as.character(val)
+    } else if (is.factor(val))                  { as.character(val) %>% setNames(names(val))
     } else                                      { capture.output(val) }
     
     

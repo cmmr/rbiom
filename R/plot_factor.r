@@ -11,6 +11,22 @@ plot_factor <- function (
   
   
   #-----------------------------------------------
+  # Allow partial matching of layer names
+  #-----------------------------------------------
+  layerlist <- c( 'b' = "box", 'v' = "violin",   'e' = "errorbar", 
+                  'r' = "bar", 's' = "strip",    'l' = "linerange",
+                  'd' = "dot", 'c' = "crossbar", 'p' = "pointrange")
+  layers <- layer_match(layers, layerlist, "rls")
+  
+  
+  #-----------------------------------------------
+  # Ignore shapes/etc without applicable layers
+  #-----------------------------------------------
+  if (!any(c('dot', 'strip')         %in% layers)) shape.by   <- NULL
+  if (!any(c('box', 'bar', 'violin') %in% layers)) pattern.by <- NULL
+  
+  
+  #-----------------------------------------------
   # Metadata needed for plotting / stat grouping
   #-----------------------------------------------
   opvars    <- c()
@@ -40,13 +56,8 @@ plot_factor <- function (
   
   
   #-----------------------------------------------
-  # Layers to include in the plot
+  # Add additional required layers to the plot
   #-----------------------------------------------
-  layerlist <- c( 'b' = "box", 'v' = "violin",   'e' = "errorbar", 
-                  'r' = "bar", 's' = "strip",    'l' = "linerange",
-                  'd' = "dot", 'c' = "crossbar", 'p' = "pointrange")
-  layers <- layer_match(layers, layerlist, "rls")
-  
   if (!is.null(color.by))   layers %<>% c('fill', 'color')
   if (!is.null(shape.by))   layers %<>% c('shape')
   if (!is.null(facet.by))   layers %<>% c('facet')
@@ -213,7 +224,7 @@ plot_factor <- function (
   # Help multiple plots overlay well together
   #--------------------------------------------------------------
   
-  dodged    <- isTRUE(length(unique(c(x, color.by, pattern.by))) > 1)
+  dodged    <- isTRUE(length(unique(c(x, color.by, shape.by, pattern.by))) > 1)
   patterned <- isTRUE(!is.null(pattern.by))
   dotted    <- isTRUE(any(c("dot", "strip") %in% names(layers)))
   
@@ -285,14 +296,17 @@ plot_factor <- function (
   if ("dot" %in% names(layers)) {
     args <- list()
     if (dodged) args[['dodge.width']] <- 0.8
-    if (any(c("violin", "box") %in% names(layers))) args <- c(args, color = "black", fill = "black")
-    if (all(c("violin", "box") %in% names(layers))) args <- c(args, cex = 1, size = 0.8)
+    if (any(c("violin", "box") %in% names(layers)))
+      args %<>% c(color = "black", fill = "black")
+    if (is.null(shape.by)) { args %<>% c(cex = 1, size = 0.8)
+    } else                 { args %<>% c(cex = 2, size = 1.8) }
     layers[['dot']] %<>% c(args)
   }
   
   # Stripchart arguments for ggbeeswarm::geom_quasirandom
   if ("strip" %in% names(layers)) {
-    args <- list('size' = 0.5)
+    args <- list()
+    args[['size']] <- ifelse(is.null(shape.by), 0.5, 2)
     if (dodged) args[['dodge.width']] <- 0.8
     if (any(c("violin", "box", "bar") %in% names(layers)))
       args %<>% c(color = "black", fill = "black")
