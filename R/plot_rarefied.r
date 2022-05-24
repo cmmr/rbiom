@@ -18,36 +18,6 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
   elements <- list('theme_bw' = list())
   
   
-  #===============================================
-  # Log scale labels
-  #===============================================
-  siunit <- function (x) {
-    sapply(as.numeric(x), function (n) {
-      if (is.na(n))       return ("")
-      if (abs(n) < 10^3 ) return (as.character(n))
-      if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
-      if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
-      if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
-      if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
-      if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
-      if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
-      return (as.character(scientific(n)))
-    })
-  }
-  loglabels <- function (values) {
-    force(values)
-    limits <- 10 ** c(0, ceiling(log10(max(values))))
-    breaks <- as.vector(sapply(log10(limits[[1]]):(log10(limits[[2]])-1), function (x) { (1:10)*10^x }))
-    list(
-      'limits' = limits, 
-      'breaks' = breaks, 
-      'labels' = function (x) {
-        x[which(1:length(x) %% 10 != 0)] <- NA
-        siunit(x)
-    })
-  }
-  
-  
   
   if (isTRUE(tolower(x) == "reads")) {
   
@@ -210,7 +180,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       aes_args                         <- list('x' = ".depth", 'y' = ".value")
       elements[['labs']]               <- list('x' = "Rarefaction Depth", 'y' = adiv_metric)
       elements[['stat_smooth']]        <- list('method' = "lm", 'formula' = "y ~ log(x)")
-      elements[['scale_x_continuous']] <- list('labels' = siunit)
+      elements[['scale_xaxisinuous']] <- list('labels' = siunit)
       
       if (!is.null(color.by)) {
         df[[color.by]] <- metadata(biom, color.by)[df[['.sample']]]

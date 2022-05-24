@@ -12,9 +12,11 @@
 #'   \item{\bold{rank} - }{ Taxonomic Rank }
 #'   \item{\bold{taxon} - }{ Taxa Names }
 #'   \item{\bold{meta} - }{ Metadata Fields }
+#'   \item{\bold{all} - }{ All of the Above }
 #' }
 #'        
-#' @return A character vector of supported values.
+#' @return A character vector of supported values. 
+#'         For \code{mode = "all"}, a named \code{list()} of character vectors.
 #' @export
 #' @seealso \code{\link{alpha.div}} \code{\link{beta.div}} \code{\link{ordinate}}
 #' @examples
@@ -23,17 +25,24 @@
 #'     metrics(hmp50, 'adiv')
 #'     metrics(hmp50, 'dist')
 #'
-metrics <- function (biom, mode, tree=NULL) {
+metrics <- function (biom, mode = "all", tree=NULL) {
   
-  mode <- tolower(mode)[[1]]
-  if (!is(biom, 'BIOM') && mode %in% c('rank', 'taxon', 'meta'))
+  mode  <- tolower(mode)[[1]]
+  
+  if (!is(biom, 'BIOM') && mode %in% c('rank', 'taxon', 'meta', 'all'))
     stop("Please provide a BIOM object when using mode='", mode, "'")
   
-  if        (mode == 'ord')   { c("PCoA", "tSNE", "NMDS") 
+  modes <- c('ord', 'adiv', 'dist', 'clust', 'rank', 'taxon', 'meta', 'bdiv')
+  if (mode == 'all')
+    return (sapply(X = modes, FUN = rbiom::metrics, biom=biom, tree=tree))
+  
+  
+  
+  if        (mode == 'ord')   { c("PCoA", "tSNE", "NMDS", "UMAP") 
   } else if (mode == 'adiv')  { c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson") 
   } else if (mode == 'dist')  { c("correlation", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
   } else if (mode == 'clust') { c("average", "ward", "mcquitty", "single", "median", "complete", "centroid") 
-  } else if (mode == 'rank')  { taxa.ranks(biom)
+  } else if (mode == 'rank')  { unique(c(taxa.ranks(biom), 'OTU'))
   } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
   } else if (mode == 'meta')  { colnames(metadata(biom))
   } else if (mode == 'bdiv')  {
@@ -47,7 +56,7 @@ metrics <- function (biom, mode, tree=NULL) {
 #===============================================
 # Cleanup dynamic options that we can recognize
 #===============================================
-validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALSE, ...) {
+validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE, ...) {
   
   #-----------------------------------------------
   # Return a list of recognized options
@@ -56,7 +65,7 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
   adiv_metrics  <- function (biom, ...) metrics(biom, 'adiv',  ...) %>% c("Depth")
   bdiv_metrics  <- function (biom, ...) metrics(biom, 'bdiv',  ...)
   dist_metrics  <- function (biom, ...) metrics(biom, 'dist',  ...)
-  rank_metrics  <- function (biom, ...) metrics(biom, 'rank',  ...)
+  rank_metrics  <- function (biom, ...) metrics(biom, 'rank',  ...) %>% c("Rank")
   taxon_metrics <- function (biom, ...) metrics(biom, 'taxon', ...)
   meta_metrics  <- function (biom, ...) metrics(biom, 'meta',  ...)
   clust_metrics <- function (biom, ...) metrics(biom, 'clust', ...) %>% c("heatmap", "UPGMA", "WPGMA", "WPGMC", "UPGMC")
@@ -64,7 +73,7 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
   all_metrics   <- function (biom, ...) {
     v <- unlist(sapply(
       USE.NAMES = FALSE, 
-      X         = c("ord", "adiv", "bdiv", "rank", "taxon", "meta", "clust", "other"), 
+      X         = c("ord", "bdiv", "rank", "adiv", "taxon", "meta", "clust", "other"), 
       FUN       = function (i) {
         k <- do.call(paste0(i, "_metrics"), list(biom=biom))
         n <- attr(k, 'mode', exact = TRUE)
@@ -73,6 +82,12 @@ validate_metrics <- function (biom, metrics, mode="all", multi=FALSE, mixed=FALS
       }))
     structure(names(v), mode=unname(v))
   }
+  
+  # Have we already validated this value?
+  if (length(unique(attr(metrics, 'mode', exact = TRUE))) == 1)
+    mode %||=% attr(metrics, 'mode', exact = TRUE)[[1]]
+  mode %||=% "all"
+  
   
   opts <- do.call(paste0(mode, "_metrics"), c(list(biom=biom), list(...)))
   okay <- pmatch(tolower(sub("^[!=]=", "", metrics)), tolower(opts))

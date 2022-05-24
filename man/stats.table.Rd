@@ -14,7 +14,8 @@ stats.table(
   weighted = TRUE,
   digits = 3,
   y.pos = NULL,
-  y.pos.facet = "Metric"
+  y.pos.facet = "Metric",
+  adj.n = NULL
 )
 }
 \arguments{
@@ -74,11 +75,14 @@ value of each group. Added for ggpubr::geom_bracket(). Options are
 \bold{NULL} for no y.pos column (the default), \bold{max} for the 
 maximum value, \bold{box} for a box plot's the whisker upper bound, 
 or \bold{violin} for the highest point of a violin plot.}
+
+\item{adj.n}{Manually set the number of comparisons to correct for. Only set
+this if you know what you are doing! Default: \code{NULL}}
 }
 \value{
 A data.frame with columns \bold{p.val}, \bold{adj.p}, 
-        \bold{adj.sig}, as well as columns for tracking for \code{x}, 
-        \code{y}, and \code{by} categories.
+        \bold{adj.sig}, as well as columns for tracking \code{x}, \code{y}, 
+        and \code{by} categories.
 }
 \description{
 Compute p-values for data vs metadata.

@@ -1,105 +1,90 @@
 # Helper functions called by the plot_*.r scripts.
 
 
-#--------------------------------------------------------------
-# Assign colors to categorical values.
-#--------------------------------------------------------------
-assign_colors <- function (vals, keys) {
-  keys <- levels(keys)
-  n    <- length(keys)
-  
-  if (is.null(vals)) {
-    vals <- if (n <= 2) { # Colorblind friendly palette
-      c('#00B9EB', '#ED5F16')
-    } else if (n <= 8) {  # Colorblind friendly palette of 8 (jfly.iam.u-tokyo.ac.jp/color/)
-      c("#0072B2", "#D55E00", "#CC79A7", "#009E73", "#F0E442", "#56B4E9", "#E69F00", "#999999")
-    } else if (n <= 11) {   # Andrea's set of 11
-      c('#66CDAA', '#FF8C69', '#8DB6CD', '#008B8B', '#FF6EB4', '#A2CD5A', '#FF6347', '#FFC125', 
-        '#EEC591', '#BEBEBE', '#CD96CD')
-    } else if (n <= 20) {   # Andrea's set of 20
-      c('#8B4500', '#CD853F', '#FF1493', '#FFB5C5', '#CDC5BF', '#6C7B8B', '#B22222', '#FF0000', 
-        '#FF7F24', '#FFD700', '#00FF00', '#2E8B57', '#00FFFF', '#63B8FF', '#0000FF', '#191970', 
-        '#8B008B', '#A020F0', '#DA70D6', '#F08080')
-    } else {                # Dan's set of 24
-      c('#1C86EE', '#E31A1C', '#008B00', '#6A3D9A', '#A52A2A', '#FF7F00', '#FFD700', '#7EC0EE', 
-        '#FB9A99', '#90EE90', '#CAB2D6', '#FDBF6F', '#B3B3B3', '#EEE685', '#B03060', '#FF83FA', 
-        '#FF1493', '#0000FF', '#36648B', '#00CED1', '#00FF00', '#8B8B00', '#CDCD00', '#8B4500')
-    }
-  }
-  
-  assign_cleanup("colors", vals, keys)
-}
 
-
-#--------------------------------------------------------------
-# Assign patterns to categorical values.
-#--------------------------------------------------------------
-assign_patterns <- function (vals, keys) {
-  keys  <- levels(keys)
+#____________________________________________________________________
+# Extract the x and y components and assign modes to them.
+#____________________________________________________________________
+parse_formula <- function (biom, formula = NULL, .x = NULL, .y = NULL) {
   
-  dvals <- unique(c(
-    'bricks', 'fishscales', 'right45', 'horizonal_saw', 
-    'hs_cross', 'crosshatch45', 'crosshatch',
-    gridpattern::names_magick ))
   
-  if (is.null(vals)) {
-    vals <- dvals
+  # Allow override with explicit .x .y notation
+  #__________________________________________________________________
+  if (!is.null(.x) && !is.null(.y))
+    formula <- list(.x, .y)
+  
+  
+  # Extract the x and y variables from the formula/vector/list
+  #__________________________________________________________________
+  if (is(formula, "formula")) {
+    x <- all.vars(formula[[3]])
+    y <- all.vars(formula[[2]])
     
-  } else if (is.null(names(vals)) && all(vals %in% keys)) {
-    keys <- setNames(dvals[seq_along(vals)], vals)
-  }
-  
-  assign_cleanup("patterns", vals, keys)
-}
-
-
-#--------------------------------------------------------------
-# Assign shapes to categorical values.
-#--------------------------------------------------------------
-assign_shapes <- function (vals, keys) {
-  
-  if (is.null(vals)) {
-    keys <- levels(keys)
-    vals <- c(16, 17, 15, 3, 7, 8)
-    n    <- length(keys)
-    if (n > 6)  vals <- c(0:14)
-    if (n > 15) vals <- c(65:90, 97:122)
-    if (n > 52) vals <- rep(vals, ceiling(n / 52))
-  }
-  
-  assign_cleanup("shapes", vals, keys)
-}
-
-
-#--------------------------------------------------------------
-# Ensure correct length/keys for colors, patterns, & shapes
-#--------------------------------------------------------------
-assign_cleanup <- function (mode, vals, keys) {
-  n <- length(keys)
-  
-  if (is.null(names(vals))) {
-    if (length(vals) < n) vals <- rep_len(vals, n)
-    if (length(vals) > n) vals <- vals[seq_len(n)]
-    vals <- setNames(vals, keys)
+  } else if ((is.character(formula) || is.list(formula)) && length(formula) == 1) {
+    x <- "."
+    y <- formula[[1]]
+    
+  } else if ((is.character(formula) || is.list(formula)) && length(formula) == 2) {
+    x <- formula[[1]]
+    y <- formula[[2]]
     
   } else {
-    missing <- setdiff(keys, names(vals))
-    if (length(missing) > 3) missing <- c(head(missing, 3), "...")
-    if (length(missing) > 0)
-      stop("Missing ", mode, " assignments for: ", paste(sep=", ", missing))
-    vals <- vals[keys]
+    stop("Please provide a valid formula.")
   }
   
-  return (vals)
+  
+  # Replace shortcut keywords
+  #__________________________________________________________________
+  if (identical(tolower(x), "abundance")) x <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
+  if (identical(tolower(y), "abundance")) y <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
+  if (identical(tolower(x), "distance"))  x <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
+  if (identical(tolower(y), "distance"))  y <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
+  
+  
+  # Assign a 'mode' attribute to x and y.
+  #__________________________________________________________________
+  x     <- validate_metrics(biom, x, multi=TRUE)
+  y     <- validate_metrics(biom, y, multi=TRUE)
+  xmode <- attr(x, 'mode', exact = TRUE) %>% head(1)
+  ymode <- attr(y, 'mode', exact = TRUE) %>% head(1)
+  
+  
+  # Convert e.g. `adiv ~ .` to `adiv ~ factor` with a new ".all" col
+  #__________________________________________________________________
+  if (identical(xmode, ".")) {
+    x     <- structure(".all", mode = "factor")
+    xmode <- "factor"
+    biom$metadata[['.all']] <- factor(rep.int(".all", nrow(biom$metadata)))
+  }
+  
+  # Combine x and y modes into a mode formula
+  #__________________________________________________________________
+  mode  <- paste(ymode, "~", xmode)      %>% head(1)
+  
+  
+  return (list(biom=biom, x=x, y=y, xmode=xmode, ymode=ymode, mode=mode))
+  
 }
 
 
-#--------------------------------------------------------------
+#____________________________________________________________________
+# Assign RHS to LHS if LHS is NULL.
+#____________________________________________________________________
+`%||=%` <- function(.lhs, .rhs) {
+  .lhs_quo <- rlang::enquo(.lhs)
+  assign(
+    x     = rlang::quo_name(.lhs_quo), 
+    value = if (is.null(.lhs)) .rhs else .lhs, 
+    envir = rlang::get_env(.lhs_quo) )
+}
+
+
+#____________________________________________________________________
 # Expand layer string / char vector to possible values
 # x = "dr" or c("d", "bar") or more examples below
 # choices = c(d = "dot", r = "bar")
 # default = "dr"
-#--------------------------------------------------------------
+#____________________________________________________________________
 layer_match <- function (x, choices, default) {
   
   if (is.null(default))        default        <- choices[[1]]
@@ -143,237 +128,43 @@ layer_match <- function (x, choices, default) {
 }
 
 
-#--------------------------------------------------------------
-# Create the plot and add each layer with its arguments.
-# Also attach a human-readable version of the plot command.
-#--------------------------------------------------------------
-layers_toPlot <- function (layers, dots) {
-  
-  stopifnot('ggplot' %in% names(layers))
-  
-  #--------------------------------------------------------------
-  # 'layers' can draw on the layers listed here
-  #--------------------------------------------------------------
-  layerspecs <- list(
-    'ggplot'     = list('.fn' = "ggplot",                    '.regex' = "^g(|gplot)\\."),
-    'point'      = list('.fn' = "geom_point",                '.regex' = "^p(|oint)\\."),
-    'violin'     = list('.fn' = "geom_violin",               '.regex' = "^v(|iolin)\\."),
-    'box'        = list('.fn' = "geom_boxplot",              '.regex' = "^b(|ox)\\."),
-    'crossbar'   = list('.fn' = "geom_crossbar",             '.regex' = "^c(|rossbar)\\."),
-    'bar'        = list('.fn' = "geom_bar",                  '.regex' = "^(|ba)r\\."),
-    'errorbar'   = list('.fn' = "geom_errorbar",             '.regex' = "^e(|rrorbar)\\."),
-    'linerange'  = list('.fn' = "geom_linerange",            '.regex' = "^l(|inerange)\\."),
-    'pointrange' = list('.fn' = "geom_pointrange",           '.regex' = "^p(|ointrange)\\."),
-    'dot'        = list('.fn' = "geom_beeswarm",             '.regex' = "^d(|ot)\\."),
-    'strip'      = list('.fn' = "geom_quasirandom",          '.regex' = "^s(|trip)\\."),
-    'regression' = list('.fn' = "stat_smooth",               '.regex' = "^r(|egression)\\."),
-    'stats_text' = list('.fn' = "geom_text",                 '.regex' = "^a(|nno)\\."),
-    'brackets'   = list('.fn' = "geom_segment",              '.regex' = "^h(|line)\\."),
-    'fill'       = list('.fn' = "scale_fill_manual",         '.regex' = "^fill\\."),
-    'color'      = list('.fn' = "scale_color_manual",        '.regex' = "^color\\."),
-    'shape'      = list('.fn' = "scale_shape_manual",        '.regex' = "^shape\\."),
-    'pattern'    = list('.fn' = "scale_pattern_type_manual", '.regex' = "^pattern\\."),
-    'facet'      = list('.fn' = "facet_wrap",                '.regex' = "^f(|acet)\\."),
-    'labs'       = list('.fn' = "labs",                      '.regex' = "^labs\\."),
-    'x_disc'     = list('.fn' = "scale_x_discrete",          '.regex' = "^x(|axis)\\."),
-    'x_cont'     = list('.fn' = "scale_x_continuous",        '.regex' = "^x(|axis)\\."),
-    'y_cont'     = list('.fn' = "scale_y_continuous",        '.regex' = "^y(|axis)\\."),
-    'theme_bw'   = list('.fn' = "theme_bw",                  '.regex' = "^(theme_|)bw\\."),
-    'theme'      = list('.fn' = "theme",                     '.regex' = "^t(|heme)\\.") )
-  
-  
-  #--------------------------------------------------------------
-  # Other common settings
-  #--------------------------------------------------------------
-  layerspecs[['stats_text']][['show.legend']] <- FALSE
-  layerspecs[['errorbar']][['width']] <- 0.5
-  layerspecs[['crossbar']][['width']] <- 0.5
-  
-  layerspecs[['stats_text']] %<>% c(list(
-    'color'   = "black",
-    'mapping' = list(x=".x", y=".y", label=".label") ))
-  layerspecs[['brackets']] %<>% c(list(
-    'color'   = "black",
-    'mapping' = list(x=".x", y=".y", xend=".xend", yend=".yend") ))
-  
-  for (i in c('errorbar', 'crossbar', 'linerange', 'pointrange')) {
-    layerspecs[[i]][['mapping']] <- list(y=".y", ymin=".ymin", ymax=".ymax")
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Only subset the data when multiple data layers are present
-  #--------------------------------------------------------------
-  if (isTRUE(length(unique(layers[['ggplot']][['data']][['.src']])) > 1)) {
-    layerspecs[['stats_text']][['data']] <- ~ subset(., .src == "stats")
-    layerspecs[['brackets']][['data']]   <- ~ subset(., .src == "brackets")
-    
-    for (i in c('point', 'bar', 'violin', 'strip', 'box', 'dot', 'regression')) {
-      layerspecs[[i]][['data']] <- ~ subset(., .src == "points")
-    }
-    
-    for (i in c('errorbar', 'crossbar', 'linerange', 'pointrange')) {
-      layerspecs[[i]][['data']] <- ~ subset(., .src == "vline")
-    }
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Special cases for ggbeeswarm and ggpattern functions
-  #--------------------------------------------------------------
-  patterned <- isTRUE("pattern" %in% names(layers))
-  for (layer in names(layers)) {
-    
-    if (!layer %in% names(layerspecs)) {
-      stopifnot(isTRUE(nzchar(layers[[layer]][['.fn']])))
-      stopifnot(is.function(layers[[layer]][['.fun']]))
-    }
-    
-    if (patterned && layer %in% c("bar", "box", "crossbar", "violin")) {
-      layerspecs[[layer]][['.fn']] %<>% paste0(., "_pattern")
-    }
-    
-    if (patterned && layer %in% c("fill", "color", "shape")) {
-      layerspecs[[layer]][['.fn']] <- paste0("scale_pattern_", layer, "_manual")
-    }
-    
-    pkg <- "ggplot2"
-    if (grepl("_beeswarm",    layerspecs[[layer]][['.fn']], fixed = TRUE)) pkg <- "ggbeeswarm"
-    if (grepl("_quasirandom", layerspecs[[layer]][['.fn']], fixed = TRUE)) pkg <- "ggbeeswarm"
-    if (grepl("_pattern",     layerspecs[[layer]][['.fn']], fixed = TRUE)) pkg <- "ggpattern"
-    
-    layerspecs[[layer]][['.fun']] <- do.call(`::`, list(pkg, layerspecs[[layer]][['.fn']]))
-    if (pkg != "ggplot2") layerspecs[[layer]][['.fn']] %<>% paste0(pkg, "::", .)
-    
-    # Merge custom and default top-level parameters
-    for (i in setdiff(names(layerspecs[[layer]]), names(layers[[layer]])))
-      layers[[layer]][[i]] <- layerspecs[[layer]][[i]]
-    
-    # Merge custom and default mapping parameters
-    for (i in setdiff(names(layerspecs[[layer]][['mapping']]), names(layers[[layer]][['mapping']])))
-      layers[[layer]][['mapping']][[i]] <- layerspecs[[layer]][['mapping']][[i]]
-  }
-  
-  
-  
-  #--------------------------------------------------------------
-  # Standardize the list order: ggplot() first, theme() last, etc
-  #--------------------------------------------------------------
-  layers <- layers[c(
-    intersect(names(layerspecs), names(layers)),
-    setdiff(names(layers), names(layerspecs))
-  )]
-  
-  
-  p    <- NULL
-  cmds <- c("library(ggplot2)")
-  
-  for (layer in names(layers)) {
-    
-    args <- layers[[layer]]
-    fn   <- args[['.fn']]
-    fun  <- args[['.fun']]
-    regx <- args[['.regex']]
-    args <- args[grep("^\\.", names(args), invert = TRUE)]
-    
-    
-    # Unprefixed dot arguments, e.g. 'scales'="free_x"
-    #--------------------------------------------------------------
-    for (i in intersect(names(dots), formalArgs(fun)))
-      args[[i]] <- dots[[i]]
-    
-    
-    # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
-    #--------------------------------------------------------------
-    for (i in grep(regx, names(dots), value = TRUE))
-      args[[sub(regx, "", i, perl = TRUE)]] <- dots[[i]]
-    
-    
-    # Don't specify an argument if it's already the default
-    #--------------------------------------------------------------
-    defaults <- formals(fun)
-    for (i in intersect(names(defaults), names(args)))
-      if (identical(defaults[[i]], args[[i]]))
-        args[[i]] <- NULL
-    
-    
-    # Create the aes object for mapping=
-    #--------------------------------------------------------------
-    if ('mapping' %in% names(args))
-      args[['mapping']] <- do.call(
-        what  = aes_string, 
-        args  = args[['mapping']], 
-        quote = TRUE )
-    
-    
-    # Rewrite layer with the updated args
-    #--------------------------------------------------------------
-    layers[[layer]] <- args
-    
-    
-    # Skip theme() unless it has arguments
-    #--------------------------------------------------------------
-    if (fn == "theme" && length(args) == 0) next
-    
-    
-    # Show ggplot() layer as "ggplot(data)", rest more verbosely
-    #--------------------------------------------------------------
-    if (fn == "ggplot") {
-      p <- do.call(fun, args) 
-      cmds <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
-    } else {
-      p    <- p + do.call(fun, args)
-      cmds <- c(cmds, sprintf("%s(%s)", fn, as.args(args, indent = 4, fun=fun)))
-    }
-    
-  }
-  
-  #--------------------------------------------------------------
-  # Attach the number of facet rows and cols as plot attributes
-  #--------------------------------------------------------------
-  if ('nfacets' %in% names(attributes(dots))) {
-    rc <- ggplot2::wrap_dims(
-      n    = attr(dots, 'nfacets'), 
-      nrow = layers[['facet']][['nrow']], 
-      ncol = layers[['facet']][['ncol']] )
-    attr(dots, 'facet.nrow') <- min(rc[[1]], attr(dots, 'nfacets'))
-    attr(dots, 'facet.ncol') <- min(rc[[2]], attr(dots, 'nfacets'))
-  }
-  attr(p, 'facet.nrow') <- attr(dots, 'facet.nrow') %||% 1
-  attr(p, 'facet.ncol') <- attr(dots, 'facet.ncol') %||% 1
-  
-  
-  attr(p, 'cmd')  <- paste(collapse=" +\n  ", cmds)
-  attr(p, 'data') <- layers[['ggplot']][['data']]
-  
-  return (p)
-}
-
-
-#------------------------------------------------------------------
+#____________________________________________________________________
 # Convert a list of arguments to character strings.
 # When indent > 0, produces a multi-line string.
 # When fun is a function, puts the arguments in the expected order.
-#------------------------------------------------------------------
+#____________________________________________________________________
 as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   stopifnot(is.list(args))
   stopifnot(is.numeric(indent))
+  
+  
+  # Discard arguments with `display = FALSE` attribute.
+  for (i in rev(seq_along(args)))
+    if (isFALSE(attr(args[[i]], 'display', exact = TRUE)))
+      args[[i]] <- NULL
+  
+  
+  # Re-arrange parameter order; omit names where implicitly known; ignore if default.
+  if (is.function(fun)) {
+    f_args <- formals(fun)
+    
+    for (i in names(args))
+      if (hasName(f_args, i) && identical(args[[i]], f_args[[i]]))
+        args[[i]] <- NULL
+    
+    f_args <- names(f_args)
+    args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
+    if (isTRUE(indent == 0))
+      for (i in seq_along(args))
+        if (names(args)[[i]] == f_args[[i]]) names(args)[i] <- "" else break
+  }
   
   # Right-pad parameter names.
   fmt <- "%s = %s"
   if (isTRUE(indent > 0 && length(args) > 1))
     fmt <- paste(collapse="", rep(" ", indent)) %>%
     paste0("\n", ., "%-", max(nchar(names(args))), "s = %s")
-  
-  # Re-arrange parameter order; omit names where implicitly known.
-  if (is.function(fun)) {
-    f_args <- formalArgs(fun)
-    args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
-    if (isTRUE(indent == 0))
-      for (i in seq_along(args))
-        if (names(args)[[i]] == f_args[[i]]) names(args)[i] <- "" else break
-  }
   
   # Convert arguments to `eval`-able string representations
   strs <- c()
@@ -382,18 +173,20 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     key <- names(args)[[i]]
     val <- args[[i]]
     
-    val <- if (is.null(val))                    { "NULL"
-    } else if (!is.null(attr(val, 'display')))  { attr(val, 'display') 
-    } else if (is.character(val))               { glue::double_quote(val) 
-    } else if (is.logical(val))                 { as.character(val) %>% setNames(names(val))
-    } else if (is.numeric(val))                 { as.character(val) %>% setNames(names(val))
-    } else if (is(val, 'BIOM'))                 { "biom"
-    } else if (is.data.frame(val))              { "data"
-    } else if (is(val, 'formula'))              { capture.output(val)[[1]]
-    } else if (is.function(val))                { fun_toString(val)
-    } else if (is(val, 'uneval'))               { aes_toString(val)
-    } else if (is.factor(val))                  { as.character(val) %>% setNames(names(val))
-    } else                                      { capture.output(val) }
+    display <- attr(val, 'display', exact = TRUE)
+    
+    val <- if (is.null(val))        { "NULL"
+    } else if (!is.null(display))   { display
+    } else if (is.character(val))   { glue::double_quote(val) 
+    } else if (is.logical(val))     { as.character(val) %>% setNames(names(val))
+    } else if (is.numeric(val))     { as.character(val) %>% setNames(names(val))
+    } else if (is(val, 'BIOM'))     { "biom"
+    } else if (is.data.frame(val))  { "data"
+    } else if (is(val, 'formula'))  { capture.output(val)[[1]]
+    } else if (is.function(val))    { fun_toString(val)
+    } else if (is(val, 'uneval'))   { aes_toString(val)
+    } else if (is.factor(val))      { as.character(val) %>% setNames(names(val))
+    } else                          { capture.output(val) }
     
     
     if (isTRUE(is.character(val) && !is.null(names(val))))
@@ -419,9 +212,9 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
 }
 
 
-#------------------------------------------------------------------
+#____________________________________________________________________
 # Find a function's name
-#------------------------------------------------------------------
+#____________________________________________________________________
 fun_toString <- function (x) {
   
   pkg <- environment(x)[['.packageName']]
@@ -440,9 +233,9 @@ fun_toString <- function (x) {
 }
 
 
-#------------------------------------------------------------------
+#____________________________________________________________________
 # Convert an aes object to a string
-#------------------------------------------------------------------
+#____________________________________________________________________
 aes_toString <- function (x) {
   
   # Consistently order the aes parameters
@@ -459,6 +252,8 @@ aes_toString <- function (x) {
     
     val <- x[[key]]
     val <- if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
+    } else if (is.logical(val))    { as.character(val)
+    } else if (is.numeric(val))    { as.character(val)
     } else                         { glue::double_quote(val) }
     
     key %<>% sub(pattern = "colour", replacement = "color")
@@ -471,20 +266,114 @@ aes_toString <- function (x) {
 }
 
 
-#------------------------------------------------------------------
+#____________________________________________________________________
 # rbind(), but add/rearrange columns as needed
-#------------------------------------------------------------------
-append_df <- function (x, y) {
-  xy <- unique(c(names(x), names(y)))
-  for (i in setdiff(xy, names(x))) x[[i]] <- NA
-  for (i in setdiff(xy, names(y))) y[[i]] <- NA
-  rbind(x[,xy,drop=F], y[,xy,drop=F])
+#____________________________________________________________________
+append_df <- function (...) {
+  
+  Reduce(
+    x = Filter(f = Negate(is.null), x = list(...)),
+    f = function (x, y) {
+      xy <- unique(c(names(x), names(y)))
+      for (i in setdiff(xy, names(x))) x[[i]] <- NA
+      for (i in setdiff(xy, names(y))) y[[i]] <- NA
+      rbind(x[,xy,drop=F], y[,xy,drop=F])
+    })
 }
 
 
-#------------------------------------------------------------------
+#____________________________________________________________________
+# Drop/Keep particular columns from a data.frame
+#____________________________________________________________________
+drop_cols <- function (df, ...) {
+  cols <- unlist(list(...))
+  if (is.null(cols) || is.null(df)) return (df)
+  df[,setdiff(colnames(df), cols),drop=FALSE]
+}
+drop_empty <- function (df) {
+  if (is.null(df))   return (NULL)
+  if (nrow(df) == 0) return (df)
+  df[,apply(df, 2L, function (x) !all(is.na(x))),drop=FALSE]
+}
+keep_cols <- function (df, ...) {
+  cols <- unlist(list(...))
+  if (is.null(cols) || is.null(df)) return (NULL)
+  df[,intersect(colnames(df), cols),drop=FALSE]
+}
+rename_cols <- function(df, ...) {
+  vals <- list(...)
+  for (i in names(vals))
+    names(df)[which(names(df) == i)] <- vals[[i]]
+  return (df)
+}
+
+
+#____________________________________________________________________
+# Rename common data frame column names, avoiding conflicts
+#____________________________________________________________________
+soft_rename <- function (df, safe=FALSE) {
+  
+  if (safe)
+    return (df)
+  
+  map <- c(
+    ".test"   = "Test",        ".metric" = "Metric",
+    ".sample" = "Sample",      ".taxa"   = "Taxa", 
+    ".p.val"  = "P-Value",     ".adj.p"  = "Adjusted P",
+    ".f.stat" = "F-Statistic", ".r.sqr"  = "R-Squared",
+    ".x"      = "x",           ".ori.1"  = "ori.1", 
+    ".y"      = "y",           ".ori.2"  = "ori.2", 
+    ".axis.1" = "Axis 1", 
+    ".axis.2" = "Axis 2",
+    ".value"  = "value" )
+  
+  for (i in names(map))
+    if (i %in% names(df) && !map[[i]] %in% names(df))
+      names(df)[which(names(df) == i)] <- map[[i]]
+  
+  return (df)
+}
+
+
+#____________________________________________________________________
+# Decorate column names for plyr
+#____________________________________________________________________
+ply_cols <- function (cols) {
+  vars <- NULL
+  for (col in cols)
+    vars <- c(plyr::as.quoted(as.name(col)), vars)
+  return (vars)
+}
+
+
+#____________________________________________________________________
+# Insert a new named column after a specified column index/name
+#____________________________________________________________________
+insert_col <- function (df, after=0, col, val) {
+  
+  if (is.null(df))                  return (NULL)
+  if (is.null(col) || is.null(val)) return (df)
+  
+  df <- cbind(df, val)
+  colnames(df)[ncol(df)] <- col
+  
+  
+  after <- after %||% 0
+  if (is.character(after))
+    after <- which(colnames(df) == after) %>% head(1) %||% 0
+  if (after > ncol(df) - 1)
+    after <- ncol(df)
+  
+  pos <- unique(c(seq_len(after), ncol(df), seq_len(ncol(df))))
+  df  <- df[,pos,drop=F]
+  
+  return (df)
+}
+
+
+#____________________________________________________________________
 # Explicitly define the code to be displayed in cmd
-#------------------------------------------------------------------
+#____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
   if (is.null(env)) {
     cmd <- capture.output(substitute(expr))
@@ -500,9 +389,9 @@ as.cmd <- function (expr, env=NULL) {
 }
 
 
-#------------------------------------------------------------------
+#____________________________________________________________________
 # Identify and remove rows of df with bad values
-#------------------------------------------------------------------
+#____________________________________________________________________
 finite_check <- function (df, col=".y", metric=NULL) {
   
   if (all(is.finite(df[[col]])))
@@ -536,4 +425,73 @@ finite_check <- function (df, col=".y", metric=NULL) {
   
   list('bad' = bad, 'msg' = msg)
 }
+
+
+
+
+
+#____________________________________________________________________
+# Log scale labels
+#____________________________________________________________________
+siunit <- function (x) {
+  sapply(as.numeric(x), function (n) {
+    if (is.na(n))       return ("")
+    if (abs(n) < 10^3 ) return (as.character(n))
+    if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
+    if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
+    if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
+    if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
+    if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
+    if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
+    return (as.character(scientific(n)))
+  })
+}
+loglabels <- function (values) {
+  force(values)
+  limits <- 10 ** c(0, ceiling(log10(max(values))))
+  breaks <- as.vector(sapply(log10(limits[[1]]):(log10(limits[[2]])-1), function (x) { (1:10)*10^x }))
+  list(
+    'limits' = limits, 
+    'breaks' = breaks, 
+    'labels' = function (x) {
+      x[which(1:length(x) %% 10 != 0)] <- NA
+      siunit(x)
+    })
+}
+
+
+# Turn unquoted barewords into a character vector.
+qw <- function (...) {
+  all.vars(match.call())
+}
+
+# Easily create list(x = ".x", label = ".label")
+.qw <- function (...) {
+  x <- all.vars(match.call())
+  as.list(setNames(paste0(".", x), x))
+}
+
+
+# Test if ALL arguments are NULL
+all.null <- function (...) {
+  for (i in list(...))
+    if (!is.null(i))
+      return (FALSE)
+  return (TRUE)
+}
+
+# Test if ANY arguments are NULL
+any.null <- function (...) {
+  for (i in list(...))
+    if (is.null(i))
+      return (TRUE)
+  return (FALSE)
+}
+
+# Like ifelse() but test is length 1 vector
+bool_switch <- function (test, yes, no) {
+  res <- if (isTRUE(test)) yes else no
+  return (res)
+}
+
 

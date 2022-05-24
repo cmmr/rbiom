@@ -58,10 +58,13 @@
 #'        \bold{NULL} for no y.pos column (the default), \bold{max} for the 
 #'        maximum value, \bold{box} for a box plot's the whisker upper bound, 
 #'        or \bold{violin} for the highest point of a violin plot.
+#'        
+#' @param adj.n   Manually set the number of comparisons to correct for. Only set
+#'        this if you know what you are doing! Default: \code{NULL}
 #'               
 #' @return A data.frame with columns \bold{p.val}, \bold{adj.p}, 
-#'         \bold{adj.sig}, as well as columns for tracking for \code{x}, 
-#'         \code{y}, and \code{by} categories.
+#'         \bold{adj.sig}, as well as columns for tracking \code{x}, \code{y}, 
+#'         and \code{by} categories.
 #'         
 #' @export
 #' @examples
@@ -114,7 +117,7 @@
 #'     #  ('Male', 'Female', 'Female vs Male').
 #'     stats.table(biom, x = "Sex", y = "unifrac", by = "Body Site")
 #'
-stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, weighted = TRUE, digits = 3, y.pos = NULL, y.pos.facet="Metric") {
+stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, weighted = TRUE, digits = 3, y.pos = NULL, y.pos.facet="Metric", adj.n = NULL) {
   
   #--------------------------------------------------------------
   # Sanity checks
@@ -180,10 +183,16 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   
   
   #--------------------------------------------------------------
+  # No data to run stats on.
+  #--------------------------------------------------------------
+  if (nrow(df) == 0)
+    return (NULL)
+  
+  
+  #--------------------------------------------------------------
   # Run non-parametric statistics
   #--------------------------------------------------------------
-  plyby <- NULL
-  for (i in rev(by)) plyby <- c(plyr::as.quoted(as.name(i)), plyby)
+  plyby   <- ply_cols(rev(by))
   results <- plyr::ddply(df, plyby, function (z) {
     
     if (isTRUE(pairwise)) {
@@ -216,6 +225,7 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
           Group1 = pairs[1,],
           Group2 = pairs[2,],
           p.val  = apply(pairs, 2L, function (pair) {
+            
             tryCatch({
               wt <- wilcox.test(
                 x = z[z[[x]] == pair[[1]], y],
@@ -275,11 +285,26 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
   if (length(by) == 0)
     results <- results[,-1,drop=F]
   
-  results[['adj.p']] <- p.adjust(results[['p.val']], method = adj)
+  # Don't count multiple metrics as multiple comparisons
+  if (".metric" %in% by) {
+    results <- plyr::ddply(results, ".metric", function (z) {
+      z[['adj.p']] <- p.adjust(
+        p      = z[['p.val']], 
+        method = adj   %||% "fdr", 
+        n      = adj.n %||% nrow(z) )
+      return(z)
+    })
+  } else {
+    results[['adj.p']] <- p.adjust(
+      p      = results[['p.val']], 
+      method = adj   %||% "fdr", 
+      n      = adj.n %||% nrow(results) )
+  }
   
   # Order by p-value, most to least significant (unless plotting)
   if (is.null(y.pos))
     results <- results[order(results[['p.val']]),,drop=F]
+  
   
   # Round the p.val and adj.p numbers
   if (!is.null(digits)) {
@@ -297,8 +322,7 @@ stats.table <- function (biom, x, y, by = NULL, adj = "fdr", pairwise = FALSE, w
       results[['y.pos']] <- signif(max(results[['y.pos']]), digits = 2)
       
     } else {
-      plyby <- NULL
-      for (i in rev(y.pos.facet)) plyby <- c(plyr::as.quoted(as.name(i)), plyby)
+      plyby   <- ply_cols(rev(y.pos.facet))
       results <- plyr::ddply(results, plyby, function (z) {
         z[['y.pos']] <- signif(max(z[['y.pos']]), digits = 2)
         return (z)

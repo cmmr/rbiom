@@ -1,12 +1,12 @@
 ## Test environments
-* Windows Server 2008 (win-builder and rhub), R devel, 4.0.0, and 3.6.3
-* Windows 7 and 10 (local), R 4.0.0
-* Ubuntu 16.04 (travis-ci and rhub), R devel and 4.0.0
-* Debian 9.3 (rhub), R devel, 4.0.0 patched, and 3.6.3
-* Fedora (rhub), R devel
-* CentOS 6 (rhub), R 3.5.2
-* macOS 10.13.6 (rhub), R 4.0.0
-* Solaris 10 (rhub), R 4.0.0
+* Windows 10 (local), R-release
+* Windows Server 2008, (winbuilder and rhub), R-oldrel, R-release, R-devel
+* macOS High Sierra, (rhub), R-release
+* macOS Big Sur, (rhub), R-release
+* Ubuntu, (rhub), R-release, R-devel
+* Fedora, (rhub), R-devel
+* Debian, (rhub), R-release, R-patched, R-devel
+* Solaris, (rhub), R-release
 
 
 ## R CMD check results
@@ -23,9 +23,9 @@ There were 2 NOTEs:
 
 
 * checking installed package size ... NOTE
-  installed size is  5.5Mb
+  installed size is  5.8Mb
   sub-directories of 1Mb or more:
-    libs   5.2Mb
+    libs   5.4Mb
 
   Including Rcpp and RcppParallel sometimes results in compiled libraries of this size.
 

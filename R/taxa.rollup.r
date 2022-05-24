@@ -67,7 +67,6 @@
 
 taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE, long=FALSE, md=FALSE, safe=FALSE) {
   
-  
   #--------------------------------------------------------------
   # Get the input into a simple_triplet_matrix
   #--------------------------------------------------------------
@@ -136,16 +135,25 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
   
   
   #--------------------------------------------------------------
+  # Depending on params, taxa might be in rows or cols. Set attr.
+  #--------------------------------------------------------------
+  taxa_in <- "rows"
+  
+  
+  #--------------------------------------------------------------
   # Return the slam matrix if sparse=TRUE
   #--------------------------------------------------------------
-  if (isTRUE(sparse))
+  if (isTRUE(sparse)) {
+    attr(res, 'taxa_in') <- taxa_in
     return (res)
+  }
   
   
   #--------------------------------------------------------------
   # Convert to R matrix
   #--------------------------------------------------------------
   res <- t(as.matrix(res))
+  taxa_in <- "cols"
   
   
   #--------------------------------------------------------------
@@ -159,10 +167,12 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
       '.taxa'          = colnames(res)[col(res)],
       '.value'         = as.numeric(res)
     )
+    taxa_in <- "rows"
     
   } else if (isFALSE(md)) {
     
     # Just a simple numeric matrix. rownames = samples, colnames = taxa
+    attr(res, 'taxa_in') <- taxa_in
     return (res)
     
   } else {
@@ -191,6 +201,7 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
       names(res)[1] <- ".sample"
       rownames(res) <- res[['.sample']]
     }
+    taxa_in <- "rows"
   }
   
   if (isTRUE(long) && length(unique(res[[".taxa"]])) > 1)
@@ -207,8 +218,8 @@ taxa.rollup <- function (biom, rank='OTU', map=NULL, lineage=FALSE, sparse=FALSE
     
   } else if (is.na(safe) && isFALSE(long)) {
     res <- res[,-1,drop=F]
-    
   }
   
+  attr(res, 'taxa_in') <- taxa_in
   return (res)
 }

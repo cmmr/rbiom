@@ -99,7 +99,7 @@ taxa.names <- function (biom) {
 taxa.ranks <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In taxa.ranks(), biom must be a BIOM-class object.'))
-  return (c(colnames(biom[['taxonomy']]), 'OTU'))
+  return (colnames(biom[['taxonomy']]))
 }
 
 
@@ -115,7 +115,7 @@ taxa.ranks <- function (biom) {
 #'     counts(hmp50)[1:4,1:5]
 #'
 
-counts <- function (biom) {
+counts <- function (biom, as.percent=FALSE) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In counts(), biom must be a BIOM-class object.'))
   return (as.matrix(biom[['counts']]))
@@ -139,7 +139,7 @@ counts <- function (biom) {
 is.rarefied <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In is.rarefied(), biom must be a BIOM-class object.'))
-  return (isTRUE(attr(biom, 'rarefaction') > 0))
+  return (isTRUE(attr(biom, 'rarefaction', exact=TRUE) > 0))
 }
 
 
@@ -165,7 +165,7 @@ is.rarefied <- function (biom) {
 depth <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In depth(), biom must be a BIOM-class object.'))
-  return (sort(unique(sample.sums(biom))))
+  return (sort(unique(round(sample.sums(biom), digits = 10))))
 }
 
 

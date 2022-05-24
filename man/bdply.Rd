@@ -31,7 +31,7 @@ A data.frame comprising the merged outputs of \code{FUN}, along with
         the columns specified by \code{vars}.
 }
 \description{
-Split BIOM by metadata, apply function, and return results in a data frame.
+Calls \code{plyr::ddply} internally.
 }
 \examples{
     library(rbiom)

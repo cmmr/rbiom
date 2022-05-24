@@ -32,7 +32,7 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   if (!is(biom, 'BIOM'))
     stop('In taxonomy(), biom must be a BIOM-class object.')
   
-  if (length(missing <- setdiff(NULL, taxa.ranks(hmp50))) > 0)
+  if (length(missing <- setdiff(NULL, taxa.ranks(biom))) > 0)
     stop("Invalid ranks(s): ", paste(collapse = ", ", missing))
   
   
@@ -59,17 +59,39 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
     
     for (row in seq_len(nrow(x))) {
       
-      lastValid <- "Root"
-      parenText <- NULL
+      lastValid     <- "Root"
+      lastValidRank <- "Root"
+      lastValidTaxa <- "Root"
+      parenText     <- NULL
       
       for (col in seq_len(ncol(x))) {
         
         if (isValid[row, col]) {
-          lastValid <- paste(colnames(x)[col], x[row, col])
+          lastValidRank <- colnames(x)[col]
+          lastValidTaxa <- x[row, col]
+          
+          lastValid <- paste(lastValidRank, lastValidTaxa)
           parenText <- NULL
           
         } else {
-          parenText   <- paste(c(parenText, x[row, col]), collapse = " ")
+          
+          parenText <- paste(c(parenText, x[row, col]), collapse = " ")
+          
+          # Prevent duplicate taxa names in final string
+          parenText <- sub(
+            pattern     = sprintf("^%s($|\\ |\\_)", lastValidTaxa), 
+            replacement = "", 
+            x           = parenText, 
+            ignore.case = TRUE )
+          
+          # Remove '_group' suffix from names; remove incertae_sedis
+          parenText <- sub("(_group|Incertae_Sedis)$", "", parenText)
+          
+          # Replace "g", etc
+          parenText <- sub("(\\ [a-z])+$", "", parenText)
+          if (isTRUE(nchar(parenText) <= 1))
+            parenText <- "uncultured"
+          
           x[row, col] <- sprintf("%s (%s)", lastValid, parenText)
         }
       }

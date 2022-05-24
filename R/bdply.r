@@ -1,5 +1,7 @@
 #' Split BIOM by metadata, apply function, and return results in a data frame.
 #' 
+#' Calls \code{plyr::ddply} internally.
+#' 
 #' @name bdply
 #' 
 #' @param biom   A BIOM object, as returned from \link{read.biom}.
@@ -65,11 +67,13 @@ bdply <- function (biom, vars, FUN, ..., fast = TRUE) {
   # Run user's function on subsetted BIOM objects
   #--------------------------------------------------------------
   .data <- metadata(biom, id = ".id")
-  .vars <- backtick(vars)
+  .vars <- if (is(vars, 'quoted')) vars else ply_cols(vars)
   .fun  <- function (df, ...) {
-    subBIOM <- select(biom, df[['.id']], fast = TRUE)
+    subBIOM <- select(biom, df[['.id']], fast = fast)
     do.call(FUN, c(list(subBIOM), list(...)))
   }
+  
   plyr::ddply(.data, .vars, .fun, ...)
   
 }
+

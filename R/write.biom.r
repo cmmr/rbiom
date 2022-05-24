@@ -257,16 +257,16 @@ write.biom.2.1 <- function (biom, file) {
   
   # Attributes
   #------------------------------------------------------
-  rhdf5::h5writeAttribute.character(biom$info$id,                                               h5, 'id')
-  rhdf5::h5writeAttribute.character(biom$info$type,                                             h5, 'type')
-  rhdf5::h5writeAttribute.character(comment(biom) %||% "",                                      h5, 'comment')
-  rhdf5::h5writeAttribute.character("http://biom-format.org",                                   h5, 'format-url')
-  rhdf5::h5writeAttribute.array(    c(2,1,0),                                                   h5, 'format-version', 3)
-  rhdf5::h5writeAttribute.character(paste("rbiom", utils::packageDescription('rbiom')$Version), h5, 'generated-by')
-  rhdf5::h5writeAttribute.character(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),       h5, 'creation-date')
-  rhdf5::h5writeAttribute.array(    c(biom$counts$nrow, biom$counts$ncol),                      h5, 'shape', 2)
-  rhdf5::h5writeAttribute.integer(  length(biom$counts$v),                                      h5, 'nnz')
-
+  rhdf5::h5writeAttribute(as.character(biom$info$id      %||% ""),                    h5, 'id')
+  rhdf5::h5writeAttribute(as.character(biom$info$type    %||% ""),                    h5, 'type')
+  rhdf5::h5writeAttribute(as.character(biom$info$comment %||% ""),                    h5, 'comment')
+  rhdf5::h5writeAttribute("http://biom-format.org",                                   h5, 'format-url')
+  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),                                       h5, 'format-version', 3)
+  rhdf5::h5writeAttribute(paste("rbiom", utils::packageDescription('rbiom')$Version), h5, 'generated-by')
+  rhdf5::h5writeAttribute(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),       h5, 'creation-date')
+  rhdf5::h5writeAttribute(as.integer(c(biom$counts$nrow, biom$counts$ncol)),          h5, 'shape', 2)
+  rhdf5::h5writeAttribute(as.integer(length(biom$counts$v)),                          h5, 'nnz')
+  
   
   
   
@@ -274,20 +274,20 @@ write.biom.2.1 <- function (biom, file) {
   #------------------------------------------------------
   x <- matrix(c(biom$counts$i - 1, biom$counts$j - 1, biom$counts$v), byrow=FALSE, ncol=3)
   x <- x[order(x[,1]),,drop=FALSE]
-  rhdf5::h5writeDataset.character(biom$counts$dimnames[[1]],                                  h5, 'observation/ids')
-  rhdf5::h5writeDataset.double(   x[,3],                                                      h5, 'observation/matrix/data')
-  rhdf5::h5writeDataset.integer(  x[,2],                                                      h5, 'observation/matrix/indices')
-  rhdf5::h5writeDataset.integer(  cumsum(unname(table(factor(x[,1]+1, 0:biom$counts$nrow)))), h5, 'observation/matrix/indptr')
+  rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[1]]),                                h5, 'observation/ids')
+  rhdf5::h5writeDataset(as.numeric(x[,3]),                                                      h5, 'observation/matrix/data')
+  rhdf5::h5writeDataset(as.integer(x[,2]),                                                      h5, 'observation/matrix/indices')
+  rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,1]+1, 0:biom$counts$nrow))))), h5, 'observation/matrix/indptr')
   
   
   
   # Read counts by sample (columns)
   #------------------------------------------------------
   x <- x[order(x[,2]),,drop=FALSE]
-  rhdf5::h5writeDataset.character(biom$counts$dimnames[[2]],                                  h5, 'sample/ids')
-  rhdf5::h5writeDataset.double(   x[,3],                                                      h5, 'sample/matrix/data')
-  rhdf5::h5writeDataset.integer(  x[,1],                                                      h5, 'sample/matrix/indices')
-  rhdf5::h5writeDataset.integer(  cumsum(unname(table(factor(x[,2]+1, 0:biom$counts$ncol)))), h5, 'sample/matrix/indptr')
+  rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[2]]),                                h5, 'sample/ids')
+  rhdf5::h5writeDataset(as.numeric(x[,3]),                                                      h5, 'sample/matrix/data')
+  rhdf5::h5writeDataset(as.integer(x[,1]),                                                      h5, 'sample/matrix/indices')
+  rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,2]+1, 0:biom$counts$ncol))))), h5, 'sample/matrix/indptr')
   
   
   
@@ -295,24 +295,19 @@ write.biom.2.1 <- function (biom, file) {
   #------------------------------------------------------
   if (is(biom[['metadata']], "data.frame")) {
     plyr::l_ply(setdiff(names(biom$metadata), 'SampleID'), function (field) {
-      h5path       <- sprintf("/sample/metadata/%s", field)
-      values       <- biom$metadata[biom$counts$dimnames[[2]], field]
       
-      if (is.logical(values)) {
-        rhdf5::h5writeDataset.logical(values, h5, h5path)
+      h5path <- sprintf("/sample/metadata/%s", field)
+      values <- biom$metadata[biom$counts$dimnames[[2]], field]
+      
+      if (is.numeric(values)) {
+        if (all(values %% 1 == 0, na.rm=TRUE))
+          values <- as.integer(values)
         
-      } else if (is.numeric(values)) {
-        isInt <- all(values %% 1 == 0, na.rm=TRUE)
-        if (isInt) {
-          rhdf5::h5writeDataset.integer(values, h5, h5path)
-        } else {
-          rhdf5::h5writeDataset.double(values, h5, h5path)
-        }
-        
-      } else {
+      } else if (!is.logical(values)) {
         values <- as.character(values)
-        rhdf5::h5writeDataset.character(values, h5, h5path)
       }
+      
+      rhdf5::h5writeDataset(values, h5, h5path)
       
     })
   }
@@ -325,7 +320,7 @@ write.biom.2.1 <- function (biom, file) {
     h5path      <- 'observation/metadata/taxonomy'
     x           <- t(biom$taxonomy[biom$counts$dimnames[[1]],,drop=FALSE])
     dimnames(x) <- list(NULL, NULL)
-    rhdf5::h5writeDataset.matrix(x, h5, h5path)
+    rhdf5::h5writeDataset(x, h5, h5path)
   }
   
   
@@ -335,7 +330,7 @@ write.biom.2.1 <- function (biom, file) {
   if (is(biom[['sequences']], "character")) {
     h5path <- 'observation/metadata/sequences'
     x      <- unname(biom$sequences[biom$counts$dimnames[[1]]])
-    rhdf5::h5writeDataset.character(x, h5, h5path)
+    rhdf5::h5writeDataset(x, h5, h5path)
   }
   
   
@@ -346,15 +341,14 @@ write.biom.2.1 <- function (biom, file) {
     
     h5path <- '/observation/group-metadata/phylogeny'
     x      <- rbiom::write.tree(biom[['phylogeny']])
-    rhdf5::h5writeDataset.character(x, h5, h5path)
+    rhdf5::h5writeDataset(x, h5, h5path)
     
     h5path <- h5&'observation'&'group-metadata'&'phylogeny'
-    rhdf5::h5writeAttribute.character("newick", h5path, 'data_type')
+    rhdf5::h5writeAttribute("newick", h5path, 'data_type')
   }
   
   rhdf5::H5Fflush(h5)
   rhdf5::H5Fclose(h5)
-  #rhdf5::H5close()
   
   return (invisible(NULL))
 }

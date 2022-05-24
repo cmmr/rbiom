@@ -266,8 +266,8 @@ read.biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   #--------------------------------------------------------------
   # Determine if these counts are pre-rarefied
   #--------------------------------------------------------------
-  if (isTRUE(length(d <- depth(biom)) != 1))
-    attr(biom, 'rarefaction') <- d[[1]]
+  if (isTRUE(length(d <- depth(biom)) == 1))
+    attr(biom, 'rarefaction') <- d
   
   
   return (biom)

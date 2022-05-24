@@ -78,8 +78,8 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
     stop ("Input for 'biom' must be a BIOM object.")
   
   
-  metric <- validate_metrics(biom, metric)
-  mode <- attr(metric, 'mode', exact = TRUE)
+  metric <- validate_metrics(biom, metric, multi=TRUE)
+  mode   <- head(attr(metric, 'mode', exact = TRUE), 1)
   
   if (isTRUE(rarefy) && !mode %in% c('adiv'))
     biom <- rbiom::rarefy(biom)
@@ -90,7 +90,33 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
     
   } else if (mode == "rank") {
     
-    df <- taxa.rollup(biom, rank = metric, long = long, md = md, safe = safe)
+    # Return specific rank(s) or all ranks
+    ranks <- as.vector(metric)
+    if (identical(ranks, "Rank"))
+      ranks <- taxa.ranks(biom)
+    
+    df      <- taxa.rollup(biom, rank = ranks[[1]], long = long, md = md, safe = safe)
+    df_rank <- rep(ranks[[1]], nrow(df))
+    taxa_in <- attr(df, 'taxa_in', exact = TRUE)
+    
+    for (rank in ranks[-1]) {
+      x <- taxa.rollup(biom, rank = rank, long = long, md = md, safe = safe)
+    
+      if (identical(taxa_in, "cols")) {
+        # Don't duplicate metadata columns
+        df <- cbind(df, x[,sort(unique(taxonomy(biom, rank))),drop=F])
+        
+      } else {
+        df      <- rbind(df, x)
+        df_rank <- c(df_rank, rep(rank, nrow(x)))
+      }
+    }
+    
+    # Put a 'Rank' column in the second position
+    if (!identical(taxa_in, "cols") && (isTRUE(safe) || length(ranks) > 1)) {
+      df[[ifelse(safe, '.rank', 'Rank')]] <- factor(df_rank, levels=ranks)
+      df <- df[,order(!colnames(df) %in% c(".sample", ".rank", "Sample", "Rank")),drop=FALSE]
+    }
     
   } else if (mode == "taxon") {
     
@@ -107,7 +133,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
     
   } else if (mode == "bdiv") {
     
-    if (is.character(md)) md <- paste0(attr(md, 'op'), md)
+    if (is.character(md)) md <- paste0(attr(md, 'op', exact = TRUE), md)
     df <- beta.div(biom, method = metric, weighted = weighted, long = long, md = md, safe = safe)
     
   } else {

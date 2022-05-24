@@ -82,7 +82,25 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   # Don't record sub-calls in the biom's history
   #--------------------------------------------------------------
   biom <- x
-  hist <- attr(biom, 'history')
+  hist <- attr(biom, 'history', exact = TRUE)
+  
+  
+  # #--------------------------------------------------------------
+  # # Convert an expression to call. expression(Age > 9) => Age > 9
+  # #--------------------------------------------------------------
+  # 
+  # browser()
+  # if (mode(substitute(expr)) == "name")
+  #   if (identical(expr[[1]], as.name("expression")))
+  #     return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
+  # 
+  # if (identical(substitute(expr)[[1]], as.name("expression")))
+  #   return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
+  #
+  # Just use do.call instead to make sure you pass a call in. E.g.:
+  #   expr <- expression(Age < 30)
+  #   biom <- do.call(subset, list(biom, expr[[1]]))
+  #
   
   
   #--------------------------------------------------------------
@@ -264,6 +282,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   }
   names(cl)[[2]] <- ""
   names(cl)[[3]] <- ""
+  
   attr(biom, 'history') <- c(hist, paste("biom <-", deparse1(cl)))
   
   return (biom)

@@ -4,7 +4,7 @@
 \alias{counts}
 \title{Get the abundance counts.}
 \usage{
-counts(biom)
+counts(biom, as.percent = FALSE)
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}

@@ -68,10 +68,10 @@ plot_stacked <- function (biom, x, y, facet.by = NULL, label.by = NULL, sort.by 
   # Control the values displayed on the y axis
   #--------------------------------------------------------------
   if (is.rarefied(biom)) {
-    df[['.value']] <- df[['.value']] / attr(biom, 'rarefaction')
+    df[['.value']] <- df[['.value']] / attr(biom, 'rarefaction', exact = TRUE)
     breaks         <- base::pretty(df[['.value']])
     labels         <- paste0(breaks * 100, "%")
-    elements[['scale_y_continuous']] <- list(
+    elements[['scale_yaxisinuous']] <- list(
       'expand' = c(0,0),
       'limits' = c(0,1),
       'breaks' = breaks,

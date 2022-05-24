@@ -1,12 +1,13 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.2.9040
+Version: 1.0.3.9050
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
     role  = c("aut", "cre", "cph"),
     comment = c(ORCID = "0000-0002-2479-2044"))
+Maintainer: Daniel P. Smith <dansmith@orst.edu>
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Features include reading/writing all 'BIOM' formats, rarefaction, alpha
@@ -28,14 +29,20 @@ Imports:
     ape,
     broom,
     ggbeeswarm,
+    ggh4x,
+    ggpattern,
     ggplot2,
     ggrepel,
+    ggtext,
     glue,
+    gridpattern,
     jsonlite,
+    magick,
     magrittr,
     memoise,
     methods,
     openxlsx,
+    patchwork,
     pheatmap,
     plyr,
     Rcpp,
@@ -45,10 +52,12 @@ Imports:
     slam,
     tidyr,
     tsne,
+    uwot,
     vegan
 Suggests:
+    ggdensity,
     ggpattern,
     reshape2,
     rhdf5,
     testthat
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0

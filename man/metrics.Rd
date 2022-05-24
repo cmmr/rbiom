@@ -4,7 +4,7 @@
 \alias{metrics}
 \title{List all the options for each type of metric.}
 \usage{
-metrics(biom, mode, tree = NULL)
+metrics(biom, mode = "all", tree = NULL)
 }
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read.biom}.}
@@ -18,10 +18,12 @@ metrics(biom, mode, tree = NULL)
   \item{\bold{rank} - }{ Taxonomic Rank }
   \item{\bold{taxon} - }{ Taxa Names }
   \item{\bold{meta} - }{ Metadata Fields }
+  \item{\bold{all} - }{ All of the Above }
 }}
 }
 \value{
-A character vector of supported values.
+A character vector of supported values. 
+        For \code{mode = "all"}, a named \code{list()} of character vectors.
 }
 \description{
 List all the options for each type of metric.

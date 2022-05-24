@@ -161,6 +161,18 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   
   
   #--------------------------------------------------------------
+  # Drop missing factor levels from metadata
+  #--------------------------------------------------------------
+  for (i in colnames(biom$metadata))
+    if (is.factor(biom$metadata[[i]]))
+      biom$metadata[[i]] <- factor(
+        x      = as.character(biom$metadata[[i]]), 
+        levels = intersect(
+          levels(biom$metadata[[i]]),
+          unique(as.character(biom$metadata[[i]])) ))
+  
+  
+  #--------------------------------------------------------------
   # Attach rarefy() call to provenance tracking
   #--------------------------------------------------------------
   cl      <- match.call()
