@@ -19,7 +19,7 @@
 #'     reg_pcoa <- ape::pcoa(dm)[['vectors']]
 #'     adj_pcoa <- apcoa(dm, metadata(biom)[,'Sex',drop=FALSE])
 #'     
-#'     ids   <- sample.names(hmp50)
+#'     ids   <- sample_names(hmp50)
 #'     color <- metadata(hmp50, 'Sex')
 #'     ggplot(mapping=aes(x=reg_pcoa[ids, 1], y=reg_pcoa[ids, 2], color=color)) + geom_point()
 #'     ggplot(mapping=aes(x=adj_pcoa[ids, 1], y=adj_pcoa[ids, 2], color=color)) + geom_point()

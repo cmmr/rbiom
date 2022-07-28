@@ -7,10 +7,10 @@
 phylogeny(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{value}{A \code{phylo} class object with tip.labels matching 
-\code{taxa.names(x)}. If there are more tip.labels than
+\code{taxa_names(x)}. If there are more tip.labels than
 taxa names, then the tree will be subset.}
 }
 \description{
@@ -21,7 +21,7 @@ Set the phylogenetic tree.
     library(rbiom)
     
     biom <- hmp50
-    phylogeny(biom) <- read.tree('path/to/newick.tre')
+    phylogeny(biom) <- read_tree('path/to/newick.tre')
 }
 
 }
@@ -30,10 +30,10 @@ Other setters:
 \code{\link{counts<-}()},
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},
-\code{\link{sample.names<-}()},
+\code{\link{sample_names<-}()},
 \code{\link{sequences<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()},
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()},
 \code{\link{taxonomy<-}()}
 }
 \concept{setters}

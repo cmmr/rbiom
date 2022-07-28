@@ -3,7 +3,7 @@
 
 #' Get the sample metadata.
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' 
 #' @param field  The name of a single metadata column to retrieve. If provided,
 #'        a named vector will be returned instead of a data.frame.
@@ -20,7 +20,7 @@
 #' @return A data frame of the metadata in \code{biom}. If \code{field} is
 #'    given, will return a named vector of the field's values.
 #'    
-#' @family accessor functions
+#' @family accessors
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -93,10 +93,10 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
 
 #' Set the \code{BIOM} object's metadata.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' 
 #' @param value  A data.frame with the metadata. All the \code{rownames()} must 
-#'        be in \code{sample.names(biom)}. If there are fewer rows of 
+#'        be in \code{sample_names(biom)}. If there are fewer rows of 
 #'        \code{data} than samples, then the \code{biom} object will be subset.
 #'    
 #' @family setters
@@ -111,7 +111,7 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
 #'
 `metadata<-` <- function(x, value) {
   
-  biom_ids <- sample.names(x)
+  biom_ids <- sample_names(x)
   data_ids <- rownames(value)
   
   stopifnot(is(x, 'BIOM'))

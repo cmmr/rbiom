@@ -19,22 +19,28 @@
     <loc>/reference/adiv_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/alpha.div.html</loc>
+    <loc>/reference/adiv_table.html</loc>
   </url>
   <url>
     <loc>/reference/apcoa.html</loc>
   </url>
   <url>
-    <loc>/reference/as.percent.html</loc>
+    <loc>/reference/as_percent.html</loc>
   </url>
   <url>
     <loc>/reference/bdiv_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/bdply.html</loc>
+    <loc>/reference/bdiv_dist.html</loc>
   </url>
   <url>
-    <loc>/reference/beta.div.html</loc>
+    <loc>/reference/bdiv_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bdiv_table.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bdply.html</loc>
   </url>
   <url>
     <loc>/reference/blply.html</loc>
@@ -58,10 +64,10 @@
     <loc>/reference/embed_csv.html</loc>
   </url>
   <url>
-    <loc>/reference/has.phylogeny.html</loc>
+    <loc>/reference/has_phylogeny.html</loc>
   </url>
   <url>
-    <loc>/reference/has.sequences.html</loc>
+    <loc>/reference/has_sequences.html</loc>
   </url>
   <url>
     <loc>/reference/hmp50.html</loc>
@@ -79,10 +85,10 @@
     <loc>/reference/info.html</loc>
   </url>
   <url>
-    <loc>/reference/init.cache.html</loc>
+    <loc>/reference/init_cache.html</loc>
   </url>
   <url>
-    <loc>/reference/is.rarefied.html</loc>
+    <loc>/reference/is_rarefied.html</loc>
   </url>
   <url>
     <loc>/reference/metadata-set.html</loc>
@@ -115,6 +121,9 @@
     <loc>/reference/plot.html</loc>
   </url>
   <url>
+    <loc>/reference/plot_heatmap.html</loc>
+  </url>
+  <url>
     <loc>/reference/print.html</loc>
   </url>
   <url>
@@ -124,25 +133,25 @@
     <loc>/reference/rbiom.html</loc>
   </url>
   <url>
-    <loc>/reference/read.biom.html</loc>
+    <loc>/reference/read_biom.html</loc>
   </url>
   <url>
-    <loc>/reference/read.fasta.html</loc>
+    <loc>/reference/read_fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/read.tree.html</loc>
+    <loc>/reference/read_tree.html</loc>
   </url>
   <url>
     <loc>/reference/repair.html</loc>
   </url>
   <url>
-    <loc>/reference/sample.names-set.html</loc>
+    <loc>/reference/sample_names-set.html</loc>
   </url>
   <url>
-    <loc>/reference/sample.names.html</loc>
+    <loc>/reference/sample_names.html</loc>
   </url>
   <url>
-    <loc>/reference/sample.sums.html</loc>
+    <loc>/reference/sample_sums.html</loc>
   </url>
   <url>
     <loc>/reference/select.html</loc>
@@ -157,7 +166,7 @@
     <loc>/reference/stacked_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/stats.table.html</loc>
+    <loc>/reference/stats_table.html</loc>
   </url>
   <url>
     <loc>/reference/subset.html</loc>
@@ -166,28 +175,34 @@
     <loc>/reference/subtree.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa.means.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.names-set.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.names.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.ranks-set.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.ranks.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.rollup.html</loc>
-  </url>
-  <url>
-    <loc>/reference/taxa.sums.html</loc>
-  </url>
-  <url>
     <loc>/reference/taxa_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_means.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_names-set.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_names.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_ranks-set.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_ranks.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_rollup.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_stacked.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_sums.html</loc>
   </url>
   <url>
     <loc>/reference/taxonomy-set.html</loc>
@@ -199,21 +214,21 @@
     <loc>/reference/tips.html</loc>
   </url>
   <url>
-    <loc>/reference/top.taxa.html</loc>
+    <loc>/reference/top_taxa.html</loc>
   </url>
   <url>
     <loc>/reference/unifrac.html</loc>
   </url>
   <url>
-    <loc>/reference/write.biom.html</loc>
+    <loc>/reference/write_biom.html</loc>
   </url>
   <url>
-    <loc>/reference/write.fasta.html</loc>
+    <loc>/reference/write_fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/write.tree.html</loc>
+    <loc>/reference/write_tree.html</loc>
   </url>
   <url>
-    <loc>/reference/write.xlsx.html</loc>
+    <loc>/reference/write_xlsx.html</loc>
   </url>
 </urlset>

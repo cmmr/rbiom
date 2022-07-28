@@ -1,81 +1,20 @@
 # Helper functions called by the plot_*.r scripts.
 
-
-
-#____________________________________________________________________
-# Extract the x and y components and assign modes to them.
-#____________________________________________________________________
-parse_formula <- function (biom, formula = NULL, .x = NULL, .y = NULL) {
-  
-  
-  # Allow override with explicit .x .y notation
-  #__________________________________________________________________
-  if (!is.null(.x) && !is.null(.y))
-    formula <- list(.x, .y)
-  
-  
-  # Extract the x and y variables from the formula/vector/list
-  #__________________________________________________________________
-  if (is(formula, "formula")) {
-    x <- all.vars(formula[[3]])
-    y <- all.vars(formula[[2]])
-    
-  } else if ((is.character(formula) || is.list(formula)) && length(formula) == 1) {
-    x <- "."
-    y <- formula[[1]]
-    
-  } else if ((is.character(formula) || is.list(formula)) && length(formula) == 2) {
-    x <- formula[[1]]
-    y <- formula[[2]]
-    
-  } else {
-    stop("Please provide a valid formula.")
-  }
-  
-  
-  # Replace shortcut keywords
-  #__________________________________________________________________
-  if (identical(tolower(x), "abundance")) x <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
-  if (identical(tolower(y), "abundance")) y <- tail(unique(c('OTU', taxa.ranks(biom))), 1)
-  if (identical(tolower(x), "distance"))  x <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
-  if (identical(tolower(y), "distance"))  y <- ifelse(has.phylogeny(biom), 'unifrac', 'bray-curtis')
-  
-  
-  # Assign a 'mode' attribute to x and y.
-  #__________________________________________________________________
-  x     <- validate_metrics(biom, x, multi=TRUE)
-  y     <- validate_metrics(biom, y, multi=TRUE)
-  xmode <- attr(x, 'mode', exact = TRUE) %>% head(1)
-  ymode <- attr(y, 'mode', exact = TRUE) %>% head(1)
-  
-  
-  # Convert e.g. `adiv ~ .` to `adiv ~ factor` with a new ".all" col
-  #__________________________________________________________________
-  if (identical(xmode, ".")) {
-    x     <- structure(".all", mode = "factor")
-    xmode <- "factor"
-    biom$metadata[['.all']] <- factor(rep.int(".all", nrow(biom$metadata)))
-  }
-  
-  # Combine x and y modes into a mode formula
-  #__________________________________________________________________
-  mode  <- paste(ymode, "~", xmode)      %>% head(1)
-  
-  
-  return (list(biom=biom, x=x, y=y, xmode=xmode, ymode=ymode, mode=mode))
-  
-}
-
-
 #____________________________________________________________________
 # Assign RHS to LHS if LHS is NULL.
 #____________________________________________________________________
 `%||=%` <- function(.lhs, .rhs) {
   .lhs_quo <- rlang::enquo(.lhs)
+  .lhs_str <- rlang::quo_name(.lhs_quo)
+  .lhs_env <- rlang::get_env(.lhs_quo)
+  
+  if (!exists(.lhs_str, envir = rlang::get_env(.lhs_quo)))
+    .lhs <- NULL
+  
   assign(
-    x     = rlang::quo_name(.lhs_quo), 
+    x     = .lhs_str, 
     value = if (is.null(.lhs)) .rhs else .lhs, 
-    envir = rlang::get_env(.lhs_quo) )
+    envir = .lhs_env )
 }
 
 
@@ -93,6 +32,7 @@ layer_match <- function (x, choices, default) {
   
   x <- x[nchar(x) > 0]
   if (length(x) == 0) return (default)
+  if (all(nchar(x) == 1)) x <- paste(collapse = "", x)
   
   x    <- tolower(x)
   vals <- unname(choices)
@@ -146,7 +86,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   
   # Re-arrange parameter order; omit names where implicitly known; ignore if default.
-  if (is.function(fun)) {
+  if (is.function(fun) && !is.null(names(args))) {
     f_args <- formals(fun)
     
     for (i in names(args))
@@ -162,7 +102,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   # Right-pad parameter names.
   fmt <- "%s = %s"
-  if (isTRUE(indent > 0 && length(args) > 1))
+  if (isTRUE(indent > 0 && length(args) > 1 && !is.null(names(args))))
     fmt <- paste(collapse="", rep(" ", indent)) %>%
     paste0("\n", ., "%-", max(nchar(names(args))), "s = %s")
   
@@ -170,7 +110,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   strs <- c()
   for (i in seq_along(args)) {
     
-    key <- names(args)[[i]]
+    key <- if (is.null(names(args))) '' else names(args)[[i]]
     val <- args[[i]]
     
     display <- attr(val, 'display', exact = TRUE)

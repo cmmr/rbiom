@@ -7,7 +7,7 @@
 id(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{value}{The identifier to add (character vector of length 1).}
 }
@@ -33,10 +33,10 @@ Other setters:
 \code{\link{counts<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},
-\code{\link{sample.names<-}()},
+\code{\link{sample_names<-}()},
 \code{\link{sequences<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()},
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()},
 \code{\link{taxonomy<-}()}
 }
 \concept{setters}

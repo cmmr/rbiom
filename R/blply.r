@@ -4,7 +4,7 @@
 #' 
 #' @name blply
 #' 
-#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param vars   A character vector of metadata fields. Each unique combination
 #'        of values in these columns will be used to create a subsetted BIOM
@@ -32,12 +32,12 @@
 #'     blply(hmp50, "Sex", nsamples)
 #'     
 #'     blply(hmp50, c("Body Site", "Sex"), function (b) {
-#'       ad <- alpha.div(b)[,c("Shannon", "Simpson")]
+#'       ad <- adiv_table(b)[,c("Shannon", "Simpson")]
 #'       apply(ad, 2L, mean)
 #'     })
 #'     
 #'     blply(hmp50, "Body Site", function (b) {
-#'       r <- range(beta.div(b, "bray"))
+#'       r <- range(bdiv_dist(b, "bray"))
 #'       data.frame(bray.min = r[[1]], bray.max = r[[2]])
 #'     })
 #'     

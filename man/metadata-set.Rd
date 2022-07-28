@@ -7,10 +7,10 @@
 metadata(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{value}{A data.frame with the metadata. All the \code{rownames()} must 
-be in \code{sample.names(biom)}. If there are fewer rows of 
+be in \code{sample_names(biom)}. If there are fewer rows of 
 \code{data} than samples, then the \code{biom} object will be subset.}
 }
 \description{
@@ -30,10 +30,10 @@ Other setters:
 \code{\link{counts<-}()},
 \code{\link{id<-}()},
 \code{\link{phylogeny<-}()},
-\code{\link{sample.names<-}()},
+\code{\link{sample_names<-}()},
 \code{\link{sequences<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()},
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()},
 \code{\link{taxonomy<-}()}
 }
 \concept{setters}

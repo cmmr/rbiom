@@ -8,7 +8,7 @@ rarefy(biom, depth = NULL, seed = 0)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-object, as returned from \link{read.biom}. For matrices, the rows and
+object, as returned from \link{read_biom}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
 
 \item{depth}{The number of observations to keep, per sample. If set to

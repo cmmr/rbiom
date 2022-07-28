@@ -74,7 +74,6 @@ plot_facets <- function (layers) {
 
 #--------------------------------------------------------------
 # Specify individual y-axis limits and breaks for each facet.
-# Overrides 'yaxis' layer with ggh4x::facetted_pos_scales()
 #--------------------------------------------------------------
 
 boxplot_facets <- function (layers) {

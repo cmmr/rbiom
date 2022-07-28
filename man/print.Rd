@@ -8,7 +8,7 @@
 \method{print}{BIOM}(x, ...)
 }
 \arguments{
-\item{x}{A BIOM object, as returned from \link{read.biom}.}
+\item{x}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{...}{Not used.}
 }

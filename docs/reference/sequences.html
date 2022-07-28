@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9050</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
       </span>
     </div>
 
@@ -53,45 +53,48 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sequences</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sequences</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>BIOM</code> object, as returned from <a href="read.biom.html">read.biom</a>.</p></dd>
+<dd><p>A <code>BIOM</code> object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named character vector of sequences in <code>biom</code>. If this data
+    
+
+<p>A named character vector of sequences in <code>biom</code>. If this data
           is not present, then returns <code>NULL</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>Other accessor functions: 
+    <div class="dont-index"><p>Other accessors: 
 <code><a href="counts.html">counts</a>()</code>,
 <code><a href="depth.html">depth</a>()</code>,
-<code><a href="has.phylogeny.html">has.phylogeny</a>()</code>,
-<code><a href="has.sequences.html">has.sequences</a>()</code>,
+<code><a href="has_phylogeny.html">has_phylogeny</a>()</code>,
+<code><a href="has_sequences.html">has_sequences</a>()</code>,
 <code><a href="id.html">id</a>()</code>,
 <code><a href="info.html">info</a>()</code>,
-<code><a href="is.rarefied.html">is.rarefied</a>()</code>,
+<code><a href="is_rarefied.html">is_rarefied</a>()</code>,
 <code><a href="metadata.html">metadata</a>()</code>,
 <code><a href="nsamples.html">nsamples</a>()</code>,
 <code><a href="ntaxa.html">ntaxa</a>()</code>,
 <code><a href="phylogeny.html">phylogeny</a>()</code>,
-<code><a href="sample.names.html">sample.names</a>()</code>,
-<code><a href="sample.sums.html">sample.sums</a>()</code>,
-<code><a href="taxa.names.html">taxa.names</a>()</code>,
-<code><a href="taxa.ranks.html">taxa.ranks</a>()</code>,
+<code><a href="sample_names.html">sample_names</a>()</code>,
+<code><a href="sample_sums.html">sample_sums</a>()</code>,
+<code><a href="taxa_names.html">taxa_names</a>()</code>,
+<code><a href="taxa_ranks.html">taxa_ranks</a>()</code>,
 <code><a href="taxonomy.html">taxonomy</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">sequences</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">sequences</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    UncO2713 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           "TGAGGAATATTGGTCAATGGACGCAAGTCTGAACCAGCCATGCCGCGTGCAGGAAGACGGCTCTATGAGTTGTAAACTGCTTTTGTACGAGGGTAAACTCACCTACGTGTAGGTGACTGAAAGTATCGTACGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGATTCAAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGCGGTTTGATAAGTTAGAGGTGAAATCCCGGGGCTTAACTCCGGAACTGCCTCTAATACTGTTAGACTAGAGAGTAGTTGCGGTAGGCGGAATGTATGGTGTAGCGGTGAAATGCTTAGAGATCATACAGAACACCGATTGCGAAGGCAGCTTACCAAACTATATCTGACGTTGAGGCACGAAAGCGTGGGGAGCAAACAGGATTAGATACCCTGGTAGTCCACGCAGTAAACGATGATAACTCGTTGTCGGCGATACACAGTCGGTGACTAAGCGAAAGCGATAAGTTATCCACCTGGGGAGTACGTTCGCAAGAATGAA" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    UncO4101 </span>
@@ -100,16 +103,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> "TGGGGAATATTGCACAATGGGCGCAAGCCTGATGCAGCGACGCCGCGTGAGGGATGGAGGCCTTCGGGTTGTGAACCTCTTTCGCCAGTGAAGAAGGTCCTGCTCTTTGTGGTGGGGTTGACGGTAGCTGGGTTAATGAAGCGCCGGCTAACTACGTGCCAGCAGCCGCGGTAATACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGCTGGTCGCGTCTGCCGTGAAATCCTCTGGCTCAGCTGGGGGCGTGCGGTGGGTACGGGCTGGCTTGAGTGCGGTAGGGGAGACTGGAACTCCTGGTGTAGCGGTGGAATGCGCAGATATCAGGAGGAACACCGGTGGCGAAGGCGGGTCTCTGGGCCGTTACTGACGCTGAGGAGCGAAAGCGTGGGGAGCGAACAGGATTAGATACCCTGGTAGTCCACGCTGTAAACGTTGGGCACTAGGTGTGGGGGGCCTTTTCCGGGTTTTCCGCGCCGTAGCTAACGCATTAAGTGCCCCGCCTGGGGAGTACGGCCGCAAGGCTAAA" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PreBivi6 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            "TGAGGAATATTGGTCAATGGACGCAAGTCTGAACCAGCCAAGTAGCGTGCAGGATGACGGCCCTATGGGTTGTAAACTGCTTTTATATGGGGATAAAGTGGGGAACGTGTTCCCTTTTGCAGGTACCATATGAATAAGGACCGGCTAATTCCGTGCCAGCAGCCGCGGTAATACGGAAGGTTCGGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTTTGGTAAGCGTGTTGTGAAATGTAGGAGCTCAACTTCTAGATTGCAGCGCGAACTGTCAGACTTGAGTGCGCACAACGTAGGCGGAATTCATGGTGTAGCGGTGAAATGCTTAGATATCATGAAGAACTCCGATTGCGAAGGCAGCTTACGGGAGCGCAACTGACGCTGAAGCTCGAAGGTGCGGGTATCGAACAGGATTAGATACCCTGGTAGTCCGCACAGTAAACGATGGATGCCCGCTGTTAGCACCTAGTGTTAGCGGCTAAGCGAAAGCATTAAGCATCCCACCTGGGGAGTACGCCGGCAACGGTGAA" </span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="co"># Write to a compressed fasta file in the temporary directory:</span></span>
-<span class="r-in">    <span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">sequences</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">bzfile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Sequences.fa.bz2"</span><span class="op">)</span>, <span class="st">"w"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"&gt;%s\n%s"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span>, <span class="va">seqs</span><span class="op">)</span>, file<span class="op">=</span><span class="va">conn</span>, sep<span class="op">=</span><span class="st">"\n"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">close</a></span><span class="op">(</span><span class="va">conn</span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="co"># You can also use the write.fasta function for this task:</span></span>
-<span class="r-in">    <span class="fu"><a href="write.fasta.html">write.fasta</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Sequences.fa.gz"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># Write to a compressed fasta file in the temporary directory:</span></span></span>
+<span class="r-in"><span>    <span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">sequences</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">bzfile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Sequences.fa.bz2"</span><span class="op">)</span>, <span class="st">"w"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"&gt;%s\n%s"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span>, <span class="va">seqs</span><span class="op">)</span>, file<span class="op">=</span><span class="va">conn</span>, sep<span class="op">=</span><span class="st">"\n"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">close</a></span><span class="op">(</span><span class="va">conn</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># You can also use the write_fasta function for this task:</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="write_fasta.html">write_fasta</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Sequences.fa.gz"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -124,7 +127,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

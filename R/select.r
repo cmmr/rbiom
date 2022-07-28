@@ -1,6 +1,6 @@
 #' Reduce samples to a specific list
 #' 
-#' @param biom  A BIOM object, as returned from \link{read.biom}. Objects of
+#' @param biom  A BIOM object, as returned from \link{read_biom}. Objects of
 #'        class \code{matrix} or \code{simple_triplet_matrix} are also accepted.
 #'        
 #' @param samples  Sample names, indices, or a logical vector identifying

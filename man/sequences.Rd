@@ -7,7 +7,7 @@
 sequences(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
 }
 \value{
 A named character vector of sequences in \code{biom}. If this data
@@ -27,27 +27,27 @@ Nucleotide sequences associated with each taxonomic identifier.
     cat(sprintf(">\%s\n\%s", names(seqs), seqs), file=conn, sep="\n")
     close(conn)
     
-    # You can also use the write.fasta function for this task:
-    write.fasta(hmp50, file.path(tempdir(), "Sequences.fa.gz"))
+    # You can also use the write_fasta function for this task:
+    write_fasta(hmp50, file.path(tempdir(), "Sequences.fa.gz"))
 
 }
 \seealso{
-Other accessor functions: 
+Other accessors: 
 \code{\link{counts}()},
 \code{\link{depth}()},
-\code{\link{has.phylogeny}()},
-\code{\link{has.sequences}()},
+\code{\link{has_phylogeny}()},
+\code{\link{has_sequences}()},
 \code{\link{id}()},
 \code{\link{info}()},
-\code{\link{is.rarefied}()},
+\code{\link{is_rarefied}()},
 \code{\link{metadata}()},
 \code{\link{nsamples}()},
 \code{\link{ntaxa}()},
 \code{\link{phylogeny}()},
-\code{\link{sample.names}()},
-\code{\link{sample.sums}()},
-\code{\link{taxa.names}()},
-\code{\link{taxa.ranks}()},
+\code{\link{sample_names}()},
+\code{\link{sample_sums}()},
+\code{\link{taxa_names}()},
+\code{\link{taxa_ranks}()},
 \code{\link{taxonomy}()}
 }
-\concept{accessor functions}
+\concept{accessors}

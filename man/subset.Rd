@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{x}{A BIOM object, as returned from \link{read.biom}.}
+\item{x}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{expr}{Logical expression to run on the metadata or taxonomy (not both)
 to identify samples or taxa to retain.}

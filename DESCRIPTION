@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9050
+Version: 1.0.3.9060
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
@@ -29,7 +29,7 @@ Imports:
     ape,
     broom,
     ggbeeswarm,
-    ggh4x,
+    ggnewscale,
     ggpattern,
     ggplot2,
     ggrepel,
@@ -42,6 +42,7 @@ Imports:
     memoise,
     methods,
     openxlsx,
+    paletteer,
     patchwork,
     pheatmap,
     plyr,

@@ -1,6 +1,6 @@
 #' Get the taxonomy table.
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' 
 #' @param rank  Return just a named character vector of this rank. (Default: 
 #'        \code{NULL})
@@ -13,7 +13,7 @@
 #'         attribute called 'fixed' and notes which taxa names were
 #'         rewritten.
 #'         
-#' @family accessor functions
+#' @family accessors
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -32,7 +32,7 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   if (!is(biom, 'BIOM'))
     stop('In taxonomy(), biom must be a BIOM-class object.')
   
-  if (length(missing <- setdiff(NULL, taxa.ranks(biom))) > 0)
+  if (length(missing <- setdiff(NULL, taxa_ranks(biom))) > 0)
     stop("Invalid ranks(s): ", paste(collapse = ", ", missing))
   
   
@@ -98,7 +98,7 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
     }
   }
   
-  x <- cbind(x, 'OTU' = taxa.names(biom))
+  x <- cbind(x, 'OTU' = taxa_names(biom))
   if (!is.null(rank)) x <- x[,rank]
   
   return (x)
@@ -109,9 +109,9 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
 
 #' Set the taxonomy table.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' 
-#' @param value  A character matrix with rownames \code{taxa.names(x)}. If
+#' @param value  A character matrix with rownames \code{taxa_names(x)}. If
 #'        there are more rownames than taxa names, the matrix will be subset.
 #'         
 #' @family setters
@@ -133,9 +133,9 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.matrix(value))
   stopifnot(typeof(value) == "character")
-  stopifnot(!all(taxa.names(x) %in% rownames(value)))
+  stopifnot(!all(taxa_names(x) %in% rownames(value)))
   
-  x[['taxonomy']] <- value[taxa.names(x),]
+  x[['taxonomy']] <- value[taxa_names(x),]
   
   return (x) 
 }

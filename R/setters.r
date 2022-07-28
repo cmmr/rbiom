@@ -1,6 +1,6 @@
 #' Set the sample names.
 #' 
-#' @param x   A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x   A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value   A character vector. A named character vector can be used to
 #'        only change some of the sample names.
 #' @family setters
@@ -10,16 +10,16 @@
 #'     
 #'     biom <- hmp50
 #'     
-#'     head(sample.names(biom))
+#'     head(sample_names(biom))
 #'     
-#'     sample.names(biom) <- sub('HMP', 'Sample_', sample.names(biom))
-#'     head(sample.names(biom))
+#'     sample_names(biom) <- sub('HMP', 'Sample_', sample_names(biom))
+#'     head(sample_names(biom))
 #'     
-#'     sample.names(biom) <- c('Sample_02' = 'One', 'Sample_03' = 'Two')
-#'     head(sample.names(biom))
+#'     sample_names(biom) <- c('Sample_02' = 'One', 'Sample_03' = 'Two')
+#'     head(sample_names(biom))
 #'
 
-`sample.names<-` <- function (x, value) {
+`sample_names<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
@@ -29,9 +29,9 @@
     
   } else {
     stopifnot(!any(duplicated(names(value))))
-    stopifnot(all(names(value) %in% sample.names(x)))
+    stopifnot(all(names(value) %in% sample_names(x)))
     
-    new_ids <- sample.names(x)
+    new_ids <- sample_names(x)
     new_ids[names(value)] <- unname(value)
   }
   
@@ -46,7 +46,7 @@
 
 #' Set the taxa names.
 #' 
-#' @param x   A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x   A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value   A character vector. A named character vector can be used to
 #'        only change some of the taxa names.
 #' @family setters
@@ -56,16 +56,16 @@
 #'     
 #'     biom <- hmp50
 #'     
-#'     head(taxa.names(biom))
+#'     head(taxa_names(biom))
 #'     
-#'     taxa.names(biom) <- sub('Unc', 'Uncultured_', taxa.names(biom))
-#'     head(taxa.names(biom))
+#'     taxa_names(biom) <- sub('Unc', 'Uncultured_', taxa_names(biom))
+#'     head(taxa_names(biom))
 #'     
-#'     taxa.names(biom) <- c('AnmMass2' = 'One', 'PreBivi6' = 'Two')
-#'     head(taxa.names(biom))
+#'     taxa_names(biom) <- c('AnmMass2' = 'One', 'PreBivi6' = 'Two')
+#'     head(taxa_names(biom))
 #'
 
-`taxa.names<-` <- function (x, value) {
+`taxa_names<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
@@ -75,20 +75,20 @@
     
   } else {
     stopifnot(!any(duplicated(names(value))))
-    stopifnot(all(names(value) %in% taxa.names(x)))
+    stopifnot(all(names(value) %in% taxa_names(x)))
     
-    new_ids <- taxa.names(x)
+    new_ids <- taxa_names(x)
     new_ids[names(value)] <- unname(value)
   }
   
   stopifnot(!any(duplicated(new_ids)))
   
-  if (has.phylogeny(x)) { # Likely ordered differently
-    idx <- match(taxa.names(x), x[['phylogeny']][['tip.label']])
+  if (has_phylogeny(x)) { # Likely ordered differently
+    idx <- match(taxa_names(x), x[['phylogeny']][['tip.label']])
     x[['phylogeny']][['tip.label']][idx] <- new_ids
   }
   
-  if (has.sequences(x))
+  if (has_sequences(x))
     names(x[['sequences']]) <- new_ids
   
   rownames(x[['counts']])   <- new_ids
@@ -100,7 +100,7 @@
 
 #' Set the taxa rank names.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value  A character vector. A named character vector can be used to
 #'        only change some of the taxa rank names.
 #' @family setters
@@ -110,16 +110,16 @@
 #'     
 #'     biom <- hmp50
 #'     
-#'     taxa.ranks(biom)
+#'     taxa_ranks(biom)
 #'     
-#'     taxa.ranks(biom) <- c("OTU" = "ASV")
-#'     taxa.ranks(biom)
+#'     taxa_ranks(biom) <- c("OTU" = "ASV")
+#'     taxa_ranks(biom)
 #'     
-#'     taxa.ranks(biom) <- paste0("Level", 1:7)
-#'     taxa.ranks(biom)
+#'     taxa_ranks(biom) <- paste0("Level", 1:7)
+#'     taxa_ranks(biom)
 #'
 
-`taxa.ranks<-` <- function (x, value) {
+`taxa_ranks<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
@@ -129,9 +129,9 @@
     
   } else {
     stopifnot(!any(duplicated(names(value))))
-    stopifnot(all(names(value) %in% taxa.ranks(x)))
+    stopifnot(all(names(value) %in% taxa_ranks(x)))
     
-    new_ids <- taxa.ranks(x)
+    new_ids <- taxa_ranks(x)
     new_ids[names(value)] <- unname(value)
   }
   
@@ -145,7 +145,7 @@
 
 #' Set the abundance counts.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value A numeric matrix. Rownames and colnames must be identical to
 #'        the current \code{counts()} value.
 #' @family setters
@@ -179,9 +179,9 @@
 
 #' Set the phylogenetic tree.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value A \code{phylo} class object with tip.labels matching 
-#'        \code{taxa.names(x)}. If there are more tip.labels than
+#'        \code{taxa_names(x)}. If there are more tip.labels than
 #'        taxa names, then the tree will be subset.
 #' @family setters
 #' @export
@@ -190,7 +190,7 @@
 #'     library(rbiom)
 #'     
 #'     biom <- hmp50
-#'     phylogeny(biom) <- read.tree('path/to/newick.tre')
+#'     phylogeny(biom) <- read_tree('path/to/newick.tre')
 #' }
 #' 
 
@@ -198,10 +198,10 @@
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is(value, 'phylo'))
-  stopifnot(all(taxa.names(x) %in% value$tip.labels))
+  stopifnot(all(taxa_names(x) %in% value$tip.labels))
   
-  if (length(value$tip.labels) > length(taxa.names(x)))
-    value <- subtree(value, taxa.names(x))
+  if (length(value$tip.labels) > length(taxa_names(x)))
+    value <- subtree(value, taxa_names(x))
   
   x[['phylogeny']] <- value
   
@@ -211,15 +211,15 @@
 
 #' Set nucleotide sequences associated with each taxonomic identifier.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
-#' @param value A named character vector. Names must match \code{taxa.names(x)}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param value A named character vector. Names must match \code{taxa_names(x)}.
 #' @family setters
 #' @export
 #' @examples
 #' \dontrun{
 #'     library(rbiom)
 #'     
-#'     sequences(biom) <- read.fasta('path/to/sequences.fa')
+#'     sequences(biom) <- read_fasta('path/to/sequences.fa')
 #'     sequences(biom) <- c(OTU1 = 'ATCGGGTA', OTU2 = 'GGCATTAGC')
 #' }
 #' 
@@ -228,9 +228,9 @@
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
-  stopifnot(all(taxa.names(x) %in% names(value)))
+  stopifnot(all(taxa_names(x) %in% names(value)))
   
-  x[['sequences']] <- value[taxa.names(x)]
+  x[['sequences']] <- value[taxa_names(x)]
   
   return (x)
 }
@@ -241,7 +241,7 @@
 #' The BIOM specification includes \code{id} and \code{comment} fields
 #' for free-form text.
 #' 
-#' @param x  A \code{BIOM} object, as returned from \link{read.biom}.
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param value The identifier to add (character vector of length 1).
 #' @family setters
 #' @export

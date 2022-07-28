@@ -22,8 +22,19 @@ boxplot_stats <- function (layers) {
     free_y <- isTRUE(layers[['facet']][['scales']] %in% c("free", "free_y"))
   }
   
-  y.pos <- ifelse(hasLayer("voilin"), "violin", "max")
-    
+  
+  y.pos <- unique(c(
+    if (hasLayer("voilin"))     "violin" else NULL,
+    if (hasLayer("dot"))        "max"    else NULL,
+    if (hasLayer("strip"))      "max"    else NULL,
+    if (hasLayer("box"))        "box"    else NULL,
+    if (hasLayer("errorbar"))   "vline"  else NULL,
+    if (hasLayer("pointrange")) "vline"  else NULL,
+    if (hasLayer("crossbar"))   "vline"  else NULL,
+    if (hasLayer("linerange"))  "vline"  else NULL,
+    if (hasLayer("bar"))        "mean"   else NULL
+  ))
+  
   stats  <- NULL
   ggdata <- attr(layers, 'data', exact = TRUE)
   
@@ -49,7 +60,7 @@ boxplot_stats <- function (layers) {
         #--------------------------------------------------------------
         # Brackets between x-values
         #--------------------------------------------------------------
-        stats <- stats.table(
+        stats <- stats_table(
           biom        = ggdata, 
           x           = xcol, 
           y           = ycol, 
@@ -61,16 +72,51 @@ boxplot_stats <- function (layers) {
         stats[['Group1']] %<>% factor(levels = levels(ggdata[[xcol]]))
         stats[['Group2']] %<>% factor(levels = levels(ggdata[[xcol]]))
         
-        pvals <- stats[which(stats[['adj.p']] <= max(p.label)),,drop=FALSE]
+        
+        #--------------------------------------------------------------
+        # Use p.top to retain only most significant taxa.
+        #--------------------------------------------------------------
+        if (isTRUE(is.finite(params[['p.top']]))) {
+          
+          taxa <- if (params[['p.top']] >= 1) {
+            rank(plyr::daply(stats, '.taxa', function (s) {
+              min(c(Inf, s[['.p.val']]), na.rm = TRUE) }), ties.method = "first")
+            
+          } else {
+            plyr::daply(stats, '.taxa', function (s) {
+              min(c(Inf, s[['.adj.p']]), na.rm = TRUE) })
+          }
+          
+          taxa   <- names(taxa[taxa <= params[['p.top']]])
+          stats  <- stats[stats[['.taxa']]   %in% taxa,,drop=FALSE]
+          ggdata <- ggdata[ggdata[['.taxa']] %in% taxa,,drop=FALSE]
+          stats[['.taxa']]  %<>% factor()
+          ggdata[['.taxa']] %<>% factor()
+          
+          for (i in names(attributes(ggdata))) {
+            obj <- attr(ggdata, i, exact = TRUE)
+            if (!is.data.frame(obj))         next
+            if (!".taxa" %in% colnames(obj)) next
+            obj <- obj[obj[['.taxa']] %in% taxa,,drop=FALSE]
+            obj[['.taxa']] %<>% factor()
+            attr(ggdata, i) <- obj
+          }
+          
+          remove("taxa")
+        }
         
         
+        #--------------------------------------------------------------
+        # Don't display insignificant p-values on the plot
+        #--------------------------------------------------------------
+        pvals <- stats[which(stats[['.adj.p']] <= max(p.label)),,drop=FALSE]
         if (nrow(pvals) > 0) {
           
           xpos <- as.factor(ggdata[[xcol]])
           xpos <- setNames(seq_along(levels(xpos)), levels(xpos))
           pvals[['.xmin']]  <- as.numeric(xpos[as.character(pvals[['Group1']])])
           pvals[['.xmax']]  <- as.numeric(xpos[as.character(pvals[['Group2']])])
-          pvals[['.label']] <- p_annotations(pvals[['adj.p']])
+          pvals[['.label']] <- p_annotations(pvals[['.adj.p']])
           
           
           if (is.null(facet.by)) {
@@ -154,7 +200,7 @@ boxplot_stats <- function (layers) {
       #--------------------------------------------------------------
       # P-value for each x position
       #--------------------------------------------------------------
-      stats <- stats.table(
+      stats <- stats_table(
         biom        = ggdata, 
         x           = setdiff(c(color.by, pattern.by, shape.by), xcol), 
         y           = ycol, 
@@ -163,114 +209,151 @@ boxplot_stats <- function (layers) {
         y.pos       = y.pos,
         y.pos.facet = facet.by )
       
-      pvals <- stats[which(stats[['adj.p']] <= max(p.label)),,drop=FALSE]
       
-      pvals[[xcol]] <- factor(pvals[[xcol]], levels = levels(ggdata[[xcol]]))
-      
-      
-      # When some x-values are absent from some facets, we'll need
-      # to re-number the remaining x-positions.
-      
-      if (!is.null(facet.by) && isTRUE(free_x)) {
+      #--------------------------------------------------------------
+      # Use p.top to retain only most significant taxa.
+      #--------------------------------------------------------------
+      if (isTRUE(is.finite(params[['p.top']]))) {
         
-        all_x <- levels(pvals[[xcol]])
+        taxa <- if (params[['p.top']] >= 1) {
+          rank(plyr::daply(stats, '.taxa', function (s) {
+            min(c(Inf, s[['.p.val']]), na.rm = TRUE) }), ties.method = "first")
+          
+        } else {
+          plyr::daply(stats, '.taxa', function (s) {
+            min(c(Inf, s[['.adj.p']]), na.rm = TRUE) })
+        }
         
-        pvals <- plyr::ddply(
-          .data      = pvals, 
-          .variables = ply_cols(facet.by), 
-          .fun       = function (z) {
-              
-            facet_x <- plyr::match_df(ggdata, z, on=facet.by)[[xcol]] %>%
-              as.character() %>%
-              unique()
-            
-            map_x <- sapply(all_x, function (x) which(facet_x == x) %>% ifelse(is.null(.), NA, .))
-            
-            z[['x.pos']] <- map_x[as.numeric(z[[xcol]])]
-            
-            
-            return (z)
-          })
+        taxa   <- names(taxa[taxa <= params[['p.top']]])
+        stats  <- stats[stats[['.taxa']]   %in% taxa,,drop=FALSE]
+        ggdata <- ggdata[ggdata[['.taxa']] %in% taxa,,drop=FALSE]
+        stats[['.taxa']]  %<>% factor()
+        ggdata[['.taxa']] %<>% factor()
         
-      } else {
-        pvals[['x.pos']] <- as.numeric(pvals[[xcol]])
+        for (i in names(attributes(ggdata))) {
+          obj <- attr(ggdata, i, exact = TRUE)
+          if (!is.data.frame(obj))         next
+          if (!".taxa" %in% colnames(obj)) next
+          obj <- obj[obj[['.taxa']] %in% taxa,,drop=FALSE]
+          obj[['.taxa']] %<>% factor()
+          attr(ggdata, i) <- obj
+        }
+        
+        remove("taxa")
       }
       
       
+      #--------------------------------------------------------------
+      # Don't display insignificant p-values on the plot
+      #--------------------------------------------------------------
+      pvals <- stats[which(stats[['.adj.p']] <= max(p.label)),,drop=FALSE]
+      if (nrow(pvals) > 0) {
       
-      attr(ggdata, 'stat_labels') <- data.frame(
-        check.names = FALSE, 
-        pvals,
-        .x     = pvals[['x.pos']],
-        .y     = pvals[['y.pos']] * 1.10,
-        .label = p_annotations(pvals[['adj.p']]) )
+        pvals[[xcol]] <- factor(pvals[[xcol]], levels = levels(ggdata[[xcol]]))
       
-      attr(ggdata, 'stat_brackets') <- data.frame(
-        check.names = FALSE, 
-        pvals,
-        .x    = pvals[['x.pos']] - .4,
-        .xend = pvals[['x.pos']] + .4,
-        .y    = pvals[['y.pos']] * 1.08,
-        .yend = pvals[['y.pos']] * 1.08 )
       
-      setLayer(
-        'layer'        = "brackets",
-        'mapping|x'    = ".x",
-        'mapping|xend' = ".xend",
-        'mapping|y'    = ".y",
-        'mapping|yend' = ".yend" )
+        # When some x-values are absent from some facets, we'll need
+        # to re-number the remaining x-positions.
+        
+        if (!is.null(facet.by) && isTRUE(free_x)) {
+          
+          all_x <- levels(pvals[[xcol]])
+          
+          pvals <- plyr::ddply(
+            .data      = pvals, 
+            .variables = ply_cols(facet.by), 
+            .fun       = function (z) {
+                
+              facet_x <- plyr::match_df(ggdata, z, on=facet.by)[[xcol]] %>%
+                as.character() %>%
+                unique()
+              
+              map_x <- sapply(all_x, function (x) which(facet_x == x) %>% ifelse(is.null(.), NA, .))
+              
+              z[['x.pos']] <- map_x[as.numeric(z[[xcol]])]
+              
+              
+              return (z)
+            })
+          
+        } else {
+          pvals[['x.pos']] <- as.numeric(pvals[[xcol]])
+        }
+        
+        
+        attr(ggdata, 'stat_labels') <- data.frame(
+          check.names = FALSE, 
+          pvals,
+          .x     = pvals[['x.pos']],
+          .y     = pvals[['y.pos']] * 1.10,
+          .label = p_annotations(pvals[['.adj.p']]) )
+        
+        attr(ggdata, 'stat_brackets') <- data.frame(
+          check.names = FALSE, 
+          pvals,
+          .x    = pvals[['x.pos']] - .4,
+          .xend = pvals[['x.pos']] + .4,
+          .y    = pvals[['y.pos']] * 1.08,
+          .yend = pvals[['y.pos']] * 1.08 )
+        
+        setLayer(
+          'layer'        = "brackets",
+          'mapping|x'    = ".x",
+          'mapping|xend' = ".xend",
+          'mapping|y'    = ".y",
+          'mapping|yend' = ".yend" )
+        
+        setLayer(
+          'layer'         = "stats_text",
+          'size'          = 3,
+          'vjust'         = 0,
+          'parse'         = length(p.label) == 1,
+          'mapping|x'     = ".x",
+          'mapping|y'     = ".y",
+          'mapping|label' = ".label" )
       
-      setLayer(
-        'layer'         = "stats_text",
-        'size'          = 3,
-        'vjust'         = 0,
-        'parse'         = length(p.label) == 1,
-        'mapping|x'     = ".x",
-        'mapping|y'     = ".y",
-        'mapping|label' = ".label" )
       
+        setLayer("theme", "plot.caption" = element_text(face = "italic", color = "gray"))
+        setLayer("labs",  "caption"      = local({
+          
+          test <- glue::glue_collapse(
+            x    = na.omit(unique(stats[['Test']])), 
+            sep  = ", ", 
+            last = " and " )
+          
+          meth <- switch(
+            EXPR = p.adj,
+            "holm"       = "FDR-adjusted as per Holm (1979)", 
+            "hochberg"   = "FDR-adjusted as per Hochberg (1988)",
+            "hommel"     = "FDR-adjusted as per Hommel (1988)",
+            "bonferroni" = "FDR-adjusted using the Bonferroni correction",
+            "BH"         = "FDR-adjusted as per Benjamini & Hochberg (1995)",
+            "fdr"        = "FDR-adjusted as per Benjamini & Hochberg (1995)",
+            "BY"         = "FDR-adjusted as per Benjamini & Yekutieli (2001)",
+            "not corrected for multiple comparisons" )
+          
+          return(glue("{test} p-values {meth}."))
+          
+        }))
+        
+      }
     }
+  }
+
+  if (is.null(stats)) {
+    setLayer("yaxis", expand = c(0.02, 0, 0.02, 0) )
     
+  } else {
+    setLayer("yaxis", expand = c(0.02, 0, 0.08, 0) )
     
-    if (is.null(stats)) {
-      setLayer("yaxis", expand = c(0.02, 0, 0.02, 0) )
-      
-    } else {
-      setLayer("yaxis", expand = c(0.02, 0, 0.08, 0) )
-      
-      dropcols <- c(".id", ".all", "x.pos", "y.pos")
-      keepcols <- setdiff(names(stats), dropcols)
-      stats    <- stats[, keepcols, drop=FALSE]
-      
-      attr(layers, "stats") <- stats
-      
-      setLayer("theme", "plot.caption" = element_text(face = "italic", color = "gray"))
-      setLayer("labs",  "caption"      = local({
-        
-        test <- glue::glue_collapse(
-          x    = na.omit(unique(stats[['Test']])), 
-          sep  = ", ", 
-          last = " and " )
-        
-        meth <- switch(
-          EXPR = p.adj,
-          "holm"       = "FDR-adjusted as per Holm (1979)", 
-          "hochberg"   = "FDR-adjusted as per Hochberg (1988)",
-          "hommel"     = "FDR-adjusted as per Hommel (1988)",
-          "bonferroni" = "FDR-adjusted using the Bonferroni correction",
-          "BH"         = "FDR-adjusted as per Benjamini & Hochberg (1995)",
-          "fdr"        = "FDR-adjusted as per Benjamini & Hochberg (1995)",
-          "BY"         = "FDR-adjusted as per Benjamini & Yekutieli (2001)",
-          "not corrected for multiple comparisons" )
-        
-        return(glue("{test} p-values {meth}."))
-        
-      }))
-    }
-    
-    attr(layers, "data") <- ggdata
+    dropcols <- c(".id", ".all", "x.pos", "y.pos")
+    keepcols <- setdiff(names(stats), dropcols)
+    stats    <- stats[, keepcols, drop=FALSE]
+    attr(layers, "stats") <- stats
   }
   
+  
+  attr(layers, "data")  <- ggdata
   
   return (layers)
 }

@@ -7,7 +7,8 @@
 taxa_boxplot(
   biom,
   x = ".taxa",
-  y = tail(taxa.ranks(biom), 1),
+  rank = NULL,
+  taxa = 5,
   layers = "rls",
   color.by = NULL,
   pattern.by = NULL,
@@ -18,7 +19,6 @@ taxa_boxplot(
   patterns = NULL,
   shapes = NULL,
   facets = NULL,
-  taxa = 5,
   p.top = Inf,
   p.adj = "fdr",
   p.label = 0.05,
@@ -31,7 +31,19 @@ taxa_boxplot(
 )
 }
 \arguments{
-\item{x}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+
+\item{x}{A categorical metadata column name to use for the x-axis. The 
+default, \code{".taxa"} puts the taxa along the x-axis.}
+
+\item{rank}{What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
+\code{taxa_ranks()} to see all options for a given BIOM object. The
+default, \code{NULL}, selects the lowest level.}
+
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
+mean abundance or greater (e.g. 0.1). A character vector of
+taxon names will show only those taxa. Default: \code{5}}
 
 \item{layers}{\code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -55,29 +67,23 @@ coerced to unnamed character vectors. If the length of these vectors
 is less than the values present in their corresponding metadata 
 column, then the data set will be subseted accordingly.}
 
-\item{taxa}{Which taxa to display. An integer value will show the top n
-most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
-mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. (Default: \code{10} for 
-heatmaps, \code{5} otherwise.)}
-
-\item{p.top}{For \code{RANK ~ .} (taxa abundance) plots or 
-\code{BDIV ~ ORD} ordination biplots, only display taxa with the most 
-significant differences in abundance. If \code{p.top} is >= 1, then 
-the \code{p.top} most significant taxa are displayed. If \code{p.top} 
-is less than one, all taxa with an adjusted p-value <= \code{p.top} 
-are displayed. Recommended to be used in combination with the 
-\code{taxa} parameter to set a lower bound on the mean abundance of 
-considered taxa. (Default: \code{Inf})}
+\item{p.top}{Only display taxa with the most significant differences in 
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
+significant taxa are displayed. If \code{p.top} is less than one, all 
+taxa with an adjusted p-value <= \code{p.top} are displayed. 
+Recommended to be used in combination with the \code{taxa} parameter 
+to set a lower bound on the mean abundance of considered taxa. 
+Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+Default: \code{fdr}}
 
-\item{p.label}{Minimum adjusted p-value to display on the plot with a bracket.
-Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
-If a numeric vector with more than one value is provided, they will be
-used as breaks for asterisk notation. (Default: \code{0.05})}
+\item{p.label}{Minimum adjusted p-value to display on the plot with a 
+bracket. Set to \code{Inf} to display all p-values, or \code{-Inf} 
+for no brackets. If a numeric vector with more than one value is 
+provided, they will be used as breaks for asterisk notation. 
+Default: \code{0.05}}
 
 \item{ci}{How to calculate min/max of the \bold{crossbar}, 
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -98,22 +104,18 @@ Set to \code{NULL} to disable. Default: \code{95}}
 angled, and vertical, respectively.}
 
 \item{other}{Should non-selected taxa be displayed as an "Other" group?
-(Default: \code{FALSE})}
+Default: \code{FALSE}}
 
 \item{safe}{If \code{FALSE}, data.frame column names such as 
 \code{".metric"} will be auto-converted to \code{"Metric"} to improve
 human-readability. Conversion if aborted if a conflict is found with
-a metadata column name. (Default: \code{FALSE})}
+a metadata column name. Default: \code{FALSE}}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
 dotplot layer has its size set to \code{2}.}
-
-\item{rank}{What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
-\code{taxa.ranks()} to see all options for a given BIOM object. The
-default, \code{NULL}, selects the lowest level.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 
@@ -138,10 +140,20 @@ Visualize BIOM data with boxplots.
     library(rbiom)
     
     biom <- rarefy(hmp50)
-    taxa_boxplot(biom, x = ".", y = c("Phylum", "Genus"))
+    taxa_boxplot(biom, rank = c("Phylum", "Genus"))
     
 
 }
 \seealso{
-\code{\link{stats.table}}
+\code{\link{stats_table}}
+
+Other plotting: 
+\code{\link{adiv_boxplot}()},
+\code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{ordination_plot}()},
+\code{\link{plot_heatmap}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
+\concept{plotting}

@@ -188,6 +188,7 @@ initLayer <- function (layer_names) {
       'ellipse'    = "^e(|llipse)\\.",
       'facet'      = "^f(|acet)\\.",
       'fill'       = "^fill\\.",
+      'heat'       = "^h(|eat|eatmap)\\.",
       'labs'       = "^labs\\.",
       'linerange'  = "^l(|inerange)\\.",
       'mean'       = "^m(|ean)\\.",
@@ -213,14 +214,15 @@ initLayer <- function (layer_names) {
     
     
     
-    params <- attr(layers, 'params', exact = TRUE)
-    func   <- attr(result, 'function', exact = TRUE)
+    layer_func <- attr(result, 'function', exact = TRUE)
+    params     <- attr(layers, 'params',   exact = TRUE)
     
     
     
-    # Blacklist named parameters for rbiom's plot() function
+    # Ignore formal arguments in the called plotting function
     #________________________________________________________
-    params <- params[setdiff(names(params), formalArgs(plot.BIOM))]
+    plot_func <- attr(layers, 'function', exact = TRUE)
+    params    <- params[setdiff(names(params), formalArgs(plot_func))]
     
     
     # Ensure NULLs can be inserted into a list
@@ -239,14 +241,16 @@ initLayer <- function (layer_names) {
     
     # Unprefixed dot arguments, e.g. 'scales'="free_x"
     #________________________________________________________
-    for (i in intersect(names(params), formalArgs(func)))
-      result[i] <- params[[i]]
+    for (i in intersect(names(params), formalArgs(layer_func)))
+      if (!isFALSE(attr(params[[i]], 'display')))
+        result[i] <- params[[i]]
     
     
     # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
     #________________________________________________________
     for (i in grep(regex, names(params), value = TRUE))
-      result[sub(regex, "", i, perl = TRUE)] <- params[[i]]
+      if (!isFALSE(attr(params[[i]], 'display')))
+        result[sub(regex, "", i, perl = TRUE)] <- params[[i]]
     
     
     layers[[layer]] <- result

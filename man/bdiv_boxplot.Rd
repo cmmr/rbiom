@@ -7,7 +7,7 @@
 bdiv_boxplot(
   biom,
   x = NULL,
-  y = "Bray-Curtis",
+  metric = "Bray-Curtis",
   layers = "rls",
   color.by = NULL,
   pattern.by = NULL,
@@ -28,17 +28,17 @@ bdiv_boxplot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{x}{Metadata column name(s). Must be categorical. Prefix with 
 \code{==} or \code{!=} to limit comparisons to within or between
 groups, respectively. The default, \code{NULL} groups all distances 
 into a single column.}
 
-\item{y}{Beta diversity metric(s) to use. Options are \code{"Manhattan"},
-\code{"Euclidean"}, \code{"Bray-Curtis"}, \code{"Jaccard"}, and
-\code{"UniFrac"}. UniFrac requires a phylogenetic tree. Default: 
-\code{"Bray-Curtis"}.}
+\item{metric}{Beta diversity metric(s) to use. Options are 
+\code{"Manhattan"}, \code{"Euclidean"}, \code{"Bray-Curtis"}, 
+\code{"Jaccard"}, and \code{"UniFrac"}. UniFrac requires a 
+phylogenetic tree. Default: \code{"Bray-Curtis"}.}
 
 \item{layers}{\code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -64,13 +64,13 @@ column, then the data set will be subseted accordingly.}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+Default: \code{fdr}}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a bracket.
 Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
 If a numeric vector with more than one value is provided, they will be
 used as breaks for asterisk notation. For ordinations, \code{p.label} 
-applies to biplot taxa. (Default: \code{0.05})}
+applies to biplot taxa. Default: \code{0.05}}
 
 \item{ci}{How to calculate min/max of the \bold{crossbar}, 
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -91,7 +91,7 @@ Set to \code{NULL} to disable. Default: \code{95}}
 angled, and vertical, respectively.}
 
 \item{weighted}{When employing a beta diversity metric, use the weighted
-version. (Default: \code{TRUE})}
+version. Default: \code{TRUE}.}
 
 \item{tree}{A phylogenetic tree for use in calculating UniFrac distance.
 The default, \code{NULL}, will use the BIOM object's tree.}
@@ -101,6 +101,10 @@ functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
 dotplot layer has its size set to \code{2}.}
+
+\item{filter.fun}{A function that takes a \code{bdiv_table()} as input and
+returns a \code{bdiv_table()} as output. This modified table will be
+used for plotting. Default: \code{NULL}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 
@@ -125,10 +129,20 @@ Visualize BIOM data with boxplots.
     library(rbiom)
     
     biom <- rarefy(hmp50)
-    bdiv_boxplot(biom, UniFrac ~ `==Body Site`, color.by="Body Site")
+    bdiv_boxplot(biom, x="==Body Site", metric="UniFrac", color.by="Body Site")
     
 
 }
 \seealso{
-\code{\link{stats.table}}
+\code{\link{stats_table}}
+
+Other plotting: 
+\code{\link{adiv_boxplot}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{ordination_plot}()},
+\code{\link{plot_heatmap}()},
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
+\concept{plotting}

@@ -1,7 +1,7 @@
 #' List all the options for each type of metric.
 #' 
 #' @name metrics
-#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param mode   One of the following options:
 #' \itemize{
@@ -18,7 +18,7 @@
 #' @return A character vector of supported values. 
 #'         For \code{mode = "all"}, a named \code{list()} of character vectors.
 #' @export
-#' @seealso \code{\link{alpha.div}} \code{\link{beta.div}} \code{\link{ordinate}}
+#' @seealso \code{\link{adiv_table}} \code{\link{bdiv_table}} \code{\link{ordinate}}
 #' @examples
 #'     library(rbiom)
 #'     
@@ -40,13 +40,13 @@ metrics <- function (biom, mode = "all", tree=NULL) {
   
   if        (mode == 'ord')   { c("PCoA", "tSNE", "NMDS", "UMAP") 
   } else if (mode == 'adiv')  { c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson") 
-  } else if (mode == 'dist')  { c("correlation", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
+  } else if (mode == 'dist')  { c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
   } else if (mode == 'clust') { c("average", "ward", "mcquitty", "single", "median", "complete", "centroid") 
-  } else if (mode == 'rank')  { unique(c(taxa.ranks(biom), 'OTU'))
-  } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa.names(biom)))
+  } else if (mode == 'rank')  { unique(c(taxa_ranks(biom), 'OTU'))
+  } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa_names(biom)))
   } else if (mode == 'meta')  { colnames(metadata(biom))
   } else if (mode == 'bdiv')  {
-    hasTree <- ifelse(is(biom, 'BIOM'), has.phylogeny(biom), FALSE) || is(tree, 'phylo')
+    hasTree <- ifelse(is(biom, 'BIOM'), has_phylogeny(biom), FALSE) || is(tree, 'phylo')
     if (hasTree) { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
     } else       { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard") }
   } else { NULL }

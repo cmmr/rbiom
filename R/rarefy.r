@@ -1,7 +1,7 @@
 #' Subset counts so that all samples have the same number of observations.
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'        object, as returned from \link{read.biom}. For matrices, the rows and
+#'        object, as returned from \link{read_biom}. For matrices, the rows and
 #'        columns are assumed to be the taxa and samples, respectively.
 #'     
 #' @param depth  The number of observations to keep, per sample. If set to

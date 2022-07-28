@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9050</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
       </span>
     </div>
 
@@ -53,43 +53,56 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for BIOM</span>
-<span class="fu">subset</span><span class="op">(</span>
-  <span class="va">x</span>,
-  <span class="va">expr</span>,
-  env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,
-  drop.na <span class="op">=</span> <span class="cn">TRUE</span>,
-  refactor <span class="op">=</span> <span class="cn">TRUE</span>,
-  fast <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for BIOM</span></span>
+<span><span class="fu">subset</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">expr</span>,</span>
+<span>  env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  refactor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fast <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>A BIOM object, as returned from <a href="read.biom.html">read.biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
+
 <dt>expr</dt>
 <dd><p>Logical expression to run on the metadata or taxonomy (not both)
 to identify samples or taxa to retain.</p></dd>
+
+
 <dt>env</dt>
 <dd><p>The environment to search for variables used in <code>expr</code>.
 (Default: <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame()</a></code>)</p></dd>
+
+
 <dt>drop.na</dt>
 <dd><p>When <code>expr</code> is e.g. <code>Age &gt; 30</code>, should
 <code>!is.na(Age)</code> be automatically applied too?</p></dd>
+
+
 <dt>refactor</dt>
 <dd><p>When <code>expr</code> is e.g.
 <code>`Body Site` %in% c("Stool", "Saliva")</code>, should
 <code>`Body Site`</code> be redefined as
 <code>factor(`Body Site`, levels=c('Stool', 'Saliva'))</code>?
 Applies to non-numeric metadata only.</p></dd>
+
+
 <dt>fast</dt>
 <dd><p>Should subsetting the phylogenetic tree and sequences be
 skipped? These slow steps are often not necessary. (Default: FALSE)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>BIOM</code> object.</p>
+    
+
+<p>A <code>BIOM</code> object.</p>
     </div>
     <div id="taxonomic-abundance-filtering">
     <h2>Taxonomic abundance filtering</h2>
@@ -129,17 +142,17 @@ relative abundances, set <code>apply(..., raw = TRUE)</code>. For instance:
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Saliva"</span>, <span class="st">"Stool"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">Age</span> <span class="op">&lt;</span> <span class="fl">25</span> <span class="op">&amp;</span> <span class="va">BMI</span> <span class="op">&gt;</span> <span class="fl">22</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">Phylum</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Firmicutes"</span>, <span class="st">"Actinobacteria"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Genus</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">Genus</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">a</span> <span class="op">==</span> <span class="va">b</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/name.html" class="external-link">as.name</a></span><span class="op">(</span><span class="st">"Body Site"</span><span class="op">)</span>, b <span class="op">=</span><span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"> <span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Saliva"</span>, <span class="st">"Stool"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">Age</span> <span class="op">&lt;</span> <span class="fl">25</span> <span class="op">&amp;</span> <span class="va">BMI</span> <span class="op">&gt;</span> <span class="fl">22</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">Phylum</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Firmicutes"</span>, <span class="st">"Actinobacteria"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Genus</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">Genus</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">subset</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">a</span> <span class="op">==</span> <span class="va">b</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/name.html" class="external-link">as.name</a></span><span class="op">(</span><span class="st">"Body Site"</span><span class="op">)</span>, b <span class="op">=</span><span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -154,7 +167,7 @@ relative abundances, set <code>apply(..., raw = TRUE)</code>. For instance:
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

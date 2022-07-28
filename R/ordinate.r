@@ -2,8 +2,8 @@
 #' 
 #' @name ordinate
 #' 
-#' @param biom   A \code{BIOM} object, as returned from \link{read.biom}.
-#'        Alternatively, a distance matrix, such as from \link{beta.div}.
+#' @param biom   A \code{BIOM} object, as returned from \link{read_biom}.
+#'        Alternatively, a distance matrix, such as from \link{bdiv_dist}.
 #'        
 #' @param dist   The distance algorithm to use. Options are:
 #'        \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"}, 
@@ -56,12 +56,12 @@
 #' @param split.by  Name(s) of metadata columns that the data should be split
 #'        by prior to calculating distance matrices, ordinations, and statistics.
 #'        
-#' @param stat.by,seed,perms   Passthrough parameters to \code{beta.div()} 
+#' @param stat.by,seed,perms   Passthrough parameters to \code{bdiv_dist()} 
 #'        for computing adonis statistics. (Default: \code{stat.by=NULL, seed=0, 
 #'        perms=1000})
 #'        
 #' @param rank   [Biplot] What rank of taxa to display (e.g. "Phylum"), or 
-#'        \code{NULL} for no biplot. Run \code{taxa.ranks()} to see all options 
+#'        \code{NULL} for no biplot. Run \code{taxa_ranks()} to see all options 
 #'        for a given BIOM object. (Default: \code{NULL})
 #'        
 #' @param taxa   [Biplot] Which taxa to display. An integer value will return 
@@ -191,7 +191,7 @@ ordinate <- function (
           }
           
         } else {
-          dm <- beta.div(biom = b, method = d, weighted = w, tree = tree, stat.by=stat.by, seed=seed, perms=perms-1)
+          dm <- bdiv_dist(biom = b, method = d, weighted = w, tree = tree, stat.by=stat.by, seed=seed, perms=perms-1)
           stats_tbl <- attr(dm, 'stats_tbl', exact = TRUE)
           attr(dm, 'stats_raw') <- NULL
           attr(dm, 'stats_tbl') <- NULL
@@ -304,7 +304,7 @@ ordinate_biplot <- function (biom, coords, ranks, taxa, p.adj, p.top, perms) {
     #________________________________________________________
     biplot             <- distill(biom, rank, safe = TRUE, md = FALSE)
     biplot[['.rank']]  <- rank
-    biplot[['.value']] <- biplot[['.value']] / sample.sums(biom)[biplot[['.sample']]]
+    biplot[['.value']] <- biplot[['.value']] / sample_sums(biom)[biplot[['.sample']]]
     biplot[['.x']]     <- coords[biplot[['.sample']], '.axis.1']
     biplot[['.y']]     <- coords[biplot[['.sample']], '.axis.2']
     center.x           <- round(mean(biplot[['.x']]), 10)
@@ -318,9 +318,9 @@ ordinate_biplot <- function (biom, coords, ranks, taxa, p.adj, p.top, perms) {
       
       if (is.numeric(taxa) && length(taxa) == 1) {
         if (taxa >= 1) {
-          taxa <- top.taxa(biom, rank, taxa)
+          taxa <- top_taxa(biom, rank, taxa)
         } else {
-          ts   <- as.percent(biom) %>% taxa.means(rank)
+          ts   <- as_percent(biom) %>% taxa_means(rank)
           taxa <- which(ts >= taxa) %>% names()
         }
       }

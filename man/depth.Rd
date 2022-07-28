@@ -7,7 +7,7 @@
 depth(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
 }
 \value{
 The rarefaction depth. If the BIOM object is not rarefied, this will 
@@ -15,7 +15,7 @@ The rarefaction depth. If the BIOM object is not rarefied, this will
 }
 \description{
 The returned values reflect changes made after any \code{subset()} commands. 
-To get the rarefaction level immediately after \code{read.biom()} or
+To get the rarefaction level immediately after \code{read_biom()} or
 \code{rarefy()} use \code{attr(biom, 'rarefaction')} instead.
 }
 \examples{
@@ -26,24 +26,24 @@ To get the rarefaction level immediately after \code{read.biom()} or
 
 }
 \seealso{
-[sample.sums()]
+[sample_sums()]
 
-Other accessor functions: 
+Other accessors: 
 \code{\link{counts}()},
-\code{\link{has.phylogeny}()},
-\code{\link{has.sequences}()},
+\code{\link{has_phylogeny}()},
+\code{\link{has_sequences}()},
 \code{\link{id}()},
 \code{\link{info}()},
-\code{\link{is.rarefied}()},
+\code{\link{is_rarefied}()},
 \code{\link{metadata}()},
 \code{\link{nsamples}()},
 \code{\link{ntaxa}()},
 \code{\link{phylogeny}()},
-\code{\link{sample.names}()},
-\code{\link{sample.sums}()},
+\code{\link{sample_names}()},
+\code{\link{sample_sums}()},
 \code{\link{sequences}()},
-\code{\link{taxa.names}()},
-\code{\link{taxa.ranks}()},
+\code{\link{taxa_names}()},
+\code{\link{taxa_ranks}()},
 \code{\link{taxonomy}()}
 }
-\concept{accessor functions}
+\concept{accessors}

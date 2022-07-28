@@ -10,12 +10,12 @@ biom <- readRDS("inputs/biom.rds")
 
 context("Beta Diversity")
 
-prev <- readRDS("outputs/beta.div.rds")
+prev <- readRDS("outputs/bdiv_dist.rds")
 
 for (method in c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac")) {
   
-  wdm <- beta.div(biom=biom, method=method, weighted=TRUE)
-  udm <- beta.div(biom=biom, method=method, weighted=FALSE)
+  wdm <- bdiv_dist(biom=biom, method=method, weighted=TRUE)
+  udm <- bdiv_dist(biom=biom, method=method, weighted=FALSE)
   
   test_that(method, {
     expect_equal(as.vector(wdm), as.vector(prev[[method]][['wdm']]))

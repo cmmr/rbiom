@@ -25,7 +25,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
     # Reads Retained: Sample (x) vs Depth (y)
     #===============================================
     
-    ss <- sort(sample.sums(biom))
+    ss <- sort(sample_sums(biom))
     df <- data.frame(
       .sample = factor(names(ss), levels=names(ss)),
       .all    = unname(ss)
@@ -90,7 +90,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
     # Samples Retained: Depth (x) vs Rank (y)
     #===============================================
     
-    ss <- sort(sample.sums(biom))
+    ss <- sort(sample_sums(biom))
     df <- data.frame(
       .reads  = unname(ss), 
       .rank   = seq_along(ss),
@@ -175,12 +175,12 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       # Rarefaction Curve
       #===============================================
       
-      df <- alpha.div(biom, rarefy = "multi", metrics = adiv_metric, long = TRUE, safe = TRUE)
+      df <- adiv_table(biom, rarefy = "multi", metrics = adiv_metric, long = TRUE, safe = TRUE)
       
       aes_args                         <- list('x' = ".depth", 'y' = ".value")
       elements[['labs']]               <- list('x' = "Rarefaction Depth", 'y' = adiv_metric)
       elements[['stat_smooth']]        <- list('method' = "lm", 'formula' = "y ~ log(x)")
-      elements[['scale_xaxisinuous']] <- list('labels' = siunit)
+      elements[['scale_x_continuous']] <- list('labels' = siunit)
       
       if (!is.null(color.by)) {
         df[[color.by]] <- metadata(biom, color.by)[df[['.sample']]]

@@ -1,38 +1,78 @@
 
-#-----------------------------------------------
-# Enable provenance tracking on ggplot functions
-#-----------------------------------------------
 
-element_blank <- function (...) {
-  res <- ggplot2::element_blank(...)
-  attr(res, 'display') <- capture.output(match.call())
-  return (res)
-}
-element_rect <- function (...) {
-  res <- ggplot2::element_rect(...)
-  attr(res, 'display') <- capture.output(match.call())
-  return (res)
-}
-element_text <- function (...) {
-  res <- ggplot2::element_text(...)
-  attr(res, 'display') <- capture.output(match.call())
-  return (res)
+#________________________________________________________
+# Log ggplot command history, complete with arguments.
+# Called in .onLoad to assign function names in pkg env.
+#________________________________________________________
+
+ggwrap <- function (pkg, fn) {
+  assign(fn, pos = ENV, function (..., .indent = 0) {
+    fun  <- do.call(`::`, list(pkg, fn))
+    res  <- fun(...)
+    args <- as.args(list(...), fun = fun, indent = .indent)
+    if (!pkg %in% c('ggplot2', 'grid')) fn <- paste0(pkg, '::', fn)
+    attr(res, 'display') <- sprintf("%s(%s)", fn, args)
+    return (res)
+  })
 }
 
-element_markdown <- function (...) {
-  res <- ggtext::element_markdown(...)
-  attr(res, 'display') <- paste0("ggtext::", capture.output(match.call()))
-  return (res)
+
+#________________________________________________________
+# Here, we'll call e.g. rep() using .rep() since we can't
+# overwrite existing functions.
+#________________________________________________________
+# .rep <- function (..., .indent = 0) {
+#   res  <- base::rep(...)
+#   args <- as.args(list(...), fun = base::rep, indent = .indent)
+#   attr(res, 'display') <- sprintf("rep(%s)", args)
+#   return (res)
+# }
+
+basewrap <- function (pkg, fn) {
+  assign(paste0(".", fn), pos = ENV, function (..., .indent = 0) {
+    fun  <- do.call(`::`, list(pkg, fn))
+    res  <- fun(...)
+    args <- as.args(list(...), fun = fun, indent = .indent)
+    attr(res, 'display') <- sprintf("%s(%s)", fn, args)
+    return (res)
+  })
 }
 
-arrow <- function (...) {
-  res <- grid::arrow(...)
-  attr(res, 'display') <- capture.output(match.call())
-  return (res)
+#________________________________________________________
+# Add a layer to a list of layers.
+#________________________________________________________
+
+ggpush <- function (gglayers, gglayer) {
+  
+  if (is.null(attr(gglayer, 'display')))
+    browser()
+  
+  gglayers[[length(gglayers) + 1]] <- gglayer
+  return (gglayers)
 }
 
-expansion <- function (...) {
-  res <- ggplot2::expansion(...)
-  attr(res, 'display') <- capture.output(match.call())
+
+#________________________________________________________
+# Combine a list of logged commands into a plot.
+#________________________________________________________
+
+ggbuild <- function (gglayers) {
+  
+  res <- NULL
+  cmd <- NULL
+  
+  for (i in seq_along(gglayers)) {
+    
+    gglayer <- gglayers[[i]]
+    
+    if (is.null(res)) {
+      res <- gglayer
+      cmd <- attr(gglayer, 'display')
+    } else {
+      res <- ggplot2::`%+%`(res, gglayer)
+      cmd <- sprintf("%s +\n  %s", cmd, attr(gglayer, 'display'))
+    }
+  }
+  attr(res, 'cmd') <- cmd
   return (res)
 }

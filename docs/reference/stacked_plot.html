@@ -53,85 +53,112 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">stacked_plot</span><span class="op">(</span>
-  <span class="va">biom</span>,
-  rank <span class="op">=</span> <span class="cn">NULL</span>,
-  taxa <span class="op">=</span> <span class="fl">6</span>,
-  facet.by <span class="op">=</span> <span class="cn">NULL</span>,
-  facets <span class="op">=</span> <span class="cn">NULL</span>,
-  colors <span class="op">=</span> <span class="cn">NULL</span>,
-  patterns <span class="op">=</span> <span class="cn">FALSE</span>,
-  label.by <span class="op">=</span> <span class="cn">NULL</span>,
-  sort.by <span class="op">=</span> <span class="cn">NULL</span>,
-  dist <span class="op">=</span> <span class="st">"euclidean"</span>,
-  clust <span class="op">=</span> <span class="st">"complete"</span>,
-  other <span class="op">=</span> <span class="cn">TRUE</span>,
-  xlab.angle <span class="op">=</span> <span class="fl">90</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">stacked_plot</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  taxa <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  colors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  patterns <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  label.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facets <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  orders <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dist <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span>  clust <span class="op">=</span> <span class="st">"complete"</span>,</span>
+<span>  other <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlab.angle <span class="op">=</span> <span class="fl">90</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read.biom.html">read.biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
+
 <dt>rank</dt>
 <dd><p>What rank(s) of taxa to display, for example <code>"Phylum"</code> 
-or <code>"Genus"</code>. Run <code><a href="taxa.ranks.html">taxa.ranks()</a></code> to see all options for a 
+or <code>"Genus"</code>. Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a 
 given BIOM object. The default, <code>NULL</code>, selects the lowest
 level.</p></dd>
+
+
 <dt>taxa</dt>
 <dd><p>Which taxa to give separate colors. An integer value will show
 the top n most abundant taxa. A value 0 &lt;= n &lt; 1 will show all taxa 
 with that mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: <code>6</code>.</p></dd>
-<dt>facet.by</dt>
-<dd><p>Split into multiple plots based on this metadata 
-column(s). Default: <code>NULL</code>.</p></dd>
-<dt>facets</dt>
-<dd><p>Optionally specify which facets to show and in what order. 
-Default: <code>NULL</code>.</p></dd>
+
+
 <dt>colors, patterns</dt>
 <dd><p>A character vector of colors or patterns to use in
 the graph. A named character vector can be used to map taxon names to 
-specific colors or patterns. Set to <code>NULL</code> or <code>TRUE</code> to
-automatically select. Set to <code>FALSE</code> to disable per-taxa colors
-or patterns. Default: <code>colors=NULL, patterns=isFALSE(colors)</code>.</p></dd>
-<dt>label.by, sort.by</dt>
+specific colors or patterns. Set to <code>TRUE</code> to auto-select colors
+or patterns, or to <code>FALSE</code> to disable per-taxa colors
+or patterns. Default: <code>colors=TRUE, patterns=FALSE</code>.</p></dd>
+
+
+<dt>facet.by</dt>
+<dd><p>Split into multiple plots based on this metadata 
+column(s). Default: <code>NULL</code>.</p></dd>
+
+
+<dt>label.by, order.by</dt>
 <dd><p>What metadata column to use for labeling and/or
-sorting the samples across the x-axis. When <code>sort.by=NULL</code>,
+sorting the samples across the x-axis. When <code>order.by=NULL</code>,
 samples are arranged based on <code>dist</code> and <code>clust</code>, below.
-Default: <code>label.by=NULL, sort.by=NULL</code>.</p></dd>
+Default: <code>label.by=NULL, order.by=NULL</code>.</p></dd>
+
+
+<dt>facets, labels, orders</dt>
+<dd><p>Subset to just these values in the 
+<code>facet.by</code>, <code>label.by</code>, and/or <code>order.by</code> metadata
+columns. Default: <code>facets=NULL, labels=NULL, orders=NULL</code>.</p></dd>
+
+
 <dt>dist, clust</dt>
 <dd><p>Distance (<a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a>) and clustering (<a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a>)
 methods to use for automatically arranging samples along the x-axis 
 to group samples with similar composition near one another.
 Default: <code>dist="euclidean", clust="complete"</code>.</p></dd>
+
+
 <dt>other</dt>
 <dd><p>Add an 'Other' taxa that ensures all bars sum to 100<!-- %.  -->
 Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>xlab.angle</dt>
 <dd><p>How to rotate the tick labels on the x-axis.
 Options are <code>90</code> (the default) or <code>30</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Parameters for underlying functions. Prefixing parameter names 
 with a layer name ensures that a particular parameter is passed to, 
 and only to, that layer.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>ggplot2</code> plot. The computed data points will be attached as 
-<code>attr(, 'data')</code>.</p>
+    
+
+<p>A <code>ggplot2</code> plot. The computed data points will be attached as</p>
+<p></p>
+<p><code>attr(, 'data')</code>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">stacked_plot</span><span class="op">(</span><span class="va">biom</span>, rank<span class="op">=</span><span class="st">"Phylum"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">stacked_plot</span><span class="op">(</span><span class="va">biom</span>, rank<span class="op">=</span><span class="st">"Phylum"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="stacked_plot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in">    </span>
+<span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>
   </div>
@@ -146,7 +173,7 @@ and only to, that layer.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

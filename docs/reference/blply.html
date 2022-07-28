@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9050</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
       </span>
     </div>
 
@@ -53,39 +53,50 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">blply</span><span class="op">(</span><span class="va">biom</span>, <span class="va">vars</span>, <span class="va">FUN</span>, <span class="va">...</span>, fast <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">blply</span><span class="op">(</span><span class="va">biom</span>, <span class="va">vars</span>, <span class="va">FUN</span>, <span class="va">...</span>, fast <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read.biom.html">read.biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
+
 <dt>vars</dt>
 <dd><p>A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted BIOM
 object to pass to <code>FUN</code>. Unambiguous abbreviations of metadata
 fields are also accepted.</p></dd>
+
+
 <dt>FUN</dt>
 <dd><p>The function to execute on each BIOM subset. <code>FUN</code> may
 return any object, all of which will be returned in a named list.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to pass on to <code>FUN</code>.</p></dd>
+
+
 <dt>fast</dt>
 <dd><p>If <code>TRUE</code> (the default), the subsetted BIOM objects will
 still contain the full taxa table and phylogenetic tree. Set 
 <code>fast = FALSE</code> to run the slow steps of subsetting these 
 elements as well.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list with the function outputs.</p>
+    
+
+<p>A list with the function outputs.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, <span class="va">nsamples</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, <span class="va">nsamples</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -98,11 +109,11 @@ elements as well.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Sex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   Male</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">      <span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="alpha.div.html">alpha.div</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Simpson"</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-in">      <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ad</span>, <span class="fl">2L</span>, <span class="va">mean</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span><span class="op">)</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>      <span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Simpson"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ad</span>, <span class="fl">2L</span>, <span class="va">mean</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`Female.Anterior nares`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Shannon   Simpson </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.4318071 0.6814534 </span>
@@ -152,11 +163,11 @@ elements as well.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male  Buccal mucosa</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male         Saliva</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9   Male          Stool</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Body Site"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">      <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="beta.div.html">beta.div</a></span><span class="op">(</span><span class="va">b</span>, <span class="st">"bray"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>bray.min <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, bray.max <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span><span class="op">)</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Body Site"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>      <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="bdiv_dist.html">bdiv_dist</a></span><span class="op">(</span><span class="va">b</span>, <span class="st">"bray"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>bray.min <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, bray.max <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`Anterior nares`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    bray.min  bray.max</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2135785 0.8957952</span>
@@ -186,9 +197,9 @@ elements as well.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3     Mid vagina</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4         Saliva</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5          Stool</span>
-<span class="r-in">    </span>
-<span class="r-in">    </span>
-<span class="r-in"></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -203,7 +214,7 @@ elements as well.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

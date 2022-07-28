@@ -7,9 +7,9 @@
 sequences(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
-\item{value}{A named character vector. Names must match \code{taxa.names(x)}.}
+\item{value}{A named character vector. Names must match \code{taxa_names(x)}.}
 }
 \description{
 Set nucleotide sequences associated with each taxonomic identifier.
@@ -18,7 +18,7 @@ Set nucleotide sequences associated with each taxonomic identifier.
 \dontrun{
     library(rbiom)
     
-    sequences(biom) <- read.fasta('path/to/sequences.fa')
+    sequences(biom) <- read_fasta('path/to/sequences.fa')
     sequences(biom) <- c(OTU1 = 'ATCGGGTA', OTU2 = 'GGCATTAGC')
 }
 
@@ -29,9 +29,9 @@ Other setters:
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},
-\code{\link{sample.names<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()},
+\code{\link{sample_names<-}()},
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()},
 \code{\link{taxonomy<-}()}
 }
 \concept{setters}

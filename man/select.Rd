@@ -14,7 +14,7 @@ select(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}. Objects of
+\item{biom}{A BIOM object, as returned from \link{read_biom}. Objects of
 class \code{matrix} or \code{simple_triplet_matrix} are also accepted.}
 
 \item{samples}{Sample names, indices, or a logical vector identifying

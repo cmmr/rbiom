@@ -1,29 +1,26 @@
 
 
-boxplot_build <- function (params, data_func, layers_func) {
+boxplot_build <- function (params, plot_func, data_func, layers_func) {
   
   
   #________________________________________________________
   # Set up the x-axis variables 
   #________________________________________________________
-  if (identical(params[['x']], ".")) {
-    params[['xval.by']] <- NA
-  } else {
-    params[['xval.by']] <- as.vector(params[['x']])
+
+  params[['xval.by']] <- as.vector(params[['x']])
+  
+  for (i in params[['xval.by']]) {
     
-    for (i in params[['xval.by']]) {
-      
-      if (identical(substr(i, 1, 1), ".")) next
-      i <- sub("^[!=]=", "", i)
-      
-      vals <- params[['biom']][['metadata']][[i]]
-      if (is.character(vals)) {
-        params[['biom']][['metadata']][[i]] <- as.factor(vals)
-      } else if (!is.factor(vals)) {
-        stop("Non-categorical '", i, "' cannot be a boxplot x-axis value.")
-      }
-      remove("vals")
+    if (identical(substr(i, 1, 1), ".")) next
+    i <- sub("^[!=]=", "", i)
+    
+    vals <- params[['biom']][['metadata']][[i]]
+    if (is.character(vals)) {
+      params[['biom']][['metadata']][[i]] <- as.factor(vals)
+    } else if (!is.factor(vals)) {
+      stop("Non-categorical '", i, "' cannot be a boxplot x-axis value.")
     }
+    remove("vals")
   }
   
   
@@ -76,8 +73,9 @@ boxplot_build <- function (params, data_func, layers_func) {
     attr(layers, i) <- attr(ggdata, i, exact = TRUE)
     attr(ggdata, i) <- NULL
   }
-  attr(layers, 'data')  <- ggdata
-  attr(layers, 'xmode') <- "factor"
+  attr(layers, 'data')      <- ggdata
+  attr(layers, 'function')  <- plot_func
+  attr(layers, 'xmode')     <- "factor"
   
   initLayer(layer_names)
   layers <- layers_func(layers)     # Plot-specific

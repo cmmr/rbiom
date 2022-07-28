@@ -5,7 +5,21 @@
 #' 
 #' @name taxa_boxplot
 #' 
-#' @param x   A BIOM object, as returned from \link{read.biom}.
+#' @family plotting
+#' 
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' 
+#' @param x   A categorical metadata column name to use for the x-axis. The 
+#'        default, \code{".taxa"} puts the taxa along the x-axis.
+#'        
+#' @param rank   What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
+#'        \code{taxa_ranks()} to see all options for a given BIOM object. The
+#'        default, \code{NULL}, selects the lowest level.
+#'        
+#' @param taxa   Which taxa to display. An integer value will show the top n
+#'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
+#'        mean abundance or greater (e.g. 0.1). A character vector of
+#'        taxon names will show only those taxa. Default: \code{5}
 #'           
 #' @param layers   \code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -28,34 +42,24 @@
 #'        coerced to unnamed character vectors. If the length of these vectors
 #'        is less than the values present in their corresponding metadata 
 #'        column, then the data set will be subseted accordingly.
-#'        
-#' @param rank   What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
-#'        \code{taxa.ranks()} to see all options for a given BIOM object. The
-#'        default, \code{NULL}, selects the lowest level.
-#'        
-#' @param taxa   Which taxa to display. An integer value will show the top n
-#'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
-#'        mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. (Default: \code{10} for 
-#'        heatmaps, \code{5} otherwise.)
 #'
-#' @param p.top   For \code{RANK ~ .} (taxa abundance) plots or 
-#'        \code{BDIV ~ ORD} ordination biplots, only display taxa with the most 
-#'        significant differences in abundance. If \code{p.top} is >= 1, then 
-#'        the \code{p.top} most significant taxa are displayed. If \code{p.top} 
-#'        is less than one, all taxa with an adjusted p-value <= \code{p.top} 
-#'        are displayed. Recommended to be used in combination with the 
-#'        \code{taxa} parameter to set a lower bound on the mean abundance of 
-#'        considered taxa. (Default: \code{Inf})
+#' @param p.top   Only display taxa with the most significant differences in 
+#'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
+#'        significant taxa are displayed. If \code{p.top} is less than one, all 
+#'        taxa with an adjusted p-value <= \code{p.top} are displayed. 
+#'        Recommended to be used in combination with the \code{taxa} parameter 
+#'        to set a lower bound on the mean abundance of considered taxa. 
+#'        Default: \code{Inf}
 #'
 #' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
 #'        Run \code{p.adjust.methods} for a list of available options.
-#'        (Default: \code{fdr})
+#'        Default: \code{fdr}
 #'        
-#' @param p.label   Minimum adjusted p-value to display on the plot with a bracket.
-#'        Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
-#'        If a numeric vector with more than one value is provided, they will be
-#'        used as breaks for asterisk notation. (Default: \code{0.05})
+#' @param p.label   Minimum adjusted p-value to display on the plot with a 
+#'        bracket. Set to \code{Inf} to display all p-values, or \code{-Inf} 
+#'        for no brackets. If a numeric vector with more than one value is 
+#'        provided, they will be used as breaks for asterisk notation. 
+#'        Default: \code{0.05}
 #'     
 #' @param ci   How to calculate min/max of the \bold{crossbar}, 
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -76,12 +80,12 @@
 #'        angled, and vertical, respectively.
 #'        
 #' @param other   Should non-selected taxa be displayed as an "Other" group?
-#'        (Default: \code{FALSE})
+#'        Default: \code{FALSE}
 #'        
 #' @param safe   If \code{FALSE}, data.frame column names such as 
 #'        \code{".metric"} will be auto-converted to \code{"Metric"} to improve
 #'        human-readability. Conversion if aborted if a conflict is found with
-#'        a metadata column name. (Default: \code{FALSE})
+#'        a metadata column name. Default: \code{FALSE}
 #'        
 #' @param ...   Parameters are matched to formal arguments of ggplot2
 #'        functions. Prefixing parameter names with a layer name ensures that
@@ -106,19 +110,19 @@
 #' 
 #' 
 #' @export
-#' @seealso \code{\link{stats.table}}
+#' @seealso \code{\link{stats_table}}
 #' @examples
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
-#'     taxa_boxplot(biom, x = ".", y = c("Phylum", "Genus"))
+#'     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
 #'     
 #'
 taxa_boxplot <- function (
-    biom, x = ".taxa", y = tail(taxa.ranks(biom), 1), layers = "rls",
+    biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    taxa = 5, p.top = Inf, p.adj = "fdr", p.label = 0.05, perms = 1000,
+    p.top = Inf, p.adj = "fdr", p.label = 0.05, perms = 1000,
     ci = 95, xlab.angle = 'auto', other = FALSE, safe = FALSE, ...) {
   
   
@@ -127,9 +131,10 @@ taxa_boxplot <- function (
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
   if (!all(x %in% c(".taxa", metrics(biom, 'meta'))))
     stop("`x` argument to taxa_boxplot must be metadata column name(s) or '.taxa'")
-  if (!all(y %in% metrics(biom, 'rank')))
+  if (is.null(rank)) rank <- tail(taxa_ranks(biom), 1)
+  if (!all(rank %in% metrics(biom, 'rank')))
     stop(
-      "`y` argument to taxa_boxplot must be taxa rank(s): ", 
+      "`rank` argument to taxa_boxplot must be taxa rank(s): ", 
       paste(collapse = ", ", metrics(biom, 'rank')) )
   
   
@@ -138,7 +143,7 @@ taxa_boxplot <- function (
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  p <- boxplot_build(params, taxa_boxplot_data, taxa_boxplot_layers)
+  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
   
   
   
@@ -158,55 +163,44 @@ taxa_boxplot <- function (
 #______________________________________________________________
 taxa_boxplot_data <- function (params) {
   
-  ggdata <- plyr::ldply(params[['y']], function (rank) {
-    df <- taxa.rollup(
-      biom = params[['biom']],
+  biom  <- params[['biom']]
+  ranks <- params[['rank']]
+  taxa  <- params[['taxa']]
+  
+  # Convert abundance spec to taxa names
+  if (is.numeric(taxa))
+    taxa <- as.vector(sapply(ranks, function (rank) {
+      means <- taxa_means(as_percent(biom), rank)
+      if (taxa < 1) { return (names(which(means >= taxa)))
+      } else        { return (head(names(means), taxa)) }
+    }))
+  
+  if (is_rarefied(biom))
+    biom <- as_percent(biom)
+  
+  ggdata <- plyr::ldply(ranks, function (rank) {
+    
+    df <- taxa_rollup(
+      biom = biom,
       rank = rank,
       long = TRUE,
       md   = TRUE,
-      safe = TRUE
-    )
+      safe = TRUE )
+    
+    df <- df[df[['.taxa']] %in% taxa,,drop=FALSE]
+    if (nrow(df) == 0) return (NULL)
+    
     df[['.rank']] <- rank
-    df[['.y']]    <- df[['.value']] / depth(params[['biom']])
+    df[['.y']]    <- df[['.value']]
     return (df)
   })
   
   
-  # Filter to specific set of taxa per rank
-  #________________________________________________________
-  taxa <- params[['taxa']]
+  ggdata[['.taxa']] %<>% factor(levels = taxa)
+  ggdata[['.rank']] %<>% factor(levels = ranks)
   
-  if (is.numeric(taxa)) {
-    
-    taxa <- plyr::dlply(ggdata, ".rank", function (x) {
-      
-      ab.counts <- aggregate(
-        x   = x[['.y']], 
-        by  = list(.taxa = x[['.taxa']]), 
-        FUN = mean )
-      ab.counts <- ab.counts[rev(order(ab.counts[['x']])), ]
-      
-      if (taxa < 1) { return (ab.counts[ab.counts[['x']] >= taxa, '.taxa'])
-      } else        { return (head(ab.counts[['.taxa']], taxa)) }
-    })
-    
-  } else if (is.character(taxa)) {
-    taxa <- sapply(params[['y']], simplify = FALSE, function (x) { return (taxa) })
-  }
-  
-  if (is.list(taxa)) {
-    ggdata <- plyr::ddply(ggdata, ".rank", function (x) {
-      keep_taxa <- taxa[[ x[1,'.rank'] ]]
-      return (x[x[['.taxa']] %in% keep_taxa,,drop=FALSE])
-    })
-  }
-  
-  
-  ggdata[['.taxa']] %<>% factor(levels = as.vector(unlist(taxa)))
-  ggdata[['.rank']] %<>% factor(levels = params[['y']])
-  
-  if (params[['x']] != ".taxa")         { params[['facet.by']] %<>% c(".taxa")
-  } else if (length(params[['y']]) > 1) { params[['facet.by']] %<>% c(".rank") }
+  if (params[['x']] != ".taxa") { params[['facet.by']] %<>% c(".taxa", .)
+  } else if (length(ranks) > 1) { params[['facet.by']] %<>% c(".rank", .) }
   
   
   attr(ggdata, 'params') <- params

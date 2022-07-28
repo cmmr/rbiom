@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9050</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
       </span>
     </div>
 
@@ -55,7 +55,7 @@
         </td>
         <td><p>Visualize alpha diversity with boxplots.</p></td>
       </tr><tr><td>
-          <p><code><a href="alpha.div.html">alpha.div()</a></code> </p>
+          <p><code><a href="adiv_table.html">adiv_table()</a></code> </p>
         </td>
         <td><p>Estimate the diversity of each sample.</p></td>
       </tr><tr><td>
@@ -63,7 +63,7 @@
         </td>
         <td><p>PCoA adjusted for corvariates.</p></td>
       </tr><tr><td>
-          <p><code><a href="as.percent.html">as.percent()</a></code> </p>
+          <p><code><a href="as_percent.html">as_percent()</a></code> </p>
         </td>
         <td><p>Convert absolute counts to relative abundances.</p></td>
       </tr><tr><td>
@@ -71,13 +71,21 @@
         </td>
         <td><p>Visualize BIOM data with boxplots.</p></td>
       </tr><tr><td>
+          <p><code><a href="bdiv_dist.html">bdiv_dist()</a></code> </p>
+        </td>
+        <td><p>Make a distance matrix of samples vs samples.</p></td>
+      </tr><tr><td>
+          <p><code><a href="bdiv_heatmap.html">bdiv_heatmap()</a></code> </p>
+        </td>
+        <td><p>Display beta diversities in an all vs all grid.</p></td>
+      </tr><tr><td>
+          <p><code><a href="bdiv_table.html">bdiv_table()</a></code> </p>
+        </td>
+        <td><p>Make a data.frame of distances between samples.</p></td>
+      </tr><tr><td>
           <p><code><a href="bdply.html">bdply()</a></code> </p>
         </td>
         <td><p>Split BIOM by metadata, apply function, and return results in a data frame.</p></td>
-      </tr><tr><td>
-          <p><code><a href="beta.div.html">beta.div()</a></code> </p>
-        </td>
-        <td><p>Make a distance matrix of samples vs samples.</p></td>
       </tr><tr><td>
           <p><code><a href="blply.html">blply()</a></code> </p>
         </td>
@@ -107,11 +115,11 @@
         </td>
         <td><p>Converts a data.frame to a download link.</p></td>
       </tr><tr><td>
-          <p><code><a href="has.phylogeny.html">has.phylogeny()</a></code> </p>
+          <p><code><a href="has_phylogeny.html">has_phylogeny()</a></code> </p>
         </td>
         <td><p>Checks if a phylogenetic tree is present.</p></td>
       </tr><tr><td>
-          <p><code><a href="has.sequences.html">has.sequences()</a></code> </p>
+          <p><code><a href="has_sequences.html">has_sequences()</a></code> </p>
         </td>
         <td><p>Checks if DNA sequences are present.</p></td>
       </tr><tr><td>
@@ -131,11 +139,11 @@
         </td>
         <td><p>Get <code>BIOM</code> object's miscellaneous information.</p></td>
       </tr><tr><td>
-          <p><code><a href="init.cache.html">init.cache()</a></code> </p>
+          <p><code><a href="init_cache.html">init_cache()</a></code> </p>
         </td>
         <td><p>Initialize caching for expensive biom operations.</p></td>
       </tr><tr><td>
-          <p><code><a href="is.rarefied.html">is.rarefied()</a></code> </p>
+          <p><code><a href="is_rarefied.html">is_rarefied()</a></code> </p>
         </td>
         <td><p>Checks if a BIOM object is rarefied.</p></td>
       </tr><tr><td>
@@ -175,9 +183,9 @@
         </td>
         <td><p>Get the phylogenetic tree.</p></td>
       </tr><tr><td>
-          <p><code><a href="plot.html">plot(<i>&lt;BIOM&gt;</i>)</a></code> </p>
+          <p><code><a href="plot_heatmap.html">plot_heatmap()</a></code> </p>
         </td>
-        <td><p>Visualize BIOM data.</p></td>
+        <td><p>Create a heatmap with tracks and dendrograms from any matrix.</p></td>
       </tr><tr><td>
           <p><code><a href="print.html">print(<i>&lt;BIOM&gt;</i>)</a></code> </p>
         </td>
@@ -191,15 +199,15 @@
         </td>
         <td><p>rbiom: Read/Write, Transform, and Summarize BIOM Data</p></td>
       </tr><tr><td>
-          <p><code><a href="read.biom.html">read.biom()</a></code> </p>
+          <p><code><a href="read_biom.html">read_biom()</a></code> </p>
         </td>
         <td><p>Extracts counts, metadata, taxonomy, and phylogeny from a biom file.</p></td>
       </tr><tr><td>
-          <p><code><a href="read.fasta.html">read.fasta()</a></code> </p>
+          <p><code><a href="read_fasta.html">read_fasta()</a></code> </p>
         </td>
         <td><p>Parse a fasta file into a named character vector.</p></td>
       </tr><tr><td>
-          <p><code><a href="read.tree.html">read.tree()</a></code> </p>
+          <p><code><a href="read_tree.html">read_tree()</a></code> </p>
         </td>
         <td><p>Read a newick formatted phylogenetic tree.</p></td>
       </tr><tr><td>
@@ -207,15 +215,15 @@
         </td>
         <td><p>Run after manually editing a BIOM object's content.</p></td>
       </tr><tr><td>
-          <p><code><a href="sample.names-set.html">`sample.names&lt;-`()</a></code> </p>
+          <p><code><a href="sample_names-set.html">`sample_names&lt;-`()</a></code> </p>
         </td>
         <td><p>Set the sample names.</p></td>
       </tr><tr><td>
-          <p><code><a href="sample.names.html">sample.names()</a></code> </p>
+          <p><code><a href="sample_names.html">sample_names()</a></code> </p>
         </td>
         <td><p>Get the sample names.</p></td>
       </tr><tr><td>
-          <p><code><a href="sample.sums.html">sample.sums()</a></code> </p>
+          <p><code><a href="sample_sums.html">sample_sums()</a></code> </p>
         </td>
         <td><p>Sum the observations in each sample.</p></td>
       </tr><tr><td>
@@ -231,11 +239,7 @@
         </td>
         <td><p>Nucleotide sequences associated with each taxonomic identifier.</p></td>
       </tr><tr><td>
-          <p><code><a href="stacked_plot.html">stacked_plot()</a></code> </p>
-        </td>
-        <td><p>Display taxa abundances as a stacked bar graph.</p></td>
-      </tr><tr><td>
-          <p><code><a href="stats.table.html">stats.table()</a></code> </p>
+          <p><code><a href="stats_table.html">stats_table()</a></code> </p>
         </td>
         <td><p>Compute p-values for data vs metadata.</p></td>
       </tr><tr><td>
@@ -247,37 +251,45 @@
         </td>
         <td><p>Create a subtree by specifying tips to keep.</p></td>
       </tr><tr><td>
-          <p><code><a href="taxa.means.html">taxa.means()</a></code> </p>
-        </td>
-        <td><p>Get the taxa abundances.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.names-set.html">`taxa.names&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Set the taxa names.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.names.html">taxa.names()</a></code> </p>
-        </td>
-        <td><p>Get the taxa names.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.ranks-set.html">`taxa.ranks&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Set the taxa rank names.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.ranks.html">taxa.ranks()</a></code> </p>
-        </td>
-        <td><p>Get the taxa ranks.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.rollup.html">taxa.rollup()</a></code> </p>
-        </td>
-        <td><p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p></td>
-      </tr><tr><td>
-          <p><code><a href="taxa.sums.html">taxa.sums()</a></code> </p>
-        </td>
-        <td><p>Get the taxa abundances.</p></td>
-      </tr><tr><td>
           <p><code><a href="taxa_boxplot.html">taxa_boxplot()</a></code> </p>
         </td>
         <td><p>Visualize BIOM data with boxplots.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_heatmap.html">taxa_heatmap()</a></code> </p>
+        </td>
+        <td><p>Display taxa abundances as a heatmap.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_means.html">taxa_means()</a></code> </p>
+        </td>
+        <td><p>Get the taxa abundances.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_names-set.html">`taxa_names&lt;-`()</a></code> </p>
+        </td>
+        <td><p>Set the taxa names.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_names.html">taxa_names()</a></code> </p>
+        </td>
+        <td><p>Get the taxa names.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_ranks-set.html">`taxa_ranks&lt;-`()</a></code> </p>
+        </td>
+        <td><p>Set the taxa rank names.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_ranks.html">taxa_ranks()</a></code> </p>
+        </td>
+        <td><p>Get the taxa ranks.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_rollup.html">taxa_rollup()</a></code> </p>
+        </td>
+        <td><p>Generate a matrix of samples by taxa, at the specified taxonomic rank.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_stacked.html">taxa_stacked()</a></code> </p>
+        </td>
+        <td><p>Display taxa abundances as a stacked bar graph.</p></td>
+      </tr><tr><td>
+          <p><code><a href="taxa_sums.html">taxa_sums()</a></code> </p>
+        </td>
+        <td><p>Get the taxa abundances.</p></td>
       </tr><tr><td>
           <p><code><a href="taxonomy-set.html">`taxonomy&lt;-`()</a></code> </p>
         </td>
@@ -291,7 +303,7 @@
         </td>
         <td><p>Names of a phylogenetic tree's tips/leafs.</p></td>
       </tr><tr><td>
-          <p><code><a href="top.taxa.html">top.taxa()</a></code> </p>
+          <p><code><a href="top_taxa.html">top_taxa()</a></code> </p>
         </td>
         <td><p>Get the names of the most abundant taxa.</p></td>
       </tr><tr><td>
@@ -299,19 +311,19 @@
         </td>
         <td><p>Compute Weighted and Unweighted UniFrac distance matrices.</p></td>
       </tr><tr><td>
-          <p><code><a href="write.biom.html">write.biom()</a></code> </p>
+          <p><code><a href="write_biom.html">write_biom()</a></code> </p>
         </td>
         <td><p>Write counts, metadata, taxonomy, and phylogeny to a biom file.</p></td>
       </tr><tr><td>
-          <p><code><a href="write.fasta.html">write.fasta()</a></code> </p>
+          <p><code><a href="write_fasta.html">write_fasta()</a></code> </p>
         </td>
         <td><p>Write sequences from a BIOM object to a file in fasta format.</p></td>
       </tr><tr><td>
-          <p><code><a href="write.tree.html">write.tree()</a></code> </p>
+          <p><code><a href="write_tree.html">write_tree()</a></code> </p>
         </td>
         <td><p>Write a newick formatted phylogenetic tree.</p></td>
       </tr><tr><td>
-          <p><code><a href="write.xlsx.html">write.xlsx()</a></code> </p>
+          <p><code><a href="write_xlsx.html">write_xlsx()</a></code> </p>
         </td>
         <td><p>Write data and summary information to a Microsoft Excel-compatible workbook.</p></td>
       </tr></tbody></table></div>
@@ -327,7 +339,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

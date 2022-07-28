@@ -2,7 +2,16 @@
 #' 
 #' @name adiv_boxplot
 #' 
-#' @param x   A BIOM object, as returned from \link{read.biom}.
+#' @family plotting
+#' 
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' 
+#' @param x   A categorical metadata column name to use for the x-axis. The 
+#'        default, \code{NULL} lumps all samples into a single column. 
+#' 
+#' @param metric   Alpha diversity metric(s) to use. Options are: \code{"OTUs"}, 
+#'        \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or 
+#'        \code{"InvSimpson"}. Default: \code{"Shannon"}.
 #'           
 #' @param layers   \code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -77,19 +86,19 @@
 #' 
 #' 
 #' @export
-#' @seealso \code{\link{stats.table}}
+#' @seealso \code{\link{stats_table}}
 #' @examples
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     adiv_boxplot(biom, x = "Body Site", y = "Shannon")
-#'     adiv_boxplot(biom, x = "Sex", y = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
-#'     adiv_boxplot(biom, x = "Body Site", y = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
+#'     adiv_boxplot(biom, x = "Body Site", metric = "Shannon")
+#'     adiv_boxplot(biom, x = "Sex", metric = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
+#'     adiv_boxplot(biom, x = "Body Site", metric = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
 #'     
 
 adiv_boxplot <- function (
-    biom, x = ".", y = "Shannon", layers = "rls",
+    biom, x = NULL, metric = "Shannon", layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
     p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
@@ -98,26 +107,30 @@ adiv_boxplot <- function (
   # Sanity checks
   #________________________________________________________
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  if (!all(x %in% c(".", metrics(biom, 'meta'))))
-    stop("`x` argument to adiv_boxplot must be metadata column name(s) or '.'")
-  if (!all(y %in% metrics(biom, 'adiv')))
+  if (!(is.null(x) || all(x %in% c(".", metrics(biom, 'meta')))))
+    stop("`x` argument to adiv_boxplot must be metadata column name(s), '.', or NULL")
+  if (!all(metric %in% metrics(biom, 'adiv')))
     stop(
-      "`y` argument to adiv_boxplot must be alpha diversity metric name(s): ", 
+      "`metric` argument to adiv_boxplot must be alpha diversity metric name(s): ", 
       paste(collapse = ", ", metrics(biom, 'adiv')) )
-  
   
   
   # Use the generalized boxplot function to make the plot
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  p <- boxplot_build(params, adiv_boxplot_data, adiv_boxplot_layers)
+  history <- sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot))
   
+  if (is.null(x) || identical(x, '.')) {
+    params[['x']] <- ".all"
+    params[['biom']][['metadata']][[".all"]] <- "all"
+  }
+  
+  p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
   
   
   # Attach history of biom modifications and this call
   #________________________________________________________
-  history <- sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot))
   attr(p, 'history') <- c(attr(biom, 'history'), history)
   
   
@@ -131,9 +144,9 @@ adiv_boxplot <- function (
 #______________________________________________________________
 adiv_boxplot_data <- function (params) {
   
-  ggdata <- alpha.div(
+  ggdata <- adiv_table(
     biom    = params[['biom']], 
-    metrics = params[['y']],
+    metrics = params[['metric']],
     md      = TRUE,
     long    = TRUE, 
     safe    = TRUE )
@@ -163,11 +176,11 @@ adiv_boxplot_data <- function (params) {
   }
   
   
-  # Allow multiple `y` alpha div metrics
+  # Allow multiple `metric` (alpha div metrics)
   #________________________________________________________
-  if (length(params[['y']]) > 1) {
+  if (length(params[['metric']]) > 1) {
     params[['facet.by']] %<>% c(".metric")
-    ggdata[['.metric']]  %<>% factor(levels = params[['y']])
+    ggdata[['.metric']]  %<>% factor(levels = params[['metric']])
   }
   
   
@@ -189,7 +202,7 @@ adiv_boxplot_layers <- function (layers) {
   
   # y-axis title
   #________________________________________________________
-  yraw <- attr(layers, 'params', exact = TRUE)[['y']]
+  yraw <- attr(layers, 'params', exact = TRUE)[['metric']]
   
   if (length(yraw) > 1) {
     ylab <- structure(

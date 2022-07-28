@@ -7,7 +7,7 @@
 subtree(tree, tips)
 }
 \arguments{
-\item{tree}{A phylo object, as returned from \link{read.tree}.}
+\item{tree}{A phylo object, as returned from \link{read_tree}.}
 
 \item{tips}{A character, numeric, or logical vector of tips to keep.}
 }
@@ -21,7 +21,7 @@ Create a subtree by specifying tips to keep.
     library(rbiom)
     
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
-    tree <- read.tree(infile)
+    tree <- read_tree(infile)
     
     leafs   <- tips(tree)
     subtree <- subtree(tree, head(leafs))

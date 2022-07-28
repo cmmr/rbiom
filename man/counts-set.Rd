@@ -7,7 +7,7 @@
 counts(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{value}{A numeric matrix. Rownames and colnames must be identical to
 the current \code{counts()} value.}
@@ -35,10 +35,10 @@ Other setters:
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},
-\code{\link{sample.names<-}()},
+\code{\link{sample_names<-}()},
 \code{\link{sequences<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()},
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()},
 \code{\link{taxonomy<-}()}
 }
 \concept{setters}

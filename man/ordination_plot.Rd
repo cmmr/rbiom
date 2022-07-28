@@ -25,7 +25,7 @@ ordination_plot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{dist}{Beta diversity metric to use for calculating inter-sample
 distances. Options are: \code{"Bray-Curtis"}, \code{"Manhattan"},
@@ -57,7 +57,7 @@ vector to map them  to specific factor levels in the metadata.}
 version. Default: \code{TRUE}.}
 
 \item{rank}{What rank of taxa to display, for example \code{"Phylum"} or 
-\code{"Genus"}. Run \code{taxa.ranks()} to see all options for a 
+\code{"Genus"}. Run \code{taxa_ranks()} to see all options for a 
 given BIOM object. The default, \code{NULL}, selects the lowest
 level.}
 
@@ -102,5 +102,15 @@ Display distances between samples as a 2-D scatter plot.
     
 }
 \seealso{
-\code{\link{stats.table}}
+\code{\link{stats_table}}
+
+Other plotting: 
+\code{\link{adiv_boxplot}()},
+\code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{plot_heatmap}()},
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
+\concept{plotting}

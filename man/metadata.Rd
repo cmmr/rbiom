@@ -7,7 +7,7 @@
 metadata(biom, field = NULL, id = NULL, cleanup = FALSE)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{field}{The name of a single metadata column to retrieve. If provided,
 a named vector will be returned instead of a data.frame.
@@ -39,22 +39,22 @@ Get the sample metadata.
 
 }
 \seealso{
-Other accessor functions: 
+Other accessors: 
 \code{\link{counts}()},
 \code{\link{depth}()},
-\code{\link{has.phylogeny}()},
-\code{\link{has.sequences}()},
+\code{\link{has_phylogeny}()},
+\code{\link{has_sequences}()},
 \code{\link{id}()},
 \code{\link{info}()},
-\code{\link{is.rarefied}()},
+\code{\link{is_rarefied}()},
 \code{\link{nsamples}()},
 \code{\link{ntaxa}()},
 \code{\link{phylogeny}()},
-\code{\link{sample.names}()},
-\code{\link{sample.sums}()},
+\code{\link{sample_names}()},
+\code{\link{sample_sums}()},
 \code{\link{sequences}()},
-\code{\link{taxa.names}()},
-\code{\link{taxa.ranks}()},
+\code{\link{taxa_names}()},
+\code{\link{taxa_ranks}()},
 \code{\link{taxonomy}()}
 }
-\concept{accessor functions}
+\concept{accessors}

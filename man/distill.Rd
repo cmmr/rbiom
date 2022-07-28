@@ -15,7 +15,7 @@ distill(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{metric}{The diversity/abundance values of interest. Options are:
 \describe{
@@ -35,7 +35,7 @@ distill(
       \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
       \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
       \bold{OTU}. Supported ranks will vary by biom. Run
-      \code{taxa.ranks(biom)} to see the available options.
+      \code{taxa_ranks(biom)} to see the available options.
     }
    }}
 
@@ -44,7 +44,7 @@ be run in in weighted mode? (Default: TRUE)}
 
 \item{rarefy}{Should the dataset be rarefied first? When \bold{metric} is 
 an alpha diversity metric, this 'rarefy' parameter is passed on 
-directly to \code{alpha.div()}. (Default: FALSE)}
+directly to \code{adiv_table()}. (Default: FALSE)}
 
 \item{long}{Pivot the returned data to long format?
 \describe{
@@ -89,5 +89,5 @@ Convert to a data.frame with metadata and diversity/abundance values.
 
 }
 \seealso{
-\code{\link{stats.table}}
+\code{\link{stats_table}}
 }

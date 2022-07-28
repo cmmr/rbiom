@@ -34,8 +34,8 @@ lapply(list(biom, onesample, onetaxa), function (x) {
   test_that(paste("TSV Intermediate for", x$info$id), {
     
     fp <- tempfile(fileext = ".gz")
-    write.biom(x, fp, format="tab")
-    tsv <- read.biom(fp)
+    write_biom(x, fp, format="tab")
+    tsv <- read_biom(fp)
     unlink(fp)
     
     expect_equivalent(as.matrix(x$counts), as.matrix(tsv$counts))
@@ -51,7 +51,7 @@ lapply(list(biom, onesample, onetaxa), function (x) {
   test_that(paste("JSON Intermediate for", x$info$id), {
     
     fp <- tempfile(fileext = ".bz2")
-    write.biom(x, fp, format="json")
+    write_biom(x, fp, format="json")
     json <- read.biom(fp)
     unlink(fp)
     
@@ -71,7 +71,7 @@ lapply(list(biom, onesample, onetaxa), function (x) {
     test_that(paste("HDF5 Intermediate for", x$info$id), {
       
       fp <- tempfile()
-      write.biom(x, fp, format="hdf5")
+      write_biom(x, fp, format="hdf5")
       hdf5 <- read.biom(fp)
       unlink(fp)
       

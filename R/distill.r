@@ -2,7 +2,7 @@
 #' 
 #' @name distill
 #' 
-#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param metric   The diversity/abundance values of interest. Options are:
 #'        \describe{
@@ -22,13 +22,13 @@
 #'              \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
 #'              \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
 #'              \bold{OTU}. Supported ranks will vary by biom. Run
-#'              \code{taxa.ranks(biom)} to see the available options.
+#'              \code{taxa_ranks(biom)} to see the available options.
 #'            }
 #'           }
 #'           
 #' @param rarefy   Should the dataset be rarefied first? When \bold{metric} is 
 #'        an alpha diversity metric, this 'rarefy' parameter is passed on 
-#'        directly to \code{alpha.div()}. (Default: FALSE)
+#'        directly to \code{adiv_table()}. (Default: FALSE)
 #'        
 #' @param weighted   When \bold{metric} is a beta diversity metric, should it 
 #'        be run in in weighted mode? (Default: TRUE)
@@ -60,7 +60,7 @@
 #'         \code{md}. See examples below.
 #'         
 #' @export
-#' @seealso \code{\link{stats.table}}
+#' @seealso \code{\link{stats_table}}
 #' @examples
 #'     library(rbiom)
 #'     
@@ -86,21 +86,21 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
   
   
   if (mode == "adiv") {
-    df <- alpha.div(biom, metrics = metric, rarefy = rarefy, long = long, md = md, safe = safe)
+    df <- adiv_table(biom, metrics = metric, rarefy = rarefy, long = long, md = md, safe = safe)
     
   } else if (mode == "rank") {
     
     # Return specific rank(s) or all ranks
     ranks <- as.vector(metric)
     if (identical(ranks, "Rank"))
-      ranks <- taxa.ranks(biom)
+      ranks <- taxa_ranks(biom)
     
-    df      <- taxa.rollup(biom, rank = ranks[[1]], long = long, md = md, safe = safe)
+    df      <- taxa_rollup(biom, rank = ranks[[1]], long = long, md = md, safe = safe)
     df_rank <- rep(ranks[[1]], nrow(df))
     taxa_in <- attr(df, 'taxa_in', exact = TRUE)
     
     for (rank in ranks[-1]) {
-      x <- taxa.rollup(biom, rank = rank, long = long, md = md, safe = safe)
+      x <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
     
       if (identical(taxa_in, "cols")) {
         # Don't duplicate metadata columns
@@ -121,7 +121,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
   } else if (mode == "taxon") {
     
     rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x == metric))))
-    df   <- taxa.rollup(biom, rank = rank, long = long, md = md, safe = safe)
+    df   <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
     
     # Only return the single requested taxon
     if (long) {
@@ -134,7 +134,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
   } else if (mode == "bdiv") {
     
     if (is.character(md)) md <- paste0(attr(md, 'op', exact = TRUE), md)
-    df <- beta.div(biom, method = metric, weighted = weighted, long = long, md = md, safe = safe)
+    df <- bdiv_table(biom, method = metric, weighted = weighted, md = md, safe = safe)
     
   } else {
     stop("Don't know how to distill metric '", metric, "'.")

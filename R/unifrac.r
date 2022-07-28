@@ -1,9 +1,9 @@
 #' Compute Weighted and Unweighted UniFrac distance matrices.
 #' 
-#' This is a wrapper around \link{beta.div} for a common use case.
+#' This is a wrapper around \link{bdiv_dist} for a common use case.
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'     object, as returned from \link{read.biom}. For matrices, the rows and 
+#'     object, as returned from \link{read_biom}. For matrices, the rows and 
 #'     columns are assumed to be the taxa and samples, respectively.
 #' @param weighted  Use weighted UniFrac, which takes abundance into account
 #'     rather than simply presence/absence.
@@ -32,7 +32,7 @@
 
 unifrac <- function (biom, weighted=TRUE, tree=NULL) {
   
-  rbiom::beta.div(biom, 'unifrac', weighted, tree)
+  rbiom::bdiv_dist(biom, 'unifrac', weighted, tree)
   
 }
 

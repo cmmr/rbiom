@@ -39,7 +39,7 @@
 #' 
 #' 
 #' @name subset
-#' @param x   A BIOM object, as returned from \link{read.biom}.
+#' @param x   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param expr   Logical expression to run on the metadata or taxonomy (not both)
 #'        to identify samples or taxa to retain.
@@ -113,7 +113,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   # Metadata or Taxonomy based subsetting?
   #--------------------------------------------------------------
   vars   <- all.vars(expr)
-  ranks  <- taxa.ranks(biom)
+  ranks  <- taxa_ranks(biom)
   mdcols <- colnames(metadata(biom))
   if (any(vars %in% ranks) && any(vars %in% mdcols))
     stop("subset expression must be either all metadata or all taxonomy.")
@@ -127,7 +127,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   if (mode == "taxonomy") {
     envir <- c(
       as.list(as.data.frame(taxonomy(biom))),
-      list(OTU = taxa.names(biom)) )
+      list(OTU = taxa_names(biom)) )
     
     
     #--------------------------------------------------------------
@@ -158,10 +158,10 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
       if (!is.function(fun)) stop("unknown function: ", fn)
       
       rank <- capture.output(substitute(x))
-      if (!rank %in% taxa.ranks(biom))
+      if (!rank %in% taxa_ranks(biom))
         return (fun(x, ...))
         
-      mtx  <- taxa.rollup(biom, rank)
+      mtx  <- taxa_rollup(biom, rank)
       mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
       res  <- apply(mtx, 2L, fun, ...)
       res[taxonomy(biom, rank)]

@@ -11,7 +11,7 @@ subset_by_params <- function (df, params) {
   #________________________________________________________
   # Drop NA and unused values in columns of interest
   #________________________________________________________
-  for (i in c("xval", "color", "shape", "facet", "pattern", "label", "sort")) {
+  for (i in c("xval", "color", "shape", "facet", "pattern", "label", "order")) {
     
     colname <- params[[paste0(i, ".by")]] %||% next
     colvals <- params[[paste0(i, "s")]]
@@ -24,10 +24,10 @@ subset_by_params <- function (df, params) {
       if (!hasName(df, cname)) next
       groupvars %<>% c(cname)
       
-      if (!is.factor(df[[cname]]))
+      if (is.character(df[[cname]]))
         df[[cname]] %<>% as.factor()
       
-      if (!is.null(colvals)) {
+      if (is.factor(df[[cname]]) && !is.null(colvals)) {
         
         cvals <- colvals                          # c('Saliva', 'Stool')
         if (is.list(cvals)) {

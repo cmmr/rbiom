@@ -25,8 +25,8 @@ ordinate(
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read.biom}.
-Alternatively, a distance matrix, such as from \link{beta.div}.}
+\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.
+Alternatively, a distance matrix, such as from \link{bdiv_dist}.}
 
 \item{dist}{The distance algorithm to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"}, 
@@ -80,12 +80,12 @@ conflicting with metadata column names. (Default: \code{FALSE})}
 \item{split.by}{Name(s) of metadata columns that the data should be split
 by prior to calculating distance matrices, ordinations, and statistics.}
 
-\item{stat.by, seed, perms}{Passthrough parameters to \code{beta.div()} 
+\item{stat.by, seed, perms}{Passthrough parameters to \code{bdiv_dist()} 
 for computing adonis statistics. (Default: \code{stat.by=NULL, seed=0, 
 perms=1000})}
 
 \item{rank}{[Biplot] What rank of taxa to display (e.g. "Phylum"), or 
-\code{NULL} for no biplot. Run \code{taxa.ranks()} to see all options 
+\code{NULL} for no biplot. Run \code{taxa_ranks()} to see all options 
 for a given BIOM object. (Default: \code{NULL})}
 
 \item{taxa}{[Biplot] Which taxa to display. An integer value will return 

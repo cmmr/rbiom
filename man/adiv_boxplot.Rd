@@ -6,8 +6,8 @@
 \usage{
 adiv_boxplot(
   biom,
-  x = ".",
-  y = "Shannon",
+  x = NULL,
+  metric = "Shannon",
   layers = "rls",
   color.by = NULL,
   pattern.by = NULL,
@@ -27,7 +27,14 @@ adiv_boxplot(
 )
 }
 \arguments{
-\item{x}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+
+\item{x}{A categorical metadata column name to use for the x-axis. The 
+default, \code{NULL} lumps all samples into a single column.}
+
+\item{metric}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"}, 
+\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or 
+\code{"InvSimpson"}. Default: \code{"Shannon"}.}
 
 \item{layers}{\code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -109,11 +116,21 @@ Visualize alpha diversity with boxplots.
     
     biom <- rarefy(hmp50)
     
-    adiv_boxplot(biom, x = "Body Site", y = "Shannon")
-    adiv_boxplot(biom, x = "Sex", y = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
-    adiv_boxplot(biom, x = "Body Site", y = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
+    adiv_boxplot(biom, x = "Body Site", metric = "Shannon")
+    adiv_boxplot(biom, x = "Sex", metric = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
+    adiv_boxplot(biom, x = "Body Site", metric = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
     
 }
 \seealso{
-\code{\link{stats.table}}
+\code{\link{stats_table}}
+
+Other plotting: 
+\code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{ordination_plot}()},
+\code{\link{plot_heatmap}()},
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
+\concept{plotting}

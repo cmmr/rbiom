@@ -2,17 +2,19 @@
 #' 
 #' @name bdiv_boxplot
 #' 
-#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' @family plotting
+#' 
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param x   Metadata column name(s). Must be categorical. Prefix with 
 #'        \code{==} or \code{!=} to limit comparisons to within or between
 #'        groups, respectively. The default, \code{NULL} groups all distances 
 #'        into a single column.
 #' 
-#' @param y   Beta diversity metric(s) to use. Options are \code{"Manhattan"},
-#'        \code{"Euclidean"}, \code{"Bray-Curtis"}, \code{"Jaccard"}, and
-#'        \code{"UniFrac"}. UniFrac requires a phylogenetic tree. Default: 
-#'        \code{"Bray-Curtis"}.
+#' @param metric   Beta diversity metric(s) to use. Options are 
+#'        \code{"Manhattan"}, \code{"Euclidean"}, \code{"Bray-Curtis"}, 
+#'        \code{"Jaccard"}, and \code{"UniFrac"}. UniFrac requires a 
+#'        phylogenetic tree. Default: \code{"Bray-Curtis"}.
 #'           
 #' @param layers   \code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -38,13 +40,13 @@
 #'
 #' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
 #'        Run \code{p.adjust.methods} for a list of available options.
-#'        (Default: \code{fdr})
+#'        Default: \code{fdr}
 #'        
 #' @param p.label   Minimum adjusted p-value to display on the plot with a bracket.
 #'        Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
 #'        If a numeric vector with more than one value is provided, they will be
 #'        used as breaks for asterisk notation. For ordinations, \code{p.label} 
-#'        applies to biplot taxa. (Default: \code{0.05})
+#'        applies to biplot taxa. Default: \code{0.05}
 #'     
 #' @param ci   How to calculate min/max of the \bold{crossbar}, 
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -65,10 +67,14 @@
 #'        angled, and vertical, respectively.
 #'        
 #' @param weighted   When employing a beta diversity metric, use the weighted
-#'        version. (Default: \code{TRUE})
+#'        version. Default: \code{TRUE}.
 #'        
 #' @param tree   A phylogenetic tree for use in calculating UniFrac distance.
 #'        The default, \code{NULL}, will use the BIOM object's tree.
+#'        
+#' @param filter.fun   A function that takes a \code{bdiv_table()} as input and
+#'        returns a \code{bdiv_table()} as output. This modified table will be
+#'        used for plotting. Default: \code{NULL}.
 #'        
 #' @param ...   Parameters are matched to formal arguments of ggplot2
 #'        functions. Prefixing parameter names with a layer name ensures that
@@ -93,16 +99,16 @@
 #' 
 #' 
 #' @export
-#' @seealso \code{\link{stats.table}}
+#' @seealso \code{\link{stats_table}}
 #' @examples
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
-#'     bdiv_boxplot(biom, UniFrac ~ `==Body Site`, color.by="Body Site")
+#'     bdiv_boxplot(biom, x="==Body Site", metric="UniFrac", color.by="Body Site")
 #'     
 #'
 bdiv_boxplot <- function (
-  biom, x = NULL, y = "Bray-Curtis", layers = "rls",
+  biom, x = NULL, metric = "Bray-Curtis", layers = "rls",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
   xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
   p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', 
@@ -112,11 +118,11 @@ bdiv_boxplot <- function (
   # Sanity checks
   #________________________________________________________
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  if (!(is.null(x) || all(sub("^(!=|==)", "", x) %in% metrics(biom, 'meta'))))
-    stop("`x` argument to bdiv_boxplot must be metadata column name(s) or NULL")
-  if (!all(y %in% metrics(biom, 'bdiv')))
+  if (!(is.null(x) || all(sub("^(!=|==)", "", x) %in% c(".", metrics(biom, 'meta')))))
+    stop("`x` argument to bdiv_boxplot must be metadata column name(s), '.', or NULL")
+  if (!all(metric %in% metrics(biom, 'bdiv')))
     stop(
-      "`y` argument to taxa_boxplot must be beta diversity metric(s): ", 
+      "`metric` argument to bdiv_boxplot must be beta diversity metric(s): ", 
       paste(collapse = ", ", metrics(biom, 'bdiv')) )
   
   
@@ -131,14 +137,17 @@ bdiv_boxplot <- function (
   
   # Defaults
   #________________________________________________________
-  if (is.null(x)) params[['x']] <- "."
+  if (is.null(x)) {
+    params[['x']] <- ".all"
+    params[['biom']][['metadata']][[".all"]] <- "all"
+  }
   params[['weighted']] <- as.logical(weighted)
   
   
   
   # Use the generalized boxplot function to make the plot
   #________________________________________________________
-  p <- boxplot_build(params, bdiv_boxplot_data, bdiv_boxplot_layers)
+  p <- boxplot_build(params, bdiv_boxplot, bdiv_boxplot_data, bdiv_boxplot_layers)
   
   
   
@@ -168,18 +177,23 @@ bdiv_boxplot_data <- function (params) {
   #________________________________________________________
   ggdata <- plyr::ddply(
     .data      = expand.grid(
-      '.metric' = params[['y']], 
+      '.metric' = params[['metric']], 
       '.weight' = params[['weighted']] ), 
     .variables = c(".metric", ".weight"), 
     .fun       =  function (x) {
-      beta.div(
+      
+      tbl <- bdiv_table(
         biom     = params[['biom']], 
         method   = x[1, '.metric'], 
         weighted = x[1, '.weight'],
         md       = md_cols,
         tree     = params[['tree']],
-        long     = TRUE, 
         safe     = TRUE )
+      
+      if (!is.null(params[['filter.fun']]))
+        tbl <- params[['filter.fun']](tbl)
+      
+      return (tbl)
   })
   
   ggdata <- within(
@@ -213,12 +227,10 @@ bdiv_boxplot_data <- function (params) {
   }
   
   
-  # Allow multiple `y` beta div metrics
+  # Allow multiple `metric` beta div metrics
   #________________________________________________________
-  if (length(params[['y']]) > 1 || length(params[['weighted']]) > 1) {
+  if (length(params[['metric']]) > 1 || length(params[['weighted']]) > 1) {
     params[['facet.by']] %<>% c(".metric")
-    if (length(params[['y']]) == 1) # "Unweighted UniFrac" => "Unweighted"
-      ggdata[['.metric']] %<>% strsplit(" ", TRUE) %>% sapply(`[[`, 1)
     ggdata[['.metric']]  %<>% factor(levels = unique(ggdata[['.metric']]))
   }
   
@@ -239,7 +251,7 @@ bdiv_boxplot_layers <- function (layers) {
   
   # y-axis title
   #________________________________________________________
-  yraw <- attr(layers, 'params', exact = TRUE)[['y']]
+  yraw <- attr(layers, 'params', exact = TRUE)[['metric']]
   
   if (length(yraw) > 1) {
     ylab <- structure(

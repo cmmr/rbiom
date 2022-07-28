@@ -17,10 +17,10 @@ on.exit(file.remove(c(f1,f2)))
 
 writeChar(original, f1)
 
-t1 <- rbiom::read.tree(src=f1)
-t2 <- rbiom::read.tree(src=original)
-newick <- rbiom::write.tree(tree=t1)
-rbiom::write.tree(tree=t1, file=f2)
+t1 <- rbiom::read_tree(src=f1)
+t2 <- rbiom::read_tree(src=original)
+newick <- rbiom::write_tree(tree=t1)
+rbiom::write_tree(tree=t1, file=f2)
 
 test_that("Newick File IO", {
   expect_equal(t1, t2)
@@ -30,8 +30,8 @@ test_that("Newick File IO", {
 
 
 t1  <- "((a,(b,c,d)),(e,f,g,(h,i)));"
-phy <- rbiom::read.tree(src=t1)
-t2  <- rbiom::write.tree(tree=phy)
+phy <- rbiom::read_tree(src=t1)
+t2  <- rbiom::write_tree(tree=phy)
 
 test_that("Newick Short Names", {
   expect_equal(t1, t2)
@@ -40,13 +40,13 @@ test_that("Newick Short Names", {
 
 
 
-phy <- rbiom::read.tree(src="((a,(b,c,d)),(e,f,g,(h,i)));")
-t1  <- rbiom::write.tree(subtree(phy, c('b', 'c', 'f', 'g', 'i')))
-t2  <- rbiom::write.tree(subtree(phy, c('a', 'b', 'c', 'f', 'g', 'h', 'i')))
+phy <- rbiom::read_tree(src="((a,(b,c,d)),(e,f,g,(h,i)));")
+t1  <- rbiom::write_tree(subtree(phy, c('b', 'c', 'f', 'g', 'i')))
+t2  <- rbiom::write_tree(subtree(phy, c('a', 'b', 'c', 'f', 'g', 'h', 'i')))
 
-phy <- rbiom::read.tree(src=original)
-t3  <- rbiom::write.tree(rbiom::subtree(phy, c('Atl Porci', 'SteMa290', 'HelPy142')))
-t4  <- rbiom::write.tree(rbiom::subtree(phy, c('AciSp313',  'MxlBact8', 'SphSp203')))
+phy <- rbiom::read_tree(src=original)
+t3  <- rbiom::write_tree(rbiom::subtree(phy, c('Atl Porci', 'SteMa290', 'HelPy142')))
+t4  <- rbiom::write_tree(rbiom::subtree(phy, c('AciSp313',  'MxlBact8', 'SphSp203')))
 
 test_that("Newick Subtree", {
   expect_equal(t1, "((b,c),(f,g,i));")

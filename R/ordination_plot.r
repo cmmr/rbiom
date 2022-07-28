@@ -2,7 +2,9 @@
 #' 
 #' @name ordination_plot
 #' 
-#' @param biom   A BIOM object, as returned from \link{read.biom}.
+#' @family plotting
+#' 
+#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param dist   Beta diversity metric to use for calculating inter-sample
 #'        distances. Options are: \code{"Bray-Curtis"}, \code{"Manhattan"},
@@ -34,7 +36,7 @@
 #'        version. Default: \code{TRUE}.
 #'        
 #' @param rank   What rank of taxa to display, for example \code{"Phylum"} or 
-#'        \code{"Genus"}. Run \code{taxa.ranks()} to see all options for a 
+#'        \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a 
 #'        given BIOM object. The default, \code{NULL}, selects the lowest
 #'        level.
 #'        
@@ -69,7 +71,7 @@
 #' 
 #' 
 #' @export
-#' @seealso \code{\link{stats.table}}
+#' @seealso \code{\link{stats_table}}
 #' @examples
 #'     library(rbiom)
 #'     
@@ -165,13 +167,14 @@ ordination_plot <- function (
   #________________________________________________________
   layers <- list()
   
-  attr(layers, 'biom')   <- biom
-  attr(layers, 'data')   <- ggdata
-  attr(layers, 'params') <- params
-  attr(layers, 'xcol')   <- ".x"
-  attr(layers, 'ycol')   <- ".y"
-  attr(layers, 'xmode')  <- "numeric"
-  attr(layers, 'ymode')  <- "numeric"
+  attr(layers, 'biom')     <- biom
+  attr(layers, 'data')     <- ggdata
+  attr(layers, 'params')   <- params
+  attr(layers, 'function') <- ordination_plot
+  attr(layers, 'xcol')     <- ".x"
+  attr(layers, 'ycol')     <- ".y"
+  attr(layers, 'xmode')    <- "numeric"
+  attr(layers, 'ymode')    <- "numeric"
   
   initLayer(layer_names)
   layers <- metadata_layers(layers)

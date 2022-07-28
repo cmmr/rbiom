@@ -7,7 +7,7 @@
 metrics(biom, mode = "all", tree = NULL)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read.biom}.}
+\item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{mode}{One of the following options:
 \itemize{
@@ -36,5 +36,5 @@ List all the options for each type of metric.
 
 }
 \seealso{
-\code{\link{alpha.div}} \code{\link{beta.div}} \code{\link{ordinate}}
+\code{\link{adiv_table}} \code{\link{bdiv_table}} \code{\link{ordinate}}
 }

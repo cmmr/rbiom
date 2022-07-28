@@ -1,6 +1,6 @@
 #' Create a subtree by specifying tips to keep.
 #' 
-#' @param tree  A phylo object, as returned from \link{read.tree}.
+#' @param tree  A phylo object, as returned from \link{read_tree}.
 #' @param tips  A character, numeric, or logical vector of tips to keep.
 #' @return A \code{phylo} object for the subtree.
 #' @export
@@ -8,7 +8,7 @@
 #'     library(rbiom)
 #'     
 #'     infile <- system.file("extdata", "newick.tre", package = "rbiom")
-#'     tree <- read.tree(infile)
+#'     tree <- read_tree(infile)
 #'     
 #'     leafs   <- tips(tree)
 #'     subtree <- subtree(tree, head(leafs))

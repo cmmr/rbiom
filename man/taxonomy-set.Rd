@@ -7,9 +7,9 @@
 taxonomy(x) <- value
 }
 \arguments{
-\item{x}{A \code{BIOM} object, as returned from \link{read.biom}.}
+\item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
-\item{value}{A character matrix with rownames \code{taxa.names(x)}. If
+\item{value}{A character matrix with rownames \code{taxa_names(x)}. If
 there are more rownames than taxa names, the matrix will be subset.}
 }
 \description{
@@ -33,9 +33,9 @@ Other setters:
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},
-\code{\link{sample.names<-}()},
+\code{\link{sample_names<-}()},
 \code{\link{sequences<-}()},
-\code{\link{taxa.names<-}()},
-\code{\link{taxa.ranks<-}()}
+\code{\link{taxa_names<-}()},
+\code{\link{taxa_ranks<-}()}
 }
 \concept{setters}
