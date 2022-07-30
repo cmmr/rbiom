@@ -34,7 +34,16 @@
     <loc>/reference/bdiv_dist.html</loc>
   </url>
   <url>
+    <loc>/reference/bdiv_distmat.html</loc>
+  </url>
+  <url>
     <loc>/reference/bdiv_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bdiv_ord_plot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bdiv_ord_table.html</loc>
   </url>
   <url>
     <loc>/reference/bdiv_table.html</loc>
@@ -181,6 +190,9 @@
     <loc>/reference/taxa_heatmap.html</loc>
   </url>
   <url>
+    <loc>/reference/taxa_matrix.html</loc>
+  </url>
+  <url>
     <loc>/reference/taxa_means.html</loc>
   </url>
   <url>
@@ -203,6 +215,9 @@
   </url>
   <url>
     <loc>/reference/taxa_sums.html</loc>
+  </url>
+  <url>
+    <loc>/reference/taxa_table.html</loc>
   </url>
   <url>
     <loc>/reference/taxonomy-set.html</loc>

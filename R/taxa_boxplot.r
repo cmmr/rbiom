@@ -180,10 +180,9 @@ taxa_boxplot_data <- function (params) {
   
   ggdata <- plyr::ldply(ranks, function (rank) {
     
-    df <- taxa_rollup(
+    df <- taxa_table(
       biom = biom,
       rank = rank,
-      long = TRUE,
       md   = TRUE,
       safe = TRUE )
     

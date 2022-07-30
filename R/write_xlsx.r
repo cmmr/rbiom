@@ -24,7 +24,7 @@
 #'     biom <- select(hmp50, 1:10) %>% rarefy()
 #'     
 #'     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
-#'     attr(biom, "Unweighted Jaccard") <- bdiv_dist(biom, 'jaccard', weighted=FALSE)
+#'     attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
 #'     
 #'     outfile <- tempfile(fileext = ".xlsx")
 #'     write_xlsx(biom, outfile)
@@ -66,8 +66,8 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Output counts and taxonomy, & seqs prior to rarefying
     #--------------------------------------------------------
     
-    RawCounts <- data.frame(rbiom::counts(biom),   check.names=FALSE)
-    Taxonomy  <- data.frame(rbiom::taxonomy(biom), check.names=FALSE)
+    RawCounts <- data.frame(counts(biom),   check.names=FALSE)
+    Taxonomy  <- data.frame(taxonomy(biom), check.names=FALSE)
     
     # Set the full taxonomy string as the first column of RawCounts
     TaxaStrings <- data.frame(Taxonomy=apply(biom$taxonomy, 1L, paste, collapse="; "))
@@ -90,11 +90,11 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     if (identical(depth, 0) || isTRUE(is_rarefied(biom))) {
       rare <- biom
     } else {
-      rare <- rbiom::rarefy(biom, depth, seed)
+      rare <- rarefy(biom, depth, seed)
     }
     
-    RareCounts <- data.frame(rbiom::counts(rare), check.names=FALSE)
-    AlphaDiv   <- rbiom::adiv_table(rare)
+    RareCounts <- data.frame(counts(rare), check.names=FALSE)
+    AlphaDiv   <- adiv_table(rare)
     
     # Set the full taxonomy string as the first column of RareCounts
     TaxaStrings <- data.frame(Taxonomy=apply(rare$taxonomy, 1L, paste, collapse="; "))
@@ -153,11 +153,11 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Roll up abundances at each taxonomic level
     #--------------------------------------------------------
     
-    ranks <- unique(c('OTU', rbiom::taxa_ranks(biom)))
+    ranks <- unique(c('OTU', taxa_ranks(biom)))
     
     for (rank in ranks) {
       
-      df <- t(rbiom::taxa_rollup(biom, rank, lineage = TRUE, safe=NA))
+      df <- t(taxa_rollup(biom, rank, lineage = TRUE, safe=NA))
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
       
       openxlsx::addWorksheet(wb, rank)
@@ -195,7 +195,7 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     wb <- openxlsx::createWorkbook(creator="CMMR", title=biom$info$id)
     
-    ranks <- c(paste0(type, "s"), rbiom::taxa_ranks(biom))
+    ranks <- c(paste0(type, "s"), taxa_ranks(biom))
     for (rank in ranks)
       openxlsx::addWorksheet(wb, rank)
     
@@ -208,8 +208,8 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     # Output totals, taxonomy/seqs, & adiv_table
     #--------------------------------------------------------
     
-    AlphaDiv  <- data.frame(rbiom::adiv_table(biom), check.names=FALSE)
-    Taxonomy  <- data.frame(rbiom::taxonomy(biom),  check.names=FALSE)
+    AlphaDiv  <- data.frame(adiv_table(biom), check.names=FALSE)
+    Taxonomy  <- data.frame(taxonomy(biom),  check.names=FALSE)
     
     # Set the centroid sequence as the first column of Taxonomy
     if (is(biom[['sequences']], "character"))
@@ -253,7 +253,7 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
       
     for (i in seq_along(ranks)) {
       
-      df <- t(rbiom::taxa_rollup(biom, i - 1, lineage=TRUE, safe=NA))
+      df <- t(taxa_rollup(biom, i - 1, lineage=TRUE, safe=NA))
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
       
       # Set the full taxonomy string as the first column

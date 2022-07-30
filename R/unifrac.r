@@ -1,6 +1,6 @@
 #' Compute Weighted and Unweighted UniFrac distance matrices.
 #' 
-#' This is a wrapper around \link{bdiv_dist} for a common use case.
+#' This is a wrapper around \link{bdiv_distmat} for a common use case.
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'     object, as returned from \link{read_biom}. For matrices, the rows and 
@@ -32,7 +32,7 @@
 
 unifrac <- function (biom, weighted=TRUE, tree=NULL) {
   
-  rbiom::bdiv_dist(biom, 'unifrac', weighted, tree)
+  rbiom::bdiv_distmat(biom, 'unifrac', weighted, tree)
   
 }
 

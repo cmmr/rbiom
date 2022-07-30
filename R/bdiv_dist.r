@@ -36,12 +36,12 @@
 #'     library(rbiom)
 #'     
 #'     biom <- select(hmp50, 1:10)
-#'     dm <- bdiv_dist(biom, 'unifrac')
+#'     dm <- bdiv_distmat(biom, 'unifrac')
 #'     as.matrix(dm)[1:4,1:4]
 #'     plot(hclust(dm))
 #'
 
-bdiv_dist <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, stat.by=NULL, seed=0, perms=999) {
+bdiv_distmat <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, stat.by=NULL, seed=0, perms=999) {
   
   #--------------------------------------------------------------
   # Enable abbreviations of metric names.
@@ -54,8 +54,8 @@ bdiv_dist <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, sta
   #--------------------------------------------------------------
   
   if (!is.logical(weighted)) stop(simpleError("Weighted must be TRUE/FALSE."))
-  if (length(method) != 1)   stop(simpleError("Invalid method for bdiv_dist()"))
-  if (is.na(method))         stop(simpleError("Invalid method for bdiv_dist()"))
+  if (length(method) != 1)   stop(simpleError("Invalid method for bdiv_distmat()"))
+  if (is.na(method))         stop(simpleError("Invalid method for bdiv_distmat()"))
   
   
   #--------------------------------------------------------------
@@ -96,7 +96,7 @@ bdiv_dist <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, sta
         }
       }
       if (!is(tree, "phylo")) {
-        stop(simpleError("No tree provided to bdiv_dist()."))
+        stop(simpleError("No tree provided to bdiv_distmat()."))
       }
     }
     

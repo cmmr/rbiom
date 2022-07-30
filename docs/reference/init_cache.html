@@ -64,14 +64,14 @@ return a warning.</p>
     <h2>Arguments</h2>
     <dl><dt>cm</dt>
 <dd><p>A memoise-compatible cache object. 
-E.g. <code><a href="https://rdrr.io/pkg/cachem/man/cache_mem.html" class="external-link">cachem::cache_mem()</a></code>, <code><a href="https://rdrr.io/pkg/cachem/man/cache_disk.html" class="external-link">cachem::cache_disk()</a></code>, or 
-<code><a href="https://rdrr.io/pkg/cachem/man/cache_layered.html" class="external-link">cachem::cache_layered()</a></code>. If <code>cm</code> is numeric, it will
+E.g. <code><a href="https://cachem.r-lib.org/reference/cache_mem.html" class="external-link">cachem::cache_mem()</a></code>, <code><a href="https://cachem.r-lib.org/reference/cache_disk.html" class="external-link">cachem::cache_disk()</a></code>, or 
+<code><a href="https://cachem.r-lib.org/reference/cache_layered.html" class="external-link">cachem::cache_layered()</a></code>. If <code>cm</code> is numeric, it will
 be used to define the maximum cache size (in bytes) for an in-memory 
 cache. Default: <code>50 * 1024^2</code> <em>(50 MB)</em></p></dd>
 
 
 <dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="https://rdrr.io/pkg/cachem/man/cache_mem.html" class="external-link">cachem::cache_mem</a></code>. 
+<dd><p>Other arguments passed on to <code><a href="https://cachem.r-lib.org/reference/cache_mem.html" class="external-link">cachem::cache_mem</a></code>. 
 For example: <code>max_size = 512 * 1024^2</code>, 
 <code>max_age = Inf</code>, <code>max_n = Inf</code>, etc.</p></dd>
 
@@ -82,27 +82,18 @@ For example: <code>max_size = 512 * 1024^2</code>,
 
 <p>The cache object, invisibly.</p>
     </div>
-    <div id="details">
-    <h2>Details</h2>
-    <p>Applies to <code><a href="adiv_table.html">adiv_table()</a></code>, <code><a href="apcoa.html">apcoa()</a></code>, <code><a href="bdply.html">bdply()</a></code>, 
-<code><a href="bdiv_dist.html">bdiv_dist()</a></code>, <code><a href="bdiv_table.html">bdiv_table()</a></code>, <code><a href="distill.html">distill()</a></code>, 
-<code><a href="ordinate.html">ordinate()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, <code><a href="rarefy.html">rarefy()</a></code>, <code><a href="select.html">select()</a></code>, 
-<code><a href="stats_table.html">stats_table()</a></code>, <code><a href="subtree.html">subtree()</a></code>, <code><a href="taxa_rollup.html">taxa_rollup()</a></code>, and 
-<code><a href="unifrac.html">unifrac()</a></code>.</p>
-    </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">init_cache</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bindingIsLocked(x, ns):</span> no binding for "plot.BIOM"</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"multi"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.06    0.02    0.08 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    0.13    0.00    0.13 </span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"multi"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.07    0.01    0.10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    0.01    0.00    0.01 </span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>

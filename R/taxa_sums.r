@@ -22,7 +22,7 @@ taxa_sums <- function (biom, rank = NULL) {
   if (is.null(rank)) {
     x <- slam::row_sums(biom$counts)
   } else {
-    x <- taxa_rollup(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
+    x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
   }
   
   return (x)
@@ -52,7 +52,7 @@ taxa_means <- function (biom, rank = NULL) {
   if (is.null(rank)) {
     x <- slam::row_means(biom$counts)
   } else {
-    x <- taxa_rollup(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
+    x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
   }
   
   return (x)

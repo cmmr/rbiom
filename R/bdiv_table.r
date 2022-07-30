@@ -64,7 +64,7 @@ bdiv_table <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, md
   #--------------------------------------------------------------
   # Compute the distance matrix
   #--------------------------------------------------------------
-  dm <- bdiv_dist(biom, method, weighted, tree, stat.by, seed, perms)
+  dm <- bdiv_distmat(biom, method, weighted, tree, stat.by, seed, perms)
   
   
   #--------------------------------------------------------------

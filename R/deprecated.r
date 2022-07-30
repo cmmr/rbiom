@@ -19,7 +19,6 @@ taxa.names       <- function (...) { .Deprecated("taxa_names");    taxa_names(..
 `taxa.names<-`   <- function (...) { .Deprecated("taxa_names");    `taxa_names<-`(...)   }
 taxa.ranks       <- function (...) { .Deprecated("taxa_ranks");    taxa_ranks(...)       }
 `taxa.ranks<-`   <- function (...) { .Deprecated("taxa_ranks");    `taxa_ranks<-`(...)   }
-taxa.rollup      <- function (...) { .Deprecated("taxa_rollup");   taxa_rollup(...)      }
 taxa.sums        <- function (...) { .Deprecated("taxa_sums");     taxa_sums(...)        }
 top.taxa         <- function (...) { .Deprecated("top_taxa");      top_taxa(...)         }
 write.biom       <- function (...) { .Deprecated("write_biom");    write_biom(...)       }
@@ -31,7 +30,7 @@ write.xlsx       <- function (...) { .Deprecated("write_xlsx");    write_xlsx(..
 
 
 # Depending on its arguments, beta.div() returned either a dist object or a 
-# data.frame. Now it's split into two functions - bdiv_dist() which always 
+# data.frame. Now it's split into two functions - bdiv_distmat() which always 
 # returns a dist, and bdiv_table() which always returns a data.frame.
 
 beta.div <- function (
@@ -47,8 +46,30 @@ beta.div <- function (
     bdiv_table(biom, method, weighted, tree, md, safe, stat.by, seed, perms)
     
   } else {
-    .Deprecated("bdiv_dist", msg = sprintf(msg, "dist", "distance matrix"))
-    bdiv_dist(biom, method, weighted, tree, stat.by, seed, perms)
+    .Deprecated("bdiv_distmat", msg = sprintf(msg, "distmat", "distance matrix"))
+    bdiv_distmat(biom, method, weighted, tree, stat.by, seed, perms)
   }
 }
+
+
+# Depending on its arguments, taxa.rollup() returned either a matrix or a 
+# data.frame. Now it's split into two functions - taxa_matrix() which always 
+# returns a matrix, and taxa_table() which always returns a data.frame.
+
+taxa.rollup <- function (
+    biom, rank = 'OTU', taxa = NULL, map = NULL, lineage = FALSE, 
+    sparse = FALSE, long = FALSE, md = FALSE, safe = FALSE) {
   
+  msg <- paste0(
+    "The rbiom function taxa.rollup() is deprecated.\n",
+    "Use taxa_%s() for generating a %s instead." )
+  
+  if (isTRUE(long) || !isFALSE(md)) {
+    .Deprecated("taxa_table", msg = sprintf(msg, "table", "data.frame"))
+    taxa_table(biom, rank, taxa, map, lineage, md, safe)
+    
+  } else {
+    .Deprecated("taxa_matrix", msg = sprintf(msg, "matrix", "matrix"))
+    taxa_matrix(biom, rank, taxa, map, lineage, sparse)
+  }
+}

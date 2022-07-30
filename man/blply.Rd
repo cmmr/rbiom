@@ -41,7 +41,7 @@ Calls \code{plyr::dlply} internally.
     })
     
     blply(hmp50, "Body Site", function (b) {
-      r <- range(bdiv_dist(b, "bray"))
+      r <- range(bdiv_distmat(b, "bray"))
       data.frame(bray.min = r[[1]], bray.max = r[[2]])
     })
     

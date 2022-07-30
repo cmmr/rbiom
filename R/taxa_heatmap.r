@@ -125,7 +125,7 @@ taxa_heatmap <- function (
   #________________________________________________________
   # Matrix with samples in columns and taxa in rows.
   #________________________________________________________
-  mtx <- t(taxa_rollup(
+  mtx <- t(taxa_matrix(
     biom = biom, 
     rank = params[['rank']], 
     taxa = params[['taxa']] ))

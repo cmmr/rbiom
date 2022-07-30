@@ -72,7 +72,7 @@ Display beta diversities in an all vs all grid.
 Other plotting: 
 \code{\link{adiv_boxplot}()},
 \code{\link{bdiv_boxplot}()},
-\code{\link{ordination_plot}()},
+\code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_heatmap}()},

@@ -40,7 +40,7 @@ Sample' tab.
     biom <- select(hmp50, 1:10) \%>\% rarefy()
     
     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
-    attr(biom, "Unweighted Jaccard") <- bdiv_dist(biom, 'jaccard', weighted=FALSE)
+    attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
     
     outfile <- tempfile(fileext = ".xlsx")
     write_xlsx(biom, outfile)

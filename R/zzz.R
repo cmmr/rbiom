@@ -9,7 +9,7 @@ ENV <- environment(NULL)
 .onLoad <- function(libname, pkgname) {
   
   lapply(FUN = ggwrap, pkg="ggplot2",    {c(
-    'aes_string', 'coord_fixed', 
+    'aes_string', 'coord_fixed', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'expansion', 'facet_grid', 'facet_wrap', 
     'geom_bar', 'geom_boxplot', 'geom_col', 
@@ -28,26 +28,21 @@ ENV <- environment(NULL)
     'scale_y_continuous', 'scale_y_discrete', 
     'stat_ellipse', 'stat_smooth', 
     'theme', 'theme_bw', 'theme_void' )})
-  lapply(FUN = ggwrap, pkg="grid",       {c(
-    'arrow', 'unit')})
-  lapply(FUN = ggwrap, pkg="ggtext",     {c(
-    'element_markdown' )})
-  lapply(FUN = ggwrap, pkg="ggdensity",  {c(
-    'geom_hdr', 'geom_hdr_lines' )})
   lapply(FUN = ggwrap, pkg="ggpattern",  {c(
     'geom_bar_pattern', 'geom_boxplot_pattern', 
     'geom_col_pattern', 'geom_crossbar_pattern', 
     'scale_pattern_color_manual', 'scale_pattern_fill_manual', 
     'scale_pattern_type_manual', 'geom_violin_pattern' )})
-  lapply(FUN = ggwrap, pkg="ggbeeswarm", {c(
-    'geom_beeswarm', 'geom_quasirandom' )})
-  lapply(FUN = ggwrap, pkg="ggrepel",    {c(
-    'geom_label_repel' )})
-  lapply(FUN = ggwrap, pkg="ggnewscale", {c(
-    'new_scale_fill' )})
   
-  lapply(FUN = basewrap, pkg="base", {c(
-    'c', 'rep' )})
+  lapply(FUN = ggwrap, pkg="grid",       {c('arrow', 'unit')})
+  lapply(FUN = ggwrap, pkg="ggtext",     {c('element_markdown')})
+  lapply(FUN = ggwrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines')})
+  lapply(FUN = ggwrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
+  lapply(FUN = ggwrap, pkg="ggrepel",    {c('geom_label_repel')})
+  lapply(FUN = ggwrap, pkg="ggnewscale", {c('new_scale_fill')})
+  lapply(FUN = ggwrap, pkg="scales",     {c('alpha' )})
+  
+  lapply(FUN = basewrap, pkg="base", {c('c', 'rep')})
   
   
   #________________________________________________________

@@ -161,7 +161,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
       if (!rank %in% taxa_ranks(biom))
         return (fun(x, ...))
         
-      mtx  <- taxa_rollup(biom, rank)
+      mtx  <- taxa_matrix(biom, rank)
       mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
       res  <- apply(mtx, 2L, fun, ...)
       res[taxonomy(biom, rank)]

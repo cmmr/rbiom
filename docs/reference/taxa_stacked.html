@@ -156,7 +156,7 @@ and only to, that layer.</p></dd>
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
-<code><a href="ordination_plot.html">ordination_plot</a>()</code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
@@ -168,6 +168,8 @@ and only to, that layer.</p></dd>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">taxa_stacked</span><span class="op">(</span><span class="va">biom</span>, rank<span class="op">=</span><span class="st">"Phylum"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 4 rows containing missing values (position_stack).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 8 rows containing missing values (geom_col).</span>
 <span class="r-plt img"><img src="taxa_stacked-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>

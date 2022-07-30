@@ -25,13 +25,6 @@ Speeds up repetitive computations by storing results of functions calls.
 This cache initialization function can only be called once. Subsequent calls 
 return a warning.
 }
-\details{
-Applies to \code{adiv_table()}, \code{apcoa()}, \code{bdply()}, 
-\code{bdiv_dist()}, \code{bdiv_table()}, \code{distill()}, 
-\code{ordinate()}, \code{plot()}, \code{rarefy()}, \code{select()}, 
-\code{stats_table()}, \code{subtree()}, \code{taxa_rollup()}, and 
-\code{unifrac()}.
-}
 \examples{
     library(rbiom)
     

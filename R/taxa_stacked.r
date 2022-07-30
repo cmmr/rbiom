@@ -163,7 +163,7 @@ taxa_stacked <- function (
   ggdata <- local({
     
     taxa <- params[['taxa']]
-    mat  <- as.matrix(taxa_rollup(biom, rank = params[['rank']], sparse = TRUE))
+    mat  <- t(taxa_matrix(biom, rank = params[['rank']]))
   
     if (is.numeric(taxa)) {
       rel <- sort(rowMeans(t(t(mat) / colSums(mat))), decreasing = TRUE)

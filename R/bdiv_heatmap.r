@@ -134,7 +134,7 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Matrix of samples x samples.
   #________________________________________________________
-  mtx <- as.matrix(bdiv_dist(
+  mtx <- as.matrix(bdiv_distmat(
     biom     = biom, 
     method   = params[['metric']], 
     weighted = params[['weighted']],
