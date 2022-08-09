@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9061</span>
       </span>
     </div>
 
@@ -53,50 +53,44 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_boxplot</span><span class="op">(</span></span>
-<span>  <span class="va">biom</span>,</span>
-<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"rls"</span>,</span>
-<span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  pattern.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  xvals <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  patterns <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  shapes <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  facets <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
-<span>  p.label <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
-<span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bdiv_boxplot</span><span class="op">(</span>
+  <span class="va">biom</span>,
+  x <span class="op">=</span> <span class="cn">NULL</span>,
+  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,
+  layers <span class="op">=</span> <span class="st">"rls"</span>,
+  color.by <span class="op">=</span> <span class="cn">NULL</span>,
+  pattern.by <span class="op">=</span> <span class="cn">NULL</span>,
+  shape.by <span class="op">=</span> <span class="cn">NULL</span>,
+  facet.by <span class="op">=</span> <span class="cn">NULL</span>,
+  xvals <span class="op">=</span> <span class="cn">NULL</span>,
+  colors <span class="op">=</span> <span class="cn">NULL</span>,
+  patterns <span class="op">=</span> <span class="cn">NULL</span>,
+  shapes <span class="op">=</span> <span class="cn">NULL</span>,
+  facets <span class="op">=</span> <span class="cn">NULL</span>,
+  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,
+  p.label <span class="op">=</span> <span class="fl">0.05</span>,
+  ci <span class="op">=</span> <span class="fl">95</span>,
+  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,
+  weighted <span class="op">=</span> <span class="cn">TRUE</span>,
+  tree <span class="op">=</span> <span class="cn">NULL</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
-
-
 <dt>x</dt>
 <dd><p>Metadata column name(s). Must be categorical. Prefix with 
 <code>==</code> or <code>!=</code> to limit comparisons to within or between
 groups, respectively. The default, <code>NULL</code> groups all distances 
 into a single column.</p></dd>
-
-
 <dt>metric</dt>
 <dd><p>Beta diversity metric(s) to use. Options are 
 <code>"Manhattan"</code>, <code>"Euclidean"</code>, <code>"Bray-Curtis"</code>, 
 <code>"Jaccard"</code>, and <code>"UniFrac"</code>. UniFrac requires a 
 phylogenetic tree. Default: <code>"Bray-Curtis"</code>.</p></dd>
-
-
 <dt>layers</dt>
 <dd><p><code>"box"</code>, <code>"bar" ("r")</code>, <code>"violin"</code>, 
 <code>"dot"</code>, <code>"strip"</code>, <code>"crossbar"</code>, <code>"errorbar"</code>, 
@@ -104,15 +98,11 @@ phylogenetic tree. Default: <code>"Bray-Curtis"</code>.</p></dd>
 abbreviations are also accepted. For instance, <code>c("box", "dot")</code> 
 is equivalent to <code>c("b", "d")</code> and <code>"bd"</code>.
 Default: <code>"rls"</code>.</p></dd>
-
-
 <dt>color.by, pattern.by, shape.by, label.by, sort.by, facet.by</dt>
 <dd><p>Metadata 
 column to color, pattern, shape, label, sort, and/or facet by. If 
 that column is a <code>factor</code>, the ordering of levels will be 
 maintained in the plot.</p></dd>
-
-
 <dt>colors, patterns, shapes, facets, xvals</dt>
 <dd><p>Names of the colors, patterns,
 shapes, facets, and/or x values to use in the plot. Available values 
@@ -123,22 +113,16 @@ factor levels in the metadata. <code>facets</code> and <code>xvals</code> are
 coerced to unnamed character vectors. If the length of these vectors
 is less than the values present in their corresponding metadata 
 column, then the data set will be subseted accordingly.</p></dd>
-
-
 <dt>p.adj</dt>
 <dd><p>Method to use for multiple comparisons adjustment of p-values.
 Run <code>p.adjust.methods</code> for a list of available options.
 Default: <code>fdr</code></p></dd>
-
-
 <dt>p.label</dt>
 <dd><p>Minimum adjusted p-value to display on the plot with a bracket.
 Set to <code>Inf</code> to display all p-values, or <code>-Inf</code> for no brackets.
 If a numeric vector with more than one value is provided, they will be
 used as breaks for asterisk notation. For ordinations, <code>p.label</code> 
 applies to biplot taxa. Default: <code>0.05</code></p></dd>
-
-
 <dt>ci</dt>
 <dd><p>How to calculate min/max of the <b>crossbar</b>, 
 <b>errorbar</b>, <b>linerange</b>, and <b>pointrange</b> layers.
@@ -152,56 +136,39 @@ The center mark of <code>crossbar</code> and <code>pointrange</code> represents
 the mean, except for <b>mad</b> in which case it represents
 the median. Trendlines require a confidence interval value. 
 Set to <code>NULL</code> to disable. Default: <code>95</code></p></dd>
-
-
 <dt>xlab.angle</dt>
 <dd><p>How to rotate the tick labels on the x-axis. 
 <b>'auto'</b> (the default), automatically selects a rotation value. 
 <b>0</b>, <b>30</b>, and <b>90</b> sets the angle to horizontal, 
 angled, and vertical, respectively.</p></dd>
-
-
 <dt>weighted</dt>
 <dd><p>When employing a beta diversity metric, use the weighted
 version. Default: <code>TRUE</code>.</p></dd>
-
-
 <dt>tree</dt>
 <dd><p>A phylogenetic tree for use in calculating UniFrac distance.
 The default, <code>NULL</code>, will use the BIOM object's tree.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, <code>dot.size = 2</code> or <code>d.size = 2</code> ensures only the 
 dotplot layer has its size set to <code>2</code>.</p></dd>
-
-
 <dt>filter.fun</dt>
 <dd><p>A function that takes a <code><a href="bdiv_table.html">bdiv_table()</a></code> as input and
 returns a <code><a href="bdiv_table.html">bdiv_table()</a></code> as output. This modified table will be
 used for plotting. Default: <code>NULL</code>.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>ggplot2</code> plot. The computed data points and statistics will 
+    <p>A <code>ggplot2</code> plot. The computed data points and statistics will 
         be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>, 
-        respectively.</p>
-        
-
-<p>Shapes can also be given as their string values, defined in pch_table here:
+        respectively.
+Shapes can also be given as their string values, defined in pch_table here:
 https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
 some shapes have a colored outline given by `color`, some are filled with 
 `color`, and some are outlined in `color` and filled with `fill`. See
-https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.</p>
-
-
-<p>To expand the low end of the y axis, you can set <code>y.trans = "sqrt"</code> or
+https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
+To expand the low end of the y axis, you can set <code>y.trans = "sqrt"</code> or
 <code>y.trans = "log1p"</code>. The former applies a square-root transformation, 
 and the latter plots log(y + 1). Both of these methods work well with data
 that contains zeroes.</p>
@@ -221,13 +188,13 @@ that contains zeroes.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"==Body Site"</span>, metric<span class="op">=</span><span class="st">"UniFrac"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
+<span class="r-in">    </span>
+<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
+<span class="r-in">    <span class="fu">bdiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"==Body Site"</span>, metric<span class="op">=</span><span class="st">"UniFrac"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="bdiv_boxplot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in">    </span>
+<span class="r-in"></span>
 </code></pre></div>
     </div>
   </div>
@@ -242,7 +209,7 @@ that contains zeroes.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

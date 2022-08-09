@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9061</span>
       </span>
     </div>
 
@@ -53,85 +53,63 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_heatmap</span><span class="op">(</span></span>
-<span>  <span class="va">biom</span>,</span>
-<span>  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  orders <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bdiv_heatmap</span><span class="op">(</span>
+  <span class="va">biom</span>,
+  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,
+  weighted <span class="op">=</span> <span class="cn">TRUE</span>,
+  color.by <span class="op">=</span> <span class="cn">NULL</span>,
+  order.by <span class="op">=</span> <span class="cn">NULL</span>,
+  colors <span class="op">=</span> <span class="cn">NULL</span>,
+  orders <span class="op">=</span> <span class="cn">NULL</span>,
+  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,
+  tree <span class="op">=</span> <span class="cn">NULL</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
-
-
 <dt>metric</dt>
 <dd><p>Beta diversity metric(s) to use. Options are 
 <code>"Manhattan"</code>, <code>"Euclidean"</code>, <code>"Bray-Curtis"</code>, 
 <code>"Jaccard"</code>, and <code>"UniFrac"</code>. UniFrac requires a 
 phylogenetic tree. Default: <code>"Bray-Curtis"</code>.</p></dd>
-
-
 <dt>weighted</dt>
 <dd><p>Should the beta diversity metric be weighted by 
 abundances? Default: <code>TRUE</code>.</p></dd>
-
-
 <dt>color.by</dt>
 <dd><p>Add annotation tracks for these metadata column(s). 
 Default: <code>NULL</code>.</p></dd>
-
-
 <dt>order.by</dt>
 <dd><p>Which metadata columns to use for ordering the samples 
 across the x-axis. The default setting, <code>order.by=NULL</code>, uses 
 sample names as labels and arranges samples by similarity. See 
 <a href="plot_heatmap.html">plot_heatmap</a> for details.</p></dd>
-
-
 <dt>colors</dt>
 <dd><p>A named <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> with names matching <code>color.by</code>, 
 each specifying a <b>palette</b> as described in <a href="plot_heatmap.html">plot_heatmap</a>.
 For example: <code>colors = list(Sex = c(Male="blue", Female="red"))</code>.
 Default: <code>NULL</code>.</p></dd>
-
-
 <dt>orders</dt>
 <dd><p>Subset to just these values in the <code>order.by</code> metadata 
 column. Default: <code>NULL</code>.</p></dd>
-
-
 <dt>xlab.angle</dt>
 <dd><p>How to rotate the tick labels on the x-axis. 
 <b>'auto'</b> (the default), automatically selects a rotation value. 
 <b>0</b>, <b>30</b>, and <b>90</b> sets the angle to horizontal, 
 angled, and vertical, respectively.</p></dd>
-
-
 <dt>tree</dt>
 <dd><p>A phylogenetic tree for use in calculating UniFrac distance.
 The default, <code>NULL</code>, will use the BIOM object's tree.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Additional arguments to pass on to <a href="plot_heatmap.html">plot_heatmap</a>.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>ggplot2</code> plot. The computed data points will be attached as</p>
-<p></p>
-<p><code>attr(, 'data')</code>.</p>
+    <p>A <code>ggplot2</code> plot. The computed data points will be attached as 
+<code>attr(, 'data')</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -147,12 +125,12 @@ The default, <code>NULL</code>, will use the BIOM object's tree.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span> <span class="op">%&gt;%</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
+<span class="r-in">    </span>
+<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span> <span class="op">%&gt;%</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
+<span class="r-in">    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="bdiv_heatmap-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span>    </span></span>
+<span class="r-in">    </span>
 </code></pre></div>
     </div>
   </div>
@@ -167,7 +145,7 @@ The default, <code>NULL</code>, will use the BIOM object's tree.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

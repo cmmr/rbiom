@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9060</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9061</span>
       </span>
     </div>
 
@@ -53,25 +53,25 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_ord_table</span><span class="op">(</span></span>
-<span>  <span class="va">biom</span>,</span>
-<span>  dist <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  ord <span class="op">=</span> <span class="st">"UMAP"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  md <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  safe <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  split.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  stat.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  perms <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  taxa <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
-<span>  p.top <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bdiv_ord_table</span><span class="op">(</span>
+  <span class="va">biom</span>,
+  dist <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,
+  ord <span class="op">=</span> <span class="st">"UMAP"</span>,
+  weighted <span class="op">=</span> <span class="cn">TRUE</span>,
+  tree <span class="op">=</span> <span class="cn">NULL</span>,
+  md <span class="op">=</span> <span class="cn">NULL</span>,
+  k <span class="op">=</span> <span class="fl">2</span>,
+  safe <span class="op">=</span> <span class="cn">TRUE</span>,
+  split.by <span class="op">=</span> <span class="cn">NULL</span>,
+  stat.by <span class="op">=</span> <span class="cn">NULL</span>,
+  seed <span class="op">=</span> <span class="fl">0</span>,
+  perms <span class="op">=</span> <span class="fl">1000</span>,
+  rank <span class="op">=</span> <span class="cn">NULL</span>,
+  taxa <span class="op">=</span> <span class="fl">5</span>,
+  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,
+  p.top <span class="op">=</span> <span class="fl">5</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -79,8 +79,6 @@
     <dl><dt>biom</dt>
 <dd><p>A <code>BIOM</code> object, as returned from <a href="read_biom.html">read_biom</a>.
 Alternatively, a distance matrix, such as from <a href="bdiv_distmat.html">bdiv_distmat</a>.</p></dd>
-
-
 <dt>dist</dt>
 <dd><p>The distance algorithm to use. Options are:
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>, 
@@ -88,8 +86,6 @@ Alternatively, a distance matrix, such as from <a href="bdiv_distmat.html">bdiv_
 present in <code>biom</code> or explicitly provided via <code>tree=</code> to use
 the UniFrac methods. Ignored if <code>biom</code> is a distance matrix.
 Multiple values allowed. Default: <code>"Bray-Curtis"</code>.</p></dd>
-
-
 <dt>ord</dt>
 <dd><p>Method for reducing the dimensionality of a distance matrix.
 Multiple values allowed. Options are:</p><dl><dt><code>"UMAP"</code> (default)</dt>
@@ -110,23 +106,17 @@ Multiple values allowed. Options are:</p><dl><dt><code>"UMAP"</code> (default)</
 
    
 </dl></dd>
-
-
 <dt>weighted</dt>
 <dd><p>Take relative abundances into account. When 
 <code>weighted=FALSE</code>, only presence/absence is considered.
  Ignored if <code>biom</code> is a distance matrix. Multiple values 
  allowed. (Default: <code>TRUE</code>)</p></dd>
-
-
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object representing the phylogenetic
 relationships of the taxa in <code>biom</code>. Will be taken from the tree
 embedded in the <code>biom</code> object if not explicitly specified. Only
 required for computing UniFrac distance matrices.  Ignored if 
 <code>biom</code> is a distance matrix.</p></dd>
-
-
 <dt>md</dt>
 <dd><p>Include metadata in the output data frame? Ignored if 
 <code>biom</code> is a distance matrix. Options are:</p><dl><dt><code>NULL</code></dt>
@@ -140,48 +130,32 @@ required for computing UniFrac distance matrices.  Ignored if
 
 
 </dl></dd>
-
-
 <dt>k</dt>
 <dd><p>Number of dimensions to return. (Default: <code>2</code>)</p></dd>
-
-
 <dt>safe</dt>
 <dd><p>If <code>TRUE</code>, then autogenerated columns names will be 
 converted to lowercase and prefixed with a <code>.</code> to avoid 
-conflicting with metadata column names. (Default: <code>FALSE</code>)</p></dd>
-
-
+conflicting with metadata column names. (Default: <code>TRUE</code>)</p></dd>
 <dt>split.by</dt>
 <dd><p>Name(s) of metadata columns that the data should be split
 by prior to calculating distance matrices, ordinations, and statistics.</p></dd>
-
-
 <dt>stat.by, seed, perms</dt>
 <dd><p>Passthrough parameters to <code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> 
 for computing adonis statistics. (Default: <code>stat.by=NULL, seed=0, 
 perms=1000</code>)</p></dd>
-
-
 <dt>rank</dt>
 <dd><p>[Biplot] What rank of taxa to display (e.g. "Phylum"), or 
 <code>NULL</code> for no biplot. Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options 
 for a given BIOM object. (Default: <code>NULL</code>)</p></dd>
-
-
 <dt>taxa</dt>
 <dd><p>[Biplot] Which taxa to display. An integer value will return 
 the top n most abundant taxa. A value 0 &lt;= n &lt; 1 will return any taxa 
 with that mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. (Default: <code>5</code>)</p></dd>
-
-
 <dt>p.adj</dt>
 <dd><p>[Biplot] Method to use for multiple comparisons adjustment of 
 p-values. Run <code>p.adjust.methods</code> for a list of available options.
 (Default: <code>fdr</code>)</p></dd>
-
-
 <dt>p.top</dt>
 <dd><p>[Biplot] Only returns taxa with the most significant 
 differences in abundance. If <code>p.top</code> is &gt;= 1, then the 
@@ -190,27 +164,19 @@ is less than one, all taxa with an adjusted p-value &lt;= <code>p.top</code>
 are displayed. Recommended to be used in combination with the 
 <code>taxa</code> parameter to set a lower bound on the mean abundance of 
 considered taxa. (Default: <code>Inf</code>)</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Additional arguments to pass on to <code><a href="https://rdrr.io/pkg/ape/man/pcoa.html" class="external-link">pcoa</a></code>, 
 <code><a href="https://rdrr.io/pkg/vegan/man/metaMDS.html" class="external-link">metaMDS</a></code>, or <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne</a></code>.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A data.frame with columns Axis.1, Axis.2, ..., Axis.k as well as 
+    <p>A data.frame with columns Axis.1, Axis.2, ..., Axis.k as well as 
         columns given by <code>md</code>, <code>split.by</code>, and <code>stat.by</code>. 
         Sample IDs are in column <code>'Sample'</code> and the metric used in 
         column <code>'Metric'</code>. These column names will be lowercase and 
-        prefixed with a <code>.</code> if <code>safe=TRUE</code>. For pcoa ordinations,</p>
-<p></p>
-<p><code>attr(, 'eig')</code> will contain the eigenvalues useful for 
-        construction of ".. <!-- % variation explained" labels.  --></p>
-<p></p>
-<p><code>attr(, 'stats_raw')</code> and <code>attr(,'stats_tbl')</code> contain the 
+        prefixed with a <code>.</code> if <code>safe=TRUE</code>. For pcoa ordinations, 
+<code>attr(, 'eig')</code> will contain the eigenvalues useful for 
+        construction of ".. <!-- % variation explained" labels.  --><code>attr(, 'stats_raw')</code> and <code>attr(,'stats_tbl')</code> contain the 
         raw and tabular adonis statistics when <code>stat.by</code> is set. 
         Distance matrices are in <code>attr(, 'dm')</code>. When <code>rank</code> is
         non-NULL, or <code>taxa</code> is a list of taxon names, a data.frame of
@@ -219,10 +185,10 @@ considered taxa. (Default: <code>Inf</code>)</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">ord</span> <span class="op">&lt;-</span> <span class="fu">bdiv_ord_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"bray-curtis"</span>, <span class="st">"pcoa"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ord</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
+<span class="r-in">    </span>
+<span class="r-in">    <span class="va">ord</span> <span class="op">&lt;-</span> <span class="fu">bdiv_ord_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"bray-curtis"</span>, <span class="st">"pcoa"</span><span class="op">)</span></span>
+<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ord</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      .axis.1      .axis.2 .sample  .weight       .dist .ord</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.3575401  0.002362419   HMP01 Weighted Bray-Curtis PCoA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.4203019  0.010404374   HMP02 Weighted Bray-Curtis PCoA</span>
@@ -230,7 +196,7 @@ considered taxa. (Default: <code>Inf</code>)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.3876548  0.004854090   HMP04 Weighted Bray-Curtis PCoA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.4154969 -0.011498409   HMP05 Weighted Bray-Curtis PCoA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.4135847 -0.007029588   HMP06 Weighted Bray-Curtis PCoA</span>
-<span class="r-in"><span>    </span></span>
+<span class="r-in">    </span>
 </code></pre></div>
     </div>
   </div>
@@ -245,7 +211,7 @@ considered taxa. (Default: <code>Inf</code>)</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>
