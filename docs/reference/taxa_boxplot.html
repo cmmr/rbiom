@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9061</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9062</span>
       </span>
     </div>
 
@@ -71,11 +71,8 @@
   p.top <span class="op">=</span> <span class="cn">Inf</span>,
   p.adj <span class="op">=</span> <span class="st">"fdr"</span>,
   p.label <span class="op">=</span> <span class="fl">0.05</span>,
-  perms <span class="op">=</span> <span class="fl">1000</span>,
   ci <span class="op">=</span> <span class="fl">95</span>,
   xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,
-  other <span class="op">=</span> <span class="cn">FALSE</span>,
-  safe <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -95,7 +92,7 @@ default, <code>NULL</code>, selects the lowest level.</p></dd>
 <dd><p>Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that 
 mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: <code>5</code></p></dd>
+taxon names will show only those taxa. Default: <code>5</code>.</p></dd>
 <dt>layers</dt>
 <dd><p><code>"box"</code>, <code>"bar" ("r")</code>, <code>"violin"</code>, 
 <code>"dot"</code>, <code>"strip"</code>, <code>"crossbar"</code>, <code>"errorbar"</code>, 
@@ -154,6 +151,12 @@ Set to <code>NULL</code> to disable. Default: <code>95</code></p></dd>
 <b>'auto'</b> (the default), automatically selects a rotation value. 
 <b>0</b>, <b>30</b>, and <b>90</b> sets the angle to horizontal, 
 angled, and vertical, respectively.</p></dd>
+<dt>...</dt>
+<dd><p>Parameters are matched to formal arguments of ggplot2
+functions. Prefixing parameter names with a layer name ensures that
+a particular parameter is passed to, and only to, that layer. For
+instance, <code>dot.size = 2</code> or <code>d.size = 2</code> ensures only the 
+dotplot layer has its size set to <code>2</code>.</p></dd>
 <dt>other</dt>
 <dd><p>Should non-selected taxa be displayed as an "Other" group?
 Default: <code>FALSE</code></p></dd>
@@ -162,12 +165,6 @@ Default: <code>FALSE</code></p></dd>
 <code>".metric"</code> will be auto-converted to <code>"Metric"</code> to improve
 human-readability. Conversion if aborted if a conflict is found with
 a metadata column name. Default: <code>FALSE</code></p></dd>
-<dt>...</dt>
-<dd><p>Parameters are matched to formal arguments of ggplot2
-functions. Prefixing parameter names with a layer name ensures that
-a particular parameter is passed to, and only to, that layer. For
-instance, <code>dot.size = 2</code> or <code>d.size = 2</code> ensures only the 
-dotplot layer has its size set to <code>2</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -189,10 +186,13 @@ that contains zeroes.</p>
     <div class="dont-index"><p><code><a href="stats_table.html">stats_table</a></code></p>
 <p>Other plotting: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
+<code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
+<code><a href="bdiv_biplot.html">bdiv_biplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
-<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
+<code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
+<code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
 <code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
     </div>

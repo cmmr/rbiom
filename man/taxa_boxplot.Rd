@@ -22,11 +22,8 @@ taxa_boxplot(
   p.top = Inf,
   p.adj = "fdr",
   p.label = 0.05,
-  perms = 1000,
   ci = 95,
   xlab.angle = "auto",
-  other = FALSE,
-  safe = FALSE,
   ...
 )
 }
@@ -43,7 +40,7 @@ default, \code{NULL}, selects the lowest level.}
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
 mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: \code{5}}
+taxon names will show only those taxa. Default: \code{5}.}
 
 \item{layers}{\code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -103,6 +100,12 @@ Set to \code{NULL} to disable. Default: \code{95}}
 \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 angled, and vertical, respectively.}
 
+\item{...}{Parameters are matched to formal arguments of ggplot2
+functions. Prefixing parameter names with a layer name ensures that
+a particular parameter is passed to, and only to, that layer. For
+instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
+dotplot layer has its size set to \code{2}.}
+
 \item{other}{Should non-selected taxa be displayed as an "Other" group?
 Default: \code{FALSE}}
 
@@ -110,12 +113,6 @@ Default: \code{FALSE}}
 \code{".metric"} will be auto-converted to \code{"Metric"} to improve
 human-readability. Conversion if aborted if a conflict is found with
 a metadata column name. Default: \code{FALSE}}
-
-\item{...}{Parameters are matched to formal arguments of ggplot2
-functions. Prefixing parameter names with a layer name ensures that
-a particular parameter is passed to, and only to, that layer. For
-instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-dotplot layer has its size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 
@@ -149,10 +146,13 @@ Visualize BIOM data with boxplots.
 
 Other plotting: 
 \code{\link{adiv_boxplot}()},
+\code{\link{adiv_corrplot}()},
+\code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
+\code{\link{rare_corrplot}()},
+\code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()}
 }

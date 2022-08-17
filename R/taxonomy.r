@@ -133,7 +133,7 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.matrix(value))
   stopifnot(typeof(value) == "character")
-  stopifnot(!all(taxa_names(x) %in% rownames(value)))
+  stopifnot(all(taxa_names(x) %in% rownames(value)))
   
   x[['taxonomy']] <- value[taxa_names(x),]
   

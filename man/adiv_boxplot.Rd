@@ -125,11 +125,14 @@ Visualize alpha diversity with boxplots.
 \code{\link{stats_table}}
 
 Other plotting: 
+\code{\link{adiv_corrplot}()},
+\code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
+\code{\link{rare_corrplot}()},
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()}
 }

@@ -19,7 +19,7 @@
 #' @param taxa   Which taxa to display. An integer value will show the top n
 #'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
 #'        mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. Default: \code{5}
+#'        taxon names will show only those taxa. Default: \code{5}.
 #'           
 #' @param layers   \code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -122,8 +122,7 @@ taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    p.top = Inf, p.adj = "fdr", p.label = 0.05, perms = 1000,
-    ci = 95, xlab.angle = 'auto', other = FALSE, safe = FALSE, ...) {
+    p.top = Inf, p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', ...) {
   
   
   # Sanity checks

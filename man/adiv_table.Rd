@@ -25,8 +25,8 @@ diversity computations. Options are:
                        without applying any rarefaction. (Default) }
   \item{\code{TRUE}}{ Automatically select and apply a single 
                       rarefaction. }
-  \item{\code{"multi"}}{ Automatically select and apply multiple 
-                         rarefactions.}
+  \item{\code{"multi_log"}, \code{"multi_even"}}{ Automatically select
+                      and apply multiple rarefactions.}
   \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
 }}
 

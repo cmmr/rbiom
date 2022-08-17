@@ -11,8 +11,8 @@
 #'                            without applying any rarefaction. (Default) }
 #'       \item{\code{TRUE}}{ Automatically select and apply a single 
 #'                           rarefaction. }
-#'       \item{\code{"multi"}}{ Automatically select and apply multiple 
-#'                              rarefactions.}
+#'       \item{\code{"multi_log"}, \code{"multi_even"}}{ Automatically select
+#'                           and apply multiple rarefactions.}
 #'       \item{\emph{integer vector}}{ Rarefy at the specified depth(s). }
 #'     }
 #'     
@@ -86,20 +86,24 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
   #--------------------------------------------------------------
   # Define the rarefaction depths to sample at
   #--------------------------------------------------------------
+  rLvls <- NA
+  
   if (identical(rarefy, TRUE)) {
-    counts <- rbiom::rarefy(counts)
-    rLvls <- NA
-    
-  } else if (identical(rarefy, "multi")) {
-    sample_sums <- slam::col_sums(counts)
-    rLvls <- floor(10 ** (c(1:10) * (log10(fivenum(sample_sums)[[4]]) / 10)))
-    remove("sample_sums")
+    counts <- rarefy(counts)
     
   } else if (is.numeric(rarefy)) {
     rLvls <- sort(rarefy)
     
-  } else {
-    rLvls <- NA
+  } else if (is.character(rarefy)) {
+    upper <- fivenum(slam::col_sums(counts))[[4]]
+    
+    if (identical(rarefy, "multi") || identical(rarefy, "multi_log")) {
+      rLvls <- floor(10 ** (c(1:10) * (log10(upper) / 10)))
+      
+    } else if (identical(rarefy, "multi_even")) {
+      rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
+    }
+    remove("upper")
   }
   
   
@@ -107,7 +111,7 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
   
   for (rLvl in rLvls) {
     
-    otus <- if (is.na(rLvl)) counts else rbiom::rarefy(counts, rLvl)
+    otus <- if (is.na(rLvl)) counts else rarefy(counts, rLvl)
     df   <- rcpp_alpha_div(otus)
     
     
@@ -157,9 +161,11 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
   if (length(rLvls) == 1 && !isTRUE(long))
     rownames(result) <- result[['Sample']]
   
-  if (isTRUE(long))
-    if (length(unique(result[['Metric']])) > 1)
+  if (isTRUE(long)) {
+    result[['Metric']] %<>% factor(levels = metrics)
+    if (length(metrics) > 1)
       attr(result, 'facet') <- ifelse(safe, '.metric', 'Metric')
+  }
   
   
   #--------------------------------------------------------------
@@ -173,7 +179,7 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
   #--------------------------------------------------------------
   # Add Metadata
   #--------------------------------------------------------------
-  if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
+  if (identical(md, TRUE))  md <- colnames(metadata(biom))
   if (identical(md, FALSE)) md <- c()
   for (i in unique(md))
     result[[i]] <- metadata(biom, i)[result[[1]]]

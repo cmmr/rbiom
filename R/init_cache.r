@@ -37,7 +37,7 @@ init_cache <- function (cm = 50 * 1024^2, ...) {
   
   fnList <- c(
     "adiv_boxplot", "adiv_table", "as_percent", "apcoa", "bdply", 
-    "bdiv_boxplot", "bdiv_distmat", "bdiv_heatmap", "bdiv_ord_plot", 
+    "bdiv_boxplot", "bdiv_distmat", "bdiv_heatmap", "bdiv_biplot", 
     "bdiv_ord_table", "bdiv_table", "blply", "distill", "plot_heatmap", 
     "rarefy", "sample_sums", "select", "stats_table", "subtree", 
     "taxa_boxplot", "taxa_heatmap", "taxa_matrix", "taxa_means", 

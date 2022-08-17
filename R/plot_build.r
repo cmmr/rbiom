@@ -1,8 +1,8 @@
 
-#--------------------------------------------------------------
+#______________________________________________________________
 # Create the plot and add each layer with its arguments.
 # Also attach a human-readable version of the plot command.
-#--------------------------------------------------------------
+#______________________________________________________________
 plot_build <- function (layers) {
   
   stopifnot('ggplot' %in% names(layers))
@@ -12,9 +12,9 @@ plot_build <- function (layers) {
   stopifnot(is.data.frame(ggdata))
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Return a placeholder plot if no data is present
-  #--------------------------------------------------------------
+  #______________________________________________________________
   if (nrow(ggdata) == 0) {
     p <- ggplot() + 
       geom_text(mapping = aes(x=1,y=1), label="No Data to Display") + 
@@ -26,23 +26,24 @@ plot_build <- function (layers) {
   }
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Standardize the list order: ggplot() first, theme() last, etc
-  #--------------------------------------------------------------
+  #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'violin', 'point', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
-    'regression', 'name', 'crossbar', 'linerange', 'errorbar', 'pointrange', 
-    'mean', 'arrow', 'taxon', 'brackets', 'stats_text', 'stack', 'labs', 
-    'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 
-    'facet', 'xaxis', 'yaxis', 'theme_bw', 'theme' )
+    'ggplot', 'violin', 'point', 'smooth', 'bar', 'box', 'spider', 'dot', 
+    'ellipse', 'strip', 'regression', 'name', 'crossbar', 'linerange', 
+    'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
+    'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
+    'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', 
+    'xaxis', 'yaxis', 'theme_bw', 'theme' )
   layer_order <- c(
     intersect(layer_order, names(layers)),
     setdiff(names(layers), layer_order) )
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Suppress x-axis labels when they're identical to facet labels
-  #--------------------------------------------------------------
+  #______________________________________________________________
   if(attr(layers, 'xcol', exact = TRUE) %in% params[['facet.by']]) {
     layers[['theme']][['axis.text.x']]        <- element_blank()
     layers[['theme']][['axis.ticks.x']]       <- element_blank()
@@ -51,18 +52,18 @@ plot_build <- function (layers) {
   }
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Note any transformation in the y-axis label
-  #--------------------------------------------------------------
+  #______________________________________________________________
   if (!is.null(layers[['labs']][['y']]))
     if (!is.null(layers[['yaxis']][['trans']]))
       layers[['labs']][['y']] %<>% paste0(" (", layers[['yaxis']][['trans']], " scale)")
   
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # See if there's a better group column than '.group'
-  #--------------------------------------------------------------
+  #______________________________________________________________
   gcol <- '.group'
   if (hasName(ggdata, '.group')) {
     
@@ -89,46 +90,15 @@ plot_build <- function (layers) {
   }
   
   
-  # #--------------------------------------------------------------
-  # # When a layer only has a single row in ggdata, inline it.
-  # #--------------------------------------------------------------
-  # for (layer in layer_order) {
-  #   
-  #   args <- layers[[layer]]
-  #   src  <- attr(args, 'src', exact = TRUE) %||% next
-  #   
-  #   row <- ggdata[ggdata[['.src']] == src,,drop=FALSE]
-  #   if (nrow(row) != 1) next
-  #   if (!'mapping' %in% names(args)) next
-  #   if (!all(unname(args[['mapping']]) %in% names(row))) next
-  #   
-  #   for (i in seq_along(args[['mapping']])) {
-  #     arg <- names(args[['mapping']][i])
-  #     col <- unname(args[['mapping']][[i]])
-  #     args[['mapping']][[arg]] <- row[[col]]
-  #     
-  #     remove("arg", "col")
-  #   }
-  #   
-  #   ggdata <- ggdata[ggdata[['.src']] != src,,drop=FALSE]
-  #   
-  #   args[['data']]    <- as.cmd(data.frame())
-  #   attr(args, 'src') <- NULL
-  #   layers[[layer]]   <- args
-  #   
-  #   remove("args", "src", "row")
-  # }
-  
-  
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Track which columns in `data` the plot command uses
-  #--------------------------------------------------------------
+  #______________________________________________________________
   mapped_cols <- params[['facet.by']]
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Clean up args; remove vestigial columns from ggdata
-  #--------------------------------------------------------------
+  #______________________________________________________________
   
   for (layer in layer_order) {
     
@@ -144,7 +114,7 @@ plot_build <- function (layers) {
     
     
     # Create the aes object for `mapping`=
-    #--------------------------------------------------------------
+    #______________________________________________________________
     if ('mapping' %in% names(args)) {
       
       aes_args <- args[['mapping']]
@@ -209,7 +179,7 @@ plot_build <- function (layers) {
     
     
     # Don't specify an argument if it's already the default
-    #--------------------------------------------------------------
+    #______________________________________________________________
     defaults <- tryCatch(expr = { formals(fun) }, error = function (e) browser() )
     # defaults <- formals(fun)
     for (i in intersect(names(defaults), names(args)))
@@ -225,9 +195,9 @@ plot_build <- function (layers) {
   remove("mapped_cols")
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Assemble the ggplot object (p)
-  #--------------------------------------------------------------
+  #______________________________________________________________
   p    <- NULL
   cmds <- c("library(ggplot2)")
   
@@ -239,19 +209,19 @@ plot_build <- function (layers) {
     
     
     # Skip theme() unless it has arguments
-    #--------------------------------------------------------------
+    #______________________________________________________________
     if (layer == "theme" && length(args) == 0)
       next
     
     
     # Force sqrt scale to display zero tick mark.
-    #--------------------------------------------------------------
+    #______________________________________________________________
     if (layer == "yaxis" && identical(args[['trans']], "sqrt"))
       args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
     
     
     # Show ggplot() layer as "ggplot(data)", rest more verbosely
-    #--------------------------------------------------------------
+    #______________________________________________________________
     if (fn == "ggplot") {
       args[['data']] <- structure(ggdata, display = "data")
       p    <- do.call(fun, args) 
@@ -264,9 +234,9 @@ plot_build <- function (layers) {
   }
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Attach the number of facet rows and cols as plot attributes
-  #--------------------------------------------------------------
+  #______________________________________________________________
   attr(p, 'facet.nrow') <- attr(layers, 'facet.nrow', exact = TRUE)
   attr(p, 'facet.ncol') <- attr(layers, 'facet.ncol', exact = TRUE)
   
@@ -276,9 +246,9 @@ plot_build <- function (layers) {
   attr(p, 'stats') <- attr(layers, "stats", exact = TRUE)
   
   
-  #--------------------------------------------------------------
+  #______________________________________________________________
   # Prevent p from including all of this environment's variables.
-  #--------------------------------------------------------------
+  #______________________________________________________________
   p$plot_env <- emptyenv()
   
   

@@ -314,6 +314,10 @@ taxa_rollup <- function (
       '.taxa'          = colnames(res)[col(res)],
       '.value'         = as.numeric(res)
     )
+    if (is.null(taxa)) { res[['.taxa']] %<>% factor()
+    } else             { res[['.taxa']] %<>% factor(levels = taxa) }
+      
+    
     taxa_in <- "rows"
     
   } else if (isFALSE(md)) {

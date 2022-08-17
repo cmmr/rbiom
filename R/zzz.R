@@ -12,7 +12,7 @@ ENV <- environment(NULL)
     'aes_string', 'coord_fixed', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'expansion', 'facet_grid', 'facet_wrap', 
-    'geom_bar', 'geom_boxplot', 'geom_col', 
+    'geom_bar', 'geom_boxplot', 'geom_col', 'geom_hline', 'geom_vline',
     'geom_crossbar', 'geom_errorbar', 'geom_linerange', 'geom_point', 
     'geom_pointrange', 'geom_raster', 'geom_rect', 'geom_segment', 
     'geom_smooth', 'geom_text', 'geom_tile', 'geom_violin', 
