@@ -7,11 +7,6 @@
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param x   A numeric metadata column name to use for the x-axis. Required.
-#'           
-#' @param layers   \code{"point"}, and/or \code{"smooth"}. Single letter 
-#'        abbreviations are also accepted. For instance, 
-#'        \code{c("point", "smooth")} is equivalent to \code{c("p", "s")} and 
-#'        \code{"ps"}. Default: \code{"ps"}.
 #'        
 #' @param rank   What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
 #'        \code{taxa_ranks()} to see all options for a given BIOM object. The
@@ -21,10 +16,21 @@
 #'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
 #'        mean abundance or greater (e.g. 0.1). A character vector of
 #'        taxon names will show only those taxa. Default: \code{6}.
+#' 
+#' @param points   Overlay a scatter plot. Default: \code{FALSE}.
+#'        
+#' @param model   What type of trendline to fit to the data. Options are: 
+#'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+#'        alternatively provide \bold{method} and/or \bold{formula} arguments
+#'        which will override these preset options for 
+#'        \link[ggplot2]{stat_smooth}. Default: \code{"linear"}.
+#' 
+#' @param ci   The confidence interval to display around the fitted curve. Set
+#'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
 #'        
 #' @param color.by,facet.by   Metadata column to color and/or facet by. If that
 #'        column is a \code{factor}, the ordering of levels will be maintained 
-#'        in the plot. Default: \code{color.by = NULL, facet.by = NULL}
+#'        in the plot. Default: \code{color.by = NULL, facet.by = NULL}.
 #'        
 #' @param colors,facets   Names of the colors and/or facets values to use in
 #'        the plot. Available values for colors are given by \code{colors()}. 
@@ -32,14 +38,7 @@
 #'        the metadata. \code{facets} are coerced to unnamed character vectors.
 #'        If the length of these vectors is less than the values present in 
 #'        their corresponding metadata column, then the data set will be 
-#'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}
-#'        
-#' @param method,formula   Passed to \link[ggplot2]{stat_smooth} to
-#'        define the fitted curve.
-#'        Default: \code{method = "lm", formula = y ~ x}.
-#' 
-#' @param ci   The confidence interval to display around the fitted curve. Set
-#'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
+#'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
 #'        functions. Prefix a parameter name with either \code{p.} or \code{s.}
@@ -58,13 +57,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     taxa_corrplot(rarefy(hmp50), "BMI", color.by="Body Site")
+#'     taxa_corrplot(rarefy(hmp50), "BMI", color.by="Body Site") 
 #'     
 
 taxa_corrplot <- function (
-    biom, x, layers = "ps", rank = NULL, taxa = 6,
+    biom, x, rank = NULL, taxa = 6, points = FALSE,
     color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL,
-    method = "lm", formula = y ~ x, ci = 95, ...) {
+    model = "linear", ci = 95, ...) {
   
   
   #________________________________________________________
@@ -130,11 +129,8 @@ taxa_corrplot <- function (
     'ycol'     = ".value",
     'xmode'    = "numeric" )
   
-  layer_names <- params[['layers']] %>%
-    layer_match(c('p' = "point", 's' = "smooth"), "ps") %>%
-    c('ggplot', ., 'labs', 'theme_bw')
-  initLayer(layer_names)
-  remove("layer_names")
+  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  if (isTRUE(points)) initLayer('point')
   
   
   #________________________________________________________

@@ -7,15 +7,14 @@
 taxa_corrplot(
   biom,
   x,
-  layers = "ps",
   rank = NULL,
   taxa = 6,
+  points = FALSE,
   color.by = NULL,
   facet.by = NULL,
   colors = NULL,
   facets = NULL,
-  method = "lm",
-  formula = y ~ x,
+  model = "linear",
   ci = 95,
   ...
 )
@@ -24,11 +23,6 @@ taxa_corrplot(
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{x}{A numeric metadata column name to use for the x-axis. Required.}
-
-\item{layers}{\code{"point"}, and/or \code{"smooth"}. Single letter 
-abbreviations are also accepted. For instance, 
-\code{c("point", "smooth")} is equivalent to \code{c("p", "s")} and 
-\code{"ps"}. Default: \code{"ps"}.}
 
 \item{rank}{What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
 \code{taxa_ranks()} to see all options for a given BIOM object. The
@@ -39,9 +33,11 @@ most abundant taxa. A value 0 <= n < 1 will show any taxa with that
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: \code{6}.}
 
+\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
+
 \item{color.by, facet.by}{Metadata column to color and/or facet by. If that
 column is a \code{factor}, the ordering of levels will be maintained 
-in the plot. Default: \code{color.by = NULL, facet.by = NULL}}
+in the plot. Default: \code{color.by = NULL, facet.by = NULL}.}
 
 \item{colors, facets}{Names of the colors and/or facets values to use in
 the plot. Available values for colors are given by \code{colors()}. 
@@ -49,11 +45,13 @@ Use a named character vector to map them to specific factor levels in
 the metadata. \code{facets} are coerced to unnamed character vectors.
 If the length of these vectors is less than the values present in 
 their corresponding metadata column, then the data set will be 
-subseted accordingly. Default: \code{colors = NULL, facets = NULL}}
+subseted accordingly. Default: \code{colors = NULL, facets = NULL}.}
 
-\item{method, formula}{Passed to \link[ggplot2]{stat_smooth} to
-define the fitted curve.
-Default: \code{method = "lm", formula = y ~ x}.}
+\item{model}{What type of trendline to fit to the data. Options are: 
+\code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+alternatively provide \bold{method} and/or \bold{formula} arguments
+which will override these preset options for 
+\link[ggplot2]{stat_smooth}. Default: \code{"linear"}.}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
@@ -77,7 +75,7 @@ Visualize taxa abundance with scatterplots and trendlines.
 \examples{
     library(rbiom)
     
-    taxa_corrplot(rarefy(hmp50), "BMI", color.by="Body Site")
+    taxa_corrplot(rarefy(hmp50), "BMI", color.by="Body Site") 
     
 }
 \seealso{

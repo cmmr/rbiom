@@ -7,15 +7,14 @@
 adiv_corrplot(
   biom,
   x,
-  layers = "ps",
   metric = "OTUs",
+  points = FALSE,
+  model = "linear",
+  ci = 95,
   color.by = NULL,
   facet.by = NULL,
   colors = NULL,
   facets = NULL,
-  method = "lm",
-  formula = y ~ x,
-  ci = 95,
   ...
 )
 }
@@ -24,18 +23,24 @@ adiv_corrplot(
 
 \item{x}{A numeric metadata column name to use for the x-axis. Required.}
 
-\item{layers}{\code{"point"}, and/or \code{"smooth"}. Single letter 
-abbreviations are also accepted. For instance, 
-\code{c("point", "smooth")} is equivalent to \code{c("p", "s")} and 
-\code{"ps"}. Default: \code{"ps"}.}
-
 \item{metric}{Alpha diversity metric(s) to use. Options are: 
 \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
 and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 
+\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
+
+\item{model}{What type of trendline to fit to the data. Options are: 
+\code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+alternatively provide \bold{method} and/or \bold{formula} arguments
+which will override these preset options for 
+\link[ggplot2]{stat_smooth}. Default: \code{"linear"}.}
+
+\item{ci}{The confidence interval to display around the fitted curve. Set
+to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
+
 \item{color.by, facet.by}{Metadata column to color and/or facet by. If that
 column is a \code{factor}, the ordering of levels will be maintained 
-in the plot. Default: \code{color.by = NULL, facet.by = NULL}}
+in the plot. Default: \code{color.by = NULL, facet.by = NULL}.}
 
 \item{colors, facets}{Names of the colors and/or facets values to use in
 the plot. Available values for colors are given by \code{colors()}. 
@@ -43,14 +48,7 @@ Use a named character vector to map them to specific factor levels in
 the metadata. \code{facets} are coerced to unnamed character vectors.
 If the length of these vectors is less than the values present in 
 their corresponding metadata column, then the data set will be 
-subseted accordingly. Default: \code{colors = NULL, facets = NULL}}
-
-\item{method, formula}{Passed to \link[ggplot2]{stat_smooth} to
-define the fitted curve.
-Default: \code{method = "lm", formula = y ~ x}.}
-
-\item{ci}{The confidence interval to display around the fitted curve. Set
-to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
+subseted accordingly. Default: \code{colors = NULL, facets = NULL}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{p.} or \code{s.}
@@ -71,7 +69,7 @@ Visualize alpha diversity with scatterplots and trendlines.
 \examples{
     library(rbiom)
     
-    adiv_corrplot(rarefy(hmp50), "Age", color.by="Body Site", metric=c("shannon", "otus"), facet.by = "Sex", ci = 90)
+    adiv_corrplot(rarefy(hmp50), "Age", color.by="Body Site", metric=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
     
 }
 \seealso{

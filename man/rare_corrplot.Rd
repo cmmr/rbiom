@@ -6,15 +6,13 @@
 \usage{
 rare_corrplot(
   biom,
-  layers = "ps",
   metric = "OTUs",
   depths = NULL,
+  points = FALSE,
   color.by = NULL,
   facet.by = NULL,
   colors = NULL,
   facets = NULL,
-  method = "lm",
-  formula = y ~ log(x),
   ci = 95,
   vline = NULL,
   ...
@@ -23,11 +21,6 @@ rare_corrplot(
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
-\item{layers}{\code{"point"}, and/or \code{"smooth"}. Single letter 
-abbreviations are also accepted. For instance, 
-\code{c("point", "smooth")} is equivalent to \code{c("p", "s")} and 
-\code{"ps"}. Default: \code{"ps"}.}
-
 \item{metric}{Alpha diversity metric(s) to use. Options are: 
 \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
 and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
@@ -35,6 +28,8 @@ and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 \item{depths}{Rarefaction depths to show in the plot. Passed to
 \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 to pick 10 evenly spaced depths.}
+
+\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
 
 \item{color.by, facet.by}{Metadata column to color and/or facet by. If that
 column is a \code{factor}, the ordering of levels will be maintained 
@@ -47,10 +42,6 @@ the metadata. \code{facets} are coerced to unnamed character vectors.
 If the length of these vectors is less than the values present in 
 their corresponding metadata column, then the data set will be 
 subseted accordingly. Default: \code{colors = NULL, facets = NULL}}
-
-\item{method, formula}{Passed to \link[ggplot2]{stat_smooth} to
-define the fitted curve.
-Default: \code{method = "lm", formula = y ~ log(x)}.}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
@@ -77,7 +68,7 @@ Visualize rarefaction curves with scatterplots and trendlines.
 \examples{
     library(rbiom)
     
-    rare_corrplot(hmp50, color.by="Body Site", metric=c("shannon", "otus"), facet.by="Sex")
+    rare_corrplot(hmp50, color.by="Body Site", metric=c("shannon", "otus"), facet.by="Sex") 
     
 }
 \seealso{

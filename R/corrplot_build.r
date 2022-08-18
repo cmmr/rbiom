@@ -6,6 +6,39 @@ corrplot_build <- function (layers) {
   
   
   #________________________________________________________
+  # Predefined regression models
+  #________________________________________________________
+  if (is.null(params[['method']]) || is.null(params[['formula']])) {
+    
+    model <- params[['model']]
+    if (length(model) != 1 || !is.character(model))
+      stop ("model must a length 1 character vector")
+    
+    models <- list(
+      'linear'      = list( method = "lm",  formula = y ~ x               ), 
+      'logarithmic' = list( method = "lm",  formula = y ~ log(x)          ), 
+      'local'       = list( method = "gam", formula = y ~ s(x, bs = "cs") ) )
+    
+    i <- pmatch(tolower(model), names(models), NA)
+    if (isTRUE(is.na(i)))
+      stop("'", model, "' is not a predefined regression model.")
+    
+    if (is.null(params[['method']]))  params[['method']]  <- models[[i]][['method']]
+    if (is.null(params[['formula']])) params[['formula']] <- models[[i]][['formula']]
+    
+    remove("model", "models", "i")
+  }
+  params[['model']] <- NULL
+  
+  
+  #________________________________________________________
+  # Convert `formula` to a formula.
+  #________________________________________________________
+  if (!is(params[['formula']], 'formula'))
+    params[['formula']] <- as.formula(params[['formula']], env = baseenv())
+  
+  
+  #________________________________________________________
   # aes() mapping for color/fill
   #________________________________________________________
   if (!is.null(params[['color.by']])) {
@@ -21,7 +54,7 @@ corrplot_build <- function (layers) {
   
   
   #________________________________________________________
-  # Fade out the point when a curve is fitted.
+  # Fade out the points when a curve is fitted.
   #________________________________________________________
   if (hasLayer("smooth") && hasLayer("point"))
     setLayer("point", size = 0.2, alpha = 0.5)

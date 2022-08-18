@@ -5,11 +5,6 @@
 #' @family plotting
 #' 
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
-#'           
-#' @param layers   \code{"point"}, and/or \code{"smooth"}. Single letter 
-#'        abbreviations are also accepted. For instance, 
-#'        \code{c("point", "smooth")} is equivalent to \code{c("p", "s")} and 
-#'        \code{"ps"}. Default: \code{"ps"}.
 #' 
 #' @param metric   Alpha diversity metric(s) to use. Options are: 
 #'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
@@ -18,6 +13,8 @@
 #' @param depths   Rarefaction depths to show in the plot. Passed to
 #'        \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 #'        to pick 10 evenly spaced depths.
+#' 
+#' @param points   Overlay a scatter plot. Default: \code{FALSE}.
 #'        
 #' @param color.by,facet.by   Metadata column to color and/or facet by. If that
 #'        column is a \code{factor}, the ordering of levels will be maintained 
@@ -30,10 +27,6 @@
 #'        If the length of these vectors is less than the values present in 
 #'        their corresponding metadata column, then the data set will be 
 #'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}
-#'        
-#' @param method,formula   Passed to \link[ggplot2]{stat_smooth} to
-#'        define the fitted curve.
-#'        Default: \code{method = "lm", formula = y ~ log(x)}.
 #' 
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
@@ -58,13 +51,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     rare_corrplot(hmp50, color.by="Body Site", metric=c("shannon", "otus"), facet.by="Sex")
+#'     rare_corrplot(hmp50, color.by="Body Site", metric=c("shannon", "otus"), facet.by="Sex") 
 #'     
 
 rare_corrplot <- function (
-    biom, layers = "ps", metric = "OTUs", depths = NULL,
+    biom, metric = "OTUs", depths = NULL, points = FALSE,
     color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL,
-    method = "lm", formula = y ~ log(x), ci = 95, vline = NULL, ...) {
+    ci = 95, vline = NULL, ...) {
   
   
   #________________________________________________________
@@ -118,6 +111,12 @@ rare_corrplot <- function (
   
   
   #________________________________________________________
+  # Tell corrplot_build to use lm(y ~ log(x))
+  #________________________________________________________
+  params[['model']] <- "logarithmic"
+  
+  
+  #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
   layers <- structure(
@@ -129,11 +128,8 @@ rare_corrplot <- function (
     'ycol'     = ".value",
     'xmode'    = "numeric" )
   
-  layer_names <- params[['layers']] %>%
-    layer_match(c('p' = "point", 's' = "smooth"), "ps") %>%
-    c('ggplot', ., 'labs', 'theme_bw')
-  initLayer(layer_names)
-  remove("layer_names")
+  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  if (isTRUE(points)) initLayer('point')
   
   
   #________________________________________________________

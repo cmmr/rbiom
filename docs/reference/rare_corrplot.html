@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9062</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9063</span>
       </span>
     </div>
 
@@ -55,15 +55,13 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rare_corrplot</span><span class="op">(</span>
   <span class="va">biom</span>,
-  layers <span class="op">=</span> <span class="st">"ps"</span>,
   metric <span class="op">=</span> <span class="st">"OTUs"</span>,
   depths <span class="op">=</span> <span class="cn">NULL</span>,
+  points <span class="op">=</span> <span class="cn">FALSE</span>,
   color.by <span class="op">=</span> <span class="cn">NULL</span>,
   facet.by <span class="op">=</span> <span class="cn">NULL</span>,
   colors <span class="op">=</span> <span class="cn">NULL</span>,
   facets <span class="op">=</span> <span class="cn">NULL</span>,
-  method <span class="op">=</span> <span class="st">"lm"</span>,
-  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,
   ci <span class="op">=</span> <span class="fl">95</span>,
   vline <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>
@@ -74,11 +72,6 @@
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
-<dt>layers</dt>
-<dd><p><code>"point"</code>, and/or <code>"smooth"</code>. Single letter 
-abbreviations are also accepted. For instance, 
-<code>c("point", "smooth")</code> is equivalent to <code>c("p", "s")</code> and 
-<code>"ps"</code>. Default: <code>"ps"</code>.</p></dd>
 <dt>metric</dt>
 <dd><p>Alpha diversity metric(s) to use. Options are: 
 <code>"OTUs"</code>, <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, 
@@ -87,6 +80,8 @@ and/or <code>"InvSimpson"</code>. Default: <code>"OTUs"</code>.</p></dd>
 <dd><p>Rarefaction depths to show in the plot. Passed to
 <a href="adiv_table.html">adiv_table</a>. The default, <code>"multi_even"</code>, uses a heuristic
 to pick 10 evenly spaced depths.</p></dd>
+<dt>points</dt>
+<dd><p>Overlay a scatter plot. Default: <code>FALSE</code>.</p></dd>
 <dt>color.by, facet.by</dt>
 <dd><p>Metadata column to color and/or facet by. If that
 column is a <code>factor</code>, the ordering of levels will be maintained 
@@ -99,10 +94,6 @@ the metadata. <code>facets</code> are coerced to unnamed character vectors.
 If the length of these vectors is less than the values present in 
 their corresponding metadata column, then the data set will be 
 subseted accordingly. Default: <code>colors = NULL, facets = NULL</code></p></dd>
-<dt>method, formula</dt>
-<dd><p>Passed to <a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">stat_smooth</a> to
-define the fitted curve.
-Default: <code>method = "lm", formula = y ~ log(x)</code>.</p></dd>
 <dt>ci</dt>
 <dd><p>The confidence interval to display around the fitted curve. Set
 to <code>FALSE</code> to hide the confidence interval. Default: <code>95</code>.</p></dd>
@@ -143,7 +134,7 @@ or <code>v.</code> to ensure it gets passed to (and only to)
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
 <span class="r-in">    </span>
-<span class="r-in">    <span class="fu">rare_corrplot</span><span class="op">(</span><span class="va">hmp50</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, metric<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shannon"</span>, <span class="st">"otus"</span><span class="op">)</span>, facet.by<span class="op">=</span><span class="st">"Sex"</span><span class="op">)</span></span>
+<span class="r-in">    <span class="fu">rare_corrplot</span><span class="op">(</span><span class="va">hmp50</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, metric<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shannon"</span>, <span class="st">"otus"</span><span class="op">)</span>, facet.by<span class="op">=</span><span class="st">"Sex"</span><span class="op">)</span> </span>
 <span class="r-plt img"><img src="rare_corrplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in">    </span>
 </code></pre></div>
