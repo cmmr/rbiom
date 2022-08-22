@@ -70,6 +70,9 @@
     <loc>/reference/depth.html</loc>
   </url>
   <url>
+    <loc>/reference/depths_barplot.html</loc>
+  </url>
+  <url>
     <loc>/reference/distill.html</loc>
   </url>
   <url>
@@ -146,6 +149,9 @@
   </url>
   <url>
     <loc>/reference/rare_corrplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rare_multiplot.html</loc>
   </url>
   <url>
     <loc>/reference/rbiom.html</loc>

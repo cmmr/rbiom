@@ -14,7 +14,8 @@ rare_corrplot(
   colors = NULL,
   facets = NULL,
   ci = 95,
-  vline = NULL,
+  rline = NULL,
+  caption = TRUE,
   ...
 )
 }
@@ -46,13 +47,18 @@ subseted accordingly. Default: \code{colors = NULL, facets = NULL}}
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
 
-\item{vline}{Where to draw a vertical line on the plot, intended to show
-a particular rarefaction depth. Default: \code{NULL}.}
+\item{rline}{Where to draw a horizontal line on the plot, intended to show
+a particular rarefaction depth. Set to \code{TRUE} to show an 
+auto-selected rarefaction depth or \code{NULL} to not show a line.
+Default: \code{NULL}.}
+
+\item{caption}{Display information about the method used for trendline
+fitting beneath the plot. Default: \code{TRUE}.}
 
 \item{...}{Additional parameters to pass along to ggplot2 
-functions. Prefix a parameter name with either \code{p.}, \code{s.}, 
-or \code{v.} to ensure it gets passed to (and only to) 
-\link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
+functions. Prefix a parameter name with either \code{p.}, 
+\code{r.}/\code{v.}, or \code{s.} to ensure it gets passed to (and
+only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
 \link[ggplot2]{geom_smooth}, respectively. For instance, 
 \code{p.size = 2} ensures only the points have their size set to 
 \code{2}.}
@@ -78,7 +84,9 @@ Other plotting:
 \code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
+\code{\link{depths_barplot}()},
 \code{\link{plot_heatmap}()},
+\code{\link{rare_multiplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

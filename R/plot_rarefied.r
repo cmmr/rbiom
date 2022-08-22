@@ -180,7 +180,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       aes_args                         <- list('x' = ".depth", 'y' = ".value")
       elements[['labs']]               <- list('x' = "Rarefaction Depth", 'y' = adiv_metric)
       elements[['stat_smooth']]        <- list('method' = "lm", 'formula' = "y ~ log(x)")
-      elements[['scale_x_continuous']] <- list('labels' = siunit)
+      elements[['scale_x_continuous']] <- list('labels' = si_units)
       
       if (!is.null(color.by)) {
         df[[color.by]] <- metadata(biom, color.by)[df[['.sample']]]

@@ -31,7 +31,7 @@ plot_build <- function (layers) {
   #______________________________________________________________
   layer_order <- c(
     'ggplot', 'violin', 'point', 'smooth', 'bar', 'box', 'spider', 'dot', 
-    'ellipse', 'strip', 'regression', 'name', 'crossbar', 'linerange', 
+    'ellipse', 'strip', 'name', 'crossbar', 'linerange', 'rect',
     'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
     'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
     'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', 
@@ -115,73 +115,79 @@ plot_build <- function (layers) {
     
     # Create the aes object for `mapping`=
     #______________________________________________________________
-    if ('mapping' %in% names(args)) {
+    if (hasName(args, 'mapping')) {
       
-      aes_args <- args[['mapping']]
-      aes_args <- aes_args[!sapply(aes_args, is.null)]
-      
-      # Put group last, so we can see if it's optional when it comes up
-      aes_cols <- c()
-      if ('group' %in% names(aes_args))
-        aes_args <- aes_args[c(setdiff(names(aes_args), 'group'), 'group')]
-      
-      
-      for (arg in names(aes_args)) {
+      if (is(args[['mapping']], "uneval")) {
         
-        val <- tryCatch(expr = { as.vector(aes_args[[arg]]) }, error = function (e) browser() )
-        # val <- as.vector(aes_args[[arg]])
-        
-        if (identical(val, ".all"))   val <- NA
-        if (identical(val, ".group")) val <- gcol
-        
-        
-        if (is.character(val) && length(val) == 1) {
-          
-          if (val %in% data_cols) {
-            
-            if (arg == "group" && val %in% aes_cols) {
-              
-              # Avoid this: color = Sex, group = Sex
-              val <- NULL
-              
-            } else {
-            
-              aes_cols <- unique(c(aes_cols, val))
-              
-              if (is.null(src))
-                mapped_cols <- unique(c(mapped_cols, val))
-              
-              # Add backticks to column names
-              val <- capture.output(as.name(val))
-            }
-          
-          } else {
-            # Add double-quotes to other strings
-            val <- glue::double_quote(val)
-          }
-        }
-        
-        aes_args[[arg]] <- val
-      }
-      
-      if (isTRUE(length(aes_args) > 0)) {
-        args[['mapping']] <- do.call(
-          what  = aes_string, 
-          args  = aes_args, 
-          quote = TRUE )
+        # mapping is already an aes() object.
+        mapped_cols <- unique(c(mapped_cols, colnames(ggdata)))
         
       } else {
-        args <- args[names(args) != 'mapping']
-      }
       
-      remove("aes_cols")
+        aes_args <- args[['mapping']]
+        aes_args <- aes_args[!sapply(aes_args, is.null)]
+        
+        # Put group last, so we can see if it's optional when it comes up
+        aes_cols <- c()
+        if ('group' %in% names(aes_args))
+          aes_args <- aes_args[c(setdiff(names(aes_args), 'group'), 'group')]
+        
+        
+        for (arg in names(aes_args)) {
+          
+          val <- as.vector(aes_args[[arg]])
+          
+          if (identical(val, ".all"))   val <- NA
+          if (identical(val, ".group")) val <- gcol
+          
+          
+          if (is.character(val) && length(val) == 1) {
+            
+            if (val %in% data_cols) {
+              
+              if (arg == "group" && val %in% aes_cols) {
+                
+                # Avoid this: color = Sex, group = Sex
+                val <- NULL
+                
+              } else {
+              
+                aes_cols <- unique(c(aes_cols, val))
+                
+                if (is.null(src))
+                  mapped_cols <- unique(c(mapped_cols, val))
+                
+                # Add backticks to column names
+                val <- capture.output(as.name(val))
+              }
+            
+            } else {
+              # Add double-quotes to other strings
+              val <- glue::double_quote(val)
+            }
+          }
+          
+          aes_args[[arg]] <- val
+        }
+        
+        if (isTRUE(length(aes_args) > 0)) {
+          args[['mapping']] <- do.call(
+            what  = aes_string, 
+            args  = aes_args, 
+            quote = TRUE )
+          
+        } else {
+          args <- args[names(args) != 'mapping']
+        }
+        
+        remove("aes_args", "aes_cols")
+      }
     }
     
     
     # Don't specify an argument if it's already the default
     #______________________________________________________________
-    defaults <- tryCatch(expr = { formals(fun) }, error = function (e) browser() )
-    # defaults <- formals(fun)
+    defaults <- formals(fun)
     for (i in intersect(names(defaults), names(args)))
       if (identical(defaults[[i]], args[[i]]))
         args[[i]] <- NULL

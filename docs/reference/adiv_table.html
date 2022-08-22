@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9063</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9065</span>
       </span>
     </div>
 
@@ -72,17 +72,18 @@ columns are assumed to be the taxa and samples, respectively.</p></dd>
 <dt>rarefy</dt>
 <dd><p>Control how/whether rarefactions are done prior to alpha 
 diversity computations. Options are:</p><dl><dt><code>FALSE</code></dt>
-<dd><p>Use each sample's current set of observations 
-                       without applying any rarefaction. (Default)</p></dd>
+<dd><p>Use each sample's current set of observations without applying
+    any rarefaction. (Default)</p></dd>
 
+    
   <dt><code>TRUE</code></dt>
-<dd><p>Automatically select and apply a single 
-                      rarefaction.</p></dd>
+<dd><p>Automatically select and apply a single rarefaction.</p></dd>
 
+    
   <dt><code>"multi_log"</code>, <code>"multi_even"</code></dt>
-<dd><p>Automatically select
-                      and apply multiple rarefactions.</p></dd>
+<dd><p>Automatically select and apply multiple rarefactions.</p></dd>
 
+    
   <dt><em>integer vector</em></dt>
 <dd><p>Rarefy at the specified depth(s).</p></dd>
 
@@ -90,17 +91,16 @@ diversity computations. Options are:</p><dl><dt><code>FALSE</code></dt>
 </dl></dd>
 <dt>metrics</dt>
 <dd><p>Character vector of one or more of the following: 
-<code>Depth</code>, <code>OTUs</code>, <code>Shannon</code>, <code>Chao1</code>, <code>Simpson</code>, 
-<code>InvSimpson</code>. Non-ambiguous abbreviations are also accepted. The 
-default, <code>all</code>, returns all of them.</p></dd>
+<code>Depth</code>, <code>OTUs</code>, <code>Shannon</code>, <code>Chao1</code>, 
+<code>Simpson</code>, <code>InvSimpson</code>. Non-ambiguous abbreviations are 
+also accepted. The default, <code>all</code>, returns all of them.</p></dd>
 <dt>long</dt>
 <dd><p>Pivot the returned data to long format?</p><dl><dt><b>FALSE</b></dt>
 <dd><p>Each metric has its own column. (Default)</p></dd>
 
   <dt><b>TRUE</b></dt>
-<dd><p>"Sample", "Metric" and "Diversity" are the columns 
-                  returned. Rows are added to attain all combinations of 
-                  samples x metrics.</p></dd>
+<dd><p>"Sample", "Metric" and "Diversity" are the columns returned. Rows
+    are added to attain all combinations of samples x metrics.</p></dd>
 
 
 </dl></dd>
@@ -112,8 +112,7 @@ default, <code>all</code>, returns all of them.</p></dd>
 <dd><p>Include all metadata.</p></dd>
 
   <dt><em>character vector</em></dt>
-<dd><p>Include only the specified metadata 
-                                  columns.</p></dd>
+<dd><p>Include only the specified metadata columns.</p></dd>
 
 
 </dl></dd>
@@ -124,10 +123,10 @@ conflicting with metadata column names? (Default: FALSE)</p></dd>
     <div id="value">
     <h2>Value</h2>
     <p>A data frame of four diversity values for each sample in
-<code>biom</code>. The column names are <b>Sample</b>, <b>Depth</b> and the 
-    diversity metrics: <b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, 
+<code>biom</code>. The column names are <b>Sample</b>, <b>Depth</b> and 
+        the diversity metrics: <b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>, 
 <b>Simpson</b>, and <b>InvSimpson</b>. The row names are the sample 
-    names, except when multiple rarefactions are done.</p>
+        names, except when multiple rarefactions are done.</p>
     </div>
 
     <div id="ref-examples">

@@ -373,31 +373,30 @@ finite_check <- function (df, col=".y", metric=NULL) {
 #____________________________________________________________________
 # Log scale labels
 #____________________________________________________________________
-siunit <- function (x) {
-  sapply(as.numeric(x), function (n) {
-    if (is.na(n))       return ("")
-    if (abs(n) < 10^3 ) return (as.character(n))
-    if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
-    if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
-    if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
-    if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
-    if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
-    if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
-    return (as.character(scientific(n)))
-  })
-}
+si_units <- as.cmd(scales::label_number(scale_cut = scales::cut_si("")))
+
 loglabels <- function (values) {
-  force(values)
-  limits <- 10 ** c(0, ceiling(log10(max(values))))
-  breaks <- as.vector(sapply(log10(limits[[1]]):(log10(limits[[2]])-1), function (x) { (1:10)*10^x }))
+  
+  hi <- ceiling(log10(max(force(values))))
   list(
-    'limits' = limits, 
-    'breaks' = breaks, 
-    'labels' = function (x) {
-      x[which(1:length(x) %% 10 != 0)] <- NA
-      siunit(x)
-    })
+    'breaks'       = as.cmd(10 ** (0:hi),                    env = list(hi = hi)),
+    'minor_breaks' = as.cmd(as.vector(10 ** (0:hi) %o% 2:9), env = list(hi = hi - 1)),
+    'labels'       = si_units )
 }
+
+# siunit <- function (x) {
+#   sapply(as.numeric(x), function (n) {
+#     if (is.na(n))       return ("")
+#     if (abs(n) < 10^3 ) return (as.character(n))
+#     if (abs(n) < 10^6 ) return (sprintf("%s k", round(n / 10^3,  1)))
+#     if (abs(n) < 10^9 ) return (sprintf("%s M", round(n / 10^6,  1)))
+#     if (abs(n) < 10^12) return (sprintf("%s G", round(n / 10^9,  1)))
+#     if (abs(n) < 10^15) return (sprintf("%s T", round(n / 10^12, 1)))
+#     if (abs(n) < 10^18) return (sprintf("%s P", round(n / 10^15, 1)))
+#     if (abs(n) < 10^21) return (sprintf("%s E", round(n / 10^18, 1)))
+#     return (as.character(scientific(n)))
+#   })
+# }
 
 
 # Turn unquoted barewords into a character vector.

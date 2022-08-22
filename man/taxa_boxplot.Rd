@@ -150,8 +150,10 @@ Other plotting:
 \code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
+\code{\link{depths_barplot}()},
 \code{\link{plot_heatmap}()},
 \code{\link{rare_corrplot}()},
+\code{\link{rare_multiplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()}

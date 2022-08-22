@@ -1,10 +1,13 @@
-#' Visualize rarefaction curves with scatterplots and trendlines.
+#' Combines rare_corrplot and depths_barplot into a single figure.
 #' 
-#' @name rare_corrplot
+#' @name rare_multiplot
 #' 
 #' @family plotting
 #' 
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
+#'        
+#' @param rline   Where to draw a vertical line on the plot, intended to show
+#'        a particular rarefaction depth. Default: \code{TRUE} (no line).
 #' 
 #' @param metric   Alpha diversity metric(s) to use. Options are: 
 #'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
@@ -31,13 +34,13 @@
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
 #'        
-#' @param rline   Where to draw a horizontal line on the plot, intended to show
-#'        a particular rarefaction depth. Set to \code{TRUE} to show an 
-#'        auto-selected rarefaction depth or \code{NULL} to not show a line.
-#'        Default: \code{NULL}.
-#'        
 #' @param caption   Display information about the method used for trendline
-#'        fitting beneath the plot. Default: \code{TRUE}.
+#'        fitting beneath the plot. Default: \code{FALSE}.
+#'        
+#' @param labels   Show sample names under each bar. Default: \code{FALSE}.
+#'        
+#' @param trans   Y-axis transformation. Options are \code{"log10"} or 
+#'        \code{NULL}.  Default: \code{"log10"}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 
 #'        functions. Prefix a parameter name with either \code{p.}, 
@@ -56,13 +59,13 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     rare_corrplot(hmp50, color.by="Body Site", metric=c("shannon", "otus"), facet.by="Sex") 
+#'     rare_multiplot(hmp50, color.by="Body Site") 
 #'     
 
-rare_corrplot <- function (
-    biom, metric = "OTUs", depths = NULL, points = FALSE,
+rare_multiplot <- function (
+    biom, rline = TRUE, metric = "OTUs", depths = NULL, points = FALSE,
     color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL,
-    ci = 95, rline = NULL, caption = TRUE, ...) {
+    ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
   
   #________________________________________________________
@@ -71,7 +74,6 @@ rare_corrplot <- function (
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
   metric <- as.vector(validate_metrics(biom, metric, "adiv", multi=TRUE))
   stopifnot(is.null(depths) || is.numeric(depths))
-  stopifnot(is.logical(rline) || is.null(rline) || is.numeric(rline))
   
   
   #________________________________________________________
@@ -79,105 +81,41 @@ rare_corrplot <- function (
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  history <- sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot))
+  history <- sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot))
   
   
   #________________________________________________________
-  # Default rarefaction depth.
+  # Build the two subplots, then arrange them together.
   #________________________________________________________
-  if (isFALSE(rline)) rline <- NULL
+  corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
+  barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
   
-  if (isTRUE(rline)) {
-    ss <- as.vector(sample_sums(biom))
-    rline <- (sum(ss) * .1) / length(ss)
-    rline <- min(ss[ss >= rline])
-    remove("ss")
-  }
+  plots <- list(
+    'corrplot' = do.call(rare_corrplot,  c(corrplot_params, list(...))),
+    'barplot'  = do.call(depths_barplot, c(barplot_params,  list(...))) )
   
+  p <- patchwork::wrap_plots(plots, ncol = 1)
   
-  #________________________________________________________
-  # Subset the biom file.
-  #________________________________________________________
-  for (i in c("color", "facet")) {
-    key <- get(paste0(i, ".by"))
-    val <- get(paste0(i, "s"))
-    if (!is.null(key) && !is.null(val))
-      biom <- subset(
-        biom = biom,
-        expr = a %in% b,
-        env  = list(a = as.name(key), b = val),
-        fast = TRUE )
-  }
+  attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
+  attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
+    cmds <- sapply(seq_along(plots), function (i) {
+      sub(
+        x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+        pattern     = "ggplot(data = data", 
+        replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, glue::single_quote(names(plots)[[i]])),
+        fixed       = TRUE )
+    })
+    c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
+  }))
   
   
   #________________________________________________________
-  # Pull rarefaction stats for each depth.
-  #________________________________________________________
-  data <- adiv_table(
-    biom    = biom,
-    rarefy  = ifelse(is.null(depths), "multi_even", depths),
-    metrics = metric,
-    long    = TRUE,
-    md      = unique(c(color.by, facet.by)), 
-    safe    = TRUE )
-  
-  
-  #________________________________________________________
-  # Facet by metric when there's more than one.
-  #________________________________________________________
-  if (length(metric) > 1)
-    params[['facet.by']] <- unique(c(facet.by, ".metric"))
-  
-  
-  #________________________________________________________
-  # Tell corrplot_build to use lm(y ~ log(x))
-  #________________________________________________________
-  params[['model']] <- "logarithmic"
-  
-  
-  #________________________________________________________
-  # Initialize the `layers` object.
-  #________________________________________________________
-  layers <- structure(
-    list(),
-    'data'     = data,
-    'params'   = params,
-    'function' = rare_corrplot,
-    'xcol'     = ".depth",
-    'ycol'     = ".value",
-    'xmode'    = "numeric" )
-  
-  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-  if (isTRUE(points)) initLayer('point')
-  
-  
-  #________________________________________________________
-  # Add default layer parameters.
-  #________________________________________________________
-  setLayer("ggplot", mapping = list(x = ".depth", y = ".value"))
-  setLayer("xaxis",  labels = si_units)
-  setLayer("labs",   x = "Rarefaction Depth")
-  setLayer("labs",   y = ifelse(length(metric) == 1, metric, "Diversity"))
-  if (length(metric) > 1) setLayer("facet", scales = "free_y")
-  
-  if (!is.null(rline))
-    setLayer("vline", xintercept = rline, color = "red", linetype="dashed")
-  
-  
-  
-  # Convert layer definitions into a plot.
-  #________________________________________________________
-  p <- corrplot_build(layers)
-  
-  
   # Attach history of biom modifications and this call.
   #________________________________________________________
   attr(p, 'history') <- c(attr(biom, 'history'), history)
   
   
   return (p)
-  
-  
 }
 
 

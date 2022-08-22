@@ -78,7 +78,7 @@ corrplot_build <- function (layers) {
   #________________________________________________________
   # Add caption describing the model/formula.
   #________________________________________________________
-  if (hasLayer("smooth")) {
+  if (hasLayer("smooth") && isTRUE(params[['caption']])) {
     
     setLayer("labs", caption = local({
       

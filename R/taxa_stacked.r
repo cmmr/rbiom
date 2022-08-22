@@ -357,7 +357,7 @@ taxa_stacked <- function (
     
     ggdata <- attr(layers, 'data', exact = TRUE)
     breaks <- base::pretty(ggdata[['.value']])
-    labels <- siunit(breaks)
+    labels <- si_units
     
     setLayer(
       layer = "labs",  
