@@ -26,16 +26,37 @@ plot_build <- function (layers) {
   }
   
   
+  #________________________________________________________
+  # Add in coord_flip when flip=TRUE
+  #________________________________________________________
+  if (isTRUE(params[['flip']])) initLayer('flip')
+  
+  
+  #________________________________________________________
+  # Shade background of x-axis positions
+  #________________________________________________________
+  if (isTRUE(params[['shade']])) {
+    x  <- ceiling(range(as.numeric(ggdata[[attr(layers, 'xcol')]])))
+    x1 <- x[[1]]
+    x2 <- x[[2]]
+    setLayer('shade',
+      data    = as.cmd(data.frame(x = seq(x1, x2, 2)), list(x1 = x1, x2 = x2)),
+      mapping = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf),
+      fill    = 'black', color = NA, alpha = 0.05 )
+    remove("x", "x1", "x2")
+  }
+  
+  
   #______________________________________________________________
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'violin', 'point', 'smooth', 'bar', 'box', 'spider', 'dot', 
-    'ellipse', 'strip', 'name', 'crossbar', 'linerange', 'rect',
+    'ggplot', 'shade', 'violin', 'point', 'smooth', 'bar', 'box', 'spider', 
+    'dot', 'ellipse', 'strip', 'name', 'crossbar', 'linerange', 'rect',
     'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
     'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
     'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', 
-    'xaxis', 'yaxis', 'theme_bw', 'theme' )
+    'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
   layer_order <- c(
     intersect(layer_order, names(layers)),
     setdiff(names(layers), layer_order) )
@@ -45,10 +66,18 @@ plot_build <- function (layers) {
   # Suppress x-axis labels when they're identical to facet labels
   #______________________________________________________________
   if(attr(layers, 'xcol', exact = TRUE) %in% params[['facet.by']]) {
-    layers[['theme']][['axis.text.x']]        <- element_blank()
-    layers[['theme']][['axis.ticks.x']]       <- element_blank()
-    layers[['theme']][['axis.title.x']]       <- element_blank()
-    layers[['theme']][['panel.grid.major.x']] <- element_blank()
+    if (isTRUE(params[['flip']])) {
+      layers[['theme']][['axis.text.x']]        <- element_blank()
+      layers[['theme']][['axis.ticks.x']]       <- element_blank()
+      layers[['theme']][['axis.title.x']]       <- element_blank()
+      layers[['theme']][['panel.grid.major.x']] <- element_blank()
+      
+    } else {
+      layers[['theme']][['axis.text.y']]        <- element_blank()
+      layers[['theme']][['axis.ticks.y']]       <- element_blank()
+      layers[['theme']][['axis.title.y']]       <- element_blank()
+      layers[['theme']][['panel.grid.major.y']] <- element_blank()
+    }
   }
   
   
@@ -221,9 +250,24 @@ plot_build <- function (layers) {
     
     
     # Force sqrt scale to display zero tick mark.
+    # Handle sqrt- and log1p- transforming of Inf and -Inf
     #______________________________________________________________
-    if (layer == "yaxis" && identical(args[['trans']], "sqrt"))
-      args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
+    if (layer == "yaxis") {
+      
+      if (identical(args[['trans']], "sqrt")) {
+        if (isTRUE(params[['shade']])) {
+          args[['trans']] <- as.cmd(scales::trans_new("sqrt0", function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, function(y) ifelse(y<0, 0, y^2)))
+        } else {
+          args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
+        }
+        
+      } else if (identical(args[['trans']], "log1p")) {
+        if (isTRUE(params[['shade']])) {
+          args[['trans']] <- as.cmd(scales::trans_new("log1p0", function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, base::expm1))
+        }
+      }
+      
+    }
     
     
     # Show ggplot() layer as "ggplot(data)", rest more verbosely

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9065</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9066</span>
       </span>
     </div>
 
@@ -68,6 +68,8 @@
   patterns <span class="op">=</span> <span class="cn">NULL</span>,
   shapes <span class="op">=</span> <span class="cn">NULL</span>,
   facets <span class="op">=</span> <span class="cn">NULL</span>,
+  flip <span class="op">=</span> <span class="cn">FALSE</span>,
+  shade <span class="op">=</span> <span class="cn">FALSE</span>,
   p.top <span class="op">=</span> <span class="cn">Inf</span>,
   p.adj <span class="op">=</span> <span class="st">"fdr"</span>,
   p.label <span class="op">=</span> <span class="fl">0.05</span>,
@@ -115,6 +117,11 @@ factor levels in the metadata. <code>facets</code> and <code>xvals</code> are
 coerced to unnamed character vectors. If the length of these vectors
 is less than the values present in their corresponding metadata 
 column, then the data set will be subseted accordingly.</p></dd>
+<dt>flip</dt>
+<dd><p>Transpose the axes, so that taxa are present as rows instead
+of columns. Default: <code>FALSE</code></p></dd>
+<dt>shade</dt>
+<dd><p>Shade every other x position. Default: <code>FALSE</code></p></dd>
 <dt>p.top</dt>
 <dd><p>Only display taxa with the most significant differences in 
 abundance. If <code>p.top</code> is &gt;= 1, then the <code>p.top</code> most 
@@ -206,6 +213,8 @@ that contains zeroes.</p>
 <span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
 <span class="r-in">    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Genus"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="taxa_boxplot-1.png" alt="" width="700" height="433"></span>
+<span class="r-in">    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Genus"</span>, taxa <span class="op">=</span> <span class="fl">10</span>, layers <span class="op">=</span> <span class="st">"ps"</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span>, flip <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, y.trans <span class="op">=</span> <span class="st">"sqrt"</span><span class="op">)</span></span>
+<span class="r-plt img"><img src="taxa_boxplot-2.png" alt="" width="700" height="433"></span>
 <span class="r-in">    </span>
 <span class="r-in"></span>
 </code></pre></div>

@@ -9,7 +9,7 @@ ENV <- environment(NULL)
 .onLoad <- function(libname, pkgname) {
   
   lapply(FUN = ggwrap, pkg="ggplot2",    {c(
-    'aes_string', 'coord_fixed', 'continuous_scale',
+    'aes_string', 'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'expansion', 'facet_grid', 'facet_wrap', 
     'geom_bar', 'geom_boxplot', 'geom_col',  

@@ -120,6 +120,7 @@ initLayer <- function (layer_names) {
       'ellipse'    = "stat_ellipse",
       'facet'      = ifelse(facetDims == 2, "facet_grid", "facet_wrap"),
       'fill'       = ifelse(patterned, "ggpattern::scale_pattern_fill_manual", "scale_fill_manual"),
+      'flip'       = "coord_flip",
       'hline'      = "geom_hline",
       'labs'       = "labs",
       'linerange'  = "geom_linerange",
@@ -129,6 +130,7 @@ initLayer <- function (layer_names) {
       'pointrange' = "geom_pointrange",
       'point'      = "geom_point",
       'rect'       = "geom_rect",
+      'shade'      = "geom_rect",
       'shape'      = "scale_shape_manual",
       'smooth'     = "stat_smooth",
       'spider'     = "geom_segment",
@@ -191,6 +193,7 @@ initLayer <- function (layer_names) {
       'ellipse'    = "^e(|llipse)\\.",
       'facet'      = "^f(|acet)\\.",
       'fill'       = "^fill\\.",
+      'flip'       = "^flip\\.",
       'heat'       = "^h(|eat|eatmap)\\.",
       'hline'      = "^[rh](|line)\\.",
       'labs'       = "^labs\\.",
@@ -237,10 +240,11 @@ initLayer <- function (layer_names) {
         params[[i]] <- list(NULL)
     
     
-    # Arrays need a list wrapper too. plot(yaxis.expand=1:4)
+    # Arrays and functions need a list wrappers too.
+    # plot(yaxis.expand=1:4, yaxis.trans=sqrt)
     #________________________________________________________
     for (i in seq_along(params))
-      if (length(params[[i]]) > 1)
+      if (length(params[[i]]) > 1 || is.function(params[[i]]))
         params[[i]] <- list(params[[i]])
     
     

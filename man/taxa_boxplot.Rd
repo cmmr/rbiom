@@ -19,6 +19,8 @@ taxa_boxplot(
   patterns = NULL,
   shapes = NULL,
   facets = NULL,
+  flip = FALSE,
+  shade = FALSE,
   p.top = Inf,
   p.adj = "fdr",
   p.label = 0.05,
@@ -63,6 +65,11 @@ factor levels in the metadata. \code{facets} and \code{xvals} are
 coerced to unnamed character vectors. If the length of these vectors
 is less than the values present in their corresponding metadata 
 column, then the data set will be subseted accordingly.}
+
+\item{flip}{Transpose the axes, so that taxa are present as rows instead
+of columns. Default: \code{FALSE}}
+
+\item{shade}{Shade every other x position. Default: \code{FALSE}}
 
 \item{p.top}{Only display taxa with the most significant differences in 
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -138,6 +145,7 @@ Visualize BIOM data with boxplots.
     
     biom <- rarefy(hmp50)
     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
+    taxa_boxplot(biom, rank = "Genus", taxa = 10, layers = "ps", color.by = "Body Site", flip = TRUE, shade = TRUE, y.trans = "sqrt")
     
 
 }

@@ -161,15 +161,26 @@ boxplot_facets <- function (layers) {
   
   if (identical(xcol, '.all')) {
     
-    setLayer(
-      axis.title.x = element_blank(),
-      axis.text.x  = element_blank(),
-      axis.ticks.x = element_blank() )
+    if (isTRUE(params[['flip']])) {
+      setLayer(
+        axis.title.y = element_blank(),
+        axis.text.y  = element_blank(),
+        axis.ticks.y = element_blank() )
+      
+    } else {
+      setLayer(
+        axis.title.x = element_blank(),
+        axis.text.x  = element_blank(),
+        axis.ticks.x = element_blank() )
+    }
     
   } else {
     
-    if (identical(substr(xcol, 1, 1), "."))
-      setLayer(axis.title.x = element_blank())
+    if (identical(substr(xcol, 1, 1), ".")) {
+      if (isTRUE(params[['flip']])) { setLayer(axis.title.y = element_blank())
+      } else                        { setLayer(axis.title.x = element_blank()) }
+    }
+      
     
     ggdata     <- attr(layers, 'data',       exact = TRUE)
     facet.cols <- attr(layers, 'facet.ncol', exact = TRUE)
@@ -178,7 +189,7 @@ boxplot_facets <- function (layers) {
     
     # x-axis Text Angle
     if (tolower(xlab.angle) == 'auto') {
-      if (!is.null(xcol)) {
+      if (!is.null(xcol) && !isTRUE(params[['flip']])) {
         charCount <- sum(nchar(unique(as.character(ggdata[[xcol]]))), na.rm = TRUE)
         charCount <- charCount * facet.cols
         if (charCount > 40)

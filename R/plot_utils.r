@@ -191,7 +191,8 @@ aes_toString <- function (x) {
   for (key in keys) {
     
     val <- x[[key]]
-    val <- if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
+    val <- if (is(val, 'quosure')) { rlang::as_label(val)
+    } else if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
     } else if (is.logical(val))    { as.character(val)
     } else if (is.numeric(val))    { as.character(val)
     } else                         { glue::double_quote(val) }

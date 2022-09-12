@@ -43,6 +43,11 @@
 #'        is less than the values present in their corresponding metadata 
 #'        column, then the data set will be subseted accordingly.
 #'
+#' @param flip   Transpose the axes, so that taxa are present as rows instead
+#'        of columns. Default: \code{FALSE}
+#'
+#' @param shade   Shade every other x position. Default: \code{FALSE}
+#'
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
 #'        significant taxa are displayed. If \code{p.top} is less than one, all 
@@ -116,13 +121,15 @@
 #'     
 #'     biom <- rarefy(hmp50)
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
+#'     taxa_boxplot(biom, rank = "Genus", taxa = 10, layers = "ps", color.by = "Body Site", flip = TRUE, shade = TRUE, y.trans = "sqrt")
 #'     
 #'
 taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    p.top = Inf, p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', ...) {
+    flip = FALSE, shade = FALSE, p.top = Inf, p.adj = "fdr", p.label = 0.05, 
+    ci = 95, xlab.angle = 'auto', ...) {
   
   
   # Sanity checks

@@ -38,7 +38,7 @@ boxplot_stats <- function (layers) {
   stats  <- NULL
   ggdata <- attr(layers, 'data', exact = TRUE)
   
-  if (isTRUE(nrow(ggdata) > 0 && is.numeric(p.label) && p.label >= 0)) {
+  if (isTRUE(nrow(ggdata) > 0 && is.numeric(p.label))) {
     
     #--------------------------------------------------------------
     # Significance values to put on top of the brackets
@@ -288,20 +288,22 @@ boxplot_stats <- function (layers) {
           .y     = pvals[['y.pos']] * 1.10,
           .label = p_annotations(pvals[['.adj.p']]) )
         
-        attr(ggdata, 'stat_brackets') <- data.frame(
-          check.names = FALSE, 
-          pvals,
-          .x    = pvals[['x.pos']] - .4,
-          .xend = pvals[['x.pos']] + .4,
-          .y    = pvals[['y.pos']] * 1.08,
-          .yend = pvals[['y.pos']] * 1.08 )
+        if (!isTRUE(params[['flip']]))
+          attr(ggdata, 'stat_brackets') <- data.frame(
+            check.names = FALSE, 
+            pvals,
+            .x    = pvals[['x.pos']] - .4,
+            .xend = pvals[['x.pos']] + .4,
+            .y    = pvals[['y.pos']] * 1.08,
+            .yend = pvals[['y.pos']] * 1.08 )
         
-        setLayer(
-          'layer'        = "brackets",
-          'mapping|x'    = ".x",
-          'mapping|xend' = ".xend",
-          'mapping|y'    = ".y",
-          'mapping|yend' = ".yend" )
+        if (!isTRUE(params[['flip']]))
+          setLayer(
+            'layer'        = "brackets",
+            'mapping|x'    = ".x",
+            'mapping|xend' = ".xend",
+            'mapping|y'    = ".y",
+            'mapping|yend' = ".yend" )
         
         setLayer(
           'layer'         = "stats_text",

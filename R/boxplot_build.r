@@ -129,7 +129,7 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   #________________________________________________________
   layer <- "bar"
   if (hasLayer()) {
-    setLayer(stat="summary", fun="mean", alpha=0.6)
+    setLayer(stat="summary", alpha=0.6)
     
     if (dodged)
       setLayer(position=dodge, width=0.7)
@@ -142,13 +142,17 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     }
     
     # Bar charts need extra help on non-linear axes
-    if (!is.null(layers[['yaxis']][['trans']])) {
+    if (is.null(layers[['yaxis']][['trans']])) {
+      setLayer(fun="mean")
+      
+    } else {
       trans <- layers[['yaxis']][['trans']]
       fun <- if (trans == 'sqrt')  { function (y) sqrt(mean(y * y))
       } else if (trans == 'log1p') { function (y) log1p(mean(exp(y) - 1))
       } else { stop('Bar charts can only be re-scaled using sqrt or log1p.') }
       setLayer(fun=fun)
       remove("fun", "trans")
+      
     }
   }
   
