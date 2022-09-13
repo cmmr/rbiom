@@ -46,7 +46,7 @@
 #' @param flip   Transpose the axes, so that taxa are present as rows instead
 #'        of columns. Default: \code{FALSE}
 #'
-#' @param shade   Shade every other x position. Default: \code{FALSE}
+#' @param stripe   Shade every other x position. Default: \code{FALSE}
 #'
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -119,16 +119,16 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- rarefy(hmp50)
+#'     biom <- rarefy(hmp50) 
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-#'     taxa_boxplot(biom, rank = "Genus", taxa = 10, layers = "ps", color.by = "Body Site", flip = TRUE, shade = TRUE, y.trans = "sqrt")
+#'     taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE, stripe = TRUE, y.trans = "sqrt")
 #'     
 #'
 taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    flip = FALSE, shade = FALSE, p.top = Inf, p.adj = "fdr", p.label = 0.05, 
+    flip = FALSE, stripe = FALSE, p.top = Inf, p.adj = "fdr", p.label = 0.05, 
     ci = 95, xlab.angle = 'auto', ...) {
   
   

@@ -42,8 +42,8 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   #________________________________________________________
   # Ignore shapes/etc without applicable layers
   #________________________________________________________
-  if (!any(c('dot', 'strip')         %in% layer_names)) params[['shape.by']]   <- NULL
-  if (!any(c('box', 'bar', 'violin') %in% layer_names)) params[['pattern.by']] <- NULL
+  if (!any(c('dot', 'strip', 'pointrange') %in% layer_names)) params[['shape.by']]   <- NULL
+  if (!any(c('box', 'bar', 'violin')       %in% layer_names)) params[['pattern.by']] <- NULL
   
   
   #________________________________________________________
@@ -82,8 +82,6 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   layers <- metadata_layers(layers) # General
   
   remove("i", "ggdata", "layer_names")
-  
-  
   
   
   
@@ -350,10 +348,10 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     "bar"        = c('x', 'y', 'group', 'color', 'fill', 'pattern_type', 'pattern_fill'),
     "dot"        = c('x', 'y', 'group', 'color',         'shape'),
     "strip"      = c('x', 'y', 'group', 'color',         'shape'),
-    "crossbar"   = c('x', 'y', 'group', 'color', 'fill', 'ymin', 'ymax'),
-    "pointrange" = c('x', 'y', 'group', 'color', 'fill', 'ymin', 'ymax'),
-    "linerange"  = c('x', 'y', 'group', 'color',         'ymin', 'ymax'),
-    "errorbar"   = c('x', 'y', 'group', 'color',         'ymin', 'ymax') )
+    "pointrange" = c('x', 'y', 'group', 'color', 'fill', 'shape', 'ymin', 'ymax'),
+    "crossbar"   = c('x', 'y', 'group', 'color', 'fill',          'ymin', 'ymax'),
+    "linerange"  = c('x', 'y', 'group', 'color',                  'ymin', 'ymax'),
+    "errorbar"   = c('x', 'y', 'group', 'color',                  'ymin', 'ymax') )
   
   ggdata <- attr(layers, 'data',   exact = TRUE)
   params <- attr(layers, 'params', exact = TRUE)

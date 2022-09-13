@@ -1,7 +1,7 @@
 
-#--------------------------------------------------------------
+#________________________________________________________
 # Computes p-values for categorical differences
-#--------------------------------------------------------------
+#________________________________________________________
 boxplot_stats <- function (layers) {
   
   params     <- attr(layers, 'params', exact = TRUE)
@@ -40,9 +40,9 @@ boxplot_stats <- function (layers) {
   
   if (isTRUE(nrow(ggdata) > 0 && is.numeric(p.label))) {
     
-    #--------------------------------------------------------------
+    #________________________________________________________
     # Significance values to put on top of the brackets
-    #--------------------------------------------------------------
+    #________________________________________________________
     p_annotations <- function (adj.p) {
       if (length(p.label) == 1)
         return (paste("italic(p)==", formatC(adj.p, format="g", digits = 1)))
@@ -57,9 +57,9 @@ boxplot_stats <- function (layers) {
     if (length(unique(c(xcol, color.by, shape.by, pattern.by))) == 1) {
       if (isFALSE(xcol == ".taxa")) {
         
-        #--------------------------------------------------------------
+        #________________________________________________________
         # Brackets between x-values
-        #--------------------------------------------------------------
+        #________________________________________________________
         stats <- stats_table(
           biom        = ggdata, 
           x           = xcol, 
@@ -73,9 +73,9 @@ boxplot_stats <- function (layers) {
         stats[['Group2']] %<>% factor(levels = levels(ggdata[[xcol]]))
         
         
-        #--------------------------------------------------------------
+        #________________________________________________________
         # Use p.top to retain only most significant taxa.
-        #--------------------------------------------------------------
+        #________________________________________________________
         if (isTRUE(is.finite(params[['p.top']]))) {
           
           taxa <- if (params[['p.top']] >= 1) {
@@ -106,9 +106,9 @@ boxplot_stats <- function (layers) {
         }
         
         
-        #--------------------------------------------------------------
+        #________________________________________________________
         # Don't display insignificant p-values on the plot
-        #--------------------------------------------------------------
+        #________________________________________________________
         pvals <- stats[which(stats[['.adj.p']] <= max(p.label)),,drop=FALSE]
         if (nrow(pvals) > 0) {
           
@@ -185,7 +185,7 @@ boxplot_stats <- function (layers) {
           setLayer(
             'layer'         = "stats_text",
             'size'          = 3,
-            'vjust'         = 0,
+            'vjust'         = ifelse(isTRUE(params[['flip']]), 0.5, 0),
             'parse'         = length(p.label) == 1,
             'mapping|x'     = ".x",
             'mapping|y'     = ".y",
@@ -197,9 +197,9 @@ boxplot_stats <- function (layers) {
       
     } else {
       
-      #--------------------------------------------------------------
+      #________________________________________________________
       # P-value for each x position
-      #--------------------------------------------------------------
+      #________________________________________________________
       stats <- stats_table(
         biom        = ggdata, 
         x           = setdiff(c(color.by, pattern.by, shape.by), xcol), 
@@ -210,9 +210,9 @@ boxplot_stats <- function (layers) {
         y.pos.facet = facet.by )
       
       
-      #--------------------------------------------------------------
+      #________________________________________________________
       # Use p.top to retain only most significant taxa.
-      #--------------------------------------------------------------
+      #________________________________________________________
       if (isTRUE(is.finite(params[['p.top']]))) {
         
         taxa <- if (params[['p.top']] >= 1) {
@@ -243,9 +243,9 @@ boxplot_stats <- function (layers) {
       }
       
       
-      #--------------------------------------------------------------
+      #________________________________________________________
       # Don't display insignificant p-values on the plot
-      #--------------------------------------------------------------
+      #________________________________________________________
       pvals <- stats[which(stats[['.adj.p']] <= max(p.label)),,drop=FALSE]
       if (nrow(pvals) > 0) {
       
@@ -306,9 +306,20 @@ boxplot_stats <- function (layers) {
             'mapping|yend' = ".yend" )
         
         setLayer(
+          'layer'   = "stats_bg",
+          'color'   = NA,
+          'fill'    = "white",
+          'mapping' = aes_string(
+            xmin = -Inf, 
+            xmax = Inf, 
+            ymin = signif(min(pvals[['y.pos']]), 3), 
+            ymax = Inf ))
+        
+        setLayer(
           'layer'         = "stats_text",
           'size'          = 3,
-          'vjust'         = 0,
+          'hjust'         = ifelse(isTRUE(params[['flip']]), 0.1, 0.5),
+          'vjust'         = ifelse(isTRUE(params[['flip']]), 0.5, 0),
           'parse'         = length(p.label) == 1,
           'mapping|x'     = ".x",
           'mapping|y'     = ".y",
@@ -346,7 +357,25 @@ boxplot_stats <- function (layers) {
     setLayer("yaxis", expand = c(0.02, 0, 0.02, 0) )
     
   } else {
-    setLayer("yaxis", expand = c(0.02, 0, 0.08, 0) )
+    
+    if (isTRUE(params[['flip']])) {
+      setLayer("yaxis", expand = c(0.02, 0, 0.15, 0) )
+    } else {
+      setLayer("yaxis", expand = c(0.02, 0, 0.08, 0) )
+    }
+    
+    
+    #________________________________________________________
+    # Don't label the y-axis beyond the data range.
+    #________________________________________________________
+    setLayer(
+      layer = "yaxis",
+      breaks = local({
+        ymax   <- min(stats[["y.pos"]])
+        breaks <- labeling::extended(0, ymax, 5)
+        return (breaks[breaks <= ymax])
+    }))
+    
     
     dropcols <- c(".id", ".all", "x.pos", "y.pos")
     keepcols <- setdiff(names(stats), dropcols)

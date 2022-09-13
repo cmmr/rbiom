@@ -35,15 +35,28 @@ plot_build <- function (layers) {
   #________________________________________________________
   # Shade background of x-axis positions
   #________________________________________________________
-  if (isTRUE(params[['shade']])) {
-    x  <- ceiling(range(as.numeric(ggdata[[attr(layers, 'xcol')]])))
-    x1 <- x[[1]]
-    x2 <- x[[2]]
-    setLayer('shade',
-      data    = as.cmd(data.frame(x = seq(x1, x2, 2)), list(x1 = x1, x2 = x2)),
-      mapping = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf),
-      fill    = 'black', color = NA, alpha = 0.05 )
-    remove("x", "x1", "x2")
+  if (isTRUE(params[['stripe']])) {
+    
+    x <- ceiling(range(as.numeric(ggdata[[attr(layers, 'xcol')]])))
+    
+    if (diff(x) > 0) {
+      x1 <- x[[1]] + 1
+      x2 <- x[[2]]
+      setLayer('stripe',
+        data    = as.cmd(data.frame(x = seq(x1, x2, 2)), list(x1 = x1, x2 = x2)),
+        mapping = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf),
+        fill    = 'black', color = NA, alpha = 0.05 )
+      remove("x1", "x2")
+    }
+    remove("x")
+    
+    # Don't need grid lines if we have striping.
+    if (isTRUE(params[['flip']])) {
+      setLayer("theme", panel.grid.major.y = element_blank())
+    } else {
+      setLayer("theme", panel.grid.major.x = element_blank())
+    }
+    
   }
   
   
@@ -51,9 +64,9 @@ plot_build <- function (layers) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'shade', 'violin', 'point', 'smooth', 'bar', 'box', 'spider', 
-    'dot', 'ellipse', 'strip', 'name', 'crossbar', 'linerange', 'rect',
-    'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
+    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 'bar', 'box', 
+    'spider', 'dot', 'ellipse', 'strip', 'name', 'crossbar', 'linerange', 
+    'rect', 'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
     'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
     'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', 
     'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
@@ -255,14 +268,14 @@ plot_build <- function (layers) {
     if (layer == "yaxis") {
       
       if (identical(args[['trans']], "sqrt")) {
-        if (isTRUE(params[['shade']])) {
+        if (isTRUE(params[['stripe']])) {
           args[['trans']] <- as.cmd(scales::trans_new("sqrt0", function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, function(y) ifelse(y<0, 0, y^2)))
         } else {
           args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
         }
         
       } else if (identical(args[['trans']], "log1p")) {
-        if (isTRUE(params[['shade']])) {
+        if (isTRUE(params[['stripe']])) {
           args[['trans']] <- as.cmd(scales::trans_new("log1p0", function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, base::expm1))
         }
       }

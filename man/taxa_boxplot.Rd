@@ -20,7 +20,7 @@ taxa_boxplot(
   shapes = NULL,
   facets = NULL,
   flip = FALSE,
-  shade = FALSE,
+  stripe = FALSE,
   p.top = Inf,
   p.adj = "fdr",
   p.label = 0.05,
@@ -69,7 +69,7 @@ column, then the data set will be subseted accordingly.}
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
 
-\item{shade}{Shade every other x position. Default: \code{FALSE}}
+\item{stripe}{Shade every other x position. Default: \code{FALSE}}
 
 \item{p.top}{Only display taxa with the most significant differences in 
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -143,9 +143,9 @@ Visualize BIOM data with boxplots.
 \examples{
     library(rbiom)
     
-    biom <- rarefy(hmp50)
+    biom <- rarefy(hmp50) 
     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-    taxa_boxplot(biom, rank = "Genus", taxa = 10, layers = "ps", color.by = "Body Site", flip = TRUE, shade = TRUE, y.trans = "sqrt")
+    taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE, stripe = TRUE, y.trans = "sqrt")
     
 
 }
