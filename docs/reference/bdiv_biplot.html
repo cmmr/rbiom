@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9069</span>
       </span>
     </div>
 
@@ -53,40 +53,46 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bdiv_biplot</span><span class="op">(</span>
-  <span class="va">biom</span>,
-  dist <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,
-  ord <span class="op">=</span> <span class="st">"PCoA"</span>,
-  layers <span class="op">=</span> <span class="cn">NULL</span>,
-  color.by <span class="op">=</span> <span class="cn">NULL</span>,
-  shape.by <span class="op">=</span> <span class="cn">NULL</span>,
-  facet.by <span class="op">=</span> <span class="cn">NULL</span>,
-  colors <span class="op">=</span> <span class="cn">NULL</span>,
-  shapes <span class="op">=</span> <span class="cn">NULL</span>,
-  facets <span class="op">=</span> <span class="cn">NULL</span>,
-  weighted <span class="op">=</span> <span class="cn">TRUE</span>,
-  rank <span class="op">=</span> <span class="cn">NULL</span>,
-  taxa <span class="op">=</span> <span class="fl">5</span>,
-  p.top <span class="op">=</span> <span class="cn">Inf</span>,
-  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,
-  perms <span class="op">=</span> <span class="fl">1000</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_biplot</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
+<span>  ord <span class="op">=</span> <span class="st">"PCoA"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shapes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facets <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  taxa <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
+<span>  perms <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
-<dt>dist</dt>
+
+
+<dt>metric</dt>
 <dd><p>Beta diversity metric to use for calculating inter-sample
 distances. Options are: <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>,
 <code>"Euclidean"</code>, <code>"Jaccard"</code>, or <code>"UniFrac"</code>.
 Default: <code>"Bray-Curtis"</code>.</p></dd>
+
+
 <dt>ord</dt>
 <dd><p>Ordination method to use for condensing n-dimensional data to
 two dimensions. Options are: <code>"UMAP"</code>, <code>"tSNE"</code>,
 <code>"NMDS"</code>, or <code>"PCoA"</code>. Default: <code>"PCoA"</code>.</p></dd>
+
+
 <dt>layers</dt>
 <dd><p>What graphical elements to use for drawing. Options are:
 <b>point</b>, <b>spider</b>, <b>ellipse</b>, and <b>name</b> for
@@ -95,28 +101,40 @@ Single letter abbreviations are also accepted. For instance,
 <code>c("point", "ellipse")</code> is equivalent to <code>c("p", "e")</code> and 
 <code>"pe"</code>. Default: <code>"pce"</code>/<code>"p"</code> for ordinations 
 with/without a <code>color.by</code> argument.</p></dd>
+
+
 <dt>color.by, shape.by, facet.by</dt>
 <dd><p>Metadata column to color, shape, and/or
 facet by. If that column is a <code>factor</code>, the ordering of levels
 will be maintained in the plot.</p></dd>
+
+
 <dt>colors, shapes, facets</dt>
 <dd><p>Names of the colors, shapes, and/or facets to 
 use in the plot. Available values for colors and shapes are given by 
 <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">colors()</a></code> and <code>0:25</code>, respectively. Use a named character 
 vector to map them  to specific factor levels in the metadata.</p></dd>
+
+
 <dt>weighted</dt>
 <dd><p>When employing a beta diversity metric, use the weighted
 version. Default: <code>TRUE</code>.</p></dd>
+
+
 <dt>rank</dt>
 <dd><p>What rank of taxa to display, for example <code>"Phylum"</code> or 
 <code>"Genus"</code>. Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a 
 given BIOM object. The default, <code>NULL</code>, selects the lowest
 level.</p></dd>
+
+
 <dt>taxa</dt>
 <dd><p>Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that 
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: <code>5</code>.</p></dd>
+
+
 <dt>p.top</dt>
 <dd><p>Only display taxa with the most significant differences in
 abundance. If <code>p.top</code> is &gt;= 1, then the <code>p.top</code> most 
@@ -125,22 +143,31 @@ taxa with an adjusted p-value &lt;= <code>p.top</code> are displayed.
 Recommended to be used in combination with the <code>taxa</code> parameter
 to set a lower bound on the mean abundance of considered taxa.
 Default: <code>Inf</code>.</p></dd>
+
+
 <dt>p.adj</dt>
 <dd><p>Method to use for multiple comparisons adjustment of p-values.
 Run <code>p.adjust.methods</code> for a list of available options.
 Default: <code>"fdr"</code>.</p></dd>
+
+
 <dt>perms</dt>
 <dd><p>Number of random permutations to use for estimating statistical
 significance. Default: <code>1000</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Parameters for underlying functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, <code>dot.size = 2</code> or <code>d.size = 2</code> ensures only the 
 dotplot layer has its size set to <code>2</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>ggplot2</code> plot. The computed data points and statistics will 
+    
+
+<p>A <code>ggplot2</code> plot. The computed data points and statistics will 
         be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>, 
         respectively.</p>
     </div>
@@ -164,12 +191,12 @@ dotplot layer has its size set to <code>2</code>.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">bdiv_biplot</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, rank<span class="op">=</span><span class="st">"Genus"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">bdiv_biplot</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, rank<span class="op">=</span><span class="st">"Genus"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="bdiv_biplot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in">    </span>
+<span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>
   </div>
@@ -184,7 +211,7 @@ dotplot layer has its size set to <code>2</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

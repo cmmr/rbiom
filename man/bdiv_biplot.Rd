@@ -6,7 +6,7 @@
 \usage{
 bdiv_biplot(
   biom,
-  dist = "Bray-Curtis",
+  metric = "Bray-Curtis",
   ord = "PCoA",
   layers = NULL,
   color.by = NULL,
@@ -27,7 +27,7 @@ bdiv_biplot(
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
-\item{dist}{Beta diversity metric to use for calculating inter-sample
+\item{metric}{Beta diversity metric to use for calculating inter-sample
 distances. Options are: \code{"Bray-Curtis"}, \code{"Manhattan"},
 \code{"Euclidean"}, \code{"Jaccard"}, or \code{"UniFrac"}.
 Default: \code{"Bray-Curtis"}.}

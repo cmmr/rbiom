@@ -6,7 +6,7 @@
 #' 
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
-#' @param dist   Beta diversity metric to use for calculating inter-sample
+#' @param metric   Beta diversity metric to use for calculating inter-sample
 #'        distances. Options are: \code{"Bray-Curtis"}, \code{"Manhattan"},
 #'        \code{"Euclidean"}, \code{"Jaccard"}, or \code{"UniFrac"}.
 #'        Default: \code{"Bray-Curtis"}.
@@ -79,7 +79,7 @@
 #'     bdiv_biplot(biom, color.by="Body Site", rank="Genus")
 #'     
 bdiv_biplot <- function (
-  biom, dist = "Bray-Curtis", ord = "PCoA", layers = NULL, 
+  biom, metric = "Bray-Curtis", ord = "PCoA", layers = NULL, 
   color.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, shapes = NULL, facets = NULL, 
   weighted = TRUE, rank = NULL, taxa = 5, p.top = Inf, p.adj = "fdr", perms = 1000, ...) {
   
@@ -87,8 +87,8 @@ bdiv_biplot <- function (
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  dist <- as.vector(validate_metrics(biom, dist, "bdiv", multi=TRUE))
-  ord  <- as.vector(validate_metrics(biom, ord,  "ord",  multi=TRUE))
+  metric <- as.vector(validate_metrics(biom, metric, "bdiv", multi=TRUE))
+  ord    <- as.vector(validate_metrics(biom, ord,    "ord",  multi=TRUE))
   if (!is.null(rank))
     rank <- as.vector(validate_metrics(biom, rank, "rank", multi=TRUE))
   
@@ -145,7 +145,7 @@ bdiv_biplot <- function (
   #________________________________________________________
   ggdata <- bdiv_ord_table(
     biom     = biom, 
-    dist     = params[['dist']],
+    dist     = params[['metric']],
     ord      = params[['ord']],
     weighted = params[['weighted']],
     md       = TRUE,

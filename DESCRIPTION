@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9068
+Version: 1.0.3.9069
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith@orst.edu", 
@@ -61,4 +61,4 @@ Suggests:
     reshape2,
     rhdf5,
     testthat
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
