@@ -241,7 +241,7 @@ initLayer <- function (layer_names) {
         params[[i]] <- list(NULL)
     
     
-    # Arrays and functions need a list wrappers too.
+    # Arrays and functions need list wrappers too.
     # plot(yaxis.expand=1:4, yaxis.trans=sqrt)
     #________________________________________________________
     for (i in seq_along(params))
@@ -254,7 +254,6 @@ initLayer <- function (layer_names) {
     for (i in intersect(names(params), formalArgs(layer_func)))
       if (!isFALSE(attr(params[[i]], 'display')))
         result[i] <- params[[i]]
-    
     
     # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
     #________________________________________________________

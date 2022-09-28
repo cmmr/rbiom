@@ -20,12 +20,13 @@ taxa_boxplot(
   shapes = NULL,
   facets = NULL,
   flip = FALSE,
-  stripe = FALSE,
+  stripe = flip,
   p.top = Inf,
   p.adj = "fdr",
   p.label = TRUE,
   ci = 95,
   xlab.angle = "auto",
+  y.trans = "sqrt",
   ...
 )
 }
@@ -69,7 +70,7 @@ column, then the data set will be subseted accordingly.}
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
 
-\item{stripe}{Shade every other x position. Default: \code{FALSE}}
+\item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
 \item{p.top}{Only display taxa with the most significant differences in 
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -114,19 +115,23 @@ Set to \code{NULL} to disable. Default: \code{95}}
 \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 angled, and vertical, respectively.}
 
+\item{y.trans}{The transformation to apply to the y-axis. Visualizing 
+differences of both high- and low-abundance taxa is best done with
+a non-linear axis. Options are:
+\itemize{
+  \item{\code{"sqrt"} - }{ square-root transformation }
+  \item{\code{"log1p"} - }{ log(y + 1) transformation }
+  \item{\emph{anything else} - }{ no transformation }
+}
+These methods allow visualization of both high- and low-abundance
+taxa simultaneously, without complaint about 'zero' count
+observations. Default: \code{"sqrt"}}
+
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
 dotplot layer has its size set to \code{2}.}
-
-\item{other}{Should non-selected taxa be displayed as an "Other" group?
-Default: \code{FALSE}}
-
-\item{safe}{If \code{FALSE}, data.frame column names such as 
-\code{".metric"} will be auto-converted to \code{"Metric"} to improve
-human-readability. Conversion if aborted if a conflict is found with
-a metadata column name. Default: \code{FALSE}}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 
@@ -138,11 +143,6 @@ https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
 some shapes have a colored outline given by `color`, some are filled with 
 `color`, and some are outlined in `color` and filled with `fill`. See
 https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
-
-To expand the low end of the y axis, you can set \code{y.trans = "sqrt"} or
-\code{y.trans = "log1p"}. The former applies a square-root transformation, 
-and the latter plots log(y + 1). Both of these methods work well with data
-that contains zeroes.
 }
 \description{
 Visualize BIOM data with boxplots.
@@ -152,7 +152,7 @@ Visualize BIOM data with boxplots.
     
     biom <- rarefy(hmp50) 
     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-    taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE, stripe = TRUE, y.trans = "sqrt")
+    taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE)
     
 
 }

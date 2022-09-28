@@ -46,7 +46,7 @@
 #' @param flip   Transpose the axes, so that taxa are present as rows instead
 #'        of columns. Default: \code{FALSE}
 #'
-#' @param stripe   Shade every other x position. Default: \code{FALSE}
+#' @param stripe   Shade every other x position. Default: \emph{same as flip}
 #'
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -91,13 +91,17 @@
 #'        \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 #'        angled, and vertical, respectively.
 #'        
-#' @param other   Should non-selected taxa be displayed as an "Other" group?
-#'        Default: \code{FALSE}
-#'        
-#' @param safe   If \code{FALSE}, data.frame column names such as 
-#'        \code{".metric"} will be auto-converted to \code{"Metric"} to improve
-#'        human-readability. Conversion if aborted if a conflict is found with
-#'        a metadata column name. Default: \code{FALSE}
+#' @param y.trans   The transformation to apply to the y-axis. Visualizing 
+#'        differences of both high- and low-abundance taxa is best done with
+#'        a non-linear axis. Options are:
+#'        \itemize{
+#'          \item{\code{"sqrt"} - }{ square-root transformation }
+#'          \item{\code{"log1p"} - }{ log(y + 1) transformation }
+#'          \item{\emph{anything else} - }{ no transformation }
+#'        }
+#'        These methods allow visualization of both high- and low-abundance
+#'        taxa simultaneously, without complaint about 'zero' count
+#'        observations. Default: \code{"sqrt"}
 #'        
 #' @param ...   Parameters are matched to formal arguments of ggplot2
 #'        functions. Prefixing parameter names with a layer name ensures that
@@ -115,11 +119,6 @@
 #' `color`, and some are outlined in `color` and filled with `fill`. See
 #' https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
 #' 
-#' To expand the low end of the y axis, you can set \code{y.trans = "sqrt"} or
-#' \code{y.trans = "log1p"}. The former applies a square-root transformation, 
-#' and the latter plots log(y + 1). Both of these methods work well with data
-#' that contains zeroes. 
-#' 
 #' 
 #' @export
 #' @seealso \code{\link{stats_table}}
@@ -128,15 +127,15 @@
 #'     
 #'     biom <- rarefy(hmp50) 
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-#'     taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE, stripe = TRUE, y.trans = "sqrt")
+#'     taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE)
 #'     
 #'
 taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    flip = FALSE, stripe = FALSE, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
-    ci = 95, xlab.angle = 'auto', ...) {
+    flip = FALSE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
+    ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
   
   # Sanity checks
@@ -152,17 +151,25 @@ taxa_boxplot <- function (
   
   
   
-  # Use the generalized boxplot function to make the plot
-  #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
-  
   
   
   # Attach history of biom modifications and this call
   #________________________________________________________
-  history <- sprintf("taxa_boxplot(%s)", as.args(params, fun = taxa_boxplot))
+  history_params <- params[which(names(params) %in% names(match.call()))]
+  history <- sprintf("taxa_boxplot(%s)", as.args(history_params, fun = taxa_boxplot))
+  
+  
+  # initLayer() ignores formalArgs, so copy into equivalent.
+  if (isTRUE(tolower(y.trans) %in% c("sqrt", "log1p")))
+    params[['yaxis.trans']] <- tolower(y.trans)
+  
+  
+  # Use the generalized boxplot function to make the plot
+  #________________________________________________________
+  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
+  
   attr(p, 'history') <- c(attr(biom, 'history'), history)
   
   
