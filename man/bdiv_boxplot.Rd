@@ -19,7 +19,7 @@ bdiv_boxplot(
   shapes = NULL,
   facets = NULL,
   p.adj = "fdr",
-  p.label = 0.05,
+  p.label = TRUE,
   ci = 95,
   xlab.angle = "auto",
   weighted = TRUE,
@@ -66,11 +66,18 @@ column, then the data set will be subseted accordingly.}
 Run \code{p.adjust.methods} for a list of available options.
 Default: \code{fdr}}
 
-\item{p.label}{Minimum adjusted p-value to display on the plot with a bracket.
-Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
-If a numeric vector with more than one value is provided, they will be
-used as breaks for asterisk notation. For ordinations, \code{p.label} 
-applies to biplot taxa. Default: \code{0.05}}
+\item{p.label}{Minimum adjusted p-value to display on the plot with a 
+bracket, for example \code{p.label = 0.05}.
+Some special cases are:
+\itemize{
+  \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
+  \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
+  \item{\code{p.label = Inf} - }{ display all p-values }
+  \item{\code{p.label = NULL} - }{ do not calculate stats }
+}
+If a numeric vector with more than one value is 
+provided, they will be used as breaks for asterisk notation.
+Default: \code{TRUE}}
 
 \item{ci}{How to calculate min/max of the \bold{crossbar}, 
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.

@@ -42,11 +42,18 @@
 #'        Run \code{p.adjust.methods} for a list of available options.
 #'        Default: \code{fdr}
 #'        
-#' @param p.label   Minimum adjusted p-value to display on the plot with a bracket.
-#'        Set to \code{Inf} to display all p-values, or \code{-Inf} for no brackets.
-#'        If a numeric vector with more than one value is provided, they will be
-#'        used as breaks for asterisk notation. For ordinations, \code{p.label} 
-#'        applies to biplot taxa. Default: \code{0.05}
+#' @param p.label   Minimum adjusted p-value to display on the plot with a 
+#'        bracket, for example \code{p.label = 0.05}.
+#'        Some special cases are:
+#'        \itemize{
+#'          \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
+#'          \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
+#'          \item{\code{p.label = Inf} - }{ display all p-values }
+#'          \item{\code{p.label = NULL} - }{ do not calculate stats }
+#'        }
+#'        If a numeric vector with more than one value is 
+#'        provided, they will be used as breaks for asterisk notation.
+#'        Default: \code{TRUE}
 #'     
 #' @param ci   How to calculate min/max of the \bold{crossbar}, 
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -111,7 +118,7 @@ bdiv_boxplot <- function (
   biom, x = NULL, metric = "Bray-Curtis", layers = "rls",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
   xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-  p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', 
+  p.adj = "fdr", p.label = TRUE, ci = 95, xlab.angle = 'auto', 
   weighted = TRUE, tree = NULL, ...) {
   
   

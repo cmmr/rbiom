@@ -16,6 +16,8 @@ boxplot_stats <- function (layers) {
   p.label    <- params[['p.label']]
   p.adj      <- params[['p.adj']]
   
+  if (identical(p.label, TRUE))  p.label <- 0.05
+  if (identical(p.label, FALSE)) p.label <- -Inf
   
   if (hasLayer("facet")) {
     free_x <- isTRUE(layers[['facet']][['scales']] %in% c("free", "free_x"))

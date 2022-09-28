@@ -61,10 +61,17 @@
 #'        Default: \code{fdr}
 #'        
 #' @param p.label   Minimum adjusted p-value to display on the plot with a 
-#'        bracket. Set to \code{Inf} to display all p-values, or \code{-Inf} 
-#'        for no brackets. If a numeric vector with more than one value is 
-#'        provided, they will be used as breaks for asterisk notation. 
-#'        Default: \code{0.05}
+#'        bracket, for example \code{p.label = 0.05}.
+#'        Some special cases are:
+#'        \itemize{
+#'          \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
+#'          \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
+#'          \item{\code{p.label = Inf} - }{ display all p-values }
+#'          \item{\code{p.label = NULL} - }{ do not calculate stats }
+#'        }
+#'        If a numeric vector with more than one value is 
+#'        provided, they will be used as breaks for asterisk notation.
+#'        Default: \code{TRUE}
 #'     
 #' @param ci   How to calculate min/max of the \bold{crossbar}, 
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -128,7 +135,7 @@ taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    flip = FALSE, stripe = FALSE, p.top = Inf, p.adj = "fdr", p.label = 0.05, 
+    flip = FALSE, stripe = FALSE, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
     ci = 95, xlab.angle = 'auto', ...) {
   
   
