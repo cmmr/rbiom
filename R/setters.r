@@ -198,7 +198,7 @@
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is(value, 'phylo'))
-  stopifnot(all(taxa_names(x) %in% value$tip.labels))
+  stopifnot(all(taxa_names(x) %in% value$tip.label))
   
   if (length(value$tip.labels) > length(taxa_names(x)))
     value <- subtree(value, taxa_names(x))

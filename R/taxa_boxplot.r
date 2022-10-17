@@ -44,7 +44,7 @@
 #'        column, then the data set will be subseted accordingly.
 #'
 #' @param flip   Transpose the axes, so that taxa are present as rows instead
-#'        of columns. Default: \code{FALSE}
+#'        of columns. Default: \code{TRUE}
 #'
 #' @param stripe   Shade every other x position. Default: \emph{same as flip}
 #'
@@ -134,7 +134,7 @@ taxa_boxplot <- function (
     biom, x = ".taxa", rank = NULL, taxa = 5, layers = "rls",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
     xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
-    flip = FALSE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
+    flip = TRUE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
     ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
   

@@ -122,7 +122,10 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
 
   if (!file.exists(fp))
     stop(simpleError(sprintf("Cannot locate file %s", fp)))
-
+  
+  # If date field is missing from the biom file, use file creation time.
+  fp_date <- strftime(file.info(fp)[['ctime']], "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
+  
 
   #--------------------------------------------------------------
   # Decompress files that are in gzip or bzip2 format
@@ -223,6 +226,14 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   
   if (!is.character(info[['comment']]))
     info[['comment']] <- NULL
+  
+  if (is.null(info[['date']])) {
+    if (!is.null(info[['creation-date']])) {
+      info[['date']] <- info[['creation-date']]
+    } else {
+      info[['date']] <- fp_date
+    }
+  }
   
   biom <- structure(
     class   = c("BIOM", "list"),
