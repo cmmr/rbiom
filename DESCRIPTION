@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9072
+Version: 1.0.3.9073
 Date: 2022-10-12
 Authors@R:
     person("Daniel P.", "Smith", 
@@ -44,6 +44,7 @@ Imports:
     memoise,
     methods,
     openxlsx,
+    optparse,
     paletteer,
     patchwork,
     pheatmap,
@@ -59,6 +60,7 @@ Imports:
     vegan
 Suggests:
     ggdensity,
+    ggtree,
     reshape2,
     rhdf5,
     testthat
