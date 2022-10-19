@@ -25,7 +25,7 @@ opt_parser <- optparse::OptionParser(
   option_list=list(
     
     optparse::make_option(c("-i", "--infile"), type="character", default=NULL,
-      help="Existing biom file to subset."),
+      help="Existing biom file to subset. Can be a URL."),
     
     optparse::make_option(c("-o", "--outfile"), type="character", default=NULL,
       help="Where to save the new biom file."),

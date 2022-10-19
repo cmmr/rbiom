@@ -73,5 +73,15 @@ init.cache()
 ```
 
 
+Building from source
+--------------------
+
+rbiom requires the following system libraries which can be installed through your operating system's package manager.
+
+* deb (Debian, Ubuntu): `libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev`
+* rpm (Fedora, CentOS, RHEL): `udunits2-devel openssl-devel libxml2-devel libcurl-devel`
+* csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev`
+* brew (OSX): `udunits`
+
 
 

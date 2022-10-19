@@ -6,12 +6,15 @@
 #________________________________________________________
 
 ggwrap <- function (pkg, fn) {
-  assign(fn, pos = ENV, function (..., .indent = 0) {
+  assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
     fun  <- do.call(`::`, list(pkg, fn))
     res  <- fun(...)
     args <- as.args(list(...), fun = fun, indent = .indent)
     if (!pkg %in% c('ggplot2', 'grid')) fn <- paste0(pkg, '::', fn)
-    attr(res, 'display') <- sprintf("%s(%s)", fn, args)
+    
+    if (is.null(.display)) .display <- sprintf("%s(%s)", fn, args)
+    attr(res, 'display') <- .display
+    
     return (res)
   })
 }
@@ -29,11 +32,14 @@ ggwrap <- function (pkg, fn) {
 # }
 
 basewrap <- function (pkg, fn) {
-  assign(paste0(".", fn), pos = ENV, function (..., .indent = 0) {
+  assign(paste0(".", fn), pos = ENV, function (..., .indent = 0, .display = NULL) {
     fun  <- do.call(`::`, list(pkg, fn))
     res  <- fun(...)
     args <- as.args(list(...), fun = fun, indent = .indent)
-    attr(res, 'display') <- sprintf("%s(%s)", fn, args)
+    
+    if (is.null(.display)) .display <- sprintf("%s(%s)", fn, args)
+    attr(res, 'display') <- .display
+    
     return (res)
   })
 }
