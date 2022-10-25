@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">unifrac</span><span class="op">(</span><span class="va">biom</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, tree <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unifrac</span><span class="op">(</span><span class="va">biom</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, tree <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -62,48 +62,55 @@
 <dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code> 
 object, as returned from <a href="read_biom.html">read_biom</a>. For matrices, the rows and 
 columns are assumed to be the taxa and samples, respectively.</p></dd>
+
+
 <dt>weighted</dt>
 <dd><p>Use weighted UniFrac, which takes abundance into account
 rather than simply presence/absence.</p></dd>
+
+
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object providing a phylogenetic tree for the
 taxa names in <code>biom</code>. If <code>tree=NULL</code>, then the tree will be
 loaded from <code>biom</code>, if encoded there.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A distance matrix of class <code>dist</code>.</p>
+    
+
+<p>A distance matrix of class <code>dist</code>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">unifrac</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span>, cex<span class="op">=</span><span class="fl">.8</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">unifrac</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span>, cex<span class="op">=</span><span class="fl">.8</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="unifrac-1.png" alt="" width="700" height="433"></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           HMP01     HMP02     HMP03     HMP04</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01 0.0000000 0.1950253 0.3687298 0.4239831</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02 0.1950253 0.0000000 0.2101679 0.3187533</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP03 0.3687298 0.2101679 0.0000000 0.3040937</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP04 0.4239831 0.3187533 0.3040937 0.0000000</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="co"># Using a custom matrix and tree</span></span>
-<span class="r-in">    <span class="va">mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fl">12</span><span class="op">*</span><span class="fl">20</span><span class="op">)</span>, ncol<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">]</span>, <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/as.phylo.html" class="external-link">as.phylo</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">unifrac</span><span class="op">(</span><span class="va">mtx</span>, tree<span class="op">=</span><span class="va">tree</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># Using a custom matrix and tree</span></span></span>
+<span class="r-in"><span>    <span class="va">mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fl">12</span><span class="op">*</span><span class="fl">20</span><span class="op">)</span>, ncol<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">]</span>, <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/as.phylo.html" class="external-link">as.phylo</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">unifrac</span><span class="op">(</span><span class="va">mtx</span>, tree<span class="op">=</span><span class="va">tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          a        b        c        d</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> a   0.0000 148.9849 190.9240 187.6669</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> b 148.9849   0.0000 213.4126 134.2024</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> c 190.9240 213.4126   0.0000 171.8943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d 187.6669 134.2024 171.8943   0.0000</span>
-<span class="r-in">    </span>
+<span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>
   </div>
@@ -118,7 +125,7 @@ loaded from <code>biom</code>, if encoded there.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

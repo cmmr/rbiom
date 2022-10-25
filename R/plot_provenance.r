@@ -6,13 +6,17 @@
 #________________________________________________________
 
 ggwrap <- function (pkg, fn) {
+  fun <- do.call(`::`, list(pkg, fn))
+  
   assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
-    fun  <- do.call(`::`, list(pkg, fn))
-    res  <- fun(...)
-    args <- as.args(list(...), fun = fun, indent = .indent)
-    if (!pkg %in% c('ggplot2', 'grid')) fn <- paste0(pkg, '::', fn)
+    res <- fun(...)
     
-    if (is.null(.display)) .display <- sprintf("%s(%s)", fn, args)
+    if (is.null(.display))
+      .display <- sprintf(
+        fmt = "%s(%s)", 
+        ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
+        as.args(list(...), fun = fun, indent = .indent) )
+    
     attr(res, 'display') <- .display
     
     return (res)
@@ -64,21 +68,30 @@ ggpush <- function (gglayers, gglayer) {
 
 ggbuild <- function (gglayers) {
   
-  res <- NULL
+  p   <- NULL
   cmd <- NULL
   
   for (i in seq_along(gglayers)) {
     
     gglayer <- gglayers[[i]]
     
-    if (is.null(res)) {
-      res <- gglayer
+    # In case this layer was built by initLayer / setLayer
+    if (!is.null(fun <- attr(gglayer, 'function', exact = TRUE)))
+      gglayer <- do.call(fun, c(gglayer, '.indent' = 4))
+    
+    if (is.null(p)) {
+      p   <- gglayer
       cmd <- attr(gglayer, 'display')
     } else {
-      res <- ggplot2::`%+%`(res, gglayer)
+      p   <- ggplot2::`%+%`(p, gglayer)
       cmd <- sprintf("%s +\n  %s", cmd, attr(gglayer, 'display'))
     }
   }
-  attr(res, 'cmd') <- cmd
-  return (res)
+  
+  attr(p, 'display') <- NULL
+  attr(p, 'cmd')     <- cmd
+  
+  p$plot_env <- emptyenv()
+  
+  return (p)
 }

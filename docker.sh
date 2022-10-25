@@ -8,7 +8,7 @@ docker build -t cmmr/rbiom-base --no-cache - >build_log.txt <<-"EOF"
 	  apt-get update                                                              \
 	                                                                              \
 	  && apt-get install -y                                                       \
-	      libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev             \
+	      libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libgdal-dev \
 	                                                                              \
 	  && su - -c "R -e \"install.packages(dependencies=TRUE, c(                   \
 	      'ape', 'broom', 'ggbeeswarm', 'ggnewscale', 'ggpattern', 'ggplot2',     \
@@ -18,7 +18,7 @@ docker build -t cmmr/rbiom-base --no-cache - >build_log.txt <<-"EOF"
 	      'rlang', 'R.utils', 'slam', 'tidyr', 'tsne', 'uwot', 'vegan',           \
 	      'BiocManager', 'remotes'))\""                                           \
 	                                                                              \
-	  && su - -c "R -e \"BiocManager::install(c('ggtree', 'rhdfs'))\""            \
+	  && su - -c "R -e \"BiocManager::install(c('ggtree', 'rhdf5'))\""            \
 	                                                                              \
 	  && rm -rf /tmp/* /var/lib/apt/lists/*
 EOF
@@ -34,3 +34,8 @@ docker build -t cmmr/rbiom --no-cache - >build_log.txt 2>&1 <<-"EOF"
 	                                                                        \
 	  && rm -rf /tmp/*
 EOF
+
+
+
+docker run --rm -it cmmr/rbiom /bin/bash
+

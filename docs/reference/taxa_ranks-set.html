@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,16 +53,19 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>A <code>BIOM</code> object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
+
 <dt>value</dt>
 <dd><p>A character vector. A named character vector can be used to
 only change some of the taxa rank names.</p></dd>
+
 </dl></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -79,23 +82,23 @@ only change some of the taxa rank names.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OTU"</span> <span class="op">=</span> <span class="st">"ASV"</span><span class="op">)</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OTU"</span> <span class="op">=</span> <span class="st">"ASV"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `taxa_ranks&lt;-`(`*tmp*`, value = c(OTU = "ASV")):</span> all(names(value) %in% taxa_ranks(x)) is not TRUE</span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Level"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Level"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dimnames(x) &lt;- dn:</span> length of 'dimnames' [2] not equal to array extent</span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -110,7 +113,7 @@ only change some of the taxa rank names.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

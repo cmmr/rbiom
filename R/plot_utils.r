@@ -317,16 +317,17 @@ insert_col <- function (df, after=0, col, val) {
 #____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
   if (is.null(env)) {
-    cmd <- capture.output(substitute(expr))
+    expr <- substitute(expr)
+    cmd  <- capture.output(expr)
   } else {
-    cmd <- do.call(substitute, list(expr=substitute(expr), env=env))
-    cmd <- capture.output(cmd)
+    expr <- do.call(substitute, list(expr=substitute(expr), env=env))
+    cmd  <- capture.output(expr)
   }
   
   if (length(cmd) > 1)
     cmd <- paste(trimws(cmd), collapse = " ")
   
-  structure(expr, 'display' = cmd)
+  structure(eval(expr), 'display' = cmd)
 }
 
 
@@ -400,19 +401,25 @@ loglabels <- function (values) {
 # }
 
 
+#____________________________________________________________________
 # Turn unquoted barewords into a character vector.
+#____________________________________________________________________
 qw <- function (...) {
   all.vars(match.call())
 }
 
+#____________________________________________________________________
 # Easily create list(x = ".x", label = ".label")
+#____________________________________________________________________
 .qw <- function (...) {
   x <- all.vars(match.call())
   as.list(setNames(paste0(".", x), x))
 }
 
 
+#____________________________________________________________________
 # Test if ALL arguments are NULL
+#____________________________________________________________________
 all.null <- function (...) {
   for (i in list(...))
     if (!is.null(i))
@@ -420,7 +427,9 @@ all.null <- function (...) {
   return (TRUE)
 }
 
+#____________________________________________________________________
 # Test if ANY arguments are NULL
+#____________________________________________________________________
 any.null <- function (...) {
   for (i in list(...))
     if (is.null(i))
@@ -428,7 +437,32 @@ any.null <- function (...) {
   return (FALSE)
 }
 
+
+
+
+
+#____________________________________________________________________
+# Shorthand for replacing NAs with something else.
+#____________________________________________________________________
+if.na <- function (x, replacement) {
+  if (!is.na(x))                 return (x)
+  if (!is.function(replacement)) return (replacement)
+  return (replacement())
+}
+
+#____________________________________________________________________
+# Shorthand for replacing NULLs with something else.
+#____________________________________________________________________
+if.null <- function (x, replacement) {
+  if (!is.null(x))               return (x)
+  if (!is.function(replacement)) return (replacement)
+  return (replacement())
+}
+
+
+#____________________________________________________________________
 # Like ifelse() but test is length 1 vector
+#____________________________________________________________________
 bool_switch <- function (test, yes, no) {
   res <- if (isTRUE(test)) yes else no
   return (res)

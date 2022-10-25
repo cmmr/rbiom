@@ -96,6 +96,7 @@ Other plotting:
 \code{\link{rare_multiplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{tree_plot}()}
 }
 \concept{plotting}

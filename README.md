@@ -2,7 +2,7 @@ rbiom
 =======
 
 [![Travis-CI Build Status](https://travis-ci.org/cmmr/rbiom.svg?branch=master)](https://travis-ci.org/cmmr/rbiom) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/r-rbiom/badges/installer/conda.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/r-rbiom/badges/version.svg)](https://anaconda.org/conda-forge/r-rbiom)
 
 This package is a toolkit for working with Biological Observation Matrix
 (BIOM) files. Features include reading/writing all BIOM formats, rarefaction,
@@ -78,9 +78,9 @@ Building from source
 
 rbiom requires the following system libraries which can be installed through your operating system's package manager.
 
-* deb (Debian, Ubuntu): `libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev`
-* rpm (Fedora, CentOS, RHEL): `udunits2-devel openssl-devel libxml2-devel libcurl-devel`
-* csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev`
+* deb (Debian, Ubuntu): `libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libgdal-dev`
+* rpm (Fedora, CentOS, RHEL): `udunits2-devel openssl-devel libxml2-devel libcurl-devel gdal-devel`
+* csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev gdal_dev`
 * brew (OSX): `udunits`
 
 

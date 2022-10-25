@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_biom</span><span class="op">(</span><span class="va">src</span>, tree <span class="op">=</span> <span class="st">"auto"</span>, prune <span class="op">=</span> <span class="va">cleanup</span>, cleanup <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_biom</span><span class="op">(</span><span class="va">src</span>, tree <span class="op">=</span> <span class="st">"auto"</span>, prune <span class="op">=</span> <span class="va">cleanup</span>, cleanup <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -69,6 +69,8 @@ as classical tabular format. URLs must begin with <kbd>http://</kbd>,
 or bzip2) BIOM files are also supported. NOTE: to read HDF5 formatted
 BIOM files, the BioConductor R package <code>rhdf5</code> must be 
 installed.</p></dd>
+
+
 <dt>tree</dt>
 <dd><p>The default value of <code>auto</code> will read the tree from the 
 BIOM file specified in <code>src</code>, if present. The value <code>TRUE</code> 
@@ -77,18 +79,27 @@ present. Setting <code>tree=FALSE</code> will return a <code>BIOM</code> object
 without any tree data. You may also provide a file path, URL, or
 Newick string to load that tree data into the final <code>BIOM</code> 
 object.</p></dd>
+
+
 <dt>prune</dt>
 <dd><p>Should samples and taxa with zero observations be discarded?
 (Default: <code>cleanup</code>)</p></dd>
+
+
 <dt>cleanup</dt>
 <dd><p>Renames ambiguous taxons and removes leading underscores. 
 Also converts character metadata into factors and dates based on 
 heuristics. (Default: FALSE)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>BIOM</code> class object containing the parsed data. This object
-    can be treated as a list with the following named elements:</p><dl><dt>counts</dt>
+    
+
+<p>A <code>BIOM</code> class object containing the parsed data. This object
+    can be treated as a list with the following named elements:</p>
+<p></p>
+<dl><dt>counts</dt>
 <dd><p>A numeric <code>slam</code> sparse matrix of observation
         counts. Taxa (OTUs) as rows and samples as columns.</p></dd>
 
@@ -125,19 +136,20 @@ heuristics. (Default: FALSE)</p></dd>
         <code>matrix_element_type</code>, <code>Comment</code>, and <code>shape</code></p></dd>
 
        
-</dl><p><code>metadata</code>, <code>taxonomy</code>, and <code>phylogeny</code> are optional
+</dl><p></p>
+<p><code>metadata</code>, <code>taxonomy</code>, and <code>phylogeny</code> are optional
     components of the BIOM file specification and therefore will be empty
     in the returned object when they are not provided by the BIOM file.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, package <span class="op">=</span> <span class="st">"rbiom"</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">read_biom</span><span class="op">(</span><span class="va">infile</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, package <span class="op">=</span> <span class="st">"rbiom"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">read_biom</span><span class="op">(</span><span class="va">infile</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Length Class                 Mode     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> counts       6   simple_triplet_matrix list     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> metadata     6   data.frame            list     </span>
@@ -145,46 +157,46 @@ heuristics. (Default: FALSE)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> phylogeny    4   phylo                 list     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sequences  490   -none-                character</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> info         9   -none-                list     </span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># Taxa Abundances</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Taxa Abundances</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101     1     5     6    18</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PreBivi6     0     0     0     0</span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="va">top5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu">slam</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slam/man/sums.html" class="external-link">row_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span><span class="op">[</span><span class="va">top5</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Family'</span>, <span class="st">'Genus'</span><span class="op">)</span><span class="op">]</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="va">top5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu">slam</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slam/man/sums.html" class="external-link">row_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span><span class="op">[</span><span class="va">top5</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Family'</span>, <span class="st">'Genus'</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Family               Genus              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc01yki "Lactobacillaceae"   "Lactobacillus"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc53100 "Streptococcaceae"   "Streptococcus"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LtbAci52 "Lactobacillaceae"   "Lactobacillus"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CnbTube3 "Corynebacteriaceae" "Corynebacterium 1"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc02qsf "Staphylococcaceae"  "Staphylococcus"   </span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span><span class="va">top5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span><span class="va">top5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc01yki     0     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc53100  1083   543   301   223  2672   748</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LtbAci52     0     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CnbTube3     0     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Unc02qsf     0     0     0     0     0     0</span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># Metadata</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Sex</span>, <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">`Body Site`</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Metadata</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Sex</span>, <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">`Body Site`</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Anterior nares Buccal mucosa Mid vagina Saliva Stool</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Female              5             5         10      5     5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Male                5             5          0      5     5</span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Mean age: %.1f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Mean age: %.1f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Mean age: 27.8"</span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co"># Phylogenetic tree</span></span>
-<span class="r-in">    <span class="va">tree</span> <span class="op">&lt;-</span> <span class="va">biom</span><span class="op">$</span><span class="va">phylogeny</span></span>
-<span class="r-in">    <span class="va">top5.tree</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="subtree.html">subtree</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">top5</span><span class="op">)</span></span>
-<span class="r-in">    <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/plot.phylo.html" class="external-link">plot.phylo</a></span><span class="op">(</span><span class="va">top5.tree</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Phylogenetic tree</span></span></span>
+<span class="r-in"><span>    <span class="va">tree</span> <span class="op">&lt;-</span> <span class="va">biom</span><span class="op">$</span><span class="va">phylogeny</span></span></span>
+<span class="r-in"><span>    <span class="va">top5.tree</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="subtree.html">subtree</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">top5</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/plot.phylo.html" class="external-link">plot.phylo</a></span><span class="op">(</span><span class="va">top5.tree</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="read_biom-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -199,7 +211,7 @@ heuristics. (Default: FALSE)</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

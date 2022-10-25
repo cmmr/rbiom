@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,45 +53,57 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rare_multiplot</span><span class="op">(</span>
-  <span class="va">biom</span>,
-  rline <span class="op">=</span> <span class="cn">TRUE</span>,
-  metric <span class="op">=</span> <span class="st">"OTUs"</span>,
-  depths <span class="op">=</span> <span class="cn">NULL</span>,
-  points <span class="op">=</span> <span class="cn">FALSE</span>,
-  color.by <span class="op">=</span> <span class="cn">NULL</span>,
-  facet.by <span class="op">=</span> <span class="cn">NULL</span>,
-  colors <span class="op">=</span> <span class="cn">NULL</span>,
-  facets <span class="op">=</span> <span class="cn">NULL</span>,
-  ci <span class="op">=</span> <span class="fl">95</span>,
-  caption <span class="op">=</span> <span class="cn">FALSE</span>,
-  labels <span class="op">=</span> <span class="cn">FALSE</span>,
-  trans <span class="op">=</span> <span class="st">"log10"</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rare_multiplot</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  rline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  metric <span class="op">=</span> <span class="st">"OTUs"</span>,</span>
+<span>  depths <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facets <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"log10"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
+
 <dt>rline</dt>
 <dd><p>Where to draw a vertical line on the plot, intended to show
 a particular rarefaction depth. Default: <code>TRUE</code> (no line).</p></dd>
+
+
 <dt>metric</dt>
 <dd><p>Alpha diversity metric(s) to use. Options are: 
 <code>"OTUs"</code>, <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, 
 and/or <code>"InvSimpson"</code>. Default: <code>"OTUs"</code>.</p></dd>
+
+
 <dt>depths</dt>
 <dd><p>Rarefaction depths to show in the plot. Passed to
 <a href="adiv_table.html">adiv_table</a>. The default, <code>"multi_even"</code>, uses a heuristic
 to pick 10 evenly spaced depths.</p></dd>
+
+
 <dt>points</dt>
 <dd><p>Overlay a scatter plot. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>color.by, facet.by</dt>
 <dd><p>Metadata column to color and/or facet by. If that
 column is a <code>factor</code>, the ordering of levels will be maintained 
 in the plot. Default: <code>color.by = NULL, facet.by = NULL</code></p></dd>
+
+
 <dt>colors, facets</dt>
 <dd><p>Names of the colors and/or facets values to use in
 the plot. Available values for colors are given by <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">colors()</a></code>. 
@@ -100,17 +112,27 @@ the metadata. <code>facets</code> are coerced to unnamed character vectors.
 If the length of these vectors is less than the values present in 
 their corresponding metadata column, then the data set will be 
 subseted accordingly. Default: <code>colors = NULL, facets = NULL</code></p></dd>
+
+
 <dt>ci</dt>
 <dd><p>The confidence interval to display around the fitted curve. Set
 to <code>FALSE</code> to hide the confidence interval. Default: <code>95</code>.</p></dd>
+
+
 <dt>caption</dt>
 <dd><p>Display information about the method used for trendline
 fitting beneath the plot. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>Show sample names under each bar. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>trans</dt>
 <dd><p>Y-axis transformation. Options are <code>"log10"</code> or 
 <code>NULL</code>.  Default: <code>"log10"</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters to pass along to ggplot2 
 functions. Prefix a parameter name with either <code>p.</code>, 
@@ -119,10 +141,13 @@ only to)  <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" clas
 <a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a>, respectively. For instance, 
 <code>p.size = 2</code> ensures only the points have their size set to 
 <code>2</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>ggplot2</code> plot. The computed data points and statistics will 
+    
+
+<p>A <code>ggplot2</code> plot. The computed data points and statistics will 
         be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>, 
         respectively.</p>
     </div>
@@ -140,16 +165,17 @@ only to)  <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" clas
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
-<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code>,
+<code><a href="tree_plot.html">tree_plot</a>()</code></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu">rare_multiplot</span><span class="op">(</span><span class="va">hmp50</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span> </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">rare_multiplot</span><span class="op">(</span><span class="va">hmp50</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span> </span></span>
 <span class="r-plt img"><img src="rare_multiplot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in">    </span>
+<span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>
   </div>
@@ -164,7 +190,7 @@ only to)  <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" clas
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

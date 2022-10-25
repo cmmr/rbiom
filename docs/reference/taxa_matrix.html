@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,14 +53,14 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">taxa_matrix</span><span class="op">(</span>
-  <span class="va">biom</span>,
-  rank <span class="op">=</span> <span class="st">"OTU"</span>,
-  taxa <span class="op">=</span> <span class="cn">NULL</span>,
-  map <span class="op">=</span> <span class="cn">NULL</span>,
-  lineage <span class="op">=</span> <span class="cn">FALSE</span>,
-  sparse <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">taxa_matrix</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  rank <span class="op">=</span> <span class="st">"OTU"</span>,</span>
+<span>  taxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  map <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sparse <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -69,12 +69,16 @@
 <dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code> 
 object, as returned from <a href="read_biom.html">read_biom</a>. For matrices, the rows and 
 columns are assumed to be the taxa and samples, respectively.</p></dd>
+
+
 <dt>rank</dt>
 <dd><p>The taxonomic rank. E.g. <code>rank = "OTU"</code>, 
 <code>rank = "Phylum"</code>, etc. May also be given numerically: 0 for
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
 of taxonomic ranks encoded in the original biom file. Run 
 <code>taxa_ranks(biom)</code> to fetch the names of all available ranks.</p></dd>
+
+
 <dt>taxa</dt>
 <dd><p>Limit the number of taxa returned in the matrix. Depending on 
 the value type, a different filter is applied.</p><dl><dt><code>NULL</code></dt>
@@ -98,6 +102,8 @@ the value type, a different filter is applied.</p><dl><dt><code>NULL</code></dt>
 
 
 </dl></dd>
+
+
 <dt>map</dt>
 <dd><p>A character matrix defining the value that each taxa IDs is
 assigned for each taxonomic rank. If <code>map=NULL</code> and <code>biom</code> is a
@@ -105,6 +111,8 @@ assigned for each taxonomic rank. If <code>map=NULL</code> and <code>biom</code>
 <code>biom$taxonomy</code>. <code>map</code> must not be <code>null</code> when <code>biom</code>
 is a <code>matrix</code> or <code>simple_triplet_matrix</code>. See the example below
 for an example of <code>map</code>'s structure.</p></dd>
+
+
 <dt>lineage</dt>
 <dd><p>Include all ranks in the name of the taxa. For instance,
 setting to <code>TRUE</code> will produce 
@@ -113,27 +121,32 @@ Whereas setting to <code>FALSE</code> (the default) will return simply
 <code>Coriobacteriales</code>. You want to set this to TRUE if you have
 genus names (such as <em>Incertae_Sedis</em>) that map to multiple higher
 level ranks.</p></dd>
+
+
 <dt>sparse</dt>
 <dd><p>If true, returns a sparse matrix as described by 
 <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix</a></code>, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A numeric matrix with samples as column names, and taxonomic
+    
+
+<p>A numeric matrix with samples as column names, and taxonomic
         identifiers as row names.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Actinobacteria Bacteroidetes Cyanobacteria Deinococcus Thermus Firmicutes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01             18           276             0                   0       1208</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02             60           221             0                   0        931</span>
@@ -144,24 +157,24 @@ memory efficient in this scenario.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02           44</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP03            6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP04          276</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="co"># Custom matrices should be formatted like so:</span></span>
-<span class="r-in">    <span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">map</span>    <span class="op">&lt;-</span> <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">counts</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># Custom matrices should be formatted like so:</span></span></span>
+<span class="r-in"><span>    <span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">map</span>    <span class="op">&lt;-</span> <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">counts</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713     0     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101     1     5     6    18     5    15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2     0     0     0     0     0     0</span>
-<span class="r-in">    <span class="va">map</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span class="r-in"><span>    <span class="va">map</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Kingdom    Phylum           Class            Order            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713 "Bacteria" "Bacteroidetes"  "Bacteroidia"    "Bacteroidales"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101 "Bacteria" "Firmicutes"     "Clostridia"     "Clostridiales"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2 "Bacteria" "Actinobacteria" "Actinobacteria" "Actinomycetales"</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">counts</span>, <span class="st">'Phylum'</span>, map<span class="op">=</span><span class="va">map</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">counts</span>, <span class="st">'Phylum'</span>, map<span class="op">=</span><span class="va">map</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Actinobacteria Bacteroidetes Cyanobacteria Deinococcus Thermus Firmicutes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01             18           276             0                   0       1208</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02             60           221             0                   0        931</span>
@@ -170,7 +183,7 @@ memory efficient in this scenario.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01           41</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02           44</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP03            6</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -185,7 +198,7 @@ memory efficient in this scenario.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbiom</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9068</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9075</span>
       </span>
     </div>
 
@@ -53,35 +53,38 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">as_percent</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">as_percent</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>biom</dt>
 <dd><p>A <code>BIOM</code> object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>BIOM</code> object.</p>
+    
+
+<p>A <code>BIOM</code> object.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html" class="external-link">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04 HMP05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101     1     5     6    18     5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2     0     0     0     0     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PreBivi6     0     0     0     0     0</span>
-<span class="r-in">    </span>
-<span class="r-in">    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">as_percent</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">as_percent</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (attr(biom, "rarefaction") == 1) return(biom):</span> argument is of length zero</span>
-<span class="r-in">    <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is(biom, "BIOM"):</span> object 'biom' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -96,7 +99,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

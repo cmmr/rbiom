@@ -19,7 +19,7 @@ taxa_boxplot(
   patterns = NULL,
   shapes = NULL,
   facets = NULL,
-  flip = FALSE,
+  flip = TRUE,
   stripe = flip,
   p.top = Inf,
   p.adj = "fdr",
@@ -68,7 +68,7 @@ is less than the values present in their corresponding metadata
 column, then the data set will be subseted accordingly.}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
-of columns. Default: \code{FALSE}}
+of columns. Default: \code{TRUE}}
 
 \item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
@@ -171,6 +171,7 @@ Other plotting:
 \code{\link{rare_multiplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+\code{\link{taxa_stacked}()},
+\code{\link{tree_plot}()}
 }
 \concept{plotting}

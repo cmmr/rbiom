@@ -12,22 +12,20 @@ ENV <- environment(NULL)
     'ggplot', 'aes_string', 
     'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
-    'expansion', 'facet_grid', 'facet_wrap', 
-    'geom_bar', 'geom_boxplot', 'geom_col',  
+    'facet_grid', 'facet_wrap', 'expansion', 'labs', 'margin', 
+    'geom_bar', 'geom_col', 'geom_boxplot', 'geom_violin',  
     'geom_hline', 'geom_vline', 'geom_segment',
     'geom_crossbar', 'geom_errorbar', 'geom_linerange', 'geom_point', 
-    'geom_pointrange', 'geom_raster', 'geom_rect', 
-    'geom_smooth', 'geom_text', 'geom_tile', 'geom_violin', 
+    'geom_pointrange', 'geom_raster', 'geom_rect', 'geom_tile', 
+    'geom_smooth', 'geom_text', 'geom_label', 
     'guide_colorbar', 'guide_legend', 'guides', 
-    'labs', 'margin', 
     'position_dodge', 'position_jitter', 'position_jitterdodge',
-    'scale_color_manual', 
+    'scale_color_manual', 'scale_color_continuous',
     'scale_fill_manual', 'scale_fill_gradient', 'scale_fill_gradientn', 
     'scale_fill_steps', 'scale_fill_stepsn', 
     'scale_shape_manual', 
-    'scale_y_log10', 
     'scale_x_continuous', 'scale_x_discrete', 
-    'scale_y_continuous', 'scale_y_discrete', 
+    'scale_y_continuous', 'scale_y_discrete', 'scale_y_log10', 
     'stat_ellipse', 'stat_smooth', 
     'theme', 'theme_bw', 'theme_void' )})
   
@@ -39,7 +37,7 @@ ENV <- environment(NULL)
   
   lapply(FUN = ggwrap, pkg="ggtree",  {c(
     'ggtree', 'geom_tiplab', 'geom_cladelab', 
-    'hexpand', 'vexpand' )})
+    'gheatmap', 'hexpand', 'vexpand' )})
   
   lapply(FUN = ggwrap, pkg="grid",       {c('arrow', 'unit')})
   lapply(FUN = ggwrap, pkg="ggtext",     {c('element_markdown')})

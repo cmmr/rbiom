@@ -85,6 +85,7 @@ Other plotting:
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+\code{\link{taxa_stacked}()},
+\code{\link{tree_plot}()}
 }
 \concept{plotting}

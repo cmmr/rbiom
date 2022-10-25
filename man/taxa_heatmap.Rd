@@ -73,6 +73,7 @@ Other plotting:
 \code{\link{rare_multiplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_stacked}()}
+\code{\link{taxa_stacked}()},
+\code{\link{tree_plot}()}
 }
 \concept{plotting}

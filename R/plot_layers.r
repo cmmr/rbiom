@@ -11,7 +11,7 @@ hasLayer <- function (layer=get("layer", pos = parent.frame())) {
 #________________________________________________________
 # Finds `layers` variable in parent env, then updates it.
 #________________________________________________________
-setLayer <- function (layer=get("layer", pos = parent.frame()), ...) {
+setLayer <- function (layer=get("layer", pos = parent.frame()), ..., .fn = NULL) {
   
   
   layers <- get("layers", pos = parent.frame())
@@ -20,7 +20,7 @@ setLayer <- function (layer=get("layer", pos = parent.frame()), ...) {
   if (!is(layers, 'list')) browser()
   
   if (!hasName(layers, layer))
-    initLayer(layer)
+    initLayer(layer, fn = .fn)
   
   dots <- list(...)
   
@@ -86,8 +86,9 @@ setLayer <- function (layer=get("layer", pos = parent.frame()), ...) {
 #________________________________________________________
 # Set up a layer with its function, function name, etc.
 # Uses attr(layers, 'params') to add in user's params.
+# Can set the underlying function using 'fn' parameter.
 #________________________________________________________
-initLayer <- function (layer_names) {
+initLayer <- function (layer_names, fn = NULL) {
   
   layers <- get("layers", pos = parent.frame())
   
@@ -108,10 +109,12 @@ initLayer <- function (layer_names) {
     attr(result, 'fn') <- switch(
       EXPR = layer,
       'ggplot'     = "ggplot",
+      'ggtree'     = "ggtree",
       'arrow'      = "geom_segment",
       'bar'        = ifelse(patterned, "ggpattern::geom_bar_pattern", "geom_bar"),
       'box'        = ifelse(patterned, "ggpattern::geom_boxplot_pattern", "geom_boxplot"),
       'brackets'   = "geom_segment",
+      'cladelab'   = "geom_cladelab",
       'color'      = ifelse(patterned, "ggpattern::scale_pattern_color_manual", "scale_color_manual"),
       'crossbar'   = ifelse(patterned, "ggpattern::geom_crossbar_pattern", "geom_crossbar"),
       'density'    = "ggdensity::geom_hdr",
@@ -122,6 +125,7 @@ initLayer <- function (layer_names) {
       'fill'       = ifelse(patterned, "ggpattern::scale_pattern_fill_manual", "scale_fill_manual"),
       'flip'       = "coord_flip",
       'hline'      = "geom_hline",
+      'label'      = "geom_label",
       'labs'       = "labs",
       'linerange'  = "geom_linerange",
       'mean'       = "geom_point",
@@ -141,12 +145,13 @@ initLayer <- function (layer_names) {
       'taxon'      = "ggrepel::geom_label_repel",
       'theme'      = "theme",
       'theme_bw'   = "theme_bw",
+      'tiplab'     = "geom_tiplab",
       'topo'       = "ggdensity::geom_hdr_lines",
       'violin'     = ifelse(patterned, "ggpattern::geom_violin_pattern", "geom_violin"),
       'vline'      = "geom_vline",
       'xaxis'      = ifelse(xmode == "factor", "scale_x_discrete", "scale_x_continuous"),
       'yaxis'      = "scale_y_continuous",
-      layer )
+      if.null(fn, layer) )
     
     attr(result, 'function') <- eval(parse(text = attr(result, 'fn', exact = TRUE)))
     
@@ -182,10 +187,12 @@ initLayer <- function (layer_names) {
     regex <- switch(
       EXPR = layer,
       'ggplot'     = "^g(|gplot)\\.",
+      'ggtree'     = "^g(|gtree)\\.",
       'arrow'      = "^a(|rrow)\\.",
       'bar'        = "^(|ba)r\\.",
       'box'        = "^b(|ox)\\.",
       'brackets'   = "^h(|line)\\.",
+      'cladelab'   = "^c(|lade|ladelab)\\.",
       'color'      = "^color\\.",
       'crossbar'   = "^c(|rossbar)\\.",
       'density'    = "^d(|ensity)\\.",
@@ -196,7 +203,9 @@ initLayer <- function (layer_names) {
       'fill'       = "^fill\\.",
       'flip'       = "^flip\\.",
       'heat'       = "^h(|eat|eatmap)\\.",
+      'hexpand'    = "^h(|expand)\\.",
       'hline'      = "^[rh](|line)\\.",
+      'label'      = "^l(|abel)\\.",
       'labs'       = "^labs\\.",
       'linerange'  = "^l(|inerange)\\.",
       'mean'       = "^m(|ean)\\.",
@@ -215,6 +224,7 @@ initLayer <- function (layer_names) {
       'topo'       = "^topo\\.",
       'theme'      = "^t(|heme)\\.",
       'theme_bw'   = "^theme_bw\\.",
+      'tiplab'     = "^tip(|lab)\\.",
       'vline'      = "^[rv](|line)\\.",
       'violin'     = "^v(|iolin)\\.",
       'xaxis'      = "^x(|axis)\\.",
