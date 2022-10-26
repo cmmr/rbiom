@@ -29,9 +29,10 @@ docker build -t cmmr/rbiom --no-cache - >build_log.txt 2>&1 <<-"EOF"
 	FROM cmmr/rbiom-base
 	MAINTAINER Daniel Smith "dansmith@orst.edu"
  
-	RUN su - -c "R -e \"                                                    \
-	  remotes::install_github('cmmr/rbiom', upgrade = 'never') \""          \
-	                                                                        \
+ 
+	 RUN su - -c "R -e \"                                                  \
+	  remotes::install_github('cmmr/rbiom', upgrade = 'never') \""         \
+	                                                                       \
 	  && rm -rf /tmp/*
 EOF
 

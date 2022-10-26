@@ -1,10 +1,10 @@
-#!Rscript
+#!/usr/bin/env Rscript
 
 
 #============================================================================================
 #=-------------------------------------------------------------------------------------------
 # Daniel Smith
-# October 18th, 2022
+# October 26th, 2022
 # Baylor College of Medicine
 # ==========================
 #
@@ -17,10 +17,7 @@
 
 opt_parser <- optparse::OptionParser(
   
-  usage = "\n\n  %prog -i input.biom -o output.biom [options]",
-  
-  description = "
-   Subsets a biom file by sample IDs or metadata.",
+  usage = "\n   %prog -i input.biom -o output.biom [options]",
   
   option_list=list(
     
@@ -45,13 +42,57 @@ opt_parser <- optparse::OptionParser(
             Metadata file format is assumed to be tab-delimited except when file's extension is '.csv'.")
   ),
   
-  epilogue = "Author: Daniel Smith, 2022 Baylor College of Medicine\n\n"
+  epilogue = '
+Subsets a biom file by sample IDs or metadata.
+
+Examples:
+  
+  SampleID Filtering:
+  ------------------------------------------
+  rbiom_subset.r -i hmp50.biom -o 02.biom -k HMP01,HMP02
+  rbiom_subset.r -i hmp50.biom -o 48.biom -d HMP01,HMP02
+  
+  
+  When the SampleIDs are in a File:
+  ------------------------------------------
+  cat << EOF > sample_ids.txt
+  HMP01
+  HMP02
+  HMP03
+  EOF
+  
+  rbiom_subset.r -i hmp50.biom -o subset.biom -k sample_ids.txt
+  
+  
+  Metadata Filtering:
+  ------------------------------------------
+  rbiom_subset.r -i hmp50.biom -o males.biom   -f Sex -k Male
+  rbiom_subset.r -i hmp50.biom -o females.biom -f Sex -d Male
+  
+  
+  When the Metadata is in a File:
+  ------------------------------------------
+  cat << EOF > metadata.txt
+  SampleID  AB
+  HMP01     A
+  HMP02     B
+  HMP03     A
+  HMP04     B
+  EOF
+  
+  rbiom_subset.r -i hmp50.biom -o 1234.biom -m metadata.txt
+  rbiom_subset.r -i hmp50.biom -o A.biom    -m metadata.txt -f AB -k A
+  rbiom_subset.r -i hmp50.biom -o B.biom    -m metadata.txt -f AB -d A
+  
+
+Author: Daniel Smith, 2022 Baylor College of Medicine
+'
 )
 opt <- optparse::parse_args(opt_parser)
 
-if (is.null(opt$values) || is.null(opt$infile) || is.null(opt$outfile)) {
+if (is.null(opt$infile) || is.null(opt$outfile)) {
   optparse::print_help(opt_parser)
-  stop("--infile, --outfile, and --values are required.\n\n", call.=FALSE)
+  stop("--infile and --outfile are required.\n\n", call.=FALSE)
 }
 
 if (is.null(opt$keep) && is.null(opt$drop) && is.null(opt$metadata)) {
@@ -65,10 +106,11 @@ if (is.null(opt$keep) && is.null(opt$drop) && is.null(opt$metadata)) {
 #________________________________________________________
 library(rbiom)
 
-cat("Reading biom file '", opt$infile, "'")
+cat("\n")
+cat("Reading biom file '", opt$infile, "'\n", sep = '')
 biom <- read_biom(src = opt$infile)
 
-cat("Initial sample count: ", nsamples(biom))
+cat("Initial sample count: ", nsamples(biom), "\n", sep = '')
 
 
 #________________________________________________________
@@ -120,7 +162,7 @@ if (!is.null(f <- opt$metadata)) {
     
     drop_ids <- setdiff(old_ids, keep_ids)
     if (length(x <- setdiff(new_ids, old_ids)) > 0)
-      cat("Metadata file excluded ", length(drop_ids), " samples from input biom file.")
+      cat("Metadata file excluded ", length(drop_ids), " samples from input biom file.\n", sep = '')
     
     biom <- select(biom, keep_ids)
     
@@ -149,28 +191,35 @@ if (!identical(opt$field, "SampleID")) {
 #________________________________________________________
 # Keep/drop particular SampleIDs/values
 #________________________________________________________
-if (!is.null(opts$keep) || !is.null(opts$drop)) {
+if (!is.null(opt$keep) || !is.null(opt$drop)) {
+  
   biom <- local({
     
     # Read SampleIDs/values from csv string or file.
     #________________________________________________________
     for (v in c("keep", "drop")) {
-      if (is.null(opts[[v]]))            { assign(v, NULL)
-      } else if (file.exists(opts[[v]])) { assign(v, readLines(con = opts[[v]]))
-      } else                             { assign(v, strsplit(opts[[v]], ",")[[1]]) }
+      vals <- opt[[v]]
+      if (is.null(vals))            { vals <- NULL
+      } else if (file.exists(vals)) { vals <- readLines(con = vals)
+      } else                        { vals <- strsplit(vals, ",")[[1]] }
+      assign(v, vals[nzchar(trimws(vals))])
+      remove("vals")
     }
     
     
     # Convert metadata values to SampleIDs
     #________________________________________________________
-    if (!identical(opts$field, "SampleID")) {
-      vals <- as.character(metadata(biom, opts$field))
+    if (!identical(opt$field, "SampleID")) {
+      ids  <- sample_names(biom)
+      vals <- as.character(metadata(biom, opt$field))
       
       if (length(x <- setdiff(c(keep, drop), vals)) > 0)
-        warning(opts$field, " values are never used: ", oxford(x))
+        warning(opt$field, " values are never used: ", oxford(x))
       
-      if (!is.null(keep)) keep <- names(vals)[ vals %in% keep]
-      if (!is.null(drop)) drop <- names(vals)[!vals %in% drop]
+      if (!is.null(keep)) keep <- ids[vals %in% keep]
+      if (!is.null(drop)) drop <- ids[vals %in% drop]
+      
+      remove("ids", "vals")
     }
     
     
@@ -195,11 +244,11 @@ if (!is.null(opts$keep) || !is.null(opts$drop)) {
 if (length(nsamples(biom)) == 0)
   stop("No samples retained.")
 
-cat("Final sample count: ", nsamples(biom))
-cat("Saving new biom file to '", opt$outfile, "'")
+cat("Final sample count: ", nsamples(biom),   "\n",  sep = '')
+cat("Saving new biom file to '", opt$outfile, "'\n", sep = '')
 
 write_biom(biom = biom, file = opt$outfile)
 
-cat("Finished.")
+cat("Finished.\n\n", sep = '')
 
 
