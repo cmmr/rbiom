@@ -11,12 +11,12 @@ docker build -t cmmr/rbiom-base --no-cache - >build_log.txt <<-"EOF"
 	      libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libgdal-dev \
 	                                                                              \
 	  && su - -c "R -e \"install.packages(dependencies=TRUE, c(                   \
-	      'ape', 'broom', 'ggbeeswarm', 'ggnewscale', 'ggpattern', 'ggplot2',     \
-	      'ggrepel', 'ggtext', 'glue', 'gridpattern', 'jsonlite', 'labeling',     \
-	      'magrittr', 'memoise', 'methods', 'openxlsx', 'optparse',               \
+	      'ape', 'broom', 'ggbeeswarm', 'ggdensity', 'ggnewscale', 'ggpattern',   \
+	      'ggplot2', 'ggrepel', 'ggtext', 'glue', 'gridpattern', 'jsonlite',      \
+	      'labeling', 'magrittr', 'memoise', 'methods', 'openxlsx', 'optparse',   \
 	      'paletteer', 'patchwork', 'plyr', 'Rcpp', 'RcppParallel',               \ 
 	      'rlang', 'R.utils', 'slam', 'tidyr', 'tsne', 'uwot', 'vegan',           \
-	      'BiocManager', 'remotes'))\""                                           \
+	      'BiocManager', 'remotes' ))\""                                          \
 	                                                                              \
 	  && su - -c "R -e \"BiocManager::install(c('ggtree', 'rhdf5'))\""            \
 	                                                                              \

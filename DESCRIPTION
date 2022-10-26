@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9075
+Version: 1.0.3.9076
 Date: 2022-10-12
 Authors@R:
     person("Daniel P.", "Smith", 
@@ -30,6 +30,7 @@ Imports:
     ape,
     broom,
     ggbeeswarm,
+    ggdensity,
     ggnewscale,
     ggpattern,
     ggplot2,
