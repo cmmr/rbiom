@@ -6,21 +6,35 @@
 #________________________________________________________
 
 ggwrap <- function (pkg, fn) {
-  fun <- do.call(`::`, list(pkg, fn))
   
-  assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
-    res <- fun(...)
+  
+  # Case when an optional dependency is not installed.
+  #________________________________________________________
+  if (nchar(system.file(package = pkg)) == 0) {
     
-    if (is.null(.display))
-      .display <- sprintf(
-        fmt = "%s(%s)", 
-        ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
-        as.args(list(...), fun = fun, indent = .indent) )
+    assign(fn, pos = ENV, function (...) {
+      stop("R package", pkg, "must be installed to use this feature.")
+    })
     
-    attr(res, 'display') <- .display
     
-    return (res)
-  })
+  } else {
+  
+    fun <- do.call(`::`, list(pkg, fn))
+    
+    assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
+      res <- fun(...)
+      
+      if (is.null(.display))
+        .display <- sprintf(
+          fmt = "%s(%s)", 
+          ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
+          as.args(list(...), fun = fun, indent = .indent) )
+      
+      attr(res, 'display') <- .display
+      
+      return (res)
+    })
+  }
 }
 
 
