@@ -5,7 +5,7 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-List rcpp_rarefy(List sparseMatrix, int depth, int seed = 8675309) {
+List rcpp_rarefy(List sparseMatrix, int depth, int seed = 0) {
   
   
   //======================================================

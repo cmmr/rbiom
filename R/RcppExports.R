@@ -13,7 +13,7 @@ rcpp_alpha_div <- function(sparseMatrix) {
     .Call(`_rbiom_rcpp_alpha_div`, sparseMatrix)
 }
 
-rcpp_rarefy <- function(sparseMatrix, depth, seed = 8675309L) {
+rcpp_rarefy <- function(sparseMatrix, depth, seed = 0L) {
     .Call(`_rbiom_rcpp_rarefy`, sparseMatrix, depth, seed)
 }
 

@@ -179,7 +179,7 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   cl[[1]] <- as.name("rarefy")
   cl[[2]] <- as.name("biom")
   for (i in seq_along(cl)[-(1:2)]) {
-    cl[[i]] <- eval.parent(cl[[i]])
+    cl[i] <- list(eval.parent(cl[[i]]))
   }
   names(cl)[[2]] <- ""
   attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))

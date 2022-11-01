@@ -18,7 +18,7 @@ docker build -t cmmr/rbiom-base --no-cache - >build_log.txt <<-"EOF"
 	      'rlang', 'R.utils', 'slam', 'tidyr', 'tsne', 'uwot', 'vegan',           \
 	      'BiocManager', 'remotes' ))\""                                          \
 	                                                                              \
-	  && su - -c "R -e \"BiocManager::install(c('ggtree', 'rhdf5'))\""            \
+	  && su - -c "R -e \"BiocManager::install(c('ggtree', 'rhdf5', 'treeio'))\""  \
 	                                                                              \
 	  && rm -rf /tmp/* /var/lib/apt/lists/*
 EOF

@@ -272,7 +272,7 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   for (i in seq_along(cl)[-1]) {
     val <- eval.parent(cl[[i]])
     if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
-      cl[[i]] <- val
+      cl[i] <- list(val)
   }
   attr(biom, 'history') <- paste("biom <-", deparse1(cl))
   

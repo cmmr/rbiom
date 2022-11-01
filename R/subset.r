@@ -278,7 +278,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   cl[[2]] <- as.name("biom")
   cl[[3]] <- expr
   for (i in seq_along(names(cl))[-(1:3)]) {
-    cl[[i]] <- eval.parent(cl[[i]])
+    cl[i] <- list(eval.parent(cl[[i]]))
   }
   names(cl)[[2]] <- ""
   names(cl)[[3]] <- ""
