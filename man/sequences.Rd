@@ -33,6 +33,7 @@ Nucleotide sequences associated with each taxonomic identifier.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},

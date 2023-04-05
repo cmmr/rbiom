@@ -46,7 +46,7 @@ write_biom <- function (biom, file, format="json") {
     
     mtx <- try(as.matrix(biom), silent = TRUE)
     if (is.matrix(mtx) && is.numeric(mtx))
-      if (!is.null(rownames(mtx)) && !is.null(colnames(mtx)))
+      if (!is_null(rownames(mtx)) && !is_null(colnames(mtx)))
         return (write_biom.tsv(mtx, file))
     
     stop(simpleError("Invalid BIOM object."))
@@ -57,11 +57,11 @@ write_biom <- function (biom, file, format="json") {
   # Default values for required fields
   #--------------------------------------------------------------
   
-  if (is.null(biom$info$type))     biom$info$type <- "OTU table"
+  if (is_null(biom$info$type))     biom$info$type <- "OTU table"
   if (is.na(biom$info$type))       biom$info$type <- "OTU table"
   if (length(biom$info$type) != 1) biom$info$id   <- "OTU table"
   if (nchar(biom$info$type) == 0)  biom$info$type <- "OTU table"
-  if (is.null(biom$info$id))       biom$info$id   <- "NA"
+  if (is_null(biom$info$id))       biom$info$id   <- "NA"
   if (is.na(biom$info$id))         biom$info$id   <- "NA"
   if (length(biom$info$id) != 1)   biom$info$id   <- "NA"
   if (nchar(biom$info$id) == 0)    biom$info$id   <- "NA"
@@ -106,7 +106,7 @@ write_biom.tsv <- function (biom, file) {
     )
   }
   
-  if (!is.null(taxonomy)) {
+  if (!is_null(taxonomy)) {
     if (ncol(taxonomy) > 0) {
       mtx <- {
         cbind(
@@ -165,7 +165,7 @@ write_biom.1.0 <- function (biom, file) {
     
     # Phylogenetic Tree
     #------------------------------------------------------
-    phylogeny = ifelse(is.null(biom$phylogeny), "", rbiom::write_tree(biom$phylogeny)),
+    phylogeny = ifelse(is_null(biom$phylogeny), "", rbiom::write_tree(biom$phylogeny)),
     
     
     # Taxonomy

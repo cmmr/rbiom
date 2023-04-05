@@ -22,6 +22,7 @@ Get \code{BIOM} object's miscellaneous information.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},

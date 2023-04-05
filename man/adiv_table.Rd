@@ -29,8 +29,10 @@ diversity computations. Options are:
   \item{\code{TRUE}}{
     Automatically select and apply a single rarefaction. }
     
-  \item{\code{"multi_log"}, \code{"multi_even"}}{
-    Automatically select and apply multiple rarefactions. }
+  \item{\code{"multi"}, \code{"multi_log"}, \code{"multi_even"}}{
+    Automatically select and apply multiple rarefactions.
+    \code{"multi"} provides \code{"multi_log"} at the low end 
+    and \code{"multi_even"} at the high end. }
     
   \item{\emph{integer vector}}{
     Rarefy at the specified depth(s). }

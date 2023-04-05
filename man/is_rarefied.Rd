@@ -25,6 +25,7 @@ Checks if a BIOM object is rarefied.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},

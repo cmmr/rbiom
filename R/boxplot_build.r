@@ -2,40 +2,42 @@
 
 boxplot_build <- function (params, plot_func, data_func, layers_func) {
   
-  
   #________________________________________________________
-  # Set up the x-axis variables 
+  # Lump all samples together into a single x-axis value.
   #________________________________________________________
-
-  params[['xval.by']] <- as.vector(params[['x']])
-  
-  for (i in params[['xval.by']]) {
-    
-    if (identical(substr(i, 1, 1), ".")) next
-    i <- sub("^[!=]=", "", i)
-    
-    vals <- params[['biom']][['metadata']][[i]]
-    if (is.character(vals)) {
-      params[['biom']][['metadata']][[i]] <- as.factor(vals)
-    } else if (!is.factor(vals)) {
-      stop("Non-categorical '", i, "' cannot be a boxplot x-axis value.")
-    }
-    remove("vals")
+  if (is_null(params[['x']])) {
+    params[['x']] <- ".all"
+    params[['biom']][['metadata']][['.all']] <- factor("all")
   }
   
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    x          = list(col_type = "cat", n = 0:1),
+    color.by   = list(col_type = "cat", n = 0:1),
+    pattern.by = list(col_type = "cat", n = 0:1),
+    shape.by   = list(col_type = "cat", n = 0:1),
+    facet.by   = list(col_type = "cat"),
+    limit.by   = list() ))
   
   
   #________________________________________________________
   # Convert user's `layers` spec to layer names.
   #________________________________________________________
   layer_names <- local({
-    layerlist <- c( 'b' = "box", 'v' = "violin",   'e' = "errorbar", 
-                    'r' = "bar", 's' = "strip",    'l' = "linerange",
+    layerlist <- c( 'x' = "box", 'v' = "violin",   'e' = "errorbar", 
+                    'b' = "bar", 's' = "strip",    'l' = "linerange",
                     'd' = "dot", 'c' = "crossbar", 'p' = "pointrange" )
     
-    layer_match(params[['layers']], choices = layerlist, default = "rls") %>%
+    layer_match(params[['layers']], choices = layerlist, default = "lsb") %>%
       c('ggplot', ., 'xaxis', 'yaxis', 'labs', 'theme', 'theme_bw')
   })
+  
+  if (!is_null(params[['color.by']]))   layer_names %<>% c("color")
+  if (!is_null(params[['shape.by']]))   layer_names %<>% c("shape")
+  if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
   
   
   
@@ -46,11 +48,12 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   if (!any(c('box', 'bar', 'violin')       %in% layer_names)) params[['pattern.by']] <- NULL
   
   
+  
   #________________________________________________________
   # Create the plot's data frame
   #________________________________________________________
-  ggdata <- data_func(params)        # Plot-specific
-  ggdata <- metadata_filters(ggdata) # General
+  ggdata <- data_func(params)      # Plot-specific
+  ggdata <- metadata_group(ggdata) # General
   remove("params")
     
   
@@ -61,6 +64,7 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   # + ggbeeswarm::geom_quasirandom(aes(x, y))
   #________________________________________________________
   ggdata[['.y']] %<>% round(12)
+  
   
   
   #________________________________________________________
@@ -77,9 +81,11 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   attr(layers, 'function')  <- plot_func
   attr(layers, 'xmode')     <- "factor"
   
+  
   initLayer(layer_names)
   layers <- layers_func(layers)     # Plot-specific
-  layers <- metadata_layers(layers) # General
+  # layers <- metadata_layers(layers) # General
+  
   
   remove("i", "ggdata", "layer_names")
   
@@ -140,7 +146,7 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     }
     
     # Bar charts need extra help on non-linear axes
-    if (is.null(layers[['yaxis']][['trans']])) {
+    if (is_null(layers[['yaxis']][['trans']])) {
       setLayer(fun="mean")
       
     } else {
@@ -232,8 +238,12 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     if (any(hasLayer(c("violin", "box", "bar"))))
       setLayer(color = "black", 'mapping|group' = ".group")
     
-    if (any(hasLayer(c("crossbar", "errorbar", "linerange", "pointrange"))))
-      setLayer(stroke = 0, alpha = 0.4)
+    if (any(hasLayer(c("crossbar", "errorbar", "linerange", "pointrange")))) {
+      setLayer(alpha = 0.4)
+      if (is_null(attr(layers, 'params', exact = TRUE)[['shape.by']])) {
+        setLayer(stroke = 0)
+      }
+    }
   }
   
   
@@ -285,22 +295,17 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     #________________________________________________________
     # Append rows to ggdata for the vline function
     #________________________________________________________
-    ggdata <- attr(layers, 'data', exact = TRUE)
-    
-    group_cols <- as.vector(unlist(c(
-      attr(layers, 'xcol', exact = TRUE),
-      ".group",
-      attr(layers, 'params', exact = TRUE)[c('color.by', 'shape.by', 'pattern.by', 'facet.by')] )))
-    
-    plyby    <- ply_cols(intersect(group_cols, colnames(ggdata)))
-    vline_df <- plyr::ddply(ggdata, plyby, function (v) { vlineFn(v[[".y"]]) })
+    ggdata   <- attr(layers, 'data', exact = TRUE)
+    group_by <- c(".group", attr(layers, 'params', exact = TRUE)[['.group.by']])
+    group_by <- ply_cols(intersect(unique(group_by), colnames(ggdata)))
+    vline_df <- plyr::ddply(ggdata, group_by, function (v) { vlineFn(v[[".y"]]) })
     
     if (nrow(vline_df) > 0) {
       attr(ggdata, "vline") <- vline_df
       attr(layers, 'data')  <- ggdata
     }
     
-    remove("ggdata", "plyby", "group_cols", "vline_df")
+    remove("ggdata", "group_by", "vline_df")
     
     
     #________________________________________________________
@@ -358,12 +363,13 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   
   xcol <- attr(layers, 'xcol', exact = TRUE)
   args <- c(list('x' = xcol), .qw(y, xmin, xmax, ymin, ymax, xend, yend, label))
-  if (hasName(ggdata, ".group"))             args[['group']]        <- ".group"
-  if (hasLayer("color"))                     args[['color']]        <- params[['color.by']]
-  if (hasLayer("color"))                     args[['fill']]         <- params[['color.by']]
-  if (hasLayer("shape"))                     args[['shape']]        <- params[['shape.by']]
-  if (hasLayer("pattern"))                   args[['pattern_type']] <- params[['pattern.by']]
-  if (all(hasLayer(c("color", "pattern"))))  args[['pattern_fill']] <- params[['color.by']]
+  if (hasName(ggdata, ".group"))               args[['group']]        <- ".group"
+  if (hasLayer("color"))                       args[['color']]        <- names(params[['color.by']])
+  if (hasLayer("color"))                       args[['fill']]         <- names(params[['color.by']])
+  if (hasLayer("shape"))                       args[['shape']]        <- names(params[['shape.by']])
+  if (hasLayer("pattern"))                     args[['pattern_type']] <- names(params[['pattern.by']])
+  if (all(hasLayer(c("color", "pattern"))))    args[['pattern_fill']] <- names(params[['color.by']])
+  if (!is_null(layers[["color"]][["values"]])) setLayer("fill", values = layers[["color"]][["values"]])
   
   for (layer in intersect(names(layers), names(specs))) {
     layerArgs <- args[intersect(specs[[layer]], names(args))]

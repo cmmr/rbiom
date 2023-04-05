@@ -6,7 +6,7 @@
 #' 
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
-#' @param layout   A layout option supported by \link{ggtree::ggtree}:
+#' @param layout   Any layout option supported by \link{ggtree::ggtree}:
 #'        \code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"}, 
 #'        \code{"ellipse"}, \code{"roundrect"}, \code{"fan"}, 
 #'        \code{"circular"}, \code{"inward_circular"}, \code{"radial"}, 
@@ -18,26 +18,29 @@
 #'        \code{tiplab = "Genus"}). Default: \code{NULL}.
 #' 
 #' @param color.by   How to color the tree. Currently only supports the options
-#'        \code{NULL} (no coloring) or \code{'reads'} (color by number of taxa 
+#'        \code{NULL} (no coloring) or \code{'.reads'} (color by number of taxa 
 #'        observations). Default: \code{NULL}.
 #' 
 #' @param label,cladelab   Label monophyletic clades. You can specify the
 #'        same or different taxonomic ranks for internal (label) and external 
-#'        (cladelab) annotations. Default: \code{NULL},\code{NULL}.
+#'        (cladelab) annotations. Default: \code{NULL}.
 #' 
 #' @param top,right,bottom,left   Add additional space around the tree.
 #'        Sometimes necessary for wide text annotations. Set as fraction of
 #'        tree's width/height. For instance, \code{right = 1} reserves the 
 #'        right half of the plotting area for non-tree elements.
-#'        Default: \code{NULL},\code{NULL},\code{NULL},\code{NULL}.
+#'        Default: \code{NULL}.
 #' 
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     tree_plot(hmp50)
 #'     
+#'     hmp1 <- select(hmp50, samples = "HMP10")
+#'     tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
+#'     tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
 #'
 tree_plot <- function (
     biom, layout = "rectangular", 
@@ -50,11 +53,13 @@ tree_plot <- function (
   local({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
     
-    if(!is.null(c(tiplab, label, cladelab))) {
+    if (!has_phylogeny(biom)) stop("No phylogenetic data present.")
+    
+    if(!is_null(c(tiplab, label, cladelab))) {
       ranks <- metrics(biom, 'rank')
       for (i in c('tiplab', 'label', 'cladelab')) {
         rank <- get(i)
-        if (is.null(rank)) next
+        if (is_null(rank)) next
         if (!is.character(rank)) stop(i, " must be NULL or character")
         if (length(rank) > 1)    stop(i, " must be NULL or length 1")
         if (!rank %in% ranks)
@@ -89,7 +94,7 @@ tree_plot <- function (
   
   # Coloring by reads requires an aes mapping.
   #________________________________________________________
-  if (identical(color.by, 'reads')) {
+  if (identical(color.by, '.reads')) {
     setLayer("ggtree", mapping = as.cmd(aes(color=log(reads))))
     setLayer("scale_color_continuous", low='darkgreen', high='red')
   }
@@ -97,7 +102,7 @@ tree_plot <- function (
   
   # Add OTU names at the tree tips.
   #________________________________________________________
-  if (!is.null(tiplab)) {
+  if (!is_null(tiplab)) {
     initLayer("tiplab")
     
     if (!identical(tiplab, 'OTU')) {
@@ -118,10 +123,10 @@ tree_plot <- function (
   
   # Label clades internally (inside) of the tree.
   #________________________________________________________
-  if (!is.null(label)) {
+  if (!is_null(label)) {
     
     mapping <- aes(x=branch, label=!!as.name(label))
-    if (identical(color.by, 'reads'))
+    if (identical(color.by, '.reads'))
       mapping <- aes(x=branch, label=!!as.name(label), color=log(reads))
     
     setLayer(
@@ -134,10 +139,10 @@ tree_plot <- function (
   
   # Label clades externally (at right) of the tree.
   #________________________________________________________
-  if (!is.null(cladelab)) {
+  if (!is_null(cladelab)) {
     
     mapping <- aes(node=node, label=!!as.name(cladelab))
-    if (identical(color.by, 'reads'))
+    if (identical(color.by, '.reads'))
       mapping <- aes(node=node, label=!!as.name(cladelab), color=log(reads))
     
     setLayer(
@@ -151,20 +156,20 @@ tree_plot <- function (
   
   # Add horizontal/vertical padding for text to bleed into.
   #________________________________________________________
-  if (!is.null(c(label, cladelab, tiplab))) {
+  if (!is_null(c(label, cladelab, tiplab))) {
     top    %<>% if.null(0.02)
     bottom %<>% if.null(0.02)
   }
-  if (!is.null(cladelab))
+  if (!is_null(cladelab))
     right %<>% if.null(0.2)
   
-  if (!is.null(top))    setLayer('top',    .fn = 'vexpand', direction =  1, ratio = top)
-  if (!is.null(right))  setLayer('right',  .fn = 'hexpand', direction =  1, ratio = right)
-  if (!is.null(bottom)) setLayer('bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
-  if (!is.null(left))   setLayer('left',   .fn = 'hexpand', direction = -1, ratio = left)
+  if (!is_null(top))    setLayer('top',    .fn = 'vexpand', direction =  1, ratio = top)
+  if (!is_null(right))  setLayer('right',  .fn = 'hexpand', direction =  1, ratio = right)
+  if (!is_null(bottom)) setLayer('bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
+  if (!is_null(left))   setLayer('left',   .fn = 'hexpand', direction = -1, ratio = left)
   
   
-  p <- ggbuild(layers)
+  p <- suppressMessages(ggbuild(layers))
   
   
   # Attach history of biom modifications and this call
@@ -228,7 +233,7 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
     if (length(bad <- setdiff(clades, taxa_ranks(biom))) > 0)
       stop("Invalid taxonomic rank: ", paste(collapse = ", ", bad))
       
-    if (is.null(names(clades))) return (setNames(clades, clades))
+    if (is_null(names(clades))) return (setNames(clades, clades))
     
     if (length(i <- which(names(clades) == "")) > 0)
       names(clades)[i] <- as.vector(clades)[i]

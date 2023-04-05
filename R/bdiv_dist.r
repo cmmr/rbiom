@@ -102,7 +102,7 @@ bdiv_distmat <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, 
     
     
     # Make sure the matrix has rownames set
-    if (is.null(rownames(counts)))
+    if (is_null(rownames(counts)))
       stop("The abundance matrix does not have rownames set to Taxa IDs.")
     
     
@@ -163,10 +163,10 @@ bdiv_distmat <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, 
   #-----------------------------------------------
   # Adonis / PERMANOVA
   #-----------------------------------------------
-  if (!is.null(g <- stat.by))
+  if (!is_null(g <- stat.by))
     attr(dm, 'stats_raw') <- try(silent=TRUE, local({
       if (length(g) == 1)     g <- unname(metadata(biom, g))
-      if (!is.null(names(g))) g <- unname(g[rownames(counts)])
+      if (!is_null(names(g))) g <- unname(g[rownames(counts)])
       set.seed(seed)
       return(vegan::adonis2(dm ~ g, permutations=perms))
     }))

@@ -24,7 +24,7 @@
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
   
-  if (is.null(names(value))) {
+  if (is_null(names(value))) {
     new_ids <- value
     
   } else {
@@ -70,7 +70,7 @@
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
   
-  if (is.null(names(value))) {
+  if (is_null(names(value))) {
     new_ids <- value
     
   } else {
@@ -124,7 +124,7 @@
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
   
-  if (is.null(names(value))) {
+  if (is_null(names(value))) {
     new_ids <- value
     
   } else {
@@ -236,7 +236,7 @@
 }
 
 
-#' Set a \code{BIOM} object's id or comment.
+#' Set a \code{BIOM} object's id.
 #' 
 #' The BIOM specification includes \code{id} and \code{comment} fields
 #' for free-form text.
@@ -253,9 +253,6 @@
 #'     
 #'     id(biom) <- "My new title/id"
 #'     info(biom)$id
-#'     
-#'     comment(biom) <- "A description of this study"
-#'     comment(biom)
 #'
 
 `id<-` <- function (x, value) {
@@ -264,7 +261,40 @@
   stopifnot(is.character(value))
   stopifnot(length(value) == 1)
   
+  value <- trimws(value, whitespace = "[\\h\\v]")
+  
   x[['info']][['id']] <- value
+  
+  return (x)
+}
+
+
+#' Set a \code{BIOM} object's comment.
+#' 
+#' The BIOM specification includes \code{id} and \code{comment} fields
+#' for free-form text.
+#' 
+#' @param x  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param value The identifier to add (character vector of length 1).
+#' @family setters
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     biom <- hmp50
+#'     
+#'     comments(biom) <- "A description of this study"
+#'     comments(biom)
+#'
+
+`comments<-` <- function (x, value) {
+  
+  stopifnot(is(x, 'BIOM'))
+  stopifnot(is.character(value))
+  stopifnot(length(value) == 1)
+  
+  value <- trimws(value, whitespace = "[\\h\\v]")
+  
+  x[['info']][['comment']] <- value
   
   return (x)
 }

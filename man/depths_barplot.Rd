@@ -4,7 +4,14 @@
 \alias{depths_barplot}
 \title{Visualize the number of observations per sample.}
 \usage{
-depths_barplot(biom, rline = TRUE, labels = TRUE, trans = "log10", ...)
+depths_barplot(
+  biom,
+  rline = TRUE,
+  counts = TRUE,
+  labels = TRUE,
+  trans = "log10",
+  ...
+)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
@@ -15,6 +22,9 @@ columns are assumed to be the taxa and samples, respectively.}
 a particular rarefaction depth. Set to \code{TRUE} to show an 
 auto-selected rarefaction depth or \code{NULL} to not show a line.
 Default: \code{TRUE}.}
+
+\item{counts}{Display the number of samples and reads remaining after
+rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 
 \item{labels}{Show sample names under each bar. Default: \code{TRUE}.}
 
@@ -39,7 +49,7 @@ Visualize the number of observations per sample.
 \examples{
     library(rbiom)
     
-    depths_barplot(hmp50, rline=TRUE) 
+    depths_barplot(hmp50, rline=TRUE)
     
 }
 \seealso{

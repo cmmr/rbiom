@@ -26,6 +26,7 @@ Sum the observations in each sample.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},

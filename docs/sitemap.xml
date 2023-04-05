@@ -1,273 +1,315 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://cmmr.github.io/rbiom/404.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/aesthetics.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/aesthetics.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/diversity.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/importing.html</loc>
   </url>
   <url>
-    <loc>/reference/adiv_boxplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/partitioning.html</loc>
   </url>
   <url>
-    <loc>/reference/adiv_corrplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/plot_types.html</loc>
   </url>
   <url>
-    <loc>/reference/adiv_table.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/diversity.html</loc>
   </url>
   <url>
-    <loc>/reference/apcoa.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/importing.html</loc>
   </url>
   <url>
-    <loc>/reference/as_percent.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/index.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_biplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/partitioning.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_boxplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/articles/plot_types.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_dist.html</loc>
+    <loc>https://cmmr.github.io/rbiom/authors.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_distmat.html</loc>
+    <loc>https://cmmr.github.io/rbiom/index.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_heatmap.html</loc>
+    <loc>https://cmmr.github.io/rbiom/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_ord_plot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_ord_table.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/adiv_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/bdiv_table.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/adiv_corrplot.html</loc>
   </url>
   <url>
-    <loc>/reference/bdply.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/adiv_table.html</loc>
   </url>
   <url>
-    <loc>/reference/blply.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/apcoa.html</loc>
   </url>
   <url>
-    <loc>/reference/counts-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/as_percent.html</loc>
   </url>
   <url>
-    <loc>/reference/counts.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_biplot.html</loc>
   </url>
   <url>
-    <loc>/reference/depth.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/depths_barplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_dist.html</loc>
   </url>
   <url>
-    <loc>/reference/distill.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_distmat.html</loc>
   </url>
   <url>
-    <loc>/reference/embed_code.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_heatmap.html</loc>
   </url>
   <url>
-    <loc>/reference/embed_csv.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/has_phylogeny.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_ord_table.html</loc>
   </url>
   <url>
-    <loc>/reference/has_sequences.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_table.html</loc>
   </url>
   <url>
-    <loc>/reference/hmp50.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/bdply.html</loc>
   </url>
   <url>
-    <loc>/reference/id-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/blply.html</loc>
   </url>
   <url>
-    <loc>/reference/id.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/comments-set.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/comments.html</loc>
   </url>
   <url>
-    <loc>/reference/info.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/counts-set.html</loc>
   </url>
   <url>
-    <loc>/reference/init_cache.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/counts.html</loc>
   </url>
   <url>
-    <loc>/reference/is_rarefied.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/default_rarefaction_depth.html</loc>
   </url>
   <url>
-    <loc>/reference/metadata-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/depth.html</loc>
   </url>
   <url>
-    <loc>/reference/metadata.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/depths_barplot.html</loc>
   </url>
   <url>
-    <loc>/reference/metrics.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/distill.html</loc>
   </url>
   <url>
-    <loc>/reference/nsamples.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/embed_code.html</loc>
   </url>
   <url>
-    <loc>/reference/ntaxa.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/embed_csv.html</loc>
   </url>
   <url>
-    <loc>/reference/ordinate.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/has_phylogeny.html</loc>
   </url>
   <url>
-    <loc>/reference/ordination_plot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/has_sequences.html</loc>
   </url>
   <url>
-    <loc>/reference/phylogeny-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/hmp50.html</loc>
   </url>
   <url>
-    <loc>/reference/phylogeny.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/id-set.html</loc>
   </url>
   <url>
-    <loc>/reference/plot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/id.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_heatmap.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/print.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/info.html</loc>
   </url>
   <url>
-    <loc>/reference/rarefy.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/init_cache.html</loc>
   </url>
   <url>
-    <loc>/reference/rare_corrplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/is_rarefied.html</loc>
   </url>
   <url>
-    <loc>/reference/rare_multiplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/metadata-set.html</loc>
   </url>
   <url>
-    <loc>/reference/rbiom.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/metadata.html</loc>
   </url>
   <url>
-    <loc>/reference/read_biom.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/metrics.html</loc>
   </url>
   <url>
-    <loc>/reference/read_fasta.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/nsamples.html</loc>
   </url>
   <url>
-    <loc>/reference/read_tree.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/ntaxa.html</loc>
   </url>
   <url>
-    <loc>/reference/repair.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/ordinate.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_names-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/ordination_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_names.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/phylogeny-set.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_sums.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/phylogeny.html</loc>
   </url>
   <url>
-    <loc>/reference/select.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/plot.html</loc>
   </url>
   <url>
-    <loc>/reference/sequences-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/plot_heatmap.html</loc>
   </url>
   <url>
-    <loc>/reference/sequences.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/print.html</loc>
   </url>
   <url>
-    <loc>/reference/stacked_plot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/rarefy.html</loc>
   </url>
   <url>
-    <loc>/reference/stats_table.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/rare_corrplot.html</loc>
   </url>
   <url>
-    <loc>/reference/subset.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/rare_multiplot.html</loc>
   </url>
   <url>
-    <loc>/reference/subtree.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/rbiom.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_boxplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/read_biom.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_corrplot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/read_fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_heatmap.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/read_tree.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_matrix.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/repair.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_means.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sample_names-set.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_names-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sample_names.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_names.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sample_sums.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_ranks-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/select.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_ranks.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sequences-set.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_rollup.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sequences.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_stacked.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/stacked_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_sums.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc>
   </url>
   <url>
-    <loc>/reference/taxa_table.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/subset.html</loc>
   </url>
   <url>
-    <loc>/reference/taxonomy-set.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/subtree.html</loc>
   </url>
   <url>
-    <loc>/reference/taxonomy.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_boxplot.html</loc>
   </url>
   <url>
-    <loc>/reference/tips.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_corrplot.html</loc>
   </url>
   <url>
-    <loc>/reference/top_taxa.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_heatmap.html</loc>
   </url>
   <url>
-    <loc>/reference/tree_data.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_matrix.html</loc>
   </url>
   <url>
-    <loc>/reference/tree_plot.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_means.html</loc>
   </url>
   <url>
-    <loc>/reference/unifrac.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_names-set.html</loc>
   </url>
   <url>
-    <loc>/reference/write_biom.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_names.html</loc>
   </url>
   <url>
-    <loc>/reference/write_fasta.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_ranks-set.html</loc>
   </url>
   <url>
-    <loc>/reference/write_tree.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_ranks.html</loc>
   </url>
   <url>
-    <loc>/reference/write_xlsx.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_rollup.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_stacked.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_sums.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_table.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxonomy-set.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxonomy.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/tips.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/top_taxa.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/tree_data.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/tree_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/unifrac.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_biom.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_fasta.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_tree.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_xlsx.html</loc>
   </url>
 </urlset>

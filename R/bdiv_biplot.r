@@ -20,17 +20,13 @@
 #'        samples, and \bold{mean}, \bold{taxon}, and \bold{arrow} for biplots.
 #'        Single letter abbreviations are also accepted. For instance,
 #'        \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and 
-#'        \code{"pe"}. Default: \code{"pce"}/\code{"p"} for ordinations 
+#'        \code{"pe"}.
+#'        See \code{vignette("biplots")} for examples of each.
+#'        Default: \code{"pce"}/\code{"p"} for ordinations 
 #'        with/without a \code{color.by} argument.
 #'                 
-#' @param color.by,shape.by,facet.by   Metadata column to color, shape, and/or
-#'        facet by. If that column is a \code{factor}, the ordering of levels
-#'        will be maintained in the plot.
-#'        
-#' @param colors,shapes,facets   Names of the colors, shapes, and/or facets to 
-#'        use in the plot. Available values for colors and shapes are given by 
-#'        \code{colors()} and \code{0:25}, respectively. Use a named character 
-#'        vector to map them  to specific factor levels in the metadata.
+#' @param color.by,shape.by,facet.by,limit.by   Metadata columns to 
+#'        use for data partitioning. Default: \code{NULL}
 #'        
 #' @param weighted   When employing a beta diversity metric, use the weighted
 #'        version. Default: \code{TRUE}.
@@ -75,36 +71,46 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- rarefy(hmp50)
+#'     biom <- rarefy(hmp50) 
 #'     bdiv_biplot(biom, color.by="Body Site", rank="Genus")
 #'     
 bdiv_biplot <- function (
   biom, metric = "Bray-Curtis", ord = "PCoA", layers = NULL, 
-  color.by = NULL, shape.by = NULL, facet.by = NULL, colors = NULL, shapes = NULL, facets = NULL, 
+  color.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
   weighted = TRUE, rank = NULL, taxa = 5, p.top = Inf, p.adj = "fdr", perms = 1000, ...) {
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  params <- c(as.list(environment()), list(...))
+  params[['...']] <- NULL
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot)))
+  remove(list = setdiff(ls(), c("params", "history")))
   
   
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  metric <- as.vector(validate_metrics(biom, metric, "bdiv", multi=TRUE))
-  ord    <- as.vector(validate_metrics(biom, ord,    "ord",  multi=TRUE))
-  if (!is.null(rank))
-    rank <- as.vector(validate_metrics(biom, rank, "rank", multi=TRUE))
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, n = 1, 'metric', 'bdiv', tree = tree)
+    ord    %<>% validate_arg(biom, n = 1, 'ord')
+    rank   %<>% validate_arg(biom, n = 1, 'rank', default = tail(c('OTU', taxa_ranks(biom)), 1))
+  })
   
   
   #________________________________________________________
-  # Collect all parameters into a list
+  # Subset biom by requested metadata and aes.
   #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  remove(list = setdiff(ls(), c("params", "biom", "layers")))
+  params %<>% metadata_params(contraints = list(
+    color.by   = list(n = c(0,1)),
+    shape.by   = list(n = c(0,1),   col_type = "cat"),
+    facet.by   = list(n = c(0,Inf), col_type = "cat"),
+    limit.by   = list(n = c(0,Inf)) ))
   
-  
-  #________________________________________________________
-  # Subset before calculating ordinations
-  #________________________________________________________
-  metadata(biom) %<>% subset_by_params(params)
+  biom <- params[['biom']]
   
   
   #________________________________________________________
@@ -117,24 +123,25 @@ bdiv_biplot <- function (
   #________________________________________________________
   # Convert user's `layers` spec to layer names.
   #________________________________________________________
-  layer_names <- local({
+  layer_names <- with(params, {
+    
     layerlist <- c( 'p' = "point", 'n' = "name",    's' = "spider", 
                     'n' = "name",  'd' = "density", 't' = "taxon",
                     'a' = "arrow", 'e' = "ellipse", 'm' = "mean" )
     
-    default <- if (is.null(params[['color.by']])) "p" else c("p", "c", "e")
-    if (!is.null(params[['rank']])) default %<>% c("t", "m")
+    default <- if (is_null(color.by)) "p" else c("p", "c", "e")
+    if (!is_null(rank)) default %<>% c("t", "m")
     
     layer_match(layers, choices = layerlist, default = default) %>%
       c('ggplot', ., 'xaxis', 'yaxis', 'labs', 'theme', 'theme_bw')
   })
-  remove("layers")
+  params[['layers']] <- NULL
   
   
   #________________________________________________________
   # Disable biplot unless both rank and layers are given.
   #________________________________________________________
-  if (is.null(params[['rank']]) || !any(c("taxon", "arrow", "mean") %in% layer_names)) {
+  if (is_null(params[['rank']]) || !any(c("taxon", "arrow", "mean") %in% layer_names)) {
     params[['rank']] <- NULL
     layer_names %<>% setdiff(c("taxon", "arrow", "mean"))
   }
@@ -150,7 +157,7 @@ bdiv_biplot <- function (
     weighted = params[['weighted']],
     md       = TRUE,
     split.by = params[['facet.by']],
-    stat.by  = params[['color.by']],
+    stat.by  = names(params[['color.by']]),
     perms    = params[['perms']],
     rank     = params[['rank']],
     taxa     = params[['taxa']],
@@ -176,8 +183,12 @@ bdiv_biplot <- function (
   attr(layers, 'xmode')    <- "numeric"
   attr(layers, 'ymode')    <- "numeric"
   
+  if (!is_null(params[['color.by']]))   layer_names %<>% c("color")
+  if (!is_null(params[['shape.by']]))   layer_names %<>% c("shape")
+  if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
+  
   initLayer(layer_names)
-  layers <- metadata_layers(layers)
+  # layers <- metadata_layers(layers)
   
   remove("layer_names")
   
@@ -197,9 +208,9 @@ bdiv_biplot <- function (
     "mean"       = c('x', 'y', 'size') )
   
   args <- .qw(x, y, xend, yend, label, size)
-  if (hasLayer("color")) args[['color']] <- params[['color.by']]
-  if (hasLayer("color")) args[['fill']]  <- params[['color.by']]
-  if (hasLayer("shape")) args[['shape']] <- params[['shape.by']]
+  if (hasLayer("color")) args[['color']] <- names(params[['color.by']])
+  if (hasLayer("color")) args[['fill']]  <- names(params[['color.by']])
+  if (hasLayer("shape")) args[['shape']] <- names(params[['shape.by']])
   
   for (layer in intersect(names(layers), names(specs))) {
     layerArgs <- args[intersect(specs[[layer]], names(args))]
@@ -279,7 +290,7 @@ bdiv_biplot <- function (
   
   #________________________________________________________
   # Create the plot and add each layer with its arguments.
-  # Also attaches a human-readable version of the plot command.
+  # Also attach the human-readable ggplot command.
   #________________________________________________________
   p <- layers %>%
     ordination_biplot() %>%
@@ -287,12 +298,7 @@ bdiv_biplot <- function (
     ordination_spider() %>%
     plot_build()
   
-  
-  #________________________________________________________
-  # Attach history of biom modifications and this call
-  #________________________________________________________
-  history <- sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot))
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   #________________________________________________________
@@ -319,8 +325,8 @@ ordination_biplot <- function (layers) {
   biplot <- attr(ggdata, 'biplot', exact = TRUE)
   params <- attr(layers, 'params', exact = TRUE)
   
-  if (is.null(biplot))           return (layers)
-  if (is.null(params[['rank']])) return (layers)
+  if (is_null(biplot))           return (layers)
+  if (is_null(params[['rank']])) return (layers)
   
   
   #________________________________________________________
@@ -462,7 +468,7 @@ ordination_facets <- function (layers) {
   #________________________________________________________
   # Last, add the statistics
   #________________________________________________________
-  if (!is.null(stats)) {
+  if (!is_null(stats)) {
     
     # stats are agnostic of .ord and .rank
     df <- plyr::join(df, stats, by = c('.weight', '.dist', params[['facet.by']]))
@@ -493,7 +499,7 @@ ordination_facets <- function (layers) {
   #________________________________________________________
   # Copy .facet column from df to biplot
   #________________________________________________________
-  if (!is.null(biplot) && hasName(df, ".facet"))
+  if (!is_null(biplot) && hasName(df, ".facet"))
     attr(df, 'biplot') <- local({
       join_cols <- c('.weight', '.dist', '.ord', '.rank', params[['facet.by']])
       join_cols <- intersect(join_cols, intersect(colnames(df), colnames(biplot)))
@@ -539,7 +545,7 @@ ordination_facets <- function (layers) {
   # Make sure ggdata retains all its original attributes.
   #________________________________________________________
   for (i in names(attributes(ggdata)))
-    if (is.null(attr(df, i, exact = TRUE)))
+    if (is_null(attr(df, i, exact = TRUE)))
       attr(df, i) <- attr(ggdata, i, exact = TRUE)
   
   
@@ -565,7 +571,7 @@ ordination_spider <- function (layers) {
   
   attr(ggdata, 'spider') <- plyr::ddply(
     .data      = ggdata,
-    .variables = ply_cols(c(params[['facet.by']], params[['color.by']])), 
+    .variables = ply_cols(c(params[['facet.by']], names(params[['color.by']]))), 
     .fun       = function (df) {
       data.frame(
         check.names = FALSE,

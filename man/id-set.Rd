@@ -2,7 +2,7 @@
 % Please edit documentation in R/setters.r
 \name{id<-}
 \alias{id<-}
-\title{Set a \code{BIOM} object's id or comment.}
+\title{Set a \code{BIOM} object's id.}
 \usage{
 id(x) <- value
 }
@@ -23,13 +23,11 @@ for free-form text.
     
     id(biom) <- "My new title/id"
     info(biom)$id
-    
-    comment(biom) <- "A description of this study"
-    comment(biom)
 
 }
 \seealso{
 Other setters: 
+\code{\link{comments<-}()},
 \code{\link{counts<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},

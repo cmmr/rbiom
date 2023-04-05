@@ -30,7 +30,7 @@ setLayer <- function (layer=get("layer", pos = parent.frame()), ..., .fn = NULL)
   keyvals <- list()
   for (i in seq_along(dots)) {
     if (isTRUE(nzchar(key <- names(dots)[[i]]))) {
-      if (is.null(dots[[i]])) {
+      if (is_null(dots[[i]])) {
         keyvals[key] <- list(NULL)
       } else {
         keyvals[[key]] <- dots[[i]]
@@ -49,7 +49,7 @@ setLayer <- function (layer=get("layer", pos = parent.frame()), ..., .fn = NULL)
     # setLayer("bar", fill = "green")
     if (length(key) == 1) {
       if (!hasName(layers[[layer]], key))
-        if (is.null(val)) {
+        if (is_null(val)) {
           layers[[layer]][key] <- list(NULL)
         } else {
           layers[[layer]][[key]] <- val
@@ -64,7 +64,7 @@ setLayer <- function (layer=get("layer", pos = parent.frame()), ..., .fn = NULL)
         layers[[layer]][[key1]] <- list()
         
       if (!hasName(layers[[layer]][[key1]], key2))
-        if (is.null(val)) {
+        if (is_null(val)) {
           layers[[layer]][[key1]][key2] <- list(NULL)
         } else {
           layers[[layer]][[key1]][[key2]] <- val
@@ -95,7 +95,7 @@ initLayer <- function (layer_names, fn = NULL) {
   params <- attr(layers, 'params', exact = TRUE)
   xmode  <- attr(layers, 'xmode',  exact = TRUE)
   
-  patterned <- !is.null(params[['pattern.by']])
+  patterned <- !is_null(params[['pattern.by']])
   facetDims <- length(params[['facet.by']])
   
   
@@ -105,6 +105,19 @@ initLayer <- function (layer_names, fn = NULL) {
       stop("Cannot initialize layer '", layer, "' twice.")
   
     result <- list()
+    params <- attr(layers, 'params', exact = TRUE)
+    
+    
+    #________________________________________________________
+    # color.by, pattern.by, and shape.by arguments.
+    #________________________________________________________
+    
+    if (layer %in% c('shape', 'pattern'))
+      result <- as.list(params[[paste0(layer, ".by")]][[1]])
+    
+    if (layer %in% c('color', 'fill'))
+      result <- as.list(params[["color.by"]][[1]])
+    
     
     attr(result, 'fn') <- switch(
       EXPR = layer,
@@ -124,6 +137,7 @@ initLayer <- function (layer_names, fn = NULL) {
       'facet'      = ifelse(facetDims == 2, "facet_grid", "facet_wrap"),
       'fill'       = ifelse(patterned, "ggpattern::scale_pattern_fill_manual", "scale_fill_manual"),
       'flip'       = "coord_flip",
+      # 'free_y'     = "ggh4x::facetted_pos_scales",
       'hline'      = "geom_hline",
       'label'      = "geom_label",
       'labs'       = "labs",
@@ -247,7 +261,7 @@ initLayer <- function (layer_names, fn = NULL) {
     # Ensure NULLs can be inserted into a list
     #________________________________________________________
     for (i in seq_along(params))
-      if (is.null(params[[i]]))
+      if (is_null(params[[i]]))
         params[[i]] <- list(NULL)
     
     

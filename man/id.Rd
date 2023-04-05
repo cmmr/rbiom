@@ -10,7 +10,7 @@ id(biom)
 \item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
 }
 \value{
-A data frame of the metadata in \code{biom}.
+A length 1 character vector.
 }
 \description{
 Get \code{BIOM} object's identifier / title.
@@ -22,6 +22,7 @@ Get \code{BIOM} object's identifier / title.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},

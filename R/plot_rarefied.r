@@ -6,9 +6,9 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
   #===============================================
   # Validate metadata fields
   #===============================================
-  if (!is.null(color.by)) color.by <- validate_metrics(biom, color.by, mode="meta")
-  if (!is.null(shape.by)) shape.by <- validate_metrics(biom, shape.by, mode="meta")
-  if (!is.null(facet.by)) facet.by <- validate_metrics(biom, facet.by, mode="meta")
+  if (!is_null(color.by)) color.by <- validate_metrics(biom, color.by, mode="meta")
+  if (!is_null(shape.by)) shape.by <- validate_metrics(biom, shape.by, mode="meta")
+  if (!is_null(facet.by)) facet.by <- validate_metrics(biom, facet.by, mode="meta")
   
   
   #===============================================
@@ -43,7 +43,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       axis.ticks.x       = element_blank(),
       panel.grid.major.x = element_blank()  )
     
-    if (!is.null(rline)) {
+    if (!is_null(rline)) {
       
       elements[['geom_hline']] <- list('yintercept' = rline, linetype="dotted")
       
@@ -73,7 +73,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       
       aes_args[['y']] <- ".value"
       
-      if (is.null(colors)) colors <- c('Excluded' = "#ED5F16", 'Retained' = "#00B9EB")
+      if (is_null(colors)) colors <- c('Excluded' = "#ED5F16", 'Retained' = "#00B9EB")
       aes_args[['fill']]  <- ".color"
       aes_args[['color']] <- ".color"
       elements[['scale_fill_manual']]  <- list(values=colors)
@@ -106,18 +106,18 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
     #-----------------------------------------------
     # How to color the samples
     #-----------------------------------------------
-    if (!is.null(color.by)) {
+    if (!is_null(color.by)) {
       
       df[[color.by]]      <- metadata(biom, color.by)[df[['.sample']]]
       aes_args[['color']] <- backtick(color.by)
       
-      if (!is.null(colors))
+      if (!is_null(colors))
         elements[['scale_color_manual']][['values']] <- colors
       
-    } else if (!is.null(rline)) {
+    } else if (!is_null(rline)) {
       
       df[['.rline']] <- factor(ifelse(ss < max(c(0, rline)), "Excluded", "Retained"))
-      if (is.null(colors)) colors <- c("Excluded"="#ED5F16", "Retained"="#00B9EB")
+      if (is_null(colors)) colors <- c("Excluded"="#ED5F16", "Retained"="#00B9EB")
       
       aes_args[['color']]           <- ".rline"
       elements[['labs']][['color']] <- ""
@@ -138,12 +138,12 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
     #-----------------------------------------------
     # How to shape the samples
     #-----------------------------------------------
-    if (!is.null(shape.by)) {
+    if (!is_null(shape.by)) {
       
       df[[shape.by]]      <- metadata(biom, shape.by)[df[['.sample']]]
       aes_args[['shape']] <- backtick(shape.by)
       
-      if (!is.null(shapes))
+      if (!is_null(shapes))
         elements[['scale_shape_manual']][['values']] <- shapes
       
     }
@@ -152,7 +152,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
     #-----------------------------------------------
     # Draw a vertical line at the rarefaction depth
     #-----------------------------------------------
-    if (!is.null(rline)) {
+    if (!is_null(rline)) {
       nTotal <- scales::comma(length(ss))
       nKept  <- scales::comma(sum(ss >= rline))
       nPct   <- as.character(signif((sum(ss >= rline) / length(ss)) * 100, digits=3))
@@ -182,13 +182,13 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
       elements[['stat_smooth']]        <- list('method' = "lm", 'formula' = "y ~ log(x)")
       elements[['scale_x_continuous']] <- list('labels' = si_units)
       
-      if (!is.null(color.by)) {
+      if (!is_null(color.by)) {
         df[[color.by]] <- metadata(biom, color.by)[df[['.sample']]]
         aes_args[['fill']]  <- backtick(color.by)
         aes_args[['color']] <- backtick(color.by)
       }
       
-      if (!is.null(rline))
+      if (!is_null(rline))
         elements[['geom_vline']] = list('xintercept' = rline, 'linetype' = "dotted")
       
     } else {
@@ -201,7 +201,7 @@ plot_rarefied <- function(biom, x, color.by = NULL, shape.by = NULL, facet.by = 
   #===============================================
   # Faceting
   #===============================================
-  if (!is.null(facet.by)) {
+  if (!is_null(facet.by)) {
     
     for (i in facet.by)
       df[[i]] <- metadata(biom, i)[df[['.sample']]]

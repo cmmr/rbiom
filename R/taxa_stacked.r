@@ -21,22 +21,18 @@
 #'        specific colors or patterns. Set to \code{TRUE} to auto-select colors
 #'        or patterns, or to \code{FALSE} to disable per-taxa colors
 #'        or patterns. Default: \code{colors=TRUE, patterns=FALSE}.
-#'                 
-#' @param facet.by   Split into multiple plots based on this metadata 
-#'        column(s). Default: \code{NULL}.
+#'        
+#' @param facet.by,limit.by   Metadata columns to 
+#'        use for data partitioning. Default: \code{NULL}
 #'                 
 #' @param label.by,order.by   What metadata column to use for labeling and/or
 #'        sorting the samples across the x-axis. When \code{order.by=NULL},
 #'        samples are arranged based on \code{dist} and \code{clust}, below.
-#'        Default: \code{label.by=NULL, order.by=NULL}.
-#'                 
-#' @param facets,labels,orders   Subset to just these values in the 
-#'        \code{facet.by}, \code{label.by}, and/or \code{order.by} metadata
-#'        columns. Default: \code{facets=NULL, labels=NULL, orders=NULL}.
+#'        Default: \code{NULL}.
 #'                 
 #' @param dist,clust   Distance (\link{dist}) and clustering (\link{hclust})
-#'        methods to use for automatically arranging samples along the x-axis 
-#'        to group samples with similar composition near one another.
+#'        methods to use for automatically arranging samples along the x-axis. 
+#'        Group samples with similar composition near one another.
 #'        Default: \code{dist="euclidean", clust="complete"}.
 #'                 
 #' @param other   Add an 'Other' taxa that ensures all bars sum to 100%. 
@@ -61,35 +57,30 @@
 #'     taxa_stacked(biom, rank="Phylum")
 #'     
 taxa_stacked <- function (
-    biom, rank = NULL, taxa = 6, 
-    colors = TRUE, patterns = FALSE,
-    facet.by = NULL, label.by = NULL, order.by = NULL, 
-    facets = NULL, labels = NULL, orders = NULL, 
-    dist = "euclidean", clust = "complete",
-    other = TRUE, xlab.angle = 90, ...) {
+    biom, rank = NULL, taxa = 6, colors = TRUE, patterns = FALSE,
+    label.by = NULL, order.by = NULL, facet.by = NULL, limit.by = NULL, 
+    dist = "euclidean", clust = "complete", other = TRUE, xlab.angle = 90, ...) {
   
   
   #________________________________________________________
-  # Sanity checks
-  #________________________________________________________
-  dist  <- as.vector(validate_metrics(NULL, dist,  "dist"))
-  clust <- as.vector(validate_metrics(NULL, clust, "clust"))
-  rank  <- bool_switch(
-    test = is.null(rank), 
-    yes  = tail(c('OTU', taxa_ranks(biom)), 1), 
-    no   = as.vector(validate_metrics(biom, rank, "rank", multi=TRUE)) )
-  
-  if (!is.null(facet.by)) facet.by <- as.vector(validate_metrics(biom, facet.by, "meta", multi=TRUE))
-  if (!is.null(label.by)) label.by <- as.vector(validate_metrics(biom, label.by, "meta"))
-  if (!is.null(order.by)) order.by <- as.vector(validate_metrics(biom, order.by, "meta"))
-  
-  
-  #________________________________________________________
-  # Collect all parameters into a list
+  # Record the function call in a human-readable format.
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  remove(list = setdiff(ls(), c("params", "biom")))
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("taxa_stacked(%s)", as.args(params, fun = taxa_stacked)))
+  remove(list = setdiff(ls(), c("params", "history")))
+  
+  
+  #________________________________________________________
+  # Sanity Checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    rank  %<>% validate_arg(biom, 'rank',  n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+    dist  %<>% validate_arg(biom, 'dist',  n = 1)
+    clust %<>% validate_arg(biom, 'clust', n = 1)
+  })
   
   
   #________________________________________________________
@@ -107,9 +98,8 @@ taxa_stacked <- function (
     })
     
     p <- patchwork::wrap_plots(plots, ncol = 1)
-     
-    history <- sprintf("taxa_stacked(%s)", as.args(params, fun = taxa_stacked))
-    attr(p, 'history') <- c(attr(biom, 'history'), history)
+    
+    attr(p, 'history') <- history
     attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
     attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
@@ -122,31 +112,29 @@ taxa_stacked <- function (
       c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
     }))
     
+    remove("ranks", "plots")
+    
     return (p)
   }
   
   
-  #________________________________________________________
-  # Store the cmd history before script-modding the params.
-  #________________________________________________________
-  history <- sprintf("taxa_stacked(%s)", as.args(params, fun = taxa_stacked))
-  
   
   #________________________________________________________
-  # Inject color.by and pattern.by arguments as needed.
+  # Subset biom by requested metadata and aes.
   #________________________________________________________
-  taxa <- structure(".taxa", display=FALSE)
-  if (!isFALSE(params[['colors']]))   params[['color.by']]   <- taxa
-  if (isTRUE(params[['colors']]))     params[['colors']]     <- NULL
-  if (!isFALSE(params[['patterns']])) params[['pattern.by']] <- taxa
-  if (isTRUE(params[['patterns']]))   params[['patterns']]   <- NULL
-  remove("taxa")
+  params %<>% metadata_params(contraints = list(
+    label.by = list(n = 0:1),
+    order.by = list(),
+    facet.by = list(col_type = "cat"),
+    limit.by = list() ))
+  
+  biom <- params[['biom']]
   
   
-  #________________________________________________________
-  # Subset before calculating relative abundances
-  #________________________________________________________
-  metadata(biom) %<>% subset_by_params(params)
+  # #________________________________________________________
+  # # Subset before calculating relative abundances
+  # #________________________________________________________
+  # metadata(biom) %<>% subset_by_params(params)
   
   
   #________________________________________________________
@@ -195,7 +183,7 @@ taxa_stacked <- function (
     # Cluster samples by composition similarity or order.by
     #________________________________________________________
     sorted <- local({
-      if (is.null(params[['order.by']])) {
+      if (is_null(params[['order.by']])) {
         dm <- dist(x = t(mat), method = params[['dist']])
         hc <- hclust(d = dm, method = params[['clust']])
         setNames(seq_along(hc$labels), hc$labels[hc$order])
@@ -242,6 +230,30 @@ taxa_stacked <- function (
   remove("lvls")
   
   
+  #________________________________________________________
+  # Inject color.by and pattern.by arguments as needed.
+  #________________________________________________________
+  
+  taxa <- levels(ggdata[['.taxa']])
+  n    <- length(taxa)
+  
+  if (!isFALSE(values <- params[['colors']])) {
+    if (!is_null(names(values))) { values <- params[['colors']][taxa]
+    } else                       { values <- get_n_colors(n, values) }
+    params[['color.by']] <- list('.taxa' = list('values' = values))
+    attr(params[['color.by']], 'display') <- FALSE
+  }
+  
+  if (!isFALSE(values <- params[['patterns']])) {
+    if (!is_null(names(values))) { values <- params[['patterns']][taxa]
+    } else                       { values <- get_n_patterns(n, values) }
+    params[['pattern.by']] <- list('.taxa' = list('values' = values))
+    attr(params[['pattern.by']], 'display') <- FALSE
+  }
+  
+  remove("taxa", "n")
+  
+  
   
   #________________________________________________________
   # Initialize the `layers` object
@@ -257,16 +269,21 @@ taxa_stacked <- function (
   attr(layers, 'xmode')    <- "factor"
   attr(layers, 'ymode')    <- "numeric"
   
-  initLayer(c('ggplot', 'stack', 'labs', 'theme', 'theme_bw'))
-  layers <- metadata_layers(layers)
-  layers[['color']] <- NULL
-  remove("ggdata")
+  layer_names <- c('ggplot', 'stack', 'labs', 'theme', 'theme_bw')
+  
+  if (!is_null(params[['color.by']]))   layer_names %<>% c("fill")
+  if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
+  
+  initLayer(layer_names)
+  
+  remove("layer_names", "ggdata")
+  
   
   
   #________________________________________________________
   # Add in facet.by columns
   #________________________________________________________
-  if (!is.null(params[['facet.by']])) {
+  if (!is_null(params[['facet.by']])) {
     ggdata <- attr(layers, 'data', exact = TRUE)
     
     ids <- as.character(ggdata[['.sample']])
@@ -284,7 +301,7 @@ taxa_stacked <- function (
   #________________________________________________________
   # Display a label on the x-axis other than sample name.
   #________________________________________________________
-  if (!is.null(params[['label.by']])) {
+  if (!is_null(params[['label.by']])) {
     
     # Convert `.sample` to "<int>-<label>" format for easy parsing.
     ggdata <- attr(layers, 'data', exact = TRUE)
@@ -308,13 +325,13 @@ taxa_stacked <- function (
     'x'       = "Sample",
     'caption' = with(params, glue::glue(
     
-      if (is.null(label.by) && is.null(order.by)) {
+      if (is_null(label.by) && is_null(order.by)) {
         "Samples are ordered according to '{clust}' clustering based on {dist} distance."
         
-      } else if (is.null(label.by)) {
+      } else if (is_null(label.by)) {
         "Samples are ordered by {order.by})*"
         
-      } else if (is.null(order.by)) {
+      } else if (is_null(order.by)) {
         "Samples are labeled by {label.by} and ordered according\nto '{clust}' clustering based on {dist} distance."
         
       } else {
@@ -330,7 +347,7 @@ taxa_stacked <- function (
   #________________________________________________________
   # Control the values displayed on the y axis
   #________________________________________________________
-  # browser()
+  
   if (is_rarefied(biom)) {
     ggdata <- attr(layers, 'data', exact = TRUE)
     ggdata[['.value']] <- ggdata[['.value']] / attr(biom, 'rarefaction', exact = TRUE)
@@ -438,11 +455,7 @@ taxa_stacked <- function (
     plot_facets() %>%
     plot_build()
   
-  
-  #________________________________________________________
-  # Attach history of biom modifications and this call
-  #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return(p)

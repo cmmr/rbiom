@@ -21,7 +21,7 @@ tree_plot(
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
-\item{layout}{A layout option supported by \link{ggtree::ggtree}:
+\item{layout}{Any layout option supported by \link{ggtree::ggtree}:
 \code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"}, 
 \code{"ellipse"}, \code{"roundrect"}, \code{"fan"}, 
 \code{"circular"}, \code{"inward_circular"}, \code{"radial"}, 
@@ -33,27 +33,30 @@ Default: \code{"rectangular"}.}
 \code{tiplab = "Genus"}). Default: \code{NULL}.}
 
 \item{color.by}{How to color the tree. Currently only supports the options
-\code{NULL} (no coloring) or \code{'reads'} (color by number of taxa 
+\code{NULL} (no coloring) or \code{'.reads'} (color by number of taxa 
 observations). Default: \code{NULL}.}
 
 \item{label, cladelab}{Label monophyletic clades. You can specify the
 same or different taxonomic ranks for internal (label) and external 
-(cladelab) annotations. Default: \code{NULL},\code{NULL}.}
+(cladelab) annotations. Default: \code{NULL}.}
 
 \item{top, right, bottom, left}{Add additional space around the tree.
 Sometimes necessary for wide text annotations. Set as fraction of
 tree's width/height. For instance, \code{right = 1} reserves the 
 right half of the plotting area for non-tree elements.
-Default: \code{NULL},\code{NULL},\code{NULL},\code{NULL}.}
+Default: \code{NULL}.}
 }
 \description{
 Display a dendrogram of the phylogenetic tree.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     tree_plot(hmp50)
     
+    hmp1 <- select(hmp50, samples = "HMP10")
+    tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
+    tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
 
 }
 \seealso{

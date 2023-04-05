@@ -39,12 +39,13 @@ ENV <- environment(NULL)
     'ggtree', 'geom_tiplab', 'geom_cladelab', 
     'gheatmap', 'hexpand', 'vexpand' )})
   
-  lapply(FUN = ggwrap, pkg="grid",       {c('arrow', 'unit')})
-  lapply(FUN = ggwrap, pkg="ggtext",     {c('element_markdown')})
-  lapply(FUN = ggwrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines')})
   lapply(FUN = ggwrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
-  lapply(FUN = ggwrap, pkg="ggrepel",    {c('geom_label_repel')})
+  lapply(FUN = ggwrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines')})
+  # lapply(FUN = ggwrap, pkg="ggh4x",      {c('facetted_pos_scales')})
   lapply(FUN = ggwrap, pkg="ggnewscale", {c('new_scale_fill')})
+  lapply(FUN = ggwrap, pkg="ggrepel",    {c('geom_label_repel')})
+  lapply(FUN = ggwrap, pkg="ggtext",     {c('element_markdown')})
+  lapply(FUN = ggwrap, pkg="grid",       {c('arrow', 'unit')})
   lapply(FUN = ggwrap, pkg="scales",     {c('alpha' )})
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep')})

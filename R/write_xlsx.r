@@ -185,7 +185,7 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     type <- sub(" table", "", biom$info$type, ignore.case=TRUE)
     
-    if (!is.null(depth))
+    if (!is_null(depth))
       return(simpleError("Please use write_xlsx(depth=NULL) for non-OTU or non-Integer data."))
     
     

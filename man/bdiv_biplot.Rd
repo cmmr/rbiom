@@ -12,9 +12,7 @@ bdiv_biplot(
   color.by = NULL,
   shape.by = NULL,
   facet.by = NULL,
-  colors = NULL,
-  shapes = NULL,
-  facets = NULL,
+  limit.by = NULL,
   weighted = TRUE,
   rank = NULL,
   taxa = 5,
@@ -41,17 +39,13 @@ two dimensions. Options are: \code{"UMAP"}, \code{"tSNE"},
 samples, and \bold{mean}, \bold{taxon}, and \bold{arrow} for biplots.
 Single letter abbreviations are also accepted. For instance,
 \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and 
-\code{"pe"}. Default: \code{"pce"}/\code{"p"} for ordinations 
+\code{"pe"}.
+See \code{vignette("biplots")} for examples of each.
+Default: \code{"pce"}/\code{"p"} for ordinations 
 with/without a \code{color.by} argument.}
 
-\item{color.by, shape.by, facet.by}{Metadata column to color, shape, and/or
-facet by. If that column is a \code{factor}, the ordering of levels
-will be maintained in the plot.}
-
-\item{colors, shapes, facets}{Names of the colors, shapes, and/or facets to 
-use in the plot. Available values for colors and shapes are given by 
-\code{colors()} and \code{0:25}, respectively. Use a named character 
-vector to map them  to specific factor levels in the metadata.}
+\item{color.by, shape.by, facet.by, limit.by}{Metadata columns to 
+use for data partitioning. Default: \code{NULL}}
 
 \item{weighted}{When employing a beta diversity metric, use the weighted
 version. Default: \code{TRUE}.}
@@ -97,7 +91,7 @@ Display distances between samples as a 2-D scatter plot.
 \examples{
     library(rbiom)
     
-    biom <- rarefy(hmp50)
+    biom <- rarefy(hmp50) 
     bdiv_biplot(biom, color.by="Body Site", rank="Genus")
     
 }

@@ -201,14 +201,14 @@ taxa_rollup <- function (
     stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
   }
   
-  if (is.null(map) && is(biom, "BIOM")) map <- biom$taxonomy
+  if (is_null(map) && is(biom, "BIOM")) map <- biom$taxonomy
   
   
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
   
-  if (!is(biom, "BIOM") && is.null(map))
+  if (!is(biom, "BIOM") && is_null(map))
     stop(simpleError("Please provide a taxonomy map."))
   
   if (!is(map, "matrix") || !identical(typeof(map), "character"))
@@ -260,7 +260,7 @@ taxa_rollup <- function (
   #________________________________________________________
   # Only retain taxa of interest (by abundance or name)
   #________________________________________________________
-  if (!is.null(taxa)) {
+  if (!is_null(taxa)) {
     
     if (is.numeric(taxa) && length(taxa) == 1) {
       rel <- sort(slam::row_means(t(t(res) / slam::col_sums(res))), decreasing = TRUE)
@@ -314,7 +314,7 @@ taxa_rollup <- function (
       '.taxa'          = colnames(res)[col(res)],
       '.value'         = as.numeric(res)
     )
-    if (is.null(taxa)) { res[['.taxa']] %<>% factor()
+    if (is_null(taxa)) { res[['.taxa']] %<>% factor()
     } else             { res[['.taxa']] %<>% factor(levels = taxa) }
       
     

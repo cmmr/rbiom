@@ -1,14 +1,14 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9080
-Date: 2022-10-12
+Version: 1.0.3.9084
+Date: 2023-04-04
 Authors@R:
     person("Daniel P.", "Smith", 
-    email = "dansmith@orst.edu", 
+    email = "dansmith01@gmail.com", 
     role  = c("aut", "cre", "cph"),
     comment = c(ORCID = "0000-0002-2479-2044"))
-Maintainer: Daniel P. Smith <dansmith@orst.edu>
+Maintainer: Daniel P. Smith <dansmith01@gmail.com>
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Features include reading/writing all 'BIOM' formats, rarefaction, alpha
@@ -21,7 +21,7 @@ BugReports: https://github.com/cmmr/rbiom/issues
 License: AGPL-3.0-or-later
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.2.0)
 Additional_repositories: https://cmmr.github.io/rbiom
 LinkingTo: 
     Rcpp,
@@ -60,7 +60,10 @@ Suggests:
     ggpattern,
     ggtree,
     gridpattern,
+    knitr,
     reshape2,
     rhdf5,
+    rmarkdown,
     testthat
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr

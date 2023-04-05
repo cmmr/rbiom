@@ -14,6 +14,8 @@ export(`bdiv_biplot`)
 export(`bdiv_ord_table`)
 export(`bdiv_table`)
 export(`blply`)
+export(`comments`)
+export(`comments<-`)
 export(`counts`)
 export(`counts<-`)
 export(`depth`)
@@ -110,19 +112,33 @@ importClassesFrom("slam")
 importClassesFrom("ggplot2")
 
 import("RcppParallel")
+
 importFrom("ape", "print.phylo")
 importFrom("glue", "backtick", "glue", "glue_collapse")
+importFrom("grDevices", "boxplot.stats")
 importFrom("ggplot2", "aes", "aes_")
 importFrom("ggrepel", "geom_text_repel", "geom_label_repel")
 importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "is", "as")
 importFrom("Rcpp", "sourceCpp")
-importFrom("rlang","%||%", "enquo", "quo_name", "get_env")
-importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate", "model.frame", "model.matrix", "terms", "reformulate")
-importFrom("utils", "download.file", "head", "write.table", "read.csv", "read.delim", "packageDescription")
+
+importFrom("rlang",
+           "%||%", "enquo", "quo_name", "get_env", 
+           "is_na", "is_null", "is_empty", "is_list",
+           "is_true", "is_false", "is_logical", "is_scalar_logical", 
+           "is_character", "is_scalar_character", "is_string", 
+           "is_integerish", "is_scalar_integerish", 
+           "is_double", "is_scalar_double")
+
+importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate", 
+           "model.frame", "model.matrix", "terms", "reformulate")
+
+importFrom("utils", "download.file", "head", "write.table", "read.csv", 
+           "read.delim", "packageDescription")
 
 
 S3method(print, BIOM)
 S3method(subset, BIOM)
 
 export("%>%")
+export("%<>%")

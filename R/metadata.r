@@ -43,7 +43,7 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
   #-----------------------------------------------
   # Add 'SampleID', '.id', etc as the first column
   #-----------------------------------------------
-  if (!is.null(id)) {
+  if (!is_null(id)) {
     md[[id]] <- rownames(md)
     md       <- md[,unique(c(id, names(md))),drop=FALSE]
   }
@@ -78,7 +78,7 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
     }
   }
   
-  if (is.null(field))
+  if (is_null(field))
     return (md)
   
   if (!field %in% names(md))

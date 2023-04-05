@@ -28,10 +28,10 @@ repair <- function (biom, prune=TRUE, fast=FALSE) {
   
   if (isFALSE(fast)) {
     
-    if (!is.null(biom[['phylogeny']]))
+    if (!is_null(biom[['phylogeny']]))
       tn <- intersect(tn, tips(biom[['phylogeny']]))
     
-    if (!is.null(biom[['sequences']]))
+    if (!is_null(biom[['sequences']]))
       tn <- intersect(tn, names(biom[['sequences']]))
   }
   
@@ -55,7 +55,7 @@ repair <- function (biom, prune=TRUE, fast=FALSE) {
   
   if (isFALSE(fast)) {
     
-    if (!is.null(biom[['phylogeny']])) {
+    if (!is_null(biom[['phylogeny']])) {
       if (length(tn) > 1) {
         biom[['phylogeny']] <- subtree(biom[['phylogeny']], tn)
       } else {
@@ -63,7 +63,7 @@ repair <- function (biom, prune=TRUE, fast=FALSE) {
       }
     }
   
-  if (!is.null(biom[['sequences']]))
+  if (!is_null(biom[['sequences']]))
     biom[['sequences']] <- biom[['sequences']][tn]
   }
   

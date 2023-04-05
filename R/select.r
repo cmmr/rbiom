@@ -50,20 +50,20 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FA
   } else { stop("Invalid object type passed to rbiom::select()") }
   
   
-  if (!is.null(samples)) {
+  if (!is_null(samples)) {
     res <- try(res[,samples], silent=TRUE)
     if (is(res, "try-error"))
       stop(simpleError(sprintf("Cannot select samples: %s", res)))
   }
   
-  if (!is.null(nTop)) {
+  if (!is_null(nTop)) {
     nTop <- min(ncol(res), nTop)
     set.seed(seed)
     ranking <- rank(slam::col_sums(res), ties.method="random")
     res     <- res[,ranking > ncol(res) - nTop]
   }
   
-  if (!is.null(nRandom)) {
+  if (!is_null(nRandom)) {
     nRandom <- min(ncol(res), nRandom)
     set.seed(seed)
     res <- res[,sort(sample(seq_len(ncol(res)), nRandom))]
@@ -99,10 +99,10 @@ select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FA
   # These steps are noncritical and can be skipped for speed
   if (isFALSE(fast)) {
     
-    if (!is.null(biom$phylogeny))
+    if (!is_null(biom$phylogeny))
       biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
     
-    if (!is.null(biom$sequences))
+    if (!is_null(biom$sequences))
       biom$sequences <- biom$sequences[taxa]
   }
   

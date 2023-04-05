@@ -221,7 +221,7 @@ phylogeny <- function (biom) {
 has_sequences <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In has_sequences(), biom must be a BIOM-class object.'))
-  return (!is.null(biom[['sequences']]))
+  return (!is_null(biom[['sequences']]))
 }
 
 
@@ -275,7 +275,7 @@ info <- function (biom) {
 #' Get \code{BIOM} object's identifier / title.
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
-#' @return A data frame of the metadata in \code{biom}.
+#' @return A length 1 character vector.
 #' @family accessors
 #' @export
 #' @examples
@@ -287,6 +287,29 @@ id <- function (biom) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In id(), biom must be a BIOM-class object.'))
   return (biom[['info']][['id']])
+}
+
+
+#' Get \code{BIOM} object's comments.
+#' 
+#' Note that the function is named \code{comments} (plural), while the internal
+#' property is names \code{comment} (singular) to match the biom specification.
+#' The plural form is taken here to avoid conflicting with the existing
+#' \code{base::comment} function.
+#' 
+#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @return A length 1 character vector.
+#' @family accessors
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     comments(hmp50)
+#'
+
+comments <- function (x) {
+  if (!is(x, 'BIOM'))
+    stop (simpleError('In comments(), biom must be a BIOM-class object.'))
+  return (x[['info']][['comment']])
 }
 
 

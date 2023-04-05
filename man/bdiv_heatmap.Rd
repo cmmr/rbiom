@@ -8,12 +8,21 @@ bdiv_heatmap(
   biom,
   metric = "Bray-Curtis",
   weighted = TRUE,
+  grid = list(label = "Distance", colors = "-bilbao"),
   color.by = NULL,
   order.by = NULL,
-  colors = NULL,
-  orders = NULL,
+  limit.by = NULL,
+  label = TRUE,
+  label_size = NULL,
+  rescale = "none",
+  trees = TRUE,
+  clust = "complete",
+  dist = "euclidean",
+  tree_height = NULL,
+  track_height = NULL,
+  ratio = 1,
+  legend = "right",
   xlab.angle = "auto",
-  tree = NULL,
   ...
 )
 }
@@ -28,31 +37,107 @@ phylogenetic tree. Default: \code{"Bray-Curtis"}.}
 \item{weighted}{Should the beta diversity metric be weighted by 
 abundances? Default: \code{TRUE}.}
 
+\item{grid}{Color palette name, or a list with entries for \code{label}, 
+\code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
+\code{guide}. See the Track Definitions section for details.
+Default: \code{list(label = "Distance", colors = "-bilbao")}.}
+
 \item{color.by}{Add annotation tracks for these metadata column(s). 
-Default: \code{NULL}.}
+See "Annotation Tracks" section below for details.
+Default: \code{NULL}}
 
-\item{order.by}{Which metadata columns to use for ordering the samples 
-across the x-axis. The default setting, \code{order.by=NULL}, uses 
-sample names as labels and arranges samples by similarity. See 
-\link{plot_heatmap} for details.}
+\item{order.by}{Which metadata column(s) to use for ordering the samples 
+across the x and y axes. Overrides any \code{clust} argument.
+See "Ordering and Limiting" section below for details.
+Default: \code{NULL}}
 
-\item{colors}{A named \code{list()} with names matching \code{color.by}, 
-each specifying a \bold{palette} as described in \link{plot_heatmap}.
-For example: \code{colors = list(Sex = c(Male="blue", Female="red"))}.
-Default: \code{NULL}.}
+\item{limit.by}{Metadata definition(s) to use for sample subsetting prior
+to calculations. 
+See "Ordering and Limiting" section below for details.
+Default: \code{NULL}}
 
-\item{orders}{Subset to just these values in the \code{order.by} metadata 
-column. Default: \code{NULL}.}
+\item{label}{Label the matrix rows and columns. You can supply a list
+or logical vector of length two to control row labels and column 
+labels separately, for example 
+\code{label = c(rows = TRUE, cols = FALSE)}, or simply 
+\code{label = c(T, F)}. Other valid options are \code{"rows"},
+\code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
+and \code{"none"}.
+Default: \code{TRUE}.}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis. 
-\bold{'auto'} (the default), automatically selects a rotation value. 
-\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
-angled, and vertical, respectively.}
+\item{label_size}{The font size to use for the row and column labels. You 
+can supply a numeric vector of length two to control row label sizes 
+and column label sizes separately, for example 
+\code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
+Default: \code{NULL}, which computes: 
+\code{pmax(8, pmin(20, 100 / dim(mtx)))}.}
+
+\item{rescale}{Rescale rows or columns to all have a common min/max.
+Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
+Default: \code{"none"}.}
+
+\item{trees}{Draw a dendrogram for rows (left) and columns (top). You can 
+supply a list or logical vector of length two to control the row tree 
+and column tree separately, for example 
+\code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}. 
+Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"}, 
+\code{"left"}, \code{"top"}, and \code{"none"}.
+Default: \code{TRUE}.}
+
+\item{clust}{Clustering algorithm for reordering the rows and columns by 
+similarity. You can supply a list or character vector of length two to 
+control the row and column clustering separately, for example 
+\code{clust = c(rows = "complete", cols = NA)}, or simply 
+\code{clust = c("complete", NA)}.
+Default: \code{"complete"}.
+
+Options are:
+\itemize{
+  \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
+  \item{An \link[stats]{hclust} object} { }
+  \item{A method name - }{ \code{"ward.D"}, 
+    \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
+    \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
+    \code{"centroid"}. }
+}}
+
+\item{dist}{Distance algorithm to use when reordering the rows and columns 
+by similarity. You can supply a list or character vector of length
+two to control the row and column clustering separately, for example 
+\code{dist = c(rows = "euclidean", cols = "maximum")}, or simply 
+\code{dist = c("euclidean", "maximum")}.
+Default: \code{"euclidean"}.
+
+Options are:
+\itemize{
+  \item{A \link[stats]{dist} object} { }
+  \item{A method name - }{ \code{"euclidean"}, 
+    \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
+    \code{"binary"}, or \code{"minkowski"}. }
+}}
+
+\item{tree_height, track_height}{The height of the dendrogram or annotation
+tracks in multiples (or fractions) of the smaller dimension of the
+grid cell size. Use a numeric vector of length two to assign
+\code{c(left, top)} independently. 
+Default: \code{NULL}, which computes:
+\code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.}
+
+\item{ratio}{Height/width ratio for entire grid. 
+Default: \code{1} (square).}
+
+\item{legend}{Where to place the legend. Options are: \code{"right"} or
+\code{"bottom"}. Default: \code{"right"}.}
+
+\item{xlab.angle}{Angle of the labels at the bottom of the plot. 
+Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}. 
+Default: \code{"auto"}.}
+
+\item{...}{Additional arguments to pass on to ggplot2::theme().
+For example, \code{labs.title = "Plot Title"}.}
 
 \item{tree}{A phylogenetic tree for use in calculating UniFrac distance.
 The default, \code{NULL}, will use the BIOM object's tree.}
-
-\item{...}{Additional arguments to pass on to \link{plot_heatmap}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points will be attached as 
@@ -61,11 +146,110 @@ A \code{ggplot2} plot. The computed data points will be attached as
 \description{
 Display beta diversities in an all vs all grid.
 }
+\section{Annotation Tracks}{
+
+
+Metadata can be displayed as colored tracks above the heatmap. Common use 
+cases are provided below, with more thorough documentation available at 
+https://cmmr.github.io/rbiom .
+
+\preformatted{  ## Categorical ----------------------------
+color.by = "Body Site"
+color.by = list('Body Site' = "bright")
+color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
+color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+
+## Numeric --------------------------------
+color.by = "Age"
+color.by = list('Age' = "reds")
+color.by = list('Age' = c(20,NA), 'colors' = "reds") # at least 20 years old
+color.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+
+## Multiple Tracks ------------------------
+color.by = c("Body Site", "Age")
+color.by = list('Body Site' = "bright", 'Age' = "reds")
+color.by = list(
+  'Body Site' = c('Stool' = "blue", 'Saliva' = "green"),
+  'Age'       = list(range = c(20,40), 'colors' = "reds") )
+}
+
+The following entries in the track definitions are understood: 
+
+\itemize{
+  \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+  \item{\code{range} - }{ The c(min,max) to use for scale values. }
+  \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
+  \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+  \item{\code{na.color} - }{ The color to use for \code{NA} values. }
+  \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
+  \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
+}
+
+All built-in color palettes are colorblind-friendly.
+
+Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+
+Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"}, 
+\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"}, 
+\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"}, 
+\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"}, 
+\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"}, 
+\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"}, 
+\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"}, 
+\code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
+}
+
+\section{Ordering and Limiting}{
+
+
+\bold{\code{order.by}} controls which metadata column(s) are used to arrange
+samples on the plot. It also enables subsetting to a particular set or 
+range of values. Prefix a column name with \code{-} to arrange values in 
+descending order rather than ascending.
+
+\preformatted{  ## Categorical ----------------------------
+order.by = "Body Site"
+order.by = list('Body Site' = c("Stool", "Saliva"))
+
+## Numeric --------------------------------
+order.by = "-Age"
+order.by = list('Age'  = c(20,NA)) # at least 20 years old
+order.by = list('-Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+
+## Multiple / Mixed -----------------------
+order.by = c("-Body Site", "Age")
+order.by = list("Body Site", '-Age' = c(20,40))
+}
+
+
+\bold{\code{limit.by}} is used to specify a subset of samples without any
+side-effects on aesthetics. It is especially useful for limiting the data
+to a single categorical metadata value. Unlike the other *.by parameters,
+\code{limit.by} must always be a named \code{list()}.
+
+\preformatted{  ## Categorical ----------------------------
+limit.by = list('Sex' = "Male")
+
+## Numeric --------------------------------
+limit.by = list('Age' = c(20,NA)) # at least 20 years old
+limit.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+
+## Multiple / Mixed -----------------------
+limit.by = list(
+  'Sex'       = "Male", 
+  'Body Site' = c("Stool", "Saliva")
+  'Age'       = c(20,40) )
+}
+}
+
 \examples{
-    library(rbiom)
-    
-    biom <- hmp50 \%>\% rarefy() \%>\% select(1:10)
-    bdiv_heatmap(biom, color.by="Body Site")
+  library(rbiom) 
+  
+  biom <- hmp50 \%>\% rarefy() \%>\% select(1:10)
+  bdiv_heatmap(biom, color.by="Body Site")
     
 }
 \seealso{

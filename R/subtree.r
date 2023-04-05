@@ -98,7 +98,7 @@ subtree <- function (tree, tips) {
   nChildren <- c(rep(0, nTips), unname(table(tree$edge[,1])))
   
   eLength   <- tree$edge.length
-  if (is.null(eLength))
+  if (is_null(eLength))
     eLength <- rep(0, nrow(tree$edge))
   
   for (tip in setdiff(1:nTips, tips)) repeat {
@@ -154,9 +154,9 @@ subtree <- function (tree, tips) {
   tree$edge  <- tree$edge[!is.na(eLength),]
   tree$Nnode <- length(unique(tree$edge[,1]))
   
-  if (!is.null(tree$edge.length)) tree$edge.length <- eLength[!is.na(eLength)]
-  if (!is.null(tree$tip.label))   tree$tip.label   <- tree$tip.label[tips]
-  if (!is.null(tree$node.label))  tree$node.label  <- tree$tip.label[unique(sort(tree$edge[,1]))]
+  if (!is_null(tree$edge.length)) tree$edge.length <- eLength[!is.na(eLength)]
+  if (!is_null(tree$tip.label))   tree$tip.label   <- tree$tip.label[tips]
+  if (!is_null(tree$node.label))  tree$node.label  <- tree$tip.label[unique(sort(tree$edge[,1]))]
   
   tree$edge <- matrix(as.numeric(factor(as.vector(tree$edge))), ncol=2)
   

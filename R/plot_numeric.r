@@ -73,7 +73,7 @@ plot_numeric <- function (biom, x, y, layers = "pr", mode, params) {
   #   layers[['regression']][['formula']] <- formula
   #   layers[['regression']][['method']]  <- regr
   #   
-  #   if (is.null(ci)) {
+  #   if (is_null(ci)) {
   #     layers[['regression']][['se']] <- FALSE
   #     
   #   } else if (is.numeric(ci)) {
@@ -123,7 +123,7 @@ plot_numeric <- function (biom, x, y, layers = "pr", mode, params) {
   #   if (isTRUE(length(anno) > 0 && nrow(stats_df) > 0)) {
   #     stats_df[['.label']] <- apply(stats_df[,anno,drop=F], 1L, function (x) paste(names(x), sep=" = ", x, collapse="; "))
   #     
-  #     if (is.null(facet.by)) {
+  #     if (is_null(facet.by)) {
   #       layers[['labs']][['subtitle']] <- stats_df[['.label']]
   #       
   #     } else {
@@ -150,7 +150,7 @@ plot_numeric <- function (biom, x, y, layers = "pr", mode, params) {
   #       #-----------------------------------------------
   #       # Prevent labels from colliding with each other
   #       #-----------------------------------------------
-  #       if (!is.null(color.by) && !identical(color.by, facet.by)) {
+  #       if (!is_null(color.by) && !identical(color.by, facet.by)) {
   #         ypos <- as.numeric(df[[color.by]])
   #         df[['.vjust']] <- 1.5 * ypos
   #         layers[['stats_text']][['mapping']] %<>% c(list(vjust = ".vjust"))

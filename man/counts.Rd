@@ -23,6 +23,7 @@ Get the abundance counts.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{depth}()},
 \code{\link{has_phylogeny}()},
 \code{\link{has_sequences}()},

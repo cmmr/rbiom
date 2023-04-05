@@ -27,6 +27,7 @@ Set the phylogenetic tree.
 }
 \seealso{
 Other setters: 
+\code{\link{comments<-}()},
 \code{\link{counts<-}()},
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},

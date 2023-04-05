@@ -35,11 +35,11 @@ read_fasta <- function (file, ids=NULL) {
         return(simpleError(paste0("Sequence ID '", sid, "' is used more than once in '", file, "'.")))
       }
       
-      if (!is.null(ids))
+      if (!is_null(ids))
         if (!sid %in% ids)
           sid <- NULL
       
-    } else if (!is.null(sid)) {
+    } else if (!is_null(sid)) {
       
       if (sid %in% names(res)) {
         res[[sid]] <- paste0(res[[sid]], line)
@@ -56,7 +56,7 @@ read_fasta <- function (file, ids=NULL) {
   #--------------------------------------------------------------
   # Ensure we return as many IDs as requested
   #--------------------------------------------------------------
-  if (!is.null(ids)) {
+  if (!is_null(ids)) {
     res <- res[ids]
     names(res) <- ids
   }

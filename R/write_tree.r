@@ -15,7 +15,7 @@
 #'
 write_tree <- function (tree=NULL, file=NULL) {
   
-  if (is.null(tree))
+  if (is_null(tree))
     stop(simpleError("Please provide a value for tree to write_tree()"))
   
   if (is(tree, "BIOM"))
@@ -50,7 +50,7 @@ write_tree <- function (tree=NULL, file=NULL) {
     children <- tree$edge[nodes, 2]
     children <- sapply(children, fx)
     
-    if (!is.null(tree$edge.length))
+    if (!is_null(tree$edge.length))
       children <- paste(sep=":", children, tree$edge.length[nodes])
     
     sprintf("(%s)", paste(collapse=",", children))
@@ -59,7 +59,7 @@ write_tree <- function (tree=NULL, file=NULL) {
   newick <- paste0(fx(rootNode), ";")
   
   
-  if (!is.null(file))
+  if (!is_null(file))
     return (writeLines(text=newick, con=file, sep=""))
   
   return (newick)

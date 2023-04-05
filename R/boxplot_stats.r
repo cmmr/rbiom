@@ -4,21 +4,22 @@
 #________________________________________________________
 boxplot_stats <- function (layers) {
   
-  params     <- attr(layers, 'params', exact = TRUE)
-  xcol       <- attr(layers, 'xcol', exact = TRUE)
-  ycol       <- attr(layers, 'ycol', exact = TRUE)
+  params      <- attr(layers, 'params', exact = TRUE)
+  xcol        <- attr(layers, 'xcol', exact = TRUE)
+  ycol        <- attr(layers, 'ycol', exact = TRUE)
   
-  color.by   <- params[['color.by']]
-  shape.by   <- params[['shape.by']]
-  pattern.by <- params[['pattern.by']]
-  facet.by   <- params[['facet.by']]
+  color.by    <- names(params[['color.by']])
+  shape.by    <- names(params[['shape.by']])
+  pattern.by  <- names(params[['pattern.by']])
+  facet.by    <- params[['facet.by']]
   
-  p.label    <- params[['p.label']]
-  p.adj      <- params[['p.adj']]
+  p.label     <- params[['p.label']]
+  p.adj       <- params[['p.adj']]
   
   if (identical(p.label, TRUE))  p.label <- 0.05
   if (identical(p.label, FALSE)) p.label <- -Inf
   
+  free_x <- free_y <- NULL
   if (hasLayer("facet")) {
     free_x <- isTRUE(layers[['facet']][['scales']] %in% c("free", "free_x"))
     free_y <- isTRUE(layers[['facet']][['scales']] %in% c("free", "free_y"))
@@ -26,7 +27,7 @@ boxplot_stats <- function (layers) {
   
   
   y.pos <- unique(c(
-    if (hasLayer("voilin"))     "violin" else NULL,
+    if (hasLayer("violin"))     "violin" else NULL,
     if (hasLayer("dot"))        "max"    else NULL,
     if (hasLayer("strip"))      "max"    else NULL,
     if (hasLayer("box"))        "box"    else NULL,
@@ -70,7 +71,7 @@ boxplot_stats <- function (layers) {
           pairwise    = TRUE, 
           adj         = p.adj, 
           y.pos       = y.pos, 
-          y.pos.facet = facet.by)
+          y.pos.facet = ".metric" ) # y.pos.facet )
         stats[['Group1']] %<>% factor(levels = levels(ggdata[[xcol]]))
         stats[['Group2']] %<>% factor(levels = levels(ggdata[[xcol]]))
         
@@ -121,7 +122,7 @@ boxplot_stats <- function (layers) {
           pvals[['.label']] <- p_annotations(pvals[['.adj.p']])
           
           
-          if (is.null(facet.by)) {
+          if (is_null(facet.by)) {
             pvals[['.step']] <- pvals[['y.pos']] * .13
             pvals[['y.pos']] <- pvals[['y.pos']] + (pvals[['.step']] * seq_len(nrow(pvals)))
             
@@ -209,7 +210,7 @@ boxplot_stats <- function (layers) {
         by          = c(xcol, facet.by), 
         adj         = p.adj, 
         y.pos       = y.pos,
-        y.pos.facet = facet.by )
+        y.pos.facet = ".metric" ) # y.pos.facet )
       
       
       #________________________________________________________
@@ -257,7 +258,7 @@ boxplot_stats <- function (layers) {
         # When some x-values are absent from some facets, we'll need
         # to re-number the remaining x-positions.
         
-        if (!is.null(facet.by) && isTRUE(free_x)) {
+        if (!is_null(facet.by) && isTRUE(free_x)) {
           
           all_x <- levels(pvals[[xcol]])
           
@@ -270,7 +271,7 @@ boxplot_stats <- function (layers) {
                 as.character() %>%
                 unique()
               
-              map_x <- sapply(all_x, function (x) which(facet_x == x) %>% ifelse(is.null(.), NA, .))
+              map_x <- sapply(all_x, function (x) which(facet_x == x) %>% ifelse(is_null(.), NA, .))
               
               z[['x.pos']] <- map_x[as.numeric(z[[xcol]])]
               
@@ -306,16 +307,6 @@ boxplot_stats <- function (layers) {
             'mapping|xend' = ".xend",
             'mapping|y'    = ".y",
             'mapping|yend' = ".yend" )
-        
-        setLayer(
-          'layer'   = "stats_bg",
-          'color'   = NA,
-          'fill'    = "white",
-          'mapping' = aes_string(
-            xmin = -Inf, 
-            xmax = Inf, 
-            ymin = signif(min(pvals[['y.pos']]), 3), 
-            ymax = Inf ))
         
         setLayer(
           'layer'         = "stats_text",
@@ -355,7 +346,7 @@ boxplot_stats <- function (layers) {
     }
   }
 
-  if (is.null(stats)) {
+  if (is_null(stats)) {
     setLayer("yaxis", expand = c(0.02, 0, 0.02, 0) )
     
   } else {
@@ -370,13 +361,30 @@ boxplot_stats <- function (layers) {
     #________________________________________________________
     # Don't label the y-axis beyond the data range.
     #________________________________________________________
-    setLayer(
-      layer = "yaxis",
-      breaks = local({
-        ymax   <- min(stats[["y.pos"]])
-        breaks <- labeling::extended(0, ymax, 5)
-        return (breaks[breaks <= ymax])
-    }))
+    if (hasLayer('facet')) {
+      
+      setLayer("yaxis", limits = c(0, NA))
+      
+    } else {
+      
+      setLayer(
+        layer = "yaxis",
+        breaks = local({
+          ymax   <- min(stats[["y.pos"]])
+          breaks <- labeling::extended(0, ymax, 5, only.loose = TRUE)
+          return (breaks[breaks <= ymax])
+      }))
+      
+      setLayer(
+        'layer'   = "stats_bg",
+        'color'   = NA,
+        'fill'    = "white",
+        'mapping' = aes_string(
+          xmin = -Inf, 
+          xmax = Inf, 
+          ymin = signif(min(stats[['y.pos']]), 3), 
+          ymax = Inf ))
+    }
     
     
     dropcols <- c(".id", ".all", "x.pos", "y.pos")

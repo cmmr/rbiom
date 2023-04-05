@@ -12,6 +12,9 @@
 #'        a particular rarefaction depth. Set to \code{TRUE} to show an 
 #'        auto-selected rarefaction depth or \code{NULL} to not show a line.
 #'        Default: \code{TRUE}.
+#' 
+#' @param counts   Display the number of samples and reads remaining after
+#'        rarefying to \code{rline} reads per sample. Default: \code{TRUE}.
 #'        
 #' @param labels   Show sample names under each bar. Default: \code{TRUE}.
 #'        
@@ -34,17 +37,17 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     depths_barplot(hmp50, rline=TRUE) 
+#'     depths_barplot(hmp50, rline=TRUE)
 #'     
 
-depths_barplot <- function (biom, rline = TRUE, labels = TRUE, trans = "log10", ...) {
+depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
   
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  stopifnot(is.logical(rline) || is.null(rline) || is.numeric(rline))
+  stopifnot(is.logical(rline) || is_null(rline) || is.numeric(rline))
   
   
   #________________________________________________________
@@ -79,7 +82,7 @@ depths_barplot <- function (biom, rline = TRUE, labels = TRUE, trans = "log10", 
   #________________________________________________________
   # Split the counts into kept/dropped.
   #________________________________________________________
-  data <- if (is.null(rline)) {
+  data <- if (is_null(rline)) {
     data.frame(
       check.names = FALSE,
       '.x'    = factor(names(ss), levels = names(ss)), 
@@ -135,10 +138,34 @@ depths_barplot <- function (biom, rline = TRUE, labels = TRUE, trans = "log10", 
     setLayer("labs",  x = NULL)
   }
   
-  if (!is.null(rline)) {
+  if (!is_null(rline)) {
+    
     setLayer("rect", 'mapping|fill' = ".group")
     setLayer("labs",  fill = "Reads")
     setLayer("hline", yintercept = rline, color = "red", linetype="dashed")
+    
+    if (isTRUE(counts))
+      setLayer("labs",  subtitle = local({
+        
+        samples_before = length(ss)
+        samples_after  = sum(ss >= rline)
+        reads_before   = sum(ss)
+        reads_after    = rline * sum(ss >= rline)
+        
+        samples_retained = sprintf(
+          fmt = "Samples Retained: %s / %s = %s%%",
+          formatC(samples_after,  format="d", big.mark=","),
+          formatC(samples_before, format="d", big.mark=","),
+          round(100 * samples_after / samples_before, 1) )
+        reads_retained = sprintf(
+          fmt = "Reads Retained: %s / %s = %s%%",
+          formatC(reads_after,  format="d", big.mark=","),
+          formatC(reads_before, format="d", big.mark=","),
+          round(100 * reads_after / reads_before, 1) )
+        
+        return (paste0(samples_retained, "\n", reads_retained))
+      }))
+      
   }
   
   

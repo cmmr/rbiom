@@ -32,6 +32,7 @@ Set the abundance counts.
 }
 \seealso{
 Other setters: 
+\code{\link{comments<-}()},
 \code{\link{id<-}()},
 \code{\link{metadata<-}()},
 \code{\link{phylogeny<-}()},

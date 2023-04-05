@@ -89,7 +89,6 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   # # Convert an expression to call. expression(Age > 9) => Age > 9
   # #--------------------------------------------------------------
   # 
-  # browser()
   # if (mode(substitute(expr)) == "name")
   #   if (identical(expr[[1]], as.name("expression")))
   #     return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
@@ -137,12 +136,12 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
       'mean'  = mean, 'median' = median, 'n'     = length,
       'min'   = min,  'max'    = max,    'apply' = apply,
       'count' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
-        lower_pass <- if (is.null(ge)) x >  gt else x >= ge
-        upper_pass <- if (is.null(lt)) x <= le else x >  lt
+        lower_pass <- if (is_null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is_null(lt)) x <= le else x >  lt
         sum(lower_pass & upper_pass) },
       'percent' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
-        lower_pass <- if (is.null(ge)) x >  gt else x >= ge
-        upper_pass <- if (is.null(lt)) x <= le else x >  lt
+        lower_pass <- if (is_null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is_null(lt)) x <= le else x >  lt
         sum(lower_pass & upper_pass) / length(x) })
     
     #--------------------------------------------------------------

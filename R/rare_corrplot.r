@@ -2,9 +2,10 @@
 #' 
 #' @name rare_corrplot
 #' 
+#' @inherit adiv_corrplot params sections return
+#' 
 #' @family plotting
 #' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param metric   Alpha diversity metric(s) to use. Options are: 
 #'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
@@ -13,23 +14,6 @@
 #' @param depths   Rarefaction depths to show in the plot. Passed to
 #'        \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 #'        to pick 10 evenly spaced depths.
-#' 
-#' @param points   Overlay a scatter plot. Default: \code{FALSE}.
-#'        
-#' @param color.by,facet.by   Metadata column to color and/or facet by. If that
-#'        column is a \code{factor}, the ordering of levels will be maintained 
-#'        in the plot. Default: \code{color.by = NULL, facet.by = NULL}
-#'        
-#' @param colors,facets   Names of the colors and/or facets values to use in
-#'        the plot. Available values for colors are given by \code{colors()}. 
-#'        Use a named character vector to map them to specific factor levels in
-#'        the metadata. \code{facets} are coerced to unnamed character vectors.
-#'        If the length of these vectors is less than the values present in 
-#'        their corresponding metadata column, then the data set will be 
-#'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}
-#' 
-#' @param ci   The confidence interval to display around the fitted curve. Set
-#'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
 #'        
 #' @param rline   Where to draw a horizontal line on the plot, intended to show
 #'        a particular rarefaction depth. Set to \code{TRUE} to show an 
@@ -61,17 +45,8 @@
 
 rare_corrplot <- function (
     biom, metric = "OTUs", depths = NULL, points = FALSE,
-    color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL,
+    color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, rline = NULL, caption = TRUE, ...) {
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  metric <- as.vector(validate_metrics(biom, metric, "adiv", multi=TRUE))
-  stopifnot(is.null(depths) || is.numeric(depths))
-  stopifnot(is.logical(rline) || is.null(rline) || is.numeric(rline))
   
   
   #________________________________________________________
@@ -79,54 +54,69 @@ rare_corrplot <- function (
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  history <- sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot))
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot)))
+  remove(list = setdiff(ls(), c("params", "history")))
+  
+  
+  #________________________________________________________
+  # Sanity Checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    stopifnot(is_null(depths) || is.numeric(depths))
+    stopifnot(is.logical(rline) || is_null(rline) || is.numeric(rline))
+  })
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    color.by = list(n = 0:1),
+    facet.by = list(col_type = "cat"),
+    limit.by = list() ))
   
   
   #________________________________________________________
   # Default rarefaction depth.
   #________________________________________________________
-  if (isFALSE(rline)) rline <- NULL
-  
-  if (isTRUE(rline)) {
-    ss <- as.vector(sample_sums(biom))
+  params[['rline']] <- with(params, {
+    
+    if (isFALSE(rline)) return (NULL)  # rline = FALSE
+    if (!isTRUE(rline)) return (rline) # rline = 1380
+    
+    # rline = TRUE (auto-select rarefaction depth)
+    ss    <- as.vector(sample_sums(biom))
     rline <- (sum(ss) * .1) / length(ss)
     rline <- min(ss[ss >= rline])
-    remove("ss")
-  }
-  
-  
-  #________________________________________________________
-  # Subset the biom file.
-  #________________________________________________________
-  for (i in c("color", "facet")) {
-    key <- get(paste0(i, ".by"))
-    val <- get(paste0(i, "s"))
-    if (!is.null(key) && !is.null(val))
-      biom <- subset(
-        biom = biom,
-        expr = a %in% b,
-        env  = list(a = as.name(key), b = val),
-        fast = TRUE )
-  }
+    return (rline)
+  })
   
   
   #________________________________________________________
   # Pull rarefaction stats for each depth.
   #________________________________________________________
+  if (is_null(params[['depths']]))
+    params[['depths']] <- "multi_even"
+  
   data <- adiv_table(
-    biom    = biom,
-    rarefy  = ifelse(is.null(depths), "multi_even", depths),
-    metrics = metric,
-    long    = TRUE,
-    md      = unique(c(color.by, facet.by)), 
-    safe    = TRUE )
+    biom    = params[['biom']],
+    rarefy  = params[['depths']],
+    metrics = params[['metric']],
+    long    = TRUE, 
+    safe    = TRUE,
+    md      = unique(c(
+      params[['color.by']] %>% names(), 
+      params[['facet.by']])) )
   
   
   #________________________________________________________
   # Facet by metric when there's more than one.
   #________________________________________________________
-  if (length(metric) > 1)
-    params[['facet.by']] <- unique(c(facet.by, ".metric"))
+  if (length(params[['metric']]) > 1)
+    params[['facet.by']] %<>% c(".metric")
   
   
   #________________________________________________________
@@ -148,7 +138,9 @@ rare_corrplot <- function (
     'xmode'    = "numeric" )
   
   initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-  if (isTRUE(points)) initLayer('point')
+  
+  if (!is_null(params[['color.by']])) initLayer("color")
+  if (isTRUE(params[['points']]))     initLayer("point")
   
   
   #________________________________________________________
@@ -156,12 +148,15 @@ rare_corrplot <- function (
   #________________________________________________________
   setLayer("ggplot", mapping = list(x = ".depth", y = ".value"))
   setLayer("xaxis",  labels = si_units)
-  setLayer("labs",   x = "Rarefaction Depth")
-  setLayer("labs",   y = ifelse(length(metric) == 1, metric, "Diversity"))
-  if (length(metric) > 1) setLayer("facet", scales = "free_y")
+  setLayer("labs",   x = "Rarefaction Depth", y = params[['metric']])
   
-  if (!is.null(rline))
-    setLayer("vline", xintercept = rline, color = "red", linetype="dashed")
+  if (length(params[['metric']]) > 1) {
+    setLayer("labs", y = "Diversity")
+    setLayer("facet", scales = "free_y")
+  }
+  
+  if (!is_null(params[['rline']]))
+    setLayer("vline", xintercept = params[['rline']], color = "red", linetype="dashed")
   
   
   
@@ -169,15 +164,10 @@ rare_corrplot <- function (
   #________________________________________________________
   p <- corrplot_build(layers)
   
-  
-  # Attach history of biom modifications and this call.
-  #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return (p)
-  
-  
 }
 
 

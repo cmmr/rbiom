@@ -15,8 +15,10 @@
 #'          \item{\code{TRUE}}{
 #'            Automatically select and apply a single rarefaction. }
 #'            
-#'          \item{\code{"multi_log"}, \code{"multi_even"}}{
-#'            Automatically select and apply multiple rarefactions. }
+#'          \item{\code{"multi"}, \code{"multi_log"}, \code{"multi_even"}}{
+#'            Automatically select and apply multiple rarefactions.
+#'            \code{"multi"} provides \code{"multi_log"} at the low end 
+#'            and \code{"multi_even"} at the high end. }
 #'            
 #'          \item{\emph{integer vector}}{
 #'            Rarefy at the specified depth(s). }
@@ -103,7 +105,16 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
   } else if (is.character(rarefy)) {
     upper <- fivenum(slam::col_sums(counts))[[4]]
     
-    if (identical(rarefy, "multi") || identical(rarefy, "multi_log")) {
+    if (identical(rarefy, "multi")) {
+      
+      # Log intervals until rLvl/2, then even intervals until rLvl*2
+      rLvl  <- default_rarefaction_depth(counts)
+      rLvls <- 10 ** (c(1,3,5,7,8,9) * (log10(rLvl / 2) / 10))
+      rLvls <- c(rLvls, seq(from = rLvl / 2, to = rLvl * 2, length.out = 5))
+      rLvls <- floor(rLvls)
+      remove("rLvl")
+      
+    } else if (identical(rarefy, "multi_log")) {
       rLvls <- floor(10 ** (c(1:10) * (log10(upper) / 10)))
       
     } else if (identical(rarefy, "multi_even")) {

@@ -6,9 +6,16 @@ corrplot_build <- function (layers) {
   
   
   #________________________________________________________
+  # Theming specific to a numeric x-axis.
+  #________________________________________________________
+  setLayer("theme", panel.grid.minor.x = element_blank())
+  
+  
+  
+  #________________________________________________________
   # Predefined regression models
   #________________________________________________________
-  if (is.null(params[['method']]) || is.null(params[['formula']])) {
+  if (is_null(params[['method']]) || is_null(params[['formula']])) {
     
     model <- params[['model']]
     if (length(model) != 1 || !is.character(model))
@@ -23,8 +30,8 @@ corrplot_build <- function (layers) {
     if (isTRUE(is.na(i)))
       stop("'", model, "' is not a predefined regression model.")
     
-    if (is.null(params[['method']]))  params[['method']]  <- models[[i]][['method']]
-    if (is.null(params[['formula']])) params[['formula']] <- models[[i]][['formula']]
+    if (is_null(params[['method']]))  params[['method']]  <- models[[i]][['method']]
+    if (is_null(params[['formula']])) params[['formula']] <- models[[i]][['formula']]
     
     remove("model", "models", "i")
   }
@@ -41,14 +48,20 @@ corrplot_build <- function (layers) {
   #________________________________________________________
   # aes() mapping for color/fill
   #________________________________________________________
-  if (!is.null(params[['color.by']])) {
+  if (!is_null(params[['color.by']])) {
+    
     if (hasName(layers, 'point'))
-      setLayer("point", "mapping|color" = params[['color.by']])
+      setLayer("point", "mapping|color" = names(params[['color.by']]))
     
     if (hasName(layers, 'smooth')) {
-      setLayer("smooth", "mapping|color" = params[['color.by']])
-      if (!isFALSE(params[['ci']]))
-        setLayer("smooth", "mapping|fill" = params[['color.by']])
+      setLayer("smooth", "mapping|color" = names(params[['color.by']]))
+      
+      if (!isFALSE(params[['ci']])) {
+        setLayer("smooth", "mapping|fill" = names(params[['color.by']]))
+        
+        if (!is_null(layers[["color"]][["values"]]))
+          setLayer("fill", values = layers[["color"]][["values"]])
+      }
     }
   }
   

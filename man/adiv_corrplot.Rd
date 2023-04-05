@@ -13,8 +13,7 @@ adiv_corrplot(
   ci = 95,
   color.by = NULL,
   facet.by = NULL,
-  colors = NULL,
-  facets = NULL,
+  limit.by = NULL,
   ...
 )
 }
@@ -38,17 +37,8 @@ which will override these preset options for
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
 
-\item{color.by, facet.by}{Metadata column to color and/or facet by. If that
-column is a \code{factor}, the ordering of levels will be maintained 
-in the plot. Default: \code{color.by = NULL, facet.by = NULL}.}
-
-\item{colors, facets}{Names of the colors and/or facets values to use in
-the plot. Available values for colors are given by \code{colors()}. 
-Use a named character vector to map them to specific factor levels in
-the metadata. \code{facets} are coerced to unnamed character vectors.
-If the length of these vectors is less than the values present in 
-their corresponding metadata column, then the data set will be 
-subseted accordingly. Default: \code{colors = NULL, facets = NULL}.}
+\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
+and partitioning. See below for details. Default: \code{NULL}}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{p.} or \code{s.}
@@ -66,6 +56,54 @@ A \code{ggplot2} plot. The computed data points and statistics will
 \description{
 Visualize alpha diversity with scatterplots and trendlines.
 }
+\section{Aesthetics and Partitions}{
+
+
+Metadata can be used to flexibly subset, partition, and apply aesthetics 
+when creating a plot. Common use cases are provided below. More thorough 
+documentation is available at \url{https://cmmr.github.io/rbiom}.
+
+\preformatted{  ## Colors ----------------------------
+  color.by = "Body Site"
+  color.by = list('Body Site' = "bright")
+  color.by = list('Body Site' = c("Stool", "Saliva"))
+  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'palette' = "bright"))
+  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+  
+  ## Facets ----------------------------
+  facet.by = "Body Site"
+  facet.by = c("Body Site", "Sex")
+  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+  
+  ## Limits ----------------------------
+  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+}
+
+\itemize{
+  \item{\code{color.by} - }{Any metadata column. (Max 1)}
+  \item{\code{facet.by} - }{Only categorical metadata column(s).}
+  \item{\code{limit.by} - }{Any metadata column(s).}
+}
+
+All built-in color palettes are colorblind-friendly.
+
+The available categorical palette names are: \code{"okabe"}, \code{"carto"}, 
+\code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"}, 
+\code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, 
+\code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, 
+and \code{"fishy"}.
+
+The available numeric palette names are: \code{"reds"}, \code{"oranges"}, 
+\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"}, 
+\code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, 
+\code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"}, 
+\code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, 
+\code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"}, 
+\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"}, 
+\code{"roma"}, \code{"tofino"}, \code{"vanimo"}, \code{"vik"}
+}
+
 \examples{
     library(rbiom)
     

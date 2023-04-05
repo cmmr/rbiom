@@ -118,24 +118,28 @@ bdiv_ord_table <- function (
   # Can't do as much when biom is a dist object
   #________________________________________________________
   if (!is(biom, 'BIOM'))
-    for (i in c('md', 'split.by', 'stat.by', 'rank', 'taxa'))
-      if (!is.null(get(i)))
+    for (i in c('md', 'split.by', 'stat.by', 'rank'))
+      if (!is_null(get(i)))
         stop("BIOM object needed for running bdiv_ord_table() with `", i, "` argument.")
   
   
   #________________________________________________________
   # Verify metadata columns exist
   #________________________________________________________
-  if (isTRUE(md)) md <- colnames(metadata(biom))
-  missing <- setdiff(c(md, split.by, stat.by), colnames(metadata(biom)))
-  if (length(missing) > 0)
-    stop("Metadata column(s) ", paste(collapse = ", ", missing), " not found.")
+  if (isTRUE(md))
+    md <- colnames(metadata(biom))
+  
+  if (is.character(md)) {
+    missing <- setdiff(c(md, split.by, stat.by), colnames(metadata(biom)))
+    if (length(missing) > 0)
+      stop("Metadata column(s) ", paste(collapse = ", ", missing), " not found.")
+  }
   
   
   #________________________________________________________
   # Subdivide BIOM object according to metadata
   #________________________________________________________
-  if (is.null(split.by)) {
+  if (is_null(split.by)) {
     biom_list <- list(biom)
   } else {
     biom_list <- blply(biom, split.by, function (b) b)
@@ -145,9 +149,9 @@ bdiv_ord_table <- function (
   #________________________________________________________
   # Biplot - determine taxonomic rank
   #________________________________________________________
-  if (is.null(rank) && is.character(taxa)) {
+  if (is_null(rank) && is.character(taxa)) {
     rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
-  } else if (!is.null(rank)) {
+  } else if (!is_null(rank)) {
     rank <- validate_metrics(biom, rank, mode="rank", multi=TRUE)
   }
   
@@ -156,10 +160,10 @@ bdiv_ord_table <- function (
   # Aggregate iterative output together into final tables
   #________________________________________________________
   add_loop_columns <- function (x, i, w, d, o = NULL) {
-    if (is.null(x)) return (NULL)
+    if (is_null(x)) return (NULL)
     x[['.weight']] <- ifelse(w, "Weighted", "Unweighted")
     x[['.dist']]   <- d
-    if (!is.null(o)) x[['.ord']]    <- o
+    if (!is_null(o)) x[['.ord']]    <- o
     for (j in colnames(attr(biom_list, 'split_labels')))
       x[[j]] <- attr(biom_list, 'split_labels')[i,j]
     return (x)
@@ -184,10 +188,12 @@ bdiv_ord_table <- function (
         
         if (is(b, 'dist')) {
           dm <- b
-          if (!is.null(stat.by)) {
+          if (!is_null(stat.by)) {
             set.seed(seed)
             stats_raw <- try(vegan::adonis2(dm ~ stat.by, permutations=perms-1), silent = TRUE)
             stats_tbl <- adonis_table(stats_raw)
+          } else {
+            stats_tbl <- NULL
           }
           
         } else {
@@ -253,7 +259,7 @@ bdiv_ord_table <- function (
   # Make properly ordered factors
   #________________________________________________________
   strings_to_factors <- function (x) {
-    if (is.null(x)) return (NULL)
+    if (is_null(x)) return (NULL)
     for (i in intersect(colnames(x), c('.weight', '.dist', '.ord')))
       x[[i]] %<>% factor(levels = unique(x[[i]]))
     return (x)
@@ -292,7 +298,7 @@ bdiv_ord_table <- function (
 
 ordinate_biplot <- function (biom, coords, ranks, taxa, p.adj, p.top, perms) {
   
-  if (is.null(ranks)) return (NULL)
+  if (is_null(ranks)) return (NULL)
   
   #________________________________________________________
   # Handle multiple ranks.
@@ -314,7 +320,7 @@ ordinate_biplot <- function (biom, coords, ranks, taxa, p.adj, p.top, perms) {
     #________________________________________________________
     # Subset the taxa. By name, top n, or min abundance.
     #________________________________________________________
-    if (!is.null(taxa)) {
+    if (!is_null(taxa)) {
       
       if (is.numeric(taxa) && length(taxa) == 1) {
         if (taxa >= 1) {

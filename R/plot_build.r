@@ -50,13 +50,16 @@ plot_build <- function (layers) {
     }
     remove("x")
     
-    # Don't need grid lines if we have striping.
-    if (isTRUE(params[['flip']])) {
-      setLayer("theme", panel.grid.major.y = element_blank())
-    } else {
-      setLayer("theme", panel.grid.major.x = element_blank())
-    }
-    
+  }
+  
+  
+  #______________________________________________________________
+  # Suppress vertical gridlines (horizontal if flipped).
+  #______________________________________________________________
+  if (isTRUE(params[['flip']])) {
+    setLayer("theme", panel.grid.major.y = element_blank())
+  } else {
+    setLayer("theme", panel.grid.major.x = element_blank())
   }
   
   
@@ -68,7 +71,7 @@ plot_build <- function (layers) {
     'spider', 'dot', 'ellipse', 'strip', 'name', 'crossbar', 'linerange', 
     'rect', 'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
     'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
-    'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', 
+    'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', # 'free_y', 
     'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
   layer_order <- c(
     intersect(layer_order, names(layers)),
@@ -97,8 +100,8 @@ plot_build <- function (layers) {
   #______________________________________________________________
   # Note any transformation in the y-axis label
   #______________________________________________________________
-  if (!is.null(layers[['labs']][['y']]))
-    if (!is.null(layers[['yaxis']][['trans']]))
+  if (!is_null(layers[['labs']][['y']]))
+    if (!is_null(layers[['yaxis']][['trans']]))
       layers[['labs']][['y']] %<>% paste0(" (", layers[['yaxis']][['trans']], " scale)")
   
   
@@ -112,7 +115,7 @@ plot_build <- function (layers) {
     gvals <- ggdata[['.group']] %>% as.character() %>% factor() %>% as.numeric()
     gvals[is.na(gvals)] <- 0
     
-    prefer <- params[grep("\\.by$", names(params))] %>% unlist() %>% unname()
+    prefer <- params[grep("^(x|.+\\.by)$", names(params))] %>% unlist() %>% unname()
     mcols  <- grep("^\\.", names(ggdata), invert = TRUE, value = TRUE)
     mcols  <- mcols[order(!mcols %in% prefer)]
     
@@ -150,9 +153,8 @@ plot_build <- function (layers) {
     src  <- attr(args, 'src',      exact = TRUE)
     
     
-    if (is.null(src)) { data_cols <- colnames(ggdata)
+    if (is_null(src)) { data_cols <- colnames(ggdata)
     } else            { data_cols <- colnames(attr(ggdata, src, exact = TRUE)) }
-      
     
     
     # Create the aes object for `mapping`=
@@ -179,7 +181,7 @@ plot_build <- function (layers) {
           
           val <- as.vector(aes_args[[arg]])
           
-          if (identical(val, ".all"))   val <- NA
+          # if (identical(val, ".all"))   val <- NA
           if (identical(val, ".group")) val <- gcol
           
           
@@ -196,7 +198,7 @@ plot_build <- function (layers) {
               
                 aes_cols <- unique(c(aes_cols, val))
                 
-                if (is.null(src))
+                if (is_null(src))
                   mapped_cols <- unique(c(mapped_cols, val))
                 
                 # Add backticks to column names
@@ -211,6 +213,7 @@ plot_build <- function (layers) {
           
           aes_args[[arg]] <- val
         }
+        
         
         if (isTRUE(length(aes_args) > 0)) {
           args[['mapping']] <- do.call(

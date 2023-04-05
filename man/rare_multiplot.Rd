@@ -12,8 +12,7 @@ rare_multiplot(
   points = FALSE,
   color.by = NULL,
   facet.by = NULL,
-  colors = NULL,
-  facets = NULL,
+  limit.by = NULL,
   ci = 95,
   caption = FALSE,
   labels = FALSE,
@@ -32,22 +31,13 @@ a particular rarefaction depth. Default: \code{TRUE} (no line).}
 and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 
 \item{depths}{Rarefaction depths to show in the plot. Passed to
-\link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
-to pick 10 evenly spaced depths.}
+\link{adiv_table}. The default, \code{NULL}, uses a heuristic
+to pick optimal depths.}
 
 \item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
 
-\item{color.by, facet.by}{Metadata column to color and/or facet by. If that
-column is a \code{factor}, the ordering of levels will be maintained 
-in the plot. Default: \code{color.by = NULL, facet.by = NULL}}
-
-\item{colors, facets}{Names of the colors and/or facets values to use in
-the plot. Available values for colors are given by \code{colors()}. 
-Use a named character vector to map them to specific factor levels in
-the metadata. \code{facets} are coerced to unnamed character vectors.
-If the length of these vectors is less than the values present in 
-their corresponding metadata column, then the data set will be 
-subseted accordingly. Default: \code{colors = NULL, facets = NULL}}
+\item{color.by, facet.by, limit.by}{Metadata columns to use for data 
+partitioning. Default: \code{NULL}}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}

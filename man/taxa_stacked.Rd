@@ -10,12 +10,10 @@ taxa_stacked(
   taxa = 6,
   colors = TRUE,
   patterns = FALSE,
-  facet.by = NULL,
   label.by = NULL,
   order.by = NULL,
-  facets = NULL,
-  labels = NULL,
-  orders = NULL,
+  facet.by = NULL,
+  limit.by = NULL,
   dist = "euclidean",
   clust = "complete",
   other = TRUE,
@@ -42,21 +40,17 @@ specific colors or patterns. Set to \code{TRUE} to auto-select colors
 or patterns, or to \code{FALSE} to disable per-taxa colors
 or patterns. Default: \code{colors=TRUE, patterns=FALSE}.}
 
-\item{facet.by}{Split into multiple plots based on this metadata 
-column(s). Default: \code{NULL}.}
-
 \item{label.by, order.by}{What metadata column to use for labeling and/or
 sorting the samples across the x-axis. When \code{order.by=NULL},
 samples are arranged based on \code{dist} and \code{clust}, below.
-Default: \code{label.by=NULL, order.by=NULL}.}
+Default: \code{NULL}.}
 
-\item{facets, labels, orders}{Subset to just these values in the 
-\code{facet.by}, \code{label.by}, and/or \code{order.by} metadata
-columns. Default: \code{facets=NULL, labels=NULL, orders=NULL}.}
+\item{facet.by, limit.by}{Metadata columns to 
+use for data partitioning. Default: \code{NULL}}
 
 \item{dist, clust}{Distance (\link{dist}) and clustering (\link{hclust})
-methods to use for automatically arranging samples along the x-axis 
-to group samples with similar composition near one another.
+methods to use for automatically arranging samples along the x-axis. 
+Group samples with similar composition near one another.
 Default: \code{dist="euclidean", clust="complete"}.}
 
 \item{other}{Add an 'Other' taxa that ensures all bars sum to 100%. 

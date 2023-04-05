@@ -24,7 +24,7 @@ ggwrap <- function (pkg, fn) {
     assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
       res <- fun(...)
       
-      if (is.null(.display))
+      if (is_null(.display))
         .display <- sprintf(
           fmt = "%s(%s)", 
           ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
@@ -55,7 +55,7 @@ basewrap <- function (pkg, fn) {
     res  <- fun(...)
     args <- as.args(list(...), fun = fun, indent = .indent)
     
-    if (is.null(.display)) .display <- sprintf("%s(%s)", fn, args)
+    if (is_null(.display)) .display <- sprintf("%s(%s)", fn, args)
     attr(res, 'display') <- .display
     
     return (res)
@@ -67,10 +67,6 @@ basewrap <- function (pkg, fn) {
 #________________________________________________________
 
 ggpush <- function (gglayers, gglayer) {
-  
-  if (is.null(attr(gglayer, 'display')))
-    browser()
-  
   gglayers[[length(gglayers) + 1]] <- gglayer
   return (gglayers)
 }
@@ -90,10 +86,10 @@ ggbuild <- function (gglayers) {
     gglayer <- gglayers[[i]]
     
     # In case this layer was built by initLayer / setLayer
-    if (!is.null(fun <- attr(gglayer, 'function', exact = TRUE)))
+    if (!is_null(fun <- attr(gglayer, 'function', exact = TRUE)))
       gglayer <- do.call(fun, c(gglayer, '.indent' = 4))
     
-    if (is.null(p)) {
+    if (is_null(p)) {
       p   <- gglayer
       cmd <- attr(gglayer, 'display')
     } else {

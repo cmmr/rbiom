@@ -19,7 +19,7 @@ taxa_sums <- function (biom, rank = NULL) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
   
-  if (is.null(rank)) {
+  if (is_null(rank)) {
     x <- slam::row_sums(biom$counts)
   } else {
     x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
@@ -49,7 +49,7 @@ taxa_means <- function (biom, rank = NULL) {
   if (!is(biom, 'BIOM'))
     stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
   
-  if (is.null(rank)) {
+  if (is_null(rank)) {
     x <- slam::row_means(biom$counts)
   } else {
     x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)

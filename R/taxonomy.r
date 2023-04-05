@@ -99,7 +99,7 @@ taxonomy <- function (biom, rank = NULL, fix.names = FALSE) {
   }
   
   x <- cbind(x, 'OTU' = taxa_names(biom))
-  if (!is.null(rank)) x <- x[,rank]
+  if (!is_null(rank)) x <- x[,rank]
   
   return (x)
 }

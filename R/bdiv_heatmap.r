@@ -2,6 +2,8 @@
 #' 
 #' @name bdiv_heatmap
 #' 
+#' @inherit plot_heatmap params return
+#' 
 #' @family plotting
 #' 
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
@@ -13,68 +15,172 @@
 #'        
 #' @param weighted   Should the beta diversity metric be weighted by 
 #'        abundances? Default: \code{TRUE}.
+#' 
+#' @param grid   Color palette name, or a list with entries for \code{label}, 
+#'        \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
+#'        \code{guide}. See the Track Definitions section for details.
+#'        Default: \code{list(label = "Distance", colors = "-bilbao")}.
 #'                 
 #' @param color.by   Add annotation tracks for these metadata column(s). 
-#'        Default: \code{NULL}.
+#'        See "Annotation Tracks" section below for details.
+#'        Default: \code{NULL}
 #'                 
-#' @param order.by   Which metadata columns to use for ordering the samples 
-#'        across the x-axis. The default setting, \code{order.by=NULL}, uses 
-#'        sample names as labels and arranges samples by similarity. See 
-#'        \link{plot_heatmap} for details.
+#' @param order.by   Which metadata column(s) to use for ordering the samples 
+#'        across the x and y axes. Overrides any \code{clust} argument.
+#'        See "Ordering and Limiting" section below for details.
+#'        Default: \code{NULL}
 #'                 
-#' @param colors   A named \code{list()} with names matching \code{color.by}, 
-#'        each specifying a \bold{palette} as described in \link{plot_heatmap}.
-#'        For example: \code{colors = list(Sex = c(Male="blue", Female="red"))}.
-#'        Default: \code{NULL}.
-#'                 
-#' @param orders   Subset to just these values in the \code{order.by} metadata 
-#'        column. Default: \code{NULL}.
-#'        
-#' @param xlab.angle   How to rotate the tick labels on the x-axis. 
-#'        \bold{'auto'} (the default), automatically selects a rotation value. 
-#'        \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
-#'        angled, and vertical, respectively.
+#' @param limit.by   Metadata definition(s) to use for sample subsetting prior
+#'        to calculations. 
+#'        See "Ordering and Limiting" section below for details.
+#'        Default: \code{NULL}
 #'        
 #' @param tree   A phylogenetic tree for use in calculating UniFrac distance.
 #'        The default, \code{NULL}, will use the BIOM object's tree.
-#'                 
-#' @param ...   Additional arguments to pass on to \link{plot_heatmap}.
+#'        
+#' @param ...   Additional arguments to pass on to ggplot2::theme().
+#'        For example, \code{labs.title = "Plot Title"}.
 #'        
 #' @return A \code{ggplot2} plot. The computed data points will be attached as 
 #'         \code{attr(, 'data')}.
+#'         
+#'         
+#' @section Annotation Tracks:
+#' 
+#' Metadata can be displayed as colored tracks above the heatmap. Common use 
+#' cases are provided below, with more thorough documentation available at 
+#' https://cmmr.github.io/rbiom .
+#' 
+#' \preformatted{  ## Categorical ----------------------------
+#' color.by = "Body Site"
+#' color.by = list('Body Site' = "bright")
+#' color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
+#' color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+#' 
+#' ## Numeric --------------------------------
+#' color.by = "Age"
+#' color.by = list('Age' = "reds")
+#' color.by = list('Age' = c(20,NA), 'colors' = "reds") # at least 20 years old
+#' color.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+#' 
+#' ## Multiple Tracks ------------------------
+#' color.by = c("Body Site", "Age")
+#' color.by = list('Body Site' = "bright", 'Age' = "reds")
+#' color.by = list(
+#'   'Body Site' = c('Stool' = "blue", 'Saliva' = "green"),
+#'   'Age'       = list(range = c(20,40), 'colors' = "reds") )
+#' }
+#' 
+#' The following entries in the track definitions are understood: 
+#' 
+#' \itemize{
+#'   \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+#'   \item{\code{range} - }{ The c(min,max) to use for scale values. }
+#'   \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
+#'   \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+#'   \item{\code{na.color} - }{ The color to use for \code{NA} values. }
+#'   \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
+#'   \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
+#' }
+#' 
+#' All built-in color palettes are colorblind-friendly.
+#' 
+#' Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
+#' \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
+#' \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+#' \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+#' 
+#' Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"}, 
+#' \code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"}, 
+#' \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"}, 
+#' \code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"}, 
+#' \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"}, 
+#' \code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"}, 
+#' \code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"}, 
+#' \code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
+#'         
+#'         
+#' @section Ordering and Limiting:
+#' 
+#' \bold{\code{order.by}} controls which metadata column(s) are used to arrange
+#' samples on the plot. It also enables subsetting to a particular set or 
+#' range of values. Prefix a column name with \code{-} to arrange values in 
+#' descending order rather than ascending.
+#' 
+#' \preformatted{  ## Categorical ----------------------------
+#' order.by = "Body Site"
+#' order.by = list('Body Site' = c("Stool", "Saliva"))
+#' 
+#' ## Numeric --------------------------------
+#' order.by = "-Age"
+#' order.by = list('Age'  = c(20,NA)) # at least 20 years old
+#' order.by = list('-Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+#' 
+#' ## Multiple / Mixed -----------------------
+#' order.by = c("-Body Site", "Age")
+#' order.by = list("Body Site", '-Age' = c(20,40))
+#' }
+#' 
+#' 
+#' \bold{\code{limit.by}} is used to specify a subset of samples without any
+#' side-effects on aesthetics. It is especially useful for limiting the data
+#' to a single categorical metadata value. Unlike the other *.by parameters,
+#' \code{limit.by} must always be a named \code{list()}.
+#' 
+#' \preformatted{  ## Categorical ----------------------------
+#' limit.by = list('Sex' = "Male")
+#' 
+#' ## Numeric --------------------------------
+#' limit.by = list('Age' = c(20,NA)) # at least 20 years old
+#' limit.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+#' 
+#' ## Multiple / Mixed -----------------------
+#' limit.by = list(
+#'   'Sex'       = "Male", 
+#'   'Body Site' = c("Stool", "Saliva")
+#'   'Age'       = c(20,40) )
+#' }
+#' 
+#' 
 #' 
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
-#'     
-#'     biom <- hmp50 %>% rarefy() %>% select(1:10)
-#'     bdiv_heatmap(biom, color.by="Body Site")
+#'   library(rbiom) 
+#'   
+#'   biom <- hmp50 %>% rarefy() %>% select(1:10)
+#'   bdiv_heatmap(biom, color.by="Body Site")
 #'     
 bdiv_heatmap <- function (
     biom, metric = "Bray-Curtis", weighted = TRUE,
-    color.by = NULL, order.by = NULL, 
-    colors = NULL, orders = NULL,
-    xlab.angle = "auto", tree = NULL, ...) {
+    grid = list(label = "Distance", colors = "-bilbao"),
+    color.by = NULL, order.by = NULL, limit.by = NULL, 
+    label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
+    clust = "complete", dist = "euclidean", 
+    tree_height  = NULL, track_height = NULL, ratio=1, 
+    legend = "right", xlab.angle = "auto", ...) {
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  params <- c(as.list(environment()), list(...))
+  params[['...']] <- NULL
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap)))
+  remove(list = setdiff(ls(), c("params", "history")))
   
   
   #________________________________________________________
   # Sanity checks
   #________________________________________________________
-  
-  if (!is.null(order.by))
-    order.by <- as.vector(validate_metrics(biom, order.by, "meta", multi=TRUE))
-  
-  if (!is.null(color.by))
-    color.by <- as.vector(validate_metrics(biom, color.by, "meta", multi=TRUE))
-  
-  
-  #________________________________________________________
-  # Collect all parameters into a list
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  remove(list = setdiff(ls(), c("params", "biom")))
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    stopifnot(is_scalar_logical(weighted))
+    metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf))
+    
+    if (length(order.by) > 0) clust <- FALSE
+  })
   
   
   #________________________________________________________
@@ -97,7 +203,7 @@ bdiv_heatmap <- function (
     p <- patchwork::wrap_plots(plots)
     
     history <- sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap))
-    attr(p, 'history') <- c(attr(biom, 'history'), history)
+    attr(p, 'history') <- history
     attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
     attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
@@ -115,12 +221,23 @@ bdiv_heatmap <- function (
   
   
   #________________________________________________________
-  # Subset
+  # Subset biom by requested metadata and aes.
   #________________________________________________________
-  if (!is.null(params[['order.by']]) || !is.null(params[['color.by']]))
-    metadata(biom) <- subset_by_params(
-      df     = metadata(biom),
-      params = params[c('order.by', 'orders', 'color.by', 'colors')] )
+  params %<>% metadata_params(contraints = list(
+    color.by = list(),
+    order.by = list(),
+    limit.by = list() ))
+  
+  biom <- params[['biom']]
+  
+  
+  # #________________________________________________________
+  # # Subset
+  # #________________________________________________________
+  # if (!is_null(params[['order.by']]) || !is_null(params[['color.by']]))
+  #   metadata(biom) <- subset_by_params(
+  #     df     = metadata(biom),
+  #     params = params[c('order.by', 'orders', 'color.by', 'colors')] )
   
   
   #________________________________________________________
@@ -137,23 +254,16 @@ bdiv_heatmap <- function (
   mtx <- as.matrix(bdiv_distmat(
     biom     = biom, 
     method   = params[['metric']], 
-    weighted = params[['weighted']],
-    tree     = params[['tree']] ))
-  
-  # supports multi-column ordering
-  if (!is.null(params[['order.by']]))
-    mtx <- mtx[,do.call(order, lapply(
-      X   = params[['order.by']], 
-      FUN = function (i) {
-        as.vector(metadata(biom, i)[colnames(mtx)]) }))]
+    weighted = params[['weighted']] ))
   
   
   
   #________________________________________________________
   # Arguments to pass on to plot_heatmap
   #________________________________________________________
-  args <- list(...)
-  
+  excl <- setdiff(formalArgs(bdiv_heatmap), formalArgs(plot_heatmap))
+  excl <- c(excl, names(params)[startsWith(names(params), '.')])
+  args <- params[setdiff(names(params), excl)]
   args[['mtx']] <- mtx
   
   within(args, {
@@ -162,36 +272,17 @@ bdiv_heatmap <- function (
       yes  = paste0("Weighted\n",   params[['metric']], "\nDistance"), 
       no   = paste0("Unweighted\n", params[['metric']], "\nDistance") )})
   
-  if (is.null(params[['colors']])) {
-    args[['colors']] <- c(.Distance = "-khroma::bilbao")
-  } else {
-    # Inject some defaults without interfering with user's specs.
-    args[['colors']] <- structure(
-      .Data      = params[['colors']],
-      grid_name  = "Distance",
-      grid_color = "khroma::bilbao",
-      grid_rev   = TRUE )
-  }
+  for (md_col in names(params[['color.by']]))
+    params[['color.by']][[md_col]] %<>% within({
+      colors <- values
+      values <- metadata(biom, md_col)
+    })
+  args[['tracks']] <- params[['color.by']]
   
-  if (length(params[['order.by']]) > 0 && is.null(args[['clust']]))
-    args[['clust']] <- c("complete", NA)
-  
-  if (!is.null(params[['color.by']])) {
-    df <- metadata(biom)
-    df <- df[colnames(mtx), params[['color.by']], drop=FALSE]
-    args[['top_tracks']] <- df
-    
-    remove("df")
-  }
   
   p <- do.call(plot_heatmap, args)
   
-  
-  #________________________________________________________
-  # Attach history of biom modifications and this call
-  #________________________________________________________
-  history <- sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap))
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return(p)

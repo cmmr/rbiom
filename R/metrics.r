@@ -27,15 +27,18 @@
 #'
 metrics <- function (biom, mode = "all", tree=NULL) {
   
-  mode  <- tolower(mode)[[1]]
+  mode  <- tolower(mode)
+  modes <- c('ord', 'adiv', 'dist', 'clust', 'rank', 'taxon', 'meta', 'bdiv')
+  stopifnot(is_string(mode, c(modes, 'all')))
+  
+  if (is.data.frame(biom) && identical(mode, 'meta'))
+    return (colnames(biom))
   
   if (!is(biom, 'BIOM') && mode %in% c('rank', 'taxon', 'meta', 'all'))
     stop("Please provide a BIOM object when using mode='", mode, "'")
   
-  modes <- c('ord', 'adiv', 'dist', 'clust', 'rank', 'taxon', 'meta', 'bdiv')
   if (mode == 'all')
     return (sapply(X = modes, FUN = rbiom::metrics, biom=biom, tree=tree))
-  
   
   
   if        (mode == 'ord')   { c("PCoA", "tSNE", "NMDS", "UMAP") 
@@ -51,6 +54,52 @@ metrics <- function (biom, mode = "all", tree=NULL) {
     } else       { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard") }
   } else { NULL }
 }
+
+
+validate_arg <- function (
+    vals, biom = NULL, arg, mode = arg, n = NULL, 
+    col_type = NULL, tree = NULL, default = NULL, 
+    allow_na = FALSE ) {
+  
+  n_min   <- ifelse(is_null(n), 0,   min(n))
+  n_max   <- ifelse(is_null(n), Inf, max(n))
+  options <- metrics(biom, mode, tree)
+  
+  if (is_null(vals)) {
+    if (is.function(default))  return (default(options))
+    if (is.character(default)) return (default)
+    if (isTRUE(default))       return (options[[1]])
+    if (is.integer(default))   return (options[[default]])
+    if (n_min == 0)            return (NULL)
+    stop("No value given for `", arg, "` parameter.")
+  }
+  
+  if (length(vals) < n_min) stop("For `", arg, "`, length must be >= ", n_min, ".")
+  if (length(vals) > n_max) stop("For `", arg, "`, length must be <= ", n_max, ".")
+  
+  for (i in seq_along(vals)) {
+    
+    val <- vals[[i]]
+    if (is_na(val) && isTRUE(allow_na)) next
+    
+    opt <- options[which(startsWith(tolower(options), tolower(val)))]
+    if (length(opt) != 1) stop("Invalid argument for ", arg, ": ", val)
+    vals[[i]] <- opt
+    
+    if (!is_null(col_type)) {
+      md_vals <- if (is.data.frame(biom)) biom[[opt]] else metadata(biom, opt)
+      is_cat  <- is.factor(md_vals) || is.character(md_vals)
+      is_num  <- is.numeric(md_vals)
+      if (identical(col_type, "cat") && !is_cat) stop("Metadata column ", opt, " is not categorical.")
+      if (identical(col_type, "num") && !is_num) stop("Metadata column ", opt, " is not numeric.")
+    }
+  }
+  
+  return (vals)
+}
+
+
+
 
 
 #===============================================
@@ -77,7 +126,7 @@ validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE
       FUN       = function (i) {
         k <- do.call(paste0(i, "_metrics"), list(biom=biom))
         n <- attr(k, 'mode', exact = TRUE)
-        if (is.null(n)) n <- rep_len(i, length(k))
+        if (is_null(n)) n <- rep_len(i, length(k))
         setNames(n, as.vector(k))
       }))
     structure(names(v), mode=unname(v))
@@ -97,7 +146,7 @@ validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE
   if (length(missing) > 0)
     stop("Invalid or ambiguous metric(s): ", paste(collapse = ", ", metrics[missing]))
   
-  if (is.null(attr(opts, 'mode', exact = TRUE))) {
+  if (is_null(attr(opts, 'mode', exact = TRUE))) {
     attr(vals, 'mode') <- rep_len(mode, length(vals))
   } else {
     attr(vals, 'mode') <- attr(opts, 'mode', exact = TRUE)[okay]

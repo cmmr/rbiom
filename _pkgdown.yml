@@ -1,0 +1,23 @@
+url: https://cmmr.github.io/rbiom
+
+template:
+  bootstrap: 5
+
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: "Analysis Basics"
+    - text: "Importing Your Data"
+      href: articles/importing.html
+    - text: "Diversity Metrics"
+      href: articles/diversity.html
+    - text: -------
+    - text: "Plotting"
+    - text: "Plot Types"
+      href: articles/plot_types.html
+    - text: "Mapping Metadata to Aesthetics"
+      href: articles/aesthetics.html
+    - text: "Data Partitioning"
+      href: articles/partitioning.html

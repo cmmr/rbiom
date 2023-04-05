@@ -6,19 +6,15 @@
 \usage{
 taxa_boxplot(
   biom,
-  x = ".taxa",
+  x = NULL,
   rank = NULL,
   taxa = 5,
-  layers = "rls",
+  layers = "lsb",
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
   facet.by = NULL,
-  xvals = NULL,
-  colors = NULL,
-  patterns = NULL,
-  shapes = NULL,
-  facets = NULL,
+  limit.by = NULL,
   flip = TRUE,
   stripe = flip,
   p.top = Inf,
@@ -34,38 +30,28 @@ taxa_boxplot(
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. The 
-default, \code{".taxa"} puts the taxa along the x-axis.}
+default, \code{NULL} puts taxa along the x-axis.}
 
-\item{rank}{What rank of taxa to display. E.g. "Phylum", "Genus", etc. Run
-\code{taxa_ranks()} to see all options for a given BIOM object. The
-default, \code{NULL}, selects the lowest level.}
+\item{rank}{What rank(s) of taxa to display. E.g. "Phylum", "Genus", etc. 
+Run \code{taxa_ranks()} to see all options for a given BIOM object. 
+The default, \code{NULL}, selects the lowest level.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: \code{5}.}
 
-\item{layers}{\code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
+\item{layers}{\code{"box" ("x")}, \code{"bar"}, \code{"violin"}, 
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
 \code{"linerange"}, and \code{"pointrange"}. Single letter 
 abbreviations are also accepted. For instance, \code{c("box", "dot")} 
-is equivalent to \code{c("b", "d")} and \code{"bd"}.
-Default: \code{"rls"}.}
+is equivalent to \code{c("x", "d")} and \code{"xd"}.
+See \code{vignette("boxplots")} for examples of each.
+Default: \code{"lsb"}.}
 
-\item{color.by, pattern.by, shape.by, facet.by}{Metadata 
-column to color, pattern, shape, and/or facet by. If 
-that column is a \code{factor}, the ordering of levels will be 
-maintained in the plot.}
-
-\item{colors, patterns, shapes, facets, xvals}{Names of the colors, patterns,
-shapes, facets, and/or x values to use in the plot. Available values 
-for colors, patterns, and shapes are given by \code{colors()}, 
-\code{gridpattern::names_magick}, and \code{0:25},
-respectively. Use a named character vector to map them to specific
-factor levels in the metadata. \code{facets} and \code{xvals} are
-coerced to unnamed character vectors. If the length of these vectors
-is less than the values present in their corresponding metadata 
-column, then the data set will be subseted accordingly.}
+\item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to 
+use for aesthetics and partitioning. See below for details.
+Default: \code{NULL}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{TRUE}}
@@ -82,12 +68,12 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
-Default: \code{fdr}}
+(Default: \code{fdr})}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a 
-bracket, for example \code{p.label = 0.05}.
-Some special cases are:
+bracket.
 \itemize{
+  \item{\code{p.label = 0.05} - }{ Use this specific value. }
   \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
   \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
   \item{\code{p.label = Inf} - }{ display all p-values }
@@ -117,7 +103,7 @@ angled, and vertical, respectively.}
 
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing 
 differences of both high- and low-abundance taxa is best done with
-a non-linear axis. Options are:
+a non-linear axis. Options are: 
 \itemize{
   \item{\code{"sqrt"} - }{ square-root transformation }
   \item{\code{"log1p"} - }{ log(y + 1) transformation }
@@ -137,22 +123,79 @@ dotplot layer has its size set to \code{2}.}
 A \code{ggplot2} plot. The computed data points and statistics will 
         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
         respectively.
-        
-Shapes can also be given as their string values, defined in pch_table here:
-https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
-some shapes have a colored outline given by `color`, some are filled with 
-`color`, and some are outlined in `color` and filled with `fill`. See
-https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
 }
 \description{
 Visualize BIOM data with boxplots.
 }
+\section{Aesthetics and Partitions}{
+
+
+Metadata can be used to flexibly subset, partition, and apply aesthetics 
+when creating a plot. Common use cases are provided below. More thorough 
+documentation is available at \url{https://cmmr.github.io/rbiom}.
+
+
+\preformatted{  ## Colors ----------------------------
+  color.by = "Body Site"
+  color.by = list('Body Site' = "bright")
+  color.by = list('Body Site' = c("Stool", "Saliva"))
+  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'palette' = "bright"))
+  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+  
+  ## Patterns --------------------------
+  pattern.by = "Body Site"
+  pattern.by = list('Body Site' = c("Stool", "Saliva"))
+  pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
+  
+  ## Shapes ----------------------------
+  shape.by = "Body Site"
+  shape.by = list('Body Site' = c("Stool", "Saliva"))
+  shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
+  
+  ## Facets ----------------------------
+  facet.by = "Body Site"
+  facet.by = c("Body Site", "Sex")
+  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+  
+  ## Limits ----------------------------
+  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+}
+
+\itemize{
+  \item{\code{color.by} - }{A categorical metadata column. (Max 1)}
+  \item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
+  \item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
+  \item{\code{facet.by} - }{Categorical metadata column(s) only.}
+  \item{\code{limit.by} - }{Any metadata column(s).}
+}
+
+All built-in color palettes are colorblind-friendly. The available 
+categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+
+Patterns are sourced from the magick R package. Pattern names are: 
+\code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"}, 
+\code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"}, 
+\code{"checkerboard"}, \code{"octagons"}, \code{"right45"}, 
+\code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"}, 
+\code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"}, 
+\code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"}, 
+\code{"verticalleftshingle"}, and \code{"verticalrightshingle"}.
+
+Shapes can be given as per base R - numbers 0 through 17 for various shapes,
+or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use 
+letters instead of shapes on the plot. Character strings may used as well.
+}
+
 \examples{
     library(rbiom)
     
     biom <- rarefy(hmp50) 
     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-    taxa_boxplot(biom, rank = "Genus", taxa = 8, layers = "ps", color.by = "Body Site", flip = TRUE)
+    taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")), flip = FALSE)
     
 
 }

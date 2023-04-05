@@ -14,22 +14,13 @@
 #'        and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.
 #' 
 #' @param depths   Rarefaction depths to show in the plot. Passed to
-#'        \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
-#'        to pick 10 evenly spaced depths.
+#'        \link{adiv_table}. The default, \code{NULL}, uses a heuristic
+#'        to pick optimal depths.
 #' 
 #' @param points   Overlay a scatter plot. Default: \code{FALSE}.
 #'        
-#' @param color.by,facet.by   Metadata column to color and/or facet by. If that
-#'        column is a \code{factor}, the ordering of levels will be maintained 
-#'        in the plot. Default: \code{color.by = NULL, facet.by = NULL}
-#'        
-#' @param colors,facets   Names of the colors and/or facets values to use in
-#'        the plot. Available values for colors are given by \code{colors()}. 
-#'        Use a named character vector to map them to specific factor levels in
-#'        the metadata. \code{facets} are coerced to unnamed character vectors.
-#'        If the length of these vectors is less than the values present in 
-#'        their corresponding metadata column, then the data set will be 
-#'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}
+#' @param color.by,facet.by,limit.by   Metadata columns to use for data 
+#'        partitioning. Default: \code{NULL}
 #' 
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
@@ -64,16 +55,8 @@
 
 rare_multiplot <- function (
     biom, rline = TRUE, metric = "OTUs", depths = NULL, points = FALSE,
-    color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL,
+    color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  metric <- as.vector(validate_metrics(biom, metric, "adiv", multi=TRUE))
-  stopifnot(is.null(depths) || is.numeric(depths))
   
   
   #________________________________________________________
@@ -81,7 +64,9 @@ rare_multiplot <- function (
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  history <- sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot))
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
+  remove(list = setdiff(ls(), c("params", "history")))
   
   
   #________________________________________________________
@@ -112,7 +97,7 @@ rare_multiplot <- function (
   #________________________________________________________
   # Attach history of biom modifications and this call.
   #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return (p)

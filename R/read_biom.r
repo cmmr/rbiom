@@ -112,7 +112,7 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
 
     fp <- tempfile(fileext=".biom")
     on.exit(unlink(fp), add=TRUE)
-    if (!is.null(try(writeChar(src, fp, eos=NULL), silent=TRUE)))
+    if (!is_null(try(writeChar(src, fp, eos=NULL), silent=TRUE)))
         stop(simpleError(sprintf("Cannot write text to file %s", fp)))
 
   } else {
@@ -227,8 +227,8 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   if (!is.character(info[['comment']]))
     info[['comment']] <- NULL
   
-  if (is.null(info[['date']])) {
-    if (!is.null(info[['creation-date']])) {
+  if (is_null(info[['date']])) {
+    if (!is_null(info[['creation-date']])) {
       info[['date']] <- info[['creation-date']]
     } else {
       info[['date']] <- fp_date
@@ -410,7 +410,7 @@ PB.JSON.Metadata <- function (json) {
     vapply(names(json$columns[[1]]$metadata), function (i) {
       sapply(json$columns, function (x) {
         val <- as.character(x[['metadata']][[i]])
-        ifelse(is.null(val), NA_character_, val)
+        ifelse(is_null(val), NA_character_, val)
       })
     }, character(length(json$columns)), USE.NAMES=TRUE)
   )
@@ -457,7 +457,7 @@ PB.HDF5.Metadata <- function (hdf5) {
 PB.JSON.Info <- function (json) {
   info <- list()
   for (i in setdiff(names(json), c("rows", "columns", "data", "phylogeny")))
-    info[[i]] <- if (is.null(unlist(json[[i]]))) NA else unlist(json[[i]])
+    info[[i]] <- if (is_null(unlist(json[[i]]))) NA else unlist(json[[i]])
   return (info)
 }
 
@@ -572,14 +572,14 @@ PB.JSON.Taxonomy <- function (json) {
     taxaNames <- unlist(x$metadata$taxonomy)
     
     # The taxa names aren't where they're supposed to be
-    if (is.null(taxaNames)) {
+    if (is_null(taxaNames)) {
       
       # MicrobiomeDB puts the taxa string in the 'ID' field, e.g, {"metadata":null,"id":"Archaea;Euryarchaeota;...
       if (identical(json[['generated_by']], "MicrobiomeDB")) {
         taxaNames <- x[['id']]
       
       # Decontam omits the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
-      } else if (is.null(names(x$metadata)) && length(x$metadata) == 1) {
+      } else if (is_null(names(x$metadata)) && length(x$metadata) == 1) {
         taxaNames <- unlist(x$metadata[[1]])
         
       } else {
@@ -652,7 +652,7 @@ PB.JSON.Sequences <- function (json) {
   
   ids  <- sapply(json$rows, simplify = "array", function (x) { unlist(x$id) })
   seqs <- sapply(json$rows, simplify = "array", function (x) {
-    if (is.null(x$metadata$sequence)) NA else unlist(x$metadata$sequence)
+    if (is_null(x$metadata$sequence)) NA else unlist(x$metadata$sequence)
   })
   
   res <- setNames(seqs, ids)
@@ -688,7 +688,7 @@ PB.JSON.Tree <- function (json, tree_mode) {
     
   } else if (identical(tree_mode, 'auto')) {
     tree <- unlist(json[['phylogeny']])
-    if (is.null(tree))       return (NULL)
+    if (is_null(tree))       return (NULL)
     if (is.na(tree))         return (NULL)
     if (!is.character(tree)) return (NULL)
     if (!length(tree) == 1)  return (NULL)
@@ -748,7 +748,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
     
     errmsg <- NULL
     
-    if (is.null(tree) || identical(tree, character(0))) {
+    if (is_null(tree) || identical(tree, character(0))) {
       errmsg <- "There is no tree in this BIOM file."
       
     } else if (!length(tree)) {
@@ -766,7 +766,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
       }
     }
     
-    if (!is.null(errmsg)) {
+    if (!is_null(errmsg)) {
       if (identical(tree_mode, TRUE)) stop(errmsg)
       return (NULL)
     }
@@ -834,7 +834,7 @@ PB.TaxaLevelNames <- function (n) {
 #
 # PB.SanitizeTaxonomy <- function (tt, env=NULL) {
 #
-#   if (is.null(env)) env <- parent.frame()
+#   if (is_null(env)) env <- parent.frame()
 #
 #   tt <- sub("^.*?__\ *", "", tt)
 #   tt <- sub("^[a-z]_",   "", tt)

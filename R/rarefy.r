@@ -33,7 +33,6 @@
 #'     range(slam::col_sums(biom$counts))
 #'
 
-
 rarefy <- function (biom, depth=NULL, seed=0) {
   
   
@@ -58,21 +57,10 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   # Choose the rarefaction depth to sample at
   #--------------------------------------------------------------
 
-  if (is.null(depth)) {
+  if (is_null(depth)) {
     
-    if (all(counts$v %% 1 == 0)) {
-      
-      sample_sums <- slam::col_sums(counts)
-      depth       <- (sum(sample_sums) * .1) / length(sample_sums)
-      depth       <- min(sample_sums[sample_sums >= depth])
-      remove("sample_sums")
-      
-    } else {
-      
-      depth <- 10000
-      
-    }
-
+    depth <- default_rarefaction_depth(counts)
+    
   } else {
 
     if (!is(depth, "numeric"))
@@ -151,10 +139,10 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   biom$taxonomy <- biom$taxonomy[TaxaIDs,,drop=FALSE]
   biom$metadata <- biom$metadata[SampleIDs,,drop=FALSE]
 
-  if (!is.null(biom$phylogeny))
+  if (!is_null(biom$phylogeny))
     biom$phylogeny <- rbiom::subtree(biom$phylogeny, TaxaIDs)
   
-  if (!is.null(biom$sequences))
+  if (!is_null(biom$sequences))
     biom$sequences <- biom$sequences[TaxaIDs]
   
   biom$info$shape <- c(length(TaxaIDs), length(SampleIDs))
@@ -194,3 +182,44 @@ rarefy <- function (biom, depth=NULL, seed=0) {
   return (biom)
 
 }
+
+
+#' Pick a 'good' rarefaction depth.
+#'
+#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
+#'        object, as returned from \link{read_biom}. For matrices, the rows and
+#'        columns are assumed to be the taxa and samples, respectively.
+#'     
+#' @return An integer.
+#'
+
+default_rarefaction_depth <- function (biom) {
+  
+  
+  #--------------------------------------------------------------
+  # Get the input into a simple_triplet_matrix
+  #--------------------------------------------------------------
+  if (is(biom, "simple_triplet_matrix")) { counts <- biom
+  } else if (is(biom, "BIOM"))           { counts <- biom$counts
+  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+  } else {
+    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+  }
+  
+  
+  if (all(counts$v %% 1 == 0)) {
+    
+    sample_sums <- slam::col_sums(counts)
+    depth       <- (sum(sample_sums) * .1) / length(sample_sums)
+    depth       <- min(sample_sums[sample_sums >= depth])
+    remove("sample_sums")
+    
+  } else {
+    
+    depth <- 10000
+    
+  }
+  
+  return (as.integer(depth))
+}
+

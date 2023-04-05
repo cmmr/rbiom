@@ -23,6 +23,7 @@ Checks if a phylogenetic tree is present.
 }
 \seealso{
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{depth}()},
 \code{\link{has_sequences}()},

@@ -27,6 +27,7 @@ Set the \code{BIOM} object's metadata.
 }
 \seealso{
 Other setters: 
+\code{\link{comments<-}()},
 \code{\link{counts<-}()},
 \code{\link{id<-}()},
 \code{\link{phylogeny<-}()},

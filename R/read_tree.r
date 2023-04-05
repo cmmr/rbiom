@@ -31,7 +31,7 @@ read_tree <- function (src) {
   errmsg <- "In read_tree(), 'src' must be a character vector of length 1, not"
   
   if (length(src) != 1)      stop(simpleError(paste(errmsg, "length", length(src))))
-  if (is.null(src))          stop(simpleError(paste(errmsg, "value 'NULL'.")))
+  if (is_null(src))          stop(simpleError(paste(errmsg, "value 'NULL'.")))
   if (is.na(src))            stop(simpleError(paste(errmsg, "value 'NA'.")))
   if (!is(src, "character")) stop(simpleError(paste(errmsg, "class", class(src))))
   if (!nchar(src))           stop(simpleError(paste(errmsg, "empty string ''.")))
@@ -113,7 +113,7 @@ read_tree <- function (src) {
   errmsg <- sprintf(errmsg, shortsrc)
   
   if (length(text) != 1)                    stop(simpleError(errmsg))
-  if (is.null(text))                        stop(simpleError(errmsg))
+  if (is_null(text))                        stop(simpleError(errmsg))
   if (is.na(text))                          stop(simpleError(errmsg))
   if (is(text, "error"))                    stop(simpleError(paste(errmsg, text)))
   if (is(text, "try-error"))                stop(simpleError(paste(errmsg, text)))

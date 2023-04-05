@@ -105,7 +105,7 @@ bdiv_table <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, md
       
       # Limit to only within or between comparisons.
       #--------------------------------------------------------------
-      if (!is.null(attr(col, 'op', exact = TRUE))) {
+      if (!is_null(attr(col, 'op', exact = TRUE))) {
         op <- attr(col, 'op', exact = TRUE)
         df <- df[get(op)(map[df$.sample1], map[df$.sample2]),,drop=F]
       }
@@ -143,7 +143,7 @@ bdiv_table <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, md
   if (isFALSE(safe))
     colnames(df)[1:3] <- c("Sample1", "Sample2", "Distance")
   
-  if (!is.null(stat.by)) {
+  if (!is_null(stat.by)) {
     attr(df, 'stats_raw') <- attr(dm, 'stats_raw', exact = TRUE)
     attr(df, 'stats_tbl') <- attr(dm, 'stats_tbl', exact = TRUE)
   }

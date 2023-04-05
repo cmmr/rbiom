@@ -29,6 +29,7 @@ To get the rarefaction level immediately after \code{read_biom()} or
 [sample_sums()]
 
 Other accessors: 
+\code{\link{comments}()},
 \code{\link{counts}()},
 \code{\link{has_phylogeny}()},
 \code{\link{has_sequences}()},

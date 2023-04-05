@@ -7,42 +7,32 @@
 #' @param biom   A BIOM object, as returned from \link{read_biom}.
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
-#'        default, \code{NULL} lumps all samples into a single column. 
+#'        default, \code{NULL}, groups all samples into a single category. 
 #' 
 #' @param metric   Alpha diversity metric(s) to use. Options are: \code{"OTUs"}, 
 #'        \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or 
 #'        \code{"InvSimpson"}. Default: \code{"Shannon"}.
 #'           
-#' @param layers   \code{"box"}, \code{"bar" ("r")}, \code{"violin"}, 
+#' @param layers   \code{"box" ("x")}, \code{"bar"}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
 #'        \code{"linerange"}, and \code{"pointrange"}. Single letter 
 #'        abbreviations are also accepted. For instance, \code{c("box", "dot")} 
-#'        is equivalent to \code{c("b", "d")} and \code{"bd"}.
-#'        Default: \code{"rls"}.
+#'        is equivalent to \code{c("x", "d")} and \code{"xd"}.
+#'        See \code{vignette("boxplots")} for examples of each.
+#'        Default: \code{"lsb"}.
 #'        
-#' @param color.by,pattern.by,shape.by,facet.by   Metadata 
-#'        column to color, pattern, shape, and/or facet by. If 
-#'        that column is a \code{factor}, the ordering of levels will be 
-#'        maintained in the plot.
-#'        
-#' @param colors,patterns,shapes,facets,xvals   Names of the colors, patterns,
-#'        shapes, facets, and/or x values to use in the plot. Available values 
-#'        for colors, patterns, and shapes are given by \code{colors()}, 
-#'        \code{gridpattern::names_magick}, and \code{0:25},
-#'        respectively. Use a named character vector to map them to specific
-#'        factor levels in the metadata. \code{facets} and \code{xvals} are
-#'        coerced to unnamed character vectors. If the length of these vectors
-#'        is less than the values present in their corresponding metadata 
-#'        column, then the data set will be subseted accordingly.
+#' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
+#'        use for aesthetics and partitioning. See below for details.
+#'        Default: \code{NULL}
 #'
 #' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
 #'        Run \code{p.adjust.methods} for a list of available options.
 #'        (Default: \code{fdr})
 #'        
 #' @param p.label   Minimum adjusted p-value to display on the plot with a 
-#'        bracket, for example \code{p.label = 0.05}.
-#'        Some special cases are:
+#'        bracket.
 #'        \itemize{
+#'          \item{\code{p.label = 0.05} - }{ Use this specific value. }
 #'          \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
 #'          \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
 #'          \item{\code{p.label = Inf} - }{ display all p-values }
@@ -84,13 +74,68 @@
 #' @return A \code{ggplot2} plot. The computed data points and statistics will 
 #'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
 #'         respectively.
-#'         
-#' Shapes can also be given as their string values, defined in pch_table here:
-#' https://github.com/tidyverse/ggplot2/blob/master/R/geom-point.r . Note that
-#' some shapes have a colored outline given by `color`, some are filled with 
-#' `color`, and some are outlined in `color` and filled with `fill`. See
-#' https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ for details.
 #' 
+#' 
+#' @section Aesthetics and Partitions:
+#' 
+#' Metadata can be used to flexibly subset, partition, and apply aesthetics 
+#' when creating a plot. Common use cases are provided below. More thorough 
+#' documentation is available at \url{https://cmmr.github.io/rbiom}.
+#' 
+#' 
+#' \preformatted{  ## Colors ----------------------------
+#'   color.by = "Body Site"
+#'   color.by = list('Body Site' = "bright")
+#'   color.by = list('Body Site' = c("Stool", "Saliva"))
+#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'palette' = "bright"))
+#'   color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+#'   
+#'   ## Patterns --------------------------
+#'   pattern.by = "Body Site"
+#'   pattern.by = list('Body Site' = c("Stool", "Saliva"))
+#'   pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
+#'   
+#'   ## Shapes ----------------------------
+#'   shape.by = "Body Site"
+#'   shape.by = list('Body Site' = c("Stool", "Saliva"))
+#'   shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
+#'   
+#'   ## Facets ----------------------------
+#'   facet.by = "Body Site"
+#'   facet.by = c("Body Site", "Sex")
+#'   facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+#'   
+#'   ## Limits ----------------------------
+#'   limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+#'   limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+#' }
+#' 
+#' \itemize{
+#'   \item{\code{color.by} - }{A categorical metadata column. (Max 1)}
+#'   \item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
+#'   \item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
+#'   \item{\code{facet.by} - }{Categorical metadata column(s) only.}
+#'   \item{\code{limit.by} - }{Any metadata column(s).}
+#' }
+#' 
+#' All built-in color palettes are colorblind-friendly. The available 
+#' categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
+#' \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
+#' \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+#' \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+#' 
+#' Patterns are sourced from the magick R package. Pattern names are: 
+#' \code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"}, 
+#' \code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"}, 
+#' \code{"checkerboard"}, \code{"octagons"}, \code{"right45"}, 
+#' \code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"}, 
+#' \code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"}, 
+#' \code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"}, 
+#' \code{"verticalleftshingle"}, and \code{"verticalrightshingle"}.
+#' 
+#' Shapes can be given as per base R - numbers 0 through 17 for various shapes,
+#' or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use 
+#' letters instead of shapes on the plot. Character strings may used as well.
 #' 
 #' @export
 #' @seealso \code{\link{stats_table}}
@@ -105,40 +150,41 @@
 #'     
 
 adiv_boxplot <- function (
-    biom, x = NULL, metric = "Shannon", layers = "rls",
-    color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, 
-    xvals = NULL, colors = NULL, patterns = NULL, shapes = NULL, facets = NULL, 
+    biom, x = NULL, metric = "Shannon", layers = "lsb",
+    color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
   
   
-  # Sanity checks
+  
   #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  if (!(is.null(x) || all(x %in% c(".", metrics(biom, 'meta')))))
-    stop("`x` argument to adiv_boxplot must be metadata column name(s), '.', or NULL")
-  if (!all(metric %in% metrics(biom, 'adiv')))
-    stop(
-      "`metric` argument to adiv_boxplot must be alpha diversity metric name(s): ", 
-      paste(collapse = ", ", metrics(biom, 'adiv')) )
-  
-  
-  # Use the generalized boxplot function to make the plot
+  # Record the function call in a human-readable format.
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  history <- sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot))
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
+  remove(list = setdiff(ls(), c("params", "history")))
   
-  if (is.null(x) || identical(x, '.')) {
-    params[['x']] <- ".all"
-    params[['biom']][['metadata']][[".all"]] <- "all"
-  }
   
+  #________________________________________________________
+  # Sanity checks. x and *.by are checked by boxplot_build.
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+  })
+  
+  
+  #________________________________________________________
+  # Use the generalized boxplot function to make the plot
+  #________________________________________________________
   p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
   
   
+  #________________________________________________________
   # Attach history of biom modifications and this call
   #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return (p)
@@ -161,40 +207,23 @@ adiv_boxplot_data <- function (params) {
   names(ggdata)[which(names(ggdata) == ".value")] <- ".y"
   
   
-  # Allow multiple `x` metadata fields
-  #________________________________________________________
-  xcol <- params[['xval.by']]
-  if (length(xcol) > 1) {
-    
-    ggdata <- plyr::ldply(xcol, function (x) {
-      df <- ggdata
-      df[['.xfield']] <- x
-      df[['.x']]      <- ggdata[[x]]
-      return (df)
-    })
-    ggdata[['.xfield']] %<>% factor(levels = xcol)
-    ggdata[['.x']]      %<>% factor(
-      levels = unique(unlist(sapply(xcol, function (x) {
-        levels(ggdata[[x]])
-      }))))
-    
-    params[['facet.by']] %<>% c(".xfield")
-    params[['xval.by']] <- xcol <- ".x"
-  }
   
-  
-  # Allow multiple `metric` (alpha div metrics)
+  # Always put .metric last in facet.by list.
   #________________________________________________________
-  if (length(params[['metric']]) > 1) {
-    params[['facet.by']] %<>% c(".metric")
-    ggdata[['.metric']]  %<>% factor(levels = params[['metric']])
+  metric <- params[['metric']]
+  if (length(metric) > 1) {
+    facet.by <- setdiff(params[['facet.by']], ".metric")
+    params[['facet.by']] <- c(facet.by, ".metric")
+    ggdata[['.metric']] %<>% factor(levels = metric)
+    remove("facet.by")
   }
+  remove("metric")
   
   
   
   
   attr(ggdata, 'params') <- params
-  attr(ggdata, 'xcol')   <- xcol
+  attr(ggdata, 'xcol')   <- params[['x']]
   attr(ggdata, 'ycol')   <- ".y"
   
   return (ggdata)
@@ -216,6 +245,7 @@ adiv_boxplot_layers <- function (layers) {
       .Data   = "Diversity (\u03B1)", 
       display = '"Diversity (\\u03B1)"' )
     
+    # setLayer("labs", scales = "free_y")
     attr(layers, 'free_y') <- TRUE
     
   } else {

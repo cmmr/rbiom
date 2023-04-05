@@ -6,54 +6,32 @@
 \usage{
 plot_heatmap(
   mtx,
-  colors = "rocket",
-  top_tracks = NULL,
-  left_tracks = NULL,
+  grid = list(label = "Grid Value", colors = "imola"),
+  tracks = NULL,
   label = TRUE,
   label_size = NULL,
-  rescale = NULL,
+  rescale = "none",
   trees = TRUE,
   clust = "complete",
   dist = "euclidean",
   tree_height = NULL,
   track_height = NULL,
   ratio = 1,
-  legend = NULL,
-  colorbar = NULL,
+  legend = "right",
+  xlab.angle = "auto",
   ...
 )
 }
 \arguments{
 \item{mtx}{A numeric \code{matrix} with named rows and columns.}
 
-\item{colors}{A named \code{list()} with names matching \code{".grid"},
-\code{colnames(top_tracks)}, and \code{colnames(left_tracks)}. Values
-in this list should be a \bold{palette} definition (see section below).
-Default: \code{"rocket"}.
+\item{grid}{Color palette name, or a list with entries for \code{label}, 
+\code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
+\code{guide}. See the Track Definitions section for details.
+Default: \code{list(label = "Grid Value", colors = "imola")}.}
 
-For simple cases, a character vector can be given instead of a list. 
-For example, \code{colors = "viridis"} is understood to mean the 
-color palette name for the main grid, and 
-\code{colors = c(Age = "magma", Male = "blue", Female = "red")}
-will apply the magma palette to the Age metadata track, and blue and
-red to the Sex metadata track. The default "rocket" palette will be 
-used for the main grid unless otherwise defined.
-
-To set a custom title in the color scale legend, provide a key 
-prefixed by \code{.} like this:
-
-\code{colors = list(.Abundance = list(palette = "rocket", name = "Grid Value")}.
-
-To reverse the color order in a predefined palette, prepend a hyphen
-to the name, for example \code{"-rocket"}.}
-
-\item{top_tracks}{A \code{data.frame()} with row names matching 
-\code{colnames(mtx)}. Each column will be its own track at the top
-of the plot. Default: \code{NULL}.}
-
-\item{left_tracks}{A \code{data.frame()} with row names matching 
-\code{rownames(mtx)}. Each column will be its own track at the left
-of the plot. Default: \code{NULL}.}
+\item{tracks}{List of track definitions. See details below.
+Default: \code{NULL}.}
 
 \item{label}{Label the matrix rows and columns. You can supply a list
 or logical vector of length two to control row labels and column 
@@ -72,8 +50,8 @@ Default: \code{NULL}, which computes:
 \code{pmax(8, pmin(20, 100 / dim(mtx)))}.}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
-Options: \code{"rows"}, \code{"cols"}, or \code{NULL}.
-Default: \code{NULL} (no rescaling).}
+Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
+Default: \code{"none"}.}
 
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can 
 supply a list or logical vector of length two to control the row tree 
@@ -94,7 +72,7 @@ Options are:
 \itemize{
   \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
   \item{An \link[stats]{hclust} object} { }
-  \item{An \link[stats]{hclust} method name - }{ \code{"ward.D"}, 
+  \item{A method name - }{ \code{"ward.D"}, 
     \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
     \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
     \code{"centroid"}. }
@@ -105,12 +83,12 @@ by similarity. You can supply a list or character vector of length
 two to control the row and column clustering separately, for example 
 \code{dist = c(rows = "euclidean", cols = "maximum")}, or simply 
 \code{dist = c("euclidean", "maximum")}.
-Default: \code{dist = "euclidean"}.
+Default: \code{"euclidean"}.
 
 Options are:
 \itemize{
   \item{A \link[stats]{dist} object} { }
-  \item{A \link[stats]{dist} method name - }{ \code{"euclidean"}, 
+  \item{A method name - }{ \code{"euclidean"}, 
     \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
     \code{"binary"}, or \code{"minkowski"}. }
 }}
@@ -118,14 +96,22 @@ Options are:
 \item{tree_height, track_height}{The height of the dendrogram or annotation
 tracks in multiples (or fractions) of the smaller dimension of the
 grid cell size. Use a numeric vector of length two to assign
-\code{c(left, top)} independently. Default: \code{NULL}, which computes:
+\code{c(left, top)} independently. 
+Default: \code{NULL}, which computes:
 \code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.}
 
-\item{ratio}{Height/width ratio for entire grid.
+\item{ratio}{Height/width ratio for entire grid. 
 Default: \code{1} (square).}
 
 \item{legend}{Where to place the legend. Options are: \code{"right"} or
 \code{"bottom"}. Default: \code{"right"}.}
+
+\item{xlab.angle}{Angle of the labels at the bottom of the plot. 
+Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}. 
+Default: \code{"auto"}.}
+
+\item{...}{Additional arguments to pass on to ggplot2::theme().
+For example, \code{labs.title = "Plot Title"}.}
 }
 \value{
 A \code{ggplot2} plot. The constructed ggplot command will be
@@ -135,78 +121,91 @@ A \code{ggplot2} plot. The constructed ggplot command will be
 \description{
 Create a heatmap with tracks and dendrograms from any matrix.
 }
-\section{Palettes}{
+\section{Track Definitions}{
 
-         A palette can be as simple as the name of a color set, for example:
+
+One or more colored tracks can be placed on the left and/or top of the 
+heatmap grid to visualize associated metadata values.
          
-         \code{colors = "oranges"}
-         
-         You can use any name defined in the \code{paletteer} R package, 
-         which aggregates color sets from a multitude of other R
-         packages including \code{viridis}, \code{RColorBrewer}, and
-         \code{ggpubr}, to name a few.
-         
-         Gradients from the \bold{viridis} and \bold{khroma} packages have
-         good support for colorblindness:   \code{"viridis"}, \code{"magma"}, 
-         \code{"plasma"}, \code{"inferno"}, \code{"cividis"}, \code{"mako"}, 
-         \code{"rocket"}, \code{"turbo"},   \code{"broc"},    \code{"cork"},
-         \code{"vik"},    \code{"lisbon"},  \code{"tofino"},  \code{"berlin"},
-         \code{"roma"},   \code{"turku"},   \code{"vanimo"},  \code{"batlow"},
-         \code{"devon"},  \code{"lajolla"}, \code{"bamako"},  \code{"davos"},
-         \code{"bilbao"}, \code{"nuuk"},    \code{"oslo"},    \code{"grayC"},
-         \code{"hawaii"}, \code{"lapaz"},   \code{"tokyo"},   \code{"buda"},
-         \code{"acton"},  \code{"bam"},  or \code{"imola"}.
-         
-         To assign metadata track colors in addition to grid colors, combine
-         them using a list. Any missing definitions will be auto-assigned.
-         
-         \code{colors = list("oranges", Sex = "wsj_red_green", 'Body Site' = "bugs")}
-         
-         You can also create custom color sets. For categorical data,
-         provide a named character vector of color names. For continuous
-         data, provide an unnamed character vector defining a gradient.
-         
-         \code{colors = list(Sex = list(palette = c('Male' = "blue", 'Female' = "#FF3390")))}
-         
-         \code{colors = list(Age = list(palette = c("azure", "darkblue", "darkorchid")))}
-         
-         You can also use this nested list structure to pass additional 
-         parameters to the underlying ggplot2 \link[ggplot2]{discrete_scale} 
-         or \link[ggplot2]{continuous_scale}, for example: 
-         
-         \code{colors = list(.grid = list(palette = "turbo", n.breaks = 5, 
-         limits = c(0,1), reverse = TRUE, name = "Relative Abundance", 
-         na.value = "grey50")}
-         
-         \itemize{
-           \item{\code{name} - } { The title for this color scale in the legend. }
-           \item{\code{na.value} - }{ The color to use for \code{NA} values. }
-           \item{\code{limits} - }{ The c(min,max) to use for scale values. }
-           \item{\code{n.breaks} - }{ Bin a gradient into this many bins/steps. }
-           \item{\code{reverse} - }{ Reverse the order of colors. }
-         }
+\preformatted{  ## Categorical ----------------------------
+cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
+tracks   = list('Sex' = cat_vals)
+tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
+tracks   = list('Sex' = list(
+  'values' = cat_vals, 
+  'colors' = c('Male' = "blue", 'Female' = "red")) )
+
+## Numeric --------------------------------
+num_vals = sample(25:40, 10, replace = TRUE)
+tracks   = list('Age' = num_vals)
+tracks   = list('Age' = list('values' = num_vals, 'colors' = "greens"))
+tracks   = list('Age' = list('values' = num_vals, 'range' = c(0,50)))
+tracks   = list('Age' = list(
+  'label'  = "Age (Years)",
+  'values' = num_vals, 
+  'colors' = c("azure", "darkblue", "darkorchid") ))
+
+## Multiple Tracks ------------------------
+tracks = list('Sex' = cat_vals, 'Age' = num_vals)
+tracks = list(
+  list('label' = "Sex", values' = cat_vals, 'colors' = "bright"),
+  list('label' = "Age", values' = num_vals, 'colors' = "greens") )
+  
+plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
+}
+
+The following entries in the track definitions are understood: 
+
+\itemize{
+  \item{\code{values} - }{ The metadata values. When unnamed, order must match matrix. }
+  \item{\code{range} - }{ The c(min,max) to use for scale values. }
+  \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
+  \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+  \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+  \item{\code{na.color} - }{ The color to use for \code{NA} values. }
+  \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
+  \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
+}
+
+All built-in color palettes are colorblind-friendly.
+
+Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+
+Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"}, 
+\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"}, 
+\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"}, 
+\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"}, 
+\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"}, 
+\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"}, 
+\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"}, 
+\code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
 }
 
 \examples{
     library(rbiom)
     
     set.seed(123)
-    mtx <- matrix(runif(5*8), nrow = 5)
-    rownames(mtx) <- sample(LETTERS, nrow(mtx))
-    colnames(mtx) <- sample(letters, ncol(mtx))
+    mtx <- matrix(runif(5*8), nrow = 5, dimnames = list(LETTERS[1:5], letters[1:8]))
     
     plot_heatmap(mtx)
-    plot_heatmap(mtx, colors="oranges")
-    plot_heatmap(mtx, colors=list(palette = "oranges", name = "New Label", n.breaks = 5))
+    plot_heatmap(mtx, grid="oranges")
+    plot_heatmap(mtx, grid=list(colors = "oranges", label = "Some \%", bins = 5))
     
-    top_tracks <- data.frame(
-      row.names = colnames(mtx), 
-      'Bool'    = sample(c(TRUE, FALSE), ncol(mtx), TRUE), 
-      'Int'     = sample(1:20,           ncol(mtx), TRUE) )
-    left_tracks <- data.frame(
-      row.names = rownames(mtx),
-      'City'    = sample(names(precip), nrow(mtx)) )
-    plot_heatmap(mtx, top_tracks=top_tracks, left_tracks=left_tracks)
+    tracks <- list(
+      'Number' = sample(1:ncol(mtx)),
+      'Person' = list(
+        values = factor(sample(c("Alice", "Bob"), ncol(mtx), TRUE)),
+        colors = c('Alice' = "purple", 'Bob' = "darkcyan") ),
+      'State' = list(
+        side   = "left",
+        values = sample(c("TX", "OR", "WA"), nrow(mtx), TRUE),
+        colors = "bright" )
+    )
+    
+    plot_heatmap(mtx, tracks=tracks)
     
 }
 \seealso{

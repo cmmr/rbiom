@@ -23,17 +23,8 @@
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
 #'        
-#' @param color.by,facet.by   Metadata column to color and/or facet by. If that
-#'        column is a \code{factor}, the ordering of levels will be maintained 
-#'        in the plot. Default: \code{color.by = NULL, facet.by = NULL}.
-#'        
-#' @param colors,facets   Names of the colors and/or facets values to use in
-#'        the plot. Available values for colors are given by \code{colors()}. 
-#'        Use a named character vector to map them to specific factor levels in
-#'        the metadata. \code{facets} are coerced to unnamed character vectors.
-#'        If the length of these vectors is less than the values present in 
-#'        their corresponding metadata column, then the data set will be 
-#'        subseted accordingly. Default: \code{colors = NULL, facets = NULL}.
+#' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
+#'        and partitioning. See below for details. Default: \code{NULL}
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
 #'        functions. Prefix a parameter name with either \code{p.} or \code{s.}
@@ -48,6 +39,52 @@
 #'         respectively.
 #' 
 #' 
+#' @section Aesthetics and Partitions:
+#' 
+#' Metadata can be used to flexibly subset, partition, and apply aesthetics 
+#' when creating a plot. Common use cases are provided below. More thorough 
+#' documentation is available at \url{https://cmmr.github.io/rbiom}.
+#' 
+#' \preformatted{  ## Colors ----------------------------
+#'   color.by = "Body Site"
+#'   color.by = list('Body Site' = "bright")
+#'   color.by = list('Body Site' = c("Stool", "Saliva"))
+#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'palette' = "bright"))
+#'   color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+#'   
+#'   ## Facets ----------------------------
+#'   facet.by = "Body Site"
+#'   facet.by = c("Body Site", "Sex")
+#'   facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+#'   
+#'   ## Limits ----------------------------
+#'   limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+#'   limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+#' }
+#' 
+#' \itemize{
+#'   \item{\code{color.by} - }{Any metadata column. (Max 1)}
+#'   \item{\code{facet.by} - }{Only categorical metadata column(s).}
+#'   \item{\code{limit.by} - }{Any metadata column(s).}
+#' }
+#' 
+#' All built-in color palettes are colorblind-friendly.
+#' 
+#' The available categorical palette names are: \code{"okabe"}, \code{"carto"}, 
+#' \code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"}, 
+#' \code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, 
+#' \code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, 
+#' and \code{"fishy"}.
+#' 
+#' The available numeric palette names are: \code{"reds"}, \code{"oranges"}, 
+#' \code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"}, 
+#' \code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, 
+#' \code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"}, 
+#' \code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, 
+#' \code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"}, 
+#' \code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"}, 
+#' \code{"roma"}, \code{"tofino"}, \code{"vanimo"}, \code{"vik"}
+#'  
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -57,17 +94,7 @@
 
 adiv_corrplot <- function (
     biom, x, metric = "OTUs", points = FALSE, model = "linear", ci = 95, 
-    color.by = NULL, facet.by = NULL, colors = NULL, facets = NULL, ...) {
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  metric <- as.vector(validate_metrics(biom, metric, "adiv", multi=TRUE))
-  x <- validate_metrics(biom, x, "meta")
-  stopifnot(identical(attr(x, 'mode', exact = TRUE), "numeric"))
-  x <- as.vector(x)
+    color.by = NULL, facet.by = NULL, limit.by = NULL, ...) {
   
   
   #________________________________________________________
@@ -75,40 +102,49 @@ adiv_corrplot <- function (
   #________________________________________________________
   params <- c(as.list(environment()), list(...))
   params[['...']] <- NULL
-  history <- sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot))
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
+  remove(list = setdiff(ls(), c("params", "history")))
   
   
   #________________________________________________________
-  # Subset the biom file.
+  # Sanity checks
   #________________________________________________________
-  for (i in c("color", "facet")) {
-    key <- get(paste0(i, ".by"))
-    val <- get(paste0(i, "s"))
-    if (!is.null(key) && !is.null(val))
-      biom <- subset(
-        biom = biom,
-        expr = a %in% b,
-        env  = list(a = as.name(key), b = val),
-        fast = TRUE )
-  }
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+  })
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    x        = list(n = 1, col_type = "num"),
+    color.by = list(n = c(0, 1)),
+    facet.by = list(n = c(0, Inf), col_type = "cat"),
+    limit.by = list(n = c(0, Inf)) ))
   
   
   #________________________________________________________
   # Compute alpha diversity values.
   #________________________________________________________
   data <- adiv_table(
-    biom    = biom,
-    metrics = metric,
+    biom    = params[['biom']],
+    metrics = params[['metric']],
     long    = TRUE,
-    md      = unique(c(x, color.by, facet.by)), 
+    md      = unique(c(
+      params[['x']], 
+      names(params[['color.by']]), 
+      params[['facet.by']] )), 
     safe    = TRUE )
   
   
   #________________________________________________________
   # Facet by metric when there's more than one.
   #________________________________________________________
-  if (length(metric) > 1)
-    params[['facet.by']] <- unique(c(facet.by, ".metric"))
+  if (length(params[['metric']]) > 1)
+    params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
   
   
   #________________________________________________________
@@ -119,35 +155,36 @@ adiv_corrplot <- function (
     'data'     = data,
     'params'   = params,
     'function' = adiv_corrplot,
-    'xcol'     = x,
+    'xcol'     = params[['x']],
     'ycol'     = ".value",
     'xmode'    = "numeric" )
   
   initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-  if (isTRUE(points)) initLayer('point')
+  
+  if (!is_null(params[['color.by']])) initLayer("color")
+  if (isTRUE(params[['points']]))     initLayer("point")
   
   
   #________________________________________________________
   # Add default layer parameters.
   #________________________________________________________
-  setLayer("ggplot", mapping = list(x = x, y = ".value"))
-  setLayer("labs", x = x, y = local({
-    ylab <- ifelse(length(metric) == 1, metric, "Diversity")
-    if (!is_rarefied(biom)) ylab %<>% paste("[UNRAREFIED]")
+  setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
+  setLayer("labs", x = params[['x']], y = local({
+    ylab <- params[['metric']]
+    if (length(params[['metric']] > 1)) ylab <- "Diversity"
+    if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
     return (ylab) }))
-  if (length(metric) > 1) setLayer("facet", scales = "free_y")
+  if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
   
   
   
   
+  #________________________________________________________
   # Convert layer definitions into a plot.
   #________________________________________________________
   p <- corrplot_build(layers)
   
-  
-  # Attach history of biom modifications and this call.
-  #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(p, 'history') <- history
   
   
   return (p)

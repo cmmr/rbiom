@@ -33,7 +33,7 @@ init_cache <- function (cm = 50 * 1024^2, ...) {
     return(warning("rbiom is already memoised.\n"))
   
   if (is.numeric(cm)) cm <- cachem::cache_mem(max_size = cm, ...)
-  if (is.null(cm))    cm <- cachem::cache_mem(...)
+  if (is_null(cm))    cm <- cachem::cache_mem(...)
   
   fnList <- c(
     "adiv_boxplot", "adiv_table", "as_percent", "apcoa", "bdply", 

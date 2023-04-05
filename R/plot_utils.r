@@ -13,7 +13,7 @@
   
   assign(
     x     = .lhs_str, 
-    value = if (is.null(.lhs)) .rhs else .lhs, 
+    value = if (is_null(.lhs)) .rhs else .lhs, 
     envir = .lhs_env )
 }
 
@@ -26,9 +26,9 @@
 #____________________________________________________________________
 layer_match <- function (x, choices, default) {
   
-  if (is.null(default))        default        <- choices[[1]]
-  if (is.null(x))              x              <- default 
-  # if (is.null(names(choices))) names(choices) <- unlist(substr(choices, 1, 1))
+  if (is_null(default))        default        <- choices[[1]]
+  if (is_null(x))              x              <- default 
+  # if (is_null(names(choices))) names(choices) <- unlist(substr(choices, 1, 1))
   
   x <- x[nchar(x) > 0]
   if (length(x) == 0) return (default)
@@ -41,7 +41,7 @@ layer_match <- function (x, choices, default) {
     x <- vals[pmatch(x, tolower(vals))] # c("d", "bar") => c("dot", "bar")
     
   } else if (nchar(x) == 1) {
-    if (is.null(names(choices))) {
+    if (is_null(names(choices))) {
       x <- vals[pmatch(x, tolower(vals))]
     } else {
       x <- unname(choices[x])  # "r" => "bar"
@@ -50,7 +50,7 @@ layer_match <- function (x, choices, default) {
   } else if (is.na(pmatch(x, tolower(vals)))) {
     x <- strsplit(x, '')[[1]]
     
-    if (is.null(names(choices))) {
+    if (is_null(names(choices))) {
       x <- vals[pmatch(x, tolower(vals))]
     } else {
       x <- unname(choices[x]) # "dr" => c("dot", "bar")
@@ -75,7 +75,7 @@ layer_match <- function (x, choices, default) {
 #____________________________________________________________________
 as.args <- function (args = list(), indent = 0, fun = NULL) {
   
-  stopifnot(is.list(args))
+  stopifnot(is_list(args))
   stopifnot(is.numeric(indent))
   
   
@@ -86,7 +86,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   
   # Re-arrange parameter order; omit names where implicitly known; ignore if default.
-  if (is.function(fun) && !is.null(names(args))) {
+  if (is.function(fun) && !is_null(names(args))) {
     f_args <- formals(fun)
     
     for (i in names(args))
@@ -102,7 +102,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   # Right-pad parameter names.
   fmt <- "%s = %s"
-  if (isTRUE(indent > 0 && length(args) > 1 && !is.null(names(args))))
+  if (isTRUE(indent > 0 && length(args) > 1 && !is_null(names(args))))
     fmt <- paste(collapse="", rep(" ", indent)) %>%
     paste0("\n", ., "%-", max(nchar(names(args))), "s = %s")
   
@@ -110,16 +110,17 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   strs <- c()
   for (i in seq_along(args)) {
     
-    key <- if (is.null(names(args))) '' else names(args)[[i]]
+    key <- if (is_null(names(args))) '' else names(args)[[i]]
     val <- args[[i]]
     
     display <- attr(val, 'display', exact = TRUE)
     
-    val <- if (is.null(val))        { "NULL"
-    } else if (!is.null(display))   { display
+    val <- if (is_null(val))        { "NULL"
+    } else if (!is_null(display))   { display
     } else if (is.character(val))   { glue::double_quote(val) 
     } else if (is.logical(val))     { as.character(val) %>% setNames(names(val))
     } else if (is.numeric(val))     { as.character(val) %>% setNames(names(val))
+    } else if (is(val, 'quosures')) { as.character(val)
     } else if (is(val, 'BIOM'))     { "biom"
     } else if (is.data.frame(val))  { "data"
     } else if (is(val, 'formula'))  { capture.output(val)[[1]]
@@ -129,7 +130,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     } else                          { capture.output(val) }
     
     
-    if (isTRUE(is.character(val) && !is.null(names(val))))
+    if (isTRUE(is.character(val) && !is_null(names(val))))
       val <- paste(glue::single_quote(names(val)), "=", unname(val))
     
     if (length(val) > 1)
@@ -158,7 +159,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
 fun_toString <- function (x) {
   
   pkg <- environment(x)[['.packageName']]
-  if (!is.null(pkg))
+  if (!is_null(pkg))
     for (fn in getNamespaceExports(pkg))
       if (identical(x, do.call(`::`, list(pkg, fn)))) {
         if (!pkg %in% getOption("defaultPackages"))
@@ -228,17 +229,17 @@ append_df <- function (...) {
 #____________________________________________________________________
 drop_cols <- function (df, ...) {
   cols <- unlist(list(...))
-  if (is.null(cols) || is.null(df)) return (df)
+  if (is_null(cols) || is_null(df)) return (df)
   df[,setdiff(colnames(df), cols),drop=FALSE]
 }
 drop_empty <- function (df) {
-  if (is.null(df))   return (NULL)
+  if (is_null(df))   return (NULL)
   if (nrow(df) == 0) return (df)
   df[,apply(df, 2L, function (x) !all(is.na(x))),drop=FALSE]
 }
 keep_cols <- function (df, ...) {
   cols <- unlist(list(...))
-  if (is.null(cols) || is.null(df)) return (NULL)
+  if (is_null(cols) || is_null(df)) return (NULL)
   df[,intersect(colnames(df), cols),drop=FALSE]
 }
 rename_cols <- function(df, ...) {
@@ -292,8 +293,8 @@ ply_cols <- function (cols) {
 #____________________________________________________________________
 insert_col <- function (df, after=0, col, val) {
   
-  if (is.null(df))                  return (NULL)
-  if (is.null(col) || is.null(val)) return (df)
+  if (is_null(df))                  return (NULL)
+  if (is_null(col) || is_null(val)) return (df)
   
   df <- cbind(df, val)
   colnames(df)[ncol(df)] <- col
@@ -316,7 +317,7 @@ insert_col <- function (df, after=0, col, val) {
 # Explicitly define the code to be displayed in cmd
 #____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
-  if (is.null(env)) {
+  if (is_null(env)) {
     expr <- substitute(expr)
     cmd  <- capture.output(expr)
   } else {
@@ -342,12 +343,12 @@ finite_check <- function (df, col=".y", metric=NULL) {
   bad <- which(!is.finite(df[[col]]))
   n   <- length(bad)
   
-  if (is.null(metric))
+  if (is_null(metric))
     if (".metric" %in% names(df))
       if (length(unique(df[['.metric']])) == 1)
         metric <- df[1,'.metric']
   
-  metric <- ifelse(is.null(metric), "", paste0(metric, " "))
+  metric <- ifelse(is_null(metric), "", paste0(metric, " "))
   msg    <- ifelse(n == 1, 
                    paste0("One sample had a non-finite ", metric, "value and was excluded from this plot:\n"),
                    paste0(n, " samples had non-finite ", metric, "values and were excluded from this plot:\n") )
@@ -422,7 +423,7 @@ qw <- function (...) {
 #____________________________________________________________________
 all.null <- function (...) {
   for (i in list(...))
-    if (!is.null(i))
+    if (!is_null(i))
       return (FALSE)
   return (TRUE)
 }
@@ -432,7 +433,7 @@ all.null <- function (...) {
 #____________________________________________________________________
 any.null <- function (...) {
   for (i in list(...))
-    if (is.null(i))
+    if (is_null(i))
       return (TRUE)
   return (FALSE)
 }
@@ -454,7 +455,7 @@ if.na <- function (x, replacement) {
 # Shorthand for replacing NULLs with something else.
 #____________________________________________________________________
 if.null <- function (x, replacement) {
-  if (!is.null(x))               return (x)
+  if (!is_null(x))               return (x)
   if (!is.function(replacement)) return (replacement)
   return (replacement())
 }
