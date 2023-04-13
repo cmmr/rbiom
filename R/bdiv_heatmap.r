@@ -179,6 +179,7 @@ bdiv_heatmap <- function (
     stopifnot(is_scalar_logical(weighted))
     metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf))
     
+    if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
     if (length(order.by) > 0) clust <- FALSE
   })
   

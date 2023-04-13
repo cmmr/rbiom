@@ -61,9 +61,10 @@ taxa_heatmap <- function (
   #________________________________________________________
   params %<>% within({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_character(taxa) || is_scalar_double(taxa))
+    stopifnot(is_scalar_atomic(taxa))
     rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
     
+    if (!is_list(grid)) grid <- list(label = "{rank} Abundance", colors = grid)
     if (length(clust)    < 1) clust <- "complete"
     if (length(order.by) > 0) clust <- c(clust[[1]], NA)
   })

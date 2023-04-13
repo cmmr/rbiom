@@ -126,6 +126,7 @@ importFrom("rlang",
            "%||%", "enquo", "quo_name", "get_env", 
            "is_na", "is_null", "is_empty", "is_list",
            "is_true", "is_false", "is_logical", "is_scalar_logical", 
+           "is_atomic", "is_scalar_atomic",
            "is_character", "is_scalar_character", "is_string", 
            "is_integerish", "is_scalar_integerish", 
            "is_double", "is_scalar_double")

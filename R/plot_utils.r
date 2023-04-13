@@ -76,7 +76,7 @@ layer_match <- function (x, choices, default) {
 as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   stopifnot(is_list(args))
-  stopifnot(is.numeric(indent))
+  stopifnot(is_integerish(indent))
   
   
   # Discard arguments with `display = FALSE` attribute.
@@ -117,8 +117,8 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     
     val <- if (is_null(val))        { "NULL"
     } else if (!is_null(display))   { display
-    } else if (is.character(val))   { glue::double_quote(val) 
-    } else if (is.logical(val))     { as.character(val) %>% setNames(names(val))
+    } else if (is_character(val))   { glue::double_quote(val) 
+    } else if (is_logical(val))     { as.character(val) %>% setNames(names(val))
     } else if (is.numeric(val))     { as.character(val) %>% setNames(names(val))
     } else if (is(val, 'quosures')) { as.character(val)
     } else if (is(val, 'BIOM'))     { "biom"
@@ -127,10 +127,11 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     } else if (is.function(val))    { fun_toString(val)
     } else if (is(val, 'uneval'))   { aes_toString(val)
     } else if (is.factor(val))      { as.character(val) %>% setNames(names(val))
+    } else if (is_list(val))        { paste0("list(", as.args(val), ")")
     } else                          { capture.output(val) }
     
     
-    if (isTRUE(is.character(val) && !is_null(names(val))))
+    if (isTRUE(is_character(val) && !is_null(names(val))))
       val <- paste(glue::single_quote(names(val)), "=", unname(val))
     
     if (length(val) > 1)

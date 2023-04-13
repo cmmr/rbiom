@@ -87,7 +87,7 @@
 #'   color.by = "Body Site"
 #'   color.by = list('Body Site' = "bright")
 #'   color.by = list('Body Site' = c("Stool", "Saliva"))
-#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'palette' = "bright"))
+#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
 #'   color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
 #'   
 #'   ## Patterns --------------------------

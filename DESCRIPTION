@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9084
+Version: 1.0.3.9085
 Date: 2023-04-04
 Authors@R:
     person("Daniel P.", "Smith", 

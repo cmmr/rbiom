@@ -38,6 +38,8 @@ metadata_params <- function (params, contraints = list()) {
   
   get_col_type <- function (col_name) {
     
+    col_name <- sub("^([!=]=|\\-)", "", col_name)
+    
     if (!hasName(md, col_name))    return (NULL)
     if (is.factor(md[[col_name]])) return ("cat")
     
@@ -73,85 +75,91 @@ metadata_params <- function (params, contraints = list()) {
       result   <- list()
       col_name <- names(params[[param]][i])
       col_spec <- params[[param]][[i]]
+      col_type <- NULL
       
       
-      if (identical(col_name, ""))  { col_name           <- col_spec 
-      } else if (is_null(col_name)) { col_name           <- col_spec 
-      } else if (is_list(col_spec)) { result             <- col_spec
-      } else                        { result[['values']] <- col_spec }
+      if (identical(col_name, "") || is_null(col_name)) {
+        
+        col_name <- col_spec
+        col_type <- get_col_type(col_name)
+        
+      } else {
+        
+        col_type <- get_col_type(col_name)
+        
+        if (is_list(col_spec))           { result             <- col_spec
+        } else if (is_palette(col_spec)) { result[['colors']] <- col_spec
+        } else if (col_type == "num")    { result[['range']]  <- col_spec
+        } else                           { result[['values']] <- col_spec }
+      }
       
       
-      col_name <- as.vector(unlist(col_name))
-      prefix   <- substr(col_name, 1, 2)
-      col_name <- sub("^([!=]=|\\-)", "", col_name)
-      col_type <- get_col_type(col_name)
-      values   <- unlist(result[['values']])
+      stopifnot(is_scalar_character(col_name))
       
-      md_revs[[col_name]] <- identical(prefix, "-")
       
-      if (!hasName(md_cmps, col_name)) md_cmps[[col_name]] <- ""
-      if (identical(prefix, "=="))     md_cmps[[col_name]] <- "=="
-      if (identical(prefix, "!="))     md_cmps[[col_name]] <- "!="
-      remove("prefix")
+      # Reverse sort any columns prefixed with a '-'.
+      if (identical(param, 'order.by')) {
+        prefixed <- startsWith(col_name, "-")
+        col_name <- sub("^\\-", "", col_name)
+        md_revs[[col_name]] <- prefixed
+        remove("prefixed")
+      }
+      
+      
+      # For bdiv_boxplot, hande within/between/all comparisons.
+      if (isTRUE(params[['.cmp']])) {
+        prefix   <- substr(col_name, 1, 2)
+        col_name <- sub("^[!=]=", "", col_name)
+        if (!hasName(md_cmps, col_name)) md_cmps[[col_name]] <- ""
+        if (identical(prefix, "=="))     md_cmps[[col_name]] <- "=="
+        if (identical(prefix, "!="))     md_cmps[[col_name]] <- "!="
+        remove("prefix")
+      }
+      
+      
+      
+      if (hasName(result, 'range')) {
+        
+        if (!identical(col_type, "num"))
+          stop ("Can't apply `range` to non-numeric '", col_name, "' column.")
+        
+        if (!is.numeric(result[['range']]))
+          stop ("Argument for '", col_name, "' `range` must be numeric.")
+        
+        
+        result[['range']] <- range(result[['range']])
+        new_md[which(md[[col_name]] < result[['range']][[1]]), col_name] <- NA
+        new_md[which(md[[col_name]] > result[['range']][[2]]), col_name] <- NA
+        
+        
+      } else if (identical(col_type, "cat") && hasName(result, 'values')) {
+        
+        values <- result[['values']]
+        
+        if (!identical(col_type, "cat"))
+          stop ("Can't filter by `values` on non-categorical '", col_name, "' column.")
+        
+        if (!is.character(values))
+          stop ("Values for '", col_name, "' must be a character vector.")
+        
+        
+        if (is_null(names(values))) { # c("Saliva", "Stool")
+          values <- intersect(values, levels(md[[col_name]]))
+          result[['values']] <- NULL
+          
+        } else { # c("Saliva" = "blue", "Stool" = "orange")
+          values <- intersect(names(values), levels(md[[col_name]]))
+          result[['values']] <- result[['values']][values]
+        }
+        
+        new_md[[col_name]] %<>% factor(levels=values)
+        remove("values")
+      }
+      
       
       
       if (param %in% group_params)   group_by %<>% c(col_name)
       if (hasName(new_md, col_name)) md_cols  %<>% c(col_name)
-      
-      
-      if (!is_null(values)) {
-        
-        if (identical(col_type, "num")) {
-          
-          if (length(values) == 2 && is.numeric(values)) {
-            
-            new_md[which(md[[col_name]] < min(values)), col_name] <- NA
-            new_md[which(md[[col_name]] > max(values)), col_name] <- NA
-            result[['limits']] <- sort(values)
-            result[['values']] <- NULL
-            
-          }
-          
-        } else if (identical(col_type, "cat")) {
-          col_vals <- levels(md[[col_name]])
-          
-          if (is_null(names(values))) {
-            
-            if (all(values %in% col_vals)) {
-              
-              # list('Body Site' = c("Saliva", "Stool"))
-              values %<>% intersect(levels(new_md[[col_name]]))
-              new_md[[col_name]] %<>% factor(levels=values)
-              result[['values']] <- NULL
-              
-            } else if (param == "color.by" && length(values) == 1) {
-              
-              # list('Body Site' = "okabe")
-              result[['values']] <- get_palette(values)
-            }
-            
-          } else {
-            # list('Body Site' = c("Saliva" = "blue", "Stool" = "orange"))
-            new_md[[col_name]] %<>% factor(levels=names(values))
-          }
-          
-        }
-        
-      }
-      
-      
-      if (hasName(result, "limits") && identical(col_type, "num")) {
-        
-        limits <- result[["limits"]]
-        
-        if (length(limits) == 2 && is.numeric(limits)){
-          limits %<>% sort()
-          new_md[which(md[[col_name]] < limits[[1]]), col_name] <- NA
-          new_md[which(md[[col_name]] > limits[[2]]), col_name] <- NA
-          result[["limits"]] <- limits
-        }
-        remove("limits")
-      }
       
       results[[col_name]] <- result
     }
@@ -224,16 +232,21 @@ metadata_params <- function (params, contraints = list()) {
         
         if (is_null(values))
           values <- switch(param,
-            "color.by"   = get_n_colors(n),
+            "color.by"   = get_n_colors(n, result[['colors']]),
             "shape.by"   = get_n_shapes(n),
             "pattern.by" = get_n_patterns(n) )
         
         
         if (!is_null(names(values)))
           values <- values[col_vals]
+        
+        
+      } else if (identical(col_type, "num")) {
+        if (hasName(result, 'colors')) values <- result[['colors']]
+        if (is_palette(values))        values %<>% get_palette()
       }
       
-      
+      result[['colors']]   <- NULL
       result[['values']]   <- values
       params[[param]][[i]] <- result
     }
