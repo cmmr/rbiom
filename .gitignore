@@ -4,7 +4,7 @@
 .Ruserdata
 .vignettes
 rbiom.Rproj
-docker.sh
+install.sh
 src/*.o
 src/*.so
 src/*.dll
