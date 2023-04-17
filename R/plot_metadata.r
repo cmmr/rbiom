@@ -1,25 +1,24 @@
 
 
 #________________________________________________________
-# Examples values for color.by:
-# 
-# "Body Site"
-# c("Body Site" = "okabe")
-# list("Body Site")
-# list("Body Site" = "okabe")
-# list("Body Site" = list(values = "okabe", name = "Swab Location"))
-# list("Body Site" = list(values = c("red", "green", "blue"), name = "Swab Location"))
-# list("Body Site" = list(values = c(Saliva = "red", Stool = "green"), name = "Swab Location"))
-# 
-# 
-# c("Body Site", "Sex")
-# c("Body Site" = "okabe", "Sex")
-# c("Body Site" = "okabe", "Sex" = "muted")
-# list("Body Site", "Sex")
-# 
-#________________________________________________________
-# Convert all *.by params into long form.
-#________________________________________________________
+#' Convert all *.by params into long form.
+#'
+#' Examples values for color.by:
+#' 
+#' "Body Site"
+#' c("Body Site" = "okabe")
+#' list("Body Site")
+#' list("Body Site" = "okabe")
+#' list("Body Site" = list(values = "okabe", name = "Swab Location"))
+#' list("Body Site" = list(values = c("red", "green", "blue"), name = "Swab Location"))
+#' list("Body Site" = list(values = c(Saliva = "red", Stool = "green"), name = "Swab Location"))
+#' 
+#' 
+#' c("Body Site", "Sex")
+#' c("Body Site" = "okabe", "Sex")
+#' c("Body Site" = "okabe", "Sex" = "muted")
+#' list("Body Site", "Sex")
+#' 
 metadata_params <- function (params, contraints = list()) {
   
   
@@ -54,6 +53,7 @@ metadata_params <- function (params, contraints = list()) {
   
   
   
+  #________________________________________________________
   # Tracks which metadata columns are used.
   #________________________________________________________
   md_params <- intersect(by_params, names(params))
@@ -64,6 +64,7 @@ metadata_params <- function (params, contraints = list()) {
   
   
   
+  #________________________________________________________
   # Standardize the data structure for metadata specs.
   #________________________________________________________
   for (param in md_params) {
@@ -98,6 +99,7 @@ metadata_params <- function (params, contraints = list()) {
       
       
       # Reverse sort any columns prefixed with a '-'.
+      #________________________________________________________
       if (identical(param, 'order.by')) {
         prefixed <- startsWith(col_name, "-")
         col_name <- sub("^\\-", "", col_name)
@@ -107,6 +109,7 @@ metadata_params <- function (params, contraints = list()) {
       
       
       # For bdiv_boxplot, hande within/between/all comparisons.
+      #________________________________________________________
       if (isTRUE(params[['.cmp']])) {
         prefix   <- substr(col_name, 1, 2)
         col_name <- sub("^[!=]=", "", col_name)
@@ -139,7 +142,7 @@ metadata_params <- function (params, contraints = list()) {
         if (!identical(col_type, "cat"))
           stop ("Can't filter by `values` on non-categorical '", col_name, "' column.")
         
-        if (!is.character(values))
+        if (!is.character(values) && !identical(param, "shape.by"))
           stop ("Values for '", col_name, "' must be a character vector.")
         
         

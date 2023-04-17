@@ -252,8 +252,8 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   # Clean up taxa names and metadata column classes.
   #--------------------------------------------------------------
   if (isTRUE(cleanup)) {
-    biom[['taxonomy']] <- rbiom::taxonomy(biom, fix.names = TRUE)
-    biom[['metadata']] <- rbiom::metadata(biom, cleanup   = TRUE)
+    biom[['taxonomy']] <- rbiom::taxonomy(biom, unc     = "grouped")
+    biom[['metadata']] <- rbiom::metadata(biom, cleanup = TRUE)
   }
   
   #--------------------------------------------------------------

@@ -50,7 +50,7 @@ docker build -t cmmr/rbiom --no-cache - >build_log.txt 2>&1 <<-"EOF"
 	 RUN R -e "remotes::install_github('cmmr/rbiom', upgrade = 'never')"    \
 	                                                                        \
 	  && R -e "remotes::install_github('cmmr/wrapt', upgrade = 'never',     \
-	    auth_token = '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')"           \
+	    auth_token = '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')"           \
 	                                                                        \
 	  && mkdir -p /cmmr/bin                                                 \
 	  && ln -s /usr/bin/Rscript /cmmr/bin                                   \

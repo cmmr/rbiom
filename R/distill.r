@@ -104,7 +104,7 @@ distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE,
     
       if (identical(taxa_in, "cols")) {
         # Don't duplicate metadata columns
-        df <- cbind(df, x[,sort(unique(taxonomy(biom, rank))),drop=F])
+        df <- cbind(df, x[,sort(unique(taxonomy(biom, rank)[,1])),drop=F])
         
       } else {
         df      <- rbind(df, x)

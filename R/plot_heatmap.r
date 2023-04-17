@@ -412,6 +412,9 @@ plot_heatmap <- function (
       trees_cols <- dendro(hc, bounds, side = "top")
     }
     remove("dm", "hc")
+    
+  } else {
+    trees_cols <- FALSE
   }
   
   if (!isFALSE(clust_rows) && !is.na(clust_rows)) {
@@ -431,6 +434,9 @@ plot_heatmap <- function (
       trees_rows <- dendro(hc, bounds, side = "left")
     }
     remove("dm", "hc")
+    
+  } else {
+    trees_rows <- FALSE
   }
   
   all_trees <- rbind(
@@ -672,7 +678,6 @@ plot_heatmap <- function (
   gglayers %<>% ggpush(do.call(theme, c(args, .indent = 4)))
   
   remove("args")
-  
   p <- ggbuild(gglayers)
   p$plot_env <- emptyenv()
   

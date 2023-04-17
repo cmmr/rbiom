@@ -102,14 +102,16 @@ validate_arg <- function (
 
 
 
-#===============================================
-# Cleanup dynamic options that we can recognize
-#===============================================
+#' Cleanup dynamic options that we can recognize
+#' 
+#' @name validate_metrics
+#'     
 validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE, ...) {
   
-  #-----------------------------------------------
+  
+  #________________________________________________________
   # Return a list of recognized options
-  #-----------------------------------------------
+  #________________________________________________________
   ord_metrics   <- function (biom, ...) metrics(biom, 'ord',   ...)
   adiv_metrics  <- function (biom, ...) metrics(biom, 'adiv',  ...) %>% c("Depth")
   bdiv_metrics  <- function (biom, ...) metrics(biom, 'bdiv',  ...)
@@ -153,9 +155,9 @@ validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE
   }
   
   
-  #-----------------------------------------------
+  #________________________________________________________
   # Sanity checks
-  #-----------------------------------------------
+  #________________________________________________________
   if (!multi && length(vals) > 1) 
     stop("Only a single metric is allowed. Found: ", paste0(collaspe=", ", vals))
   
@@ -164,21 +166,21 @@ validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE
     stop("All metrics must be the same type. Found: ", paste0(collaspe=", ", uModes))
   
   
-  #-----------------------------------------------
+  #________________________________________________________
   # Solo metadata columns get further attributes
-  #-----------------------------------------------
+  #________________________________________________________
   if (identical(attr(vals, 'mode', exact = TRUE), "meta")) {
     
-    #-----------------------------------------------
+    
     # Look for '==' or '!=' prefixes
-    #-----------------------------------------------
+    #________________________________________________________
     attr(vals, 'op') <- attr(metrics, 'op', exact = TRUE)
     if (substr(metrics, 1, 2) %in% c("==", "!="))
       attr(vals, 'op') <- substr(metrics, 1, 2)
     
-    #-----------------------------------------------
+    
     # Further classify as 'factor' or 'numeric'
-    #-----------------------------------------------
+    #________________________________________________________
     cl <- class(metadata(biom, vals))
     if (any(cl %in% c('factor', 'character', 'logical'))) {
       attr(vals, 'mode') <- "factor"

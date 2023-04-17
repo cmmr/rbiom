@@ -163,7 +163,7 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
       mtx  <- taxa_matrix(biom, rank)
       mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
       res  <- apply(mtx, 2L, fun, ...)
-      res[taxonomy(biom, rank)]
+      res[taxonomy(biom, rank)[,1]]
     }
     for (i in names(funcs)) envir[[i]] <- envir[['apply']]
     

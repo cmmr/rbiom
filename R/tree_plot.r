@@ -109,7 +109,7 @@ tree_plot <- function (
       
       df  <- attr(layers[['ggtree']][['tr']], 'data',  exact = TRUE)
       phy <- attr(layers[['ggtree']][['tr']], 'phylo', exact = TRUE)
-      df[['tiplab']] <- taxonomy(biom, tiplab)[phy$tip.label][1:nrow(df)]
+      df[['tiplab']] <- taxonomy(biom, tiplab)[phy$tip.label,1][1:nrow(df)]
       attr(layers[['ggtree']][['tr']], 'data') <- df
       remove("df", "phy")
       
@@ -248,7 +248,7 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
     df[1:nTips, 'reads'] <- as.vector(taxa_sums(biom)[labels])
   
   for (i in seq_along(ranks))
-    df[1:nTips, names(ranks)[[i]]] <- as.vector(taxonomy(biom, ranks[[i]])[labels])
+    df[1:nTips, names(ranks)[[i]]] <- as.vector(taxonomy(biom, ranks[[i]])[labels,1])
   
   df[1:nTips, 'OTU'] <- labels
   

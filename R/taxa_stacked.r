@@ -175,6 +175,7 @@ taxa_stacked <- function (
       other <- matrix(
         data = colSums(mat[!rownames(mat) %in% taxa,,drop=FALSE]), 
         nrow = 1, dimnames = list("Other", colnames(mat)))
+      browser()
       mat <- rbind(mat[taxa,,drop=FALSE], other)
     }
     
