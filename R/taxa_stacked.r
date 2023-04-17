@@ -172,11 +172,20 @@ taxa_stacked <- function (
       mat <- mat[taxa,,drop=FALSE]
       
     } else {
-      other <- matrix(
-        data = colSums(mat[!rownames(mat) %in% taxa,,drop=FALSE]), 
-        nrow = 1, dimnames = list("Other", colnames(mat)))
-      browser()
-      mat <- rbind(mat[taxa,,drop=FALSE], other)
+      
+      mat <- local({
+      
+        other <- params[['other']]
+        if (identical(other, TRUE)) other <- "Other"
+        stopifnot(is_scalar_character(other))
+        
+        mat1 <- mat[taxa,,drop=FALSE]
+        mat2 <- mat[!rownames(mat) %in% taxa,,drop=FALSE] %>%
+          colSums() %>% 
+          matrix(nrow = 1, dimnames = list(other, NULL))
+        
+        return (rbind(mat1, mat2))
+      })
     }
     
       
@@ -211,14 +220,16 @@ taxa_stacked <- function (
   #________________________________________________________
   # Convert taxa names to a factor
   #________________________________________________________
-  vals <- sort(unique(ggdata[['.taxa']]))
-  taxa <- params[['taxa']]
-  taxa <- if (is.character(taxa)) intersect(taxa, vals) else vals
-  if (isTRUE(params[['other']]) && "Other" %in% vals)
-    taxa <- c(setdiff(taxa, "Other"), "Other")
+  vals  <- sort(unique(ggdata[['.taxa']]))
+  taxa  <- params[['taxa']]
+  taxa  <- if (is.character(taxa)) intersect(taxa, vals) else vals
+  other <- params[['other']]
+  if (identical(other, TRUE)) other <- "Other"
+  if (is_scalar_character(other) && other %in% vals)
+    taxa <- c(setdiff(taxa, other), other)
   ggdata[['.taxa']] %<>% factor(levels = taxa)
   
-  remove("vals", "taxa")
+  remove("vals", "taxa", "other")
   
   
   

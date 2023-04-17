@@ -47,7 +47,7 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
       if (is(biom, 'BIOM')) biom <- biom[['taxonomy']]
       stopifnot(identical(typeof(biom), "character"))
       stopifnot(!is.null(rownames(biom)))
-      stopifnot(!is.null(colnames(biom)))
+      stopifnot(!is.null(colnames(biom)) || ncol(biom) == 0)
     
       return (biom)
     }), 

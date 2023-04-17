@@ -1,14 +1,21 @@
 #' Write data and summary information to a Microsoft Excel-compatible workbook.
+#' 
+#' @name write_xlsx
+#' 
+#' @inherit taxonomy params
 #'
-#' @param biom     The BIOM object to save to the file.
-#' @param outfile  Path to the output xlsx file.
-#' @param depth    Depth to rarefy to. See \code{rarefy} function for details.
-#'                 \code{depth = NULL} auto-selects a rarefaction level.
-#'                 \code{depth = 0} disables rarefaction.
-#'                   Only use \code{depth} with \code{BIOM} files of type
-#'                   'OTU table' and integer count values.
-#' @param seed     Random seed to use in rarefying. See \code{rarefy} function
-#'                   for details.
+#' @param biom   The BIOM object to save to the file.
+#' 
+#' @param outfile   Path to the output xlsx file.
+#' 
+#' @param depth   Depth to rarefy to. See \code{rarefy} function for details.
+#'        \code{depth = NULL} auto-selects a rarefaction level. 
+#'        \code{depth = 0} disables rarefaction. Only use \code{depth} with 
+#'        \code{BIOM} files of type 'OTU table' and integer count values.
+#'                   
+#' @param seed   Random seed to use in rarefying. See \code{rarefy} function
+#'        for details.
+#'                   
 #' @return On success, returns \code{NULL} invisibly.
 #' 
 #' @section Note:
@@ -31,14 +38,13 @@
 #'
 
 
-write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
+write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
   
   #========================================================
   # Sanity Checks
   #========================================================
-  
-  if (!is(biom, "BIOM"))
-    stop(simpleError("Invalid BIOM object."))
+  if (!is(biom, "BIOM")) stop(simpleError("Invalid BIOM object."))
+  unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
   
   
   
@@ -48,26 +54,29 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
   
   if (identical(tolower(biom$info$type), 'otu table') && !any(biom$counts$v %% 1 > 0)) {
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Define the initial structure of our workbook
-    #--------------------------------------------------------
+    #________________________________________________________
     
-    wb <- openxlsx::createWorkbook(creator="CMMR", title=biom$info$id)
+    wb <- openxlsx::createWorkbook(creator="rbiom", title=biom$info$id)
     
     openxlsx::addWorksheet(wb, 'Reads Per Sample')
     openxlsx::addWorksheet(wb, 'Mapped OTU Counts')
     openxlsx::addWorksheet(wb, 'Rarefied OTU Counts')
+    openxlsx::addWorksheet(wb, 'Sample Metadata')
     openxlsx::addWorksheet(wb, 'Alpha Diversity')
     openxlsx::addWorksheet(wb, 'Centroid Taxonomy')
     
     
     
-    #--------------------------------------------------------
-    # Output counts and taxonomy, & seqs prior to rarefying
-    #--------------------------------------------------------
+    #________________________________________________________
+    # Output counts, taxonomy, metadata, and sequencess 
+    # prior to rarefying
+    #________________________________________________________
     
-    RawCounts <- data.frame(counts(biom),   check.names=FALSE)
-    Taxonomy  <- data.frame(taxonomy(biom), check.names=FALSE)
+    RawCounts <- data.frame(counts(biom),              check.names=FALSE)
+    Taxonomy  <- data.frame(taxonomy(biom, unc = unc), check.names=FALSE)
+    Metadata  <- data.frame(metadata(biom),            check.names=FALSE)
     
     # Set the full taxonomy string as the first column of RawCounts
     TaxaStrings <- data.frame(Taxonomy=apply(biom$taxonomy, 1L, paste, collapse="; "))
@@ -79,12 +88,13 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     openxlsx::writeData(wb, 'Mapped OTU Counts', RawCounts, rowNames=TRUE)
     openxlsx::writeData(wb, 'Centroid Taxonomy', Taxonomy,  rowNames=TRUE)
+    openxlsx::writeData(wb, 'Sample Metadata',   Metadata,  rowNames=TRUE)
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Rarefy, then output counts again and adiv_table
-    #--------------------------------------------------------
+    #________________________________________________________
     
     # Allow the user to override rarefaction by setting depth = 0.
     if (identical(depth, 0) || isTRUE(is_rarefied(biom))) {
@@ -105,9 +115,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Track each sample's read counts before and after
-    #--------------------------------------------------------
+    #________________________________________________________
     
     if ('Reads Per Step' %in% names(attributes(biom))) {
       rps <- attr(biom, 'Reads Per Step', exact = TRUE)
@@ -126,9 +136,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Create worksheets for any other attributes on biom
-    #--------------------------------------------------------
+    #________________________________________________________
     
     for (key in names(attributes(biom))) {
       if (key %in% c("names", "class", "Reads Per Step"))   next
@@ -149,9 +159,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Roll up abundances at each taxonomic level
-    #--------------------------------------------------------
+    #________________________________________________________
     
     ranks <- unique(c('OTU', taxa_ranks(biom)))
     
@@ -168,9 +178,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Write everything to the specified output file
-    #--------------------------------------------------------
+    #________________________________________________________
     
     openxlsx::saveWorkbook(wb, file=outfile, overwrite=TRUE)
     
@@ -189,11 +199,11 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
       return(simpleError("Please use write_xlsx(depth=NULL) for non-OTU or non-Integer data."))
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Define the initial structure of our workbook
-    #--------------------------------------------------------
+    #________________________________________________________
     
-    wb <- openxlsx::createWorkbook(creator="CMMR", title=biom$info$id)
+    wb <- openxlsx::createWorkbook(creator="rbiom", title=biom$info$id)
     
     ranks <- c(paste0(type, "s"), taxa_ranks(biom))
     for (rank in ranks)
@@ -204,12 +214,12 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Output totals, taxonomy/seqs, & adiv_table
-    #--------------------------------------------------------
+    #________________________________________________________
     
-    AlphaDiv  <- data.frame(adiv_table(biom), check.names=FALSE)
-    Taxonomy  <- data.frame(taxonomy(biom),  check.names=FALSE)
+    AlphaDiv  <- data.frame(adiv_table(biom),          check.names=FALSE)
+    Taxonomy  <- data.frame(taxonomy(biom, unc = unc), check.names=FALSE)
     
     # Set the centroid sequence as the first column of Taxonomy
     if (is(biom[['sequences']], "character"))
@@ -224,9 +234,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Create worksheets for any other attributes on biom
-    #--------------------------------------------------------
+    #________________________________________________________
     
     for (key in names(attributes(biom))) {
       if (key %in% c("names", "class")) next
@@ -247,9 +257,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Roll up abundances at each taxonomic level
-    #--------------------------------------------------------
+    #________________________________________________________
       
     for (i in seq_along(ranks)) {
       
@@ -269,9 +279,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0) {
     
     
     
-    #--------------------------------------------------------
+    #________________________________________________________
     # Write everything to the specified output file
-    #--------------------------------------------------------
+    #________________________________________________________
     
     openxlsx::saveWorkbook(wb, file=outfile, overwrite=TRUE)
     

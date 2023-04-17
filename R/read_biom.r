@@ -633,7 +633,11 @@ PB.HDF5.Taxonomy <- function (hdf5) {
     
   } else {
     ids        <- as.character(hdf5$observation$ids)
-    taxa_table <- matrix(nrow=length(ids), ncol=0, dimnames=list(ids, character(0)))
+    taxa_table <- matrix(
+      data     = character(0), 
+      nrow     = length(ids), 
+      ncol     = 0, 
+      dimnames = list(ids, character(0)) )
   }
 
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
