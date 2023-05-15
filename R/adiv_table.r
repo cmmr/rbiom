@@ -1,5 +1,7 @@
 #' Estimate the diversity of each sample.
 #' 
+#' @name adiv_table
+#' 
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
 #'        object, as returned from \link{read_biom}. For matrices, the rows and
 #'        columns are assumed to be the taxa and samples, respectively.
@@ -69,139 +71,143 @@
 
 adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE, safe=FALSE) {
   
-  #--------------------------------------------------------------
-  # Enable abbreviations of metric names.
-  #--------------------------------------------------------------
-  if (!identical(metrics, 'all')) {
-    metricList <- c("Depth", "OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
-    metrics    <- metricList[pmatch(tolower(metrics), tolower(metricList))]
-    metrics    <- metrics[!is.na(metrics)]
-    if (length(metrics) == 0) stop(simpleError("Invalid 'adiv_table(metric=' argument"))
-  }
+  with_cache(local({
   
-  
-  #--------------------------------------------------------------
-  # Get the input into a simple_triplet_matrix
-  #--------------------------------------------------------------
-  if (is(biom, "simple_triplet_matrix")) { counts <- biom
-  } else if (is(biom, "BIOM"))           { counts <- biom$counts
-  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
-  } else {
-    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Define the rarefaction depths to sample at
-  #--------------------------------------------------------------
-  rLvls <- NA
-  
-  if (identical(rarefy, TRUE)) {
-    counts <- rarefy(counts)
     
-  } else if (is.numeric(rarefy)) {
-    rLvls <- sort(rarefy)
-    
-  } else if (is.character(rarefy)) {
-    upper <- fivenum(slam::col_sums(counts))[[4]]
-    
-    if (identical(rarefy, "multi")) {
-      
-      # Log intervals until rLvl/2, then even intervals until rLvl*2
-      rLvl  <- default_rarefaction_depth(counts)
-      rLvls <- 10 ** (c(1,3,5,7,8,9) * (log10(rLvl / 2) / 10))
-      rLvls <- c(rLvls, seq(from = rLvl / 2, to = rLvl * 2, length.out = 5))
-      rLvls <- floor(rLvls)
-      remove("rLvl")
-      
-    } else if (identical(rarefy, "multi_log")) {
-      rLvls <- floor(10 ** (c(1:10) * (log10(upper) / 10)))
-      
-    } else if (identical(rarefy, "multi_even")) {
-      rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
+    #________________________________________________________
+    # Enable abbreviations of metric names.
+    #________________________________________________________
+    if (!identical(metrics, 'all')) {
+      metricList <- c("Depth", "OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
+      metrics    <- metricList[pmatch(tolower(metrics), tolower(metricList))]
+      metrics    <- metrics[!is.na(metrics)]
+      if (length(metrics) == 0) stop(simpleError("Invalid 'adiv_table(metric=' argument"))
     }
-    remove("upper")
-  }
-  
-  
-  result <- NULL
-  
-  for (rLvl in rLvls) {
-    
-    otus <- if (is.na(rLvl)) counts else rarefy(counts, rLvl)
-    df   <- rcpp_alpha_div(otus)
     
     
-    #--------------------------------------------------------------
-    # Convert 'all' to actual names of all adiv metrics
-    #--------------------------------------------------------------
-    if ('all' %in%  metrics)
-      metrics <- colnames(df)[-1]
-    
-    
-    #--------------------------------------------------------------
-    # Pivot Longer
-    #--------------------------------------------------------------
-    if (isTRUE(long)) {
-      
-        mtx <- as.matrix(df[,metrics,drop=F])
-        df  <- data.frame(
-          stringsAsFactors = FALSE,
-          Sample    = df[['Sample']][row(mtx)],
-          Depth     = df[['Depth']][row(mtx)],
-          Metric    = colnames(mtx)[col(mtx)],
-          Diversity = as.numeric(mtx)
-        )
-      
+    #________________________________________________________
+    # Get the input into a simple_triplet_matrix
+    #________________________________________________________
+    if (is(biom, "simple_triplet_matrix")) { counts <- biom
+    } else if (is(biom, "BIOM"))           { counts <- biom$counts
+    } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
     } else {
-      
-      #--------------------------------------------------------------
-      # The metrics of interest in wide format
-      #--------------------------------------------------------------
-      if (length(rLvls) == 1) {
-        df <- df[,c('Sample', metrics),drop=F]
-      } else {
-        df <- df[,unique(c('Sample', 'Depth', metrics)),drop=F]
-      }
+      stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
     }
     
     
+    #________________________________________________________
+    # Define the rarefaction depths to sample at
+    #________________________________________________________
+    rLvls <- NA
     
-    result <- rbind(result, df)
+    if (identical(rarefy, TRUE)) {
+      counts <- rarefy(counts)
+      
+    } else if (is.numeric(rarefy)) {
+      rLvls <- sort(rarefy)
+      
+    } else if (is.character(rarefy)) {
+      upper <- fivenum(slam::col_sums(counts))[[4]]
+      
+      if (identical(rarefy, "multi")) {
+        
+        # Log intervals until rLvl/2, then even intervals until rLvl*2
+        rLvl  <- default_rarefaction_depth(counts)
+        rLvls <- 10 ** (c(1,3,5,7,8,9) * (log10(rLvl / 2) / 10))
+        rLvls <- c(rLvls, seq(from = rLvl / 2, to = rLvl * 2, length.out = 5))
+        rLvls <- floor(rLvls)
+        remove("rLvl")
+        
+      } else if (identical(rarefy, "multi_log")) {
+        rLvls <- floor(10 ** (c(1:10) * (log10(upper) / 10)))
+        
+      } else if (identical(rarefy, "multi_even")) {
+        rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
+      }
+      remove("upper")
+    }
     
-  }
+    
+    result <- NULL
+    
+    for (rLvl in rLvls) {
+      
+      otus <- if (is.na(rLvl)) counts else rarefy(counts, rLvl)
+      df   <- rcpp_alpha_div(otus)
+      
+      
+      #________________________________________________________
+      # Convert 'all' to actual names of all adiv metrics
+      #________________________________________________________
+      if ('all' %in%  metrics)
+        metrics <- colnames(df)[-1]
+      
+      
+      #________________________________________________________
+      # Pivot Longer
+      #________________________________________________________
+      if (isTRUE(long)) {
+        
+          mtx <- as.matrix(df[,metrics,drop=F])
+          df  <- data.frame(
+            stringsAsFactors = FALSE,
+            Sample    = df[['Sample']][row(mtx)],
+            Depth     = df[['Depth']][row(mtx)],
+            Metric    = colnames(mtx)[col(mtx)],
+            Diversity = as.numeric(mtx)
+          )
+        
+      } else {
+        
+        #________________________________________________________
+        # The metrics of interest in wide format
+        #________________________________________________________
+        if (length(rLvls) == 1) {
+          df <- df[,c('Sample', metrics),drop=F]
+        } else {
+          df <- df[,unique(c('Sample', 'Depth', metrics)),drop=F]
+        }
+      }
+      
+      
+      
+      result <- rbind(result, df)
+      
+    }
+    
+    
+    #________________________________________________________
+    # Add rownames and facet attribute when appropriate
+    #________________________________________________________
+    if (length(rLvls) == 1 && !isTRUE(long))
+      rownames(result) <- result[['Sample']]
+    
+    if (isTRUE(long)) {
+      result[['Metric']] %<>% factor(levels = metrics)
+      if (length(metrics) > 1)
+        attr(result, 'facet') <- ifelse(safe, '.metric', 'Metric')
+    }
+    
+    
+    #________________________________________________________
+    # Make the auto-generated columns safe
+    #________________________________________________________
+    if (isTRUE(safe)) {
+      colnames(result) <- paste0(".", tolower(colnames(result)))
+      colnames(result) <- sub(".diversity", ".value", colnames(result))
+    }
+    
+    #________________________________________________________
+    # Add Metadata
+    #________________________________________________________
+    if (identical(md, TRUE))  md <- colnames(metadata(biom))
+    if (identical(md, FALSE)) md <- c()
+    for (i in unique(md))
+      result[[i]] <- metadata(biom, i)[result[[1]]]
+    
+    
+    return (result)
   
-  
-  #--------------------------------------------------------------
-  # Add rownames and facet attribute when appropriate
-  #--------------------------------------------------------------
-  if (length(rLvls) == 1 && !isTRUE(long))
-    rownames(result) <- result[['Sample']]
-  
-  if (isTRUE(long)) {
-    result[['Metric']] %<>% factor(levels = metrics)
-    if (length(metrics) > 1)
-      attr(result, 'facet') <- ifelse(safe, '.metric', 'Metric')
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Make the auto-generated columns safe
-  #--------------------------------------------------------------
-  if (isTRUE(safe)) {
-    colnames(result) <- paste0(".", tolower(colnames(result)))
-    colnames(result) <- sub(".diversity", ".value", colnames(result))
-  }
-  
-  #--------------------------------------------------------------
-  # Add Metadata
-  #--------------------------------------------------------------
-  if (identical(md, TRUE))  md <- colnames(metadata(biom))
-  if (identical(md, FALSE)) md <- c()
-  for (i in unique(md))
-    result[[i]] <- metadata(biom, i)[result[[1]]]
-  
-  
-  return (result)
-  
+  }))
 }

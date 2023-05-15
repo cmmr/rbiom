@@ -58,49 +58,53 @@ rare_multiplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Build the two subplots, then arrange them together.
-  #________________________________________________________
-  corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
-  barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
-  
-  plots <- list(
-    'corrplot' = do.call(rare_corrplot,  c(corrplot_params, list(...))),
-    'barplot'  = do.call(depths_barplot, c(barplot_params,  list(...))) )
-  
-  p <- patchwork::wrap_plots(plots, ncol = 1)
-  
-  attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-  attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
-    cmds <- sapply(seq_along(plots), function (i) {
-      sub(
-        x           = attr(plots[[i]], 'cmd', exact = TRUE), 
-        pattern     = "ggplot(data = data", 
-        replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, glue::single_quote(names(plots)[[i]])),
-        fixed       = TRUE )
-    })
-    c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
+  with_cache(local({
+    
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Build the two subplots, then arrange them together.
+    #________________________________________________________
+    corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
+    barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
+    
+    plots <- list(
+      'corrplot' = do.call(rare_corrplot,  c(corrplot_params, list(...))),
+      'barplot'  = do.call(depths_barplot, c(barplot_params,  list(...))) )
+    
+    p <- patchwork::wrap_plots(plots, ncol = 1)
+    
+    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
+    attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
+      cmds <- sapply(seq_along(plots), function (i) {
+        sub(
+          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+          pattern     = "ggplot(data = data", 
+          replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, single_quote(names(plots)[[i]])),
+          fixed       = TRUE )
+      })
+      c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
+    }))
+    
+    
+    #________________________________________________________
+    # Attach history of biom modifications and this call.
+    #________________________________________________________
+    attr(p, 'history') <- history
+    
+    
+    return (p)
+    
   }))
-  
-  
-  #________________________________________________________
-  # Attach history of biom modifications and this call.
-  #________________________________________________________
-  attr(p, 'history') <- history
-  
-  
-  return (p)
 }
 
 

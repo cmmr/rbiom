@@ -1,6 +1,8 @@
 
 #' Get the taxa abundances.
 #' 
+#' @name taxa_sums
+#' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param rank  The taxonomic rank to return sums for. The default, 
 #'        \code{NULL}, return OTU sums in the same order as they appear in 
@@ -16,20 +18,26 @@
 
 taxa_sums <- function (biom, rank = NULL) {
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+  with_cache(local({
   
-  if (is_null(rank)) {
-    x <- slam::row_sums(biom$counts)
-  } else {
-    x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
-  }
-  
-  return (x)
+    if (!is(biom, 'BIOM'))
+      stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+    
+    if (is_null(rank)) {
+      x <- slam::row_sums(biom$counts)
+    } else {
+      x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
+    }
+    
+    return (x)
+    
+  }))
 }
 
 
 #' Get the taxa abundances.
+#' 
+#' @name taxa_means
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param rank  The taxonomic rank to return means for. The default, 
@@ -46,20 +54,26 @@ taxa_sums <- function (biom, rank = NULL) {
 
 taxa_means <- function (biom, rank = NULL) {
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
-  
-  if (is_null(rank)) {
-    x <- slam::row_means(biom$counts)
-  } else {
-    x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
-  }
-  
-  return (x)
+  with_cache(local({
+    
+    if (!is(biom, 'BIOM'))
+      stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
+    
+    if (is_null(rank)) {
+      x <- slam::row_means(biom$counts)
+    } else {
+      x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
+    }
+    
+    return (x)
+    
+  }))
 }
 
 
 #' Get the names of the most abundant taxa.
+#' 
+#' @name top_taxa
 #' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @param rank  The taxonomic rank of interest. Default: \code{"OTU"}.
@@ -75,10 +89,14 @@ taxa_means <- function (biom, rank = NULL) {
 
 top_taxa <- function (biom, rank = 'OTU', n = Inf) {
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+  with_cache(local({
   
-  x <- taxa_sums(biom, rank) %>% names() %>% head(n)
-  
-  return (x)
+    if (!is(biom, 'BIOM'))
+      stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+    
+    x <- taxa_sums(biom, rank) %>% names() %>% head(n)
+    
+    return (x)
+    
+  }))
 }

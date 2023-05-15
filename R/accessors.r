@@ -19,9 +19,13 @@ sample_names <- function (biom) {
 
 #' Sum the observations in each sample.
 #' 
+#' @name sample_sums
+#' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' 
 #' @return A named numeric vector of the number of observations in each 
 #'         sample. The names are the sample IDs.
+#'         
 #' @family accessors
 #' @export
 #' @examples
@@ -34,34 +38,38 @@ sample_names <- function (biom) {
 
 sample_sums <- function (biom, long=FALSE, md=FALSE) {
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In sample_names(), biom must be a BIOM-class object.'))
-  
-  result <- slam::col_sums(biom[['counts']])
-  
-  if (isTRUE(long) || !isFALSE(md)) {
+  with_cache(local({
     
-    #--------------------------------------------------------------
-    # Convert to long format
-    #--------------------------------------------------------------
-    result <- data.frame(
-      stringsAsFactors = FALSE,
-      'Sample' = names(result),
-      'Reads'  = unname(result)
-      )
     
-    #--------------------------------------------------------------
-    # Add Metadata
-    #--------------------------------------------------------------
-    if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
-    if (identical(md, FALSE)) md <- c()
-    for (i in unique(md))
-      result[[i]] <- metadata(biom, i)[result[['Sample']]]
+    if (!is(biom, 'BIOM'))
+      stop (simpleError('In sample_names(), biom must be a BIOM-class object.'))
     
-  }
+    result <- slam::col_sums(biom[['counts']])
+    
+    if (isTRUE(long) || !isFALSE(md)) {
+      
+      #________________________________________________________
+      # Convert to long format
+      #________________________________________________________
+      result <- data.frame(
+        stringsAsFactors = FALSE,
+        'Sample' = names(result),
+        'Reads'  = unname(result)
+        )
+      
+      #________________________________________________________
+      # Add Metadata
+      #________________________________________________________
+      if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
+      if (identical(md, FALSE)) md <- c()
+      for (i in unique(md))
+        result[[i]] <- metadata(biom, i)[result[['Sample']]]
+      
+    }
+    
+    return (result)
   
-  return (result)
-  
+  }))
 }
 
 

@@ -17,7 +17,7 @@ Wraps R code with Markdown syntax highlighting.
 }
 \examples{
     library(rbiom)
-    p <- plot(hmp50, Bray ~ Sex, "b")
+    p <- adiv_boxplot(hmp50, color.by = "Body Site")
     attr(p, 'cmd') \%>\% embed_code() \%>\% cat("\n\n")
 }
 \seealso{

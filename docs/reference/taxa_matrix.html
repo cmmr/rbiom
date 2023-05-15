@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9085</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9088</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Generate a matrix of samples by taxa, at the specified taxonomic rank.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_table.r" class="external-link"><code>R/taxa_table.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_rollup.r" class="external-link"><code>R/taxa_rollup.r</code></a></small>
       <div class="d-none name"><code>taxa_matrix.Rd</code></div>
     </div>
 
@@ -70,7 +70,9 @@
 <span>  taxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  map <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  sparse <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  sparse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
+<span>  other <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -139,6 +141,23 @@ level ranks.</p></dd>
 <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix</a></code>, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
 memory efficient in this scenario.</p></dd>
+
+
+<dt>unc</dt>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. The default, <code>"singly"</code>/<code>"s"</code>, replaces them 
+with the OTU name. Other options are <code>"grouped"</code>/<code>"g"</code>, 
+which replaces them with a higher rank's name, <code>"drop"</code>/<code>"d"</code> 
+which excludes them from the result, and <code>"asis"</code>/<code>"a"</code> to
+not check/modify any taxa names.</p></dd>
+
+
+<dt>other</dt>
+<dd><p>Sum all non-itemized taxa into an "Other" taxa. The default,
+<code>FALSE</code>, only returns taxa matched by the <code>`taxa`</code> 
+argument. Specifying <code>TRUE</code> adds "Other" to the returned set.
+A string can also be given to imply <code>TRUE</code>, but with that
+value as the name to use in place of "Other".</p></dd>
 
 </dl></div>
     <div class="section level2">

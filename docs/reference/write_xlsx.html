@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9085</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9088</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_xlsx</span><span class="op">(</span><span class="va">biom</span>, <span class="va">outfile</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_xlsx</span><span class="op">(</span><span class="va">biom</span>, <span class="va">outfile</span>, depth <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span>, unc <span class="op">=</span> <span class="st">"asis"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,15 +79,23 @@
 
 <dt>depth</dt>
 <dd><p>Depth to rarefy to. See <code>rarefy</code> function for details.
-<code>depth = NULL</code> auto-selects a rarefaction level.
-<code>depth = 0</code> disables rarefaction.
-  Only use <code>depth</code> with <code>BIOM</code> files of type
-  'OTU table' and integer count values.</p></dd>
+<code>depth = NULL</code> auto-selects a rarefaction level. 
+<code>depth = 0</code> disables rarefaction. Only use <code>depth</code> with 
+<code>BIOM</code> files of type 'OTU table' and integer count values.</p></dd>
 
 
 <dt>seed</dt>
 <dd><p>Random seed to use in rarefying. See <code>rarefy</code> function
 for details.</p></dd>
+
+
+<dt>unc</dt>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Default: <code>"asis"</code></p><ul><li><p><code>"asis"</code> -  Don't check/modify any taxa names.</p></li>
+<li><p><code>"singly"</code> -  Replace with "Unc. &lt;OTU ID&gt;".</p></li>
+<li><p><code>"grouped"</code> -  Replace with "Unc. &lt;Higher Rank&gt;".</p></li>
+<li><p><code>"drop"</code> -  Don't include in the returned matrix.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">

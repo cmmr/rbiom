@@ -5,7 +5,6 @@ alpha.div        <- function (...) { .Deprecated("adiv_table");    adiv_table(..
 as.percent       <- function (...) { .Deprecated("as_percent");    as_percent(...)       }
 has.phylogeny    <- function (...) { .Deprecated("has_phylogeny"); has_phylogeny(...)    }
 has.sequences    <- function (...) { .Deprecated("has_sequences"); has_sequences(...)    }
-init.cache       <- function (...) { .Deprecated("init_cache");    init_cache(...)       }
 is.rarefied      <- function (...) { .Deprecated("is_rarefied");   is_rarefied(...)      }
 read.biom        <- function (...) { .Deprecated("read_biom");     read_biom(...)        }
 read.fasta       <- function (...) { .Deprecated("read_fasta");    read_fasta(...)       }
@@ -25,8 +24,6 @@ write.biom       <- function (...) { .Deprecated("write_biom");    write_biom(..
 write.fasta      <- function (...) { .Deprecated("write_fasta");   write_fasta(...)      }
 write.tree       <- function (...) { .Deprecated("write_tree");    write_tree(...)       }
 write.xlsx       <- function (...) { .Deprecated("write_xlsx");    write_xlsx(...)       }
-
-
 
 
 # Depending on its arguments, beta.div() returned either a dist object or a 

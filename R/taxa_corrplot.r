@@ -37,97 +37,101 @@ taxa_corrplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     model = "linear", ci = 95, ...) {
   
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("taxa_corrplot(%s)", as.args(params, fun = taxa_corrplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    rank %<>% validate_arg(biom, 'rank', n = 1, default = tail(c('OTU', taxa_ranks(biom)), 1))
-  })
-  
-  
-  #________________________________________________________
-  # Subset biom by requested metadata and aes.
-  #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    x        = list(n = 1, col_type = "num"),
-    color.by = list(n = 0:1),
-    facet.by = list(col_type = "cat"),
-    limit.by = list() ))
-  
-  
-  #________________________________________________________
-  # Compute taxa abundance values.
-  #________________________________________________________
-  
-  if (is_rarefied(params[['biom']]))
-    params[['biom']] %<>% as_percent()
-  
-  data <- taxa_table(
-    biom = params[['biom']],
-    rank = params[['rank']],
-    taxa = params[['taxa']],
-    md   = unique(c(
-      params[['x']], 
-      names(params[['color.by']]), 
-      params[['facet.by']] )),
-    safe = TRUE )
-  
-  params[['facet.by']] %<>% c(".taxa")
-  
-  
-  #________________________________________________________
-  # Initialize the `layers` object.
-  #________________________________________________________
-  layers <- structure(
-    list(),
-    'data'     = data,
-    'params'   = params,
-    'function' = taxa_corrplot,
-    'xcol'     = params[['x']],
-    'ycol'     = ".value",
-    'xmode'    = "numeric" )
-  
-  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-  
-  if (!is_null(params[['color.by']])) initLayer("color")
-  if (isTRUE(params[['points']]))     initLayer("point")
-  
-  
-  #________________________________________________________
-  # Add default layer parameters.
-  #________________________________________________________
-  setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
-  
-  setLayer("labs", x = params[['x']], y = local({
-    ylab <- paste(params[['rank']], "Abundance")
-    if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
-    return (ylab) }))
-  
-  setLayer("facet", scales = "free_y")
-  
-  
-  
-  
-  # Convert layer definitions into a plot.
-  #________________________________________________________
-  p <- corrplot_build(layers)
-  
-  attr(p, 'history') <- history
-  
-  
-  return (p)
+  with_cache(local({
+    
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("taxa_corrplot(%s)", as.args(params, fun = taxa_corrplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Sanity Checks
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      rank %<>% validate_arg(biom, 'rank', n = 1, default = tail(c('OTU', taxa_ranks(biom)), 1))
+    })
+    
+    
+    #________________________________________________________
+    # Subset biom by requested metadata and aes.
+    #________________________________________________________
+    params %<>% metadata_params(contraints = list(
+      x        = list(n = 1, col_type = "num"),
+      color.by = list(n = 0:1),
+      facet.by = list(col_type = "cat"),
+      limit.by = list() ))
+    
+    
+    #________________________________________________________
+    # Compute taxa abundance values.
+    #________________________________________________________
+    
+    if (is_rarefied(params[['biom']]))
+      params[['biom']] %<>% as_percent()
+    
+    data <- taxa_table(
+      biom = params[['biom']],
+      rank = params[['rank']],
+      taxa = params[['taxa']],
+      md   = unique(c(
+        params[['x']], 
+        names(params[['color.by']]), 
+        params[['facet.by']] )),
+      safe = TRUE )
+    
+    params[['facet.by']] %<>% c(".taxa")
+    
+    
+    #________________________________________________________
+    # Initialize the `layers` object.
+    #________________________________________________________
+    layers <- structure(
+      list(),
+      'data'     = data,
+      'params'   = params,
+      'function' = taxa_corrplot,
+      'xcol'     = params[['x']],
+      'ycol'     = ".value",
+      'xmode'    = "numeric" )
+    
+    initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+    
+    if (!is_null(params[['color.by']])) initLayer("color")
+    if (isTRUE(params[['points']]))     initLayer("point")
+    
+    
+    #________________________________________________________
+    # Add default layer parameters.
+    #________________________________________________________
+    setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
+    
+    setLayer("labs", x = params[['x']], y = local({
+      ylab <- paste(params[['rank']], "Abundance")
+      if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
+      return (ylab) }))
+    
+    setLayer("facet", scales = "free_y")
+    
+    
+    
+    
+    # Convert layer definitions into a plot.
+    #________________________________________________________
+    p <- corrplot_build(layers)
+    
+    attr(p, 'history') <- history
+    
+    
+    return (p)
+    
+  }))
 }
 
 

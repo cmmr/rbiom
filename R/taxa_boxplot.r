@@ -70,44 +70,47 @@ taxa_boxplot <- function (
     flip = TRUE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
     ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
+  with_cache(local({
+    
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("taxa_boxplot(%s)", as.args(params, fun = taxa_boxplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Sanity checks. x and *.by are checked by boxplot_build.
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+    })
+    
+    
+    #________________________________________________________
+    # initLayer ignores formalArgs, so copy into equivalent.
+    #________________________________________________________
+    if (isTRUE(tolower(params[['y.trans']]) %in% c("sqrt", "log1p")))
+      params[['yaxis.trans']] <- tolower(params[['y.trans']])
+    
+    
+    
+    #________________________________________________________
+    # Use the generalized boxplot function to make the plot
+    #________________________________________________________
+    p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
+    
+    attr(p, 'history') <- history
+    
+    
+    return (p)
   
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("taxa_boxplot(%s)", as.args(params, fun = taxa_boxplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity checks. x and *.by are checked by boxplot_build.
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
-  })
-  
-  
-  #________________________________________________________
-  # initLayer ignores formalArgs, so copy into equivalent.
-  #________________________________________________________
-  if (isTRUE(tolower(params[['y.trans']]) %in% c("sqrt", "log1p")))
-    params[['yaxis.trans']] <- tolower(params[['y.trans']])
-  
-  
-  
-  #________________________________________________________
-  # Use the generalized boxplot function to make the plot
-  #________________________________________________________
-  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
-  
-  attr(p, 'history') <- history
-  
-  
-  return (p)
-  
+  }))
 }
 
 

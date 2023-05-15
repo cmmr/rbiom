@@ -45,118 +45,122 @@ taxa_heatmap <- function (
     tree_height = NULL, track_height = NULL, ratio=1, 
     legend = "right", xlab.angle = "auto", ...) {
   
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("taxa_heatmap(%s)", as.args(params, fun = taxa_heatmap)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_scalar_atomic(taxa))
-    rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+  with_cache(local({
     
-    if (!is_list(grid)) grid <- list(label = "{rank} Abundance", colors = grid)
-    if (length(clust)    < 1) clust <- "complete"
-    if (length(order.by) > 0) clust <- c(clust[[1]], NA)
-  })
-  
-  
-  #________________________________________________________
-  # Handle multiple ranks with recursive subcalls.
-  #________________________________________________________
-  if (length(params[['rank']]) > 1) {
     
-    ranks <- params[['rank']]
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("taxa_heatmap(%s)", as.args(params, fun = taxa_heatmap)))
+    remove(list = setdiff(ls(), c("params", "history")))
     
-    plots <- sapply(ranks, simplify = FALSE, function (rank) {
-      args                 <- params
-      args[['rank']]       <- rank
-      args[['labs.title']] <- rank
-      do.call(taxa_heatmap, args)
+    
+    #________________________________________________________
+    # Sanity Checks
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      stopifnot(is_scalar_atomic(taxa))
+      rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+      
+      if (!is_list(grid)) grid <- list(label = "{rank} Abundance", colors = grid)
+      if (length(clust)    < 1) clust <- "complete"
+      if (length(order.by) > 0) clust <- c(clust[[1]], NA)
     })
     
-    p <- patchwork::wrap_plots(plots, ncol = 1)
+    
+    #________________________________________________________
+    # Handle multiple ranks with recursive subcalls.
+    #________________________________________________________
+    if (length(params[['rank']]) > 1) {
+      
+      ranks <- params[['rank']]
+      
+      plots <- sapply(ranks, simplify = FALSE, function (rank) {
+        args                 <- params
+        args[['rank']]       <- rank
+        args[['labs.title']] <- rank
+        do.call(taxa_heatmap, args)
+      })
+      
+      p <- patchwork::wrap_plots(plots, ncol = 1)
+      
+      attr(p, 'history') <- history
+      attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
+      attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
+        cmds <- sapply(seq_along(ranks), function (i) {
+          sub(
+            x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+            pattern     = "ggplot(data)", 
+            replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
+            fixed       = TRUE )
+        })
+        c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
+      }))
+      
+      remove("ranks", "plots")
+      
+      return (p)
+    }
+    
+    
+    #________________________________________________________
+    # Subset biom by requested metadata and aes.
+    #________________________________________________________
+    params %<>% metadata_params(contraints = list(
+      color.by = list(),
+      order.by = list(),
+      limit.by = list() ))
+    
+    biom <- params[['biom']]
+    
+    
+    #________________________________________________________
+    # Sanity Check
+    #________________________________________________________
+    if (nsamples(biom) < 1)
+      stop("At least one sample is needed for a taxa heatmap.")
+    
+    
+    
+    #________________________________________________________
+    # Matrix with samples in columns and taxa in rows.
+    #________________________________________________________
+    mtx <- t(taxa_matrix(
+      biom = biom, 
+      rank = params[['rank']], 
+      taxa = params[['taxa']] ))
+    
+    
+    
+    #________________________________________________________
+    # Arguments to pass on to plot_heatmap
+    #________________________________________________________
+    excl <- setdiff(formalArgs(taxa_heatmap), formalArgs(plot_heatmap))
+    excl <- c(excl, names(params)[startsWith(names(params), '.')])
+    args <- params[setdiff(names(params), excl)]
+    
+    args[['mtx']] <- mtx
+    args[['grid']][['label']] %<>% sub("{rank}", params[['rank']], ., fixed = TRUE)
+    
+    for (md_col in names(params[['color.by']]))
+      params[['color.by']][[md_col]] %<>% within({
+        colors <- values
+        values <- metadata(biom, md_col)
+      })
+    args[['tracks']] <- params[['color.by']]
+    
+    
+    p <- do.call(plot_heatmap, args)
     
     attr(p, 'history') <- history
-    attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
-    attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
-      cmds <- sapply(seq_along(ranks), function (i) {
-        sub(
-          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
-          pattern     = "ggplot(data)", 
-          replacement = sprintf("p%i <- ggplot(data[[%s]])", i, glue::single_quote(ranks[[i]])),
-          fixed       = TRUE )
-      })
-      c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
-    }))
     
-    remove("ranks", "plots")
     
-    return (p)
-  }
-  
-  
-  #________________________________________________________
-  # Subset biom by requested metadata and aes.
-  #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    color.by = list(),
-    order.by = list(),
-    limit.by = list() ))
-  
-  biom <- params[['biom']]
-  
-  
-  #________________________________________________________
-  # Sanity Check
-  #________________________________________________________
-  if (nsamples(biom) < 1)
-    stop("At least one sample is needed for a taxa heatmap.")
-  
-  
-  
-  #________________________________________________________
-  # Matrix with samples in columns and taxa in rows.
-  #________________________________________________________
-  mtx <- t(taxa_matrix(
-    biom = biom, 
-    rank = params[['rank']], 
-    taxa = params[['taxa']] ))
-  
-  
-  
-  #________________________________________________________
-  # Arguments to pass on to plot_heatmap
-  #________________________________________________________
-  excl <- setdiff(formalArgs(taxa_heatmap), formalArgs(plot_heatmap))
-  excl <- c(excl, names(params)[startsWith(names(params), '.')])
-  args <- params[setdiff(names(params), excl)]
-  
-  args[['mtx']] <- mtx
-  args[['grid']][['label']] %<>% sub("{rank}", params[['rank']], ., fixed = TRUE)
-  
-  for (md_col in names(params[['color.by']]))
-    params[['color.by']][[md_col]] %<>% within({
-      colors <- values
-      values <- metadata(biom, md_col)
-    })
-  args[['tracks']] <- params[['color.by']]
-  
-  
-  p <- do.call(plot_heatmap, args)
-  
-  attr(p, 'history') <- history
-  
-  
-  return(p)
+    return(p)
+    
+  }))
 }
 

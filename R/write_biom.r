@@ -21,26 +21,26 @@
 write_biom <- function (biom, file, format="json") {
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Accept abbreviations of tab, json, and hdf5
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   opts   <- c("tab", "json", "hdf5")
   format <- tolower(head(format, 1))
   format <- c(opts, format)[pmatch(format, opts, nomatch=4)]
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Refuse to overwrite existing files.
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   if (file.exists(file))
       stop(simpleError(sprintf("Output file already exists: '%s'", file)))
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Try to convert non-BIOM objects to a matrix for tsv output.
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   if (!is(biom, "BIOM")) {
     
@@ -53,9 +53,9 @@ write_biom <- function (biom, file, format="json") {
   }
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Default values for required fields
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   if (is_null(biom$info$type))     biom$info$type <- "OTU table"
   if (is.na(biom$info$type))       biom$info$type <- "OTU table"
@@ -77,9 +77,9 @@ write_biom <- function (biom, file, format="json") {
 
 
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 # BIOM Classic - Tabular
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 
 write_biom.tsv <- function (biom, file) {
   
@@ -133,9 +133,9 @@ write_biom.tsv <- function (biom, file) {
 
 
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 # BIOM v1.0 - JSON
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 
 write_biom.1.0 <- function (biom, file) {
   
@@ -150,7 +150,7 @@ write_biom.1.0 <- function (biom, file) {
     
     
     # Attributes
-    #------------------------------------------------------
+    #________________________________________________________
     id                  = biom$info$id,
     type                = biom$info$type,
     format              = "1.0.0", 
@@ -164,12 +164,12 @@ write_biom.1.0 <- function (biom, file) {
     
     
     # Phylogenetic Tree
-    #------------------------------------------------------
+    #________________________________________________________
     phylogeny = ifelse(is_null(biom$phylogeny), "", rbiom::write_tree(biom$phylogeny)),
     
     
     # Taxonomy
-    #------------------------------------------------------
+    #________________________________________________________
     rows = lapply(1:biom$counts$nrow, function (i) {
       TaxaID   <- biom$counts$dimnames[[1]][i]
       Metadata <- list(taxonomy=unname(biom$taxonomy[i,]))
@@ -182,7 +182,7 @@ write_biom.1.0 <- function (biom, file) {
     
     
     # Sample IDs and Metadata
-    #------------------------------------------------------
+    #________________________________________________________
     columns = lapply(1:biom$counts$ncol, function (j) list(
       id = biom$counts$dimnames[[2]][j],
       metadata = {
@@ -197,7 +197,7 @@ write_biom.1.0 <- function (biom, file) {
     
     
     # Read counts
-    #------------------------------------------------------
+    #________________________________________________________
     data = lapply(seq_along(biom$counts$v), function (k) 
       c(biom$counts$i[k] - 1, biom$counts$j[k] - 1, biom$counts$v[k])
     )
@@ -220,9 +220,9 @@ write_biom.1.0 <- function (biom, file) {
 
 
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 # BIOM v2.1 - HDF5
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#________________________________________________________
 
 write_biom.2.1 <- function (biom, file) {
   
@@ -256,7 +256,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Attributes
-  #------------------------------------------------------
+  #________________________________________________________
   rhdf5::h5writeAttribute(as.character(biom$info$id      %||% ""),                    h5, 'id')
   rhdf5::h5writeAttribute(as.character(biom$info$type    %||% ""),                    h5, 'type')
   rhdf5::h5writeAttribute(as.character(biom$info$comment %||% ""),                    h5, 'comment')
@@ -271,7 +271,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Read counts by taxa (rows)
-  #------------------------------------------------------
+  #________________________________________________________
   x <- matrix(c(biom$counts$i - 1, biom$counts$j - 1, biom$counts$v), byrow=FALSE, ncol=3)
   x <- x[order(x[,1]),,drop=FALSE]
   rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[1]]),                                h5, 'observation/ids')
@@ -282,7 +282,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Read counts by sample (columns)
-  #------------------------------------------------------
+  #________________________________________________________
   x <- x[order(x[,2]),,drop=FALSE]
   rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[2]]),                                h5, 'sample/ids')
   rhdf5::h5writeDataset(as.numeric(x[,3]),                                                      h5, 'sample/matrix/data')
@@ -292,7 +292,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Sample Metadata
-  #------------------------------------------------------
+  #________________________________________________________
   if (is(biom[['metadata']], "data.frame")) {
     plyr::l_ply(setdiff(names(biom$metadata), 'SampleID'), function (field) {
       
@@ -315,7 +315,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Taxonomy
-  #------------------------------------------------------
+  #________________________________________________________
   if (is(biom[['taxonomy']], "matrix")) {
     h5path      <- 'observation/metadata/taxonomy'
     x           <- t(biom$taxonomy[biom$counts$dimnames[[1]],,drop=FALSE])
@@ -326,7 +326,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Sequences
-  #------------------------------------------------------
+  #________________________________________________________
   if (is(biom[['sequences']], "character")) {
     h5path <- 'observation/metadata/sequences'
     x      <- unname(biom$sequences[biom$counts$dimnames[[1]]])
@@ -336,7 +336,7 @@ write_biom.2.1 <- function (biom, file) {
   
   
   # Phylogenetic Tree
-  #------------------------------------------------------
+  #________________________________________________________
   if (is(biom[['phylogeny']], "phylo")) {
     
     h5path <- '/observation/group-metadata/phylogeny'

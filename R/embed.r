@@ -23,7 +23,7 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
     openssl::base64_encode() %>%
     sprintf(
       fmt = '<a download=%s href="data:text/csv;base64,%s">%s</a>', 
-      glue::double_quote(filename), ., label) %>%
+      double_quote(filename), ., label) %>%
     structure(html = TRUE, class = c("html", "character"))
 }
 
@@ -36,7 +36,7 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
 #' @export
 #' @examples
 #'     library(rbiom)
-#'     p <- plot(hmp50, Bray ~ Sex, "b")
+#'     p <- adiv_boxplot(hmp50, color.by = "Body Site")
 #'     attr(p, 'cmd') %>% embed_code() %>% cat("\n\n")
 
 embed_code <- function (x) {

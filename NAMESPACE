@@ -28,7 +28,6 @@ export(`has_sequences`)
 export(`id`)
 export(`id<-`)
 export(`info`)
-export(`init_cache`)
 export(`is_rarefied`)
 export(`nsamples`)
 export(`ntaxa`)
@@ -84,7 +83,6 @@ export(`as.percent`)
 export(`beta.div`)
 export(`has.phylogeny`)
 export(`has.sequences`)
-export(`init.cache`)
 export(`is.rarefied`)
 export(`read.biom`)
 export(`read.fasta`)
@@ -114,7 +112,7 @@ importClassesFrom("ggplot2")
 import("RcppParallel")
 
 importFrom("ape", "print.phylo")
-importFrom("glue", "backtick", "glue", "glue_collapse")
+importFrom("glue", "glue", "glue_collapse", "backtick", "single_quote", "double_quote")
 importFrom("grDevices", "boxplot.stats")
 importFrom("ggplot2", "aes", "aes_")
 importFrom("ggrepel", "geom_text_repel", "geom_label_repel")
@@ -123,7 +121,10 @@ importFrom("methods", "is", "as")
 importFrom("Rcpp", "sourceCpp")
 
 importFrom("rlang",
-           "%||%", "enquo", "quo_name", "get_env", 
+           "%||%", "enquo", "get_env", "hash", "quo_name", 
+           "as_label",
+           "caller_call", "caller_env", "caller_fn", 
+           "call_match", "call_args", "call_name",
            "is_na", "is_null", "is_empty", "is_list",
            "is_true", "is_false", "is_logical", "is_scalar_logical", 
            "is_atomic", "is_scalar_atomic",

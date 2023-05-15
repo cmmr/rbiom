@@ -1,4 +1,6 @@
 #' Subset counts so that all samples have the same number of observations.
+#' 
+#' @name rarefy
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'        object, as returned from \link{read_biom}. For matrices, the rows and
@@ -35,152 +37,155 @@
 
 rarefy <- function (biom, depth=NULL, seed=0) {
   
-  
-  #--------------------------------------------------------------
-  # Get the input into a simple_triplet_matrix
-  #--------------------------------------------------------------
-  if (is(biom, "simple_triplet_matrix")) { counts <- biom
-  } else if (is(biom, "BIOM"))           { counts <- biom$counts
-  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
-  } else {
-    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Remove rows/cols with zero observations
-  #--------------------------------------------------------------
-  counts <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
-  
-  
-  #--------------------------------------------------------------
-  # Choose the rarefaction depth to sample at
-  #--------------------------------------------------------------
-
-  if (is_null(depth)) {
+  with_cache(local({
     
-    depth <- default_rarefaction_depth(counts)
     
-  } else {
-
-    if (!is(depth, "numeric"))
-      stop(simpleError("In rarefy(), depth must be an integer."))
-
-    if (depth %% 1 != 0)
-      stop(simpleError("In rarefy(), depth must be an integer."))
+    #________________________________________________________
+    # Get the input into a simple_triplet_matrix
+    #________________________________________________________
+    if (is(biom, "simple_triplet_matrix")) { counts <- biom
+    } else if (is(biom, "BIOM"))           { counts <- biom$counts
+    } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+    } else {
+      stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+    }
     
-    if (depth <= 0)
-      stop(simpleError("In rarefy(), depth must be positive."))
-  }
-  
-  
-  
-  
-  #--------------------------------------------------------------
-  # Integer data. Randomly select observations to keep.
-  #--------------------------------------------------------------
-  
-  if (all(counts$v %% 1 == 0)) {
     
-    counts <- rcpp_rarefy(counts, depth, seed)
+    #________________________________________________________
+    # Remove rows/cols with zero observations
+    #________________________________________________________
+    counts <- counts[slam::row_sums(counts) > 0, slam::col_sums(counts) > 0]
+    
+    
+    #________________________________________________________
+    # Choose the rarefaction depth to sample at
+    #________________________________________________________
   
-    
-  #--------------------------------------------------------------
-  # Fractional data. Re-scale between 1 and depth. Total = depth.
-  #--------------------------------------------------------------
-  
-  } else {
-    
-    counts <- as.matrix(counts)
-    
-    # Does this, but then nudges up and down until == depth:
-    # round(t((t(counts) / colSums(counts))) * depth)
-    
-    counts <- apply(counts, 2L, function (x) { 
-      x        <- x / sum(x)
-      y        <- round(x * depth)
-      maxIters <- length(x)
+    if (is_null(depth)) {
       
-      while (sum(y) < depth && maxIters > 0) {
-        i        <- which.min( ((y + 1) / depth) - x )
-        y[i]     <- y[i] + 1
-        maxIters <- maxIters - 1
-      }
-      while (sum(y) > depth && maxIters > 0) {
-        i        <- which.min( x - ((y - 1) / depth) )
-        y[i]     <- y[i] - 1
-        maxIters <- maxIters - 1
-      }
+      depth <- default_rarefaction_depth(counts)
       
-      return (y)
-    })
+    } else {
+  
+      if (!is(depth, "numeric"))
+        stop(simpleError("In rarefy(), depth must be an integer."))
+  
+      if (depth %% 1 != 0)
+        stop(simpleError("In rarefy(), depth must be an integer."))
+      
+      if (depth <= 0)
+        stop(simpleError("In rarefy(), depth must be positive."))
+    }
     
-    counts    <- slam::as.simple_triplet_matrix(counts)
     
-  }
+    
+    
+    #________________________________________________________
+    # Integer data. Randomly select observations to keep.
+    #________________________________________________________
+    
+    if (all(counts$v %% 1 == 0)) {
+      
+      counts <- rcpp_rarefy(counts, depth, seed)
+    
+      
+    #________________________________________________________
+    # Fractional data. Re-scale between 1 and depth. Total = depth.
+    #________________________________________________________
+    
+    } else {
+      
+      counts <- as.matrix(counts)
+      
+      # Does this, but then nudges up and down until == depth:
+      # round(t((t(counts) / colSums(counts))) * depth)
+      
+      counts <- apply(counts, 2L, function (x) { 
+        x        <- x / sum(x)
+        y        <- round(x * depth)
+        maxIters <- length(x)
+        
+        while (sum(y) < depth && maxIters > 0) {
+          i        <- which.min( ((y + 1) / depth) - x )
+          y[i]     <- y[i] + 1
+          maxIters <- maxIters - 1
+        }
+        while (sum(y) > depth && maxIters > 0) {
+          i        <- which.min( x - ((y - 1) / depth) )
+          y[i]     <- y[i] - 1
+          maxIters <- maxIters - 1
+        }
+        
+        return (y)
+      })
+      
+      counts    <- slam::as.simple_triplet_matrix(counts)
+      
+    }
+    
+    TaxaIDs   <- rownames(counts)
+    SampleIDs <- colnames(counts)
+    
+    
+    #________________________________________________________
+    # If biom isn't a BIOM object, return now.
+    #________________________________________________________
+    if (is(biom, "simple_triplet_matrix")) return (counts)
+    if (is(biom, "matrix")) return (as.matrix(counts))
+    
   
-  TaxaIDs   <- rownames(counts)
-  SampleIDs <- colnames(counts)
   
+    #________________________________________________________
+    # Drop unobserved taxa and excluded samples from BIOM object
+    #________________________________________________________
+    
+    biom$counts   <- counts
+    biom$taxonomy <- biom$taxonomy[TaxaIDs,,drop=FALSE]
+    biom$metadata <- biom$metadata[SampleIDs,,drop=FALSE]
   
-  #--------------------------------------------------------------
-  # If biom isn't a BIOM object, return now.
-  #--------------------------------------------------------------
-  if (is(biom, "simple_triplet_matrix")) return (counts)
-  if (is(biom, "matrix")) return (as.matrix(counts))
+    if (!is_null(biom$phylogeny))
+      biom$phylogeny <- rbiom::subtree(biom$phylogeny, TaxaIDs)
+    
+    if (!is_null(biom$sequences))
+      biom$sequences <- biom$sequences[TaxaIDs]
+    
+    biom$info$shape <- c(length(TaxaIDs), length(SampleIDs))
+    
+    
+    #________________________________________________________
+    # Drop missing factor levels from metadata
+    #________________________________________________________
+    for (i in colnames(biom$metadata))
+      if (is.factor(biom$metadata[[i]]))
+        biom$metadata[[i]] <- factor(
+          x      = as.character(biom$metadata[[i]]), 
+          levels = intersect(
+            levels(biom$metadata[[i]]),
+            unique(as.character(biom$metadata[[i]])) ))
+    
+    
+    #________________________________________________________
+    # Attach rarefy() call to provenance tracking
+    #________________________________________________________
+    cl      <- match.call()
+    cl[[1]] <- as.name("rarefy")
+    cl[[2]] <- as.name("biom")
+    for (i in seq_along(cl)[-(1:2)]) {
+      cl[i] <- list(eval.parent(cl[[i]]))
+    }
+    names(cl)[[2]] <- ""
+    attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
+    
+    
+    #________________________________________________________
+    # Record rarefaction level
+    #________________________________________________________
+    attr(biom, 'rarefaction') <- depth
   
+    
+    return (biom)
 
-
-  #--------------------------------------------------------------
-  # Drop unobserved taxa and excluded samples from BIOM object
-  #--------------------------------------------------------------
-  
-  biom$counts   <- counts
-  biom$taxonomy <- biom$taxonomy[TaxaIDs,,drop=FALSE]
-  biom$metadata <- biom$metadata[SampleIDs,,drop=FALSE]
-
-  if (!is_null(biom$phylogeny))
-    biom$phylogeny <- rbiom::subtree(biom$phylogeny, TaxaIDs)
-  
-  if (!is_null(biom$sequences))
-    biom$sequences <- biom$sequences[TaxaIDs]
-  
-  biom$info$shape <- c(length(TaxaIDs), length(SampleIDs))
-  
-  
-  #--------------------------------------------------------------
-  # Drop missing factor levels from metadata
-  #--------------------------------------------------------------
-  for (i in colnames(biom$metadata))
-    if (is.factor(biom$metadata[[i]]))
-      biom$metadata[[i]] <- factor(
-        x      = as.character(biom$metadata[[i]]), 
-        levels = intersect(
-          levels(biom$metadata[[i]]),
-          unique(as.character(biom$metadata[[i]])) ))
-  
-  
-  #--------------------------------------------------------------
-  # Attach rarefy() call to provenance tracking
-  #--------------------------------------------------------------
-  cl      <- match.call()
-  cl[[1]] <- as.name("rarefy")
-  cl[[2]] <- as.name("biom")
-  for (i in seq_along(cl)[-(1:2)]) {
-    cl[i] <- list(eval.parent(cl[[i]]))
-  }
-  names(cl)[[2]] <- ""
-  attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
-  
-  
-  #--------------------------------------------------------------
-  # Record rarefaction level
-  #--------------------------------------------------------------
-  attr(biom, 'rarefaction') <- depth
-
-  
-  return (biom)
-
+  }))
 }
 
 
@@ -196,9 +201,9 @@ rarefy <- function (biom, depth=NULL, seed=0) {
 default_rarefaction_depth <- function (biom) {
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Get the input into a simple_triplet_matrix
-  #--------------------------------------------------------------
+  #________________________________________________________
   if (is(biom, "simple_triplet_matrix")) { counts <- biom
   } else if (is(biom, "BIOM"))           { counts <- biom$counts
   } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)

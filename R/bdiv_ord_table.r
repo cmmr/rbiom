@@ -110,188 +110,193 @@ bdiv_ord_table <- function (
     rank=NULL, taxa=5, p.adj='fdr', p.top=5, ...) {
   
   
-  ord  %<>% validate_metrics(NULL, ., mode = "ord",  multi=TRUE)
-  dist %<>% validate_metrics(biom, ., mode = "bdiv", multi=TRUE)
-  
-  
-  #________________________________________________________
-  # Can't do as much when biom is a dist object
-  #________________________________________________________
-  if (!is(biom, 'BIOM'))
-    for (i in c('md', 'split.by', 'stat.by', 'rank'))
-      if (!is_null(get(i)))
-        stop("BIOM object needed for running bdiv_ord_table() with `", i, "` argument.")
-  
-  
-  #________________________________________________________
-  # Verify metadata columns exist
-  #________________________________________________________
-  if (isTRUE(md))
-    md <- colnames(metadata(biom))
-  
-  if (is.character(md)) {
-    missing <- setdiff(c(md, split.by, stat.by), colnames(metadata(biom)))
-    if (length(missing) > 0)
-      stop("Metadata column(s) ", paste(collapse = ", ", missing), " not found.")
-  }
-  
-  
-  #________________________________________________________
-  # Subdivide BIOM object according to metadata
-  #________________________________________________________
-  if (is_null(split.by)) {
-    biom_list <- list(biom)
-  } else {
-    biom_list <- blply(biom, split.by, function (b) b)
-  }
-  
-  
-  #________________________________________________________
-  # Biplot - determine taxonomic rank
-  #________________________________________________________
-  if (is_null(rank) && is.character(taxa)) {
-    rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
-  } else if (!is_null(rank)) {
-    rank <- validate_metrics(biom, rank, mode="rank", multi=TRUE)
-  }
-  
-  
-  #________________________________________________________
-  # Aggregate iterative output together into final tables
-  #________________________________________________________
-  add_loop_columns <- function (x, i, w, d, o = NULL) {
-    if (is_null(x)) return (NULL)
-    x[['.weight']] <- ifelse(w, "Weighted", "Unweighted")
-    x[['.dist']]   <- d
-    if (!is_null(o)) x[['.ord']]    <- o
-    for (j in colnames(attr(biom_list, 'split_labels')))
-      x[[j]] <- attr(biom_list, 'split_labels')[i,j]
-    return (x)
-  }
-  
-  
-  #________________________________________________________
-  # Loop over all combinations of variables
-  #________________________________________________________
-  ord_results       <- NULL
-  stats_tbl_results <- NULL
-  biplot_results    <- NULL
-  
-  for (i in seq_along(biom_list))
-    for (w in as.logical(weighted))
-      for (d in dist) {
-        
-        #________________________________________________________
-        # Generate distance matrix and/or Adonis statistics
-        #________________________________________________________
-        b <- biom_list[[i]]
-        
-        if (is(b, 'dist')) {
-          dm <- b
-          if (!is_null(stat.by)) {
-            set.seed(seed)
-            stats_raw <- try(vegan::adonis2(dm ~ stat.by, permutations=perms-1), silent = TRUE)
-            stats_tbl <- adonis_table(stats_raw)
-          } else {
-            stats_tbl <- NULL
-          }
-          
-        } else {
-          dm <- bdiv_distmat(biom = b, method = d, weighted = w, tree = tree, stat.by=stat.by, seed=seed, perms=perms-1)
-          stats_tbl <- attr(dm, 'stats_tbl', exact = TRUE)
-          attr(dm, 'stats_raw') <- NULL
-          attr(dm, 'stats_tbl') <- NULL
-        }
-        
-        
-        for (o in ord) {
-          
+  with_cache(local({
+    
+    
+    ord  %<>% validate_metrics(NULL, ., mode = "ord",  multi=TRUE)
+    dist %<>% validate_metrics(biom, ., mode = "bdiv", multi=TRUE)
+    
+    
+    #________________________________________________________
+    # Can't do as much when biom is a dist object
+    #________________________________________________________
+    if (!is(biom, 'BIOM'))
+      for (i in c('md', 'split.by', 'stat.by', 'rank'))
+        if (!is_null(get(i)))
+          stop("BIOM object needed for running bdiv_ord_table() with `", i, "` argument.")
+    
+    
+    #________________________________________________________
+    # Verify metadata columns exist
+    #________________________________________________________
+    if (isTRUE(md))
+      md <- colnames(metadata(biom))
+    
+    if (is.character(md)) {
+      missing <- setdiff(c(md, split.by, stat.by), colnames(metadata(biom)))
+      if (length(missing) > 0)
+        stop("Metadata column(s) ", paste(collapse = ", ", missing), " not found.")
+    }
+    
+    
+    #________________________________________________________
+    # Subdivide BIOM object according to metadata
+    #________________________________________________________
+    if (is_null(split.by)) {
+      biom_list <- list(biom)
+    } else {
+      biom_list <- blply(biom, split.by, function (b) b)
+    }
+    
+    
+    #________________________________________________________
+    # Biplot - determine taxonomic rank
+    #________________________________________________________
+    if (is_null(rank) && is.character(taxa)) {
+      rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
+    } else if (!is_null(rank)) {
+      rank <- validate_metrics(biom, rank, mode="rank", multi=TRUE)
+    }
+    
+    
+    #________________________________________________________
+    # Aggregate iterative output together into final tables
+    #________________________________________________________
+    add_loop_columns <- function (x, i, w, d, o = NULL) {
+      if (is_null(x)) return (NULL)
+      x[['.weight']] <- ifelse(w, "Weighted", "Unweighted")
+      x[['.dist']]   <- d
+      if (!is_null(o)) x[['.ord']]    <- o
+      for (j in colnames(attr(biom_list, 'split_labels')))
+        x[[j]] <- attr(biom_list, 'split_labels')[i,j]
+      return (x)
+    }
+    
+    
+    #________________________________________________________
+    # Loop over all combinations of variables
+    #________________________________________________________
+    ord_results       <- NULL
+    stats_tbl_results <- NULL
+    biplot_results    <- NULL
+    
+    for (i in seq_along(biom_list))
+      for (w in as.logical(weighted))
+        for (d in dist) {
           
           #________________________________________________________
-          # Ordinate samples => ('.axis.1', '.axis.2')
+          # Generate distance matrix and/or Adonis statistics
           #________________________________________________________
-          if (o == "PCoA") {
-            res <- ape::pcoa(dm, ...)
-            df  <- res$vectors[,1:k] %>% as.data.frame()
-            eig <- res$values$Relative_eig[1:k] %>% as.data.frame()
-            
-          } else if (o == "tSNE") {
-            res <- suppressMessages(tsne::tsne(dm, k=k, ...))
-            df  <- res %>% as.data.frame()
-            rownames(df) <- attr(dm, "Labels", exact = TRUE)
-            eig <- NULL
-            
-          } else if (o == "NMDS") {
-            res <- vegan::metaMDS(dm, k=k, trace=0, ...)
-            df  <- res$points %>% as.data.frame()
-            eig <- NULL
-            
-          } else if (o == "UMAP") {
-            n_neighbors <- max(2, min(100, as.integer(attr(dm, 'Size') / 3)))
-            res <- uwot::umap(dm, n_neighbors, n_components = k, ...)
-            df  <- res %>% as.data.frame()
-            eig <- NULL
+          b <- biom_list[[i]]
+          
+          if (is(b, 'dist')) {
+            dm <- b
+            if (!is_null(stat.by)) {
+              set.seed(seed)
+              stats_raw <- try(vegan::adonis2(dm ~ stat.by, permutations=perms-1), silent = TRUE)
+              stats_tbl <- adonis_table(stats_raw)
+            } else {
+              stats_tbl <- NULL
+            }
             
           } else {
-            stop("'", o, "' is not a valid argument for 'ord'.")
+            dm <- bdiv_distmat(biom = b, method = d, weighted = w, tree = tree, stat.by=stat.by, seed=seed, perms=perms-1)
+            stats_tbl <- attr(dm, 'stats_tbl', exact = TRUE)
+            attr(dm, 'stats_raw') <- NULL
+            attr(dm, 'stats_tbl') <- NULL
           }
-          colnames(df)    <- paste0(".axis.", 1:k)
-          df[['.sample']] <- rownames(df)
           
           
-          #________________________________________________________
-          # Calculate 0, 1, or more biplot(s)
-          #________________________________________________________
-          biplot <- ordinate_biplot(b, df, rank, taxa, p.adj, p.top, perms)
+          for (o in ord) {
+            
+            
+            #________________________________________________________
+            # Ordinate samples => ('.axis.1', '.axis.2')
+            #________________________________________________________
+            if (o == "PCoA") {
+              res <- ape::pcoa(dm, ...)
+              df  <- res$vectors[,1:k] %>% as.data.frame()
+              eig <- res$values$Relative_eig[1:k] %>% as.data.frame()
+              
+            } else if (o == "tSNE") {
+              res <- suppressMessages(tsne::tsne(dm, k=k, ...))
+              df  <- res %>% as.data.frame()
+              rownames(df) <- attr(dm, "Labels", exact = TRUE)
+              eig <- NULL
+              
+            } else if (o == "NMDS") {
+              res <- vegan::metaMDS(dm, k=k, trace=0, ...)
+              df  <- res$points %>% as.data.frame()
+              eig <- NULL
+              
+            } else if (o == "UMAP") {
+              n_neighbors <- max(2, min(100, as.integer(attr(dm, 'Size') / 3)))
+              res <- uwot::umap(dm, n_neighbors, n_components = k, ...)
+              df  <- res %>% as.data.frame()
+              eig <- NULL
+              
+            } else {
+              stop("'", o, "' is not a valid argument for 'ord'.")
+            }
+            colnames(df)    <- paste0(".axis.", 1:k)
+            df[['.sample']] <- rownames(df)
+            
+            
+            #________________________________________________________
+            # Calculate 0, 1, or more biplot(s)
+            #________________________________________________________
+            biplot <- ordinate_biplot(b, df, rank, taxa, p.adj, p.top, perms)
+            
+            rownames(df) <- NULL
+            ord_results    %<>% rbind(add_loop_columns(df,     i, w, d, o))
+            biplot_results %<>% rbind(add_loop_columns(biplot, i, w, d, o))
+            
+          } # end o / ord
           
-          rownames(df) <- NULL
-          ord_results    %<>% rbind(add_loop_columns(df,     i, w, d, o))
-          biplot_results %<>% rbind(add_loop_columns(biplot, i, w, d, o))
+          stats_tbl_results %<>% rbind(add_loop_columns(stats_tbl, i, w, d))
           
-        } # end o / ord
-        
-        stats_tbl_results %<>% rbind(add_loop_columns(stats_tbl, i, w, d))
-        
-      } # end i,w,d / biom_list, weighted, dist
-  
-  
-  #________________________________________________________
-  # Make properly ordered factors
-  #________________________________________________________
-  strings_to_factors <- function (x) {
-    if (is_null(x)) return (NULL)
-    for (i in intersect(colnames(x), c('.weight', '.dist', '.ord')))
-      x[[i]] %<>% factor(levels = unique(x[[i]]))
-    return (x)
-  }
-  ord_results       %<>% strings_to_factors()
-  stats_tbl_results %<>% strings_to_factors()
-  biplot_results    %<>% strings_to_factors()
-  
-  
-  #________________________________________________________
-  # Add metadata to the ord_results table.
-  #________________________________________________________
-  sampleIDs <- ord_results[['.sample']]
-  for (i in rev(unique(c(md, split.by, stat.by))))
-    ord_results[[i]] <- metadata(biom, i)[sampleIDs]
-  remove("sampleIDs")
-  
-  
-  #________________________________________________________
-  # Optionally switch to unsafe column names.
-  #________________________________________________________
-  if (!isTRUE(safe)) {
-    ord_results       %<>% soft_rename()
-    stats_tbl_results %<>% soft_rename()
-    biplot_results    %<>% soft_rename()
-  }
-  
-  
-  attr(ord_results, 'stats_tbl') <- stats_tbl_results
-  attr(ord_results, 'biplot')    <- biplot_results
-  
-  return (ord_results)
+        } # end i,w,d / biom_list, weighted, dist
+    
+    
+    #________________________________________________________
+    # Make properly ordered factors
+    #________________________________________________________
+    strings_to_factors <- function (x) {
+      if (is_null(x)) return (NULL)
+      for (i in intersect(colnames(x), c('.weight', '.dist', '.ord')))
+        x[[i]] %<>% factor(levels = unique(x[[i]]))
+      return (x)
+    }
+    ord_results       %<>% strings_to_factors()
+    stats_tbl_results %<>% strings_to_factors()
+    biplot_results    %<>% strings_to_factors()
+    
+    
+    #________________________________________________________
+    # Add metadata to the ord_results table.
+    #________________________________________________________
+    sampleIDs <- ord_results[['.sample']]
+    for (i in rev(unique(c(md, split.by, stat.by))))
+      ord_results[[i]] <- metadata(biom, i)[sampleIDs]
+    remove("sampleIDs")
+    
+    
+    #________________________________________________________
+    # Optionally switch to unsafe column names.
+    #________________________________________________________
+    if (!isTRUE(safe)) {
+      ord_results       %<>% soft_rename()
+      stats_tbl_results %<>% soft_rename()
+      biplot_results    %<>% soft_rename()
+    }
+    
+    
+    attr(ord_results, 'stats_tbl') <- stats_tbl_results
+    attr(ord_results, 'biplot')    <- biplot_results
+    
+    return (ord_results)
+    
+  }))
 }
 
 

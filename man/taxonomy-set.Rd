@@ -24,7 +24,7 @@ Set the taxonomy table.
     taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
     
     # rbiom can insert more descriptive placeholders
-    taxonomy(hmp50, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
+    taxonomy(hmp50, unc = "grouped")[c(107,170,194), 'Genus', drop=FALSE]
 
 }
 \seealso{

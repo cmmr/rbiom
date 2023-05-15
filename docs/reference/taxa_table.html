@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9085</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9088</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Generate a data.frame of taxa abundance for each sample at the specified taxonomic rank.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_table.r" class="external-link"><code>R/taxa_table.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_rollup.r" class="external-link"><code>R/taxa_rollup.r</code></a></small>
       <div class="d-none name"><code>taxa_table.Rd</code></div>
     </div>
 
@@ -71,6 +71,8 @@
 <span>  map <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  md <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
+<span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  safe <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -98,18 +100,18 @@ the value type, a different filter is applied.</p><dl><dt><code>NULL</code></dt>
 
   <dt>Integer &gt;= 1</dt>
 <dd><p>The N most abundant taxa are retained. Example:
-    <code>taxa_table(biom, 'Genus', 5)</code> returned the five most
+    <code>taxa_matrix(biom, 'Genus', 5)</code> returned the five most
     abundant genera.</p></dd>
 
   <dt>Numeric between 0 and 1</dt>
 <dd><p>Taxa are retained if their abundance 
     is greater than or equal to N. Example: 
-    <code>taxa_table(biom, 'Phylum', 0.1)</code> returns all phyla with a
+    <code>taxa_matrix(biom, 'Phylum', 0.1)</code> returns all phyla with a
     relative abundance of at least 10 %.</p></dd>
 
   <dt>Character vector</dt>
 <dd><p>Only these taxa names are retained. Example: 
-    <code>taxa_table(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))</code>
+    <code>taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))</code>
     will only retain those two phyla.</p></dd>
 
 
@@ -147,6 +149,23 @@ level ranks.</p></dd>
 
 
 </dl></dd>
+
+
+<dt>unc</dt>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. The default, <code>"singly"</code>/<code>"s"</code>, replaces them 
+with the OTU name. Other options are <code>"grouped"</code>/<code>"g"</code>, 
+which replaces them with a higher rank's name, <code>"drop"</code>/<code>"d"</code> 
+which excludes them from the result, and <code>"asis"</code>/<code>"a"</code> to
+not check/modify any taxa names.</p></dd>
+
+
+<dt>other</dt>
+<dd><p>Sum all non-itemized taxa into an "Other" taxa. The default,
+<code>FALSE</code>, only returns taxa matched by the <code>`taxa`</code> 
+argument. Specifying <code>TRUE</code> adds "Other" to the returned set.
+A string can also be given to imply <code>TRUE</code>, but with that
+value as the name to use in place of "Other".</p></dd>
 
 
 <dt>safe</dt>

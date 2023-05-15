@@ -87,17 +87,17 @@
 
 read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Sanity check input values
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   if (length(src) != 1 || !is(src, "character"))
     stop(simpleError("Data source for read_biom() must be a single string."))
 
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Get the url or text for the src/BIOM data into a file
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
 
@@ -127,9 +127,9 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   fp_date <- strftime(file.info(fp)[['ctime']], "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
   
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Decompress files that are in gzip or bzip2 format
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   file_con   <- file(fp)
   file_class <- summary(file_con)$class
@@ -149,15 +149,15 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   remove("file_con", "file_class")
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Process the file according to its internal format
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   if (identical(as.numeric(readBin(fp, "raw", 4)), c(137, 72, 68, 70))) {
     
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     # HDF5 file format  #
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     
     if (!requireNamespace("rhdf5", quietly = TRUE)) {
       stop(simpleError(paste0(
@@ -174,55 +174,55 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
     }
     
     
-    hdf5      <- PB.HDF5.ReadHDF5(fp)
-    counts    <- PB.HDF5.Counts(hdf5)
-    sequences <- PB.HDF5.Sequences(hdf5)
-    taxonomy  <- PB.HDF5.Taxonomy(hdf5)
-    metadata  <- PB.HDF5.Metadata(hdf5)
-    info      <- PB.HDF5.Info(hdf5)
-    phylogeny <- PB.HDF5.Tree(hdf5, tree)
+    hdf5      <- read_biom_hdf5(fp)
+    counts    <- parse_hdf5_counts(hdf5)
+    sequences <- parse_hdf5_sequences(hdf5)
+    taxonomy  <- parse_hdf5_taxonomy(hdf5)
+    metadata  <- parse_hdf5_metadata(hdf5)
+    info      <- parse_hdf5_info(hdf5)
+    phylogeny <- parse_hdf5_tree(hdf5, tree)
     
     rhdf5::H5Fclose(hdf5)
     remove("hdf5")
     
   } else if (identical("{", readChar(fp, 1))) {
     
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     # JSON file format  #
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     
-    json      <- PB.JSON.ReadJSON(fp)
-    counts    <- PB.JSON.Counts(json)
-    sequences <- PB.JSON.Sequences(json)
-    taxonomy  <- PB.JSON.Taxonomy(json)
-    metadata  <- PB.JSON.Metadata(json)
-    info      <- PB.JSON.Info(json)
-    phylogeny <- PB.JSON.Tree(json, tree)
+    json      <- read_biom_json(fp)
+    counts    <- parse_json_counts(json)
+    sequences <- parse_json_sequences(json)
+    taxonomy  <- parse_json_taxonomy(json)
+    metadata  <- parse_json_metadata(json)
+    info      <- parse_json_info(json)
+    phylogeny <- parse_json_tree(json, tree)
     
     remove("json")
     
   } else {
     
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     # TSV file format   #
-    #-=-=-=-=-=-=-=-=-=-#
+    #___________________#
     
     if (identical(tree, TRUE))
       stop(simpleError("It is impossible to load a phylogenetic tree from a BIOM file in tab-separated format."))
     
-    mtx       <- PB.TSV.ReadTSV(fp)
-    counts    <- PB.TSV.Counts(mtx)
+    mtx       <- read_biom_tsv(fp)
+    counts    <- parse_tsv_counts(mtx)
     sequences <- NULL
-    taxonomy  <- PB.TSV.Taxonomy(mtx)
+    taxonomy  <- parse_tsv_taxonomy(mtx)
     metadata  <- data.frame(row.names=colnames(counts))
     info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
     phylogeny <- NULL
   }
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Return everything we've computed as a BIOM class object.
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   if (!is.character(info[['comment']]))
     info[['comment']] <- NULL
@@ -248,25 +248,25 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   )
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Clean up taxa names and metadata column classes.
-  #--------------------------------------------------------------
+  #________________________________________________________
   if (isTRUE(cleanup)) {
     biom[['taxonomy']] <- rbiom::taxonomy(biom, unc     = "grouped")
     biom[['metadata']] <- rbiom::metadata(biom, cleanup = TRUE)
   }
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Discard samples/taxa with zero observations
-  #--------------------------------------------------------------
+  #________________________________________________________
   if (isTRUE(prune)) {
     biom <- repair(biom, prune=TRUE)
   }
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Attach read_biom() call to provenance tracking
-  #--------------------------------------------------------------
+  #________________________________________________________
   cl <- match.call()
   cl[[1]] <- as.name("read_biom")
   for (i in seq_along(cl)[-1]) {
@@ -277,9 +277,9 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   attr(biom, 'history') <- paste("biom <-", deparse1(cl))
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Determine if these counts are pre-rarefied
-  #--------------------------------------------------------------
+  #________________________________________________________
   if (isTRUE(length(d <- depth(biom)) == 1))
     attr(biom, 'rarefaction') <- d
   
@@ -289,20 +289,20 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
 
 
 
-PB.TSV.ReadTSV <- function (fp) {
+read_biom_tsv <- function (fp) {
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Read in all the lines from the file
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   lines <- try(readLines(fp, warn=FALSE), silent=TRUE)
   if (is(lines, "try-error"))
     stop(simpleError(sprintf("Unable to parse tab delimited file. %s", as.character(lines))))
 
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Write to a temp file all the lines that have content and don't begin with '#'
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   lines <- trimws(lines)
   lines <- c(
@@ -314,9 +314,9 @@ PB.TSV.ReadTSV <- function (fp) {
   writeLines(lines, fp, "\n")
 
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Comma or a tab first? To infer csv vs tsv format.
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   csv <- min(gregexpr(",",   lines[[1]])[[1]], fixed=TRUE)
   tsv <- min(gregexpr("\\t", lines[[1]])[[1]], fixed=TRUE)
@@ -335,9 +335,9 @@ PB.TSV.ReadTSV <- function (fp) {
     stop(simpleError(sprintf("Error converting to matrix: %s", as.character(mat))))
 
 
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Ensure we have at least one taxa (row headers) and one sample (column headers)
-  #--------------------------------------------------------------
+  #________________________________________________________
 
   if (nrow(mat) < 2 || ncol(mat) < 2) {
     msg <- "Unable to parse provided file: found %i rows and %i columns"
@@ -345,9 +345,9 @@ PB.TSV.ReadTSV <- function (fp) {
   }
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Check for duplicate taxa or sample names
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   dupTaxaNames   <- unique(mat[duplicated(mat[,1]),1])
   dupSampleNames <- unique(mat[1,duplicated(mat[1,])])
@@ -357,9 +357,9 @@ PB.TSV.ReadTSV <- function (fp) {
   if (length(dupSampleNames) > 0) stop(simpleError(sprintf("Duplicate sample names: %s", paste(collapse=",", dupSampleNames))))
   
   
-  #--------------------------------------------------------------
+  #________________________________________________________
   # Move the Taxa and Sample names into the matrix headers
-  #--------------------------------------------------------------
+  #________________________________________________________
   
   dimnames(mat) <- list(mat[,1], mat[1,])
   mat <- mat[-1,-1, drop=FALSE]
@@ -367,7 +367,7 @@ PB.TSV.ReadTSV <- function (fp) {
   return (mat)
 }
 
-PB.JSON.ReadJSON <- function (fp) {
+read_biom_json <- function (fp) {
 
   json <- try(jsonlite::read_json(path=fp), silent=TRUE)
   if (is(json, "try-error"))
@@ -379,7 +379,7 @@ PB.JSON.ReadJSON <- function (fp) {
   return (json)
 }
 
-PB.HDF5.ReadHDF5 <- function (fp) {
+read_biom_hdf5 <- function (fp) {
   
   hdf5 <- try(rhdf5::H5Fopen(fp), silent=TRUE)
   if (is(hdf5, "try-error")) {
@@ -402,7 +402,7 @@ PB.HDF5.ReadHDF5 <- function (fp) {
 
 
 
-PB.JSON.Metadata <- function (json) {
+parse_json_metadata <- function (json) {
   
   df <- as.data.frame(
     check.names      = FALSE,
@@ -430,7 +430,7 @@ PB.JSON.Metadata <- function (json) {
   return (df)
 }
 
-PB.HDF5.Metadata <- function (hdf5) {
+parse_hdf5_metadata <- function (hdf5) {
 
   keys <- names(hdf5$sample$metadata)
   vals <- lapply(keys, function (k) {
@@ -454,14 +454,14 @@ PB.HDF5.Metadata <- function (hdf5) {
 
 
 
-PB.JSON.Info <- function (json) {
+parse_json_info <- function (json) {
   info <- list()
   for (i in setdiff(names(json), c("rows", "columns", "data", "phylogeny")))
     info[[i]] <- if (is_null(unlist(json[[i]]))) NA else unlist(json[[i]])
   return (info)
 }
 
-PB.HDF5.Info <- function (hdf5) {
+parse_hdf5_info <- function (hdf5) {
   attrs <- rhdf5::h5readAttributes(hdf5, "/")
   for (i in names(attrs)) {
     attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
@@ -471,7 +471,7 @@ PB.HDF5.Info <- function (hdf5) {
 
 
 
-PB.TSV.Counts <- function (mtx) {
+parse_tsv_counts <- function (mtx) {
 
   # Only keep columns that are all numbers
   allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)([Ee][\\+\\-]{0,1}[0-9]+|)$", x))
@@ -487,7 +487,7 @@ PB.TSV.Counts <- function (mtx) {
   slam::as.simple_triplet_matrix(mtx)
 }
 
-PB.JSON.Counts <- function (json) {
+parse_json_counts <- function (json) {
 
   if (!any(c('sparse', 'dense') %in% json$matrix_type))
     stop(simpleError("BIOM file's matrix_type must be either 'sparse' or 'dense'"))
@@ -519,7 +519,7 @@ PB.JSON.Counts <- function (json) {
   return (counts)
 }
 
-PB.HDF5.Counts <- function (hdf5) {
+parse_hdf5_counts <- function (hdf5) {
 
   indptr <- as.numeric(hdf5$observation$matrix$indptr)
 
@@ -537,7 +537,7 @@ PB.HDF5.Counts <- function (hdf5) {
 
 
 
-PB.TSV.Taxonomy <- function (mtx) {
+parse_tsv_taxonomy <- function (mtx) {
 
   # Discard columns that are all numbers
   allNumbers <- function (x) all(grepl("^\\d+(\\.\\d+|)(e[\\+\\-]{0,1}[0-9]+|)$", x))
@@ -556,7 +556,7 @@ PB.TSV.Taxonomy <- function (mtx) {
   taxa_table    <- matrix(unlist(taxa_table), nrow=length(taxa_table), byrow=TRUE)
 
   rownames(taxa_table) <- rownames(mtx)
-  colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
+  colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
 
   # Better to return a completely empty table than one with just the taxa IDs
   if (identical(unname(taxa_table[,1]), rownames(taxa_table)))
@@ -565,7 +565,7 @@ PB.TSV.Taxonomy <- function (mtx) {
   return (taxa_table)
 }
 
-PB.JSON.Taxonomy <- function (json) {
+parse_json_taxonomy <- function (json) {
 
   taxa_table <- sapply(json$rows, simplify = "array", function (x) {
     
@@ -617,19 +617,19 @@ PB.JSON.Taxonomy <- function (json) {
   }
 
   rownames(taxa_table) <- sapply(json$rows, function (x) unlist(x$id))
-  colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
+  colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
 
   #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
 
   return (taxa_table)
 }
 
-PB.HDF5.Taxonomy <- function (hdf5) {
+parse_hdf5_taxonomy <- function (hdf5) {
   
   if ("taxonomy" %in% names(hdf5$observation$metadata)) {
     taxa_table           <- t(hdf5$observation$metadata$taxonomy)
     rownames(taxa_table) <- as.character(hdf5$observation$ids)
-    colnames(taxa_table) <- PB.TaxaLevelNames(ncol(taxa_table))
+    colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
     
   } else {
     ids        <- as.character(hdf5$observation$ids)
@@ -648,7 +648,7 @@ PB.HDF5.Taxonomy <- function (hdf5) {
 
 
 
-PB.JSON.Sequences <- function (json) {
+parse_json_sequences <- function (json) {
   
   # No sequence information
   if (!any(sapply(json$rows, function (x) 'sequence' %in% names(x$metadata) )))
@@ -664,7 +664,7 @@ PB.JSON.Sequences <- function (json) {
   return (res)
 }
 
-PB.HDF5.Sequences <- function (hdf5) {
+parse_hdf5_sequences <- function (hdf5) {
   
   # No sequence information
   if (!"sequences" %in% names(hdf5$observation$metadata))
@@ -680,10 +680,10 @@ PB.HDF5.Sequences <- function (hdf5) {
 
 
 
-PB.JSON.Tree <- function (json, tree_mode) {
+parse_json_tree <- function (json, tree_mode) {
   
   # Obey the tree argument
-  #------------------------------------------------------
+  #________________________________________________________
   if (identical(tree_mode, TRUE)) {
     tree <- unlist(json[['phylogeny']])
     
@@ -704,7 +704,7 @@ PB.JSON.Tree <- function (json, tree_mode) {
   
 
   # Try to read it, assuming newick format
-  #------------------------------------------------------
+  #________________________________________________________
   tree <- try(rbiom::read_tree(tree), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
@@ -715,7 +715,7 @@ PB.JSON.Tree <- function (json, tree_mode) {
 
 
   # Make sure it has all the OTUs from the table
-  #------------------------------------------------------
+  #________________________________________________________
   TaxaIDs <- sapply(json$rows, function (x) unlist(x$id))
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
@@ -729,7 +729,7 @@ PB.JSON.Tree <- function (json, tree_mode) {
   
   
   # Drop any extra taxa found in the tree
-  #------------------------------------------------------
+  #________________________________________________________
   if (length(tree$tip.label) > length(TaxaIDs))
     tree <- rbiom::subtree(tree, TaxaIDs)
 
@@ -737,17 +737,17 @@ PB.JSON.Tree <- function (json, tree_mode) {
   return (tree)
 }
 
-PB.HDF5.Tree <- function (hdf5, tree_mode) {
+parse_hdf5_tree <- function (hdf5, tree_mode) {
   
   # Obey the tree argument
-  #------------------------------------------------------
+  #________________________________________________________
   if (identical(tree_mode, FALSE)) {
     return (NULL)
   
   } else if (identical(tree_mode, TRUE) || identical(tree_mode, 'auto')) {
     
     # See if a tree is included in the BIOM file
-    #------------------------------------------------------
+    #________________________________________________________
     tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
     
     errmsg <- NULL
@@ -761,7 +761,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
     } else {
     
       # Assume it's newick format unless otherwise indicated
-      #------------------------------------------------------
+      #________________________________________________________
       attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
       if ("data_type" %in% names(attrs)) {
         data_type <- tolower(as.character(attrs[['data_type']]))
@@ -781,7 +781,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
   
   
   # Try to read the Newick-formatted tree
-  #------------------------------------------------------
+  #________________________________________________________
   tree <- try(rbiom::read_tree(tree), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
@@ -792,7 +792,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
   
   
   # Make sure it has all the OTUs from the table
-  #------------------------------------------------------
+  #________________________________________________________
   TaxaIDs <- as.character(hdf5$observation$ids)
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
@@ -806,7 +806,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
   
   
   # Drop any extra taxa found in the tree
-  #------------------------------------------------------
+  #________________________________________________________
   if (length(tree$tip.label) > length(TaxaIDs))
     tree <- rbiom::subtree(tree, TaxaIDs)
   
@@ -817,7 +817,7 @@ PB.HDF5.Tree <- function (hdf5, tree_mode) {
 
 
 
-PB.TaxaLevelNames <- function (n) {
+default_taxa_ranks <- function (n) {
   if (n >= 6 && n <= 8)
     return(c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "Strain")[1:n])
   sprintf("Level.%i", 1:n)
@@ -826,64 +826,3 @@ PB.TaxaLevelNames <- function (n) {
 
 
 
-# #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# # Rename poorly described taxa
-# #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# # Definition of poorly named taxa:
-# #  - ambiguious keywords
-# #  - numbers outside of parentheses
-# #  - length of less than 2 characters
-# #  - two capital letters in a row
-# #------------------------------------------------------------------
-#
-# PB.SanitizeTaxonomy <- function (tt, env=NULL) {
-#
-#   if (is_null(env)) env <- parent.frame()
-#
-#   tt <- sub("^.*?__\ *", "", tt)
-#   tt <- sub("^[a-z]_",   "", tt)
-#   tt <- sub("^[\ _]+",   "", tt)
-#   tt <- sub("[\ ]+$",    "", tt)
-#   tt[which(tt == "")] <- NA
-#
-#   invalid_case_sensi <- "([A-Z]{2})"
-#   invalid_case_insen <- paste(sep="|",
-#     "unknown",    "uncultured",      "unclassified",    "unidentified",
-#     "group",      "subsection",      "family",          "lineage",
-#     "candidate",  "incertae.*sedis", "(^.$)" )
-#   exception_rewrites <- c(
-#     "TM7"                  = "Saccharibacteria (TM7)",
-#     "RF9"                  = "Mollicutes RF9",
-#     "Escherichia_Shigella" = "Escherichia/Shigella")
-#
-#   # Search and replace bad names with NA
-#   taxaNames <- unique(as.vector(tt))
-#   invalids1 <- grep(invalid_case_insen, taxaNames, value=TRUE, ignore.case=TRUE)
-#   invalids2 <- grep(invalid_case_sensi, taxaNames, value=TRUE, ignore.case=FALSE)
-#   invalids  <- unique(c(invalids1, invalids2))
-#   invalids  <- setNames(rep(NA, length(invalids)), invalids)
-#   rewrites  <- c(exception_rewrites, invalids)
-#   rewrites  <- rewrites[!duplicated(names(rewrites))]
-#   tt[]      <- plyr::revalue(as.vector(as.matrix(tt)), rewrites, FALSE)
-#
-#   tt <- cbind(tt, rownames(tt))
-#
-#   # Replace NA with "<Last prior Non-NA value> (<Next Non-NA value or OTU Name>)"
-#   env$tt <- tt
-#
-#   tt <- withCluster(nTasks=nrow(tt), env=env, {
-#
-#     foreach::`%dopar%`(
-#       foreach::foreach(set=sets, .combine='cbind', .options.snow=opts),
-#       apply(tt[set,,drop=FALSE], 1, function (row) {
-#         cols <- which(is.na(row))
-#         if (length(cols) > 0)
-#           for (i in split(seq_along(cols), cumsum(c(0, diff(cols) > 1))))
-#             row[cols[i]] <- paste0(row[cols[min(i)] - 1], " (", row[cols[max(i)] + 1], ")")
-#         return (row)
-#       })
-#     )
-#   })
-#
-#   return (t(tt[1:(nrow(tt) - 1),,drop=FALSE]))
-# }

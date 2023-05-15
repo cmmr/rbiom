@@ -53,48 +53,52 @@ bdiv_boxplot <- function (
   p.adj = "fdr", p.label = TRUE, ci = 95, xlab.angle = 'auto', 
   weighted = TRUE, tree = NULL, ...) {
   
+  with_cache(local({
   
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("bdiv_boxplot(%s)", as.args(params, fun = bdiv_boxplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity checks. x and *.by are checked by boxplot_build.
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf), tree = tree)
-  })
-  
-  
-  
-  #________________________________________________________
-  # Defaults
-  #________________________________________________________
-  if (is_null(params[['x']])) {
-    params[['x']] <- ".all"
-    params[['biom']][['metadata']][[".all"]] <- factor("all")
-  }
-  params[['weighted']] %<>% as.logical()
-  params[['.cmp']]    <- TRUE
-  
-  
-  
-  #________________________________________________________
-  # Use the generalized boxplot function to make the plot
-  #________________________________________________________
-  p <- boxplot_build(params, bdiv_boxplot, bdiv_boxplot_data, bdiv_boxplot_layers)
-  
-  attr(p, 'history') <- history
-  
-  
-  return (p)
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("bdiv_boxplot(%s)", as.args(params, fun = bdiv_boxplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Sanity checks. x and *.by are checked by boxplot_build.
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf), tree = tree)
+    })
+    
+    
+    
+    #________________________________________________________
+    # Defaults
+    #________________________________________________________
+    if (is_null(params[['x']])) {
+      params[['x']] <- ".all"
+      params[['biom']][['metadata']][[".all"]] <- factor("all")
+    }
+    params[['weighted']] %<>% as.logical()
+    params[['.cmp']]    <- TRUE
+    
+    
+    
+    #________________________________________________________
+    # Use the generalized boxplot function to make the plot
+    #________________________________________________________
+    p <- boxplot_build(params, bdiv_boxplot, bdiv_boxplot_data, bdiv_boxplot_layers)
+    
+    attr(p, 'history') <- history
+    
+    
+    return (p)
+    
+  }))
 }
 
 

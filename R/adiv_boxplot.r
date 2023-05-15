@@ -154,41 +154,43 @@ adiv_boxplot <- function (
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
   
-  
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity checks. x and *.by are checked by boxplot_build.
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
-  })
-  
-  
-  #________________________________________________________
-  # Use the generalized boxplot function to make the plot
-  #________________________________________________________
-  p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
-  
-  
-  #________________________________________________________
-  # Attach history of biom modifications and this call
-  #________________________________________________________
-  attr(p, 'history') <- history
-  
-  
-  return (p)
-  
+  with_cache(local({
+      
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Sanity checks. x and *.by are checked by boxplot_build.
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    })
+    
+    
+    #________________________________________________________
+    # Use the generalized boxplot function to make the plot
+    #________________________________________________________
+    p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
+    
+    
+    #________________________________________________________
+    # Attach history of biom modifications and this call
+    #________________________________________________________
+    attr(p, 'history') <- history
+    
+    
+    return (p)
+    
+  }))
 }
 
 

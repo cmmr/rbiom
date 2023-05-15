@@ -104,234 +104,239 @@
 taxa_rollup <- function (
     biom, rank = 'OTU', taxa = NULL, map = NULL, 
     lineage = FALSE, sparse = FALSE, long = FALSE, 
-    md = FALSE, unc = "singly", other = FALSE, safe = FALSE ) {
+    md = FALSE, unc = "singly", other = FALSE, 
+    safe = FALSE ) {
   
-  #________________________________________________________
-  # Get the input into a simple_triplet_matrix
-  #________________________________________________________
-  if (is(biom, "simple_triplet_matrix")) { counts <- biom
-  } else if (is(biom, "BIOM"))           { counts <- biom$counts
-  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
-  } else {
-    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
-  }
-  
-  
-  #________________________________________________________
-  # Ensure we have a valid taxonomy map.
-  #________________________________________________________
-  if (is.matrix(map)) {
-    stopifnot(is(map, "matrix"))
-    stopifnot(identical(typeof(map), "character"))
-    stopifnot(!is.null(rownames(biom)))
-    stopifnot(!is.null(colnames(biom)))
-    stopifnot(all(rownames(counts) %in% rownames(map)))
+  with_cache(local({
     
-  } else if (is(biom, "BIOM")) {
-    map <- biom[['taxonomy']]
-    map <- cbind(map, 'OTU' = rownames(map))
+    #________________________________________________________
+    # Get the input into a simple_triplet_matrix
+    #________________________________________________________
+    if (is(biom, "simple_triplet_matrix")) { counts <- biom
+    } else if (is(biom, "BIOM"))           { counts <- biom$counts
+    } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+    } else {
+      stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+    }
     
-  } else {
-    stop("Invalid taxonomy map.")
-  }
-  
-  
-  
-  #________________________________________________________
-  # Sanity check arguments for rank and unc.
-  #________________________________________________________
-  if (is_null(rank))      rank <- ncol(map)
-  if (is_character(rank)) rank <- pmatch(tolower(rank), tolower(colnames(map)))
-  stopifnot(is_integerish(rank) && all(rank > 0) && all(rank <= ncol(map)))
-  
-  unc <- match.arg(tolower(unc), c("singly", "grouped", "drop", "asis"))
-  
-  
-  
-  #________________________________________________________
-  # Handle ambiguous taxa names.
-  #________________________________________________________
-  map <- tryCatch(
     
-    expr = local({
-    
-      if (isTRUE(lineage)) rank <- range(c(1,rank))
+    #________________________________________________________
+    # Ensure we have a valid taxonomy map.
+    #________________________________________________________
+    if (is.matrix(map)) {
+      stopifnot(is(map, "matrix"))
+      stopifnot(identical(typeof(map), "character"))
+      stopifnot(!is.null(rownames(biom)))
+      stopifnot(!is.null(colnames(biom)))
+      stopifnot(all(rownames(counts) %in% rownames(map)))
       
-      map <- taxonomy(biom = map, ranks = rank, unc = unc)
-      map <- apply(map, 1L, paste, collapse="; ")
+    } else if (is(biom, "BIOM")) {
+      map <- biom[['taxonomy']]
+      map <- cbind(map, 'OTU' = rownames(map))
       
-      return (map)
-    }), 
-    error = function (e) {
-      stop("Can't resolve taxa names from map and unc. ", e)
+    } else {
+      stop("Invalid taxonomy map.")
+    }
+    
+    
+    
+    #________________________________________________________
+    # Sanity check arguments for rank and unc.
+    #________________________________________________________
+    if (is_null(rank))      rank <- ncol(map)
+    if (is_character(rank)) rank <- pmatch(tolower(rank), tolower(colnames(map)))
+    stopifnot(is_integerish(rank) && all(rank > 0) && all(rank <= ncol(map)))
+    
+    unc <- match.arg(tolower(unc), c("singly", "grouped", "drop", "asis"))
+    
+    
+    
+    #________________________________________________________
+    # Handle ambiguous taxa names.
+    #________________________________________________________
+    map <- tryCatch(
+      
+      expr = local({
+      
+        if (isTRUE(lineage)) rank <- range(c(1,rank))
+        
+        map <- taxonomy(biom = map, ranks = rank, unc = unc)
+        map <- apply(map, 1L, paste, collapse="; ")
+        
+        return (map)
+      }), 
+      error = function (e) {
+        stop("Can't resolve taxa names from map and unc. ", e)
+      })
+    
+    
+    
+    
+    mtx <- local({
+      
+      
+      #________________________________________________________
+      # The OTU table is easy
+      #________________________________________________________
+      if (rank == 0) {
+        mtx <- biom[['counts']]
+        
+        return (mtx)
+      }
+      
+      
+      
+      #________________________________________________________
+      # Compute abundance matrix for this rank.
+      #________________________________________________________
+      mtx <- tryCatch(
+        
+        expr = local({
+          
+          mtx <- slam::rollup(counts[names(map),], 1L, map, sum)
+          mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
+          
+          stopifnot(is(mtx, "simple_triplet_matrix"))
+          
+          return (mtx)
+        }),
+        
+        error = function (e) {
+          stop("Unable to group by taxonomic level: ", e)
+        })
+      
+      
+      return (mtx)
     })
-  
-  
-  
-  
-  mtx <- local({
     
     
     #________________________________________________________
-    # The OTU table is easy
+    # Only retain taxa of interest (by abundance or name).
     #________________________________________________________
-    if (rank == 0) {
-      mtx <- biom[['counts']]
+    if (!is_null(taxa)) {
       
+      if (is.numeric(taxa) && length(taxa) == 1) {
+        rel <- sort(slam::row_means(t(t(mtx) / slam::col_sums(mtx))), decreasing = TRUE)
+        if (taxa >= 1) { taxa <- head(names(rel), taxa) 
+        } else         { taxa <- names(rel)[rel >= taxa] }
+        
+      } else if (is.character(taxa)) {
+        taxa <- intersect(as.character(taxa), rownames(mtx))
+        
+      } else {
+        stop ("Invalid argument for taxa parameter in taxa_rollup().")
+      }
+      
+      if (length(taxa) == 0)
+        stop("No taxa match the criteria: ", capture.output(str(taxa)))
+      
+      mtx <- mtx[taxa,,drop=FALSE]
+    }
+    
+    
+    #________________________________________________________
+    # Add an 'Other' taxa.
+    #________________________________________________________
+    if (isTRUE(other)) other <- "Other"
+    if (is_scalar_character(other)) {
+      
+    }
+    
+    
+    #________________________________________________________
+    # Depending on params, taxa might be in rows or cols.
+    #________________________________________________________
+    taxa_in <- "rows"
+    
+    
+    #________________________________________________________
+    # Return the slam matrix if sparse=TRUE
+    #________________________________________________________
+    if (isTRUE(sparse)) {
+      attr(mtx, 'taxa_in') <- taxa_in
       return (mtx)
     }
     
     
+    #________________________________________________________
+    # Convert to R matrix
+    #________________________________________________________
+    mtx <- t(as.matrix(mtx))
+    taxa_in <- "cols"
+    
     
     #________________________________________________________
-    # Compute abundance matrix for this rank.
+    # Pivot Longer
     #________________________________________________________
-    mtx <- tryCatch(
-      
-      expr = local({
-        
-        mtx <- slam::rollup(counts[names(map),], 1L, map, sum)
-        mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
-        
-        stopifnot(is(mtx, "simple_triplet_matrix"))
-        
-        return (mtx)
-      }),
-      
-      error = function (e) {
-        stop("Unable to group by taxonomic level: ", e)
-      })
-    
-    
-    return (mtx)
-  })
-  
-  
-  #________________________________________________________
-  # Only retain taxa of interest (by abundance or name).
-  #________________________________________________________
-  if (!is_null(taxa)) {
-    
-    if (is.numeric(taxa) && length(taxa) == 1) {
-      rel <- sort(slam::row_means(t(t(mtx) / slam::col_sums(mtx))), decreasing = TRUE)
-      if (taxa >= 1) { taxa <- head(names(rel), taxa) 
-      } else         { taxa <- names(rel)[rel >= taxa] }
-      
-    } else if (is.character(taxa)) {
-      taxa <- intersect(as.character(taxa), rownames(mtx))
-      
-    } else {
-      stop ("Invalid argument for taxa parameter in taxa_rollup().")
-    }
-    
-    if (length(taxa) == 0)
-      stop("No taxa match the criteria: ", capture.output(str(taxa)))
-    
-    mtx <- mtx[taxa,,drop=FALSE]
-  }
-  
-  
-  #________________________________________________________
-  # Add an 'Other' taxa.
-  #________________________________________________________
-  if (isTRUE(other)) other <- "Other"
-  if (is_scalar_character(other)) {
-    
-  }
-  
-  
-  #________________________________________________________
-  # Depending on params, taxa might be in rows or cols.
-  #________________________________________________________
-  taxa_in <- "rows"
-  
-  
-  #________________________________________________________
-  # Return the slam matrix if sparse=TRUE
-  #________________________________________________________
-  if (isTRUE(sparse)) {
-    attr(mtx, 'taxa_in') <- taxa_in
-    return (mtx)
-  }
-  
-  
-  #________________________________________________________
-  # Convert to R matrix
-  #________________________________________________________
-  mtx <- t(as.matrix(mtx))
-  taxa_in <- "cols"
-  
-  
-  #________________________________________________________
-  # Pivot Longer
-  #________________________________________________________
-  if (isTRUE(long)) {
-    df <- data.frame(
-      check.names      = FALSE, 
-      stringsAsFactors = FALSE,
-      '.sample'        = rownames(mtx)[row(mtx)],
-      '.taxa'          = colnames(mtx)[col(mtx)],
-      '.value'         = as.numeric(mtx)
-    )
-    if (is_null(taxa)) { df[['.taxa']] %<>% factor()
-    } else             { df[['.taxa']] %<>% factor(levels = taxa) }
-    
-    
-    taxa_in <- "rows"
-    
-  } else if (isFALSE(md)) {
-    
-    # Just a simple numeric matrix. rownames = samples, colnames = taxa
-    attr(mtx, 'taxa_in') <- taxa_in
-    return (mtx)
-    
-  } else {
-    
-    # Don't pivot, but convert matrix to data.frame with 'Sample' column
-    df <- data.frame(
-      check.names      = FALSE, 
-      stringsAsFactors = FALSE, 
-      '.sample'        = rownames(mtx), 
-      mtx
-    )
-  }
-  
-  
-  #________________________________________________________
-  # Add Metadata
-  #________________________________________________________
-  if (!isFALSE(md)) {
-    
-    md <- metadata(biom)[,unique(md),drop=F]
-    
     if (isTRUE(long)) {
-      df <- merge(df, md, by.x = ".sample", by.y = "row.names")
+      df <- data.frame(
+        check.names      = FALSE, 
+        stringsAsFactors = FALSE,
+        '.sample'        = rownames(mtx)[row(mtx)],
+        '.taxa'          = colnames(mtx)[col(mtx)],
+        '.value'         = as.numeric(mtx)
+      )
+      if (is_null(taxa)) { df[['.taxa']] %<>% factor()
+      } else             { df[['.taxa']] %<>% factor(levels = taxa) }
+      
+      
+      taxa_in <- "rows"
+      
+    } else if (isFALSE(md)) {
+      
+      # Just a simple numeric matrix. rownames = samples, colnames = taxa
+      attr(mtx, 'taxa_in') <- taxa_in
+      return (mtx)
+      
     } else {
-      df <- merge(md, df, by.x = "row.names", by.y = ".sample")
-      names(df)[1] <- ".sample"
-      rownames(df) <- df[['.sample']]
+      
+      # Don't pivot, but convert matrix to data.frame with 'Sample' column
+      df <- data.frame(
+        check.names      = FALSE, 
+        stringsAsFactors = FALSE, 
+        '.sample'        = rownames(mtx), 
+        mtx
+      )
     }
-    taxa_in <- "rows"
-  }
-  
-  if (isTRUE(long) && length(unique(df[[".taxa"]])) > 1)
-    attr(df, 'facet') <- ifelse(isTRUE(safe), ".taxa", "Taxa")
-  
-  
-  #________________________________________________________
-  # Convert auto-generated column names to less-safe values
-  #________________________________________________________
-  if (isFALSE(safe)) {
-    f <- c("Sample", "Taxa", "Abundance")
-    if (isFALSE(long)) f <- "Sample"
-    colnames(df)[seq_along(f)] <- f
     
-  } else if (is.na(safe) && isFALSE(long)) {
-    df <- df[,-1,drop=F]
-  }
-  
-  attr(df, 'taxa_in') <- taxa_in
-  return (df)
+    
+    #________________________________________________________
+    # Add Metadata
+    #________________________________________________________
+    if (!isFALSE(md)) {
+      
+      md <- metadata(biom)[,unique(md),drop=F]
+      
+      if (isTRUE(long)) {
+        df <- merge(df, md, by.x = ".sample", by.y = "row.names")
+      } else {
+        df <- merge(md, df, by.x = "row.names", by.y = ".sample")
+        names(df)[1] <- ".sample"
+        rownames(df) <- df[['.sample']]
+      }
+      taxa_in <- "rows"
+    }
+    
+    if (isTRUE(long) && length(unique(df[[".taxa"]])) > 1)
+      attr(df, 'facet') <- ifelse(isTRUE(safe), ".taxa", "Taxa")
+    
+    
+    #________________________________________________________
+    # Convert auto-generated column names to less-safe values
+    #________________________________________________________
+    if (isFALSE(safe)) {
+      f <- c("Sample", "Taxa", "Abundance")
+      if (isFALSE(long)) f <- "Sample"
+      colnames(df)[seq_along(f)] <- f
+      
+    } else if (is.na(safe) && isFALSE(long)) {
+      df <- df[,-1,drop=F]
+    }
+    
+    attr(df, 'taxa_in') <- taxa_in
+    return (df)
+    
+  }))
 }
 
 

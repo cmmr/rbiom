@@ -207,7 +207,7 @@ plot_build <- function (layers) {
             
             } else {
               # Add double-quotes to other strings
-              val <- glue::double_quote(val)
+              val <- double_quote(val)
             }
           }
           

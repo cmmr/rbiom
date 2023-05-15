@@ -1,3 +1,7 @@
+
+# See also ggpmisc package
+# https://docs.r4photobiology.info/ggpmisc/articles/model-based-annotations.html
+
 #' Visualize alpha diversity with scatterplots and trendlines.
 #' 
 #' @name adiv_corrplot
@@ -91,105 +95,106 @@
 #'     
 #'     adiv_corrplot(rarefy(hmp50), "Age", color.by="Body Site", metric=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
 #'     
-
 adiv_corrplot <- function (
     biom, x, metric = "OTUs", points = FALSE, model = "linear", ci = 95, 
     color.by = NULL, facet.by = NULL, limit.by = NULL, ...) {
   
+  with_cache(local({
+    
+    
+    #________________________________________________________
+    # Record the function call in a human-readable format.
+    #________________________________________________________
+    params <- c(as.list(environment()), list(...))
+    params[['...']] <- NULL
+    history <- attr(biom, 'history')
+    history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
+    remove(list = setdiff(ls(), c("params", "history")))
+    
+    
+    #________________________________________________________
+    # Sanity checks
+    #________________________________________________________
+    params %<>% within({
+      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+      metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    })
+    
+    
+    #________________________________________________________
+    # Subset biom by requested metadata and aes.
+    #________________________________________________________
+    params %<>% metadata_params(contraints = list(
+      x        = list(n = 1, col_type = "num"),
+      color.by = list(n = c(0, 1)),
+      facet.by = list(n = c(0, Inf), col_type = "cat"),
+      limit.by = list(n = c(0, Inf)) ))
+    
+    
+    #________________________________________________________
+    # Compute alpha diversity values.
+    #________________________________________________________
+    data <- adiv_table(
+      biom    = params[['biom']],
+      metrics = params[['metric']],
+      long    = TRUE,
+      md      = unique(c(
+        params[['x']], 
+        names(params[['color.by']]), 
+        params[['facet.by']] )), 
+      safe    = TRUE )
+    
+    
+    #________________________________________________________
+    # Facet by metric when there's more than one.
+    #________________________________________________________
+    if (length(params[['metric']]) > 1)
+      params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
+    
+    
+    #________________________________________________________
+    # Initialize the `layers` object.
+    #________________________________________________________
+    layers <- structure(
+      list(),
+      'data'     = data,
+      'params'   = params,
+      'function' = adiv_corrplot,
+      'xcol'     = params[['x']],
+      'ycol'     = ".value",
+      'xmode'    = "numeric" )
+    
+    initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+    
+    if (!is_null(params[['color.by']])) initLayer("color")
+    if (isTRUE(params[['points']]))     initLayer("point")
+    
+    
+    #________________________________________________________
+    # Add default layer parameters.
+    #________________________________________________________
+    setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
+    setLayer("labs", x = params[['x']], y = local({
+      ylab <- params[['metric']]
+      if (length(params[['metric']] > 1)) ylab <- "Diversity"
+      if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
+      return (ylab) }))
+    if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
+    
+    
+    
+    
+    #________________________________________________________
+    # Convert layer definitions into a plot.
+    #________________________________________________________
+    p <- corrplot_build(layers)
+    
+    attr(p, 'history') <- history
+    
+    
+    return (p)
   
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  params <- c(as.list(environment()), list(...))
-  params[['...']] <- NULL
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
-  remove(list = setdiff(ls(), c("params", "history")))
-  
-  
-  #________________________________________________________
-  # Sanity checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
-  })
-  
-  
-  #________________________________________________________
-  # Subset biom by requested metadata and aes.
-  #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    x        = list(n = 1, col_type = "num"),
-    color.by = list(n = c(0, 1)),
-    facet.by = list(n = c(0, Inf), col_type = "cat"),
-    limit.by = list(n = c(0, Inf)) ))
-  
-  
-  #________________________________________________________
-  # Compute alpha diversity values.
-  #________________________________________________________
-  data <- adiv_table(
-    biom    = params[['biom']],
-    metrics = params[['metric']],
-    long    = TRUE,
-    md      = unique(c(
-      params[['x']], 
-      names(params[['color.by']]), 
-      params[['facet.by']] )), 
-    safe    = TRUE )
-  
-  
-  #________________________________________________________
-  # Facet by metric when there's more than one.
-  #________________________________________________________
-  if (length(params[['metric']]) > 1)
-    params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
-  
-  
-  #________________________________________________________
-  # Initialize the `layers` object.
-  #________________________________________________________
-  layers <- structure(
-    list(),
-    'data'     = data,
-    'params'   = params,
-    'function' = adiv_corrplot,
-    'xcol'     = params[['x']],
-    'ycol'     = ".value",
-    'xmode'    = "numeric" )
-  
-  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-  
-  if (!is_null(params[['color.by']])) initLayer("color")
-  if (isTRUE(params[['points']]))     initLayer("point")
-  
-  
-  #________________________________________________________
-  # Add default layer parameters.
-  #________________________________________________________
-  setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
-  setLayer("labs", x = params[['x']], y = local({
-    ylab <- params[['metric']]
-    if (length(params[['metric']] > 1)) ylab <- "Diversity"
-    if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
-    return (ylab) }))
-  if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
-  
-  
-  
-  
-  #________________________________________________________
-  # Convert layer definitions into a plot.
-  #________________________________________________________
-  p <- corrplot_build(layers)
-  
-  attr(p, 'history') <- history
-  
-  
-  return (p)
-  
-  
+  }))
 }
 
 

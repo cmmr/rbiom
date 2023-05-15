@@ -4,11 +4,11 @@
 # Assign RHS to LHS if LHS is NULL.
 #____________________________________________________________________
 `%||=%` <- function(.lhs, .rhs) {
-  .lhs_quo <- rlang::enquo(.lhs)
-  .lhs_str <- rlang::quo_name(.lhs_quo)
-  .lhs_env <- rlang::get_env(.lhs_quo)
+  .lhs_quo <- enquo(.lhs)
+  .lhs_str <- quo_name(.lhs_quo)
+  .lhs_env <- get_env(.lhs_quo)
   
-  if (!exists(.lhs_str, envir = rlang::get_env(.lhs_quo)))
+  if (!exists(.lhs_str, envir = get_env(.lhs_quo)))
     .lhs <- NULL
   
   assign(
@@ -117,7 +117,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     
     val <- if (is_null(val))        { "NULL"
     } else if (!is_null(display))   { display
-    } else if (is_character(val))   { glue::double_quote(val) 
+    } else if (is_character(val))   { double_quote(val) 
     } else if (is_logical(val))     { as.character(val) %>% setNames(names(val))
     } else if (is.numeric(val))     { as.character(val) %>% setNames(names(val))
     } else if (is(val, 'quosures')) { as.character(val)
@@ -132,7 +132,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     
     
     if (isTRUE(is_character(val) && !is_null(names(val))))
-      val <- paste(glue::single_quote(names(val)), "=", unname(val))
+      val <- paste(single_quote(names(val)), "=", unname(val))
     
     if (length(val) > 1)
       val <- paste0("c(", paste(collapse=", ", val), ")")
@@ -193,11 +193,11 @@ aes_toString <- function (x) {
   for (key in keys) {
     
     val <- x[[key]]
-    val <- if (is(val, 'quosure')) { rlang::as_label(val)
+    val <- if (is(val, 'quosure')) { as_label(val)
     } else if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
     } else if (is.logical(val))    { as.character(val)
     } else if (is.numeric(val))    { as.character(val)
-    } else                         { glue::double_quote(val) }
+    } else                         { double_quote(val) }
     
     key %<>% sub(pattern = "colour", replacement = "color")
     key <- capture.output(as.name(key))
@@ -357,12 +357,12 @@ finite_check <- function (df, col=".y", metric=NULL) {
   
   if ('.sample' %in% names(df)) {
     msg %<>% paste0(
-      glue::glue_collapse(
+      glue_collapse(
         x = paste(df[bad,'.sample'], "=", df[bad,col]), 
         width = 100, sep = ", ", last = ", and " ))
   } else {
     msg %<>% paste0(
-      glue::glue_collapse(
+      glue_collapse(
         x = as.character(unique(df[bad,col])), 
         width = 100, sep = ", ", last = ", and " ))
   }

@@ -1,6 +1,8 @@
 
 #' Convert absolute counts to relative abundances.
 #' 
+#' @name as_percent
+#' 
 #' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
 #' @return A \code{BIOM} object.
 #' @export
@@ -15,17 +17,22 @@
 
 as_percent <- function (biom) {
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In as_percent(), biom must be a BIOM-class object.'))
+  with_cache(local({
   
-  if (attr(biom, 'rarefaction') == 1)
+  
+    if (!is(biom, 'BIOM'))
+      stop (simpleError('In as_percent(), biom must be a BIOM-class object.'))
+    
+    if (attr(biom, 'rarefaction') == 1)
+      return (biom)
+    
+    divisor <- if (is_rarefied(biom)) { attr(biom, 'rarefaction', exact = TRUE)
+    } else                            { sample_sums(biom)[biom$counts$j] }
+    
+    biom$counts$v <- biom$counts$v / divisor
+    attr(biom, 'rarefaction') <- 1
+    
     return (biom)
-  
-  divisor <- if (is_rarefied(biom)) { attr(biom, 'rarefaction', exact = TRUE)
-  } else                            { sample_sums(biom)[biom$counts$j] }
-  
-  biom$counts$v <- biom$counts$v / divisor
-  attr(biom, 'rarefaction') <- 1
-  
-  return (biom)
+    
+  }))
 }

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9085</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9088</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,48 +176,58 @@ this if you know what you are doing! Default: <code>NULL</code></p></dd>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="subset.html">subset</a></span><span class="op">(</span><span class="va">biom</span>, <span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span>, <span class="st">'Stool'</span>, <span class="st">'Buccal mucosa'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in FUN(X[[i]], ...):</span> object 'Body Site' not found</span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Overall, do the three body sites different have different Shannon</span></span></span>
 <span class="r-in"><span>    <span class="co">#  diversity indices (alpha diversity)? - YES</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, y <span class="op">=</span> <span class="st">"Shannon"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    n           Test   .p.val   .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 29 Kruskal-Wallis 4.68e-05 4.68e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 49 Kruskal-Wallis 8.04e-08 8.04e-08</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Which body sites have the most different Shannon diversity</span></span></span>
 <span class="r-in"><span>    <span class="co">#  indices? - Buccal mucosa vs. Saliva</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, y <span class="op">=</span> <span class="st">"Shannon"</span>, pairwise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    n         Test Group1        Group2   .p.val   .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 20 Mann-Whitney Saliva Buccal mucosa 2.17e-05 0.000065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 19 Mann-Whitney  Stool Buccal mucosa 1.45e-03 0.002180</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 19 Mann-Whitney Saliva         Stool 2.99e-03 0.002990</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     n         Test         Group1        Group2   .p.val   .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  20 Mann-Whitney Anterior nares        Saliva 1.08e-05 4.33e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  20 Mann-Whitney     Mid vagina        Saliva 1.08e-05 4.33e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  19 Mann-Whitney Anterior nares         Stool 2.17e-05 4.33e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  20 Mann-Whitney  Buccal mucosa        Saliva 2.17e-05 4.33e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  19 Mann-Whitney     Mid vagina         Stool 2.17e-05 4.33e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  19 Mann-Whitney  Buccal mucosa         Stool 1.45e-03 1.88e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  20 Mann-Whitney Anterior nares    Mid vagina 1.50e-03 1.88e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  20 Mann-Whitney  Buccal mucosa    Mid vagina 1.50e-03 1.88e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  19 Mann-Whitney         Saliva         Stool 2.99e-03 3.32e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 20 Mann-Whitney Anterior nares Buccal mucosa 9.71e-01 9.71e-01</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Do males or females have more alpha diversity variation among </span></span></span>
 <span class="r-in"><span>    <span class="co">#  body sites? - Females</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, y <span class="op">=</span> <span class="st">"Shannon"</span>, by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Sex  n           Test  .p.val  .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female 15 Kruskal-Wallis 0.00374 0.00747</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Male 14 Kruskal-Wallis 0.00821 0.00821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Sex  n           Test   .p.val   .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female 30 Kruskal-Wallis 7.79e-05 0.000156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Male 19 Kruskal-Wallis 3.25e-03 0.003250</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Which phylum is most different overall between males and females?</span></span></span>
 <span class="r-in"><span>    <span class="co">#  - Saccharibacteria</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, y <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     n         Test .p.val .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 348 Mann-Whitney  0.242  0.242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 637 Mann-Whitney 0.0622 0.0622</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Which phyla is the most differentially abundant between males and </span></span></span>
 <span class="r-in"><span>    <span class="co">#  females on a particular body site? - Tenericutes in Saliva</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, y <span class="op">=</span> <span class="st">"Phylum"</span>, by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Body Site   n         Test .p.val .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        Saliva 120 Mann-Whitney  0.232  0.695</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Buccal mucosa 120 Mann-Whitney  0.819  0.909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3         Stool 108 Mann-Whitney  0.909  0.909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Body Site   n         Test .p.val .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         Saliva 130 Mann-Whitney  0.226      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Anterior nares 130 Mann-Whitney  0.530      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Buccal mucosa 130 Mann-Whitney  0.826      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          Stool 117 Mann-Whitney  0.912      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     Mid vagina 130         &lt;NA&gt;  1.000      1</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Overall, are males and females characterized by their OTU </span></span></span>
 <span class="r-in"><span>    <span class="co">#  abundances? - NO</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, y <span class="op">=</span> <span class="st">"unifrac"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     n           Test .p.val .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 406 Kruskal-Wallis   0.49   0.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      n           Test .p.val .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1176 Kruskal-Wallis  0.489  0.489</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># What about on a particular body site? - Yes, Buccal mucosa.</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"==Sex"</span>, y <span class="op">=</span> <span class="st">"unifrac"</span>, by <span class="op">=</span> <span class="st">"==Body Site"</span><span class="op">)</span></span></span>
@@ -238,13 +248,22 @@ this if you know what you are doing! Default: <code>NULL</code></p></dd>
 <span class="r-in"><span>    <span class="co">#  ('Male', 'Female') we are now comparing three groups </span></span></span>
 <span class="r-in"><span>    <span class="co">#  ('Male', 'Female', 'Female vs Male').</span></span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, y <span class="op">=</span> <span class="st">"unifrac"</span>, by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 Body Site   n           Test  .p.val .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           Buccal mucosa  45 Kruskal-Wallis 0.00319 0.0191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         Saliva vs Stool  90 Kruskal-Wallis 0.15100 0.3260</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Buccal mucosa vs Saliva 100 Kruskal-Wallis 0.16300 0.3260</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Buccal mucosa vs Stool  90 Kruskal-Wallis 0.79700 0.9580</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                  Saliva  45 Kruskal-Wallis 0.80700 0.9580</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                   Stool  36 Kruskal-Wallis 0.95800 0.9580</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          Body Site   n           Test  .p.val .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Buccal mucosa vs Mid vagina 100   Mann-Whitney 0.00228 0.0239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    Buccal mucosa  45 Kruskal-Wallis 0.00319 0.0239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  Saliva vs Stool  90 Kruskal-Wallis 0.15100 0.6110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          Buccal mucosa vs Saliva 100 Kruskal-Wallis 0.16300 0.6110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5              Mid vagina vs Stool  90   Mann-Whitney 0.45700 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6             Mid vagina vs Saliva 100   Mann-Whitney 0.55600 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                   Anterior nares  45 Kruskal-Wallis 0.64400 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8           Buccal mucosa vs Stool  90 Kruskal-Wallis 0.79700 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                           Saliva  45 Kruskal-Wallis 0.80700 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10         Anterior nares vs Stool  90 Kruskal-Wallis 0.94300 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                           Stool  36 Kruskal-Wallis 0.95800 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12        Anterior nares vs Saliva 100 Kruskal-Wallis 0.98200 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Anterior nares vs Buccal mucosa 100 Kruskal-Wallis 0.99000 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14    Anterior nares vs Mid vagina 100   Mann-Whitney 0.99700 1.0000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                      Mid vagina  45           &lt;NA&gt; 1.00000 1.0000</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -49,6 +49,9 @@
     <loc>https://cmmr.github.io/rbiom/news/index.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/paper.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/adiv_boxplot.html</loc>
   </url>
   <url>
@@ -155,6 +158,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/metadata_params.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/metrics.html</loc>
@@ -299,6 +305,12 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/unifrac.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/validate_metrics.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/with_cache.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_biom.html</loc>

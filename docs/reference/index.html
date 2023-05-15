@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9085</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9088</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -214,11 +214,6 @@
         <dd>Get <code>BIOM</code> object's miscellaneous information.</dd>
       </dl><dl><dt>
           
-          <code><a href="init_cache.html">init_cache()</a></code> 
-        </dt>
-        <dd>Initialize caching for expensive biom operations.</dd>
-      </dl><dl><dt>
-          
           <code><a href="is_rarefied.html">is_rarefied()</a></code> 
         </dt>
         <dd>Checks if a BIOM object is rarefied.</dd>
@@ -232,6 +227,11 @@
           <code><a href="metadata.html">metadata()</a></code> 
         </dt>
         <dd>Get the sample metadata.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="metadata_params.html">metadata_params()</a></code> 
+        </dt>
+        <dd>Convert all *.by params into long form.</dd>
       </dl><dl><dt>
           
           <code><a href="metrics.html">metrics()</a></code> 
@@ -399,6 +399,11 @@
         <dd>Get the taxa ranks.</dd>
       </dl><dl><dt>
           
+          <code><a href="taxa_rollup.html">taxa_rollup()</a></code> 
+        </dt>
+        <dd>Generate a matrix of samples by taxa, at the specified taxonomic rank.</dd>
+      </dl><dl><dt>
+          
           <code><a href="taxa_stacked.html">taxa_stacked()</a></code> 
         </dt>
         <dd>Display taxa abundances as a stacked bar graph.</dd>
@@ -447,6 +452,16 @@
           <code><a href="unifrac.html">unifrac()</a></code> 
         </dt>
         <dd>Compute Weighted and Unweighted UniFrac distance matrices.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="validate_metrics.html">validate_metrics()</a></code> 
+        </dt>
+        <dd>Cleanup dynamic options that we can recognize</dd>
+      </dl><dl><dt>
+          
+          <code><a href="with_cache.html">with_cache()</a></code> 
+        </dt>
+        <dd>Speeds up repetitive computations by storing results of functions calls.</dd>
       </dl><dl><dt>
           
           <code><a href="write_biom.html">write_biom()</a></code> 

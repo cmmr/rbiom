@@ -72,89 +72,101 @@
 #'     
 #'     distill(hmp50, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
 #'
-distill <- function (biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE, safe = FALSE) {
+distill <- function (
+    biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE, safe = FALSE ) {
   
-  if (!is(biom, 'BIOM'))
-    stop ("Input for 'biom' must be a BIOM object.")
-  
-  
-  metric <- validate_metrics(biom, metric, multi=TRUE)
-  mode   <- head(attr(metric, 'mode', exact = TRUE), 1)
-  
-  if (isTRUE(rarefy) && !mode %in% c('adiv'))
-    biom <- rbiom::rarefy(biom)
-  
-  
-  if (mode == "adiv") {
-    df <- adiv_table(biom, metrics = metric, rarefy = rarefy, long = long, md = md, safe = safe)
+  with_cache(local({
     
-  } else if (mode == "rank") {
     
-    # Return specific rank(s) or all ranks
-    ranks <- as.vector(metric)
-    if (identical(ranks, "Rank"))
-      ranks <- taxa_ranks(biom)
+    if (!is(biom, 'BIOM'))
+      stop ("Input for 'biom' must be a BIOM object.")
     
-    df      <- taxa_rollup(biom, rank = ranks[[1]], long = long, md = md, safe = safe)
-    df_rank <- rep(ranks[[1]], nrow(df))
-    taxa_in <- attr(df, 'taxa_in', exact = TRUE)
     
-    for (rank in ranks[-1]) {
-      x <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
+    metric <- validate_metrics(biom, metric, multi=TRUE)
+    mode   <- head(attr(metric, 'mode', exact = TRUE), 1)
     
-      if (identical(taxa_in, "cols")) {
-        # Don't duplicate metadata columns
-        df <- cbind(df, x[,sort(unique(taxonomy(biom, rank)[,1])),drop=F])
-        
-      } else {
-        df      <- rbind(df, x)
-        df_rank <- c(df_rank, rep(rank, nrow(x)))
+    if (isTRUE(rarefy) && !mode %in% c('adiv'))
+      biom <- rbiom::rarefy(biom)
+    
+    
+    if (mode == "adiv") {
+      df <- adiv_table(
+        biom    = biom, 
+        metrics = metric, 
+        rarefy  = rarefy, 
+        long    = long, 
+        md      = md, 
+        safe    = safe )
+      
+    } else if (mode == "rank") {
+      
+      # Return specific rank(s) or all ranks
+      ranks <- as.vector(metric)
+      if (identical(ranks, "Rank"))
+        ranks <- taxa_ranks(biom)
+      
+      df      <- taxa_rollup(biom, rank = ranks[[1]], long = long, md = md, safe = safe)
+      df_rank <- rep(ranks[[1]], nrow(df))
+      taxa_in <- attr(df, 'taxa_in', exact = TRUE)
+      
+      for (rank in ranks[-1]) {
+        x <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
+      
+        if (identical(taxa_in, "cols")) {
+          # Don't duplicate metadata columns
+          df <- cbind(df, x[,sort(unique(taxonomy(biom, rank)[,1])),drop=F])
+          
+        } else {
+          df      <- rbind(df, x)
+          df_rank <- c(df_rank, rep(rank, nrow(x)))
+        }
       }
-    }
-    
-    # Put a 'Rank' column in the second position
-    if (!identical(taxa_in, "cols") && (isTRUE(safe) || length(ranks) > 1)) {
-      df[[ifelse(safe, '.rank', 'Rank')]] <- factor(df_rank, levels=ranks)
-      df <- df[,order(!colnames(df) %in% c(".sample", ".rank", "Sample", "Rank")),drop=FALSE]
-    }
-    
-  } else if (mode == "taxon") {
-    
-    rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x == metric))))
-    df   <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
-    
-    # Only return the single requested taxon
-    if (long) {
-      df <- df[df[[ifelse(safe, ".taxa", "Taxa")]] == metric,,drop=FALSE]
+      
+      # Put a 'Rank' column in the second position
+      if (!identical(taxa_in, "cols") && (isTRUE(safe) || length(ranks) > 1)) {
+        df[[ifelse(safe, '.rank', 'Rank')]] <- factor(df_rank, levels=ranks)
+        df <- df[,order(!colnames(df) %in% c(".sample", ".rank", "Sample", "Rank")),drop=FALSE]
+      }
+      
+    } else if (mode == "taxon") {
+      
+      rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x == metric))))
+      df   <- taxa_rollup(biom, rank = rank, long = long, md = md, safe = safe)
+      
+      # Only return the single requested taxon
+      if (long) {
+        df <- df[df[[ifelse(safe, ".taxa", "Taxa")]] == metric,,drop=FALSE]
+      } else {
+        keep <- c('Sample', '.sample', colnames(metadata(biom)), metric)
+        df   <- df[,colnames(df) %in% keep,drop=FALSE]
+      }
+      
+    } else if (mode == "bdiv") {
+      
+      if (is.character(md)) md <- paste0(attr(md, 'op', exact = TRUE), md)
+      df <- bdiv_table(biom, method = metric, weighted = weighted, md = md, safe = safe)
+      
     } else {
-      keep <- c('Sample', '.sample', colnames(metadata(biom)), metric)
-      df   <- df[,colnames(df) %in% keep,drop=FALSE]
+      stop("Don't know how to distill metric '", metric, "'.")
     }
     
-  } else if (mode == "bdiv") {
     
-    if (is.character(md)) md <- paste0(attr(md, 'op', exact = TRUE), md)
-    df <- bdiv_table(biom, method = metric, weighted = weighted, md = md, safe = safe)
+    #________________________________________________________
+    # Flag the response variable
+    #________________________________________________________
+    if (isTRUE(long)) {
+      if        (mode == "adiv")  { attr(df, 'response') <- "Diversity"
+      } else if (mode == "bdiv")  { attr(df, 'response') <- "Distance"
+      } else                      { attr(df, 'response') <- "Abundance" }
+      
+      if (isTRUE(safe))
+        attr(df, 'response') <- ".value"
+    }
     
-  } else {
-    stop("Don't know how to distill metric '", metric, "'.")
-  }
-  
-  
-  #--------------------------------------------------------------
-  # Flag the response variable
-  #--------------------------------------------------------------
-  if (isTRUE(long)) {
-    if        (mode == "adiv")  { attr(df, 'response') <- "Diversity"
-    } else if (mode == "bdiv")  { attr(df, 'response') <- "Distance"
-    } else                      { attr(df, 'response') <- "Abundance" }
     
-    if (isTRUE(safe))
-      attr(df, 'response') <- ".value"
-  }
-  
-  
-  return (df)
+    return (df)
+    
+  }))
 }
 
 

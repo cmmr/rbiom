@@ -4,7 +4,7 @@
 \alias{write_xlsx}
 \title{Write data and summary information to a Microsoft Excel-compatible workbook.}
 \usage{
-write_xlsx(biom, outfile, depth = NULL, seed = 0)
+write_xlsx(biom, outfile, depth = NULL, seed = 0, unc = "asis")
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
@@ -12,13 +12,21 @@ write_xlsx(biom, outfile, depth = NULL, seed = 0)
 \item{outfile}{Path to the output xlsx file.}
 
 \item{depth}{Depth to rarefy to. See \code{rarefy} function for details.
-\code{depth = NULL} auto-selects a rarefaction level.
-\code{depth = 0} disables rarefaction.
-  Only use \code{depth} with \code{BIOM} files of type
-  'OTU table' and integer count values.}
+\code{depth = NULL} auto-selects a rarefaction level. 
+\code{depth = 0} disables rarefaction. Only use \code{depth} with 
+\code{BIOM} files of type 'OTU table' and integer count values.}
 
 \item{seed}{Random seed to use in rarefying. See \code{rarefy} function
 for details.}
+
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Default: \code{"asis"}
+\itemize{
+  \item{\code{"asis"} - }{ Don't check/modify any taxa names. }
+  \item{\code{"singly"} - }{ Replace with "Unc. <OTU ID>". }
+  \item{\code{"grouped"} - }{ Replace with "Unc. <Higher Rank>". }
+  \item{\code{"drop"} - }{ Don't include in the returned matrix. }
+}}
 }
 \value{
 On success, returns \code{NULL} invisibly.

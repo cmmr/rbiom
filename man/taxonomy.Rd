@@ -4,22 +4,27 @@
 \alias{taxonomy}
 \title{Get the taxonomy table.}
 \usage{
-taxonomy(biom, rank = NULL, fix.names = FALSE)
+taxonomy(biom, ranks = NULL, unc = "asis")
 }
 \arguments{
 \item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
-\item{rank}{Return just a named character vector of this rank. (Default: 
-\code{NULL})}
+\item{ranks}{The taxonomic ranks to return in the matrix, or \code{NULL} 
+for all of them. Default: \code{NULL}}
 
-\item{fix.names}{Clean up taxa names. See example below. (Default: 
-\code{FALSE})}
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Default: \code{"asis"}
+\itemize{
+  \item{\code{"asis"} - }{ Don't check/modify any taxa names. }
+  \item{\code{"singly"} - }{ Replace with "Unc. <OTU ID>". }
+  \item{\code{"grouped"} - }{ Replace with "Unc. <Higher Rank>". }
+  \item{\code{"drop"} - }{ Don't include in the returned matrix. }
+}}
 }
 \value{
-A character matrix of the named taxonomies in \code{biom}.
-        When \code{fix.names = TRUE}, a second matrix is attached as an
-        attribute called 'fixed' and notes which taxa names were
-        rewritten.
+A character matrix with taxa/OTU IDs as row names and taxa ranks as
+        column names. An 'OTU' column is always added as the last column and
+        matches the row names.
 }
 \description{
 Get the taxonomy table.
@@ -28,12 +33,15 @@ Get the taxonomy table.
     library(rbiom)
     
     taxonomy(hmp50)[1:4,]
+    taxonomy(hmp50, c("Family", "Genus"))[1:4,]
+    head(taxonomy(hmp50, "Genus")[,])
     
     # Sometimes taxonomic names are incomplete
-    taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
+    taxonomy(hmp50)[c(53,107,139), 2:6]
     
     # rbiom can insert more descriptive placeholders
-    taxonomy(hmp50, fix.names = TRUE)[c(107,170,194), 'Genus', drop=FALSE]
+    taxonomy(hmp50, unc = "singly")[c(53,107,139), 3:6]
+    taxonomy(hmp50, unc = "grouped")[c(53,107,139), 4:6]
 
 }
 \seealso{

@@ -1,5 +1,7 @@
 #' Make a data.frame of distances between samples.
 #' 
+#' @name bdiv_table
+#' 
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
 #'        object, as returned from \link{read_biom}. For matrices, the rows and 
 #'        columns are assumed to be the taxa and samples, respectively.
@@ -59,97 +61,104 @@
 #'     bdiv_table(biom, 'unifrac', md = c("Body Site", "!=Sex"))
 #'
 
-bdiv_table <- function (biom, method="bray-curtis", weighted=TRUE, tree=NULL, md=FALSE, safe=FALSE, stat.by=NULL, seed=0, perms=999) {
+bdiv_table <- function (
+    biom, method="bray-curtis", weighted=TRUE, tree=NULL, md=FALSE, safe=FALSE, stat.by=NULL, 
+    seed=0, perms=999) {
   
-  #--------------------------------------------------------------
-  # Compute the distance matrix
-  #--------------------------------------------------------------
-  dm <- bdiv_distmat(biom, method, weighted, tree, stat.by, seed, perms)
+  with_cache(local({
   
-  
-  #--------------------------------------------------------------
-  # Convert to long form
-  #--------------------------------------------------------------
-  df <- as.matrix(dm)
-  df <- data.frame(
-    stringsAsFactors = FALSE,
-    '.sample1'       = rownames(df)[row(df)],
-    '.sample2'       = colnames(df)[col(df)],
-    '.value'         = as.numeric(df)
-  )
-  df <- subset(df, .sample1 < .sample2)
-  
-  
-  #--------------------------------------------------------------
-  # Add metadata columns
-  #--------------------------------------------------------------
-  if (!isFALSE(md)) {
     
-    if (isTRUE(md))        md <- names(metadata(biom))
-    if (!is.character(md)) md <- names(metadata(biom))[md]
+    #________________________________________________________
+    # Compute the distance matrix
+    #________________________________________________________
+    dm <- bdiv_distmat(biom, method, weighted, tree, stat.by, seed, perms)
     
-    for (i in which(!duplicated(md))) {
+    
+    #________________________________________________________
+    # Convert to long form
+    #________________________________________________________
+    df <- as.matrix(dm)
+    df <- data.frame(
+      stringsAsFactors = FALSE,
+      '.sample1'       = rownames(df)[row(df)],
+      '.sample2'       = colnames(df)[col(df)],
+      '.value'         = as.numeric(df)
+    )
+    df <- subset(df, .sample1 < .sample2)
+    
+    
+    #________________________________________________________
+    # Add metadata columns
+    #________________________________________________________
+    if (!isFALSE(md)) {
       
-      col <- md[[i]]
-      op  <- attr(md, 'op', exact = TRUE)[[i]]
+      if (isTRUE(md))        md <- names(metadata(biom))
+      if (!is.character(md)) md <- names(metadata(biom))[md]
       
-      # Convert '==' or '!=' prefix to an attribute
-      #--------------------------------------------------------------
-      if (isTRUE(substr(col, 1, 2) %in% c("==", "!="))) {
-        op  <- substr(col, 1, 2)
-        col <- substr(col, 3, nchar(col))
-        attr(col, 'op') <- op
-      }
-      
-      map <- metadata(biom, col)
-      
-      # Limit to only within or between comparisons.
-      #--------------------------------------------------------------
-      if (!is_null(attr(col, 'op', exact = TRUE))) {
-        op <- attr(col, 'op', exact = TRUE)
-        df <- df[get(op)(map[df$.sample1], map[df$.sample2]),,drop=F]
-      }
-      
-      v1 <- as.character(map[df$.sample1])
-      v2 <- as.character(map[df$.sample2])
-      
-      
-      # Change "Male vs Female" to "Female vs Male" (alphabetical).
-      #--------------------------------------------------------------
-      df[[col]] <- paste(
-        ifelse(v1 < v2, v1, v2), 
-        "vs", 
-        ifelse(v1 < v2, v2, v1) )
-      
-      
-      # Change "Male vs Male" to "Male".
-      #--------------------------------------------------------------
-      df[[col]] <- ifelse(v1 == v2, v1, df[[col]])
-      
-      
-      # Keep factors as factors when possible
-      #--------------------------------------------------------------
-      if (is.factor(map)) {
-        if (identical(op, "==")) {
-          df[[col]] <- factor(df[[col]], levels = levels(map))
-        } else {
-          df[[col]] <- factor(df[[col]])
+      for (i in which(!duplicated(md))) {
+        
+        col <- md[[i]]
+        op  <- attr(md, 'op', exact = TRUE)[[i]]
+        
+        # Convert '==' or '!=' prefix to an attribute
+        #________________________________________________________
+        if (isTRUE(substr(col, 1, 2) %in% c("==", "!="))) {
+          op  <- substr(col, 1, 2)
+          col <- substr(col, 3, nchar(col))
+          attr(col, 'op') <- op
         }
+        
+        map <- metadata(biom, col)
+        
+        # Limit to only within or between comparisons.
+        #________________________________________________________
+        if (!is_null(attr(col, 'op', exact = TRUE))) {
+          op <- attr(col, 'op', exact = TRUE)
+          df <- df[get(op)(map[df$.sample1], map[df$.sample2]),,drop=F]
+        }
+        
+        v1 <- as.character(map[df$.sample1])
+        v2 <- as.character(map[df$.sample2])
+        
+        
+        # Change "Male vs Female" to "Female vs Male" (alphabetical).
+        #________________________________________________________
+        df[[col]] <- paste(
+          ifelse(v1 < v2, v1, v2), 
+          "vs", 
+          ifelse(v1 < v2, v2, v1) )
+        
+        
+        # Change "Male vs Male" to "Male".
+        #________________________________________________________
+        df[[col]] <- ifelse(v1 == v2, v1, df[[col]])
+        
+        
+        # Keep factors as factors when possible
+        #________________________________________________________
+        if (is.factor(map)) {
+          if (identical(op, "==")) {
+            df[[col]] <- factor(df[[col]], levels = levels(map))
+          } else {
+            df[[col]] <- factor(df[[col]])
+          }
+        }
+        
       }
-      
     }
-  }
-  
-  if (isFALSE(safe))
-    colnames(df)[1:3] <- c("Sample1", "Sample2", "Distance")
-  
-  if (!is_null(stat.by)) {
-    attr(df, 'stats_raw') <- attr(dm, 'stats_raw', exact = TRUE)
-    attr(df, 'stats_tbl') <- attr(dm, 'stats_tbl', exact = TRUE)
-  }
-  
-  
-  return (df)
+    
+    if (isFALSE(safe))
+      colnames(df)[1:3] <- c("Sample1", "Sample2", "Distance")
+    
+    if (!is_null(stat.by)) {
+      attr(df, 'stats_raw') <- attr(dm, 'stats_raw', exact = TRUE)
+      attr(df, 'stats_tbl') <- attr(dm, 'stats_tbl', exact = TRUE)
+    }
+    
+    
+    return (df)
+    
+  }))
 }
 
 

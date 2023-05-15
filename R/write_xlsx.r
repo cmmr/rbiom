@@ -40,17 +40,17 @@
 
 write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
   
-  #========================================================
+  #________________________________________________________
   # Sanity Checks
-  #========================================================
+  #________________________________________________________
   if (!is(biom, "BIOM")) stop(simpleError("Invalid BIOM object."))
   unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
   
   
   
-  #========================================================
+  #________________________________________________________
   # Biom is an 'OTU table' and all counts are int
-  #========================================================
+  #________________________________________________________
   
   if (identical(tolower(biom$info$type), 'otu table') && !any(biom$counts$v %% 1 > 0)) {
     
@@ -104,7 +104,7 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
     }
     
     RareCounts <- data.frame(counts(rare), check.names=FALSE)
-    AlphaDiv   <- adiv_table(rare)
+    AlphaDiv   <- adiv_table(biom = rare)
     
     # Set the full taxonomy string as the first column of RareCounts
     TaxaStrings <- data.frame(Taxonomy=apply(rare$taxonomy, 1L, paste, collapse="; "))
@@ -187,9 +187,9 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
     
     
     
-  #========================================================
+  #________________________________________________________
   # Biom isn't an 'OTU table' or not all counts are int
-  #========================================================
+  #________________________________________________________
   
   } else {
     

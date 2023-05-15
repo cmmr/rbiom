@@ -48,32 +48,36 @@
 #'
 bdply <- function (biom, vars, FUN, ..., fast = TRUE) {
   
-  #--------------------------------------------------------------
-  # Sanity checks
-  #--------------------------------------------------------------
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
-  vars <- validate_metrics(biom, vars, mode = "meta", multi = TRUE)
-  
-  
-  #--------------------------------------------------------------
-  # Pass-through for case of no variables to ply by
-  #--------------------------------------------------------------
-  if (length(vars) < 1)
-    return (do.call(FUN, c(list(biom), list(...))))
-  
-  
-  #--------------------------------------------------------------
-  # Run user's function on subsetted BIOM objects
-  #--------------------------------------------------------------
-  .data <- metadata(biom, id = ".id")
-  .vars <- if (is(vars, 'quoted')) vars else ply_cols(vars)
-  .fun  <- function (df, ...) {
-    subBIOM <- select(biom, df[['.id']], fast = fast)
-    do.call(FUN, c(list(subBIOM), list(...)))
-  }
-  
-  plyr::ddply(.data, .vars, .fun, ...)
-  
+  with_cache(local({
+    
+    
+    #________________________________________________________
+    # Sanity checks
+    #________________________________________________________
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
+    vars <- validate_metrics(biom, vars, mode = "meta", multi = TRUE)
+    
+    
+    #________________________________________________________
+    # Pass-through for case of no variables to ply by
+    #________________________________________________________
+    if (length(vars) < 1)
+      return (do.call(FUN, c(list(biom), list(...))))
+    
+    
+    #________________________________________________________
+    # Run user's function on subsetted BIOM objects
+    #________________________________________________________
+    .data <- metadata(biom, id = ".id")
+    .vars <- if (is(vars, 'quoted')) vars else ply_cols(vars)
+    .fun  <- function (df, ...) {
+      subBIOM <- select(biom, df[['.id']], fast = fast)
+      do.call(FUN, c(list(subBIOM), list(...)))
+    }
+    
+    plyr::ddply(.data, .vars, .fun, ...)
+    
+  }))
 }
 

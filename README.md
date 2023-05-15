@@ -60,17 +60,30 @@ plot(biom$phylogeny)
 dm <- beta.div(biom, 'unifrac')
 ```
 
-Several functions will by default use all available CPU cores. To limit the number of cores used, you can set the numThreads option:
+
+Parallel Processing
+-------------------
+
+Computation of beta diversity metrics (UniFrac, Bray-Curtis, etc) will use all available CPU cores by default. To limit the number of cores used, you can set the numThreads option:
 
 ```r
 RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
-To enable caching to speed up repeat operations, call `init.cache()`. For instance:
+
+Caching
+-------
+
+Caching is enabled by default. rbiom will store a maximum of 200MB in the temporary directory given by `file.path(tempdir(), "rbiom", "cache")`. Caching can be disabled by setting the environmental variable `RBIOM_CACHE="FALSE"` or the R option `options(rbiom.cache=FALSE)`. The following commands can also be used to change the directory and storage limit (given in bytes):
 ```r
-library(rbiom)
-init.cache()
+options(rbiom.cache="/tmp/rbiom_cache")
+options(rbiom.cache_max=1024 ^ 2)
+
+Sys.setenv(RBIOM_CACHE="/tmp/rbiom_cache")
+Sys.setenv(RBIOM_CACHE_MAX=1024 ^ 2)
 ```
+R options will override environment variables.
+
 
 
 Building from source
