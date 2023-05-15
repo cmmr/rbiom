@@ -15,21 +15,22 @@
 #'
 with_cache <- function (expr) {
   
+  env <- caller_env(n = 2)
+  
   #________________________________________________________
   # Find a directory to use for caching.
   #________________________________________________________
   cache <- getOption("rbiom.cache", default = "")
   if (identical(cache, "")) cache <- Sys.getenv("RBIOM_CACHE", unset = "")
   if (identical(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
-  if (isFALSE(cache) || identical(cache, "FALSE"))                return (expr)
-  if (!is_scalar_character(cache) || !nzchar(cache))              return (expr)
-  if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (expr)
+  if (isFALSE(cache) || identical(cache, "FALSE"))                return (eval(expr, env))
+  if (!is_scalar_character(cache) || !nzchar(cache))              return (eval(expr, env))
+  if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (eval(expr, env))
   
   
   #________________________________________________________
   # Hash the call into a filename.
   #________________________________________________________
-  env  <- caller_env(n = 2)
   call <- call_match(
       call     = caller_call(n = 1),
       fn       = caller_fn(n = 1), 
