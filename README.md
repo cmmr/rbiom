@@ -77,10 +77,10 @@ Caching
 Caching is enabled by default. rbiom will store a maximum of 200MB in the temporary directory given by `file.path(tempdir(), "rbiom", "cache")`. Caching can be disabled by setting the environmental variable `RBIOM_CACHE="FALSE"` or the R option `options(rbiom.cache=FALSE)`. The following commands can also be used to change the directory and storage limit (given in bytes):
 ```r
 options(rbiom.cache="/tmp/rbiom_cache")
-options(rbiom.cache_max=1024 ^ 2)
+options(rbiom.cache_size=1024 ^ 2)
 
 Sys.setenv(RBIOM_CACHE="/tmp/rbiom_cache")
-Sys.setenv(RBIOM_CACHE_MAX=1024 ^ 2)
+Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 2)
 ```
 R options will override environment variables.
 

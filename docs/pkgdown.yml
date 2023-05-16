@@ -1,13 +1,8 @@
 pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
-articles:
-  aesthetics: aesthetics.html
-  diversity: diversity.html
-  importing: importing.html
-  partitioning: partitioning.html
-  plot_types: plot_types.html
-last_built: 2023-05-15T23:02Z
+articles: {}
+last_built: 2023-05-16T17:20Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles
