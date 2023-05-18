@@ -130,30 +130,25 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   #________________________________________________________
   # Decompress files that are in gzip or bzip2 format
   #________________________________________________________
-
-  file_con   <- file(fp)
-  file_class <- summary(file_con)$class
-  close.connection(file_con)
   
-  if (file_class %in% c("gzfile", "bzfile")) {
+  format <- guess_format(fp)
+  
+  if (endsWith(format, ".gz")) {
+    fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
+    on.exit(unlink(fp), add=TRUE)
     
-    if (identical(file_class, "gzfile"))
-      fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
-    
-    if (identical(file_class, "bzfile"))
-      fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
-    
+  } else if (endsWith(format, ".bz2")) {
+    fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
     on.exit(unlink(fp), add=TRUE)
   }
   
-  remove("file_con", "file_class")
   
   
   #________________________________________________________
   # Process the file according to its internal format
   #________________________________________________________
   
-  if (identical(as.numeric(readBin(fp, "raw", 4)), c(137, 72, 68, 70))) {
+  if (startsWith(format, "hdf5")) {
     
     #___________________#
     # HDF5 file format  #
@@ -185,7 +180,7 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
     rhdf5::H5Fclose(hdf5)
     remove("hdf5")
     
-  } else if (identical("{", readChar(fp, 1))) {
+  } else if (startsWith(format, "json")) {
     
     #___________________#
     # JSON file format  #
@@ -285,6 +280,45 @@ read_biom <- function (src, tree='auto', prune=cleanup, cleanup=FALSE) {
   
   
   return (biom)
+}
+
+
+
+#' Inspects a file to see if it's most likely hdf5, json, or tab-delimited.
+#' Also reports gzip or bzip2 compression.
+#' 
+#' @name guess_format
+#' 
+#' @param fp  The path to a BIOM file.
+#' 
+#' @return One of \code{c("tsv", "tsv.gz", "tsv.bz2", "json", "json.gz", 
+#'         "json.bz2", "hdf5")}.
+#' @export
+#' @examples
+#'     
+#'     fp <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+#'     guess_format(fp)
+#'
+guess_format <- function (fp) {
+  
+  stopifnot(file.exists(fp))
+  
+  con <- file(fp)
+  on.exit(close(con))
+  
+  format <- local({
+    if (identical(readChar(con, 1L), '{'))       return ("json")
+    if (identical(readChar(con, 4L), "\x89HDF")) return ("hdf5")
+    return ("tsv")
+  })
+  
+  format <- switch(
+    EXPR = summary(con)$class,
+    'gzfile' = paste0(format, ".gz"),
+    'bzfile' = paste0(format, ".bz2"),
+    format)
+  
+  return (format)
 }
 
 
