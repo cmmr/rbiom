@@ -17,15 +17,35 @@ with_cache <- function (expr) {
   
   env <- caller_env(n = 2)
   
+  
   #________________________________________________________
-  # Find a directory to use for caching.
+  # Fetch the maximum cache size.
   #________________________________________________________
-  cache <- getOption("rbiom.cache", default = "")
-  if (identical(cache, "")) cache <- Sys.getenv("RBIOM_CACHE", unset = "")
+  cache_size <- suppressWarnings(abs(as.integer(getOption(
+    x       = "rbiom.cache_size", 
+    default = Sys.getenv("RBIOM_CACHE_SIZE", unset = "") ))))
+  
+  if (is.na(cache_size) || !is_scalar_integerish(cache_size))
+    cache_size <- 200 * 1024 ^ 2 # 200 MB
+  
+  if (!isTRUE(cache_size > 0)) return (eval(expr, env))
+  
+  
+  #________________________________________________________
+  # Fetch the cache directory.
+  #________________________________________________________
+  cache <- getOption("rbiom.cache_dir", default = "")
+  if (identical(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
   if (identical(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
-  if (isFALSE(cache) || identical(cache, "FALSE"))                return (eval(expr, env))
   if (!is_scalar_character(cache) || !nzchar(cache))              return (eval(expr, env))
   if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (eval(expr, env))
+  
+  
+  #________________________________________________________
+  # Fetch the hashing function.
+  #________________________________________________________
+  hash <- getOption("rbiom.cache_hash", default = "")
+  if (!is.function(hash)) hash <- rlang::hash
   
   
   #________________________________________________________
@@ -52,16 +72,6 @@ with_cache <- function (expr) {
     expr <- readRDS(fp)
     
   } else {
-    
-    #________________________________________________________
-    # Find the maximum cache size.
-    #________________________________________________________
-    cache_size <- suppressWarnings(abs(as.integer(getOption(
-      x       = "rbiom.cache_size", 
-      default = Sys.getenv("RBIOM_CACHE_SIZE", unset = "") ))))
-    
-    if (is.na(cache_size) || !is_scalar_integerish(cache_size))
-      cache_size <- 200 * 1024 ^ 2 # 200 MB
     
     
     #________________________________________________________

@@ -122,7 +122,7 @@ importFrom("methods", "is", "as")
 importFrom("Rcpp", "sourceCpp")
 
 importFrom("rlang",
-           "%||%", "enquo", "get_env", "hash", "quo_name", 
+           "%||%", "enquo", "get_env", "quo_name", 
            "as_label",
            "caller_call", "caller_env", "caller_fn", 
            "call_match", "call_args", "call_name",
