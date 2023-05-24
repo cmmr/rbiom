@@ -1,47 +1,47 @@
+
 #' Write counts, metadata, taxonomy, and phylogeny to a biom file.
-#'
+#' 
 #' @param biom  The BIOM object to save to the file. If another class of
 #'        object is given, it will be coerced to matrix and output in
 #'        tabular format, provided it is numeric with rownames and colnames.
-#'        
+#' 
 #' @param file  Path to the output file. If the file name ends in \code{.gz} 
 #'        or \code{.bz2}, the file contents will be compressed accordingly.
-#'        
+#' 
 #' @param format  Options are \bold{tab}, \bold{json}, and \bold{hdf5}, 
 #'        corresponding to classic tabular format, biom format version 1.0 and 
-#'        biom version 2.1, respectively. Abbreviations are also accepted. See 
-#'        \url{http://biom-format.org/documentation/} for details. NOTE: to 
-#'        write HDF5 formatted BIOM files, the BioConductor R package 
+#'        biom version 2.1, respectively. 
+#'        See \url{http://biom-format.org/documentation/} for details.
+#'         NOTE: to write HDF5 formatted BIOM files, the BioConductor R package 
 #'        \code{rhdf5} must be installed.
-#'        
-#' @return On success, returns \code{NULL} invisibly.
+#' 
+#' @return The normalized filepath that was written to (invisibly).
 #' @export
 
 
 write_biom <- function (biom, file, format="json") {
   
-  
-  #________________________________________________________
-  # Accept abbreviations of tab, json, and hdf5
-  #________________________________________________________
-  
-  opts   <- c("tab", "json", "hdf5")
-  format <- tolower(head(format, 1))
-  format <- c(opts, format)[pmatch(format, opts, nomatch=4)]
+  stopifnot(is_scalar_character(file))
+  stopifnot(is_string(format, c("tab", "json", "hdf5")))
   
   
   #________________________________________________________
   # Refuse to overwrite existing files.
   #________________________________________________________
   
+  file <- normalizePath(file, winslash = "/", mustWork = FALSE)
+  
+  if (!dir.exists(dirname(file)))
+    dir.create(dirname(file), recursive = TRUE)
+  
   if (file.exists(file))
-      stop(simpleError(sprintf("Output file already exists: '%s'", file)))
+      stop("Output file already exists: ", file)
+  
   
   
   #________________________________________________________
   # Try to convert non-BIOM objects to a matrix for tsv output.
   #________________________________________________________
-  
   if (!is(biom, "BIOM")) {
     
     mtx <- try(as.matrix(biom), silent = TRUE)
@@ -49,7 +49,7 @@ write_biom <- function (biom, file, format="json") {
       if (!is_null(rownames(mtx)) && !is_null(colnames(mtx)))
         return (write_biom.tsv(mtx, file))
     
-    stop(simpleError("Invalid BIOM object."))
+    stop("Invalid BIOM object.")
   }
   
   
@@ -70,9 +70,8 @@ write_biom <- function (biom, file, format="json") {
     "hdf5" = write_biom.2.1(biom, file),
     "json" = write_biom.1.0(biom, file),
     "tab"  = write_biom.tsv(biom, file),
-    stop(simpleError(sprintf("unknown output format: '%s'", format)))
+    stop("unknown output format: ", format)
   )
-  
 }
 
 
@@ -128,7 +127,7 @@ write_biom.tsv <- function (biom, file) {
   
   close(con)
   
-  return (invisible(NULL))
+  return (invisible(file))
 }
 
 
@@ -214,7 +213,7 @@ write_biom.1.0 <- function (biom, file) {
   
   close(con)
   
-  return (invisible(NULL))
+  return (invisible(file))
 }
 
 
@@ -350,5 +349,5 @@ write_biom.2.1 <- function (biom, file) {
   rhdf5::H5Fflush(h5)
   rhdf5::H5Fclose(h5)
   
-  return (invisible(NULL))
+  return (invisible(file))
 }

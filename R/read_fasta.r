@@ -1,26 +1,31 @@
+
 #' Parse a fasta file into a named character vector.
 #'
-#' @param file  A file with fasta-formatted sequences. Can optionally be compressed with gzip, bzip2, xz, or lzma.
-#' @param ids  Character vector of IDs to retrieve. The default, \code{NULL}, will retrieve everything.
-#' @return A named character vector in which names are the fasta headers and values are the sequences.
+#' @param file  A file/URL with fasta-formatted sequences. Can optionally be 
+#'        compressed with gzip, bzip2, xz, or lzma.
+#' 
+#' @param ids  Character vector of IDs to retrieve. The default, \code{NULL}, 
+#'        will retrieve everything.
+#' 
+#' @return A named character vector in which names are the fasta headers and 
+#'         values are the sequences.
 #' @export
 #'
 
-
-read_fasta <- function (file, ids=NULL) {
+read_fasta <- function (file, ids = NULL) {
   
   if (!file.exists(file))
     return(simpleError(paste0("File '", file, "' does not exist.")))
   
   
   #________________________________________________________
-  # Open uncompressed files as well as gzip, bzip2, xz, or lzma.
+  # Open uncompressed files as well as gzip/bzip2/xz/lzma.
   #________________________________________________________
   con <- gzfile(file, "r")
   
   
   #________________________________________________________
-  # Parse headers and potentially multiline sequences
+  # Parse headers and potentially multi-line sequences.
   #________________________________________________________
   sid <- NULL
   res <- c()

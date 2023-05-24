@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9090</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9091</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Write a newick formatted phylogenetic tree.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/write_tree.r" class="external-link"><code>R/write_tree.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/writers.r" class="external-link"><code>R/writers.r</code></a></small>
       <div class="d-none name"><code>write_tree.Rd</code></div>
     </div>
 
@@ -51,7 +51,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_tree</span><span class="op">(</span>tree <span class="op">=</span> <span class="cn">NULL</span>, file <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_tree</span><span class="op">(</span><span class="va">tree</span>, file <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -70,7 +70,7 @@ accepts a <code>BIOM</code> object if it has a phylogentic tree.</p></dd>
     
 
 <p>If file is NULL, the newick string as a character vector. Otherwise,
-        the return value from <code>writeChar</code>, typically invsible(NULL).</p>
+        the normalized filepath that was written to (invisibly).</p>
     </div>
 
     <div class="section level2">

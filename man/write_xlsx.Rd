@@ -4,12 +4,19 @@
 \alias{write_xlsx}
 \title{Write data and summary information to a Microsoft Excel-compatible workbook.}
 \usage{
-write_xlsx(biom, outfile, depth = NULL, seed = 0, unc = "asis")
+write_xlsx(
+  biom,
+  file = NULL,
+  depth = NULL,
+  seed = 0,
+  unc = "asis",
+  outfile = NULL
+)
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
 
-\item{outfile}{Path to the output xlsx file.}
+\item{file}{Path to the output xlsx file.}
 
 \item{depth}{Depth to rarefy to. See \code{rarefy} function for details.
 \code{depth = NULL} auto-selects a rarefaction level. 
@@ -29,7 +36,7 @@ taxa names. Default: \code{"asis"}
 }}
 }
 \value{
-On success, returns \code{NULL} invisibly.
+The normalized filepath that was written to (invisibly).
 }
 \description{
 Write data and summary information to a Microsoft Excel-compatible workbook.
@@ -50,7 +57,6 @@ Sample' tab.
     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
     attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
     
-    outfile <- tempfile(fileext = ".xlsx")
-    write_xlsx(biom, outfile)
+    outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
 
 }

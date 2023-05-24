@@ -197,6 +197,10 @@
 `phylogeny<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
+  
+  if (is_scalar_character(value))
+    value <- read_tree(value)
+  
   stopifnot(is(value, 'phylo'))
   stopifnot(all(taxa_names(x) %in% value$tip.label))
   
@@ -228,6 +232,10 @@
   
   stopifnot(is(x, 'BIOM'))
   stopifnot(is.character(value))
+  
+  if (length(value) == 1 && is.null(names(value)))
+    value <- read_fasta(value, ids = taxa_names(x))
+  
   stopifnot(all(taxa_names(x) %in% names(value)))
   
   x[['sequences']] <- value[taxa_names(x)]
@@ -258,8 +266,8 @@
 `id<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
-  stopifnot(is.character(value))
-  stopifnot(length(value) == 1)
+  stopifnot(is_scalar_character(value))
+  stopifnot(!is.na(value))
   
   value <- trimws(value, whitespace = "[\\h\\v]")
   
@@ -289,8 +297,8 @@
 `comments<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
-  stopifnot(is.character(value))
-  stopifnot(length(value) == 1)
+  stopifnot(is_scalar_character(value))
+  stopifnot(!is.na(value))
   
   value <- trimws(value, whitespace = "[\\h\\v]")
   

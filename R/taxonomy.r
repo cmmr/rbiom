@@ -53,13 +53,12 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
       
         return (biom)
       }), 
-      error = function (e) {
+      error = function (e)
         stop(
           "Invalid argument for `biom` in rbiom::taxonomy(). ",
           "Must be a BIOM object or a character matrix with ",
           "OTU ids as row names and taxa ranks as column names.",
-          "\n\nError: ", e, "\n\n")
-      })
+          "\n\nError: ", e, "\n\n" ))
     
     
     #________________________________________________________
@@ -148,9 +147,8 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
           return (map)
         }), 
         
-        error = function (e) {
-          stop("Error in renaming taxa with taxonomy() call: ", e)
-        })
+        error = function (e)
+          stop("Error in renaming taxa with taxonomy() call: ", e) )
     
     
     map <- map[,ranks,drop=FALSE]
@@ -169,27 +167,39 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
 #' 
 #' @param value  A character matrix with rownames \code{taxa_names(x)}. If
 #'        there are more rownames than taxa names, the matrix will be subset.
+#'        May also be a character vector of length one with a file or URL
+#'        where the matrix is saved in either comma- or tab-separated format.
 #'         
 #' @family setters
 #' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     taxonomy(hmp50)[1:4,]
-#'     
-#'     # Sometimes taxonomic names are incomplete
-#'     taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
-#'     
-#'     # rbiom can insert more descriptive placeholders
-#'     taxonomy(hmp50, unc = "grouped")[c(107,170,194), 'Genus', drop=FALSE]
 #'
 
 `taxonomy<-` <- function (x, value) {
   
   stopifnot(is(x, 'BIOM'))
-  stopifnot(is.matrix(value))
-  stopifnot(typeof(value) == "character")
-  stopifnot(all(taxa_names(x) %in% rownames(value)))
+  
+  
+  #________________________________________________________
+  # Parse a file/URL.
+  #________________________________________________________
+  if (is_scalar_character(value)) {
+    value <- import_table(value, matrix = "character", row.names = 1)
+    colnames(value) <- default_taxa_ranks(ncol(value))
+  }
+  
+  
+  #________________________________________________________
+  # Row names of taxonomy matrix must include all TaxaIDs.
+  #________________________________________________________
+  missing <- setdiff(taxa_names(x), rownames(value))
+  n       <- length(missing)
+  if (n > 0) {
+    if (n > 4) missing <- c(head(missing, 4), "...")
+    missing <- paste(collapse = ", ", missing)
+    msg <- "%i Taxa ID%s missing from the taxonomy map: %s"
+    stop(sprintf(msg, n, ifelse(n == 1, " is", "s are"), missing))
+  }
+  
   
   x[['taxonomy']] <- value[taxa_names(x),]
   

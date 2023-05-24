@@ -97,6 +97,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/blply.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/build_biom.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/comments-set.html</loc>
   </url>
   <url>
@@ -143,6 +146,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/id.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/import_table.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/index.html</loc>
@@ -319,10 +325,22 @@
     <loc>https://cmmr.github.io/rbiom/reference/write_biom.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_counts.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_fasta.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_taxonomy.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_tree.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/write_wrapper.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_xlsx.html</loc>

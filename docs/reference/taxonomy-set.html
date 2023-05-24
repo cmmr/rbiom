@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9090</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9091</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,9 @@
 
 <dt>value</dt>
 <dd><p>A character matrix with rownames <code>taxa_names(x)</code>. If
-there are more rownames than taxa names, the matrix will be subset.</p></dd>
+there are more rownames than taxa names, the matrix will be subset.
+May also be a character vector of length one with a file or URL
+where the matrix is saved in either comma- or tab-separated format.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -79,38 +81,6 @@ there are more rownames than taxa names, the matrix will be subset.</p></dd>
 <code>taxa_ranks&lt;-()</code></p></div>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Kingdom    Phylum           Class            Order            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713 "Bacteria" "Bacteroidetes"  "Bacteroidia"    "Bacteroidales"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101 "Bacteria" "Firmicutes"     "Clostridia"     "Clostridiales"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2 "Bacteria" "Actinobacteria" "Actinobacteria" "Actinomycetales"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PreBivi6 "Bacteria" "Bacteroidetes"  "Bacteroidia"    "Bacteroidales"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Family             Genus                 OTU       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713 "Rikenellaceae"    "Alistipes"           "UncO2713"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101 "Lachnospiraceae"  "Lachnoanaerobaculum" "UncO4101"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2 "Actinomycetaceae" "Actinomyces"         "AnmMass2"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PreBivi6 "Prevotellaceae"   "Prevotella"          "PreBivi6"</span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="co"># Sometimes taxonomic names are incomplete</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">107</span>,<span class="fl">170</span>,<span class="fl">194</span><span class="op">)</span>, <span class="st">'Genus'</span>, drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Genus           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> GcbBacte "g"             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc0434x "Incertae Sedis"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc01skg "uncultured"    </span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="co"># rbiom can insert more descriptive placeholders</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span>, unc <span class="op">=</span> <span class="st">"grouped"</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">107</span>,<span class="fl">170</span>,<span class="fl">194</span><span class="op">)</span>, <span class="st">'Genus'</span>, drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Genus                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> GcbBacte "Unc.  Gracilibacteria"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc0434x "Unc.  Lachnospiraceae"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc01skg "Unc.  Clostridiales XIII"</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

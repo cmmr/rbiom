@@ -111,20 +111,47 @@ metadata <- function (biom, field=NULL, id=NULL, cleanup=FALSE) {
 #'
 `metadata<-` <- function(x, value) {
   
-  biom_ids <- sample_names(x)
-  data_ids <- rownames(value)
-  
   stopifnot(is(x, 'BIOM'))
-  stopifnot(all(class(value) == "data.frame"))
-  stopifnot(length(data_ids) > 0)
-  stopifnot(!any(duplicated(data_ids)))
-  stopifnot(all(data_ids %in% biom_ids))
   
-  # Different number or order of IDs
-  if (length(data_ids) != length(biom_ids)) { x %<>% select(data_ids)
-  } else if (any(data_ids != biom_ids))     { x %<>% select(data_ids) }
   
-  x[['metadata']] <- value
+  #________________________________________________________
+  # Parse a file/URL.
+  #________________________________________________________
+  if (is_scalar_character(value))
+    value <- import_table(value, row.names = 1, header = TRUE)
+  
+  stopifnot(is.data.frame(value))
+  
+  
+  #________________________________________________________
+  # All current sample names must be in the new metadata.
+  #________________________________________________________
+  missing <- setdiff(sample_names(x), rownames(value))
+  n       <- length(missing)
+  if (n > 0) {
+    if (n > 4) missing <- c(head(missing, 4), "...")
+    missing <- paste(collapse = ", ", missing)
+    msg <- "%i Sample ID%s missing from the new metadata: %s"
+    stop(sprintf(msg, n, ifelse(n == 1, " is", "s are"), missing))
+  }
+  
+  
+  #________________________________________________________
+  # Ignore IDs that aren't currently in the BIOM object.
+  #________________________________________________________
+  ignored <- setdiff(rownames(value), sample_names(x))
+  n       <- length(ignored)
+  if (n > 0) {
+    if (n > 4) ignored <- c(head(ignored, 4), "...")
+    ignored <- paste(collapse = ", ", ignored)
+    msg <- "%i Sample ID%s have no matching sample in the BIOM: %s"
+    warning(sprintf(msg, n, ifelse(n == 1, " is", "s are"), ignored))
+  }
+  
+  
+  
+  
+  x[['metadata']] <- value[sample_names(x),,drop=FALSE]
   
   return (x)
 }

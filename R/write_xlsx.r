@@ -6,7 +6,7 @@
 #'
 #' @param biom   The BIOM object to save to the file.
 #' 
-#' @param outfile   Path to the output xlsx file.
+#' @param file   Path to the output xlsx file.
 #' 
 #' @param depth   Depth to rarefy to. See \code{rarefy} function for details.
 #'        \code{depth = NULL} auto-selects a rarefaction level. 
@@ -15,8 +15,8 @@
 #'                   
 #' @param seed   Random seed to use in rarefying. See \code{rarefy} function
 #'        for details.
-#'                   
-#' @return On success, returns \code{NULL} invisibly.
+#' 
+#' @return The normalized filepath that was written to (invisibly).
 #' 
 #' @section Note:
 #' Any \code{data frame}, \code{matrix}, or \code{dist} attributes on 
@@ -33,18 +33,32 @@
 #'     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
 #'     attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
 #'     
-#'     outfile <- tempfile(fileext = ".xlsx")
-#'     write_xlsx(biom, outfile)
+#'     outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
 #'
 
 
-write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
+write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis", outfile = NULL) {
+  
+  if (!missing(outfile)) {
+    warning("In write.fasta(), `outfile` is deprecated. Use `file` instead.")
+    file <- outfile
+  }
+  
+  
+  stopifnot(is(biom, "BIOM"))
+  stopifnot(is_scalar_character(file))
+  
   
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  if (!is(biom, "BIOM")) stop(simpleError("Invalid BIOM object."))
   unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
+  
+  
+  
+  file <- normalizePath(file, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(dirname(file))) dir.create(dirname(file), recursive = TRUE)
+  
   
   
   
@@ -182,7 +196,7 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
     # Write everything to the specified output file
     #________________________________________________________
     
-    openxlsx::saveWorkbook(wb, file=outfile, overwrite=TRUE)
+    openxlsx::saveWorkbook(wb, file=file, overwrite=TRUE)
     
     
     
@@ -283,9 +297,10 @@ write_xlsx <- function (biom, outfile, depth=NULL, seed=0, unc = "asis") {
     # Write everything to the specified output file
     #________________________________________________________
     
-    openxlsx::saveWorkbook(wb, file=outfile, overwrite=TRUE)
+    openxlsx::saveWorkbook(wb, file=file, overwrite=TRUE)
     
   }
   
-  return(invisible(NULL))
+  
+  return (invisible(file))
 }

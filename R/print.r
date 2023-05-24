@@ -14,7 +14,10 @@
 print.BIOM <- function (x, ...) {
   
   w  <- getOption("width") * 0.75
-  gc <- function (vals) glue_collapse(vals, sep=", ", width=w - 20, last=" and ")
+  gc <- function (vals) {
+    last <- ifelse(length(vals) == 2, " and ", ", and ")
+    glue_collapse(vals, sep=", ", width=w - 20, last=last)
+  }
   i  <- x[['info']]
   
   cat(paste(collapse="\n", c(

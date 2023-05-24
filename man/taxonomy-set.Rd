@@ -10,22 +10,12 @@ taxonomy(x) <- value
 \item{x}{A \code{BIOM} object, as returned from \link{read_biom}.}
 
 \item{value}{A character matrix with rownames \code{taxa_names(x)}. If
-there are more rownames than taxa names, the matrix will be subset.}
+there are more rownames than taxa names, the matrix will be subset.
+May also be a character vector of length one with a file or URL
+where the matrix is saved in either comma- or tab-separated format.}
 }
 \description{
 Set the taxonomy table.
-}
-\examples{
-    library(rbiom)
-    
-    taxonomy(hmp50)[1:4,]
-    
-    # Sometimes taxonomic names are incomplete
-    taxonomy(hmp50)[c(107,170,194), 'Genus', drop=FALSE]
-    
-    # rbiom can insert more descriptive placeholders
-    taxonomy(hmp50, unc = "grouped")[c(107,170,194), 'Genus', drop=FALSE]
-
 }
 \seealso{
 Other setters: 

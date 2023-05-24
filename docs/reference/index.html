@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9090</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9091</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,6 +121,11 @@
         <dd>Split BIOM by metadata, apply function, and return results in a list.</dd>
       </dl><dl><dt>
           
+          <code><a href="build_biom.html">build_biom()</a></code> 
+        </dt>
+        <dd>Create a BIOM object.</dd>
+      </dl><dl><dt>
+          
           <code><a href="comments-set.html">`comments&lt;-`()</a></code> 
         </dt>
         <dd>Set a <code>BIOM</code> object's comment.</dd>
@@ -200,6 +205,11 @@ Also reports gzip or bzip2 compression.</dd>
           <code><a href="id.html">id()</a></code> 
         </dt>
         <dd>Get <code>BIOM</code> object's identifier / title.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="import_table.html">import_table()</a></code> 
+        </dt>
+        <dd>Read a data.frame from a filename/URL. Auto-detects separator.</dd>
       </dl><dl><dt>
           
           <code><a href="info.html">info()</a></code> 
@@ -462,14 +472,34 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Write counts, metadata, taxonomy, and phylogeny to a biom file.</dd>
       </dl><dl><dt>
           
+          <code><a href="write_counts.html">write_counts()</a></code> 
+        </dt>
+        <dd>Write BIOM counts to a tab-separated value (tsv) file.</dd>
+      </dl><dl><dt>
+          
           <code><a href="write_fasta.html">write_fasta()</a></code> 
         </dt>
-        <dd>Write sequences from a BIOM object to a file in fasta format.</dd>
+        <dd>Write DNA sequences to a file in fasta format.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="write_metadata.html">write_metadata()</a></code> 
+        </dt>
+        <dd>Write BIOM metadata to a tab-separated value (tsv) file.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="write_taxonomy.html">write_taxonomy()</a></code> 
+        </dt>
+        <dd>Write BIOM taxonomy map to a tab-separated value (tsv) file.</dd>
       </dl><dl><dt>
           
           <code><a href="write_tree.html">write_tree()</a></code> 
         </dt>
         <dd>Write a newick formatted phylogenetic tree.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="write_wrapper.html">write_wrapper()</a></code> 
+        </dt>
+        <dd>Common code for writers.</dd>
       </dl><dl><dt>
           
           <code><a href="write_xlsx.html">write_xlsx()</a></code> 

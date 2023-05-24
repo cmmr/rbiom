@@ -7,12 +7,15 @@
 read_fasta(file, ids = NULL)
 }
 \arguments{
-\item{file}{A file with fasta-formatted sequences. Can optionally be compressed with gzip, bzip2, xz, or lzma.}
+\item{file}{A file/URL with fasta-formatted sequences. Can optionally be 
+compressed with gzip, bzip2, xz, or lzma.}
 
-\item{ids}{Character vector of IDs to retrieve. The default, \code{NULL}, will retrieve everything.}
+\item{ids}{Character vector of IDs to retrieve. The default, \code{NULL}, 
+will retrieve everything.}
 }
 \value{
-A named character vector in which names are the fasta headers and values are the sequences.
+A named character vector in which names are the fasta headers and 
+        values are the sequences.
 }
 \description{
 Parse a fasta file into a named character vector.
