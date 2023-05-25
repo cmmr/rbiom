@@ -73,9 +73,10 @@
 #'     distill(hmp50, "Phylum", long=FALSE, md=c("Age", "Body Site"))[1:4,1:6]
 #'
 distill <- function (
-    biom, metric, weighted = TRUE, rarefy = FALSE, long = TRUE, md = TRUE, safe = FALSE ) {
+    biom, metric, weighted = TRUE, rarefy = FALSE, 
+    long = TRUE, md = TRUE, safe = FALSE ) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     
     if (!is(biom, 'BIOM'))

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9091</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9092</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,9 +76,62 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">hmp50</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in metrics(biom, mode, tree):</span> Please provide a BIOM object when using mode='meta'</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">'cmd'</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">embed_code</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n\n"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'p' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ~~~~ {.R}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ggplot(data = data) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   geom_rect(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     color   = NA, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = "white", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(xmax = Inf, xmin = -Inf, ymax = Inf, ymin = 4) ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   geom_bar(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha    = 0.6, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fun      = "mean", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes_string(".all", ".y", color = "`Body Site`", fill = "`Body Site`"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     position = position_dodge(width = 0.8), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     stat     = "summary", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     width    = 0.7 ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ggbeeswarm::geom_quasirandom(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping     = aes_string(".all", ".y", group = "`Body Site`"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     dodge.width = 0.8, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha       = 0.4, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     color       = "black", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     size        = 1.14, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     stroke      = 0 ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   geom_linerange(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data     = ~attr(., "vline"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes_string(".all", ".y", color = "`Body Site`", ymax = ".ymax", ymin = ".ymin"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     position = position_dodge(width = 0.8) ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   geom_segment(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = ~attr(., "stat_brackets"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(".x", ".y", xend = ".xend", yend = ".yend") ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   geom_text(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = ~attr(., "stat_labels"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hjust   = 0.5, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(".x", ".y", label = ".label"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     parse   = TRUE, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     size    = 3, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     vjust   = 0 ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   labs(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     caption = "Kruskal-Wallis p-values FDR-adjusted as per Benjamini &amp; Hochberg (1995).", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     y       = "Shannon Diversity" ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2")) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2")) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   scale_x_discrete() +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   scale_y_continuous(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     breaks = c(0, 1, 2, 3, 4), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     expand = c(0.02, 0, 0.08, 0) ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   theme_bw() +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   theme(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.text.x        = element_blank(), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.ticks.x       = element_blank(), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.title.x       = element_blank(), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     panel.grid.major.x = element_blank(), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.caption       = element_text(face = "italic", color = "gray"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     text               = element_text(size = 14) )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ~~~~</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

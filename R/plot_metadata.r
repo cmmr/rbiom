@@ -277,8 +277,10 @@ metadata_params <- function (params, contraints = list()) {
   
   
   if (is(biom, 'BIOM')) {
+    biom             <- select(biom, rownames(new_md))
     metadata(biom)   <- new_md
     params[['biom']] <- biom
+    
   } else {
     params[['biom']] <- new_md
   }

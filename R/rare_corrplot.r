@@ -48,14 +48,13 @@ rare_corrplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, rline = NULL, caption = TRUE, ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot)))
     remove(list = setdiff(ls(), c("params", "history")))

@@ -71,7 +71,7 @@
 
 adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE, safe=FALSE) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
   
     
     #________________________________________________________

@@ -58,14 +58,13 @@ rare_multiplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
     remove(list = setdiff(ls(), c("params", "history")))

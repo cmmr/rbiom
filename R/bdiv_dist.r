@@ -47,7 +47,7 @@ bdiv_distmat <- function (
     biom, method="bray-curtis", weighted=TRUE, tree=NULL, stat.by=NULL, 
     seed=0, perms=999 ) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
   
   
     #________________________________________________________

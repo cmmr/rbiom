@@ -4,7 +4,7 @@
 \alias{with_cache}
 \title{Speeds up repetitive computations by storing results of functions calls.}
 \usage{
-with_cache(expr)
+with_cache(env, dots, expr)
 }
 \arguments{
 \item{expr}{An expression to cache the output of.}

@@ -14,7 +14,7 @@ adjusted principal coordinates analysis. Bioinformatics. 2020 Jul
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9091</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9092</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@ names of this data frame should match the labels of the distance matrix.</p></dd
 <span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="unifrac.html">unifrac</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">reg_pcoa</span> <span class="op">&lt;-</span> <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/pcoa.html" class="external-link">pcoa</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">[[</span><span class="st">'vectors'</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="va">adj_pcoa</span> <span class="op">&lt;-</span> <span class="fu">apcoa</span><span class="op">(</span><span class="va">dm</span>, <span class="fu"><a href="metadata.html">metadata</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span><span class="op">[</span>,<span class="st">'Sex'</span>,drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in FUN(X[[i]], ...):</span> object 'biom' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">ids</span>   <span class="op">&lt;-</span> <span class="fu"><a href="sample_names.html">sample_names</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">color</span> <span class="op">&lt;-</span> <span class="fu"><a href="metadata.html">metadata</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Sex'</span><span class="op">)</span></span></span>

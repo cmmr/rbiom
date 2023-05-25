@@ -189,11 +189,11 @@ plot_heatmap <- function (
     trees = TRUE, clust = "complete", dist = "euclidean",
     tree_height  = NULL, track_height = NULL, ratio=1, 
     legend = "right", xlab.angle = "auto", ... ) {
+    
+  theme_args <- list(...)
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
-    
-    theme_args <- list(...)
     
     #________________________________________________________
     # Sanity Checks.

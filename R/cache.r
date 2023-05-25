@@ -13,9 +13,10 @@
 #'     system.time(y <- adiv_table(hmp50, "multi"))
 #'     identical(x, y)
 #'
-with_cache <- function (expr) {
+with_cache <- function (env, dots, expr) {
   
-  env <- caller_env(n = 2)
+  args <- lapply(c(as.list(env), dots), eval, env)
+  env  <- list2env(args)
   
   
   #________________________________________________________
@@ -51,17 +52,10 @@ with_cache <- function (expr) {
   #________________________________________________________
   # Hash the call into a filename.
   #________________________________________________________
-  call <- call_match(
-      call     = caller_call(n = 1),
-      fn       = caller_fn(n = 1), 
-      dots_env = env, 
-      defaults = TRUE)
-  
-  args <- lapply(call_args(call), eval, env)
-  key  <- hash(c(call_name(call), args))
-  
-  fp <- file.path(cache, paste0(key, ".rds"))
-  fp <- normalizePath(fp, winslash = "/", mustWork = FALSE)
+  fn  <- rlang::call_name(rlang::caller_call())
+  key <- hash(c(list(fn), args[order(names(args))]))
+  fp  <- file.path(cache, paste0(key, ".rds"))
+  fp  <- normalizePath(fp, winslash = "/", mustWork = FALSE)
   
   
   #________________________________________________________

@@ -53,14 +53,13 @@ bdiv_boxplot <- function (
   p.adj = "fdr", p.label = TRUE, ci = 95, xlab.angle = 'auto', 
   weighted = TRUE, tree = NULL, ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
   
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("bdiv_boxplot(%s)", as.args(params, fun = bdiv_boxplot)))
     remove(list = setdiff(ls(), c("params", "history")))

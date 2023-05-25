@@ -37,7 +37,7 @@
 
 rarefy <- function (biom, depth=NULL, seed=0) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     
     #________________________________________________________

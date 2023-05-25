@@ -110,7 +110,7 @@ bdiv_ord_table <- function (
     rank=NULL, taxa=5, p.adj='fdr', p.top=5, ...) {
   
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
     ord  %<>% validate_metrics(NULL, ., mode = "ord",  multi=TRUE)

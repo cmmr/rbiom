@@ -47,9 +47,10 @@ tree_plot <- function (
     tiplab = NULL, color.by = NULL, label = NULL, cladelab = NULL, 
     top = NULL, right = NULL, bottom = NULL, left = NULL, ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
+    #________________________________________________________
     # Sanity checks
     #________________________________________________________
     local({
@@ -71,14 +72,15 @@ tree_plot <- function (
     })
     
     
+    #________________________________________________________
     # Package and print this call
     #________________________________________________________
-    params          <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- sprintf("tree_plot(%s)", as.args(params, fun = tree_plot))
     
     
     
+    #________________________________________________________
     # Assemble the plot layers with initLayer / setLayer.
     #________________________________________________________
     layers <- list()
@@ -87,6 +89,7 @@ tree_plot <- function (
     
     
     
+    #________________________________________________________
     # Use ggtree to render a phylogenetic tree
     #________________________________________________________
     tr <- tree_data(biom)
@@ -94,6 +97,7 @@ tree_plot <- function (
     setLayer("ggtree", layout = layout, tr = tr)
     
     
+    #________________________________________________________
     # Coloring by reads requires an aes mapping.
     #________________________________________________________
     if (identical(color.by, '.reads')) {
@@ -102,6 +106,7 @@ tree_plot <- function (
     }
     
     
+    #________________________________________________________
     # Add OTU names at the tree tips.
     #________________________________________________________
     if (!is_null(tiplab)) {
@@ -123,6 +128,7 @@ tree_plot <- function (
     }
     
     
+    #________________________________________________________
     # Label clades internally (inside) of the tree.
     #________________________________________________________
     if (!is_null(label)) {
@@ -139,6 +145,7 @@ tree_plot <- function (
     }
     
     
+    #________________________________________________________
     # Label clades externally (at right) of the tree.
     #________________________________________________________
     if (!is_null(cladelab)) {
@@ -156,6 +163,7 @@ tree_plot <- function (
     }
     
     
+    #________________________________________________________
     # Add horizontal/vertical padding for text to bleed into.
     #________________________________________________________
     if (!is_null(c(label, cladelab, tiplab))) {
@@ -174,6 +182,7 @@ tree_plot <- function (
     p <- suppressMessages(ggbuild(layers))
     
     
+    #________________________________________________________
     # Attach history of biom modifications and this call
     #________________________________________________________
     attr(p, 'history') <- c(attr(biom, 'history'), history)
@@ -212,7 +221,7 @@ tree_plot <- function (
 #'
 tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     
     # Sanity checks

@@ -37,7 +37,7 @@
 
 taxonomy <- function (biom, ranks = NULL, unc = "asis") {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     #________________________________________________________
     # Check that `biom` look right.

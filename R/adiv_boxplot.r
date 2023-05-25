@@ -154,14 +154,14 @@ adiv_boxplot <- function (
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
   
-  with_cache(local({
-      
+  
+  with_cache(environment(), list(...), local({
+    
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
     remove(list = setdiff(ls(), c("params", "history")))

@@ -80,15 +80,13 @@ bdiv_biplot <- function (
   weighted = TRUE, rank = NULL, taxa = 5, p.top = Inf, p.adj = "fdr", 
   perms = 1000, ...) {
   
-  with_cache(local({
-    
+  with_cache(environment(), list(...), local({
     
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot)))
     remove(list = setdiff(ls(), c("params", "history")))

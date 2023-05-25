@@ -62,14 +62,13 @@ taxa_stacked <- function (
     dist = "euclidean", clust = "complete", 
     other = TRUE, xlab.angle = 90, ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- attr(biom, 'history')
     history %<>% c(sprintf("taxa_stacked(%s)", as.args(params, fun = taxa_stacked)))
     remove(list = setdiff(ls(), c("params", "history")))

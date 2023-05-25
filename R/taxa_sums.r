@@ -18,7 +18,7 @@
 
 taxa_sums <- function (biom, rank = NULL) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
   
     if (!is(biom, 'BIOM'))
       stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
@@ -54,7 +54,7 @@ taxa_sums <- function (biom, rank = NULL) {
 
 taxa_means <- function (biom, rank = NULL) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     if (!is(biom, 'BIOM'))
       stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
@@ -89,7 +89,7 @@ taxa_means <- function (biom, rank = NULL) {
 
 top_taxa <- function (biom, rank = 'OTU', n = Inf) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
   
     if (!is(biom, 'BIOM'))
       stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))

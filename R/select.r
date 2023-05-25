@@ -43,7 +43,7 @@
 #'
 select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FALSE) {
   
-  with_cache(local({
+  with_cache(environment(), NULL, local({
     
     #________________________________________________________
     # Accept multiple types of input: BIOM, slam matrix, R matrix

@@ -42,7 +42,7 @@
 
 depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
-  with_cache(local({
+  with_cache(environment(), list(...), local({
     
     
     #________________________________________________________
@@ -55,8 +55,7 @@ depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, tr
     #________________________________________________________
     # Record the function call in a human-readable format.
     #________________________________________________________
-    params <- c(as.list(environment()), list(...))
-    params[['...']] <- NULL
+    params  <- as.list(parent.env(environment()))
     history <- sprintf("depths_barplot(%s)", as.args(params, fun = depths_barplot))
     
     
