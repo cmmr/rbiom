@@ -37,7 +37,7 @@ taxa_corrplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     model = "linear", ci = 95, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("taxa_corrplot", environment(), list(...), local({
     
     
     #________________________________________________________

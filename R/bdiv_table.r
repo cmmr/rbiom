@@ -65,7 +65,7 @@ bdiv_table <- function (
     biom, method="bray-curtis", weighted=TRUE, tree=NULL, md=FALSE, safe=FALSE, stat.by=NULL, 
     seed=0, perms=999) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("bdiv_table", environment(), NULL, local({
   
     
     #________________________________________________________

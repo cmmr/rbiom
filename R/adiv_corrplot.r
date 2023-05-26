@@ -99,7 +99,7 @@ adiv_corrplot <- function (
     biom, x, metric = "OTUs", points = FALSE, model = "linear", ci = 95, 
     color.by = NULL, facet.by = NULL, limit.by = NULL, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("adiv_corrplot", environment(), list(...), local({
     
     
     #________________________________________________________

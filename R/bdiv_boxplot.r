@@ -53,7 +53,7 @@ bdiv_boxplot <- function (
   p.adj = "fdr", p.label = TRUE, ci = 95, xlab.angle = 'auto', 
   weighted = TRUE, tree = NULL, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("bdiv_biplot", environment(), list(...), local({
   
     
     #________________________________________________________

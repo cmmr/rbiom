@@ -62,7 +62,7 @@ taxa_stacked <- function (
     dist = "euclidean", clust = "complete", 
     other = TRUE, xlab.angle = 90, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("taxa_stacked", environment(), list(...), local({
     
     
     #________________________________________________________

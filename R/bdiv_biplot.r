@@ -80,7 +80,7 @@ bdiv_biplot <- function (
   weighted = TRUE, rank = NULL, taxa = 5, p.top = Inf, p.adj = "fdr", 
   perms = 1000, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("bdiv_biplot", environment(), list(...), local({
     
     
     #________________________________________________________

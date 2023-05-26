@@ -155,7 +155,7 @@ adiv_boxplot <- function (
     p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
   
   
-  with_cache(environment(), list(...), local({
+  with_cache("adiv_boxplot", environment(), list(...), local({
     
     
     #________________________________________________________

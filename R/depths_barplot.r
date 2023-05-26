@@ -42,7 +42,7 @@
 
 depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("depths_barplot", environment(), list(...), local({
     
     
     #________________________________________________________

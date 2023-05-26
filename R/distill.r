@@ -76,7 +76,7 @@ distill <- function (
     biom, metric, weighted = TRUE, rarefy = FALSE, 
     long = TRUE, md = TRUE, safe = FALSE ) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("distill", environment(), NULL, local({
     
     
     if (!is(biom, 'BIOM'))

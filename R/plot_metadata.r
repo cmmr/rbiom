@@ -98,6 +98,7 @@ metadata_params <- function (params, contraints = list()) {
       stopifnot(is_scalar_character(col_name))
       
       
+      #________________________________________________________
       # Reverse sort any columns prefixed with a '-'.
       #________________________________________________________
       if (identical(param, 'order.by')) {
@@ -108,6 +109,7 @@ metadata_params <- function (params, contraints = list()) {
       }
       
       
+      #________________________________________________________
       # For bdiv_boxplot, hande within/between/all comparisons.
       #________________________________________________________
       if (isTRUE(params[['.cmp']])) {
@@ -168,6 +170,7 @@ metadata_params <- function (params, contraints = list()) {
     }
     
     
+    #________________________________________________________
     # Enforce validation constraints.
     #________________________________________________________
     validate_arg(
@@ -185,11 +188,13 @@ metadata_params <- function (params, contraints = list()) {
   
   
   
+  #________________________________________________________
   # Which columns to concatenate and use for ggplot group.
   #________________________________________________________
   params[['.group.by']] <- unique(group_by)
   
   
+  #________________________________________________________
   # Other column and column attribute tracking.
   #________________________________________________________
   params[['.md.cols']]  <- unique(md_cols)
@@ -197,7 +202,7 @@ metadata_params <- function (params, contraints = list()) {
   
   
   
-  
+  #________________________________________________________
   # Drop rows with NA's from the metadata table.
   #________________________________________________________
   new_md <- new_md[,unique(md_cols),drop=FALSE]
@@ -205,6 +210,7 @@ metadata_params <- function (params, contraints = list()) {
   
   
   
+  #________________________________________________________
   # Update all the *.by params to ensure subsets match.
   #________________________________________________________
   for (param in md_params) {
@@ -256,6 +262,8 @@ metadata_params <- function (params, contraints = list()) {
   }
   
   
+  
+  #________________________________________________________
   # Simplify all *.by params except color/shape/pattern.
   #________________________________________________________
   for (param in md_params) {
@@ -269,6 +277,8 @@ metadata_params <- function (params, contraints = list()) {
   }
   
   
+  
+  #________________________________________________________
   # Re-order the samples according to metadata.
   #________________________________________________________
   for (i in rev(params[['order.by']]))

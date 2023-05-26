@@ -109,8 +109,9 @@ bdiv_ord_table <- function (
     safe=TRUE, split.by=NULL, stat.by=NULL, seed=0, perms=1000, 
     rank=NULL, taxa=5, p.adj='fdr', p.top=5, ...) {
   
+  ord_args <- list(...)
   
-  with_cache(environment(), list(...), local({
+  with_cache("bdiv_ord_table", environment(), NULL, local({
     
     
     ord  %<>% validate_metrics(NULL, ., mode = "ord",  multi=TRUE)
@@ -214,24 +215,31 @@ bdiv_ord_table <- function (
             # Ordinate samples => ('.axis.1', '.axis.2')
             #________________________________________________________
             if (o == "PCoA") {
-              res <- ape::pcoa(dm, ...)
+              res <- do.call(ape::pcoa, c(list(D = dm), ord_args))
               df  <- res$vectors[,1:k] %>% as.data.frame()
               eig <- res$values$Relative_eig[1:k] %>% as.data.frame()
               
             } else if (o == "tSNE") {
-              res <- suppressMessages(tsne::tsne(dm, k=k, ...))
+              ord_args[['X']] <-  dm
+              ord_args[['k']] <-  k
+              res <- suppressMessages(do.call(tsne::tsne, ord_args))
               df  <- res %>% as.data.frame()
               rownames(df) <- attr(dm, "Labels", exact = TRUE)
               eig <- NULL
               
             } else if (o == "NMDS") {
-              res <- vegan::metaMDS(dm, k=k, trace=0, ...)
+              ord_args[['comm']]   <-  dm
+              ord_args[['k']]      <-  k
+              ord_args[['trace']] %<>% if.null(0)
+              res <- do.call(vegan::metaMDS, ord_args)
               df  <- res$points %>% as.data.frame()
               eig <- NULL
               
             } else if (o == "UMAP") {
-              n_neighbors <- max(2, min(100, as.integer(attr(dm, 'Size') / 3)))
-              res <- uwot::umap(dm, n_neighbors, n_components = k, ...)
+              ord_args[['X']]             <-  dm
+              ord_args[['n_components']] %<>% if.null(k)
+              ord_args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))
+              res <- do.call(uwot::umap, ord_args)
               df  <- res %>% as.data.frame()
               eig <- NULL
               

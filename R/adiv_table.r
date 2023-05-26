@@ -71,8 +71,8 @@
 
 adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE, safe=FALSE) {
   
-  with_cache(environment(), NULL, local({
-  
+  with_cache("adiv_table", environment(), NULL, local({
+    
     
     #________________________________________________________
     # Enable abbreviations of metric names.
@@ -197,6 +197,8 @@ adiv_table <- function (biom, rarefy=FALSE, metrics="all", long=FALSE, md=FALSE,
       colnames(result) <- paste0(".", tolower(colnames(result)))
       colnames(result) <- sub(".diversity", ".value", colnames(result))
     }
+    
+    
     
     #________________________________________________________
     # Add Metadata

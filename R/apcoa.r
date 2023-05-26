@@ -28,7 +28,7 @@
 #'     
 apcoa <- function (distmat, covariates)  {
   
-  with_cache(environment(), NULL, local({
+  with_cache("apcoa", environment(), NULL, local({
   
     
     if (!is(distmat,    "dist"))       stop ("distmat must be of class 'dist'.")

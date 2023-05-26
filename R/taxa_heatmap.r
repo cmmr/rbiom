@@ -45,7 +45,7 @@ taxa_heatmap <- function (
     tree_height = NULL, track_height = NULL, ratio=1, 
     legend = "right", xlab.angle = "auto", ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("taxa_heatmap", environment(), list(...), local({
     
     
     #________________________________________________________

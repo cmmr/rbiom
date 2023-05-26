@@ -192,7 +192,7 @@ plot_heatmap <- function (
     
   theme_args <- list(...)
   
-  with_cache(environment(), NULL, local({
+  with_cache("plot_heatmap", environment(), NULL, local({
     
     
     #________________________________________________________

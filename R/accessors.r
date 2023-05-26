@@ -38,7 +38,7 @@ sample_names <- function (biom) {
 
 sample_sums <- function (biom, long=FALSE, md=FALSE) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("sample_sums", environment(), NULL, local({
     
     
     if (!is(biom, 'BIOM'))

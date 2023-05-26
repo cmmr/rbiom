@@ -13,10 +13,11 @@
 #'     system.time(y <- adiv_table(hmp50, "multi"))
 #'     identical(x, y)
 #'
-with_cache <- function (env, dots, expr) {
+with_cache <- function (fn, env, dots, expr) {
   
   args <- lapply(c(as.list(env), dots), eval, env)
   env  <- list2env(args)
+  
   
   
   #________________________________________________________
@@ -52,10 +53,9 @@ with_cache <- function (env, dots, expr) {
   #________________________________________________________
   # Hash the call into a filename.
   #________________________________________________________
-  fn  <- rlang::call_name(rlang::caller_call())
-  key <- hash(c(list(fn), args[order(names(args))]))
-  fp  <- file.path(cache, paste0(key, ".rds"))
-  fp  <- normalizePath(fp, winslash = "/", mustWork = FALSE)
+  args <- c(fn, args[order(names(args))])
+  fp   <- file.path(cache, paste0(hash(args), ".rds"))
+  fp   <- normalizePath(fp, winslash = "/", mustWork = FALSE)
   
   
   #________________________________________________________
@@ -92,3 +92,58 @@ with_cache <- function (env, dots, expr) {
   
   return (expr)
 }
+
+
+
+#' Delete all the cached files. 
+#' 
+#' @name clear_cache
+#' 
+#' @return NULL.
+clear_cache <- function () {
+  
+  #________________________________________________________
+  # Fetch the cache directory.
+  #________________________________________________________
+  cache <- getOption("rbiom.cache_dir", default = "")
+  if (identical(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
+  if (identical(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
+  
+  
+  #________________________________________________________
+  # No directory to empty.
+  #________________________________________________________
+  if (!is_scalar_character(cache) || !nzchar(cache)) {
+    warning("No cache directory defined for rbiom.")
+    return (NULL)
+  }
+  cache <- normalizePath(cache, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(cache)) {
+    warning("Cache directory does not exist:\n", cache, "\n")
+    return (NULL)
+  }
+  
+  
+  
+  files <- list.files(cache, full.names = TRUE)
+  files <- files[endsWith(files, ".rds")]
+  
+  
+  #________________________________________________________
+  # Directory is already empty.
+  #________________________________________________________
+  if (length(files) == 0) {
+    message("No cached files found in:\n", cache, "\n")
+    return (NULL)
+  }
+  
+  
+  #________________________________________________________
+  # Delete all the *.rds files in the cache dir.
+  #________________________________________________________
+  message("Deleting ", length(files)," files from:\n", cache, "\n")
+  file.remove(files)
+  message("Done\n")
+  return (NULL)
+}
+

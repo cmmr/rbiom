@@ -58,7 +58,9 @@ rare_multiplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
-  with_cache(environment(), list(...), local({
+  dots <- list(...)
+  
+  with_cache("rare_multiplot", environment(), list(...), local({
     
     
     #________________________________________________________
@@ -77,8 +79,8 @@ rare_multiplot <- function (
     barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
     
     plots <- list(
-      'corrplot' = do.call(rare_corrplot,  c(corrplot_params, list(...))),
-      'barplot'  = do.call(depths_barplot, c(barplot_params,  list(...))) )
+      'corrplot' = do.call(rare_corrplot,  c(corrplot_params, dots)),
+      'barplot'  = do.call(depths_barplot, c(barplot_params,  dots)) )
     
     p <- patchwork::wrap_plots(plots, ncol = 1)
     

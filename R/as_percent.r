@@ -17,7 +17,7 @@
 
 as_percent <- function (biom) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("as_percent", environment(), NULL, local({
   
   
     if (!is(biom, 'BIOM'))

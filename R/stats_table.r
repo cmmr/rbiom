@@ -122,7 +122,7 @@ stats_table <- function (
     pairwise = FALSE, weighted = TRUE, digits = 3, 
     y.pos = NULL, y.pos.facet="Metric", adj.n = NULL ) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("stats_table", environment(), NULL, local({
     
     #________________________________________________________
     # Sanity checks

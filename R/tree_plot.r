@@ -47,7 +47,7 @@ tree_plot <- function (
     tiplab = NULL, color.by = NULL, label = NULL, cladelab = NULL, 
     top = NULL, right = NULL, bottom = NULL, left = NULL, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("tree_plot", environment(), list(...), local({
     
     
     #________________________________________________________
@@ -221,7 +221,7 @@ tree_plot <- function (
 #'
 tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("tree_data", environment(), NULL, local({
     
     
     # Sanity checks

@@ -76,7 +76,7 @@
 #'
 subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor = TRUE, fast = FALSE) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("subset.BIOM", environment(), NULL, local({
     
     
     stopifnot(is(x, 'BIOM'))

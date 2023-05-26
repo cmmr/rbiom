@@ -17,7 +17,7 @@
 #'
 subtree <- function (tree, tips) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("subtree", environment(), NULL, local({
     
     #________________________________________________________
     # Did we get a tree?

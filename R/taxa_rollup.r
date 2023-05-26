@@ -107,7 +107,7 @@ taxa_rollup <- function (
     md = FALSE, unc = "singly", other = FALSE, 
     safe = FALSE ) {
   
-  with_cache(environment(), NULL, local({
+  with_cache("taxa_rollup", environment(), NULL, local({
     
     #________________________________________________________
     # Get the input into a simple_triplet_matrix

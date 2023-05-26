@@ -161,7 +161,7 @@ bdiv_heatmap <- function (
     legend = "right", xlab.angle = "auto", ...) {
   
   
-  with_cache(environment(), list(...), local({
+  with_cache("bdiv_heatmap", environment(), list(...), local({
     
     
     #________________________________________________________

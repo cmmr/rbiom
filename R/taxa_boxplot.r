@@ -70,7 +70,7 @@ taxa_boxplot <- function (
     flip = TRUE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
     ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("taxa_boxplot", environment(), list(...), local({
     
     
     #________________________________________________________

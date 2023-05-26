@@ -48,7 +48,7 @@ rare_corrplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, rline = NULL, caption = TRUE, ...) {
   
-  with_cache(environment(), list(...), local({
+  with_cache("rare_corrplot", environment(), list(...), local({
     
     
     #________________________________________________________
