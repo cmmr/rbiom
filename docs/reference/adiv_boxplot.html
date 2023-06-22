@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9093</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9096</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,11 +61,12 @@
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  flip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  stripe <span class="op">=</span> <span class="va">flip</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
 <span>  p.label <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  safe <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -101,6 +102,15 @@ Default: <code>"lsb"</code>.</p></dd>
 <dd><p>Metadata columns to 
 use for aesthetics and partitioning. See below for details.
 Default: <code>NULL</code></p></dd>
+
+
+<dt>flip</dt>
+<dd><p>Transpose the axes, so that taxa are present as rows instead
+of columns. Default: <code>FALSE</code></p></dd>
+
+
+<dt>stripe</dt>
+<dd><p>Shade every other x position. Default: <em>same as flip</em></p></dd>
 
 
 <dt>p.adj</dt>
@@ -141,13 +151,6 @@ Set to <code>NULL</code> to disable. Default: <code>95</code></p></dd>
 <b>'auto'</b> (the default), automatically selects a rotation value. 
 <b>0</b>, <b>30</b>, and <b>90</b> sets the angle to horizontal, 
 angled, and vertical, respectively.</p></dd>
-
-
-<dt>safe</dt>
-<dd><p>If <code>FALSE</code>, data.frame column names such as 
-<code>".metric"</code> will be auto-converted to <code>"Metric"</code> to improve
-human-readability. Conversion if aborted if a conflict is found with
-a metadata column name. (Default: <code>FALSE</code>)</p></dd>
 
 
 <dt>...</dt>
@@ -251,6 +254,7 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, metric <span class="op">=</span> <span class="st">"Shannon"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_boxplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OTUs"</span>, <span class="st">"Shannon"</span><span class="op">)</span>, layers<span class="op">=</span><span class="st">"b"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, scales<span class="op">=</span><span class="st">"free"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
 <span class="r-plt img"><img src="adiv_boxplot-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, metric <span class="op">=</span> <span class="st">"Simpson"</span>, layers<span class="op">=</span><span class="st">"p"</span>, color.by<span class="op">=</span><span class="st">"Sex"</span>, xlab.angle<span class="op">=</span><span class="fl">30</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_boxplot-3.png" alt="" width="700" height="433"></span>

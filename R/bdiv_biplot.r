@@ -80,237 +80,246 @@ bdiv_biplot <- function (
   weighted = TRUE, rank = NULL, taxa = 5, p.top = Inf, p.adj = "fdr", 
   perms = 1000, ...) {
   
-  with_cache("bdiv_biplot", environment(), list(...), local({
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("bdiv_biplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity Checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, n = 1, 'metric', 'bdiv', tree = tree)
+    ord    %<>% validate_arg(biom, n = 1, 'ord')
+    rank   %<>% validate_arg(biom, n = 1, 'rank', default = tail(c('OTU', taxa_ranks(biom)), 1))
+  })
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    color.by   = list(n = c(0,1)),
+    shape.by   = list(n = c(0,1),   col_type = "cat"),
+    facet.by   = list(n = c(0,Inf), col_type = "cat"),
+    limit.by   = list(n = c(0,Inf)) ))
+  
+  biom <- params[['biom']]
+  
+  
+  #________________________________________________________
+  # Sanity Check
+  #________________________________________________________
+  if (nsamples(biom) < 4)
+    stop("At least four samples are needed for an ordination.")
+  
+  
+  #________________________________________________________
+  # Convert user's `layers` spec to layer names.
+  #________________________________________________________
+  layer_names <- with(params, {
     
+    layerlist <- c( 'p' = "point", 'n' = "name",    's' = "spider", 
+                    'n' = "name",  'd' = "density", 't' = "taxon",
+                    'a' = "arrow", 'e' = "ellipse", 'm' = "mean" )
     
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
+    default <- if (is_null(color.by)) "p" else c("p", "c", "e")
+    if (!is_null(rank)) default %<>% c("t", "m")
     
+    layer_match(layers, choices = layerlist, default = default) %>%
+      c('ggplot', ., 'xaxis', 'yaxis', 'labs', 'theme', 'theme_bw')
+  })
+  params[['layers']] <- NULL
+  
+  
+  #________________________________________________________
+  # Disable biplot unless both rank and layers are given.
+  #________________________________________________________
+  if (is_null(params[['rank']]) || !any(c("taxon", "arrow", "mean") %in% layer_names)) {
+    params[['rank']] <- NULL
+    layer_names %<>% setdiff(c("taxon", "arrow", "mean"))
+  }
+  
+  
+  #________________________________________________________
+  # Coordinates for ordination "points"
+  #________________________________________________________
+  ggdata <- bdiv_ord_table(
+    biom     = biom, 
+    dist     = params[['metric']],
+    ord      = params[['ord']],
+    weighted = params[['weighted']],
+    md       = TRUE,
+    split.by = params[['facet.by']],
+    stat.by  = names(params[['color.by']]),
+    perms    = params[['perms']],
+    rank     = params[['rank']],
+    taxa     = params[['taxa']],
+    p.adj    = params[['p.adj']],
+    p.top    = params[['p.top']] )
+  
+  ggdata %<>% rename_cols(
+    ".axis.1" = ".x", 
+    ".axis.2" = ".y",
+    ".sample" = ".label" )
+  
+  
+  
+  
+  #________________________________________________________
+  # Initialize the `layers` object
+  #________________________________________________________
+  layers <- list()
+  
+  attr(layers, 'biom')     <- biom
+  attr(layers, 'data')     <- ggdata
+  attr(layers, 'params')   <- params
+  attr(layers, 'function') <- bdiv_biplot
+  attr(layers, 'xcol')     <- ".x"
+  attr(layers, 'ycol')     <- ".y"
+  attr(layers, 'xmode')    <- "numeric"
+  attr(layers, 'ymode')    <- "numeric"
+  
+  if (!is_null(params[['color.by']]))   layer_names %<>% c("color")
+  if (!is_null(params[['shape.by']]))   layer_names %<>% c("shape")
+  if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
+  
+  initLayer(layer_names)
+  # layers <- metadata_layers(layers)
+  
+  remove("layer_names")
+  
+  
+  
+  #________________________________________________________
+  # aes() parameters
+  #________________________________________________________
+  specs <- list(
+    "arrow"      = c('x', 'y', 'xend',  'yend'),
+    "spider"     = c('x', 'y', 'xend',  'yend',  'color'),
+    "ellipse"    = c('x', 'y',                   'color'),
+    "point"      = c('x', 'y', 'shape', 'fill',  'color'),
+    "name"       = c('x', 'y',          'label', 'color'),
+    "stats_text" = c(                   'label'),
+    "taxon"      = c('x', 'y', 'size',  'label'),
+    "mean"       = c('x', 'y', 'size') )
+  
+  args <- .qw(x, y, xend, yend, label, size)
+  if (hasLayer("color")) args[['color']] <- names(params[['color.by']])
+  if (hasLayer("color")) args[['fill']]  <- names(params[['color.by']])
+  if (hasLayer("shape")) args[['shape']] <- names(params[['shape.by']])
+  
+  for (layer in intersect(names(layers), names(specs))) {
+    layerArgs <- args[intersect(specs[[layer]], names(args))]
+    layerArgs <- args[setdiff(names(layerArgs), names(layers[[layer]]))]
     
-    #________________________________________________________
-    # Sanity Checks
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      metric %<>% validate_arg(biom, n = 1, 'metric', 'bdiv', tree = tree)
-      ord    %<>% validate_arg(biom, n = 1, 'ord')
-      rank   %<>% validate_arg(biom, n = 1, 'rank', default = tail(c('OTU', taxa_ranks(biom)), 1))
-    })
+    if (length(layerArgs) == 0) next
     
+    names(layerArgs) <- paste0("mapping|", names(layerArgs))
+    setLayer(layer=layer, layerArgs)
+  }
+  remove(list = c("specs", "args", "arg", "layer", "val") %>% intersect(ls()))
+  
+  
+  
+  
+  #________________________________________________________
+  # Non-aes parameters
+  #________________________________________________________
+  if (hasLayer("labs"))   setLayer(layer="labs",   x = NULL, y = NULL)
+  if (hasLayer("spider")) setLayer(layer="spider", alpha = 0.4, size = 0.75)
+  if (hasLayer("mean"))   setLayer(layer="mean",   alpha = 0.5, color = "darkgray")
+  
+  if (hasLayer("arrow"))
+    setLayer(layer="arrow", 
+             alpha = 0.4,
+             color = "darkgray", 
+             size  = 0.75, 
+             arrow = arrow(ends="first", length=unit(.5,"cm")))
+  
+  if (hasLayer("taxon"))
+    setLayer(layer="taxon", 
+           show.legend        = FALSE,
+           fill               = alpha(c("white"), 0.8),
+           box.padding        = 1,
+           segment.curvature  = -0.1, 
+           segment.linetype   = 8, 
+           max.overlaps       = 100,
+           seed               = 0)
+  
+  setLayer(layer="theme", 
+           axis.text        = element_blank(),
+           axis.ticks       = element_blank(),
+           panel.border     = element_rect(color = "black", fill = FALSE, size = 1),
+           panel.grid.major = element_blank(),
+           panel.grid.minor = element_blank(),
+           panel.background = element_rect(fill = "white"))
+  
+  
+  
+  #________________________________________________________
+  # Scale the size of biplot means and taxon labels
+  #________________________________________________________
+  if (hasName(layers, 'mean') || hasName(layers, 'taxon')) {
     
-    #________________________________________________________
-    # Subset biom by requested metadata and aes.
-    #________________________________________________________
-    params %<>% metadata_params(contraints = list(
-      color.by   = list(n = c(0,1)),
-      shape.by   = list(n = c(0,1),   col_type = "cat"),
-      facet.by   = list(n = c(0,Inf), col_type = "cat"),
-      limit.by   = list(n = c(0,Inf)) ))
-    
-    biom <- params[['biom']]
-    
-    
-    #________________________________________________________
-    # Sanity Check
-    #________________________________________________________
-    if (nsamples(biom) < 4)
-      stop("At least four samples are needed for an ordination.")
-    
-    
-    #________________________________________________________
-    # Convert user's `layers` spec to layer names.
-    #________________________________________________________
-    layer_names <- with(params, {
+    if (hasLayer("taxon") && hasLayer("mean")) {
+      setLayer(layer="taxon", "mapping|point.size" = ".size")
+      setLayer(
+        layer        = "continuous_scale",
+        'scale_name' = "size",
+        'palette'    = as.cmd(scales::area_pal(range = c(2,5))),
+        'aesthetics' = c("size", "point.size"), 
+        'name'       = "Taxa Abundance", 
+        'labels'     = ~ paste0(. * 100, "%") )
       
-      layerlist <- c( 'p' = "point", 'n' = "name",    's' = "spider", 
-                      'n' = "name",  'd' = "density", 't' = "taxon",
-                      'a' = "arrow", 'e' = "ellipse", 'm' = "mean" )
+    } else if (hasLayer("mean")) {
+      setLayer(
+        layer    = "scale_size",
+        'range'  = c(2, 5),
+        'name'   = "Taxa Abundance",
+        'labels' = ~ paste0(. * 100, "%") )
       
-      default <- if (is_null(color.by)) "p" else c("p", "c", "e")
-      if (!is_null(rank)) default %<>% c("t", "m")
-      
-      layer_match(layers, choices = layerlist, default = default) %>%
-        c('ggplot', ., 'xaxis', 'yaxis', 'labs', 'theme', 'theme_bw')
-    })
-    params[['layers']] <- NULL
-    
-    
-    #________________________________________________________
-    # Disable biplot unless both rank and layers are given.
-    #________________________________________________________
-    if (is_null(params[['rank']]) || !any(c("taxon", "arrow", "mean") %in% layer_names)) {
-      params[['rank']] <- NULL
-      layer_names %<>% setdiff(c("taxon", "arrow", "mean"))
+    } else {
+      setLayer(layer = "scale_size", 'range' = c(2, 5))
     }
-    
-    
-    #________________________________________________________
-    # Coordinates for ordination "points"
-    #________________________________________________________
-    ggdata <- bdiv_ord_table(
-      biom     = biom, 
-      dist     = params[['metric']],
-      ord      = params[['ord']],
-      weighted = params[['weighted']],
-      md       = TRUE,
-      split.by = params[['facet.by']],
-      stat.by  = names(params[['color.by']]),
-      perms    = params[['perms']],
-      rank     = params[['rank']],
-      taxa     = params[['taxa']],
-      p.adj    = params[['p.adj']],
-      p.top    = params[['p.top']] )
-    
-    ggdata %<>% rename_cols(".axis.1" = ".x", ".axis.2" = ".y")
-    
-    
-    
-    
-    #________________________________________________________
-    # Initialize the `layers` object
-    #________________________________________________________
-    layers <- list()
-    
-    attr(layers, 'biom')     <- biom
-    attr(layers, 'data')     <- ggdata
-    attr(layers, 'params')   <- params
-    attr(layers, 'function') <- bdiv_biplot
-    attr(layers, 'xcol')     <- ".x"
-    attr(layers, 'ycol')     <- ".y"
-    attr(layers, 'xmode')    <- "numeric"
-    attr(layers, 'ymode')    <- "numeric"
-    
-    if (!is_null(params[['color.by']]))   layer_names %<>% c("color")
-    if (!is_null(params[['shape.by']]))   layer_names %<>% c("shape")
-    if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
-    
-    initLayer(layer_names)
-    # layers <- metadata_layers(layers)
-    
-    remove("layer_names")
-    
-    
-    
-    #________________________________________________________
-    # aes() parameters
-    #________________________________________________________
-    specs <- list(
-      "arrow"      = c('x', 'y', 'xend',  'yend'),
-      "spider"     = c('x', 'y', 'xend',  'yend',  'color'),
-      "ellipse"    = c('x', 'y',                   'color'),
-      "point"      = c('x', 'y', 'shape', 'fill',  'color'),
-      "name"       = c('x', 'y',          'label', 'color'),
-      "stats_text" = c(                   'label'),
-      "taxon"      = c('x', 'y', 'size',  'label'),
-      "mean"       = c('x', 'y', 'size') )
-    
-    args <- .qw(x, y, xend, yend, label, size)
-    if (hasLayer("color")) args[['color']] <- names(params[['color.by']])
-    if (hasLayer("color")) args[['fill']]  <- names(params[['color.by']])
-    if (hasLayer("shape")) args[['shape']] <- names(params[['shape.by']])
-    
-    for (layer in intersect(names(layers), names(specs))) {
-      layerArgs <- args[intersect(specs[[layer]], names(args))]
-      layerArgs <- args[setdiff(names(layerArgs), names(layers[[layer]]))]
-      
-      if (length(layerArgs) == 0) next
-      
-      names(layerArgs) <- paste0("mapping|", names(layerArgs))
-      setLayer(layer=layer, layerArgs)
-    }
-    remove(list = c("specs", "args", "arg", "layer", "val") %>% intersect(ls()))
-    
-    
-    
-    
-    #________________________________________________________
-    # Non-aes parameters
-    #________________________________________________________
-    if (hasLayer("labs"))   setLayer(layer="labs",   x = NULL, y = NULL)
-    if (hasLayer("spider")) setLayer(layer="spider", alpha = 0.4, size = 0.75)
-    if (hasLayer("mean"))   setLayer(layer="mean",   alpha = 0.5, color = "darkgray")
-    
-    if (hasLayer("arrow"))
-      setLayer(layer="arrow", 
-               alpha = 0.4,
-               color = "darkgray", 
-               size  = 0.75, 
-               arrow = arrow(ends="first", length=unit(.5,"cm")))
-    
-    if (hasLayer("taxon"))
-      setLayer(layer="taxon", 
-             show.legend        = FALSE,
-             fill               = alpha(c("white"), 0.8),
-             box.padding        = 1,
-             segment.curvature  = -0.1, 
-             segment.linetype   = 8, 
-             max.overlaps       = 100,
-             seed               = 0)
-    
-    setLayer(layer="theme", 
-             axis.text        = element_blank(),
-             axis.ticks       = element_blank(),
-             panel.border     = element_rect(color = "black", fill = FALSE, size = 1),
-             panel.grid.major = element_blank(),
-             panel.grid.minor = element_blank(),
-             panel.background = element_rect(fill = "white"))
-    
-    
-    
-    #________________________________________________________
-    # Scale the size of biplot means and taxon labels
-    #________________________________________________________
-    if (hasName(layers, 'mean') || hasName(layers, 'taxon')) {
-      
-      if (hasLayer("taxon") && hasLayer("mean")) {
-        setLayer(layer="taxon", "mapping|point.size" = ".size")
-        setLayer(
-          layer        = "continuous_scale",
-          'scale_name' = "size",
-          'palette'    = as.cmd(scales::area_pal(range = c(2,5))),
-          'aesthetics' = c("size", "point.size"), 
-          'name'       = "Taxa Abundance", 
-          'labels'     = ~ paste0(. * 100, "%") )
-        
-      } else if (hasLayer("mean")) {
-        setLayer(
-          layer    = "scale_size",
-          'range'  = c(2, 5),
-          'name'   = "Taxa Abundance",
-          'labels' = ~ paste0(. * 100, "%") )
-        
-      } else {
-        setLayer(layer = "scale_size", 'range' = c(2, 5))
-      }
-    }
-    
-    
-    #________________________________________________________
-    # Create the plot and add each layer with its arguments.
-    # Also attach the human-readable ggplot command.
-    #________________________________________________________
-    p <- layers %>%
-      ordination_biplot() %>%
-      ordination_facets() %>%
-      ordination_spider() %>%
-      plot_build()
-    
-    attr(p, 'history') <- history
-    
-    
-    #________________________________________________________
-    # Statistics table to show the user
-    #________________________________________________________
-    attr(p, 'stats') <- attr(ggdata, "stats_tbl", exact = TRUE)
-    
-    return(p)
-    
-  }))
+  }
+  
+  
+  #________________________________________________________
+  # Create the plot and add each layer with its arguments.
+  # Also attach the human-readable ggplot command.
+  #________________________________________________________
+  p <- layers %>%
+    ordination_biplot() %>%
+    ordination_facets() %>%
+    ordination_spider() %>%
+    plot_build()
+  
+  attr(p, 'history') <- history
+  
+  
+  #________________________________________________________
+  # Statistics table to show the user
+  #________________________________________________________
+  attr(p, 'stats') <- list('groupwise' = attr(ggdata, "stats_tbl", exact = TRUE))
+  
+  
+  set_cache_value(cache_file, p)
+  return(p)
 }
 
 
@@ -367,7 +376,7 @@ ordination_biplot <- function (layers) {
     '.yend'  = biplot[['.ori.2']],
     '.p.val' = biplot[['.p.val']],
     '.adj.p' = biplot[['.adj.p']],
-    '.size'  = biplot[['.value']] )
+    '.size'  = biplot[['.abundance']] )
     
   
   attr(ggdata, 'biplot') <- biplot

@@ -47,146 +47,151 @@ bdiv_distmat <- function (
     biom, method="bray-curtis", weighted=TRUE, tree=NULL, stat.by=NULL, 
     seed=0, perms=999 ) {
   
-  with_cache("bdiv_distmat", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("bdiv_distmat", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
   
   
-    #________________________________________________________
-    # Enable abbreviations of metric names.
-    #________________________________________________________
-    method <- validate_metrics(biom, method, mode="bdiv", tree=tree)
+  #________________________________________________________
+  # Enable abbreviations of metric names.
+  #________________________________________________________
+  method <- validate_metrics(biom, method, mode="bdiv", tree=tree)
+  
+  
+  #________________________________________________________
+  # Sanity Checks
+  #________________________________________________________
+  
+  if (!is.logical(weighted)) stop(simpleError("Weighted must be TRUE/FALSE."))
+  if (length(method) != 1)   stop(simpleError("Invalid method for bdiv_distmat()"))
+  if (is.na(method))         stop(simpleError("Invalid method for bdiv_distmat()"))
+  
+  
+  #________________________________________________________
+  # Get the input into a simple_triplet_matrix
+  #________________________________________________________
+  
+  if (is(biom, "simple_triplet_matrix")) { counts <- biom
+  } else if (is(biom, "BIOM"))           { counts <- biom$counts
+  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
+  } else {
+    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+  }
+  
+  
+  #________________________________________________________
+  # Sanity check the matrix
+  #________________________________________________________
+  if (!is.numeric(counts[['v']]))     stop("The abundance matrix must be numeric.")
+  if (!all(is.finite(counts[['v']]))) stop("Non-finite values in abundance matrix.")
+  
+  
+  #________________________________________________________
+  # Find the UniFrac tree
+  #________________________________________________________
+  
+  if (method == "UniFrac") {
     
-    
-    #________________________________________________________
-    # Sanity Checks
-    #________________________________________________________
-    
-    if (!is.logical(weighted)) stop(simpleError("Weighted must be TRUE/FALSE."))
-    if (length(method) != 1)   stop(simpleError("Invalid method for bdiv_distmat()"))
-    if (is.na(method))         stop(simpleError("Invalid method for bdiv_distmat()"))
-    
-    
-    #________________________________________________________
-    # Get the input into a simple_triplet_matrix
-    #________________________________________________________
-    
-    if (is(biom, "simple_triplet_matrix")) { counts <- biom
-    } else if (is(biom, "BIOM"))           { counts <- biom$counts
-    } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
-    } else {
-      stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
-    }
-    
-    
-    #________________________________________________________
-    # Sanity check the matrix
-    #________________________________________________________
-    if (!is.numeric(counts[['v']]))     stop("The abundance matrix must be numeric.")
-    if (!all(is.finite(counts[['v']]))) stop("Non-finite values in abundance matrix.")
-    
-    
-    #________________________________________________________
-    # Find the UniFrac tree
-    #________________________________________________________
-    
-    if (method == "UniFrac") {
-      
-      # Find a tree for the UniFrac algorithm
+    # Find a tree for the UniFrac algorithm
+    if (!is(tree, "phylo")) {
+      if (is(biom, "BIOM")) {
+        if (is(biom$phylogeny, "phylo")) {
+          tree <- biom$phylogeny
+        }
+      }
+      if (is(tree, "character")) {
+        if (file.exists(tree)) {
+          tree <- rbiom::read_tree(tree)
+        }
+      }
       if (!is(tree, "phylo")) {
-        if (is(biom, "BIOM")) {
-          if (is(biom$phylogeny, "phylo")) {
-            tree <- biom$phylogeny
-          }
-        }
-        if (is(tree, "character")) {
-          if (file.exists(tree)) {
-            tree <- rbiom::read_tree(tree)
-          }
-        }
-        if (!is(tree, "phylo")) {
-          stop(simpleError("No tree provided to bdiv_distmat()."))
-        }
+        stop(simpleError("No tree provided to bdiv_distmat()."))
       }
-      
-      
-      # Make sure the matrix has rownames set
-      if (is_null(rownames(counts)))
-        stop("The abundance matrix does not have rownames set to Taxa IDs.")
-      
-      
-      # Abundance matrix's Taxa IDs aren't all in the tree
-      if (length(missing <- setdiff(rownames(counts), tree$tip.label)) > 0) {
-        
-        # Try swapping spaces/underscores in tip labels
-        if (any(grepl("_", missing, fixed = TRUE))) {
-          tree$tip.label %<>% gsub(" ", "_", ., fixed = TRUE)
-        } else if (any(grepl(" ", missing, fixed = TRUE))) {
-          tree$tip.label %<>% gsub("_", " ", ., fixed = TRUE)
-        }
-        
-        if (!all(rownames(counts) %in% tree$tip.label))missing %>%
-          glue_collapse(sep = ", ", width = 30, last = " and ") %>%
-          paste("OTUs missing from reference tree:", .) %>%
-          stop()
-      }
-      
-      # Prune the tree down to only what we need
-      if (length(setdiff(tree$tip.label, rownames(counts))) > 0)
-        tree <- rbiom::subtree(tree, rownames(counts))
-      
-      counts <- counts[as.character(tree$tip.label),]
     }
     
     
-    #________________________________________________________
-    # Order the sparse matrix's values by sample, then by taxa
-    #________________________________________________________
-    
-    ord      <- order(counts$j, counts$i)
-    counts$i <- counts$i[ord]
-    counts$j <- counts$j[ord]
-    counts$v <- counts$v[ord]
+    # Make sure the matrix has rownames set
+    if (is_null(rownames(counts)))
+      stop("The abundance matrix does not have rownames set to Taxa IDs.")
     
     
-    #________________________________________________________
-    # Run C++ implemented dissimilarity algorithms multithreaded
-    #________________________________________________________
-    
-    if (method == "UniFrac") {
+    # Abundance matrix's Taxa IDs aren't all in the tree
+    if (length(missing <- setdiff(rownames(counts), tree$tip.label)) > 0) {
       
-      dm <- par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
+      # Try swapping spaces/underscores in tip labels
+      if (any(grepl("_", missing, fixed = TRUE))) {
+        tree$tip.label %<>% gsub(" ", "_", ., fixed = TRUE)
+      } else if (any(grepl(" ", missing, fixed = TRUE))) {
+        tree$tip.label %<>% gsub("_", " ", ., fixed = TRUE)
+      }
       
-      
-    } else {
-      
-      counts <- t(as.matrix(counts))
-      dm <- par_beta_div(counts, tolower(method), ifelse(weighted, 1L, 0L))
-      dm <- as.dist(dm)
-      attr(dm, 'Labels') <- rownames(counts)
-      
+      if (!all(rownames(counts) %in% tree$tip.label))missing %>%
+        glue_collapse(sep = ", ", width = 30, last = " and ") %>%
+        paste("OTUs missing from reference tree:", .) %>%
+        stop()
     }
     
+    # Prune the tree down to only what we need
+    if (length(setdiff(tree$tip.label, rownames(counts))) > 0)
+      tree <- rbiom::subtree(tree, rownames(counts))
+    
+    counts <- counts[as.character(tree$tip.label),]
+  }
+  
+  
+  #________________________________________________________
+  # Order the sparse matrix's values by sample, then by taxa
+  #________________________________________________________
+  
+  ord      <- order(counts$j, counts$i)
+  counts$i <- counts$i[ord]
+  counts$j <- counts$j[ord]
+  counts$v <- counts$v[ord]
+  
+  
+  #________________________________________________________
+  # Run C++ implemented dissimilarity algorithms multithreaded
+  #________________________________________________________
+  
+  if (method == "UniFrac") {
+    
+    dm <- par_unifrac(counts, tree, ifelse(weighted, 1L, 0L))
     
     
-    #________________________________________________________
-    # Adonis / PERMANOVA
-    #________________________________________________________
-    if (!is_null(g <- stat.by))
-      attr(dm, 'stats_raw') <- try(silent=TRUE, local({
-        if (length(g) == 1)     g <- unname(metadata(biom, g))
-        if (!is_null(names(g))) g <- unname(g[rownames(counts)])
-        set.seed(seed)
-        return(vegan::adonis2(dm ~ g, permutations=perms))
-      }))
-    attr(dm, 'stats_tbl') <- adonis_table(attr(dm, 'stats_raw', exact = TRUE))
+  } else {
     
+    counts <- t(as.matrix(counts))
+    dm <- par_beta_div(counts, tolower(method), ifelse(weighted, 1L, 0L))
+    dm <- as.dist(dm)
+    attr(dm, 'Labels') <- rownames(counts)
     
-    
-    #________________________________________________________
-    # Return the dist object
-    #________________________________________________________
-    return (dm)
-    
-  }))
+  }
+  
+  
+  
+  #________________________________________________________
+  # Adonis / PERMANOVA
+  #________________________________________________________
+  if (!is_null(g <- stat.by))
+    attr(dm, 'stats_raw') <- try(silent=TRUE, local({
+      if (length(g) == 1)     g <- unname(metadata(biom, g))
+      if (!is_null(names(g))) g <- unname(g[rownames(counts)])
+      set.seed(seed)
+      return(vegan::adonis2(dm ~ g, permutations=perms))
+    }))
+  attr(dm, 'stats_tbl') <- adonis_table(attr(dm, 'stats_raw', exact = TRUE))
+  
+  
+  
+  #________________________________________________________
+  # Return the dist object
+  #________________________________________________________
+  set_cache_value(cache_file, dm)
+  return (dm)
 }
 
 

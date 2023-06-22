@@ -22,11 +22,6 @@
 #'        mean abundance or greater (e.g. 0.1). A character vector of
 #'        taxon names will show only those taxa. Default: \code{5}.
 #'
-#' @param flip   Transpose the axes, so that taxa are present as rows instead
-#'        of columns. Default: \code{TRUE}
-#'
-#' @param stripe   Shade every other x position. Default: \emph{same as flip}
-#'
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
 #'        significant taxa are displayed. If \code{p.top} is less than one, all 
@@ -60,56 +55,61 @@
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50) 
-#'     taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-#'     taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")), flip = FALSE)
+#'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
+#'     taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
 #'     
 #'
 taxa_boxplot <- function (
     biom, x = NULL, rank = NULL, taxa = 5, layers = "lsb",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-    flip = TRUE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
+    flip = FALSE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
     ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
-  with_cache("taxa_boxplot", environment(), list(...), local({
-    
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("taxa_boxplot(%s)", as.args(params, fun = taxa_boxplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity checks. x and *.by are checked by boxplot_build.
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
-    })
-    
-    
-    #________________________________________________________
-    # initLayer ignores formalArgs, so copy into equivalent.
-    #________________________________________________________
-    if (isTRUE(tolower(params[['y.trans']]) %in% c("sqrt", "log1p")))
-      params[['yaxis.trans']] <- tolower(params[['y.trans']])
-    
-    
-    
-    #________________________________________________________
-    # Use the generalized boxplot function to make the plot
-    #________________________________________________________
-    p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
-    
-    attr(p, 'history') <- history
-    
-    
-    return (p)
   
-  }))
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("taxa_boxplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("taxa_boxplot(%s)", as.args(params, fun = taxa_boxplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity checks. x and *.by are checked by boxplot_build.
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+  })
+  
+  
+  #________________________________________________________
+  # initLayer ignores formalArgs, so copy into equivalent.
+  #________________________________________________________
+  if (isTRUE(tolower(params[['y.trans']]) %in% c("sqrt", "log1p")))
+    params[['yaxis.trans']] <- tolower(params[['y.trans']])
+  
+  
+  
+  #________________________________________________________
+  # Use the generalized boxplot function to make the plot
+  #________________________________________________________
+  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
+  
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 
@@ -138,16 +138,16 @@ taxa_boxplot_data <- function (params) {
     df <- taxa_table(
       biom = biom,
       rank = rank,
-      md   = TRUE,
-      safe = TRUE )
+      md   = TRUE )
     
     df <- df[df[['.taxa']] %in% taxa,,drop=FALSE]
     if (nrow(df) == 0) return (NULL)
     
-    df[['.rank']] <- rank
-    df[['.y']]    <- df[['.value']]
+    df[['.rank']]      <- rank
+    df[['.abundance']] <- df[[attr(df, 'response', exact = TRUE)]]
     return (df)
   })
+  attr(ggdata, 'response') <- ".abundance"
   
   
   ggdata[['.taxa']] %<>% factor(levels = taxa)
@@ -171,7 +171,7 @@ taxa_boxplot_data <- function (params) {
   
   attr(ggdata, 'params') <- params
   attr(ggdata, 'xcol')   <- params[['x']]
-  attr(ggdata, 'ycol')   <- ".y"
+  attr(ggdata, 'ycol')   <- attr(ggdata, 'response', exact = TRUE)
   
   return (ggdata)
 }

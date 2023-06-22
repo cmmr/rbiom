@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9093</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9096</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +128,7 @@ Default: <code>NULL</code>.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
-<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>     </span></span>
 <span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tree_plot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>
@@ -136,10 +136,7 @@ Default: <code>NULL</code>.</p></dd>
 <span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, cladelab <span class="op">=</span> <span class="st">"Phylum"</span>, layout <span class="op">=</span> <span class="st">"roundrect"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tree_plot-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, tiplab <span class="op">=</span> <span class="st">"Genus"</span>, layout <span class="op">=</span> <span class="st">"fan"</span>, color.by <span class="op">=</span> <span class="st">".reads"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in label_geom(mapping = structure(list(x = ~x + diff(range(x, na.rm = TRUE))/200,     y = ~y, label = ~tiplab, node = ~node, subset = ~(angle &lt;         90 | angle &gt; 270) &amp; isTip, angle = ~angle), class = "uneval"),     hjust = 0, nudge_x = 0, stat = &lt;environment&gt;, data = structure(function (x)     {        subset(x, !is.na(tiplab))    }, display = "function(x) { subset(x, !is.na(tiplab)) }")):</span> Problem while computing layer data.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Error occurred in the 3rd layer.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'tiplab' not found</span>
+<span class="r-plt img"><img src="tree_plot-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

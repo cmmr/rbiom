@@ -58,54 +58,60 @@ rare_multiplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("rare_multiplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
   dots <- list(...)
   
-  with_cache("rare_multiplot", environment(), list(...), local({
-    
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Build the two subplots, then arrange them together.
-    #________________________________________________________
-    corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
-    barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
-    
-    plots <- list(
-      'corrplot' = do.call(rare_corrplot,  c(corrplot_params, dots)),
-      'barplot'  = do.call(depths_barplot, c(barplot_params,  dots)) )
-    
-    p <- patchwork::wrap_plots(plots, ncol = 1)
-    
-    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-    attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
-      cmds <- sapply(seq_along(plots), function (i) {
-        sub(
-          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
-          pattern     = "ggplot(data = data", 
-          replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, single_quote(names(plots)[[i]])),
-          fixed       = TRUE )
-      })
-      c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
-    }))
-    
-    
-    #________________________________________________________
-    # Attach history of biom modifications and this call.
-    #________________________________________________________
-    attr(p, 'history') <- history
-    
-    
-    return (p)
-    
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file", "dots")))
+  
+  
+  #________________________________________________________
+  # Build the two subplots, then arrange them together.
+  #________________________________________________________
+  corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
+  barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
+  
+  plots <- list(
+    'corrplot' = do.call(rare_corrplot,  c(corrplot_params, dots)),
+    'barplot'  = do.call(depths_barplot, c(barplot_params,  dots)) )
+  
+  p <- patchwork::wrap_plots(plots, ncol = 1)
+  
+  attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
+  attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
+    cmds <- sapply(seq_along(plots), function (i) {
+      sub(
+        x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+        pattern     = "ggplot(data = data", 
+        replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, single_quote(names(plots)[[i]])),
+        fixed       = TRUE )
+    })
+    c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
   }))
+  
+  
+  #________________________________________________________
+  # Attach history of biom modifications and this call.
+  #________________________________________________________
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 

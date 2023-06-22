@@ -20,9 +20,12 @@
 #'        
 #' @param model   What type of trendline to fit to the data. Options are: 
 #'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
-#'        alternatively provide \bold{method} and/or \bold{formula} arguments
-#'        which will override these preset options for 
-#'        \link[ggplot2]{stat_smooth}. Default: \code{"linear"}.
+#'        alternatively provide a list of length two where the first element is
+#'        a character vector of length 1 naming a function, and the second 
+#'        element is a list of arguments to pass to that function. One of the 
+#'        function's arguments must be named 'formula'. For example, 
+#'        \code{model = list("stats::lm", list(formula = y ~ x))}.
+#'        Default: \code{"linear"}.
 #' 
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
@@ -99,101 +102,121 @@ adiv_corrplot <- function (
     biom, x, metric = "OTUs", points = FALSE, model = "linear", ci = 95, 
     color.by = NULL, facet.by = NULL, limit.by = NULL, ...) {
   
-  with_cache("adiv_corrplot", environment(), list(...), local({
-    
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity checks
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
-    })
-    
-    
-    #________________________________________________________
-    # Subset biom by requested metadata and aes.
-    #________________________________________________________
-    params %<>% metadata_params(contraints = list(
-      x        = list(n = 1, col_type = "num"),
-      color.by = list(n = c(0, 1)),
-      facet.by = list(n = c(0, Inf), col_type = "cat"),
-      limit.by = list(n = c(0, Inf)) ))
-    
-    
-    #________________________________________________________
-    # Compute alpha diversity values.
-    #________________________________________________________
-    data <- adiv_table(
-      biom    = params[['biom']],
-      metrics = params[['metric']],
-      long    = TRUE,
-      md      = unique(c(
-        params[['x']], 
-        names(params[['color.by']]), 
-        params[['facet.by']] )), 
-      safe    = TRUE )
-    
-    
-    #________________________________________________________
-    # Facet by metric when there's more than one.
-    #________________________________________________________
-    if (length(params[['metric']]) > 1)
-      params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
-    
-    
-    #________________________________________________________
-    # Initialize the `layers` object.
-    #________________________________________________________
-    layers <- structure(
-      list(),
-      'data'     = data,
-      'params'   = params,
-      'function' = adiv_corrplot,
-      'xcol'     = params[['x']],
-      'ycol'     = ".value",
-      'xmode'    = "numeric" )
-    
-    initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-    
-    if (!is_null(params[['color.by']])) initLayer("color")
-    if (isTRUE(params[['points']]))     initLayer("point")
-    
-    
-    #________________________________________________________
-    # Add default layer parameters.
-    #________________________________________________________
-    setLayer("ggplot", mapping = list(x = params[['x']], y = ".value"))
-    setLayer("labs", x = params[['x']], y = local({
-      ylab <- params[['metric']]
-      if (length(params[['metric']] > 1)) ylab <- "Diversity"
-      if (!is_rarefied(params[['biom']])) ylab %<>% paste("[UNRAREFIED]")
-      return (ylab) }))
-    if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
-    
-    
-    
-    
-    #________________________________________________________
-    # Convert layer definitions into a plot.
-    #________________________________________________________
-    p <- corrplot_build(layers)
-    
-    attr(p, 'history') <- history
-    
-    
-    return (p)
   
-  }))
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("adiv_corrplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+  })
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    x        = list(n = 1, col_type = "num"),
+    color.by = list(n = c(0, 1)),
+    facet.by = list(n = c(0, Inf), col_type = "cat"),
+    limit.by = list(n = c(0, Inf)) ))
+  
+  
+  #________________________________________________________
+  # Compute alpha diversity values.
+  #________________________________________________________
+  data <- adiv_table(
+    biom    = params[['biom']],
+    metrics = params[['metric']],
+    long    = TRUE,
+    md      = unique(c(
+      params[['x']], 
+      names(params[['color.by']]), 
+      params[['facet.by']] )))
+  
+  
+  #________________________________________________________
+  # Facet by metric when there's more than one.
+  #________________________________________________________
+  ylab <- NULL
+  ycol <- attr(data, 'response', exact = TRUE)
+  hist <- attr(data, 'history',  exact = TRUE)
+  
+  if (length(unique(data[['.metric']])) > 1) {
+    ylab <- "Diversity (multiple metrics)"
+    data <- drop_cols(data, '.depth')
+    params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
+    
+  } else {
+    data <- rename_response(data, paste0(".", unique(data[['.metric']])))
+    ycol <- attr(data, 'response', exact = TRUE)
+    ylab <- sprintf("Diversity (%s)", unique(data[['.metric']]))
+    data <- drop_cols(data, '.depth', '.metric')
+  }
+  
+  if (!is_rarefied(params[['biom']]))
+    ylab %<>% paste("\nWARNING: DATA NOT RAREFIED")
+  
+  attr(data, 'response') <- ycol
+  attr(data, 'history')  <- hist
+  remove("ycol", "hist")
+  
+  
+  #________________________________________________________
+  # Initialize the `layers` object.
+  #________________________________________________________
+  layers <- structure(
+    list(),
+    'data'     = data,
+    'params'   = params,
+    'function' = adiv_corrplot,
+    'xcol'     = params[['x']],
+    'ycol'     = attr(data, 'response', exact = TRUE),
+    'xmode'    = "numeric" )
+  
+  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  
+  if (!is_null(params[['color.by']])) initLayer("color")
+  if (isTRUE(params[['points']]))     initLayer("point")
+  
+  
+  #________________________________________________________
+  # Add default layer parameters.
+  #________________________________________________________
+  setLayer("ggplot", mapping = list(x = params[['x']], y = attr(data, 'response', exact = TRUE)))
+  setLayer("labs", x = params[['x']], y = ylab)
+  if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
+  
+  
+  
+  
+  #________________________________________________________
+  # Convert layer definitions into a plot.
+  #________________________________________________________
+  p <- corrplot_build(layers)
+  
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 

@@ -43,88 +43,94 @@
 #'
 select <- function (biom, samples=NULL, nTop=NULL, nRandom=NULL, seed=0, fast=FALSE) {
   
-  with_cache("select", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("select", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Accept multiple types of input: BIOM, slam matrix, R matrix
+  #________________________________________________________
+  if (is(biom, 'BIOM'))                         { res <- biom$counts
+  } else if (is(biom, 'simple_triplet_matrix')) { res <- biom
+  } else if (is(biom, 'matrix')) { res <- slam::as.simple_triplet_matrix(biom)
+  } else { stop("Invalid object type passed to rbiom::select()") }
+  
+  
+  if (!is_null(samples)) {
+    res <- try(res[,samples], silent=TRUE)
+    if (is(res, "try-error"))
+      stop(simpleError(sprintf("Cannot select samples: %s", res)))
+  }
+  
+  if (!is_null(nTop)) {
+    nTop <- min(ncol(res), nTop)
+    set.seed(seed)
+    ranking <- rank(slam::col_sums(res), ties.method="random")
+    res     <- res[,ranking > ncol(res) - nTop]
+  }
+  
+  if (!is_null(nRandom)) {
+    nRandom <- min(ncol(res), nRandom)
+    set.seed(seed)
+    res <- res[,sort(sample(seq_len(ncol(res)), nRandom))]
+  }
+  
+  
+  #________________________________________________________
+  # Drop taxa with zero observations
+  #________________________________________________________
+  res <- res[slam::row_sums(res) > 0, ]
+  
+  
+  #________________________________________________________
+  # Input was a matrix, so return a matrix.
+  #________________________________________________________
+  if (is(biom, 'simple_triplet_matrix')) return (res)
+  if (is(biom, 'matrix'))                return (as.matrix(res))
+  
+  
+  #________________________________________________________
+  # Alter the rest of the BIOM to match this new subset
+  #________________________________________________________
+  samples         <- colnames(res)
+  taxa            <- rownames(res)
+  
+  biom$counts     <- biom$counts[taxa, samples]
+  biom$metadata   <- biom$metadata[samples,,drop=FALSE]
+  biom$info$shape <- dim(biom$counts)
+  biom$info$nnz   <- length(biom$counts$v)
+  biom$taxonomy   <- biom$taxonomy[taxa,,drop=FALSE]
+  
+  
+  # These steps are noncritical and can be skipped for speed
+  if (isFALSE(fast)) {
     
-    #________________________________________________________
-    # Accept multiple types of input: BIOM, slam matrix, R matrix
-    #________________________________________________________
-    if (is(biom, 'BIOM'))                         { res <- biom$counts
-    } else if (is(biom, 'simple_triplet_matrix')) { res <- biom
-    } else if (is(biom, 'matrix')) { res <- slam::as.simple_triplet_matrix(biom)
-    } else { stop("Invalid object type passed to rbiom::select()") }
+    if (!is_null(biom$phylogeny))
+      biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
     
-    
-    if (!is_null(samples)) {
-      res <- try(res[,samples], silent=TRUE)
-      if (is(res, "try-error"))
-        stop(simpleError(sprintf("Cannot select samples: %s", res)))
-    }
-    
-    if (!is_null(nTop)) {
-      nTop <- min(ncol(res), nTop)
-      set.seed(seed)
-      ranking <- rank(slam::col_sums(res), ties.method="random")
-      res     <- res[,ranking > ncol(res) - nTop]
-    }
-    
-    if (!is_null(nRandom)) {
-      nRandom <- min(ncol(res), nRandom)
-      set.seed(seed)
-      res <- res[,sort(sample(seq_len(ncol(res)), nRandom))]
-    }
-    
-    
-    #________________________________________________________
-    # Drop taxa with zero observations
-    #________________________________________________________
-    res <- res[slam::row_sums(res) > 0, ]
-    
-    
-    #________________________________________________________
-    # Input was a matrix, so return a matrix.
-    #________________________________________________________
-    if (is(biom, 'simple_triplet_matrix')) return (res)
-    if (is(biom, 'matrix'))                return (as.matrix(res))
-    
-    
-    #________________________________________________________
-    # Alter the rest of the BIOM to match this new subset
-    #________________________________________________________
-    samples         <- colnames(res)
-    taxa            <- rownames(res)
-    
-    biom$counts     <- biom$counts[taxa, samples]
-    biom$metadata   <- biom$metadata[samples,,drop=FALSE]
-    biom$info$shape <- dim(biom$counts)
-    biom$info$nnz   <- length(biom$counts$v)
-    biom$taxonomy   <- biom$taxonomy[taxa,,drop=FALSE]
-    
-    
-    # These steps are noncritical and can be skipped for speed
-    if (isFALSE(fast)) {
-      
-      if (!is_null(biom$phylogeny))
-        biom$phylogeny <- rbiom::subtree(biom$phylogeny, taxa)
-      
-      if (!is_null(biom$sequences))
-        biom$sequences <- biom$sequences[taxa]
-    }
-    
-    
-    #________________________________________________________
-    # Attach select() call to provenance tracking
-    #________________________________________________________
-    cl      <- match.call()
-    cl[[1]] <- as.name("select")
-    cl[[2]] <- as.name("biom")
-    for (i in seq_along(cl)[-(1:2)]) {
-      cl[i] <- list(eval.parent(cl[[i]]))
-    }
-    names(cl)[[2]] <- ""
-    attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
-    
-    
-    return (biom)
-    
-  }))
+    if (!is_null(biom$sequences))
+      biom$sequences <- biom$sequences[taxa]
+  }
+  
+  
+  #________________________________________________________
+  # Attach select() call to provenance tracking
+  #________________________________________________________
+  cl      <- match.call()
+  cl[[1]] <- as.name("select")
+  cl[[2]] <- as.name("biom")
+  for (i in seq_along(cl)[-(1:2)]) {
+    cl[i] <- list(eval.parent(cl[[i]]))
+  }
+  names(cl)[[2]] <- ""
+  attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
+  
+  
+  set_cache_value(cache_file, biom)
+  return (biom)
 }

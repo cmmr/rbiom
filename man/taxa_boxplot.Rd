@@ -15,7 +15,7 @@ taxa_boxplot(
   shape.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
-  flip = TRUE,
+  flip = FALSE,
   stripe = flip,
   p.top = Inf,
   p.adj = "fdr",
@@ -54,7 +54,7 @@ use for aesthetics and partitioning. See below for details.
 Default: \code{NULL}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
-of columns. Default: \code{TRUE}}
+of columns. Default: \code{FALSE}}
 
 \item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
@@ -194,8 +194,8 @@ letters instead of shapes on the plot. Character strings may used as well.
     library(rbiom)
     
     biom <- rarefy(hmp50) 
-    taxa_boxplot(biom, rank = c("Phylum", "Genus"))
-    taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")), flip = FALSE)
+    taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
+    taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
     
 
 }

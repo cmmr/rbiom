@@ -48,129 +48,133 @@ rare_corrplot <- function (
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     ci = 95, rline = NULL, caption = TRUE, ...) {
   
-  with_cache("rare_corrplot", environment(), list(...), local({
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("rare_corrplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity Checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    stopifnot(is_null(depths) || is.numeric(depths))
+    stopifnot(is.logical(rline) || is_null(rline) || is.numeric(rline))
+  })
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    color.by = list(n = 0:1),
+    facet.by = list(col_type = "cat"),
+    limit.by = list() ))
+  
+  
+  #________________________________________________________
+  # Default rarefaction depth.
+  #________________________________________________________
+  params[['rline']] <- with(params, {
     
+    if (isFALSE(rline)) return (NULL)  # rline = FALSE
+    if (!isTRUE(rline)) return (rline) # rline = 1380
     
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity Checks
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
-      stopifnot(is_null(depths) || is.numeric(depths))
-      stopifnot(is.logical(rline) || is_null(rline) || is.numeric(rline))
-    })
-    
-    
-    #________________________________________________________
-    # Subset biom by requested metadata and aes.
-    #________________________________________________________
-    params %<>% metadata_params(contraints = list(
-      color.by = list(n = 0:1),
-      facet.by = list(col_type = "cat"),
-      limit.by = list() ))
-    
-    
-    #________________________________________________________
-    # Default rarefaction depth.
-    #________________________________________________________
-    params[['rline']] <- with(params, {
-      
-      if (isFALSE(rline)) return (NULL)  # rline = FALSE
-      if (!isTRUE(rline)) return (rline) # rline = 1380
-      
-      # rline = TRUE (auto-select rarefaction depth)
-      ss    <- as.vector(sample_sums(biom))
-      rline <- (sum(ss) * .1) / length(ss)
-      rline <- min(ss[ss >= rline])
-      return (rline)
-    })
-    
-    
-    #________________________________________________________
-    # Pull rarefaction stats for each depth.
-    #________________________________________________________
-    if (is_null(params[['depths']]))
-      params[['depths']] <- "multi_even"
-    
-    data <- adiv_table(
-      biom    = params[['biom']],
-      rarefy  = params[['depths']],
-      metrics = params[['metric']],
-      long    = TRUE, 
-      safe    = TRUE,
-      md      = unique(c(
-        params[['color.by']] %>% names(), 
-        params[['facet.by']])) )
-    
-    
-    #________________________________________________________
-    # Facet by metric when there's more than one.
-    #________________________________________________________
-    if (length(params[['metric']]) > 1)
-      params[['facet.by']] %<>% c(".metric")
-    
-    
-    #________________________________________________________
-    # Tell corrplot_build to use lm(y ~ log(x))
-    #________________________________________________________
-    params[['model']] <- "logarithmic"
-    
-    
-    #________________________________________________________
-    # Initialize the `layers` object.
-    #________________________________________________________
-    layers <- structure(
-      list(),
-      'data'     = data,
-      'params'   = params,
-      'function' = rare_corrplot,
-      'xcol'     = ".depth",
-      'ycol'     = ".value",
-      'xmode'    = "numeric" )
-    
-    initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
-    
-    if (!is_null(params[['color.by']])) initLayer("color")
-    if (isTRUE(params[['points']]))     initLayer("point")
-    
-    
-    #________________________________________________________
-    # Add default layer parameters.
-    #________________________________________________________
-    setLayer("ggplot", mapping = list(x = ".depth", y = ".value"))
-    setLayer("xaxis",  labels = si_units)
-    setLayer("labs",   x = "Rarefaction Depth", y = params[['metric']])
-    
-    if (length(params[['metric']]) > 1) {
-      setLayer("labs", y = "Diversity")
-      setLayer("facet", scales = "free_y")
-    }
-    
-    if (!is_null(params[['rline']]))
-      setLayer("vline", xintercept = params[['rline']], color = "red", linetype="dashed")
-    
-    
-    
-    # Convert layer definitions into a plot.
-    #________________________________________________________
-    p <- corrplot_build(layers)
-    
-    attr(p, 'history') <- history
-    
-    
-    return (p)
-    
-  }))
+    # rline = TRUE (auto-select rarefaction depth)
+    ss    <- as.vector(sample_sums(biom))
+    rline <- (sum(ss) * .1) / length(ss)
+    rline <- min(ss[ss >= rline])
+    return (rline)
+  })
+  
+  
+  #________________________________________________________
+  # Pull rarefaction stats for each depth.
+  #________________________________________________________
+  if (is_null(params[['depths']]))
+    params[['depths']] <- "multi_even"
+  
+  data <- adiv_table(
+    biom    = params[['biom']],
+    rarefy  = params[['depths']],
+    metrics = params[['metric']],
+    long    = TRUE, 
+    md      = unique(c(
+      params[['color.by']] %>% names(), 
+      params[['facet.by']])) )
+  
+  
+  #________________________________________________________
+  # Facet by metric when there's more than one.
+  #________________________________________________________
+  if (length(params[['metric']]) > 1)
+    params[['facet.by']] %<>% c(".metric")
+  
+  
+  #________________________________________________________
+  # Tell corrplot_build to use lm(y ~ log(x))
+  #________________________________________________________
+  params[['model']] <- "logarithmic"
+  
+  
+  #________________________________________________________
+  # Initialize the `layers` object.
+  #________________________________________________________
+  layers <- structure(
+    list(),
+    'data'     = data,
+    'params'   = params,
+    'function' = rare_corrplot,
+    'xcol'     = ".depth",
+    'ycol'     = attr(data, 'response', exact = TRUE),
+    'xmode'    = "numeric" )
+  
+  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  
+  if (!is_null(params[['color.by']])) initLayer("color")
+  if (isTRUE(params[['points']]))     initLayer("point")
+  
+  
+  #________________________________________________________
+  # Add default layer parameters.
+  #________________________________________________________
+  setLayer("ggplot", mapping = list(x = ".depth", y = attr(data, 'response', exact = TRUE)))
+  setLayer("xaxis",  labels = si_units)
+  setLayer("labs",   x = "Rarefaction Depth", y = params[['metric']])
+  
+  if (length(params[['metric']]) > 1) {
+    setLayer("labs", y = "Diversity")
+    setLayer("facet", scales = "free_y")
+  }
+  
+  if (!is_null(params[['rline']]))
+    setLayer("vline", xintercept = params[['rline']], color = "red", linetype="dashed")
+  
+  
+  
+  # Convert layer definitions into a plot.
+  #________________________________________________________
+  p <- corrplot_build(layers)
+  
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 

@@ -161,135 +161,139 @@ bdiv_heatmap <- function (
     legend = "right", xlab.angle = "auto", ...) {
   
   
-  with_cache("bdiv_heatmap", environment(), list(...), local({
-    
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity checks
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      stopifnot(is_scalar_logical(weighted))
-      metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf))
-      
-      if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
-      if (length(order.by) > 0) clust <- FALSE
-    })
-    
-    
-    #________________________________________________________
-    # Handle multiple ranks with recursive subcalls.
-    #________________________________________________________
-    if (length(params[['metric']]) > 1 || length(params[['weighted']]) > 1) {
-      
-      plots <- list()
-      
-      for (m in params[['metric']])
-        for (w in params[['weighted']])
-          plots[[length(plots) + 1]] <- local({
-            args                 <- params
-            args[['metric']]     <- m
-            args[['weighted']]   <- w
-            args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), m)
-            do.call(bdiv_heatmap, args)
-          })
-      
-      p <- patchwork::wrap_plots(plots)
-      
-      history <- sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap))
-      attr(p, 'history') <- history
-      attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
-      attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
-        cmds <- sapply(seq_along(ranks), function (i) {
-          sub(
-            x           = attr(plots[[i]], 'cmd', exact = TRUE), 
-            pattern     = "ggplot(data)", 
-            replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
-            fixed       = TRUE )
-        })
-        c(cmds, sprintf("patchwork::wrap_plots(%s)", paste0(collapse = ", ", "p", seq_along(ranks))))
-      }))
-      
-      return (p)
-    }
-    
-    
-    #________________________________________________________
-    # Subset biom by requested metadata and aes.
-    #________________________________________________________
-    params %<>% metadata_params(contraints = list(
-      color.by = list(),
-      order.by = list(),
-      limit.by = list() ))
-    
-    biom <- params[['biom']]
-    
-    
-    # #________________________________________________________
-    # # Subset
-    # #________________________________________________________
-    # if (!is_null(params[['order.by']]) || !is_null(params[['color.by']]))
-    #   metadata(biom) <- subset_by_params(
-    #     df     = metadata(biom),
-    #     params = params[c('order.by', 'orders', 'color.by', 'colors')] )
-    
-    
-    #________________________________________________________
-    # Sanity Check
-    #________________________________________________________
-    if (nsamples(biom) < 1)
-      stop("At least one sample is needed for a bdiv heatmap.")
-    
-    
-    
-    #________________________________________________________
-    # Matrix of samples x samples.
-    #________________________________________________________
-    mtx <- as.matrix(bdiv_distmat(
-      biom     = biom, 
-      method   = params[['metric']], 
-      weighted = params[['weighted']] ))
-    
-    
-    
-    #________________________________________________________
-    # Arguments to pass on to plot_heatmap
-    #________________________________________________________
-    excl <- setdiff(formalArgs(bdiv_heatmap), formalArgs(plot_heatmap))
-    excl <- c(excl, names(params)[startsWith(names(params), '.')])
-    args <- params[setdiff(names(params), excl)]
-    args[['mtx']] <- mtx
-    
-    within(args, {
-      labs.title %||=% ifelse(
-        test = isTRUE(params[['weighted']]), 
-        yes  = paste0("Weighted\n",   params[['metric']], "\nDistance"), 
-        no   = paste0("Unweighted\n", params[['metric']], "\nDistance") )})
-    
-    for (md_col in names(params[['color.by']]))
-      params[['color.by']][[md_col]] %<>% within({
-        colors <- values
-        values <- metadata(biom, md_col)
-      })
-    args[['tracks']] <- params[['color.by']]
-    
-    
-    p <- do.call(plot_heatmap, args)
-    
-    attr(p, 'history') <- history
-    
-    
-    return(p)
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("bdiv_heatmap", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
   
-  }))
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity checks
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    stopifnot(is_scalar_logical(weighted))
+    metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf))
+    
+    if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
+    if (length(order.by) > 0) clust <- FALSE
+  })
+  
+  
+  #________________________________________________________
+  # Handle multiple ranks with recursive subcalls.
+  #________________________________________________________
+  if (length(params[['metric']]) > 1 || length(params[['weighted']]) > 1) {
+    
+    plots <- list()
+    
+    for (m in params[['metric']])
+      for (w in params[['weighted']])
+        plots[[length(plots) + 1]] <- local({
+          args                 <- params
+          args[['metric']]     <- m
+          args[['weighted']]   <- w
+          args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), m)
+          do.call(bdiv_heatmap, args)
+        })
+    
+    p <- patchwork::wrap_plots(plots)
+    
+    history <- sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap))
+    attr(p, 'history') <- history
+    attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
+    attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
+      cmds <- sapply(seq_along(ranks), function (i) {
+        sub(
+          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+          pattern     = "ggplot(data)", 
+          replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
+          fixed       = TRUE )
+      })
+      c(cmds, sprintf("patchwork::wrap_plots(%s)", paste0(collapse = ", ", "p", seq_along(ranks))))
+    }))
+    
+    return (p)
+  }
+  
+  
+  #________________________________________________________
+  # Subset biom by requested metadata and aes.
+  #________________________________________________________
+  params %<>% metadata_params(contraints = list(
+    color.by = list(),
+    order.by = list(),
+    limit.by = list() ))
+  
+  biom <- params[['biom']]
+  
+  
+  # #________________________________________________________
+  # # Subset
+  # #________________________________________________________
+  # if (!is_null(params[['order.by']]) || !is_null(params[['color.by']]))
+  #   metadata(biom) <- subset_by_params(
+  #     df     = metadata(biom),
+  #     params = params[c('order.by', 'orders', 'color.by', 'colors')] )
+  
+  
+  #________________________________________________________
+  # Sanity Check
+  #________________________________________________________
+  if (nsamples(biom) < 1)
+    stop("At least one sample is needed for a bdiv heatmap.")
+  
+  
+  
+  #________________________________________________________
+  # Matrix of samples x samples.
+  #________________________________________________________
+  mtx <- as.matrix(bdiv_distmat(
+    biom     = biom, 
+    method   = params[['metric']], 
+    weighted = params[['weighted']] ))
+  
+  
+  
+  #________________________________________________________
+  # Arguments to pass on to plot_heatmap
+  #________________________________________________________
+  excl <- setdiff(formalArgs(bdiv_heatmap), formalArgs(plot_heatmap))
+  excl <- c(excl, names(params)[startsWith(names(params), '.')])
+  args <- params[setdiff(names(params), excl)]
+  args[['mtx']] <- mtx
+  
+  within(args, {
+    labs.title %||=% ifelse(
+      test = isTRUE(params[['weighted']]), 
+      yes  = paste0("Weighted\n",   params[['metric']], "\nDistance"), 
+      no   = paste0("Unweighted\n", params[['metric']], "\nDistance") )})
+  
+  for (md_col in names(params[['color.by']]))
+    params[['color.by']][[md_col]] %<>% within({
+      colors <- values
+      values <- metadata(biom, md_col)
+    })
+  args[['tracks']] <- params[['color.by']]
+  
+  
+  p <- do.call(plot_heatmap, args)
+  
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 

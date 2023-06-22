@@ -119,13 +119,13 @@ List rcpp_alpha_div(List sparseMatrix) {
   //======================================================
   
   DataFrame df = DataFrame::create(
-    Named("Sample")     = SampleNames,
-    Named("Depth")      = FinalDepth,
-    Named("OTUs")       = FinalOTUs,
-    Named("Shannon")    = FinalShannon,
-    Named("Chao1")      = FinalChao1,
-    Named("Simpson")    = FinalSimpson,
-    Named("InvSimpson") = FinalInvSimpson );
+    Named(".sample")   = SampleNames,
+    Named(".depth")    = FinalDepth,
+    Named(".otus")     = FinalOTUs,
+    Named(".shannon")  = FinalShannon,
+    Named(".chao1")    = FinalChao1,
+    Named(".simpson")  = FinalSimpson,
+    Named(".inv_simp") = FinalInvSimpson );
   
   return df;
 }

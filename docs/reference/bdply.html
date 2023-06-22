@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9093</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9096</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,16 +106,7 @@ elements as well.</p></dd>
 <span class="r-in"><span>      <span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Simpson"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ad</span>, <span class="fl">2L</span>, <span class="va">mean</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Sex      Body Site   Shannon   Simpson</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female Anterior nares 1.4318071 0.6814534</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Female  Buccal mucosa 1.1739844 0.4080621</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Female     Mid vagina 0.4070774 0.1670592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Female         Saliva 2.9304968 0.8934531</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Female          Stool 2.4288307 0.8496172</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Male Anterior nares 1.5053133 0.6650060</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male  Buccal mucosa 1.7128815 0.6016869</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male         Saliva 3.1718522 0.9132980</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   Male          Stool 2.5126148 0.8347696</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(adiv_table(b), , c("Shannon", "Simpson")):</span> undefined columns selected</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">bdply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Body Site"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>      <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">b</span>, <span class="st">"bray"</span><span class="op">)</span><span class="op">)</span></span></span>

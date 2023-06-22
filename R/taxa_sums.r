@@ -18,20 +18,27 @@
 
 taxa_sums <- function (biom, rank = NULL) {
   
-  with_cache("taxa_sums", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("taxa_sums", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
   
-    if (!is(biom, 'BIOM'))
-      stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
-    
-    if (is_null(rank)) {
-      x <- slam::row_sums(biom$counts)
-    } else {
-      x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
-    }
-    
-    return (x)
-    
-  }))
+  
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+  
+  if (is_null(rank)) {
+    x <- slam::row_sums(biom$counts)
+  } else {
+    x <- taxa_matrix(biom, rank) %>% colSums() %>% sort(decreasing = TRUE)
+  }
+  
+  
+  set_cache_value(cache_file, x)
+  return (x)
 }
 
 
@@ -54,20 +61,27 @@ taxa_sums <- function (biom, rank = NULL) {
 
 taxa_means <- function (biom, rank = NULL) {
   
-  with_cache("taxa_means", environment(), NULL, local({
-    
-    if (!is(biom, 'BIOM'))
-      stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
-    
-    if (is_null(rank)) {
-      x <- slam::row_means(biom$counts)
-    } else {
-      x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
-    }
-    
-    return (x)
-    
-  }))
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("taxa_means", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
+  
+  if (is_null(rank)) {
+    x <- slam::row_means(biom$counts)
+  } else {
+    x <- taxa_matrix(biom, rank) %>% colMeans() %>% sort(decreasing = TRUE)
+  }
+  
+  
+  set_cache_value(cache_file, x)
+  return (x)
 }
 
 
@@ -89,14 +103,21 @@ taxa_means <- function (biom, rank = NULL) {
 
 top_taxa <- function (biom, rank = 'OTU', n = Inf) {
   
-  with_cache("top_taxa", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("top_taxa", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
   
-    if (!is(biom, 'BIOM'))
-      stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
-    
-    x <- taxa_sums(biom, rank) %>% names() %>% head(n)
-    
-    return (x)
-    
-  }))
+  
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
+  
+  x <- taxa_sums(biom, rank) %>% names() %>% head(n)
+  
+  
+  set_cache_value(cache_file, x)
+  return (x)
 }

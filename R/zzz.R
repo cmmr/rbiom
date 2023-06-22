@@ -23,7 +23,7 @@ ENV <- environment(NULL)
     'scale_color_manual', 'scale_color_continuous',
     'scale_fill_manual', 'scale_fill_gradient', 'scale_fill_gradientn', 
     'scale_fill_steps', 'scale_fill_stepsn', 
-    'scale_shape_manual', 
+    'scale_shape_manual', 'scale_size',
     'scale_x_continuous', 'scale_x_discrete', 
     'scale_y_continuous', 'scale_y_discrete', 'scale_y_log10', 
     'stat_ellipse', 'stat_smooth', 

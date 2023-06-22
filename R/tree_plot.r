@@ -35,7 +35,7 @@
 #' @export
 #' @examples
 #'     library(rbiom) 
-#'     
+#'      
 #'     tree_plot(hmp50)
 #'     
 #'     hmp1 <- select(hmp50, samples = "HMP10")
@@ -47,151 +47,160 @@ tree_plot <- function (
     tiplab = NULL, color.by = NULL, label = NULL, cladelab = NULL, 
     top = NULL, right = NULL, bottom = NULL, left = NULL, ...) {
   
-  with_cache("tree_plot", environment(), list(...), local({
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("tree_plot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Sanity checks
+  #________________________________________________________
+  local({
     
+    if (!is(biom, 'BIOM'))    stop("Please provide a BIOM object.")
+    if (!has_phylogeny(biom)) stop("No phylogenetic data present.")
     
-    #________________________________________________________
-    # Sanity checks
-    #________________________________________________________
-    local({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      
-      if (!has_phylogeny(biom)) stop("No phylogenetic data present.")
-      
-      if(!is_null(c(tiplab, label, cladelab))) {
-        ranks <- metrics(biom, 'rank')
-        for (i in c('tiplab', 'label', 'cladelab')) {
-          rank <- get(i)
-          if (is_null(rank)) next
-          if (!is.character(rank)) stop(i, " must be NULL or character")
-          if (length(rank) > 1)    stop(i, " must be NULL or length 1")
-          if (!rank %in% ranks)
-            stop(i, " must be one of NULL, '", paste(collapse = "', '", ranks), "'")
-        }
-      }
-    })
-    
-    
-    #________________________________________________________
-    # Package and print this call
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- sprintf("tree_plot(%s)", as.args(params, fun = tree_plot))
-    
-    
-    
-    #________________________________________________________
-    # Assemble the plot layers with initLayer / setLayer.
-    #________________________________________________________
-    layers <- list()
-    attr(layers, 'params')   <- params
-    attr(layers, 'function') <- tree_plot
-    
-    
-    
-    #________________________________________________________
-    # Use ggtree to render a phylogenetic tree
-    #________________________________________________________
-    tr <- tree_data(biom)
-    attr(tr, 'display') <- "tree_data(biom)"
-    setLayer("ggtree", layout = layout, tr = tr)
-    
-    
-    #________________________________________________________
-    # Coloring by reads requires an aes mapping.
-    #________________________________________________________
-    if (identical(color.by, '.reads')) {
-      setLayer("ggtree", mapping = as.cmd(aes(color=log(reads))))
-      setLayer("scale_color_continuous", low='darkgreen', high='red')
-    }
-    
-    
-    #________________________________________________________
-    # Add OTU names at the tree tips.
-    #________________________________________________________
-    if (!is_null(tiplab)) {
-      initLayer("tiplab")
-      
-      if (!identical(tiplab, 'OTU')) {
-        
-        df  <- attr(layers[['ggtree']][['tr']], 'data',  exact = TRUE)
-        phy <- attr(layers[['ggtree']][['tr']], 'phylo', exact = TRUE)
-        df[['tiplab']] <- taxonomy(biom, tiplab)[phy$tip.label,1][1:nrow(df)]
-        attr(layers[['ggtree']][['tr']], 'data') <- df
-        remove("df", "phy")
-        
-        setLayer(
-          layer   = "tiplab", 
-          data    = as.cmd(function (x) { subset(x, !is.na(tiplab)) }), 
-          mapping = aes(label=tiplab) )
+    if(!is_null(c(tiplab, label, cladelab))) {
+      ranks <- metrics(biom, 'rank')
+      for (i in c('tiplab', 'label', 'cladelab')) {
+        rank <- get(i)
+        if (is_null(rank)) next
+        if (!is.character(rank)) stop(i, " must be NULL or character")
+        if (length(rank) > 1)    stop(i, " must be NULL or length 1")
+        if (!rank %in% ranks)
+          stop(i, " must be one of NULL, '", paste(collapse = "', '", ranks), "'")
       }
     }
+  })
+  
+  
+  #________________________________________________________
+  # Package and print this call
+  #________________________________________________________
+  history <- sprintf("tree_plot(%s)", as.args(params, fun = tree_plot))
+  
+  
+  
+  #________________________________________________________
+  # Assemble the plot layers with initLayer / setLayer.
+  #________________________________________________________
+  layers <- list()
+  attr(layers, 'params')   <- params
+  attr(layers, 'function') <- tree_plot
+  
+  
+  
+  #________________________________________________________
+  # Use ggtree to render a phylogenetic tree
+  #________________________________________________________
+  tr <- tree_data(biom)
+  attr(tr, 'display') <- "tree_data(biom)"
+  setLayer("ggtree", layout = layout, tr = tr)
+  
+  
+  #________________________________________________________
+  # Coloring by reads requires an aes mapping.
+  #________________________________________________________
+  if (identical(color.by, '.reads')) {
+    setLayer("ggtree", mapping = as.cmd(aes(color=log(reads))))
+    setLayer("scale_color_continuous", low='darkgreen', high='red')
+  }
+  
+  
+  #________________________________________________________
+  # Add OTU names at the tree tips.
+  #________________________________________________________
+  if (!is_null(tiplab)) {
+    initLayer("tiplab")
     
-    
-    #________________________________________________________
-    # Label clades internally (inside) of the tree.
-    #________________________________________________________
-    if (!is_null(label)) {
+    if (!identical(tiplab, 'OTU')) {
       
-      mapping <- aes(x=branch, label=!!as.name(label))
-      if (identical(color.by, '.reads'))
-        mapping <- aes(x=branch, label=!!as.name(label), color=log(reads))
+      df  <- attr(layers[['ggtree']][['tr']], 'data',  exact = TRUE)
+      phy <- attr(layers[['ggtree']][['tr']], 'phylo', exact = TRUE)
+      
+      if (nrow(df) == 0)
+        df <- attr(tr, 'extraInfo', exact = TRUE)[,'node']
+      
+      df[['tiplab']] <- taxonomy(biom, tiplab)[phy$tip.label,1][df[['node']]]
+      
+      attr(layers[['ggtree']][['tr']], 'data') <- df
+      remove("df", "phy")
       
       setLayer(
-        layer   = "label",
-        data    = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(label))), 
-        mapping = mapping, 
-        fill    = 'white' )
+        layer   = "tiplab", 
+        data    = as.cmd(function (x) { subset(x, !is.na(tiplab)) }), 
+        mapping = aes(label=tiplab) )
     }
+  }
+  
+  
+  #________________________________________________________
+  # Label clades internally (inside) of the tree.
+  #________________________________________________________
+  if (!is_null(label)) {
     
+    mapping <- aes(x=branch, label=!!as.name(label))
+    if (identical(color.by, '.reads'))
+      mapping <- aes(x=branch, label=!!as.name(label), color=log(reads))
     
-    #________________________________________________________
-    # Label clades externally (at right) of the tree.
-    #________________________________________________________
-    if (!is_null(cladelab)) {
-      
-      mapping <- aes(node=node, label=!!as.name(cladelab))
-      if (identical(color.by, '.reads'))
-        mapping <- aes(node=node, label=!!as.name(cladelab), color=log(reads))
-      
-      setLayer(
-        layer       = "cladelab",
-        data        = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(cladelab))), 
-        mapping     = mapping,
-        offset      = 0.02,
-        offset.text = 0.02 )
-    }
+    setLayer(
+      layer   = "label",
+      data    = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(label))), 
+      mapping = mapping, 
+      fill    = 'white' )
+  }
+  
+  
+  #________________________________________________________
+  # Label clades externally (at right) of the tree.
+  #________________________________________________________
+  if (!is_null(cladelab)) {
     
+    mapping <- aes(node=node, label=!!as.name(cladelab))
+    if (identical(color.by, '.reads'))
+      mapping <- aes(node=node, label=!!as.name(cladelab), color=log(reads))
     
-    #________________________________________________________
-    # Add horizontal/vertical padding for text to bleed into.
-    #________________________________________________________
-    if (!is_null(c(label, cladelab, tiplab))) {
-      top    %<>% if.null(0.02)
-      bottom %<>% if.null(0.02)
-    }
-    if (!is_null(cladelab))
-      right %<>% if.null(0.2)
-    
-    if (!is_null(top))    setLayer('top',    .fn = 'vexpand', direction =  1, ratio = top)
-    if (!is_null(right))  setLayer('right',  .fn = 'hexpand', direction =  1, ratio = right)
-    if (!is_null(bottom)) setLayer('bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
-    if (!is_null(left))   setLayer('left',   .fn = 'hexpand', direction = -1, ratio = left)
-    
-    
-    p <- suppressMessages(ggbuild(layers))
-    
-    
-    #________________________________________________________
-    # Attach history of biom modifications and this call
-    #________________________________________________________
-    attr(p, 'history') <- c(attr(biom, 'history'), history)
-    
-    
-    
-    return (p)
-    
-  }))
+    setLayer(
+      layer       = "cladelab",
+      data        = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(cladelab))), 
+      mapping     = mapping,
+      offset      = 0.02,
+      offset.text = 0.02 )
+  }
+  
+  
+  #________________________________________________________
+  # Add horizontal/vertical padding for text to bleed into.
+  #________________________________________________________
+  if (!is_null(c(label, cladelab, tiplab))) {
+    top    %<>% if.null(0.02)
+    bottom %<>% if.null(0.02)
+  }
+  if (!is_null(cladelab))
+    right %<>% if.null(0.2)
+  
+  if (!is_null(top))    setLayer('top',    .fn = 'vexpand', direction =  1, ratio = top)
+  if (!is_null(right))  setLayer('right',  .fn = 'hexpand', direction =  1, ratio = right)
+  if (!is_null(bottom)) setLayer('bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
+  if (!is_null(left))   setLayer('left',   .fn = 'hexpand', direction = -1, ratio = left)
+  
+  
+  p <- suppressMessages(ggbuild(layers))
+  
+  
+  #________________________________________________________
+  # Attach history of biom modifications and this call
+  #________________________________________________________
+  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 
@@ -221,82 +230,87 @@ tree_plot <- function (
 #'
 tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   
-  with_cache("tree_data", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("tree_data", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  # Sanity checks
+  #________________________________________________________
+  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+  stopifnot(is.logical(reads) && length(reads) == 1)
+  
+  tree   <- phylogeny(biom)
+  ranks  <- taxa_ranks(biom)
+  labels <- tree$tip.label
+  nTips  <- length(labels)
+  df     <- data.frame(node = seq_len(max(tree$edge)))
+  
+  
+  # Convert `clades` param to named `ranks`.
+  #________________________________________________________
+  ranks <- local({
     
+    stopifnot(is.logical(clades) || is.character(clades))
     
-    # Sanity checks
-    #________________________________________________________
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is.logical(reads) && length(reads) == 1)
+    if (isFALSE(clades)) return (NULL)
+    if (isTRUE(clades))  return (taxa_ranks(biom) %>% setNames(., .))
     
-    tree   <- phylogeny(biom)
-    ranks  <- taxa_ranks(biom)
-    labels <- tree$tip.label
-    nTips  <- length(labels)
-    df     <- data.frame(node = seq_len(max(tree$edge)))
-    
-    
-    # Convert `clades` param to named `ranks`.
-    #________________________________________________________
-    ranks <- local({
+    if (length(bad <- setdiff(clades, taxa_ranks(biom))) > 0)
+      stop("Invalid taxonomic rank: ", paste(collapse = ", ", bad))
       
-      stopifnot(is.logical(clades) || is.character(clades))
-      
-      if (isFALSE(clades)) return (NULL)
-      if (isTRUE(clades))  return (taxa_ranks(biom) %>% setNames(., .))
-      
-      if (length(bad <- setdiff(clades, taxa_ranks(biom))) > 0)
-        stop("Invalid taxonomic rank: ", paste(collapse = ", ", bad))
-        
-      if (is_null(names(clades))) return (setNames(clades, clades))
-      
-      if (length(i <- which(names(clades) == "")) > 0)
-        names(clades)[i] <- as.vector(clades)[i]
-      
-      return (clades)
-    })
+    if (is_null(names(clades))) return (setNames(clades, clades))
     
+    if (length(i <- which(names(clades) == "")) > 0)
+      names(clades)[i] <- as.vector(clades)[i]
     
-    # We can pre-populate all the data for leaf nodes.
-    #________________________________________________________
+    return (clades)
+  })
+  
+  
+  # We can pre-populate all the data for leaf nodes.
+  #________________________________________________________
+  if (isTRUE(reads))
+    df[1:nTips, 'reads'] <- as.vector(taxa_sums(biom)[labels])
+  
+  for (i in seq_along(ranks))
+    df[1:nTips, names(ranks)[[i]]] <- as.vector(taxonomy(biom, ranks[[i]])[labels,1])
+  
+  df[1:nTips, 'OTU'] <- labels
+  
+  
+  # Recurse through the tree.
+  #________________________________________________________
+  traverse <- function (i) {
+    
+    if (i <= nTips) return (i)
+    
+    children    <- tree$edge[which(tree$edge[,1] == i),2]
+    descendents <- unlist(lapply(children, traverse))
+    
     if (isTRUE(reads))
-      df[1:nTips, 'reads'] <- as.vector(taxa_sums(biom)[labels])
+      df[i, 'reads'] <<- sum(df[children, 'reads'])
     
-    for (i in seq_along(ranks))
-      df[1:nTips, names(ranks)[[i]]] <- as.vector(taxonomy(biom, ranks[[i]])[labels,1])
-    
-    df[1:nTips, 'OTU'] <- labels
-    
-    
-    # Recurse through the tree.
-    #________________________________________________________
-    traverse <- function (i) {
-      
-      if (i <= nTips) return (i)
-      
-      children    <- tree$edge[which(tree$edge[,1] == i),2]
-      descendents <- unlist(lapply(children, traverse))
-      
-      if (isTRUE(reads))
-        df[i, 'reads'] <<- sum(df[children, 'reads'])
-      
-      for (rank in names(ranks)) {
-        if (length(unique(df[children, rank])) == 1) {
-          df[i, rank]        <<- df[children[[1]], rank]
-          df[children, rank] <<- NA
-        }
+    for (rank in names(ranks)) {
+      if (length(unique(df[children, rank])) == 1) {
+        df[i, rank]        <<- df[children[[1]], rank]
+        df[children, rank] <<- NA
       }
-      
-      return (c(i, descendents))
     }
-    invisible(traverse(nTips + 1))
     
-    
-    # Convert phylo object to treedata object.
-    #________________________________________________________
-    tree <- treeio::full_join(tree, df, by = "node")
-    
-    return (tree)
-    
-  }))
+    return (c(i, descendents))
+  }
+  invisible(traverse(nTips + 1))
+  
+  
+  # Convert phylo object to treedata object.
+  #________________________________________________________
+  tree <- treeio::full_join(tree, df, by = "node")
+  
+  set_cache_value(cache_file, tree)
+  return (tree)
 }

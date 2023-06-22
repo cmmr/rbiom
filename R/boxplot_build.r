@@ -54,6 +54,8 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   #________________________________________________________
   ggdata <- data_func(params)      # Plot-specific
   ggdata <- metadata_group(ggdata) # General
+  ggdata <- rename_response(ggdata, ".y")
+  attr(ggdata, 'ycol') <- ".y"
   remove("params")
     
   
@@ -77,9 +79,9 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     attr(layers, i) <- attr(ggdata, i, exact = TRUE)
     attr(ggdata, i) <- NULL
   }
-  attr(layers, 'data')      <- ggdata
-  attr(layers, 'function')  <- plot_func
-  attr(layers, 'xmode')     <- "factor"
+  attr(layers, 'data')     <- ggdata
+  attr(layers, 'function') <- plot_func
+  attr(layers, 'xmode')    <- "factor"
   
   
   initLayer(layer_names)
@@ -151,8 +153,8 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
       
     } else {
       trans <- layers[['yaxis']][['trans']]
-      fun <- if (trans == 'sqrt')  { function (y) sqrt(mean(y * y))
-      } else if (trans == 'log1p') { function (y) log1p(mean(exp(y) - 1))
+      fun <- if (trans == 'sqrt')  { as.cmd(function (y) sqrt(mean(y * y)))
+      } else if (trans == 'log1p') { as.cmd(function (y) log1p(mean(exp(y) - 1)))
       } else { stop('Bar charts can only be re-scaled using sqrt or log1p.') }
       setLayer(fun=fun)
       remove("fun", "trans")

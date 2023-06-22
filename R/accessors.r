@@ -38,38 +38,43 @@ sample_names <- function (biom) {
 
 sample_sums <- function (biom, long=FALSE, md=FALSE) {
   
-  with_cache("sample_sums", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("sample_sums", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
     
-    
-    if (!is(biom, 'BIOM'))
-      stop (simpleError('In sample_names(), biom must be a BIOM-class object.'))
-    
-    result <- slam::col_sums(biom[['counts']])
-    
-    if (isTRUE(long) || !isFALSE(md)) {
-      
-      #________________________________________________________
-      # Convert to long format
-      #________________________________________________________
-      result <- data.frame(
-        stringsAsFactors = FALSE,
-        'Sample' = names(result),
-        'Reads'  = unname(result)
-        )
-      
-      #________________________________________________________
-      # Add Metadata
-      #________________________________________________________
-      if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
-      if (identical(md, FALSE)) md <- c()
-      for (i in unique(md))
-        result[[i]] <- metadata(biom, i)[result[['Sample']]]
-      
-    }
-    
-    return (result)
   
-  }))
+  if (!is(biom, 'BIOM'))
+    stop (simpleError('In sample_names(), biom must be a BIOM-class object.'))
+  
+  result <- slam::col_sums(biom[['counts']])
+  
+  if (isTRUE(long) || !isFALSE(md)) {
+    
+    #________________________________________________________
+    # Convert to long format
+    #________________________________________________________
+    result <- data.frame(
+      stringsAsFactors = FALSE,
+      'Sample' = names(result),
+      'Reads'  = unname(result)
+      )
+    
+    #________________________________________________________
+    # Add Metadata
+    #________________________________________________________
+    if (identical(md, TRUE))  md <- colnames(rbiom::metadata(biom))
+    if (identical(md, FALSE)) md <- c()
+    for (i in unique(md))
+      result[[i]] <- metadata(biom, i)[result[['Sample']]]
+    
+  }
+  
+  set_cache_value(cache_file, result)
+  return (result)
 }
 
 

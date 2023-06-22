@@ -84,7 +84,7 @@ Sys.setenv(RBIOM_CACHE_DIR="/tmp/rbiom_cache")
 Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 2) # 1GB
 ```
 
-Setting the cache size to `0` will disable caching.
+Setting the cache directory to `"FALSE"` will disable caching.
 
 R options will override environment variables.
 

@@ -168,6 +168,10 @@ boxplot_facets <- function (layers) {
       } else                          { "fixed" }
       
       
+      if (isTRUE(params[['flip']]) && scales %in% c("free_x", "free_y"))
+        scales <- ifelse(scales == "free_x", "free_y", "free_x")
+      
+      
       setLayer(layer = "facet", scales = scales)
     }
     

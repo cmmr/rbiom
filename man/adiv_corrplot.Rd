@@ -30,9 +30,12 @@ and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 
 \item{model}{What type of trendline to fit to the data. Options are: 
 \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
-alternatively provide \bold{method} and/or \bold{formula} arguments
-which will override these preset options for 
-\link[ggplot2]{stat_smooth}. Default: \code{"linear"}.}
+alternatively provide a list of length two where the first element is
+a character vector of length 1 naming a function, and the second 
+element is a list of arguments to pass to that function. One of the 
+function's arguments must be named 'formula'. For example, 
+\code{model = list("stats::lm", list(formula = y ~ x))}.
+Default: \code{"linear"}.}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}

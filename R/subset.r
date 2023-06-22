@@ -76,220 +76,226 @@
 #'
 subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor = TRUE, fast = FALSE) {
   
-  with_cache("subset.BIOM", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("subset.BIOM", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  stopifnot(is(x, 'BIOM'))
+  
+  #________________________________________________________
+  # Don't record sub-calls in the biom's history
+  #________________________________________________________
+  biom <- x
+  hist <- attr(biom, 'history', exact = TRUE)
+  
+  
+  # #________________________________________________________
+  # # Convert an expression to call. expression(Age > 9) => Age > 9
+  # #________________________________________________________
+  # 
+  # if (mode(substitute(expr)) == "name")
+  #   if (identical(expr[[1]], as.name("expression")))
+  #     return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
+  # 
+  # if (identical(substitute(expr)[[1]], as.name("expression")))
+  #   return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
+  #
+  # Just use do.call instead to make sure you pass a call in. E.g.:
+  #   expr <- expression(Age < 30)
+  #   biom <- do.call(subset, list(biom, expr[[1]]))
+  #
+  
+  
+  #________________________________________________________
+  # Replace variable names with their values
+  #________________________________________________________
+  expr <- do.call(substitute, list(substitute(expr), as.list(env)))
+  
+  
+  #________________________________________________________
+  # Metadata or Taxonomy based subsetting?
+  #________________________________________________________
+  vars   <- all.vars(expr)
+  ranks  <- taxa_ranks(biom)
+  mdcols <- colnames(metadata(biom))
+  if (any(vars %in% ranks) && any(vars %in% mdcols))
+    stop("subset expression must be either all metadata or all taxonomy.")
+  mode  <- ifelse(any(vars %in% mdcols), "metadata", "taxonomy")
+  remove("vars", "ranks", "mdcols")
+  
+  
+  #________________________________________________________
+  # Taxonomy vs metadata subsetting are done differently
+  #________________________________________________________
+  if (mode == "taxonomy") {
+    envir <- c(
+      as.list(as.data.frame(taxonomy(biom))),
+      list(OTU = taxa_names(biom)) )
     
-    
-    stopifnot(is(x, 'BIOM'))
     
     #________________________________________________________
-    # Don't record sub-calls in the biom's history
+    # These functions get mapped to new apply; remember originals
     #________________________________________________________
-    biom <- x
-    hist <- attr(biom, 'history', exact = TRUE)
-    
-    
-    # #________________________________________________________
-    # # Convert an expression to call. expression(Age > 9) => Age > 9
-    # #________________________________________________________
-    # 
-    # if (mode(substitute(expr)) == "name")
-    #   if (identical(expr[[1]], as.name("expression")))
-    #     return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
-    # 
-    # if (identical(substitute(expr)[[1]], as.name("expression")))
-    #   return (do.call(subset.BIOM, list(x, expr[[1]], env, drop.na, refactor, fast)))
-    #
-    # Just use do.call instead to make sure you pass a call in. E.g.:
-    #   expr <- expression(Age < 30)
-    #   biom <- do.call(subset, list(biom, expr[[1]]))
-    #
-    
+    funcs <- c(
+      'mean'  = mean, 'median' = median, 'n'     = length,
+      'min'   = min,  'max'    = max,    'apply' = apply,
+      'count' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
+        lower_pass <- if (is_null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is_null(lt)) x <= le else x >  lt
+        sum(lower_pass & upper_pass) },
+      'percent' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
+        lower_pass <- if (is_null(ge)) x >  gt else x >= ge
+        upper_pass <- if (is_null(lt)) x <= le else x >  lt
+        sum(lower_pass & upper_pass) / length(x) })
     
     #________________________________________________________
-    # Replace variable names with their values
+    # Take any function and run it on each taxon's rel. abundances.
+    # `f` should take a vector of numbers and return one value.
     #________________________________________________________
-    expr <- do.call(substitute, list(substitute(expr), as.list(env)))
-    
-    
-    #________________________________________________________
-    # Metadata or Taxonomy based subsetting?
-    #________________________________________________________
-    vars   <- all.vars(expr)
-    ranks  <- taxa_ranks(biom)
-    mdcols <- colnames(metadata(biom))
-    if (any(vars %in% ranks) && any(vars %in% mdcols))
-      stop("subset expression must be either all metadata or all taxonomy.")
-    mode  <- ifelse(any(vars %in% mdcols), "metadata", "taxonomy")
-    remove("vars", "ranks", "mdcols")
-    
-    
-    #________________________________________________________
-    # Taxonomy vs metadata subsetting are done differently
-    #________________________________________________________
-    if (mode == "taxonomy") {
-      envir <- c(
-        as.list(as.data.frame(taxonomy(biom))),
-        list(OTU = taxa_names(biom)) )
+    envir[['apply']] <- function (x, f = NULL, raw = FALSE, ...) {
+      for (i in names(funcs)) assign(i, funcs[[i]])
       
+      if (missing(f)) f <- as.character(match.call()[[1]])
+      fn  <- ifelse(is.character(f), f, capture.output(substitute(f)))
+      fun <- funcs[[fn]] %||% ifelse(is.function(f), f, get(fn))
+      if (!is.function(fun)) stop("unknown function: ", fn)
       
-      #________________________________________________________
-      # These functions get mapped to new apply; remember originals
-      #________________________________________________________
-      funcs <- c(
-        'mean'  = mean, 'median' = median, 'n'     = length,
-        'min'   = min,  'max'    = max,    'apply' = apply,
-        'count' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
-          lower_pass <- if (is_null(ge)) x >  gt else x >= ge
-          upper_pass <- if (is_null(lt)) x <= le else x >  lt
-          sum(lower_pass & upper_pass) },
-        'percent' = function (x, gt=0, le=1, ge=NULL, lt=NULL) {
-          lower_pass <- if (is_null(ge)) x >  gt else x >= ge
-          upper_pass <- if (is_null(lt)) x <= le else x >  lt
-          sum(lower_pass & upper_pass) / length(x) })
-      
-      #________________________________________________________
-      # Take any function and run it on each taxon's rel. abundances.
-      # `f` should take a vector of numbers and return one value.
-      #________________________________________________________
-      envir[['apply']] <- function (x, f = NULL, raw = FALSE, ...) {
-        for (i in names(funcs)) assign(i, funcs[[i]])
+      rank <- capture.output(substitute(x))
+      if (!rank %in% taxa_ranks(biom))
+        return (fun(x, ...))
         
-        if (missing(f)) f <- as.character(match.call()[[1]])
-        fn  <- ifelse(is.character(f), f, capture.output(substitute(f)))
-        fun <- funcs[[fn]] %||% ifelse(is.function(f), f, get(fn))
-        if (!is.function(fun)) stop("unknown function: ", fn)
+      mtx  <- taxa_matrix(biom, rank)
+      mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
+      res  <- apply(mtx, 2L, fun, ...)
+      res[taxonomy(biom, rank)[,1]]
+    }
+    for (i in names(funcs)) envir[[i]] <- envir[['apply']]
+    
+    
+    #________________________________________________________
+    # Rank calls apply then does additional post-processing.
+    #________________________________________________________
+    funcs %<>% c('rank' = rank)
+    envir[['rank']] <- function (...) {
+      for (i in names(funcs)) assign(i, funcs[[i]])
+      means    <- envir[['apply']](f = mean, ...)
+      rankings <- rank(-means, ties.method = "min")
+      gapfill  <- sort(unique(rankings))
+      gapfill  <- setNames(rank(gapfill), as.character(gapfill))
+      gapfill[as.character(rankings)]
+    }
+    
+    
+    #________________________________________________________
+    # Evaluate expr to determine which taxa to keep
+    #________________________________________________________
+    keep <- try(eval(expr, envir = envir), silent=TRUE)
+    if (is(keep, "try-error") || is(keep, 'error'))
+      stop(simpleError(sprintf("Subset failed: %s", keep)))
+    
+    
+    biom$taxonomy <- biom$taxonomy[keep,,drop=F]
+    biom <- repair(biom, fast=fast)
+    
+  } else {
+    envir <- metadata(biom)
+    
+    #________________________________________________________
+    # Evaluate expr to determine which samples to keep
+    #________________________________________________________
+    keep <- try(eval(expr, envir = envir), silent=TRUE)
+    if (is(keep, "try-error") || is(keep, 'error'))
+      stop(simpleError(sprintf("Subset failed: %s", keep)))
+    
+    #________________________________________________________
+    # Keep only the indicated samples
+    #________________________________________________________
+    biom <- select(biom, keep, fast=fast)
+    
+    
+    #________________________________________________________
+    # Remove NAs in subsetted columns
+    #________________________________________________________
+    if (isTRUE(drop.na))
+      for (i in all.vars(expr))
+        if (i %in% colnames(biom$metadata))
+          biom <- select(biom, !is.na(biom$metadata[[i]]))
+    
+    
+    
+    #________________________________________________________
+    # Recursively traverse subsetting expression to find all
+    # instances of, e.g., `Body Site` %in% c('Stool', 'Saliva')
+    #________________________________________________________
+    in_lists <- function (expr) {
+      result <- list()
+      
+      if (isTRUE(expr[[1]] == "%in%")) {
         
-        rank <- capture.output(substitute(x))
-        if (!rank %in% taxa_ranks(biom))
-          return (fun(x, ...))
-          
-        mtx  <- taxa_matrix(biom, rank)
-        mtx  <- if (isTRUE(raw)) mtx else mtx / rowSums(mtx)
-        res  <- apply(mtx, 2L, fun, ...)
-        res[taxonomy(biom, rank)[,1]]
-      }
-      for (i in names(funcs)) envir[[i]] <- envir[['apply']]
-      
-      
-      #________________________________________________________
-      # Rank calls apply then does additional post-processing.
-      #________________________________________________________
-      funcs %<>% c('rank' = rank)
-      envir[['rank']] <- function (...) {
-        for (i in names(funcs)) assign(i, funcs[[i]])
-        means    <- envir[['apply']](f = mean, ...)
-        rankings <- rank(-means, ties.method = "min")
-        gapfill  <- sort(unique(rankings))
-        gapfill  <- setNames(rank(gapfill), as.character(gapfill))
-        gapfill[as.character(rankings)]
-      }
-      
-      
-      #________________________________________________________
-      # Evaluate expr to determine which taxa to keep
-      #________________________________________________________
-      keep <- try(eval(expr, envir = envir), silent=TRUE)
-      if (is(keep, "try-error") || is(keep, 'error'))
-        stop(simpleError(sprintf("Subset failed: %s", keep)))
-      
-      
-      biom$taxonomy <- biom$taxonomy[keep,,drop=F]
-      biom <- repair(biom, fast=fast)
-      
-    } else {
-      envir <- metadata(biom)
-      
-      #________________________________________________________
-      # Evaluate expr to determine which samples to keep
-      #________________________________________________________
-      keep <- try(eval(expr, envir = envir), silent=TRUE)
-      if (is(keep, "try-error") || is(keep, 'error'))
-        stop(simpleError(sprintf("Subset failed: %s", keep)))
-      
-      #________________________________________________________
-      # Keep only the indicated samples
-      #________________________________________________________
-      biom <- select(biom, keep, fast=fast)
-      
-      
-      #________________________________________________________
-      # Remove NAs in subsetted columns
-      #________________________________________________________
-      if (isTRUE(drop.na))
-        for (i in all.vars(expr))
-          if (i %in% colnames(biom$metadata))
-            biom <- select(biom, !is.na(biom$metadata[[i]]))
-      
-      
-      
-      #________________________________________________________
-      # Recursively traverse subsetting expression to find all
-      # instances of, e.g., `Body Site` %in% c('Stool', 'Saliva')
-      #________________________________________________________
-      in_lists <- function (expr) {
-        result <- list()
+        key <- as.character(expr[[2]])
+        val <- expr[[3]]
         
-        if (isTRUE(expr[[1]] == "%in%")) {
-          
-          key <- as.character(expr[[2]])
-          val <- expr[[3]]
-          
-          if (is(val, "call") && val[[1]] == "c")
-            val <- sapply(val[-1], unlist)
-          
-          result[[key]] <- as.character(val)
-          
-        } else {
-          
-          for (i in seq_len(length(expr))) {
-            if (length(expr[[i]]) > 1) {
-              result <- c(result, in_lists(expr[[i]]))
-            }
+        if (is(val, "call") && val[[1]] == "c")
+          val <- sapply(val[-1], unlist)
+        
+        result[[key]] <- as.character(val)
+        
+      } else {
+        
+        for (i in seq_len(length(expr))) {
+          if (length(expr[[i]]) > 1) {
+            result <- c(result, in_lists(expr[[i]]))
           }
         }
-        
-        result <- result[!duplicated(names(result))]
-        
-        return (result)
       }
       
+      result <- result[!duplicated(names(result))]
       
-      #________________________________________________________
-      # Convert/update factors according to subset specs
-      #________________________________________________________
-      if (isTRUE(refactor)) {
-        specs <- in_lists(expr)
-        for (key in names(specs)) {
-          val <- specs[[key]]
-          col <- biom$metadata[[key]]
-          if (all(unique(col) %in% val))
-            biom$metadata[[key]] <- factor(as.character(col), levels = val)
-        }
-      }
-      
+      return (result)
     }
     
     
     #________________________________________________________
-    # Attach subset() call to provenance tracking
+    # Convert/update factors according to subset specs
     #________________________________________________________
-    
-    cl <- match.call()
-    cl <- cl[names(cl) != "env"]
-    cl[[1]] <- as.name("subset")
-    cl[[2]] <- as.name("biom")
-    cl[[3]] <- expr
-    for (i in seq_along(names(cl))[-(1:3)]) {
-      cl[i] <- list(eval.parent(cl[[i]]))
+    if (isTRUE(refactor)) {
+      specs <- in_lists(expr)
+      for (key in names(specs)) {
+        val <- specs[[key]]
+        col <- biom$metadata[[key]]
+        if (all(unique(col) %in% val))
+          biom$metadata[[key]] <- factor(as.character(col), levels = val)
+      }
     }
-    names(cl)[[2]] <- ""
-    names(cl)[[3]] <- ""
     
-    attr(biom, 'history') <- c(hist, paste("biom <-", deparse1(cl)))
-    
-    return (biom)
-    
-  }))
+  }
+  
+  
+  #________________________________________________________
+  # Attach subset() call to provenance tracking
+  #________________________________________________________
+  
+  cl <- match.call()
+  cl <- cl[names(cl) != "env"]
+  cl[[1]] <- as.name("subset")
+  cl[[2]] <- as.name("biom")
+  cl[[3]] <- expr
+  for (i in seq_along(names(cl))[-(1:3)]) {
+    cl[i] <- list(eval.parent(cl[[i]]))
+  }
+  names(cl)[[2]] <- ""
+  names(cl)[[3]] <- ""
+  
+  attr(biom, 'history') <- c(hist, paste("biom <-", deparse1(cl)))
+  
+  
+  set_cache_value(cache_file, biom)
+  return (biom)
 }
 
 

@@ -122,255 +122,262 @@ stats_table <- function (
     pairwise = FALSE, weighted = TRUE, digits = 3, 
     y.pos = NULL, y.pos.facet="Metric", adj.n = NULL ) {
   
-  with_cache("stats_table", environment(), NULL, local({
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("stats_table", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Sanity checks
+  #________________________________________________________
+  if (length(x) == 0) stop("Please provide a value to 'x'.")
+  if (length(y) == 0) stop("Please provide a value to 'y'.")
+  
+  
+  #________________________________________________________
+  # Assemble a data frame to run stats on.
+  #________________________________________________________
+  if (is(biom, 'BIOM')) {
+    
+    md <- intersect(c(x, by), colnames(metadata(biom)))
+    df <- distill(biom, metric = y, weighted = weighted, long = TRUE, md = md)
+    y  <- attr(df, 'response', exact = TRUE)
+    
+    if (y == '.diversity') {
+      by <- c(".metric", by)
+      
+    } else if (y == '.abundance') {
+      by <- c(names(df)[[2]], by)
+      
+    } else if (y == '.distance') {
+      by <- sub("^[\\!=]=", "", by)
+      x  <- sub("^[\\!=]=", "", x)
+      
+    }
+    
+  } else if (is(biom, 'data.frame')) {
     
     #________________________________________________________
-    # Sanity checks
+    # The user supplied the data frame to run stats on
     #________________________________________________________
-    if (length(x) == 0) stop("Please provide a value to 'x'.")
-    if (length(y) == 0) stop("Please provide a value to 'y'.")
     
+    df <- biom
     
-    #________________________________________________________
-    # Assemble a data frame to run stats on.
-    #________________________________________________________
-    if (is(biom, 'BIOM')) {
-      
-      md <- intersect(c(x, by), colnames(metadata(biom)))
-      df <- distill(biom, metric = y, weighted = weighted, long = TRUE, md = md, safe = TRUE)
-      y  <- attr(df, 'response', exact = TRUE)
-      
-      if (y == '.diversity') {
-        by <- c(".metric", by)
-        
-      } else if (y == '.abundance') {
-        by <- c(names(df)[[2]], by)
-        
-      } else if (y == '.distance') {
-        by <- sub("^[\\!=]=", "", by)
-        x  <- sub("^[\\!=]=", "", x)
-        
-      }
-      
-    } else if (is(biom, 'data.frame')) {
-      
-      #________________________________________________________
-      # The user supplied the data frame to run stats on
-      #________________________________________________________
-      
-      df <- biom
-      
-      missing <- setdiff(c(x, y, by), names(df))
-      if (length(missing) > 0)
-        stop(
-          "Expected column not present in data frame: ", 
-          paste(collapse = ", ", missing) )
-      
-    } else {
-      
-      #________________________________________________________
-      # The user gave us an unexpected data type to run stats on
-      #________________________________________________________
-      
+    missing <- setdiff(c(x, y, by), names(df))
+    if (length(missing) > 0)
       stop(
-        "'biom' should be BIOM or data.frame, not ", 
-        paste(collapse=", ", class(biom)) )
-    }
+        "Expected column not present in data frame: ", 
+        paste(collapse = ", ", missing) )
     
-    
-    #________________________________________________________
-    # Create a `.x` column if there's multiple x values
-    #________________________________________________________
-    if (length(x) > 1) {
-      df[['.x']] <- apply(df[,x,drop=FALSE], 1L, paste, collapse=".")
-      x <- ".x"
-    }
-    
+  } else {
     
     #________________________________________________________
-    # No data to run stats on.
+    # The user gave us an unexpected data type to run stats on
     #________________________________________________________
-    if (nrow(df) == 0)
-      return (NULL)
     
+    stop(
+      "'biom' should be BIOM or data.frame, not ", 
+      paste(collapse=", ", class(biom)) )
+  }
+  
+  
+  #________________________________________________________
+  # Create a `.x` column if there's multiple x values
+  #________________________________________________________
+  if (length(x) > 1) {
+    df[['.x']] <- apply(df[,x,drop=FALSE], 1L, paste, collapse=".")
+    x <- ".x"
+  }
+  
+  
+  #________________________________________________________
+  # No data to run stats on.
+  #________________________________________________________
+  if (nrow(df) == 0)
+    return (NULL)
+  
+  
+  #________________________________________________________
+  # Run non-parametric statistics
+  #________________________________________________________
+  plyby   <- ply_cols(rev(by))
+  results <- plyr::ddply(df, plyby, function (z) {
     
-    #________________________________________________________
-    # Run non-parametric statistics
-    #________________________________________________________
-    plyby   <- ply_cols(rev(by))
-    results <- plyr::ddply(df, plyby, function (z) {
+    if (isTRUE(pairwise)) {
       
-      if (isTRUE(pairwise)) {
+      #________________________________________________________
+      # wilcox-style stats
+      #________________________________________________________
+      groups <- if (is.factor(z[[x]])) levels(z[[x]]) else sort(unique(z[[x]]))
+      
+      if (length(groups) < 2) {
         
-        #________________________________________________________
-        # wilcox-style stats
-        #________________________________________________________
-        groups <- if (is.factor(z[[x]])) levels(z[[x]]) else sort(unique(z[[x]]))
-        
-        if (length(groups) < 2) {
-          
-          result <- data.frame(
-            check.names = FALSE, 
-            n      = nrow(z),
-            Test   = NA,
-            Group1 = NA,
-            Group2 = NA,
-            .p.val = 1 )
-          
-        } else {
-          
-          pairs <- combn(groups, 2)
-          
-          result <- data.frame(
-            check.names = FALSE,
-            n      = apply(pairs, 2L, function (pair) { sum(z[[x]] %in% pair) }),
-            Test   = "Mann-Whitney",
-            Group1 = pairs[1,],
-            Group2 = pairs[2,],
-            .p.val = apply(pairs, 2L, function (pair) {
-              
-              tryCatch({
-                wt <- wilcox.test(
-                  x = z[z[[x]] == pair[[1]], y],
-                  y = z[z[[x]] == pair[[2]], y] ) %>%
-                  suppressWarnings()
-                wt[['p.value']]
-              }, error = function (e) 1)
-            }) )
-          
-        }
-        
+        result <- data.frame(
+          check.names = FALSE, 
+          n      = nrow(z),
+          Test   = NA,
+          Group1 = NA,
+          Group2 = NA,
+          .p.val = 1 )
         
       } else {
-        #________________________________________________________
-        # kruskal-style stats, possibly interspersed with wilcox
-        #________________________________________________________
         
-        ngroups <- length(unique(z[[x]]))
-        result  <- data.frame(n = nrow(z))
+        pairs <- combn(groups, 2)
         
-        if (ngroups < 2) {
-          result[['Test']]   <- NA
-          result[['.p.val']] <- 1
-          
-        } else if (ngroups == 2) {
-          result[['Test']]   <- "Mann-Whitney"
-          result[['.p.val']] <- tryCatch({
-            groups <- as.character(unique(z[[x]]))
-            wt <- wilcox.test(
-              x = z[z[[x]] == groups[[1]], y],
-              y = z[z[[x]] == groups[[2]], y] ) %>%
-              suppressWarnings()
-            wt[['p.value']]
-          }, error = function (e) 1)
-          
-        } else {
-          result[['Test']]   <- "Kruskal-Wallis"
-          result[['.p.val']] <- tryCatch({
-            kruskal.test(z[[y]], z[[x]])[['p.value']]
-          }, error = function (e) 1)
-          
-        }
+        result <- data.frame(
+          check.names = FALSE,
+          n      = apply(pairs, 2L, function (pair) { sum(z[[x]] %in% pair) }),
+          Test   = "Mann-Whitney",
+          Group1 = pairs[1,],
+          Group2 = pairs[2,],
+          .p.val = apply(pairs, 2L, function (pair) {
+            
+            tryCatch({
+              wt <- wilcox.test(
+                x = z[z[[x]] == pair[[1]], y],
+                y = z[z[[x]] == pair[[2]], y] ) %>%
+                suppressWarnings()
+              wt[['p.value']]
+            }, error = function (e) 1)
+          }) )
+        
       }
       
       
-      #________________________________________________________
-      # Vertical start position for p-value plot annotations
-      #________________________________________________________
-      
-      if (!is_null(y.pos)) {
-        
-        if ("vline" %in% names(attributes(biom))) {
-          vline <- attr(biom, 'vline', exact = TRUE)
-          vline <- setNames(vline[['.ymax']], vline[['.group']])
-          z[['.vline']] <- vline[z[['.group']]]
-          remove("vline")
-        }
-        
-        result[['y.pos']] <- local({
-          
-          max(plyr::daply(z, ".group", function (group_df) {
-            
-            group_df <- group_df[is.finite(group_df[[y]]),,drop=FALSE]
-            vals     <- group_df[[y]]
-            
-            if (length(vals) == 0) return (0)
-            
-            res <- 0
-            for (i in y.pos)
-              res <- max(na.rm = TRUE, res, local({
-                if (i == "max")           { max(vals)
-                } else if (i == "mean")   { mean(vals)
-                } else if (i == "box")    { boxplot.stats(vals)$stats[5]
-                } else if (i == "violin") { max(density(vals)[['x']])
-                } else if (i == "vline")  { max(group_df[['.vline']]) } }))
-            
-            # Avoid horizontal gridlines.
-            res <- max(labeling::extended(0, res, 5, only.loose = TRUE))
-            
-            return (res)
-          }))
-        })
-      }
-      
-      return (result)
-      
-    })
-    
-    # Remove '.id' column that ddply adds when by=NULL
-    if (length(by) == 0)
-      results <- results[,-1,drop=F]
-    
-    # Don't count multiple metrics as multiple comparisons
-    if (".metric" %in% by) {
-      results <- plyr::ddply(results, ".metric", function (z) {
-        z[['.adj.p']] <- p.adjust(
-          p      = z[['.p.val']], 
-          method = adj   %||% "fdr", 
-          n      = adj.n %||% nrow(z) )
-        return(z)
-      })
     } else {
-      results[['.adj.p']] <- p.adjust(
-        p      = results[['.p.val']], 
-        method = adj   %||% "fdr", 
-        n      = adj.n %||% nrow(results) )
-    }
-    
-    # Order by p-value, most to least significant (unless plotting)
-    if (is_null(y.pos))
-      results <- results[order(results[['.p.val']]),,drop=F]
-    
-    
-    # Round the p.val and adj.p numbers
-    if (!is_null(digits)) {
-      results[['.p.val']] <- signif(results[['.p.val']], digits = digits)
-      results[['.adj.p']] <- signif(results[['.adj.p']], digits = digits)
-    }
-    
-    # Make y.pos the last column
-    if (!is_null(y.pos) && "y.pos" %in% names(results)) {
+      #________________________________________________________
+      # kruskal-style stats, possibly interspersed with wilcox
+      #________________________________________________________
       
-      y.pos.facet <- intersect(y.pos.facet, by)
+      ngroups <- length(unique(z[[x]]))
+      result  <- data.frame(n = nrow(z))
       
-      if (is_null(y.pos.facet)) {
+      if (ngroups < 2) {
+        result[['Test']]   <- NA
+        result[['.p.val']] <- 1
         
-        results[['y.pos']] <- signif(max(results[['y.pos']]), digits = 2)
+      } else if (ngroups == 2) {
+        result[['Test']]   <- "Mann-Whitney"
+        result[['.p.val']] <- tryCatch({
+          groups <- as.character(unique(z[[x]]))
+          wt <- wilcox.test(
+            x = z[z[[x]] == groups[[1]], y],
+            y = z[z[[x]] == groups[[2]], y] ) %>%
+            suppressWarnings()
+          wt[['p.value']]
+        }, error = function (e) 1)
         
       } else {
-        plyby   <- ply_cols(rev(y.pos.facet))
-        results <- plyr::ddply(results, plyby, function (z) {
-          z[['y.pos']] <- signif(max(z[['y.pos']]), digits = 2)
-          return (z)
-        })
+        result[['Test']]   <- "Kruskal-Wallis"
+        result[['.p.val']] <- tryCatch({
+          kruskal.test(z[[y]], z[[x]])[['p.value']]
+        }, error = function (e) 1)
+        
       }
-      
-      results <- results[,order(names(results) == "y.pos"),drop=F]
     }
     
-    rownames(results) <- NULL
     
-    return (results)
+    #________________________________________________________
+    # Vertical start position for p-value plot annotations
+    #________________________________________________________
     
-  }))
+    if (!is_null(y.pos)) {
+      
+      if ("vline" %in% names(attributes(biom))) {
+        vline <- attr(biom, 'vline', exact = TRUE)
+        vline <- setNames(vline[['.ymax']], vline[['.group']])
+        z[['.vline']] <- vline[z[['.group']]]
+        remove("vline")
+      }
+      
+      result[['y.pos']] <- local({
+        
+        max(plyr::daply(z, ".group", function (group_df) {
+          
+          group_df <- group_df[is.finite(group_df[[y]]),,drop=FALSE]
+          vals     <- group_df[[y]]
+          
+          if (length(vals) == 0) return (0)
+          
+          res <- 0
+          for (i in y.pos)
+            res <- max(na.rm = TRUE, res, local({
+              if (i == "max")           { max(vals)
+              } else if (i == "mean")   { mean(vals)
+              } else if (i == "box")    { boxplot.stats(vals)$stats[5]
+              } else if (i == "violin") { max(density(vals)[['x']])
+              } else if (i == "vline")  { max(group_df[['.vline']]) } }))
+          
+          # Avoid horizontal gridlines.
+          res <- max(labeling::extended(0, res, 5, only.loose = TRUE))
+          
+          return (res)
+        }))
+      })
+    }
+    
+    return (result)
+    
+  })
+  
+  # Remove '.id' column that ddply adds when by=NULL
+  if (length(by) == 0)
+    results <- results[,-1,drop=F]
+  
+  # Don't count multiple metrics as multiple comparisons
+  if (".metric" %in% by) {
+    results <- plyr::ddply(results, ".metric", function (z) {
+      z[['.adj.p']] <- p.adjust(
+        p      = z[['.p.val']], 
+        method = adj   %||% "fdr", 
+        n      = adj.n %||% nrow(z) )
+      return(z)
+    })
+  } else {
+    results[['.adj.p']] <- p.adjust(
+      p      = results[['.p.val']], 
+      method = adj   %||% "fdr", 
+      n      = adj.n %||% nrow(results) )
+  }
+  
+  # Order by p-value, most to least significant (unless plotting)
+  if (is_null(y.pos))
+    results <- results[order(results[['.p.val']]),,drop=F]
+  
+  
+  # Round the p.val and adj.p numbers
+  if (!is_null(digits)) {
+    results[['.p.val']] <- signif(results[['.p.val']], digits = digits)
+    results[['.adj.p']] <- signif(results[['.adj.p']], digits = digits)
+  }
+  
+  # Make y.pos the last column
+  if (!is_null(y.pos) && "y.pos" %in% names(results)) {
+    
+    y.pos.facet <- intersect(y.pos.facet, by)
+    
+    if (is_null(y.pos.facet)) {
+      
+      results[['y.pos']] <- signif(max(results[['y.pos']]), digits = 2)
+      
+    } else {
+      plyby   <- ply_cols(rev(y.pos.facet))
+      results <- plyr::ddply(results, plyby, function (z) {
+        z[['y.pos']] <- signif(max(z[['y.pos']]), digits = 2)
+        return (z)
+      })
+    }
+    
+    results <- results[,order(names(results) == "y.pos"),drop=F]
+  }
+  
+  rownames(results) <- NULL
+  
+  
+  set_cache_value(cache_file, result)
+  return (results)
 }

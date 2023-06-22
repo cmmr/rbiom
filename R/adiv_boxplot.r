@@ -25,6 +25,11 @@
 #'        use for aesthetics and partitioning. See below for details.
 #'        Default: \code{NULL}
 #'
+#' @param flip   Transpose the axes, so that taxa are present as rows instead
+#'        of columns. Default: \code{FALSE}
+#'
+#' @param stripe   Shade every other x position. Default: \emph{same as flip}
+#'
 #' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
 #'        Run \code{p.adjust.methods} for a list of available options.
 #'        (Default: \code{fdr})
@@ -59,11 +64,6 @@
 #'        \bold{'auto'} (the default), automatically selects a rotation value. 
 #'        \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 #'        angled, and vertical, respectively.
-#'        
-#' @param safe   If \code{FALSE}, data.frame column names such as 
-#'        \code{".metric"} will be auto-converted to \code{"Metric"} to improve
-#'        human-readability. Conversion if aborted if a conflict is found with
-#'        a metadata column name. (Default: \code{FALSE})
 #'        
 #' @param ...   Parameters are matched to formal arguments of ggplot2
 #'        functions. Prefixing parameter names with a layer name ensures that
@@ -152,45 +152,51 @@
 adiv_boxplot <- function (
     biom, x = NULL, metric = "Shannon", layers = "lsb",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-    p.adj = "fdr", p.label = 0.05, ci = 95, xlab.angle = 'auto', safe = FALSE, ...) {
+    flip = FALSE, stripe = flip, p.adj = "fdr", p.label = 0.05, ci = 95, 
+    xlab.angle = 'auto', ...) {
   
   
-  with_cache("adiv_boxplot", environment(), list(...), local({
-    
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity checks. x and *.by are checked by boxplot_build.
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
-    })
-    
-    
-    #________________________________________________________
-    # Use the generalized boxplot function to make the plot
-    #________________________________________________________
-    p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
-    
-    
-    #________________________________________________________
-    # Attach history of biom modifications and this call
-    #________________________________________________________
-    attr(p, 'history') <- history
-    
-    
-    return (p)
-    
-  }))
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("adiv_boxplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity checks. x and *.by are checked by boxplot_build.
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+  })
+  
+  
+  #________________________________________________________
+  # Use the generalized boxplot function to make the plot
+  #________________________________________________________
+  p <- boxplot_build(params, adiv_boxplot, adiv_boxplot_data, adiv_boxplot_layers)
+  
+  
+  #________________________________________________________
+  # Attach history of biom modifications and this call
+  #________________________________________________________
+  attr(p, 'history') <- history
+  
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 
@@ -203,10 +209,7 @@ adiv_boxplot_data <- function (params) {
     biom    = params[['biom']], 
     metrics = params[['metric']],
     md      = TRUE,
-    long    = TRUE, 
-    safe    = TRUE )
-  
-  names(ggdata)[which(names(ggdata) == ".value")] <- ".y"
+    long    = TRUE )
   
   
   
@@ -226,7 +229,7 @@ adiv_boxplot_data <- function (params) {
   
   attr(ggdata, 'params') <- params
   attr(ggdata, 'xcol')   <- params[['x']]
-  attr(ggdata, 'ycol')   <- ".y"
+  attr(ggdata, 'ycol')   <- attr(ggdata, 'response', exact = TRUE)
   
   return (ggdata)
 }

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9093</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9096</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,9 +101,12 @@ and partitioning. See below for details. Default: <code>NULL</code></p></dd>
 <dt>model</dt>
 <dd><p>What type of trendline to fit to the data. Options are: 
 <code>"linear"</code>, <code>"logarithmic"</code>, or <code>"local"</code>. You can
-alternatively provide <b>method</b> and/or <b>formula</b> arguments
-which will override these preset options for 
-<a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">stat_smooth</a>. Default: <code>"linear"</code>.</p></dd>
+alternatively provide a list of length two where the first element is
+a character vector of length 1 naming a function, and the second 
+element is a list of arguments to pass to that function. One of the 
+function's arguments must be named 'formula'. For example, 
+<code>model = list("stats::lm", list(formula = y ~ x))</code>.
+Default: <code>"linear"</code>.</p></dd>
 
 
 <dt>ci</dt>
@@ -194,6 +197,9 @@ and <code>"fishy"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_corrplot</span><span class="op">(</span><span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span>, <span class="st">"BMI"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Argument 'ci' was ignored. Valid choices are:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> adjust, alpha, avgd.over, bias.adjust, by.vars, calc, delta, df, initMesg, estName, estType, famSize, frequentist, infer, inv.lbl, level, methDesc, nesting, null, predict.type, pri.vars, side, sigma, tran, tran.mult, tran.offset, tran2, type, is.new.rg, submodel, model.info, roles, grid, levels, matlevs, linfct, bhat, nbasis, V, dffun, dfargs, misc, post.beta</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_smooth()` using formula = 'y ~ x'</span>
 <span class="r-plt img"><img src="taxa_corrplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>

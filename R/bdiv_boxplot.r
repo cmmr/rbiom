@@ -50,54 +50,59 @@
 bdiv_boxplot <- function (
   biom, x = NULL, metric = "Bray-Curtis", layers = "lsb",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-  p.adj = "fdr", p.label = TRUE, ci = 95, xlab.angle = 'auto', 
-  weighted = TRUE, tree = NULL, ...) {
+  flip = FALSE, stripe = flip, p.adj = "fdr", p.label = TRUE, ci = 95, 
+  xlab.angle = 'auto', weighted = TRUE, tree = NULL, ...) {
   
-  with_cache("bdiv_biplot", environment(), list(...), local({
   
-    
-    #________________________________________________________
-    # Record the function call in a human-readable format.
-    #________________________________________________________
-    params  <- as.list(parent.env(environment()))
-    history <- attr(biom, 'history')
-    history %<>% c(sprintf("bdiv_boxplot(%s)", as.args(params, fun = bdiv_boxplot)))
-    remove(list = setdiff(ls(), c("params", "history")))
-    
-    
-    #________________________________________________________
-    # Sanity checks. x and *.by are checked by boxplot_build.
-    #________________________________________________________
-    params %<>% within({
-      if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-      metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf), tree = tree)
-    })
-    
-    
-    
-    #________________________________________________________
-    # Defaults
-    #________________________________________________________
-    if (is_null(params[['x']])) {
-      params[['x']] <- ".all"
-      params[['biom']][['metadata']][[".all"]] <- factor("all")
-    }
-    params[['weighted']] %<>% as.logical()
-    params[['.cmp']]    <- TRUE
-    
-    
-    
-    #________________________________________________________
-    # Use the generalized boxplot function to make the plot
-    #________________________________________________________
-    p <- boxplot_build(params, bdiv_boxplot, bdiv_boxplot_data, bdiv_boxplot_layers)
-    
-    attr(p, 'history') <- history
-    
-    
-    return (p)
-    
-  }))
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(c(as.list(environment()), list(...)), eval)
+  cache_file <- get_cache_file("bdiv_boxplot", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Record the function call in a human-readable format.
+  #________________________________________________________
+  history <- attr(biom, 'history')
+  history %<>% c(sprintf("bdiv_boxplot(%s)", as.args(params, fun = bdiv_boxplot)))
+  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
+  
+  
+  #________________________________________________________
+  # Sanity checks. x and *.by are checked by boxplot_build.
+  #________________________________________________________
+  params %<>% within({
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf), tree = tree)
+  })
+  
+  
+  
+  #________________________________________________________
+  # Defaults
+  #________________________________________________________
+  if (is_null(params[['x']])) {
+    params[['x']] <- ".all"
+    params[['biom']][['metadata']][[".all"]] <- factor("all")
+  }
+  params[['weighted']] %<>% as.logical()
+  params[['.cmp']]    <- TRUE
+  
+  
+  
+  #________________________________________________________
+  # Use the generalized boxplot function to make the plot
+  #________________________________________________________
+  p <- boxplot_build(params, bdiv_boxplot, bdiv_boxplot_data, bdiv_boxplot_layers)
+  
+  attr(p, 'history') <- history
+  
+  
+  set_cache_value(cache_file, p)
+  return (p)
 }
 
 
@@ -121,8 +126,7 @@ bdiv_boxplot_data <- function (params) {
         method   = x[1, '.metric'], 
         weighted = x[1, '.weight'],
         md       = paste0(params[['.md.cmps']], names(params[['.md.cmps']])),
-        tree     = params[['tree']],
-        safe     = TRUE )
+        tree     = params[['tree']] )
       
       if (!is_null(params[['filter.fun']]))
         tbl <- params[['filter.fun']](tbl)
@@ -130,13 +134,9 @@ bdiv_boxplot_data <- function (params) {
       return (tbl)
   })
   
-  ggdata <- within(
-    data = ggdata, 
-    expr = {
-      .y      <- .value
-      .metric <- paste(ifelse(.weight, "Weighted", "Unweighted"), .metric)
-      rm(".value", ".weight")
-  })
+  ggdata %<>% within({
+    .metric <- paste(ifelse(.weight, "Weighted", "Unweighted"), .metric)
+    rm(".weight") })
   
   
   # Allow multiple `metric` beta div metrics
@@ -147,9 +147,10 @@ bdiv_boxplot_data <- function (params) {
   }
   
   
-  attr(ggdata, 'params') <- params
-  attr(ggdata, 'xcol')   <- params[['x']]
-  attr(ggdata, 'ycol')   <- ".y"
+  attr(ggdata, 'params')   <- params
+  attr(ggdata, 'xcol')     <- params[['x']]
+  attr(ggdata, 'response') <- ".distance"
+  attr(ggdata, 'ycol')     <- ".distance"
   
   return (ggdata)
 }

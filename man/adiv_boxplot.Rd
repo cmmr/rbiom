@@ -14,11 +14,12 @@ adiv_boxplot(
   shape.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  flip = FALSE,
+  stripe = flip,
   p.adj = "fdr",
   p.label = 0.05,
   ci = 95,
   xlab.angle = "auto",
-  safe = FALSE,
   ...
 )
 }
@@ -43,6 +44,11 @@ Default: \code{"lsb"}.}
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to 
 use for aesthetics and partitioning. See below for details.
 Default: \code{NULL}}
+
+\item{flip}{Transpose the axes, so that taxa are present as rows instead
+of columns. Default: \code{FALSE}}
+
+\item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
@@ -78,11 +84,6 @@ Set to \code{NULL} to disable. Default: \code{95}}
 \bold{'auto'} (the default), automatically selects a rotation value. 
 \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
 angled, and vertical, respectively.}
-
-\item{safe}{If \code{FALSE}, data.frame column names such as 
-\code{".metric"} will be auto-converted to \code{"Metric"} to improve
-human-readability. Conversion if aborted if a conflict is found with
-a metadata column name. (Default: \code{FALSE})}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that

@@ -50,8 +50,8 @@ metrics <- function (biom, mode = "all", tree=NULL) {
   } else if (mode == 'meta')  { colnames(metadata(biom))
   } else if (mode == 'bdiv')  {
     hasTree <- ifelse(is(biom, 'BIOM'), has_phylogeny(biom), FALSE) || is(tree, 'phylo')
-    if (hasTree) { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard", "UniFrac")
-    } else       { c("Manhattan", "Euclidean", "Bray-Curtis", "Jaccard") }
+    if (hasTree) { c("UniFrac", "Jaccard", "Bray-Curtis", "Manhattan", "Euclidean")
+    } else       { c("Jaccard", "Bray-Curtis", "Manhattan", "Euclidean") }
   } else { NULL }
 }
 

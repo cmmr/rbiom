@@ -68,6 +68,50 @@ layer_match <- function (x, choices, default) {
 }
 
 
+
+#____________________________________________________________________
+# Explicitly define the code to be displayed in cmd
+#____________________________________________________________________
+as.cmd <- function (expr, env=NULL) {
+  if (is_null(env)) {
+    expr <- substitute(expr)
+    cmd  <- capture.output(expr)
+  } else {
+    expr <- do.call(substitute, list(expr=substitute(expr), env=env))
+    cmd  <- capture.output(expr)
+  }
+  
+  if (length(cmd) > 1)
+    cmd <- paste(trimws(cmd), collapse = " ")
+  
+  structure(eval(expr), 'display' = cmd)
+}
+
+
+
+#____________________________________________________________________
+# Run a command and add attr(,cmd) and attr(,display) to result.
+#____________________________________________________________________
+run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=NULL) {
+  
+  fn  <- as.character(substitute(f))
+  fun <- f
+  if (is_scalar_character(f)) {
+    fn  <- f
+    x   <- strsplit(f, "::", fixed = TRUE)[[1]]
+    fun <- if (length(x) == 1) get(x[[1]]) else getFromNamespace(x[[2]], ns = x[[1]])
+  }
+  
+  cmd <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
+  if (is.null(display)) display <- cmd
+  if (!is.null(lhs))    cmd <- sprintf("%s <- %s", lhs, cmd)
+  if (!is.null(hist))   cmd <- sprintf("%s\n%s", attr(hist, 'cmd'), cmd)
+  
+  return (aa(do.call(fun, args), display = display, cmd = cmd))
+}
+
+
+
 #____________________________________________________________________
 # Convert a list of arguments to character strings.
 # When indent > 0, produces a multi-line string.
@@ -216,12 +260,23 @@ append_df <- function (...) {
   
   Reduce(
     x = Filter(f = Negate(is.null), x = list(...)),
-    f = function (x, y) {
+    f = function (x, y) ({
       xy <- unique(c(names(x), names(y)))
       for (i in setdiff(xy, names(x))) x[[i]] <- NA
       for (i in setdiff(xy, names(y))) y[[i]] <- NA
       rbind(x[,xy,drop=F], y[,xy,drop=F])
-    })
+    }))
+}
+
+
+#____________________________________________________________________
+# Add attributes to an object.
+#____________________________________________________________________
+aa <- function (obj, ...) {
+  dots <- list(...)
+  for (k in names(dots))
+    attr(obj, k) <- dots[[k]]
+  return (obj)
 }
 
 
@@ -249,31 +304,12 @@ rename_cols <- function(df, ...) {
     names(df)[which(names(df) == i)] <- vals[[i]]
   return (df)
 }
-
-
-#____________________________________________________________________
-# Rename common data frame column names, avoiding conflicts
-#____________________________________________________________________
-soft_rename <- function (df, safe=FALSE) {
-  
-  if (safe)
-    return (df)
-  
-  map <- c(
-    ".test"   = "Test",        ".metric" = "Metric",
-    ".sample" = "Sample",      ".taxa"   = "Taxa", 
-    ".p.val"  = "P-Value",     ".adj.p"  = "Adjusted P",
-    ".f.stat" = "F-Statistic", ".r.sqr"  = "R-Squared",
-    ".x"      = "x",           ".ori.1"  = "ori.1", 
-    ".y"      = "y",           ".ori.2"  = "ori.2", 
-    ".axis.1" = "Axis 1", 
-    ".axis.2" = "Axis 2",
-    ".value"  = "value" )
-  
-  for (i in names(map))
-    if (i %in% names(df) && !map[[i]] %in% names(df))
-      names(df)[which(names(df) == i)] <- map[[i]]
-  
+rename_response <- function(df, new) {
+  old <- attr(df, 'response', exact = TRUE)
+  stopifnot(is_scalar_character(old))
+  stopifnot(is_string(old, colnames(old)))
+  names(df)[which(names(df) == old)] <- new
+  attr(df, 'response') <- new
   return (df)
 }
 
@@ -311,25 +347,6 @@ insert_col <- function (df, after=0, col, val) {
   df  <- df[,pos,drop=F]
   
   return (df)
-}
-
-
-#____________________________________________________________________
-# Explicitly define the code to be displayed in cmd
-#____________________________________________________________________
-as.cmd <- function (expr, env=NULL) {
-  if (is_null(env)) {
-    expr <- substitute(expr)
-    cmd  <- capture.output(expr)
-  } else {
-    expr <- do.call(substitute, list(expr=substitute(expr), env=env))
-    cmd  <- capture.output(expr)
-  }
-  
-  if (length(cmd) > 1)
-    cmd <- paste(trimws(cmd), collapse = " ")
-  
-  structure(eval(expr), 'display' = cmd)
 }
 
 

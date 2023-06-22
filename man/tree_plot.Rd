@@ -51,7 +51,7 @@ Display a dendrogram of the phylogenetic tree.
 }
 \examples{
     library(rbiom) 
-    
+     
     tree_plot(hmp50)
     
     hmp1 <- select(hmp50, samples = "HMP10")

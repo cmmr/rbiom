@@ -38,8 +38,9 @@ boxplot_stats <- function (layers) {
     if (hasLayer("bar"))        "mean"   else NULL
   ))
   
-  stats  <- NULL
-  ggdata <- attr(layers, 'data', exact = TRUE)
+  stats       <- NULL
+  stats_title <- NULL
+  ggdata      <- attr(layers, 'data', exact = TRUE)
   
   if (isTRUE(nrow(ggdata) > 0 && is.numeric(p.label))) {
     
@@ -58,12 +59,14 @@ boxplot_stats <- function (layers) {
     
     
     if (length(unique(c(xcol, color.by, shape.by, pattern.by))) == 1) {
+      
       if (isFALSE(xcol == ".taxa")) {
         
         #________________________________________________________
         # Brackets between x-values
         #________________________________________________________
-        stats <- stats_table(
+        stats_title <- "pairwise"
+        stats       <- stats_table(
           biom        = ggdata, 
           x           = xcol, 
           y           = ycol, 
@@ -203,7 +206,8 @@ boxplot_stats <- function (layers) {
       #________________________________________________________
       # P-value for each x position
       #________________________________________________________
-      stats <- stats_table(
+      stats_title <- "groupwise"
+      stats       <- stats_table(
         biom        = ggdata, 
         x           = setdiff(c(color.by, pattern.by, shape.by), xcol), 
         y           = ycol, 
@@ -389,7 +393,8 @@ boxplot_stats <- function (layers) {
     
     dropcols <- c(".id", ".all", "x.pos", "y.pos")
     keepcols <- setdiff(names(stats), dropcols)
-    stats    <- stats[, keepcols, drop=FALSE]
+    stats    <- list(stats[, keepcols, drop=FALSE])
+    names(stats) <- stats_title
     attr(layers, "stats") <- stats
   }
   

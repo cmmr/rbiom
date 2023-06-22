@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9093</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9096</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,8 @@
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  flip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  stripe <span class="op">=</span> <span class="va">flip</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
 <span>  p.label <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
@@ -106,6 +108,15 @@ Default: <code>"lsb"</code>.</p></dd>
 use for data partitioning. Prefix the column name with 
 <code>==</code> or <code>!=</code> to limit comparisons to within or between
 groups, respectively. Default: <code>NULL</code></p></dd>
+
+
+<dt>flip</dt>
+<dd><p>Transpose the axes, so that taxa are present as rows instead
+of columns. Default: <code>FALSE</code></p></dd>
+
+
+<dt>stripe</dt>
+<dd><p>Shade every other x position. Default: <em>same as flip</em></p></dd>
 
 
 <dt>p.adj</dt>

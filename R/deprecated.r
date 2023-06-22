@@ -32,7 +32,7 @@ write.xlsx       <- function (...) { .Deprecated("write_xlsx");    write_xlsx(..
 
 beta.div <- function (
   biom, method, weighted = TRUE, tree = NULL, long = FALSE,
-  md = FALSE, safe = FALSE, stat.by = NULL, seed = 0, perms = 999 ) {
+  md = FALSE, stat.by = NULL, seed = 0, perms = 999 ) {
   
   msg <- paste0(
     "The rbiom function beta.div() is deprecated.\n",
@@ -40,7 +40,7 @@ beta.div <- function (
   
   if (isTRUE(long) || !isFALSE(md)) {
     .Deprecated("bdiv_table", msg = sprintf(msg, "table", "data.frame"))
-    bdiv_table(biom, method, weighted, tree, md, safe, stat.by, seed, perms)
+    bdiv_table(biom, method, weighted, tree, md, stat.by, seed, perms)
     
   } else {
     .Deprecated("bdiv_distmat", msg = sprintf(msg, "distmat", "distance matrix"))
@@ -55,7 +55,7 @@ beta.div <- function (
 
 taxa.rollup <- function (
     biom, rank = 'OTU', taxa = NULL, map = NULL, lineage = FALSE, 
-    sparse = FALSE, long = FALSE, md = FALSE, safe = FALSE) {
+    sparse = FALSE, long = FALSE, md = FALSE) {
   
   msg <- paste0(
     "The rbiom function taxa.rollup() is deprecated.\n",
@@ -63,7 +63,7 @@ taxa.rollup <- function (
   
   if (isTRUE(long) || !isFALSE(md)) {
     .Deprecated("taxa_table", msg = sprintf(msg, "table", "data.frame"))
-    taxa_table(biom, rank, taxa, map, lineage, md, safe)
+    taxa_table(biom, rank, taxa, map, lineage, md)
     
   } else {
     .Deprecated("taxa_matrix", msg = sprintf(msg, "matrix", "matrix"))

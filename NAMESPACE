@@ -67,6 +67,7 @@ export(`taxa_names`)
 export(`taxa_names<-`)
 export(`taxa_ranks`)
 export(`taxa_ranks<-`)
+export(`taxa_rollup`)
 export(`taxa_stacked`)
 export(`taxa_sums`)
 export(`taxa_table`)
@@ -116,9 +117,14 @@ export(`write.xlsx`)
 importClassesFrom("slam")
 importClassesFrom("ggplot2")
 
+importMethodsFrom("broom")
+importMethodsFrom("emmeans")
+
 import("RcppParallel")
 
 importFrom("ape", "print.phylo")
+importFrom("broom", "tidy", "glance", "augment")
+importFrom("emmeans", "emmeans", "eff_size")
 importFrom("glue", "glue", "glue_collapse", "backtick", "single_quote", "double_quote")
 importFrom("grDevices", "boxplot.stats")
 importFrom("ggplot2", "aes", "aes_")
@@ -132,15 +138,17 @@ importFrom("rlang",
            "as_label",
            "caller_call", "caller_env", "caller_fn", 
            "call_match", "call_args", "call_name",
-           "is_na", "is_null", "is_empty", "is_list",
+           "is_na", "is_null", "is_empty", 
+           "is_list", "is_formula", "is_function",
            "is_true", "is_false", "is_logical", "is_scalar_logical", 
            "is_atomic", "is_scalar_atomic",
            "is_character", "is_scalar_character", "is_string", 
            "is_integerish", "is_scalar_integerish", 
            "is_double", "is_scalar_double")
 
-importFrom("stats", "fivenum", "setNames", "as.dist", "na.omit", "aggregate", 
-           "model.frame", "model.matrix", "terms", "reformulate")
+importFrom("stats", "as.dist", "aggregate", "df.residual", "fivenum", 
+           "model.frame", "model.matrix", "na.omit", "setNames", "sigma", 
+           "terms")
 
 importFrom("utils", "download.file", "head", "write.table", "read.csv", 
            "read.delim", "packageDescription")

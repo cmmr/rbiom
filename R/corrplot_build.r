@@ -4,6 +4,10 @@ corrplot_build <- function (layers) {
   
   params <- attr(layers, 'params', exact = TRUE)
   
+  ci       <- params[['ci']]
+  color.by <- names(params[['color.by']])
+  stopifnot(is_null(color.by) || is_scalar_character(color.by))
+  
   
   #________________________________________________________
   # Theming specific to a numeric x-axis.
@@ -11,53 +15,19 @@ corrplot_build <- function (layers) {
   setLayer("theme", panel.grid.minor.x = element_blank())
   
   
-  
-  #________________________________________________________
-  # Predefined regression models
-  #________________________________________________________
-  if (is_null(params[['method']]) || is_null(params[['formula']])) {
-    
-    model <- params[['model']]
-    if (length(model) != 1 || !is.character(model))
-      stop ("model must a length 1 character vector")
-    
-    models <- list(
-      'linear'      = list( method = "lm",  formula = y ~ x               ), 
-      'logarithmic' = list( method = "lm",  formula = y ~ log(x)          ), 
-      'local'       = list( method = "gam", formula = y ~ s(x, bs = "cs") ) )
-    
-    i <- pmatch(tolower(model), names(models), NA)
-    if (isTRUE(is.na(i)))
-      stop("'", model, "' is not a predefined regression model.")
-    
-    if (is_null(params[['method']]))  params[['method']]  <- models[[i]][['method']]
-    if (is_null(params[['formula']])) params[['formula']] <- models[[i]][['formula']]
-    
-    remove("model", "models", "i")
-  }
-  params[['model']] <- NULL
-  
-  
-  #________________________________________________________
-  # Convert `formula` to a formula.
-  #________________________________________________________
-  if (!is(params[['formula']], 'formula'))
-    params[['formula']] <- as.formula(params[['formula']], env = baseenv())
-  
-  
   #________________________________________________________
   # aes() mapping for color/fill
   #________________________________________________________
-  if (!is_null(params[['color.by']])) {
+  if (is_scalar_character(color.by)) {
     
     if (hasName(layers, 'point'))
-      setLayer("point", "mapping|color" = names(params[['color.by']]))
+      setLayer("point", "mapping|color" = color.by)
     
     if (hasName(layers, 'smooth')) {
-      setLayer("smooth", "mapping|color" = names(params[['color.by']]))
+      setLayer("smooth", "mapping|color" = color.by)
       
-      if (!isFALSE(params[['ci']])) {
-        setLayer("smooth", "mapping|fill" = names(params[['color.by']]))
+      if (!isFALSE(ci)) {
+        setLayer("smooth", "mapping|fill" = color.by)
         
         if (!is_null(layers[["color"]][["values"]]))
           setLayer("fill", values = layers[["color"]][["values"]])
@@ -66,60 +36,86 @@ corrplot_build <- function (layers) {
   }
   
   
-  #________________________________________________________
-  # Fade out the points when a curve is fitted.
-  #________________________________________________________
-  if (hasLayer("smooth") && hasLayer("point"))
-    setLayer("point", size = 0.2, alpha = 0.5)
-  
   
   #________________________________________________________
   # Define the curve and confidence interval.
   #________________________________________________________
   if (hasLayer("smooth")) {
     
-    setLayer("smooth", params[c('method', 'formula')])
-    params[grep("\\.(method|formula)$", names(params))] <- NULL
+    model <- params[['model']]
     
-    ci <- params[['ci']]
+    
+    #________________________________________________________
+    # Predefined regression models
+    #________________________________________________________
+    if (is_scalar_character(model)) {
+      
+      model <- local({
+        
+        models <- list(
+          'linear'      = list("stats::lm", list(formula = y ~ x      )), 
+          'logarithmic' = list("stats::lm", list(formula = y ~ log(x) )), 
+          'local'       = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML" )) )
+        
+        i <- pmatch(tolower(model), names(models), NA)
+        if (isTRUE(is.na(i)))
+          stop("'", model, "' is not a predefined regression model.")
+        
+        return (models[[i]])
+      })
+    }
+    
+    
+    #________________________________________________________
+    # Sanity check model function.
+    #________________________________________________________
+    stopifnot(is.list(model))
+    stopifnot(identical(length(model), 2L))
+    stopifnot(is.list(model[[2]]))
+    stopifnot(is_scalar_character(model[[1]]))
+    stopifnot(is_formula(model[[2]][['formula']]))
+    
+    model[[1]] <- local({
+      fn  <- strsplit(model[[1]], '::', fixed = TRUE)[[1]]
+      fun <- if (length(fn) == 1) get(fn[[1]]) else getFromNamespace(fn[[2]], fn[[1]])
+      stopifnot(is_function(fun))
+      stopifnot(all(c('formula', 'data') %in% formalArgs(fun)))
+      attr(fun, 'fn') <- model[[1]]
+      return (fun)
+    })
+    
+    
+    #________________________________________________________
+    # The method for geom_smooth.
+    #________________________________________________________
+    method <- function (data, ...) do.call(model[[1]], c(model[[2]], list(data = data)))
+    attr(method, 'display') <- sprintf(
+      fmt = "function (data, ...) %s(%s, data = data)",
+      attr(model[[1]], 'fn', exact = TRUE),
+      as.args(model[[2]], fun = model[[1]]) )
+    setLayer("smooth", method = method)
+    
+    
     if (is.logical(ci)) setLayer("smooth", se    = ci)
     if (is.numeric(ci)) setLayer("smooth", level = ci / 100)
     params[grep("(^|\\.)(se|level)$", names(params))] <- NULL
+    
+    
+    
+    #________________________________________________________
+    # Fade out the points when a curve is fitted.
+    #________________________________________________________
+    if (hasLayer("point"))
+      setLayer("point", size = 0.2, alpha = 0.5)
+    
+    
+    params[['model']] <- model
+    
+  } else {
+    params[['model']] <- NULL
   }
   
   
-  #________________________________________________________
-  # Add caption describing the model/formula.
-  #________________________________________________________
-  if (hasLayer("smooth") && isTRUE(params[['caption']])) {
-    
-    setLayer("labs", caption = local({
-      
-      caption <- ifelse(
-        test = isFALSE(params[['ci']]), 
-        yes  = "Curve fitted using", 
-        no   = sprintf("Curve and %g%% CI fitted using", params[['ci']]) )
-      
-      model <- as.args(list(params[['method']]))
-      model <- gsub('(\\w+\\:\\:|")', '', model) # remove quotes, pkg::
-      
-      if (identical(model, 'loess')) {
-        caption %<>% paste("local polynomial regression")
-        
-      } else {
-        if (identical(model, 'lm'))  model <- "linear model"
-        if (identical(model, 'glm')) model <- "generalized linear model"
-        if (identical(model, 'nlm')) model <- "non-linear model"
-        if (identical(model, 'gam')) model <- "generalized additive model"
-        
-        caption %<>% paste(as.args(list(params[['formula']])), model)
-      }
-      
-      return (paste0(caption, "."))
-    }))
-    
-    setLayer("theme", plot.caption = element_text(face = "italic"))
-  }
   
   
   
@@ -132,6 +128,7 @@ corrplot_build <- function (layers) {
   #________________________________________________________
   p <- layers %>% 
     plot_facets() %>% 
+    corrplot_stats() %>%
     plot_build()
   
   

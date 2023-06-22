@@ -14,6 +14,8 @@ bdiv_boxplot(
   shape.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  flip = FALSE,
+  stripe = flip,
   p.adj = "fdr",
   p.label = TRUE,
   ci = 95,
@@ -48,6 +50,11 @@ Default: \code{"lsb"}.}
 use for data partitioning. Prefix the column name with 
 \code{==} or \code{!=} to limit comparisons to within or between
 groups, respectively. Default: \code{NULL}}
+
+\item{flip}{Transpose the axes, so that taxa are present as rows instead
+of columns. Default: \code{FALSE}}
+
+\item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
