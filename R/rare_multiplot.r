@@ -74,8 +74,10 @@ rare_multiplot <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("rare_multiplot(%s)", as.args(params, fun = rare_multiplot)))
+  arg_str <- as.args(params, fun = rare_multiplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- rare_multiplot(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file", "dots")))
   
   
@@ -85,14 +87,15 @@ rare_multiplot <- function (
   corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
   barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
   
-  plots <- list(
-    'corrplot' = do.call(rare_corrplot,  c(corrplot_params, dots)),
-    'barplot'  = do.call(depths_barplot, c(barplot_params,  dots)) )
+  corrplot <- do.call(rare_corrplot,  c(corrplot_params, dots))
+  barplot  <- do.call(depths_barplot, c(barplot_params,  dots))
+  plots    <- list(corrplot = corrplot, barplot = barplot)
   
   p <- patchwork::wrap_plots(plots, ncol = 1)
   
-  attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-  attr(p, 'cmd')  <- paste(collapse = "\n\n", local({
+  attr(p, 'stats') <- attr(corrplot, 'stats', exact = TRUE)
+  attr(p, 'data')  <- lapply(plots, attr, which = 'data', exact = TRUE)
+  attr(p, 'cmd')   <- paste(collapse = "\n\n", local({
     cmds <- sapply(seq_along(plots), function (i) {
       sub(
         x           = attr(plots[[i]], 'cmd', exact = TRUE), 

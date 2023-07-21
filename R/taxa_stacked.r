@@ -75,8 +75,10 @@ taxa_stacked <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("taxa_stacked(%s)", as.args(params, fun = taxa_stacked)))
+  arg_str <- as.args(params, fun = taxa_stacked, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- taxa_stacked(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file")))
   
   
@@ -346,14 +348,14 @@ taxa_stacked <- function (
   #________________________________________________________
   setLayer(
     layer = "labs", 
-    'x'       = "Sample",
-    'caption' = with(params, glue(
+    'x'        = "Sample",
+    'subtitle' = with(params, glue(
     
       if (is_null(label.by) && is_null(order.by)) {
         "Samples are ordered according to '{clust}' clustering based on {dist} distance."
         
       } else if (is_null(label.by)) {
-        "Samples are ordered by {order.by})*"
+        "Samples are ordered by {order.by}."
         
       } else if (is_null(order.by)) {
         "Samples are labeled by {label.by} and ordered according\nto '{clust}' clustering based on {dist} distance."
@@ -365,7 +367,7 @@ taxa_stacked <- function (
           no   = "Samples are labeled by {label.by} and ordered by {order.by}." )
       }
     )))
-  setLayer(layer = "theme", 'plot.caption' = element_text(face = "italic", color = "gray"))
+  setLayer(layer = "theme", 'plot.subtitle' = element_text(size = 9, lineheight = 1.2))
   
   
   #________________________________________________________

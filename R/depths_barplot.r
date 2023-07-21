@@ -62,7 +62,12 @@ depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, tr
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- sprintf("depths_barplot(%s)", as.args(params, fun = depths_barplot))
+  arg_str <- as.args(params, fun = depths_barplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- depths_barplot(%s)", arg_str) ))
+  remove("arg_str")
+  
   
   
   #________________________________________________________

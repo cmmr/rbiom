@@ -29,8 +29,6 @@ and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 to pick 10 evenly spaced depths.}
 
-\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
-
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
 and partitioning. See below for details. Default: \code{NULL}}
 

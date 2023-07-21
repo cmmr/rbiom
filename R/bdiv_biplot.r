@@ -93,8 +93,10 @@ bdiv_biplot <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("bdiv_biplot(%s)", as.args(params, fun = bdiv_biplot)))
+  arg_str <- as.args(params, fun = bdiv_biplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- bdiv_biplot(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file")))
   
   
@@ -491,20 +493,26 @@ ordination_facets <- function (layers) {
       format(df[['.r.sqr']],  digits=3), 
       format(df[['.f.stat']], digits=3) )
     
+    methods_text <- sprintf(
+      fmt = "Statistics computed with Adonis (%i permutations).", 
+      params[['perms']] )
+    
     if (length(unique(stats_text)) == 1) {
-      setLayer("labs",  subtitle      = stats_text[[1]])
-      setLayer("theme", plot.subtitle = element_markdown())
+      setLayer("labs",  subtitle = sprintf(
+        fmt = "%s<br><span style='font-size:9pt'>%s</span>",
+        stats_text[[1]],
+        methods_text ))
+      setLayer("theme", plot.subtitle = element_markdown(size = 11, lineheight = 1.2))
       
     } else {
       df[['.facet']] <- bool_switch(
         test = hasName(df, ".facet"),
         yes  = sprintf("%s<br>%s", df[['.facet']], stats_text), 
         no   = stats_text )
+      setLayer("labs", caption = methods_text)
+      setLayer("theme", plot.caption = element_text(face = "italic"))
     }
     
-    setLayer("labs", caption = local({
-      sprintf("Statistics computed with Adonis (%i permutations).", params[['perms']]) }))
-    setLayer("theme", plot.caption = element_text(face = "italic"))
   }
   
   

@@ -8,7 +8,7 @@ ENV <- environment(NULL)
 
 .onLoad <- function(libname, pkgname) {
   
-  lapply(FUN = ggwrap, pkg="ggplot2",    {c(
+  lapply(FUN = cmd_wrap, pkg="ggplot2",    {c(
     'ggplot', 'aes_string', 
     'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
@@ -29,24 +29,25 @@ ENV <- environment(NULL)
     'stat_ellipse', 'stat_smooth', 
     'theme', 'theme_bw', 'theme_void' )})
   
-  lapply(FUN = ggwrap, pkg="ggpattern",  {c(
+  lapply(FUN = cmd_wrap, pkg="ggpattern",  {c(
     'geom_bar_pattern', 'geom_boxplot_pattern', 
     'geom_col_pattern', 'geom_crossbar_pattern', 
     'scale_pattern_color_manual', 'scale_pattern_fill_manual', 
     'scale_pattern_type_manual', 'geom_violin_pattern' )})
   
-  lapply(FUN = ggwrap, pkg="ggtree",  {c(
+  lapply(FUN = cmd_wrap, pkg="ggtree",  {c(
     'ggtree', 'geom_tiplab', 'geom_cladelab', 
     'gheatmap', 'hexpand', 'vexpand' )})
   
-  lapply(FUN = ggwrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
-  lapply(FUN = ggwrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines')})
-  # lapply(FUN = ggwrap, pkg="ggh4x",      {c('facetted_pos_scales')})
-  lapply(FUN = ggwrap, pkg="ggnewscale", {c('new_scale_fill')})
-  lapply(FUN = ggwrap, pkg="ggrepel",    {c('geom_label_repel')})
-  lapply(FUN = ggwrap, pkg="ggtext",     {c('element_markdown')})
-  lapply(FUN = ggwrap, pkg="grid",       {c('arrow', 'unit')})
-  lapply(FUN = ggwrap, pkg="scales",     {c('alpha' )})
+  lapply(FUN = cmd_wrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
+  lapply(FUN = cmd_wrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines')})
+  # lapply(FUN = cmd_wrap, pkg="ggh4x",      {c('facetted_pos_scales')})
+  lapply(FUN = cmd_wrap, pkg="ggnewscale", {c('new_scale_fill')})
+  lapply(FUN = cmd_wrap, pkg="ggrepel",    {c('geom_label_repel')})
+  lapply(FUN = cmd_wrap, pkg="ggtext",     {c('element_markdown')})
+  lapply(FUN = cmd_wrap, pkg="grid",       {c('arrow', 'unit')})
+  lapply(FUN = cmd_wrap, pkg="scales",     {c('alpha')})
+  lapply(FUN = cmd_wrap, pkg="emmeans",    {c('emmeans', 'emtrends')})
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep')})
   

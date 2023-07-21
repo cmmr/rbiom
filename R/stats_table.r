@@ -1,4 +1,4 @@
-#' Compute p-values for data vs metadata.
+#' Compute p-values for data vs categorical metadata.
 #' 
 #' @name stats_table
 #' 
@@ -6,33 +6,28 @@
 #'        Alternatively, a data.frame with column names expected by \code{x}, 
 #'        \code{y}, and \code{by}.
 #'        
-#' @param x   The metadata column name of the category to use for comparisons.
+#' @param x   A CATEGORICAL metadata column name to use for comparisons.
 #' 
-#' @param y   A \emph{character vector} with values from one of the following 
+#' @param y   A \emph{character vector} with a value from one of the following 
 #'        sets:
 #'        \describe{
-#'            \item{Alpha Diversity Metrics (one or more)}{
+#'            \item{Alpha Diversity Metric}{
 #'              \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, \bold{Simpson}, 
-#'              and/or \bold{InvSimpson}. You may also set 
-#'              \code{y = "Diversity"} to get all five metrics.
+#'              and/or \bold{InvSimpson}.
 #'            }
-#'            \item{Beta Diversity Metrics (one only)}{
+#'            \item{Beta Diversity Metric}{
 #'              \bold{manhattan}, \bold{euclidean}, \bold{bray-curtis}, 
 #'              \bold{jaccard}, or \bold{unifrac}. Use in combination with the
 #'              \code{weighted} parameter. Metadata column names can be 
 #'              prefixed with \bold{==} or \bold{!=} to limit distance
 #'              calculations to \emph{within} or \emph{between}, respectively, 
-#'              those categories. See examples below. Setting 
-#'              \code{y = "Distance"} will use \bold{unifrac} if a 
-#'              phylogenetic tree is present, or \bold{bray-curtis} otherwise.
+#'              those categories. See examples below.
 #'            }
-#'            \item{Taxa Abundances (one only)}{
+#'            \item{Taxonomic Rank}{
 #'              \bold{Kingdom}, \bold{Phylum}, \bold{Class}, \bold{Order}, 
 #'              \bold{Family}, \bold{Genus}, \bold{Species}, \bold{Strain}, or 
 #'              \bold{OTU}. Supported ranks will vary by biom. Run
-#'              \code{taxa_ranks(biom)} to see the available options. 
-#'              Specifying \code{y = "Taxa"} will default to the most precise 
-#'              rank possible.
+#'              \code{taxa_ranks(biom)} to see the available options.
 #'            }
 #'           }
 #'           
@@ -59,12 +54,11 @@
 #'        maximum value, \bold{box} for a box plot's the whisker upper bound, 
 #'        or \bold{violin} for the highest point of a violin plot.
 #'        
-#' @param adj.n   Manually set the number of comparisons to correct for. Only set
-#'        this if you know what you are doing! Default: \code{NULL}
+#' @param adj.n   Manually set the number of comparisons to correct for. Only
+#'        set this if you know what you are doing! Default: \code{NULL}
 #'               
-#' @return A data.frame with columns \bold{.p.val}, \bold{.adj.p}, 
-#'         \bold{adj.sig}, as well as columns for tracking \code{x}, \code{y}, 
-#'         and \code{by} categories.
+#' @return A data.frame with columns \bold{.p.val} and \bold{.adj.p}, as well 
+#'         as columns for tracking \code{x}, \code{y}, and \code{by} values.
 #'         
 #' @export
 #' @examples
@@ -120,7 +114,7 @@
 stats_table <- function (
     biom, x, y, by = NULL, adj = "fdr", 
     pairwise = FALSE, weighted = TRUE, digits = 3, 
-    y.pos = NULL, y.pos.facet="Metric", adj.n = NULL ) {
+    y.pos = NULL, y.pos.facet = "Metric", adj.n = NULL ) {
   
   #________________________________________________________
   # See if this result is already in the cache.

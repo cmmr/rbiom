@@ -168,8 +168,10 @@ adiv_boxplot <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("adiv_boxplot(%s)", as.args(params, fun = adiv_boxplot)))
+  arg_str <- as.args(params, fun = adiv_boxplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- adiv_boxplot(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file")))
   
   

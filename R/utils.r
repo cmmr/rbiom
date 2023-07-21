@@ -141,7 +141,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
     if (isTRUE(indent == 0))
       for (i in seq_along(args))
-        if (names(args)[[i]] == f_args[[i]]) names(args)[i] <- "" else break
+        if (identical(names(args)[[i]], f_args[[i]])) names(args)[i] <- "" else break
   }
   
   # Right-pad parameter names.
@@ -401,7 +401,7 @@ loglabels <- function (values) {
   hi <- ceiling(log10(max(force(values))))
   list(
     'breaks'       = as.cmd(10 ** (0:hi),                    env = list(hi = hi)),
-    'minor_breaks' = as.cmd(as.vector(10 ** (0:hi) %o% 2:9), env = list(hi = hi - 1)),
+    'minor_breaks' = as.cmd(as.vector(2:9 %o% 10 ** (0:hi)), env = list(hi = hi - 1)),
     'labels'       = si_units )
 }
 

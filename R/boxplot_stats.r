@@ -323,8 +323,8 @@ boxplot_stats <- function (layers) {
           'mapping|label' = ".label" )
       
       
-        setLayer("theme", "plot.caption" = element_text(face = "italic", color = "gray"))
-        setLayer("labs",  "caption"      = local({
+        setLayer("theme", "plot.subtitle" = element_text(size = 9))
+        setLayer("labs",  "subtitle"      = local({
           
           test <- glue_collapse(
             x    = na.omit(unique(stats[['Test']])), 

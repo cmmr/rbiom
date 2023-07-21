@@ -5,7 +5,7 @@
 # Called in .onLoad to assign function names in pkg env.
 #________________________________________________________
 
-ggwrap <- function (pkg, fn) {
+cmd_wrap <- function (pkg, fn) {
   
   
   # Case when an optional dependency is not installed.
@@ -21,7 +21,7 @@ ggwrap <- function (pkg, fn) {
   
     fun <- do.call(`::`, list(pkg, fn))
     
-    assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL) {
+    assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL, .lhs = NULL) {
       res <- fun(...)
       
       if (is_null(.display))
@@ -30,7 +30,14 @@ ggwrap <- function (pkg, fn) {
           ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
           as.args(list(...), fun = fun, indent = .indent) )
       
-      attr(res, 'display') <- .display
+      if (is_null(.lhs)) {
+        attr(res, 'display') <- .display
+      } else {
+        attr(res, 'cmd')     <- sprintf("%s <- %s", .lhs, .display)
+        attr(res, 'display') <- .lhs
+      }
+      
+      
       
       return (res)
     })

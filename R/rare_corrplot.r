@@ -61,8 +61,10 @@ rare_corrplot <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("rare_corrplot(%s)", as.args(params, fun = rare_corrplot)))
+  arg_str <- as.args(params, fun = rare_corrplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- rare_corrplot(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file")))
   
   

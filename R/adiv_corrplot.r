@@ -15,8 +15,12 @@
 #' @param metric   Alpha diversity metric(s) to use. Options are: 
 #'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
 #'        and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.
-#' 
-#' @param points   Overlay a scatter plot. Default: \code{FALSE}.
+#'           
+#' @param layers   \code{"trend"}, \code{"scatter"}. Single letter 
+#'        abbreviations are also accepted. For instance, 
+#'        \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
+#'        \code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+#'        Default: \code{"t"}.
 #'        
 #' @param model   What type of trendline to fit to the data. Options are: 
 #'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
@@ -34,12 +38,11 @@
 #'        and partitioning. See below for details. Default: \code{NULL}
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
-#'        functions. Prefix a parameter name with either \code{p.} or \code{s.}
+#'        functions. Prefix a parameter name with either \code{t.} or \code{s.}
 #'        to ensure it gets passed to (and only to) 
-#'        \link[ggplot2]{geom_point} or 
-#'        \link[ggplot2]{geom_smooth}, respectively. For instance, 
-#'        \code{p.size = 2} ensures only the points have their size set to 
-#'        \code{2}.
+#'        \link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+#'        respectively. For instance, \code{s.size = 2} ensures only the 
+#'        scatterplot points have their size set to \code{2}.
 #'        
 #' @return A \code{ggplot2} plot. The computed data points and statistics will 
 #'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
@@ -99,8 +102,9 @@
 #'     adiv_corrplot(rarefy(hmp50), "Age", color.by="Body Site", metric=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
 #'     
 adiv_corrplot <- function (
-    biom, x, metric = "OTUs", points = FALSE, model = "linear", ci = 95, 
-    color.by = NULL, facet.by = NULL, limit.by = NULL, ...) {
+    biom, x, metric = "OTUs", layers = "t", 
+    color.by = NULL, facet.by = NULL, limit.by = NULL, 
+    model = "linear", p.adj = "fdr", ci = 95, ...) {
   
   
   #________________________________________________________
@@ -115,8 +119,10 @@ adiv_corrplot <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("adiv_corrplot(%s)", as.args(params, fun = adiv_corrplot)))
+  arg_str <- as.args(params, fun = adiv_corrplot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- adiv_corrplot(%s)", arg_str) ))
   remove(list = setdiff(ls(), c("params", "history", "cache_file")))
   
   
@@ -180,6 +186,20 @@ adiv_corrplot <- function (
   
   
   #________________________________________________________
+  # Convert user's `layers` spec to layer names.
+  #________________________________________________________
+  layer_names <- local({
+    layerlist <- c('t' = "trend", 's' = "scatter")
+    
+    layer_match(params[['layers']], choices = layerlist, default = "t") %>%
+      c('ggplot', ., 'labs', 'theme_bw')
+  })
+  
+  if (!'scatter' %in% layer_names) params[['shape.by']] <- NULL
+  
+  
+  
+  #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
   layers <- structure(
@@ -191,10 +211,11 @@ adiv_corrplot <- function (
     'ycol'     = attr(data, 'response', exact = TRUE),
     'xmode'    = "numeric" )
   
-  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  initLayer(layer_names)
   
   if (!is_null(params[['color.by']])) initLayer("color")
-  if (isTRUE(params[['points']]))     initLayer("point")
+  if (!is_null(params[['shape.by']])) initLayer("shape")
+  
   
   
   #________________________________________________________

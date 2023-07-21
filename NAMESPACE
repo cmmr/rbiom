@@ -124,7 +124,7 @@ import("RcppParallel")
 
 importFrom("ape", "print.phylo")
 importFrom("broom", "tidy", "glance", "augment")
-importFrom("emmeans", "emmeans", "eff_size")
+importFrom("emmeans", "emmeans", "eff_size", "contrast")
 importFrom("glue", "glue", "glue_collapse", "backtick", "single_quote", "double_quote")
 importFrom("grDevices", "boxplot.stats")
 importFrom("ggplot2", "aes", "aes_")

@@ -82,7 +82,11 @@ tree_plot <- function (
   #________________________________________________________
   # Package and print this call
   #________________________________________________________
-  history <- sprintf("tree_plot(%s)", as.args(params, fun = tree_plot))
+  arg_str <- as.args(params, fun = tree_plot, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("fig  <- tree_plot(%s)", arg_str) ))
+  remove("arg_str")
   
   
   

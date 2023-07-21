@@ -20,14 +20,14 @@ corrplot_build <- function (layers) {
   #________________________________________________________
   if (is_scalar_character(color.by)) {
     
-    if (hasName(layers, 'point'))
-      setLayer("point", "mapping|color" = color.by)
+    if (hasName(layers, 'scatter'))
+      setLayer("scatter", "mapping|color" = color.by)
     
-    if (hasName(layers, 'smooth')) {
-      setLayer("smooth", "mapping|color" = color.by)
+    if (hasName(layers, 'trend')) {
+      setLayer("trend", "mapping|color" = color.by)
       
       if (!isFALSE(ci)) {
-        setLayer("smooth", "mapping|fill" = color.by)
+        setLayer("trend", "mapping|fill" = color.by)
         
         if (!is_null(layers[["color"]][["values"]]))
           setLayer("fill", values = layers[["color"]][["values"]])
@@ -40,7 +40,7 @@ corrplot_build <- function (layers) {
   #________________________________________________________
   # Define the curve and confidence interval.
   #________________________________________________________
-  if (hasLayer("smooth")) {
+  if (hasLayer("trend")) {
     
     model <- params[['model']]
     
@@ -93,11 +93,11 @@ corrplot_build <- function (layers) {
       fmt = "function (data, ...) %s(%s, data = data)",
       attr(model[[1]], 'fn', exact = TRUE),
       as.args(model[[2]], fun = model[[1]]) )
-    setLayer("smooth", method = method)
+    setLayer("trend", method = method)
     
     
-    if (is.logical(ci)) setLayer("smooth", se    = ci)
-    if (is.numeric(ci)) setLayer("smooth", level = ci / 100)
+    if (is.logical(ci)) setLayer("trend", se    = ci)
+    if (is.numeric(ci)) setLayer("trend", level = ci / 100)
     params[grep("(^|\\.)(se|level)$", names(params))] <- NULL
     
     
@@ -105,8 +105,8 @@ corrplot_build <- function (layers) {
     #________________________________________________________
     # Fade out the points when a curve is fitted.
     #________________________________________________________
-    if (hasLayer("point"))
-      setLayer("point", size = 0.2, alpha = 0.5)
+    if (hasLayer("scatter"))
+      setLayer("scatter", size = 0.2, alpha = 0.5)
     
     
     params[['model']] <- model

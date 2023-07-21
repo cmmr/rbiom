@@ -67,11 +67,12 @@ plot_build <- function (layers) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 'bar', 'box', 
-    'spider', 'dot', 'ellipse', 'strip', 'name', 'crossbar', 'linerange', 
-    'rect', 'errorbar', 'pointrange', 'mean', 'arrow', 'taxon', 'brackets', 
-    'stats_text', 'stack', 'hline', 'vline', 'labs', 'color', 'fill', 
-    'shape', 'pattern', 'size', 'continuous_scale', 'scale_size', 'facet', # 'free_y', 
+    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 'trend', 
+    'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 'name', 
+    'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
+    'arrow', 'taxon', 'brackets', 'stats_text', 'stack', 'hline', 'vline', 
+    'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 
+    'scale_size', 'facet', # 'free_y', 
     'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
   layer_order <- c(
     intersect(layer_order, names(layers)),

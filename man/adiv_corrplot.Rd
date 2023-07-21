@@ -8,12 +8,13 @@ adiv_corrplot(
   biom,
   x,
   metric = "OTUs",
-  points = FALSE,
-  model = "linear",
-  ci = 95,
+  layers = "t",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  model = "linear",
+  p.adj = "fdr",
+  ci = 95,
   ...
 )
 }
@@ -26,7 +27,14 @@ adiv_corrplot(
 \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
 and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 
-\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
+\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter 
+abbreviations are also accepted. For instance, 
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
+\code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+Default: \code{"t"}.}
+
+\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
+and partitioning. See below for details. Default: \code{NULL}}
 
 \item{model}{What type of trendline to fit to the data. Options are: 
 \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
@@ -40,16 +48,12 @@ Default: \code{"linear"}.}
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
 
-\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
-and partitioning. See below for details. Default: \code{NULL}}
-
 \item{...}{Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either \code{p.} or \code{s.}
+functions. Prefix a parameter name with either \code{t.} or \code{s.}
 to ensure it gets passed to (and only to) 
-\link[ggplot2]{geom_point} or 
-\link[ggplot2]{geom_smooth}, respectively. For instance, 
-\code{p.size = 2} ensures only the points have their size set to 
-\code{2}.}
+\link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+respectively. For instance, \code{s.size = 2} ensures only the 
+scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 

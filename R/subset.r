@@ -291,7 +291,9 @@ subset.BIOM <- function (x, expr, env = parent.frame(), drop.na = TRUE, refactor
   names(cl)[[2]] <- ""
   names(cl)[[3]] <- ""
   
-  attr(biom, 'history') <- c(hist, paste("biom <-", deparse1(cl)))
+  attr(biom, 'history') <- paste0(collapse = "\n", c(
+    hist,
+    sprintf("biom <- %s", deparse1(cl)) ))
   
   
   set_cache_value(cache_file, biom)

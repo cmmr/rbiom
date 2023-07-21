@@ -9,11 +9,14 @@ taxa_corrplot(
   x,
   rank = NULL,
   taxa = 6,
-  points = FALSE,
+  layers = "t",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
   model = "linear",
+  stats = "emtrends",
+  p.top = Inf,
+  p.adj = "fdr",
   ci = 95,
   ...
 )
@@ -32,7 +35,11 @@ most abundant taxa. A value 0 <= n < 1 will show any taxa with that
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: \code{6}.}
 
-\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
+\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter 
+abbreviations are also accepted. For instance, 
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
+\code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+Default: \code{"t"}.}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
 and partitioning. See below for details. Default: \code{NULL}}
@@ -46,16 +53,42 @@ function's arguments must be named 'formula'. For example,
 \code{model = list("stats::lm", list(formula = y ~ x))}.
 Default: \code{"linear"}.}
 
+\item{stats}{Which statistic to display on the plot. Options are: 
+\describe{
+  \item{\code{"fit"}}{ How well does the model fit all the data? }
+  \item{\code{"emtrends"}}{ Does any trendline have a non-zero slope? }
+  \item{\code{"emt_pairs"}}{ Are the slopes of any trendlines different? }
+  \item{\code{"emm_pairs"}}{ Are the means of any trendlines different? }
+  \item{\code{"hide"}}{ Don't show stats on the plot, but still compute them. }
+  \item{\code{"none"}}{ Do not compute or show statistics. }
+}
+Statistical tests are run separately on each facet (except 
+\code{"fit"}). P-values are adjusted for multiple comparisons by 
+considering all facets together. Unless \code{stats = "none"}, all 
+stats are attached to the plot as \code{attr(,'stats')}. 
+Default: \code{"emtrends"}}
+
+\item{p.top}{Only display taxa with the most significant differences in 
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
+significant taxa are displayed. If \code{p.top} is less than one, all 
+taxa with an adjusted p-value <= \code{p.top} are displayed. 
+Recommended to be used in combination with the \code{taxa} parameter 
+to set a lower bound on the mean abundance of considered taxa. 
+Default: \code{Inf}}
+
+\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
+Run \code{p.adjust.methods} for a list of available options.
+(Default: \code{fdr})}
+
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either \code{p.} or \code{s.}
+functions. Prefix a parameter name with either \code{t.} or \code{s.}
 to ensure it gets passed to (and only to) 
-\link[ggplot2]{geom_point} or 
-\link[ggplot2]{geom_smooth}, respectively. For instance, 
-\code{p.size = 2} ensures only the points have their size set to 
-\code{2}.}
+\link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+respectively. For instance, \code{s.size = 2} ensures only the 
+scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 

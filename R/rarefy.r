@@ -170,7 +170,11 @@ rarefy <- function (biom, depth=NULL, seed=0) {
     cl[i] <- list(eval.parent(cl[[i]]))
   }
   names(cl)[[2]] <- ""
-  attr(biom, 'history') %<>% c(paste("biom <-", deparse1(cl)))
+  
+  attr(biom, 'history') <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("biom <- %s", deparse1(cl)) ))
+  
   
   
   #________________________________________________________

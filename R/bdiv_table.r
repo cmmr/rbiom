@@ -75,8 +75,12 @@ bdiv_table <- function (
   #________________________________________________________
   # Record the function call in a human-readable format.
   #________________________________________________________
-  history <- attr(biom, 'history')
-  history %<>% c(sprintf("bdiv_table(%s)", as.args(params, fun = bdiv_table)))
+  arg_str <- as.args(params, fun = bdiv_table, indent = 2)
+  history <- paste0(collapse = "\n", c(
+    attr(biom, 'history', exact = TRUE),
+    sprintf("data <- bdiv_table(%s)", arg_str) ))
+  remove("arg_str")
+  
   
   
   #________________________________________________________
