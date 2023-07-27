@@ -6,13 +6,15 @@
 \usage{
 rare_multiplot(
   biom,
-  rline = TRUE,
   metric = "OTUs",
   depths = NULL,
-  points = FALSE,
+  layers = "t",
+  rline = TRUE,
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  model = "logarithmic",
+  p.adj = "fdr",
   ci = 95,
   caption = FALSE,
   labels = FALSE,
@@ -23,21 +25,40 @@ rare_multiplot(
 \arguments{
 \item{biom}{A BIOM object, as returned from \link{read_biom}.}
 
-\item{rline}{Where to draw a vertical line on the plot, intended to show
-a particular rarefaction depth. Default: \code{TRUE} (no line).}
-
 \item{metric}{Alpha diversity metric(s) to use. Options are: 
 \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
 and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 
 \item{depths}{Rarefaction depths to show in the plot. Passed to
-\link{adiv_table}. The default, \code{NULL}, uses a heuristic
-to pick optimal depths.}
+\link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
+to pick 10 evenly spaced depths.}
 
-\item{points}{Overlay a scatter plot. Default: \code{FALSE}.}
+\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter 
+abbreviations are also accepted. For instance, 
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
+\code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+Default: \code{"t"}.}
 
-\item{color.by, facet.by, limit.by}{Metadata columns to use for data 
-partitioning. Default: \code{NULL}}
+\item{rline}{Where to draw a horizontal line on the plot, intended to show
+a particular rarefaction depth. Set to \code{TRUE} to show an 
+auto-selected rarefaction depth or \code{NULL} to not show a line.
+Default: \code{NULL}.}
+
+\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
+and partitioning. See below for details. Default: \code{NULL}}
+
+\item{model}{What type of trendline to fit to the data. Options are: 
+\code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+alternatively provide a list of length two where the first element is
+a character vector of length 1 naming a function, and the second 
+element is a list of arguments to pass to that function. One of the 
+function's arguments must be named 'formula'. For example, 
+\code{model = list("stats::lm", list(formula = y ~ x))}.
+Default: \code{"logarithmic"}.}
+
+\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
+Run \code{p.adjust.methods} for a list of available options.
+Default: \code{"fdr"}.}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
@@ -51,12 +72,11 @@ fitting beneath the plot. Default: \code{FALSE}.}
 \code{NULL}.  Default: \code{"log10"}.}
 
 \item{...}{Additional parameters to pass along to ggplot2 
-functions. Prefix a parameter name with either \code{p.}, 
-\code{r.}/\code{v.}, or \code{s.} to ensure it gets passed to (and
-only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
-\link[ggplot2]{geom_smooth}, respectively. For instance, 
-\code{p.size = 2} ensures only the points have their size set to 
-\code{2}.}
+functions. Prefix a parameter name with either \code{t.} or 
+\code{s.}/\code{pt.} to ensure it gets passed to (and only to)
+\link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
+respectively. For instance, \code{s.size = 2} ensures only the points 
+have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 
@@ -66,6 +86,54 @@ A \code{ggplot2} plot. The computed data points and statistics will
 \description{
 Combines rare_corrplot and depths_barplot into a single figure.
 }
+\section{Aesthetics and Partitions}{
+
+
+Metadata can be used to flexibly subset, partition, and apply aesthetics 
+when creating a plot. Common use cases are provided below. More thorough 
+documentation is available at \url{https://cmmr.github.io/rbiom}.
+
+\preformatted{  ## Colors ----------------------------
+  color.by = "Body Site"
+  color.by = list('Body Site' = "bright")
+  color.by = list('Body Site' = c("Stool", "Saliva"))
+  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
+  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+  
+  ## Facets ----------------------------
+  facet.by = "Body Site"
+  facet.by = c("Body Site", "Sex")
+  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+  
+  ## Limits ----------------------------
+  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+}
+
+\itemize{
+  \item{\code{color.by} - }{Any metadata column. (Max 1)}
+  \item{\code{facet.by} - }{Only categorical metadata column(s).}
+  \item{\code{limit.by} - }{Any metadata column(s).}
+}
+
+All built-in color palettes are colorblind-friendly.
+
+The available categorical palette names are: \code{"okabe"}, \code{"carto"}, 
+\code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"}, 
+\code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, 
+\code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, 
+and \code{"fishy"}.
+
+The available numeric palette names are: \code{"reds"}, \code{"oranges"}, 
+\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"}, 
+\code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, 
+\code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"}, 
+\code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, 
+\code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"}, 
+\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"}, 
+\code{"roma"}, \code{"tofino"}, \code{"vanimo"}, \code{"vik"}
+}
+
 \examples{
     library(rbiom)
     

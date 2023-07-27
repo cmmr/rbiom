@@ -78,15 +78,15 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+Default: \code{"fdr"}.}
 
 \item{ci}{The confidence interval to display around the fitted curve. Set
 to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either \code{t.} or \code{s.}
-to ensure it gets passed to (and only to) 
-\link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+functions. Prefix a parameter name with either \code{t.} or 
+\code{s.}/\code{pt.} to ensure it gets passed to (and only to) 
+\link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
 respectively. For instance, \code{s.size = 2} ensures only the 
 scatterplot points have their size set to \code{2}.}
 }

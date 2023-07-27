@@ -50,6 +50,27 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   
   
   #________________________________________________________
+  # Show/hide/customize boxplot outliers.
+  #________________________________________________________
+  if ('box' %in% layer_names) {
+    outliers <- params[['outliers']]
+    
+    if (is.null(outliers))
+      outliers <- !any(c('dot', 'strip') %in% layer_names)
+    
+    if (isFALSE(outliers)) {
+      params[['box.outlier.shape']] <- NA
+    } else {
+      params[['box.outlier.size']]  <- params[['pt.size']]
+      params[['box.outlier.alpha']] <- params[['pt.alpha']]
+    }
+    remove("outliers")
+  }
+  params[['outliers']] <- NULL
+  
+  
+  
+  #________________________________________________________
   # Create the plot's data frame
   #________________________________________________________
   ggdata <- data_func(params)      # Plot-specific
@@ -184,7 +205,7 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
     }
     
     if (dodged)
-      setLayer(position=dodge, outlier.shape=NA)
+      setLayer(position=dodge) #, outlier.shape=NA)
   }
   
   

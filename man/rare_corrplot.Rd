@@ -8,13 +8,15 @@ rare_corrplot(
   biom,
   metric = "OTUs",
   depths = NULL,
-  points = FALSE,
+  layers = "t",
+  rline = TRUE,
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  model = "logarithmic",
+  p.adj = "fdr",
   ci = 95,
-  rline = NULL,
-  caption = TRUE,
+  caption = FALSE,
   ...
 )
 }
@@ -29,22 +31,41 @@ and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
 \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 to pick 10 evenly spaced depths.}
 
-\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
-and partitioning. See below for details. Default: \code{NULL}}
-
-\item{ci}{The confidence interval to display around the fitted curve. Set
-to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
+\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter 
+abbreviations are also accepted. For instance, 
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
+\code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+Default: \code{"t"}.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an 
 auto-selected rarefaction depth or \code{NULL} to not show a line.
 Default: \code{NULL}.}
 
+\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
+and partitioning. See below for details. Default: \code{NULL}}
+
+\item{model}{What type of trendline to fit to the data. Options are: 
+\code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+alternatively provide a list of length two where the first element is
+a character vector of length 1 naming a function, and the second 
+element is a list of arguments to pass to that function. One of the 
+function's arguments must be named 'formula'. For example, 
+\code{model = list("stats::lm", list(formula = y ~ x))}.
+Default: \code{"logarithmic"}.}
+
+\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
+Run \code{p.adjust.methods} for a list of available options.
+Default: \code{"fdr"}.}
+
+\item{ci}{The confidence interval to display around the fitted curve. Set
+to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
+
 \item{caption}{Display information about the method used for trendline
-fitting beneath the plot. Default: \code{TRUE}.}
+fitting beneath the plot. Default: \code{FALSE}.}
 
 \item{...}{Additional parameters to pass along to ggplot2 
-functions. Prefix a parameter name with either \code{p.}, 
+functions. Prefix a parameter name with either \code{p.}/\code{pt.}, 
 \code{r.}/\code{v.}, or \code{s.} to ensure it gets passed to (and
 only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
 \link[ggplot2]{geom_smooth}, respectively. For instance, 

@@ -19,6 +19,7 @@ adiv_boxplot(
   p.adj = "fdr",
   p.label = 0.05,
   ci = 95,
+  outliers = NULL,
   xlab.angle = "auto",
   ...
 )
@@ -80,6 +81,10 @@ the mean, except for \bold{mad} in which case it represents
 the median. Trendlines require a confidence interval value. 
 Set to \code{NULL} to disable. Default: \code{95}}
 
+\item{outliers}{Show boxplot outliers? \code{TRUE} to always show. 
+\code{FALSE} to always hide. \code{NULL} to only hide them when
+overlaying a dot or strip chart.  Default: \code{NULL}}
+
 \item{xlab.angle}{How to rotate the tick labels on the x-axis. 
 \bold{'auto'} (the default), automatically selects a rotation value. 
 \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
@@ -89,7 +94,8 @@ angled, and vertical, respectively.}
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-dotplot layer has its size set to \code{2}.}
+dotplot layer has its size set to \code{2}. The special prefix
+\code{pt.} will control both the dot and strip layers.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 

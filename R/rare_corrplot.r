@@ -7,10 +7,6 @@
 #' @family plotting
 #' 
 #' 
-#' @param metric   Alpha diversity metric(s) to use. Options are: 
-#'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
-#'        and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.
-#' 
 #' @param depths   Rarefaction depths to show in the plot. Passed to
 #'        \link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
 #'        to pick 10 evenly spaced depths.
@@ -20,11 +16,17 @@
 #'        auto-selected rarefaction depth or \code{NULL} to not show a line.
 #'        Default: \code{NULL}.
 #'        
-#' @param caption   Display information about the method used for trendline
-#'        fitting beneath the plot. Default: \code{TRUE}.
+#' @param model   What type of trendline to fit to the data. Options are: 
+#'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
+#'        alternatively provide a list of length two where the first element is
+#'        a character vector of length 1 naming a function, and the second 
+#'        element is a list of arguments to pass to that function. One of the 
+#'        function's arguments must be named 'formula'. For example, 
+#'        \code{model = list("stats::lm", list(formula = y ~ x))}.
+#'        Default: \code{"logarithmic"}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 
-#'        functions. Prefix a parameter name with either \code{p.}, 
+#'        functions. Prefix a parameter name with either \code{p.}/\code{pt.}, 
 #'        \code{r.}/\code{v.}, or \code{s.} to ensure it gets passed to (and
 #'        only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
 #'        \link[ggplot2]{geom_smooth}, respectively. For instance, 
@@ -44,9 +46,9 @@
 #'     
 
 rare_corrplot <- function (
-    biom, metric = "OTUs", depths = NULL, points = FALSE,
+    biom, metric = "OTUs", depths = NULL, layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    ci = 95, rline = NULL, caption = TRUE, ...) {
+    model = "logarithmic", p.adj = "fdr", ci = 95, caption = FALSE, ...) {
   
   
   #________________________________________________________
@@ -134,6 +136,20 @@ rare_corrplot <- function (
   
   
   #________________________________________________________
+  # Convert user's `layers` spec to layer names.
+  #________________________________________________________
+  layer_names <- local({
+    layerlist <- c('t' = "trend", 's' = "scatter")
+    
+    layer_match(params[['layers']], choices = layerlist, default = "t") %>%
+      c('ggplot', ., 'labs', 'theme_bw')
+  })
+  
+  if (!'scatter' %in% layer_names) params[['shape.by']] <- NULL
+  
+  
+  
+  #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
   layers <- structure(
@@ -145,10 +161,10 @@ rare_corrplot <- function (
     'ycol'     = attr(data, 'response', exact = TRUE),
     'xmode'    = "numeric" )
   
-  initLayer(c('ggplot', 'smooth', 'labs', 'theme_bw'))
+  initLayer(layer_names)
   
   if (!is_null(params[['color.by']])) initLayer("color")
-  if (isTRUE(params[['points']]))     initLayer("point")
+  if (!is_null(params[['shape.by']])) initLayer("shape")
   
   
   #________________________________________________________

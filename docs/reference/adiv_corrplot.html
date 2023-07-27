@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9097</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,7 @@
 <span>  model <span class="op">=</span> <span class="st">"linear"</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
 <span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -106,16 +107,27 @@ function's arguments must be named 'formula'. For example,
 Default: <code>"linear"</code>.</p></dd>
 
 
+<dt>p.adj</dt>
+<dd><p>Method to use for multiple comparisons adjustment of p-values.
+Run <code>p.adjust.methods</code> for a list of available options.
+Default: <code>"fdr"</code>.</p></dd>
+
+
 <dt>ci</dt>
 <dd><p>The confidence interval to display around the fitted curve. Set
 to <code>FALSE</code> to hide the confidence interval. Default: <code>95</code>.</p></dd>
 
 
+<dt>caption</dt>
+<dd><p>Display information about the method used for trendline
+fitting beneath the plot. Default: <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either <code>t.</code> or <code>s.</code>
-to ensure it gets passed to (and only to) 
-<a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a> or <a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a>, 
+functions. Prefix a parameter name with either <code>t.</code> or 
+<code>s.</code>/<code>pt.</code> to ensure it gets passed to (and only to) 
+<a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a> or <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a>, 
 respectively. For instance, <code>s.size = 2</code> ensures only the 
 scatterplot points have their size set to <code>2</code>.</p></dd>
 

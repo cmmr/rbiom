@@ -46,7 +46,8 @@
 #'        functions. Prefixing parameter names with a layer name ensures that
 #'        a particular parameter is passed to, and only to, that layer. For
 #'        instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-#'        dotplot layer has its size set to \code{2}.
+#'        dotplot layer has its size set to \code{2}. The special prefix
+#'        \code{pt.} will control both the dot and strip layers.
 #' 
 #' 
 #' @export
@@ -63,7 +64,7 @@ taxa_boxplot <- function (
     biom, x = NULL, rank = NULL, taxa = 5, layers = "lsb",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
-    ci = 95, xlab.angle = 'auto', y.trans = "sqrt", ...) {
+    ci = 95, outliers = NULL, xlab.angle = 'auto', y.trans = "sqrt", ...) {
   
   
   #________________________________________________________

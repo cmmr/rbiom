@@ -56,10 +56,11 @@
 #' @param perms   Number of random permutations to use for estimating statistical
 #'        significance. Default: \code{1000}.
 #'        
-#' @param ...   Parameters for underlying functions. Prefixing parameter names with a layer name ensures that
-#'        a particular parameter is passed to, and only to, that layer. For
-#'        instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-#'        dotplot layer has its size set to \code{2}.
+#' @param ...   Parameters for underlying functions. Prefixing parameter names 
+#'        with a layer name ensures that a particular parameter is passed to, 
+#'        and only to, that layer. For instance, \code{point.size = 2} or 
+#'        \code{d.size = 2} ensures only the points have their size set to 
+#'        \code{2}. Points can also be controlled with the \code{pt.} prefix.
 #'        
 #' @return A \code{ggplot2} plot. The computed data points and statistics will 
 #'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
@@ -317,7 +318,8 @@ bdiv_biplot <- function (
   #________________________________________________________
   # Statistics table to show the user
   #________________________________________________________
-  attr(p, 'stats') <- list('groupwise' = attr(ggdata, "stats_tbl", exact = TRUE))
+  if (!is.null(stats_tbl <- attr(ggdata, "stats_tbl", exact = TRUE)))
+    attr(p, 'stats') <- list('groupwise' = stats_tbl)
   
   
   set_cache_value(cache_file, p)

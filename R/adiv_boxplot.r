@@ -60,6 +60,10 @@
 #'        the median. Trendlines require a confidence interval value. 
 #'        Set to \code{NULL} to disable. Default: \code{95}
 #'        
+#' @param outliers   Show boxplot outliers? \code{TRUE} to always show. 
+#'        \code{FALSE} to always hide. \code{NULL} to only hide them when
+#'        overlaying a dot or strip chart.  Default: \code{NULL}
+#'        
 #' @param xlab.angle   How to rotate the tick labels on the x-axis. 
 #'        \bold{'auto'} (the default), automatically selects a rotation value. 
 #'        \bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
@@ -69,7 +73,8 @@
 #'        functions. Prefixing parameter names with a layer name ensures that
 #'        a particular parameter is passed to, and only to, that layer. For
 #'        instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-#'        dotplot layer has its size set to \code{2}.
+#'        dotplot layer has its size set to \code{2}. The special prefix
+#'        \code{pt.} will control both the dot and strip layers.
 #'        
 #' @return A \code{ggplot2} plot. The computed data points and statistics will 
 #'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
@@ -152,7 +157,7 @@
 adiv_boxplot <- function (
     biom, x = NULL, metric = "Shannon", layers = "lsb",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-    flip = FALSE, stripe = flip, p.adj = "fdr", p.label = 0.05, ci = 95, 
+    flip = FALSE, stripe = flip, p.adj = "fdr", p.label = 0.05, ci = 95, outliers = NULL,
     xlab.angle = 'auto', ...) {
   
   

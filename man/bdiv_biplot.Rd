@@ -75,10 +75,11 @@ Default: \code{"fdr"}.}
 \item{perms}{Number of random permutations to use for estimating statistical
 significance. Default: \code{1000}.}
 
-\item{...}{Parameters for underlying functions. Prefixing parameter names with a layer name ensures that
-a particular parameter is passed to, and only to, that layer. For
-instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-dotplot layer has its size set to \code{2}.}
+\item{...}{Parameters for underlying functions. Prefixing parameter names 
+with a layer name ensures that a particular parameter is passed to, 
+and only to, that layer. For instance, \code{point.size = 2} or 
+\code{d.size = 2} ensures only the points have their size set to 
+\code{2}. Points can also be controlled with the \code{pt.} prefix.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and statistics will 

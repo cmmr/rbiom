@@ -33,9 +33,9 @@
 #'        Default: \code{"emtrends"}
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
-#'        functions. Prefix a parameter name with either \code{t.} or \code{s.}
-#'        to ensure it gets passed to (and only to) 
-#'        \link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+#'        functions. Prefix a parameter name with either \code{t.} or 
+#'        \code{s.}/\code{pt.} to ensure it gets passed to (and only to) 
+#'        \link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
 #'        respectively. For instance, \code{s.size = 2} ensures only the 
 #'        scatterplot points have their size set to \code{2}.
 #' 
@@ -50,7 +50,8 @@
 taxa_corrplot <- function (
     biom, x, rank = NULL, taxa = 6, layers = "t",
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    model = "linear", stats = "emtrends", p.top = Inf, p.adj = "fdr", ci = 95, ...) {
+    model = "linear", stats = "emtrends", 
+    p.top = Inf, p.adj = "fdr", ci = 95, ...) {
   
   
   #________________________________________________________

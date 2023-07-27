@@ -2,31 +2,10 @@
 #' 
 #' @name rare_multiplot
 #' 
+#' @inherit rare_corrplot params
+#' @inherit adiv_corrplot params sections return
+#' 
 #' @family plotting
-#' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
-#'        
-#' @param rline   Where to draw a vertical line on the plot, intended to show
-#'        a particular rarefaction depth. Default: \code{TRUE} (no line).
-#' 
-#' @param metric   Alpha diversity metric(s) to use. Options are: 
-#'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
-#'        and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.
-#' 
-#' @param depths   Rarefaction depths to show in the plot. Passed to
-#'        \link{adiv_table}. The default, \code{NULL}, uses a heuristic
-#'        to pick optimal depths.
-#' 
-#' @param points   Overlay a scatter plot. Default: \code{FALSE}.
-#'        
-#' @param color.by,facet.by,limit.by   Metadata columns to use for data 
-#'        partitioning. Default: \code{NULL}
-#' 
-#' @param ci   The confidence interval to display around the fitted curve. Set
-#'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
-#'        
-#' @param caption   Display information about the method used for trendline
-#'        fitting beneath the plot. Default: \code{FALSE}.
 #'        
 #' @param labels   Show sample names under each bar. Default: \code{FALSE}.
 #'        
@@ -34,12 +13,11 @@
 #'        \code{NULL}.  Default: \code{"log10"}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 
-#'        functions. Prefix a parameter name with either \code{p.}, 
-#'        \code{r.}/\code{v.}, or \code{s.} to ensure it gets passed to (and
-#'        only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{vline}, or 
-#'        \link[ggplot2]{geom_smooth}, respectively. For instance, 
-#'        \code{p.size = 2} ensures only the points have their size set to 
-#'        \code{2}.
+#'        functions. Prefix a parameter name with either \code{t.} or 
+#'        \code{s.}/\code{pt.} to ensure it gets passed to (and only to)
+#'        \link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
+#'        respectively. For instance, \code{s.size = 2} ensures only the points 
+#'        have their size set to \code{2}.
 #'        
 #' @return A \code{ggplot2} plot. The computed data points and statistics will 
 #'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
@@ -54,9 +32,10 @@
 #'     
 
 rare_multiplot <- function (
-    biom, rline = TRUE, metric = "OTUs", depths = NULL, points = FALSE,
+    biom, metric = "OTUs", depths = NULL, layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    ci = 95, caption = FALSE, labels = FALSE, trans = "log10", ...) {
+    model = "logarithmic", p.adj = "fdr", ci = 95, caption = FALSE, 
+    labels = FALSE, trans = "log10", ...) {
   
   
   #________________________________________________________

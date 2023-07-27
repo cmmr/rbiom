@@ -21,15 +21,13 @@
 #' @param trans   Y-axis transformation. Options are \code{"log10"} or 
 #'        \code{NULL}.  Default: \code{"log10"}.
 #'        
-#' @param ...   Additional parameters to pass along to ggplot2 
-#'        functions. Prefix a parameter name with either \code{p.}, 
-#'        \code{r.}/\code{h.}, or \code{s.} to ensure it gets passed to (and
-#'        only to)  \link[ggplot2]{geom_point}, \link[ggplot2]{hline}, or 
-#'        \link[ggplot2]{geom_smooth}, respectively. For instance, 
-#'        \code{p.size = 2} ensures only the points have their size set to 
-#'        \code{2}.
+#' @param ...   Additional parameters to pass along to ggplot2 functions. 
+#'        Prefix a parameter name with either \code{r.} to ensure it gets 
+#'        passed to (and only to) \link[ggplot2]{geom_vline}. For instance, 
+#'        \code{r.color = "black"} ensures only the vertical rarefaction line 
+#'        has its color set to \code{"black"}.
 #'        
-#' @return A \code{ggplot2} plot. The computed data points will be attached as 
+#' @return A \code{ggplot2} plot. The underlying dataset will be attached as 
 #'         \code{attr(p, 'data')}.
 #' 
 #' 
@@ -40,7 +38,8 @@
 #'     depths_barplot(hmp50, rline=TRUE)
 #'     
 
-depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
+depths_barplot <- function (
+    biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
   
   #________________________________________________________

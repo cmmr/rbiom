@@ -22,6 +22,9 @@
 #'        \code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
 #'        Default: \code{"t"}.
 #'        
+#' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
+#'        and partitioning. See below for details. Default: \code{NULL}
+#'        
 #' @param model   What type of trendline to fit to the data. Options are: 
 #'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
 #'        alternatively provide a list of length two where the first element is
@@ -30,17 +33,21 @@
 #'        function's arguments must be named 'formula'. For example, 
 #'        \code{model = list("stats::lm", list(formula = y ~ x))}.
 #'        Default: \code{"linear"}.
+#'
+#' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
+#'        Run \code{p.adjust.methods} for a list of available options.
+#'        Default: \code{"fdr"}.
 #' 
 #' @param ci   The confidence interval to display around the fitted curve. Set
 #'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
 #'        
-#' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
-#'        and partitioning. See below for details. Default: \code{NULL}
+#' @param caption   Display information about the method used for trendline
+#'        fitting beneath the plot. Default: \code{FALSE}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
-#'        functions. Prefix a parameter name with either \code{t.} or \code{s.}
-#'        to ensure it gets passed to (and only to) 
-#'        \link[ggplot2]{geom_point} or \link[ggplot2]{geom_smooth}, 
+#'        functions. Prefix a parameter name with either \code{t.} or 
+#'        \code{s.}/\code{pt.} to ensure it gets passed to (and only to) 
+#'        \link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
 #'        respectively. For instance, \code{s.size = 2} ensures only the 
 #'        scatterplot points have their size set to \code{2}.
 #'        
@@ -104,7 +111,7 @@
 adiv_corrplot <- function (
     biom, x, metric = "OTUs", layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    model = "linear", p.adj = "fdr", ci = 95, ...) {
+    model = "linear", p.adj = "fdr", ci = 95, caption = FALSE, ...) {
   
   
   #________________________________________________________

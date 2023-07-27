@@ -358,7 +358,7 @@ corrplot_stats <- function (layers) {
   params[['p.top']] <- NULL
   
   attr(layers, 'data')   <- ggdata
-  attr(layers, "stats")  <- stats
+  attr(layers, 'stats')  <- stats
   attr(layers, 'params') <- params
   
   
