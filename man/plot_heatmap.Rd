@@ -14,9 +14,9 @@ plot_heatmap(
   trees = TRUE,
   clust = "complete",
   dist = "euclidean",
+  ratio = 1,
   tree_height = NULL,
   track_height = NULL,
-  ratio = 1,
   legend = "right",
   xlab.angle = "auto",
   ...
@@ -25,8 +25,8 @@ plot_heatmap(
 \arguments{
 \item{mtx}{A numeric \code{matrix} with named rows and columns.}
 
-\item{grid}{Color palette name, or a list with entries for \code{label}, 
-\code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
+\item{grid}{Color palette name, or a list with entries for \code{label},
+\code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
 \code{guide}. See the Track Definitions section for details.
 Default: \code{list(label = "Grid Value", colors = "imola")}.}
 
@@ -34,80 +34,82 @@ Default: \code{list(label = "Grid Value", colors = "imola")}.}
 Default: \code{NULL}.}
 
 \item{label}{Label the matrix rows and columns. You can supply a list
-or logical vector of length two to control row labels and column 
-labels separately, for example 
-\code{label = c(rows = TRUE, cols = FALSE)}, or simply 
+or logical vector of length two to control row labels and column
+labels separately, for example
+\code{label = c(rows = TRUE, cols = FALSE)}, or simply
 \code{label = c(T, F)}. Other valid options are \code{"rows"},
 \code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
 and \code{"none"}.
 Default: \code{TRUE}.}
 
-\item{label_size}{The font size to use for the row and column labels. You 
-can supply a numeric vector of length two to control row label sizes 
-and column label sizes separately, for example 
+\item{label_size}{The font size to use for the row and column labels. You
+can supply a numeric vector of length two to control row label sizes
+and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
-Default: \code{NULL}, which computes: 
+Default: \code{NULL}, which computes:
 \code{pmax(8, pmin(20, 100 / dim(mtx)))}.}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
 Default: \code{"none"}.}
 
-\item{trees}{Draw a dendrogram for rows (left) and columns (top). You can 
-supply a list or logical vector of length two to control the row tree 
-and column tree separately, for example 
-\code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}. 
-Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"}, 
+\item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
+supply a list or logical vector of length two to control the row tree
+and column tree separately, for example
+\code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}.
+Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"},
 \code{"left"}, \code{"top"}, and \code{"none"}.
 Default: \code{TRUE}.}
 
-\item{clust}{Clustering algorithm for reordering the rows and columns by 
-similarity. You can supply a list or character vector of length two to 
-control the row and column clustering separately, for example 
-\code{clust = c(rows = "complete", cols = NA)}, or simply 
+\item{clust}{Clustering algorithm for reordering the rows and columns by
+similarity. You can supply a list or character vector of length two to
+control the row and column clustering separately, for example
+\code{clust = c(rows = "complete", cols = NA)}, or simply
 \code{clust = c("complete", NA)}.
 Default: \code{"complete"}.
 
-Options are:
-\itemize{
-  \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
-  \item{An \link[stats]{hclust} object} { }
-  \item{A method name - }{ \code{"ward.D"}, 
-    \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
-    \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
-    \code{"centroid"}. }
-}}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
+   \\itemize\{
+     \\item\{\code{FALSE} or \code{NA} - \}\{ Disable reordering. \}
+     \\item\{An \code{hclust} class object\} \{ E.g. from [stats::hclust()]. \}
+     \\item\{A method name - \}\{ \code{"ward.D"}, 
+       \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
+       \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
+       \code{"centroid"}. \}
+   \}
+}\if{html}{\out{</div>}}}
 
-\item{dist}{Distance algorithm to use when reordering the rows and columns 
+\item{dist}{Distance algorithm to use when reordering the rows and columns
 by similarity. You can supply a list or character vector of length
-two to control the row and column clustering separately, for example 
-\code{dist = c(rows = "euclidean", cols = "maximum")}, or simply 
+two to control the row and column clustering separately, for example
+\code{dist = c(rows = "euclidean", cols = "maximum")}, or simply
 \code{dist = c("euclidean", "maximum")}.
 Default: \code{"euclidean"}.
 
-Options are:
-\itemize{
-  \item{A \link[stats]{dist} object} { }
-  \item{A method name - }{ \code{"euclidean"}, 
-    \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
-    \code{"binary"}, or \code{"minkowski"}. }
-}}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
+   \\itemize\{
+     \\item\{A \code{dist} class object\} \{ E.g. from [stats::dist()] or [bdiv_distmat()]. \}
+     \\item\{A method name - \}\{ \code{"euclidean"}, 
+       \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
+       \code{"binary"}, or \code{"minkowski"}. \}
+   \}
+}\if{html}{\out{</div>}}}
+
+\item{ratio}{Height/width ratio for entire grid.
+Default: \code{1} (square).}
 
 \item{tree_height, track_height}{The height of the dendrogram or annotation
 tracks in multiples (or fractions) of the smaller dimension of the
 grid cell size. Use a numeric vector of length two to assign
-\code{c(left, top)} independently. 
+\code{c(left, top)} independently.
 Default: \code{NULL}, which computes:
 \code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.}
-
-\item{ratio}{Height/width ratio for entire grid. 
-Default: \code{1} (square).}
 
 \item{legend}{Where to place the legend. Options are: \code{"right"} or
 \code{"bottom"}. Default: \code{"right"}.}
 
-\item{xlab.angle}{Angle of the labels at the bottom of the plot. 
-Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}. 
+\item{xlab.angle}{Angle of the labels at the bottom of the plot.
+Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}.
 Default: \code{"auto"}.}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
@@ -115,8 +117,8 @@ For example, \code{labs.title = "Plot Title"}.}
 }
 \value{
 A \code{ggplot2} plot. The constructed ggplot command will be
-        attached as \code{attr(,'cmd')}, and the underlying computed data
-        as \code{$data}.
+attached as \code{attr(,'cmd')}, and the underlying computed data
+as \code{$data}.
 }
 \description{
 Create a heatmap with tracks and dendrograms from any matrix.
@@ -124,9 +126,9 @@ Create a heatmap with tracks and dendrograms from any matrix.
 \section{Track Definitions}{
 
 
-One or more colored tracks can be placed on the left and/or top of the 
+One or more colored tracks can be placed on the left and/or top of the
 heatmap grid to visualize associated metadata values.
-         
+
 \preformatted{  ## Categorical ----------------------------
 cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
 tracks   = list('Sex' = cat_vals)
@@ -154,33 +156,33 @@ tracks = list(
 plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
 }
 
-The following entries in the track definitions are understood: 
+The following entries in the track definitions are understood:
 
 \itemize{
-  \item{\code{values} - }{ The metadata values. When unnamed, order must match matrix. }
-  \item{\code{range} - }{ The c(min,max) to use for scale values. }
-  \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
-  \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
-  \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
-  \item{\code{na.color} - }{ The color to use for \code{NA} values. }
-  \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
-  \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
+\item{\code{values} - }{ The metadata values. When unnamed, order must match matrix. }
+\item{\code{range} - }{ The c(min,max) to use for scale values. }
+\item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
+\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+\item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+\item{\code{na.color} - }{ The color to use for \code{NA} values. }
+\item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
+\item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 }
 
 All built-in color palettes are colorblind-friendly.
 
-Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
 \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
 
-Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"}, 
-\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"}, 
-\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"}, 
-\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"}, 
-\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"}, 
-\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"}, 
-\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"}, 
+Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
+\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
+\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
+\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
+\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
+\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
+\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
 \code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
 }
 
@@ -209,19 +211,18 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
     
 }
 \seealso{
-Other plotting: 
+Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
-\code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
-\code{\link{depths_barplot}()},
+\code{\link{bdiv_ord_plot}()},
+\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{tree_plot}()}
+\code{\link{taxa_heatmap}()}
 }
-\concept{plotting}
+\concept{visualization}

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,19 +51,22 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">blply</span><span class="op">(</span><span class="va">biom</span>, <span class="va">vars</span>, <span class="va">FUN</span>, <span class="va">...</span>, fast <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">blply</span><span class="op">(</span><span class="va">biom</span>, <span class="va">vars</span>, <span class="va">FUN</span>, <span class="va">...</span>, iters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, prefix <span class="op">=</span> <span class="cn">FALSE</span>, fast <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>. Technically
+accepts all types of objects, but only BIOM objects allow using the
+<code>vars</code> option, below.</p></dd>
 
 
 <dt>vars</dt>
 <dd><p>A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted BIOM
-object to pass to <code>FUN</code>. Unambiguous abbreviations of metadata
+object to pass to <code>FUN</code>. If <code>NULL</code>, <code>biom</code> will be
+passed to <code>FUN</code> unaltered. Unambiguous abbreviations of metadata
 fields are also accepted.</p></dd>
 
 
@@ -76,10 +79,22 @@ return any object, all of which will be returned in a named list.</p></dd>
 <dd><p>Additional arguments to pass on to <code>FUN</code>.</p></dd>
 
 
+<dt>iters</dt>
+<dd><p>A named list of values to pass to <code>FUN</code>. Unlike
+<code>...</code>, these will be iterated over in all combinations.
+Default: <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code></p></dd>
+
+
+<dt>prefix</dt>
+<dd><p>When <code>TRUE</code>, prefixes the names in in <code>iters</code> with
+a '.' in the split_labels attribute of the returned object.
+Default: <code>FALSE</code></p></dd>
+
+
 <dt>fast</dt>
 <dd><p>If <code>TRUE</code> (the default), the subsetted BIOM objects will
-still contain the full taxa table and phylogenetic tree. Set 
-<code>fast = FALSE</code> to run the slow steps of subsetting these 
+still contain the full taxa table and phylogenetic tree. Set
+<code>fast = FALSE</code> to run the slow steps of subsetting these
 elements as well.</p></dd>
 
 </dl></div>
@@ -94,7 +109,7 @@ elements as well.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, <span class="va">nsamples</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, <span class="va">n_samples</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -109,44 +124,106 @@ elements as well.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   Male</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>      <span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Simpson"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span>      <span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">b</span>, adiv <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".Shannon"</span>, <span class="st">".Simpson"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ad</span>, <span class="fl">2L</span>, <span class="va">mean</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(adiv_table(b), , c("Shannon", "Simpson")):</span> undefined columns selected</span>
-<span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Body Site"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>      <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">b</span>, <span class="st">"bray"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>bray.min <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, bray.max <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Anterior nares`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    bray.min  bray.max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2135785 0.8957952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`Female.Anterior nares`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.4318071 0.6814534 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Buccal mucosa`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    bray.min  bray.max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.1113202 0.7878359</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`Female.Buccal mucosa`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.1739844 0.4080621 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Mid vagina`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     bray.min bray.max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.04589041        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`Female.Mid vagina`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.4070774 0.1670592 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Saliva</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    bray.min  bray.max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3710539 0.6975318</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.Saliva</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.9304968 0.8934531 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Stool</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    bray.min  bray.max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.4022374 0.9739696</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.Stool</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.4288307 0.8496172 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`Male.Anterior nares`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> .Shannon .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.505313 0.665006 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`Male.Buccal mucosa`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.7128815 0.6016869 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.Saliva</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> .Shannon .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3.171852 0.913298 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.Stool</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .Shannon  .Simpson </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.5126148 0.8347696 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"split_type")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data.frame"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"split_labels")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Body Site</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Anterior nares</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Buccal mucosa</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     Mid vagina</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4         Saliva</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          Stool</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Sex      Body Site</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female Anterior nares</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Female  Buccal mucosa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Female     Mid vagina</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Female         Saliva</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Female          Stool</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Male Anterior nares</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male  Buccal mucosa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male         Saliva</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   Male          Stool</span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="va">iters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>w <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span>, d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bray"</span>, <span class="st">"euclid"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, iters <span class="op">=</span> <span class="va">iters</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">b</span>, <span class="va">w</span>, <span class="va">d</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>      <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">b</span>, bdiv <span class="op">=</span> <span class="va">d</span>, weighted <span class="op">=</span> <span class="va">w</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>min <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, max <span class="op">=</span> <span class="va">r</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min   max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 123 17185</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Female.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   3  12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min   max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 292 11855</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Male.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   5  14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"split_labels")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Sex     w      d</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female  TRUE   bray</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Female FALSE   bray</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Female  TRUE euclid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Female FALSE euclid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Male  TRUE   bray</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Male FALSE   bray</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male  TRUE euclid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male FALSE euclid</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span></span></span>

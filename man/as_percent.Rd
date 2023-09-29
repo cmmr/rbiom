@@ -7,7 +7,7 @@
 as_percent(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 }
 \value{
 A \code{BIOM} object.
@@ -18,9 +18,9 @@ Convert absolute counts to relative abundances.
 \examples{
     library(rbiom)
     
-    counts(hmp50)[1:4,1:5]
+    otu_matrix(hmp50)[1:4,1:5]
     
     biom <- as_percent(hmp50)
-    counts(biom)[1:4,1:5]
+    otu_matrix(biom)[1:4,1:5]
 
 }

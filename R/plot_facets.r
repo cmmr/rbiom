@@ -139,10 +139,14 @@ boxplot_facets <- function (layers) {
       clean_df <- clean_df[complete.cases(clean_df),,drop=FALSE]
       
       
-      # At most 50% whitespace on average at the top of all plots
+      # Set free_y=TRUE for facets with very different max(y).
       #________________________________________________________
-      y_maxs <- plyr::daply(clean_df, plyby, function (df) { max(df[[ycol]], na.rm = TRUE) })
-      free_y <- isTRUE(mean(y_maxs / max(y_maxs, na.rm = TRUE)) < 0.5)
+      free_y <- local({
+        y_maxs <- plyr::daply(clean_df, plyby, function (df) { max(df[[ycol]], na.rm = TRUE) })
+        y_maxs <- y_maxs[!is.na(y_maxs)]
+        if (length(y_maxs) < 2) return (FALSE)
+        isTRUE(mean(y_maxs) * 1.5 < max(y_maxs))
+      })
       
       
       # All x categories need to be present >50% of the time.

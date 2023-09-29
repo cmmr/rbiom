@@ -1,108 +1,126 @@
-#' Reduce a distance matrix to two or three dimensions
+#' Calculate PCoA and other ordinations, including taxa biplots and statistics.
 #' 
 #' @name bdiv_ord_table
 #' 
-#' @param biom   A \code{BIOM} object, as returned from \link{read_biom}.
-#'        Alternatively, a distance matrix, such as from \link{bdiv_distmat}.
+#' @family ordination
+#' @family beta_diversity
+#' 
+#' @inherit bdiv_distmat params
+#' 
+#' @param biom   A \code{BIOM} object, as returned from [read_biom()].
+#'        Alternatively, a {dist} class distance matrix can be given, in which
+#'        case only the parameters \code{ord}, \code{k}, and \code{...} are
+#'        allowed.
 #'        
-#' @param dist   The distance algorithm to use. Options are:
+#' @param bdiv   The beta diversity distance algorithm to use. Options are:
 #'        \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"}, 
 #'        \code{"Jaccard"}, and \code{"UniFrac"}. A phylogenetic tree must be
 #'        present in \code{biom} or explicitly provided via \code{tree=} to use
-#'        the UniFrac methods. Ignored if \code{biom} is a distance matrix.
+#'        the UniFrac methods.
 #'        Multiple values allowed. Default: \code{"Bray-Curtis"}.
-#'                
-#' @param ord    Method for reducing the dimensionality of a distance matrix.
-#'        Multiple values allowed. Options are:
-#'        \describe{
-#'            \item{\code{"UMAP"} (default)}{
-#'              Uniform manifold approximation and projection,
-#'              via \code{\link[uwot]{umap}}. }
-#'            \item{\code{"PCoA"}}{
-#'              Principal coordinate analysis,
-#'              via \code{\link[ape]{pcoa}}. }
-#'            \item{\code{"NMDS"}}{
-#'              Nonmetric multidimensional scaling,
-#'              via \code{\link[vegan]{metaMDS}}. }
-#'            \item{\code{"tSNE"}}{
-#'              t-distributed stochastic neighbor embedding,
-#'              via \code{\link[tsne]{tsne}}. }
-#'           }
+#'        
+#' @param ord    Method for reducing dimensionality. Options are:
+#'        \itemize{
+#'            \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
+#'            \item{\code{"PCoA"} - }{ Principal coordinate analysis; [ape::pcoa()]. }
+#'            \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
+#'            \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
+#'        }
+#'        Default: \code{"UMAP"} \cr\cr
+#'        Multiple values allowed. Non-ambiguous abbreviations are allowed.
 #'        
 #' @param weighted   Take relative abundances into account. When 
 #'        \code{weighted=FALSE}, only presence/absence is considered.
-#'         Ignored if \code{biom} is a distance matrix. Multiple values 
-#'         allowed. (Default: \code{TRUE})
+#'         Multiple values allowed. Default: \code{TRUE}
 #'     
-#' @param tree   A \code{phylo} object representing the phylogenetic
-#'        relationships of the taxa in \code{biom}. Will be taken from the tree
-#'        embedded in the \code{biom} object if not explicitly specified. Only
-#'        required for computing UniFrac distance matrices.  Ignored if 
-#'        \code{biom} is a distance matrix.
-#'     
-#' @param md   Include metadata in the output data frame? Ignored if 
-#'        \code{biom} is a distance matrix. Options are: 
-#'        \describe{
-#'          \item{\code{NULL}}{ Don't include metadata. (Default) }
-#'          \item{\code{TRUE}}{ Include all metadata. }
-#'          \item{\emph{character vector}}{ Include only the specified metadata columns. }
+#' @param md   Include metadata in the output data frame? Options are: 
+#'        \itemize{
+#'          \item{\code{NULL} - }{ Don't include metadata. (Default) }
+#'          \item{\code{TRUE} - }{ Include all metadata. }
+#'          \item{\emph{character vector} - }{ Include only the specified metadata columns. }
 #'        }
-#' @param k   Number of dimensions to return. (Default: \code{2})
+#'        Default: \code{NULL}
 #'        
-#' @param split.by  Name(s) of metadata columns that the data should be split
+#' @param k   Number of ordination dimensions to return. Either \code{2L} or 
+#'        \code{3L}. Default: \code{2L}
+#'        
+#' @param split.by   Name(s) of metadata columns that the data should be split
 #'        by prior to calculating distance matrices, ordinations, and statistics.
+#'        Equivalent to the \code{facet.by} parameter in [bdiv_ord_plot()].
+#'        Default: \code{NULL}
 #'        
-#' @param stat.by,seed,perms   Passthrough parameters to \code{bdiv_distmat()} 
-#'        for computing adonis statistics. (Default: \code{stat.by=NULL, seed=0, 
-#'        perms=1000})
+#' @param stat.by   Name of the metadata column for statistical groups. 
+#'        Equivalent to the \code{color.by} parameter in [bdiv_ord_plot()].
+#'        Default: \code{NULL}
 #'        
-#' @param rank   [Biplot] What rank of taxa to display (e.g. "Phylum"), or 
-#'        \code{NULL} for no biplot. Run \code{taxa_ranks()} to see all options 
-#'        for a given BIOM object. (Default: \code{NULL})
+#' @param test,seed,permutations   Passthrough parameters to [distmat_stats()] 
+#'        for assessing significance of \code{stat.by} and \code{rank} groups. 
+#'        Default: \code{test="adonis2", seed=0, permutations=999}
 #'        
-#' @param taxa   [Biplot] Which taxa to display. An integer value will return 
+#' @param rank   [Biplot] What rank of taxa to use for the biplot (e.g. 
+#'        "Phylum"), or \code{NULL} for no biplot. Run \code{taxa_ranks()} to 
+#'        see all options for a given BIOM object. Default: \code{NULL}
+#'        
+#' @param taxa   [Biplot] Which taxa to include. An integer value will return 
 #'        the top n most abundant taxa. A value 0 <= n < 1 will return any taxa 
 #'        with that mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. (Default: \code{5})
+#'        taxon names will show only those taxa. Default: \code{5}
+#'        
+#' @param unc   [Biplot] How to handle unclassified, uncultured, and similarly 
+#'        ambiguous taxa names. Options are: 
+#'        \itemize{
+#'          \item{\code{"singly"} - }{ Replaces them with the OTU name. }
+#'          \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+#'          \item{\code{"drop"} - }{ Excludes them from the result. }
+#'          \item{\code{"asis"} - }{ To not check/modify any taxa names. }
+#'        }
+#'        Default: \code{"singly"} \cr\cr
+#'        Non-ambiguous abbreviations are allowed.
 #'
-#' @param p.top   [Biplot] Only returns taxa with the most significant 
+#' @param p.top   [Biplot] Only return taxa with the most significant 
 #'        differences in abundance. If \code{p.top} is >= 1, then the 
 #'        \code{p.top} most significant taxa are displayed. If \code{p.top} 
 #'        is less than one, all taxa with an adjusted p-value <= \code{p.top} 
 #'        are displayed. Recommended to be used in combination with the 
 #'        \code{taxa} parameter to set a lower bound on the mean abundance of 
-#'        considered taxa. (Default: \code{Inf})
+#'        considered taxa. Default: \code{Inf}
 #'
 #' @param p.adj   [Biplot] Method to use for multiple comparisons adjustment of 
 #'        p-values. Run \code{p.adjust.methods} for a list of available options.
-#'        (Default: \code{fdr})
+#'        Default: \code{fdr}
 #'        
-#' @param ...  Additional arguments to pass on to \code{\link[ape]{pcoa}}, 
-#'             \code{\link[vegan]{metaMDS}}, or \code{\link[tsne]{tsne}}.
+#' @param ...  Additional arguments to pass on to [uwot::umap()], 
+#'        [ape::pcoa()], [vegan::metaMDS()], or [tsne::tsne()].
 #'             
-#' @return A data.frame with columns .axis.1, .axis.2, ..., axis.k as well as 
-#'         columns given by \code{md}, \code{split.by}, and \code{stat.by}. 
-#'         Sample IDs are in column \code{'.sample'} and the metric used in 
-#'         column \code{'.metric'}. For pcoa ordinations, 
-#'         \code{attr(, 'eig')} will contain the eigenvalues useful for 
-#'         construction of ".. % variation explained" labels. 
-#'         \code{attr(, 'stats_raw')} and \code{attr(,'stats_tbl')} contain the 
-#'         raw and tabular adonis statistics when \code{stat.by} is set. 
-#'         Distance matrices are in \code{attr(, 'dm')}. When \code{rank} is
-#'         non-NULL, or \code{taxa} is a list of taxon names, a data.frame of
-#'         biplot coordinates will be given by \code{attr(,'biplot')}.
+#' @return A data.frame with columns \code{.sample}, \code{.ord}, \code{.x}, 
+#'         \code{.y}, and (optionally) \code{.z}.
+#'         
+#'         If \code{biom} is a \code{BIOM} object, then \code{.weighted}, 
+#'         \code{.bdiv}, and any columns given by \code{md}, \code{split.by}, 
+#'         and \code{stat.by} are included as well.
+#'         
+#'         If \code{stat.by} is given, then \code{attr(, 'sample_stats')}
+#'         and \code{attr(, 'sample_stats_cmds')} are set.
+#'         
+#'         If \code{rank} is given, then \code{attr(, 'taxa_coords')},
+#'         \code{attr(, 'taxa_stats')}, and \code{attr(, 'taxa_stats_cmds')} 
+#'         are set.
+#'         
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
-#'     ord <- bdiv_ord_table(hmp50, "bray-curtis", "pcoa")
+#'     ord <- bdiv_ord_table(hmp50, "bray", "pcoa", stat.by="Body Site", rank="g")
 #'     head(ord)
+#'     attr(ord, 'sample_stats')
+#'     attr(ord, 'taxa_stats')
+#'     
 #'     
 
 bdiv_ord_table <- function (
-    biom, dist="Bray-Curtis", ord="UMAP", weighted=TRUE, tree=NULL, 
-    md=NULL, k=2, split.by=NULL, stat.by=NULL, seed=0, perms=1000, 
-    rank=NULL, taxa=5, p.adj='fdr', p.top=5, ...) {
+    biom, bdiv="Bray-Curtis", ord="UMAP", weighted=TRUE, md=NULL, k=2, 
+    split.by=NULL, stat.by=NULL, tree=NULL, test="adonis2", seed=0, 
+    permutations=999, rank=NULL, taxa=5, p.top=Inf, p.adj='fdr', unc="singly", ...) {
   
   
   #________________________________________________________
@@ -114,298 +132,357 @@ bdiv_ord_table <- function (
     return (readRDS(cache_file))
   
   
-  ord_args <- list(...)
+  stopifnot(is(biom, 'dist') || is(biom, 'BIOM'))
+  dots <- list(...)
+  ord %<>% validate_arg(NULL, 'ord', n = c(1,Inf))
   
-  ord  %<>% validate_metrics(NULL, ., mode = "ord",  multi=TRUE)
-  dist %<>% validate_metrics(biom, ., mode = "bdiv", multi=TRUE)
   
   
   #________________________________________________________
   # Can't do as much when biom is a dist object
   #________________________________________________________
-  if (!is(biom, 'BIOM'))
-    for (i in c('md', 'split.by', 'stat.by', 'rank'))
-      if (!is_null(get(i)))
-        stop("BIOM object needed for running bdiv_ord_table() with `", i, "` argument.")
-  
-  
-  #________________________________________________________
-  # Verify metadata columns exist
-  #________________________________________________________
-  if (isTRUE(md))
-    md <- colnames(metadata(biom))
-  
-  if (is.character(md)) {
-    missing <- setdiff(c(md, split.by, stat.by), colnames(metadata(biom)))
-    if (length(missing) > 0)
-      stop("Metadata column(s) ", paste(collapse = ", ", missing), " not found.")
+  if (is(biom, 'dist')) {
+    
+    extraneous_args <- setdiff(c('ord', 'k', '...'), formalArgs(f))
+    invalid_args    <- intersect(extraneous_args, names(match.call()))
+    if (length(invalid_args) > 0) {
+      invalid_args %<>% paste(collapse = ", ")
+      stop("In bdiv_ord_table() `biom` must be a BIOM object to use: ", invalid_args)
+    }
+    
+    results <- plyr::ldply(setNames(ord, ord), .id = ".ord", function (o) {
+      do.call(distmat_ordinate, c(list(dm = biom, ord = o, k = k), dots))
+    })
+    
+    set_cache_value(cache_file, results)
+    return (results)
   }
   
   
+  
   #________________________________________________________
-  # Subdivide BIOM object according to metadata
+  # Validate arguments only relevant for BIOM objects
   #________________________________________________________
-  if (is_null(split.by)) {
-    biom_list <- list(biom)
-  } else {
-    biom_list <- blply(biom, split.by, function (b) b)
-  }
+  biom     %<>% as_percent()
+  tree     %<>% aa(display = deparse(substitute(tree)))
+  bdiv     %<>% validate_arg(biom, 'bdiv',     'bdiv', n = c(1,Inf))
+  weighted %<>% validate_arg(NULL, 'weighted',         n = c(1,Inf))
+  
+  if (isTRUE(md)) md <- colnames(sample_metadata(biom))
+  md       %<>% validate_arg(biom, 'md',       'meta')
+  split.by %<>% validate_arg(biom, 'split.by', 'meta')
+  stat.by  %<>% validate_arg(biom, 'stat.by',  'meta')
+  
   
   
   #________________________________________________________
   # Biplot - determine taxonomic rank
   #________________________________________________________
-  if (is_null(rank) && is.character(taxa)) {
-    rank <- names(which.max(apply(taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
-  } else if (!is_null(rank)) {
-    rank <- validate_metrics(biom, rank, mode="rank", multi=TRUE)
+  if (!is_null(rank)) {
+    rank %<>% validate_arg(biom, 'rank', n = c(1,10))
+  } else if (is.character(taxa)) {
+    rank <- names(which.max(apply(otu_taxonomy(biom), 2L, function (x) sum(x %in% taxa))))
   }
   
   
-  #________________________________________________________
-  # Aggregate iterative output together into final tables
-  #________________________________________________________
-  add_loop_columns <- function (x, i, w, d, o = NULL) {
-    if (is_null(x)) return (NULL)
-    x[['.weight']] <- ifelse(w, "Weighted", "Unweighted")
-    x[['.dist']]   <- d
-    if (!is_null(o)) x[['.ord']]    <- o
-    for (j in colnames(attr(biom_list, 'split_labels')))
-      x[[j]] <- attr(biom_list, 'split_labels')[i,j]
-    return (x)
-  }
   
-  
-  #________________________________________________________
-  # Loop over all combinations of variables
-  #________________________________________________________
-  ord_results       <- NULL
-  stats_tbl_results <- NULL
-  biplot_results    <- NULL
-  
-  for (i in seq_along(biom_list))
-    for (w in as.logical(weighted))
-      for (d in dist) {
-        
-        #________________________________________________________
-        # Generate distance matrix and/or Adonis statistics
-        #________________________________________________________
-        b <- biom_list[[i]]
-        
-        if (is(b, 'dist')) {
-          dm <- b
-          if (!is_null(stat.by)) {
-            set.seed(seed)
-            stats_raw <- try(vegan::adonis2(dm ~ stat.by, permutations=perms-1), silent = TRUE)
-            stats_tbl <- adonis_table(stats_raw)
-          } else {
-            stats_tbl <- NULL
-          }
-          
-        } else {
-          dm <- bdiv_distmat(biom = b, method = d, weighted = w, tree = tree, stat.by=stat.by, seed=seed, perms=perms-1)
-          stats_tbl <- attr(dm, 'stats_tbl', exact = TRUE)
-          attr(dm, 'stats_raw') <- NULL
-          attr(dm, 'stats_tbl') <- NULL
-        }
-        
-        
-        for (o in ord) {
-          
-          
-          #________________________________________________________
-          # Ordinate samples => ('.axis.1', '.axis.2')
-          #________________________________________________________
-          if (o == "PCoA") {
-            res <- do.call(ape::pcoa, c(list(D = dm), ord_args))
-            df  <- res$vectors[,1:k] %>% as.data.frame()
-            eig <- res$values$Relative_eig[1:k] %>% as.data.frame()
-            
-          } else if (o == "tSNE") {
-            ord_args[['X']] <-  dm
-            ord_args[['k']] <-  k
-            res <- suppressMessages(do.call(tsne::tsne, ord_args))
-            df  <- res %>% as.data.frame()
-            rownames(df) <- attr(dm, "Labels", exact = TRUE)
-            eig <- NULL
-            
-          } else if (o == "NMDS") {
-            ord_args[['comm']]   <-  dm
-            ord_args[['k']]      <-  k
-            ord_args[['trace']] %<>% if.null(0)
-            res <- do.call(vegan::metaMDS, ord_args)
-            df  <- res$points %>% as.data.frame()
-            eig <- NULL
-            
-          } else if (o == "UMAP") {
-            ord_args[['X']]             <-  dm
-            ord_args[['n_components']] %<>% if.null(k)
-            ord_args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))
-            res <- do.call(uwot::umap, ord_args)
-            df  <- res %>% as.data.frame()
-            eig <- NULL
-            
-          } else {
-            stop("'", o, "' is not a valid argument for 'ord'.")
-          }
-          colnames(df)    <- paste0(".axis.", 1:k)
-          df[['.sample']] <- rownames(df)
-          
-          
-          #________________________________________________________
-          # Calculate 0, 1, or more biplot(s)
-          #________________________________________________________
-          biplot <- ordinate_biplot(b, df, rank, taxa, p.adj, p.top, perms)
-          
-          rownames(df) <- NULL
-          ord_results    %<>% rbind(add_loop_columns(df,     i, w, d, o))
-          biplot_results %<>% rbind(add_loop_columns(biplot, i, w, d, o))
-          
-        } # end o / ord
-        
-        stats_tbl_results %<>% rbind(add_loop_columns(stats_tbl, i, w, d))
-        
-      } # end i,w,d / biom_list, weighted, dist
-  
-  
-  #________________________________________________________
-  # Make properly ordered factors
-  #________________________________________________________
-  strings_to_factors <- function (x) {
-    if (is_null(x)) return (NULL)
-    for (i in intersect(colnames(x), c('.weight', '.dist', '.ord')))
-      x[[i]] %<>% factor(levels = unique(x[[i]]))
-    return (x)
-  }
-  ord_results       %<>% strings_to_factors()
-  stats_tbl_results %<>% strings_to_factors()
-  biplot_results    %<>% strings_to_factors()
-  
-  
-  #________________________________________________________
-  # Add metadata to the ord_results table.
-  #________________________________________________________
-  sampleIDs <- ord_results[['.sample']]
-  for (i in rev(unique(c(md, split.by, stat.by))))
-    ord_results[[i]] <- metadata(biom, i)[sampleIDs]
-  remove("sampleIDs")
-  
-  
-  attr(ord_results, 'response') <- ".diversity"
-  attr(ord_results, 'stats_tbl') <- stats_tbl_results
-  attr(ord_results, 'biplot')    <- biplot_results
-  
-  
-  set_cache_value(cache_file, ord_results)
-  return (ord_results)
-}
-
-
-
-ordinate_biplot <- function (biom, coords, ranks, taxa, p.adj, p.top, perms) {
-  
-  if (is_null(ranks)) return (NULL)
-  
-  #________________________________________________________
-  # Handle multiple ranks.
-  #________________________________________________________
-  biplots <- plyr::ldply(ranks, function (rank) {
-    
-    #________________________________________________________
-    # Calculate Weighted average for each taxon
-    #________________________________________________________
-    biplot                 <- distill(biom, rank, md = FALSE)
-    biplot                 <- rename_response(biplot, ".abundance")
-    biplot[['.rank']]      <- rank
-    biplot[['.abundance']] <- biplot[['.abundance']] / sample_sums(biom)[biplot[['.sample']]]
-    biplot[['.x']]         <- coords[biplot[['.sample']], '.axis.1']
-    biplot[['.y']]         <- coords[biplot[['.sample']], '.axis.2']
-    center.x               <- round(mean(biplot[['.x']]), 10)
-    center.y               <- round(mean(biplot[['.y']]), 10)
-    
-    
-    #________________________________________________________
-    # Subset the taxa. By name, top n, or min abundance.
-    #________________________________________________________
-    if (!is_null(taxa)) {
+  results <- blply(
+    biom   = biom, 
+    vars   = split.by, 
+    iters  = list(weighted = weighted, bdiv = bdiv),
+    prefix = TRUE,
+    FUN    = function (b, weighted, bdiv) {
       
-      if (is.numeric(taxa) && length(taxa) == 1) {
-        if (taxa >= 1) {
-          taxa <- top_taxa(biom, rank, taxa)
-        } else {
-          ts   <- as_percent(biom) %>% taxa_means(rank)
-          taxa <- which(ts >= taxa) %>% names()
-        }
+      
+      dm <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted, tree = tree)
+      
+      
+      #________________________________________________________
+      # Sample Ordination(s). x/y/z coordinates.
+      #________________________________________________________
+      sample_coords <- plyr::ldply(setNames(ord, ord), .id = ".ord", function (o) {
+        do.call(distmat_ordinate, c(list(dm = dm, ord = o, k = k), dots))
+      })
+      attr(dm, 'sample_coords') <- sample_coords
+      
+      
+      #________________________________________________________
+      # Statistics: Sample Groups vs Distance Matrix
+      #________________________________________________________
+      if (!is.null(stat.by)) {
+        
+        sample_stats <- distmat_stats(
+          dm           = dm, 
+          groups       = sample_metadata(b, stat.by), 
+          test         = test, 
+          seed         = seed,
+          permutations = permutations,
+          p.adj        = p.adj )
+        
+        attr(dm, 'sample_stats') <- sample_stats
       }
       
-      if (is.character(taxa)) {
-        biplot <- biplot[biplot[['.taxa']] %in% taxa,,drop=F]
+      
+      
+      #________________________________________________________
+      # Biplot statistics and x/y/z coordinates.
+      #________________________________________________________
+      if (!is.null(rank)) {
+        
+        rank_results <- plyr::llply(setNames(rank, rank), function (r) {
+          
+          taxa_mtx    <- taxa_matrix(biom = b, rank = r, taxa = taxa, unc = unc)
+          taxa_stats  <- biplot_taxa_stats(dm, taxa_mtx, test, seed, permutations, p.adj, p.top)
+          taxa_coords <- plyr::ddply(sample_coords, ".ord", function (df) {
+            biplot_taxa_coords(sample_coords = df, taxa_mtx)
+          })
+          
+          return (list(taxa_stats, taxa_coords))
+        })
+        
+        attr(dm, 'taxa_stats')  <- plyr::ldply(rank_results, .id = ".rank", `[[`, 1)
+        attr(dm, 'taxa_coords') <- plyr::ldply(rank_results, .id = ".rank", `[[`, 2)
       }
-    }
-    
-    
-    #________________________________________________________
-    # Get x,y,size and p-value for each taxon
-    #________________________________________________________
-    biplot <- plyr::ddply(biplot, c('.rank', '.taxa'), function(df) {
       
-      # Calculate Weighted average for each taxon
-      Abundance <- sum(df[['.abundance']])
-      if (Abundance == 0) return (NULL)
-      Axis.1 <- sum(df[['.x']] * df[['.abundance']]) / Abundance
-      Axis.2 <- sum(df[['.y']] * df[['.abundance']]) / Abundance
       
-      data.frame(
-        '.axis.1'    = Axis.1, 
-        '.axis.2'    = Axis.2,
-        '.ori.1'     = center.x,
-        '.ori.2'     = center.y,
-        '.abundance' = Abundance/nrow(df), 
-        '.p.val'     = local({
-          
-          # Use random reassignment of abundances to calculate 
-          # p-value. Known as approximate/random/Monte Carlo
-          # permutation test.
-          ptest <- boot::boot(
-            data      = df, 
-            R         = perms, 
-            statistic = function(data, ind) {
-              r.x <- sum(data[['.x']] * data[ind,'.abundance']) / Abundance
-              r.y <- sum(data[['.y']] * data[ind,'.abundance']) / Abundance
-              d   <- sqrt((r.x - center.x)^2 + (r.y - center.y)^2)
-              return (d)
-            })
-          d <- sqrt((Axis.1 - center.x)^2 + (Axis.2 - center.y)^2)
-          p <- length(which(ptest[['t']] >= d)) / ptest[['R']]
-          
-          return (p)
-          
-        }) )
-    })
-    
-    
-    #________________________________________________________
-    # Limit to taxa with adj. p-value <= p.top or top n signif taxa
-    #________________________________________________________
-    biplot[['.adj.p']] <- p.adjust(biplot[['.p.val']], method=p.adj)
-    if (p.top >= 1) {
-      biplot <- biplot[rank(-biplot[['.adj.p']]) <= p.top,,drop=F]
-    } else {
-      biplot <- biplot[biplot[['.adj.p']] <= p.top,,drop=F]
-    }
-    
-    
-    #________________________________________________________
-    # Final biplot data frame
-    #________________________________________________________
-    if (nrow(biplot) == 0)
-      return (NULL)
-    
-    return (biplot)
+      return (dm)
   })
   
-  return (biplots)
+  sample_coords <- plyr::ldply(results, attr, 'sample_coords')
+  sample_stats  <- plyr::ldply(results, attr, 'sample_stats')
+  taxa_coords   <- plyr::ldply(results, attr, 'taxa_coords')
+  taxa_stats    <- plyr::ldply(results, attr, 'taxa_stats')
+  
+  
+  if (!is.null(sample_stats)) {
+    sample_stats[['.adj.p']] <- signif(p.adjust(sample_stats[['.p.val']], method = p.adj), 3)
+  }
+  
+  if (!is.null(taxa_stats)) {
+    taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], method = p.adj), 3)
+    if (p.top < 1)
+      taxa_stats <- taxa_stats[taxa_stats[['.adj.p']] <= p.top,,drop=FALSE]
+  }
+  
+  #________________________________________________________
+  # Rearrange columns.
+  #________________________________________________________
+  # sample_coords[['.weighted']] %<>% ifelse("Weighted", "Unweighted")
+  # sample_coords %<>% within(.distance <- paste(.weighted, .method))
+  # sample_coords %<>% keep_cols(c(".sample", ".distance", ".ord", ".x", ".y", ".z"))
+  
+  for (i in unique(c(split.by, stat.by, md)))
+    sample_coords[[i]] <- sample_metadata(biom, i)[sample_coords[['.sample']]]
+  
+  
+  attr(sample_coords, 'sample_stats') <- sample_stats
+  attr(sample_coords, 'taxa_coords')  <- taxa_coords
+  attr(sample_coords, 'taxa_stats')   <- taxa_stats
+  
+  
+  
+  #________________________________________________________
+  # R code for reproducing statistics.
+  #________________________________________________________
+  
+  if (!is.null(sample_stats) || !is.null(taxa_stats)) {
+    
+    biom <- structure(NA, 'display' = "biom")
+    
+    
+    
+    #________________________________________________________
+    # Sample metadata groups
+    #________________________________________________________
+    
+    if (!is.null(sample_stats)) {
+      
+      attr(sample_coords, 'sample_stats_cmds') <- local({
+        
+        
+        # Simple case: no iterations over the stats section(s).
+        #________________________________________________________
+        
+        if (length(results) == 1)
+          return (paste(
+            sep = "\n",
+            "dm     <- %s" %>% fmt_cmd(bdiv_distmat, biom, bdiv, weighted, tree),
+            "groups <- sample_metadata(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
+            "set.seed(%i)" %>% sprintf(seed),
+            sprintf(permutations, fmt = switch(
+              EXPR = test,
+              adonis2 = "ptest  <- vegan::adonis2(formula = dm ~ groups, permutations = %i)",
+              mrpp    = "ptest  <- vegan::mrpp(dat = dm, grouping = groups, permutations = %i)" )),
+            "pstats <- summary(vegan::permustats(ptest))",
+            "sample_stats <- with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p, .adj.p=p), 3))",
+            "print(sample_stats)" ))
+        
+        
+        # Complex case: stats assembled from multiple iterations.
+        #________________________________________________________
+        
+        iters   <- list(weighted = weighted, bdiv = bdiv)
+        dm_args <- list(
+          biom   = biom, 
+          vars   = split.by, 
+          iters  = aa(iters, display = "iters"), 
+          prefix = TRUE, 
+          FUN    = aa(bdiv_distmat, display = "bdiv_distmat") )
+        dm_args[['tree']] <- tree
+        
+        paste(collapse = "\n", c(
+          "iters        <- list(%s)"  %>% sprintf(as.args(iters)),
+          "dm_list      <- blply(%s)" %>% sprintf(as.args(dm_args, fun = blply)),
+          "sample_stats <- plyr::ldply(dm_list, function (dm) {",
+          "  groups <- sample_metadata(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
+          "  set.seed(%i)" %>% sprintf(seed),
+          sprintf(permutations, fmt = switch(
+            EXPR = test,
+            adonis2 = "  ptest  <- vegan::adonis2(formula = dm ~ groups, permutations = %i)",
+            mrpp    = "  ptest  <- vegan::mrpp(dat = dm, grouping = groups, permutations = %i)" )),
+          "  pstats <- summary(vegan::permustats(ptest))",
+          "  with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
+          "})",
+          sprintf("sample_stats[['.adj.p']] <- signif(p.adjust(sample_stats[['.p.val']], %s), 3))", double_quote(p.adj)),
+          "print(sample_stats)" ))
+        
+      })
+      
+    }
+    
+    
+    
+    #________________________________________________________
+    # Taxa as groups
+    #________________________________________________________
+    
+    if (!is.null(taxa_stats)) {
+      
+      attr(sample_coords, 'taxa_stats_cmds') <- local({
+        
+        
+        # Simple case: no iterations over the stats section(s).
+        #________________________________________________________
+        
+        if (length(results) == 1 && length(rank) < 2)
+          return (paste(
+            sep = "\n",
+            "dm         <- %s" %>% fmt_cmd(bdiv_distmat, biom, bdiv, weighted, tree),
+            "taxa_mtx   <- %s" %>% fmt_cmd(taxa_matrix, biom, rank, taxa, unc),
+            "taxa_stats <- plyr::adply(taxa_mtx, 2L, .id = '.taxa', function (abundances) {",
+            "  abundances <- abundances[attr(dm, 'Labels')]",
+            "  set.seed(%i)" %>% sprintf(seed),
+            sprintf(permutations, fmt = switch(
+              EXPR = test,
+              adonis2 = "  ptest  <- vegan::adonis2(formula = dm ~ abundances, permutations = %i)",
+              mrpp    = "  ptest  <- vegan::mrpp(dat = dm, grouping = abundances, permutations = %i)" )),
+            "  pstats <- summary(vegan::permustats(ptest))",
+            "  with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
+            "})",
+            sprintf("taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], %s), 3))", double_quote(p.adj)),
+            "print(taxa_stats)" ))
+        
+        
+        # Complex case: stats assembled from multiple iterations.
+        #________________________________________________________
+        
+        iters   <- list(weighted = weighted, bdiv = bdiv)
+        dm_args <- list(
+          biom   = biom, 
+          vars   = split.by, 
+          iters  = aa(iters, display = "iters"), 
+          prefix = TRUE, 
+          FUN    = aa(bdiv_distmat, display = "bdiv_distmat") )
+        dm_args[['tree']] <- tree
+        
+        paste(collapse = "\n", c(
+          "iters      <- list(%s)"  %>% sprintf(as.args(iters)),
+          "dm_list    <- blply(%s)" %>% sprintf(as.args(dm_args, fun = blply)),
+          "ranks      <- %s"        %>% sprintf(as.args(list(rank))),
+          "taxa_stats <- plyr::ldply(dm_list, function (dm) {",
+          "  plyr::ldply(setNames(ranks, ranks), .id = '.rank', function (rank) {",
+          "    taxa_mtx <- %s" %>% fmt_cmd(taxa_matrix, biom_, rank_, taxa, unc),
+          "    plyr::adply(taxa_mtx, 2L, .id = '.taxa', function (abundances) {",
+          "      abundances <- abundances[attr(dm, 'Labels')]",
+          "      set.seed(%i)" %>% sprintf(seed),
+          sprintf(permutations, fmt = switch(
+            EXPR = test,
+            adonis2 = "      ptest  <- vegan::adonis2(formula = dm ~ abundances, permutations = %i)",
+            mrpp    = "      ptest  <- vegan::mrpp(dat = dm, grouping = abundances, permutations = %i)" )),
+          "      pstats <- summary(vegan::permustats(ptest))",
+          "      with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
+          "    })",
+          "  })",
+          "})",
+          sprintf("taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], %s), 3))", double_quote(p.adj)),
+          if (p.top < 1)          { sprintf("taxa_stats <- subset(taxa_stats, .adj.p <= %f)", p.top)
+          } else if (p.top < Inf) { sprintf("taxa_stats <- subset(taxa_stats, rank(.p.val) <= %i)", p.top)
+          } else                  { NULL },
+          "print(taxa_stats)" ))
+        
+      })
+    }
+    
+  }
+  
+  
+  
+  set_cache_value(cache_file, sample_coords)
+  return (sample_coords)
 }
 
+
+
+
+biplot_taxa_stats <- function (dm, taxa_mtx, test, seed, permutations, p.adj, p.top) {
+  
+  taxa_stats <- plyr::adply(
+    .data        = taxa_mtx[attr(dm, 'Labels'),], 
+    .margins     = 2L, 
+    .id          = ".taxa", 
+    .fun         = distmat_stats,
+    dm           = dm, 
+    test         = test, 
+    seed         = seed,
+    permutations = permutations,
+    p.adj        = p.adj )
+  
+  if (!is.data.frame(taxa_stats)) return (NULL)
+  
+  if (p.top >= 1)
+    taxa_stats <- taxa_stats[rank(taxa_stats[['.p.val']]) <= p.top,,drop=FALSE]
+  
+  if (p.top < 1)
+    taxa_stats <- taxa_stats[taxa_stats[['.adj.p']] <= p.top,,drop=FALSE]
+  
+  
+  return (taxa_stats)
+}
+
+
+
+
+biplot_taxa_coords <- function (sample_coords, taxa_mtx) {
+  
+  xyz     <- intersect(names(sample_coords), c('.x', '.y', '.z')) %>% setNames(.,.)
+  origins <- lapply(xyz, function (i) { round(mean(sample_coords[[i]]), 10) })
+  names(origins) %<>% paste0("0")
+  taxa_mtx <- taxa_mtx[sample_coords[['.sample']],]
+  
+  #________________________________________________________
+  # Find weighted average x, y, z, and size for each taxon.
+  #________________________________________________________
+  plyr::adply(taxa_mtx, 2L, .id = ".taxa", function (vals) {
+    
+    taxa_size <- mean(vals)
+    if (taxa_size == 0) return (NULL)
+    
+    taxa_xyz <- lapply(xyz, function (i) { mean(sample_coords[[i]] * vals) / taxa_size })
+    
+    data.frame(check.names = FALSE, '.size' = taxa_size, taxa_xyz, origins) %>%
+      signif(3)
+  })
+  
+}
 
 

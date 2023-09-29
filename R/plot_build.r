@@ -5,11 +5,11 @@
 #______________________________________________________________
 plot_build <- function (layers) {
   
-  stopifnot('ggplot' %in% names(layers))
+  stopifnot(has_name(layers, 'ggplot'))
   
   ggdata <- attr(layers, 'data',   exact = TRUE)
   params <- attr(layers, 'params', exact = TRUE)
-  stopifnot(is.data.frame(ggdata))
+  stopifnot(is(ggdata, 'data.frame'))
   
   
   #______________________________________________________________
@@ -68,8 +68,8 @@ plot_build <- function (layers) {
   #______________________________________________________________
   layer_order <- c(
     'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 'trend', 
-    'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 'name', 
-    'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
+    'residual', 'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
+    'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
     'arrow', 'taxon', 'brackets', 'stats_text', 'stack', 'hline', 'vline', 
     'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 
     'scale_size', 'facet', # 'free_y', 
@@ -149,7 +149,6 @@ plot_build <- function (layers) {
   for (layer in layer_order) {
     
     args <- layers[[layer]]
-    fn   <- attr(args, 'fn',       exact = TRUE)
     fun  <- attr(args, 'function', exact = TRUE)
     src  <- attr(args, 'src',      exact = TRUE)
     
@@ -203,13 +202,13 @@ plot_build <- function (layers) {
                   mapped_cols <- unique(c(mapped_cols, val))
                 
                 # Add backticks to column names
-                val <- capture.output(as.name(val))
+                val <- as.name(val)
+                #val <- sym(val)
+                #val <- enquo(val)
               }
             
-            } else {
-              # Add double-quotes to other strings
-              val <- double_quote(val)
             }
+            
           }
           
           aes_args[[arg]] <- val
@@ -217,10 +216,7 @@ plot_build <- function (layers) {
         
         
         if (isTRUE(length(aes_args) > 0)) {
-          args[['mapping']] <- do.call(
-            what  = aes_string, 
-            args  = aes_args, 
-            quote = TRUE )
+          args[['mapping']] <- do.call(aes, aes_args)
           
         } else {
           args <- args[names(args) != 'mapping']
@@ -239,7 +235,7 @@ plot_build <- function (layers) {
         args[[i]] <- NULL
     
     
-    layers[[layer]] <- list(fn = fn, fun = fun, args = args)
+    layers[[layer]] <- list(fun = fun, args = args)
   }
   
   # Drop columns while keeping attributes
@@ -255,9 +251,9 @@ plot_build <- function (layers) {
   
   for (layer in layer_order) {
     
-    fn   = layers[[layer]][['fn']]
-    fun  = layers[[layer]][['fun']]
-    args = layers[[layer]][['args']]
+    fun  <- layers[[layer]][['fun']]
+    args <- layers[[layer]][['args']]
+    fn   <- attr(fun, 'fn', exact = TRUE)
     
     
     # Skip theme() unless it has arguments
@@ -290,14 +286,17 @@ plot_build <- function (layers) {
     # Show ggplot() layer as "ggplot(data)", rest more verbosely
     #______________________________________________________________
     if (fn == "ggplot") {
+      
       args[['data']] <- structure(ggdata, display = "data")
       p    <- do.call(fun, args) 
-      cmds <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
+      cmds <- attr(p, 'display')
       
     } else {
-      p    <- p + do.call(fun, args)
-      cmds <- c(cmds, sprintf("%s(%s)", fn, as.args(args, indent = 4, fun=fun)))
+      args[['.indent']] <- 4
+      p    <- p + (q <- do.call(fun, args))
+      cmds <- c(cmds, attr(q, 'display'))
     }
+    
   }
   
   
@@ -309,8 +308,9 @@ plot_build <- function (layers) {
   
   
   attr(p, 'cmd')   <- paste(collapse=" +\n  ", cmds)
-  attr(p, 'data')  <- ggdata
-  attr(p, 'stats') <- attr(layers, "stats", exact = TRUE)
+  #attr(p, 'data')  <- ggdata
+  #attr(p, 'stats') <- attr(layers, "stats", exact = TRUE)
+  p$stats <- attr(layers, "stats", exact = TRUE)
   
   
   #______________________________________________________________

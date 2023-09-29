@@ -19,12 +19,12 @@ tree_plot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{layout}{Any layout option supported by \link{ggtree::ggtree}:
-\code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"}, 
-\code{"ellipse"}, \code{"roundrect"}, \code{"fan"}, 
-\code{"circular"}, \code{"inward_circular"}, \code{"radial"}, 
+\item{layout}{Any layout option supported by \code{\link[ggtree:ggtree]{ggtree::ggtree()}}:
+\code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"},
+\code{"ellipse"}, \code{"roundrect"}, \code{"fan"},
+\code{"circular"}, \code{"inward_circular"}, \code{"radial"},
 \code{"equal_angle"}, \code{"daylight"} or \code{"ape"}.
 Default: \code{"rectangular"}.}
 
@@ -33,16 +33,16 @@ Default: \code{"rectangular"}.}
 \code{tiplab = "Genus"}). Default: \code{NULL}.}
 
 \item{color.by}{How to color the tree. Currently only supports the options
-\code{NULL} (no coloring) or \code{'.reads'} (color by number of taxa 
+\code{NULL} (no coloring) or \code{'.reads'} (color by number of taxa
 observations). Default: \code{NULL}.}
 
 \item{label, cladelab}{Label monophyletic clades. You can specify the
-same or different taxonomic ranks for internal (label) and external 
+same or different taxonomic ranks for internal (label) and external
 (cladelab) annotations. Default: \code{NULL}.}
 
 \item{top, right, bottom, left}{Add additional space around the tree.
 Sometimes necessary for wide text annotations. Set as fraction of
-tree's width/height. For instance, \code{right = 1} reserves the 
+tree's width/height. For instance, \code{right = 1} reserves the
 right half of the plotting area for non-tree elements.
 Default: \code{NULL}.}
 }
@@ -50,29 +50,17 @@ Default: \code{NULL}.}
 Display a dendrogram of the phylogenetic tree.
 }
 \examples{
-    library(rbiom) 
-     
-    tree_plot(hmp50)
+    library(rbiom)
     
-    hmp1 <- select(hmp50, samples = "HMP10")
-    tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
-    tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
-
+    hmp1 <- sample_select(hmp50, samples = "HMP10")
+    
+    # Needs the optional ggtree package
+    if (nzchar(system.file(package = "ggtree")))
+      tree_plot(hmp50)
+      
+    if (nzchar(system.file(package = "ggtree")))
+      tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
+    
+    if (nzchar(system.file(package = "ggtree")))
+      tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
 }
-\seealso{
-Other plotting: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_biplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{depths_barplot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
-}
-\concept{plotting}

@@ -7,20 +7,20 @@
 write_tree(tree, file = NULL)
 }
 \arguments{
-\item{tree}{A \code{phylo} object, as returned from \link{read_tree}. Also 
+\item{tree}{A \code{phylo} object, as returned from \code{\link[=read_tree]{read_tree()}}. Also
 accepts a \code{BIOM} object if it has a phylogentic tree.}
 
 \item{file}{Filename or connection to write the newick file to (optional).}
 }
 \value{
 If file is NULL, the newick string as a character vector. Otherwise,
-        the normalized filepath that was written to (invisibly).
+the normalized filepath that was written to (invisibly).
 }
 \description{
 Write a newick formatted phylogenetic tree.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
     tree   <- read_tree(infile)

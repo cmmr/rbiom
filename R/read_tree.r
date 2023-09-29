@@ -5,10 +5,11 @@
 #' This tree must be in Newick format, also known as parenthetic format and
 #' New Hampshire format.
 #'
-#' @param src Input data as either a file path, URL, or Newick string. 
+#' @param src   Input data as either a file path, URL, or Newick string. 
 #'        Compressed (gzip or bzip2) files are also supported.
 #'        
 #' @return A \code{phylo} class object representing the tree.
+#' 
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -23,7 +24,7 @@
 #'
 read_tree <- function (src) {
   
-  stopifnot(is_scalar_character(src))
+  stopifnot(is_scalar_character(src) && !is_na(src))
   
   src <- trimws(src)
   stopifnot(isTRUE(nchar(src) > 0))
@@ -52,7 +53,7 @@ read_tree <- function (src) {
         on.exit(close(con))
         paste0(collapse = "", readLines(con, warn = FALSE)) }))
   
-  stopifnot(is_scalar_character(text))
+  stopifnot(is_scalar_character(text) && !is_na(text))
   
   
   #________________________________________________________
@@ -62,8 +63,8 @@ read_tree <- function (src) {
   text <- gsub("\\[.*?\\]", "",             text, perl=TRUE)
   text <- sub("^[\ \t]+",  "",              text)
   
-  stopifnot(nchar(text) >= 2)
-  stopifnot(startsWith(text, '('))
+  stopifnot(isTRUE(nchar(text) >= 2))
+  stopifnot(isTRUE(startsWith(text, '(')))
   
   
   #________________________________________________________

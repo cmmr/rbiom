@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"linear"</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  stats <span class="op">=</span> <span class="st">"emtrends"</span>,</span>
 <span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
@@ -72,7 +72,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
 
 
 <dt>x</dt>
@@ -80,76 +80,68 @@
 
 
 <dt>rank</dt>
-<dd><p>What rank of taxa to display. E.g. "Phylum", "Genus", etc. 
-Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a given BIOM object. 
+<dd><p>What rank of taxa to display. E.g. "Phylum", "Genus", etc.
+Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a given BIOM object.
 The default, <code>NULL</code>, selects the lowest level.</p></dd>
 
 
 <dt>taxa</dt>
 <dd><p>Which taxa to display. An integer value will show the top n
-most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that 
+most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: <code>6</code>.</p></dd>
 
 
 <dt>layers</dt>
-<dd><p><code>"trend"</code>, <code>"scatter"</code>. Single letter 
-abbreviations are also accepted. For instance, 
-<code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and 
-<code>"ts"</code>. See <code>vignette("corrplots")</code> for examples of each. 
+<dd><p><code>"trend"</code>, <code>"scatter"</code>. Single letter
+abbreviations are also accepted. For instance,
+<code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and
+<code>"ts"</code>. See <code>vignette("corrplots")</code> for examples of each.
 Default: <code>"t"</code>.</p></dd>
 
 
 <dt>color.by, facet.by, limit.by</dt>
-<dd><p>Metadata columns to use for aesthetics 
+<dd><p>Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: <code>NULL</code></p></dd>
 
 
 <dt>model</dt>
-<dd><p>What type of trendline to fit to the data. Options are: 
-<code>"linear"</code>, <code>"logarithmic"</code>, or <code>"local"</code>. You can
-alternatively provide a list of length two where the first element is
-a character vector of length 1 naming a function, and the second 
-element is a list of arguments to pass to that function. One of the 
-function's arguments must be named 'formula'. For example, 
-<code>model = list("stats::lm", list(formula = y ~ x))</code>.
-Default: <code>"linear"</code>.</p></dd>
+<dd><p>What type of trendline to fit to the data. Options are:</p><ul><li><p><code>"lm"</code> -   Linear model: <code>stats::lm(formula = y ~ x)</code>.)</p></li>
+<li><p><code>"log"</code> -  Logarithmic model: <code>stats::lm(formula = y ~ log(x))</code>.</p></li>
+<li><p><code>"gam"</code> -  Generalized additive model: <code>mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")</code>.</p></li>
+</ul><p>Default: <code>"lm"</code> <br><br>
+You can alternatively provide a list of length two where the first
+element is a character vector of length 1 naming a function, and the
+second element is a list of arguments to pass to that function. One
+of the function's arguments must be named 'formula'.
+For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p></dd>
 
 
 <dt>stats</dt>
-<dd><p>Which statistic to display on the plot. Options are:</p><dl><dt><code>"fit"</code></dt>
-<dd><p>How well does the model fit all the data?</p></dd>
-
-  <dt><code>"emtrends"</code></dt>
-<dd><p>Does any trendline have a non-zero slope?</p></dd>
-
-  <dt><code>"emt_pairs"</code></dt>
-<dd><p>Are the slopes of any trendlines different?</p></dd>
-
-  <dt><code>"emm_pairs"</code></dt>
-<dd><p>Are the means of any trendlines different?</p></dd>
-
-  <dt><code>"hide"</code></dt>
-<dd><p>Don't show stats on the plot, but still compute them.</p></dd>
-
-  <dt><code>"none"</code></dt>
-<dd><p>Do not compute or show statistics.</p></dd>
-
-
-</dl><p>Statistical tests are run separately on each facet (except 
-<code>"fit"</code>). P-values are adjusted for multiple comparisons by 
-considering all facets together. Unless <code>stats = "none"</code>, all 
-stats are attached to the plot as <code>attr(,'stats')</code>. 
-Default: <code>"emtrends"</code></p></dd>
+<dd><p>Which statistic to display on the plot. Options are:</p><ul><li><p><code>"fit"</code> -  How well does the model fit the data?</p></li>
+<li><p><code>"terms"</code> -  How strongly does 'x' influence 'y'?</p></li>
+<li><p><code>"emmeans"</code> -  Is the average 'y' value non-zero?</p></li>
+<li><p><code>"emtrends"</code> -  Does any trendline have a non-zero slope?</p></li>
+<li><p><code>"emm_pairs"</code> -  Are the means of any trendlines different?</p></li>
+<li><p><code>"emt_pairs"</code> -  Are the slopes of any trendlines different?</p></li>
+<li><p><code>"hide"</code> -  Don't show stats on the plot, but still compute them.</p></li>
+<li><p><code>"none"</code> -  Do not compute or show statistics.</p></li>
+</ul><p>Default: <code>"emtrends"</code> <br><br>
+Note: <code>"emm_pairs"</code> and <code>"emt_pairs"</code> can only be calculated
+when using a <code>color.by</code> metadata column with more than one level. <br><br>
+Statistical tests are run separately on each facet. P-values are
+adjusted for multiple comparisons by considering all facets together.
+Unless <code>stats = "none"</code>, all stats are attached to the plot as
+<code>attr(,'stats')</code>.</p></dd>
 
 
 <dt>p.top</dt>
-<dd><p>Only display taxa with the most significant differences in 
-abundance. If <code>p.top</code> is &gt;= 1, then the <code>p.top</code> most 
-significant taxa are displayed. If <code>p.top</code> is less than one, all 
-taxa with an adjusted p-value &lt;= <code>p.top</code> are displayed. 
-Recommended to be used in combination with the <code>taxa</code> parameter 
-to set a lower bound on the mean abundance of considered taxa. 
+<dd><p>Only display taxa with the most significant differences in
+abundance. If <code>p.top</code> is &gt;= 1, then the <code>p.top</code> most
+significant taxa are displayed. If <code>p.top</code> is less than one, all
+taxa with an adjusted p-value &lt;= <code>p.top</code> are displayed.
+Recommended to be used in combination with the <code>taxa</code> parameter
+to set a lower bound on the mean abundance of considered taxa.
 Default: <code>Inf</code></p></dd>
 
 
@@ -160,16 +152,16 @@ Default: <code>"fdr"</code>.</p></dd>
 
 
 <dt>ci</dt>
-<dd><p>The confidence interval to display around the fitted curve. Set
-to <code>FALSE</code> to hide the confidence interval. Default: <code>95</code>.</p></dd>
+<dd><p>The confidence interval to display around the trendline.
+Default: <code>95</code>.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either <code>t.</code> or 
-<code>s.</code>/<code>pt.</code> to ensure it gets passed to (and only to) 
-<a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a> or <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a>, 
-respectively. For instance, <code>s.size = 2</code> ensures only the 
+functions. Prefix a parameter name with either <code>t.</code> or
+<code>s.</code>/<code>pt.</code> to ensure it gets passed to (and only to)
+<a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a> or <a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a>,
+respectively. For instance, <code>s.size = 2</code> ensures only the
 scatterplot points have their size set to <code>2</code>.</p></dd>
 
 </dl></div>
@@ -177,17 +169,17 @@ scatterplot points have their size set to <code>2</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The computed data points and statistics will 
-        be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>, 
-        respectively.</p>
+<p>A <code>ggplot2</code> plot. The computed data points and statistics will
+be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>,
+respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>
     
 
 
-<p>Metadata can be used to flexibly subset, partition, and apply aesthetics 
-when creating a plot. Common use cases are provided below. More thorough 
+<p>Metadata can be used to flexibly subset, partition, and apply aesthetics
+when creating a plot. Common use cases are provided below. More thorough
 documentation is available at <a href="https://cmmr.github.io/rbiom">https://cmmr.github.io/rbiom</a>.</p>
 <div class="sourceCode"><pre><code><span>  <span class="co">## Colors ----------------------------</span></span>
 <span>  <span class="va">color.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
@@ -209,43 +201,43 @@ documentation is available at <a href="https://cmmr.github.io/rbiom">https://cmm
 <li><p><code>facet.by</code> - Only categorical metadata column(s).</p></li>
 <li><p><code>limit.by</code> - Any metadata column(s).</p></li>
 </ul><p>All built-in color palettes are colorblind-friendly.</p>
-<p>The available categorical palette names are: <code>"okabe"</code>, <code>"carto"</code>, 
-<code>"r4"</code>, <code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, 
-<code>"light"</code>, <code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, 
-<code>"classic"</code>, <code>"alphabet"</code>, <code>"tableau20"</code>, <code>"kelly"</code>, 
+<p>The available categorical palette names are: <code>"okabe"</code>, <code>"carto"</code>,
+<code>"r4"</code>, <code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>,
+<code>"light"</code>, <code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>,
+<code>"classic"</code>, <code>"alphabet"</code>, <code>"tableau20"</code>, <code>"kelly"</code>,
 and <code>"fishy"</code>.</p>
-<p>The available numeric palette names are: <code>"reds"</code>, <code>"oranges"</code>, 
-<code>"greens"</code>, <code>"purples"</code>, <code>"grays"</code>, <code>"acton"</code>, 
-<code>"bamako"</code>, <code>"batlow"</code>, <code>"bilbao"</code>, <code>"buda"</code>, 
-<code>"davos"</code>, <code>"devon"</code>, <code>"grayC"</code>, <code>"hawaii"</code>, 
-<code>"imola"</code>, <code>"lajolla"</code>, <code>"lapaz"</code>, <code>"nuuk"</code>, 
-<code>"oslo"</code>, <code>"tokyo"</code>, <code>"turku"</code>, <code>"bam"</code>, 
-<code>"berlin"</code>, <code>"broc"</code>, <code>"cork"</code>, <code>"lisbon"</code>, 
+<p>The available numeric palette names are: <code>"reds"</code>, <code>"oranges"</code>,
+<code>"greens"</code>, <code>"purples"</code>, <code>"grays"</code>, <code>"acton"</code>,
+<code>"bamako"</code>, <code>"batlow"</code>, <code>"bilbao"</code>, <code>"buda"</code>,
+<code>"davos"</code>, <code>"devon"</code>, <code>"grayC"</code>, <code>"hawaii"</code>,
+<code>"imola"</code>, <code>"lajolla"</code>, <code>"lapaz"</code>, <code>"nuuk"</code>,
+<code>"oslo"</code>, <code>"tokyo"</code>, <code>"turku"</code>, <code>"bam"</code>,
+<code>"berlin"</code>, <code>"broc"</code>, <code>"cork"</code>, <code>"lisbon"</code>,
 <code>"roma"</code>, <code>"tofino"</code>, <code>"vanimo"</code>, <code>"vik"</code></p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other plotting: 
+    <div class="dont-index"><p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
-<code><a href="bdiv_biplot.html">bdiv_biplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
-<code><a href="depths_barplot.html">depths_barplot</a>()</code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
+<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
+<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
-<code><a href="taxa_stacked.html">taxa_stacked</a>()</code>,
-<code><a href="tree_plot.html">tree_plot</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">taxa_corrplot</span><span class="op">(</span><span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span>, <span class="st">"BMI"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="sample_rarefy.html">sample_rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">taxa_corrplot</span><span class="op">(</span><span class="va">biom</span>, <span class="st">"BMI"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, taxa <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_smooth()` using formula = 'y ~ x'</span>
 <span class="r-plt img"><img src="taxa_corrplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>

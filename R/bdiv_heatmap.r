@@ -1,20 +1,11 @@
 #' Display beta diversities in an all vs all grid.
 #' 
-#' @name bdiv_heatmap
-#' 
+#' @inherit bdiv_ord_table params
 #' @inherit plot_heatmap params return
 #' 
-#' @family plotting
+#' @family beta_diversity
+#' @family visualization
 #' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
-#' 
-#' @param metric   Beta diversity metric(s) to use. Options are 
-#'        \code{"Manhattan"}, \code{"Euclidean"}, \code{"Bray-Curtis"}, 
-#'        \code{"Jaccard"}, and \code{"UniFrac"}. UniFrac requires a 
-#'        phylogenetic tree. Default: \code{"Bray-Curtis"}.
-#'        
-#' @param weighted   Should the beta diversity metric be weighted by 
-#'        abundances? Default: \code{TRUE}.
 #' 
 #' @param grid   Color palette name, or a list with entries for \code{label}, 
 #'        \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
@@ -35,14 +26,8 @@
 #'        See "Ordering and Limiting" section below for details.
 #'        Default: \code{NULL}
 #'        
-#' @param tree   A phylogenetic tree for use in calculating UniFrac distance.
-#'        The default, \code{NULL}, will use the BIOM object's tree.
-#'        
 #' @param ...   Additional arguments to pass on to ggplot2::theme().
 #'        For example, \code{labs.title = "Plot Title"}.
-#'        
-#' @return A \code{ggplot2} plot. The computed data points will be attached as 
-#'         \code{attr(, 'data')}.
 #'         
 #'         
 #' @section Annotation Tracks:
@@ -148,16 +133,15 @@
 #' @examples
 #'   library(rbiom) 
 #'   
-#'   biom <- hmp50 %>% rarefy() %>% select(1:10)
+#'   biom <- hmp50 %>% sample_rarefy() %>% sample_select(1:10)
 #'   bdiv_heatmap(biom, color.by="Body Site")
 #'     
 bdiv_heatmap <- function (
-    biom, metric = "Bray-Curtis", weighted = TRUE,
+    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL,
     grid = list(label = "Distance", colors = "-bilbao"),
     color.by = NULL, order.by = NULL, limit.by = NULL, 
-    label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
-    clust = "complete", dist = "euclidean", 
-    tree_height  = NULL, track_height = NULL, ratio=1, 
+    label = TRUE, label_size = NULL, rescale = "none", ratio=1, 
+    clust = "complete", trees = TRUE, tree_height = NULL, track_height = NULL, 
     legend = "right", xlab.angle = "auto", ...) {
   
   
@@ -185,8 +169,10 @@ bdiv_heatmap <- function (
   #________________________________________________________
   params %<>% within({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_scalar_logical(weighted))
-    metric %<>% validate_arg(biom, 'metric', 'bdiv', n = c(1,Inf))
+    stopifnot(is_logical(weighted) && !any(is.na(weighted)))
+    stopifnot(is_scalar_logical(trees) && !is.na(trees))
+    stopifnot(is_null(tree) || is(tree, 'phylo'))
+    bdiv %<>% validate_arg(biom, 'bdiv', 'bdiv', n = c(1,Inf), tree = tree)
     
     if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
     if (length(order.by) > 0) clust <- FALSE
@@ -196,17 +182,17 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Handle multiple ranks with recursive subcalls.
   #________________________________________________________
-  if (length(params[['metric']]) > 1 || length(params[['weighted']]) > 1) {
+  if (length(params[['bdiv']]) > 1 || length(params[['weighted']]) > 1) {
     
     plots <- list()
     
-    for (m in params[['metric']])
+    for (d in params[['bdiv']])
       for (w in params[['weighted']])
         plots[[length(plots) + 1]] <- local({
           args                 <- params
-          args[['metric']]     <- m
+          args[['bdiv']]       <- d
           args[['weighted']]   <- w
-          args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), m)
+          args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), d)
           do.call(bdiv_heatmap, args)
         })
     
@@ -245,15 +231,15 @@ bdiv_heatmap <- function (
   # # Subset
   # #________________________________________________________
   # if (!is_null(params[['order.by']]) || !is_null(params[['color.by']]))
-  #   metadata(biom) <- subset_by_params(
-  #     df     = metadata(biom),
+  #   sample_metadata(biom) <- subset_by_params(
+  #     df     = sample_metadata(biom),
   #     params = params[c('order.by', 'orders', 'color.by', 'colors')] )
   
   
   #________________________________________________________
   # Sanity Check
   #________________________________________________________
-  if (nsamples(biom) < 1)
+  if (n_samples(biom) < 1)
     stop("At least one sample is needed for a bdiv heatmap.")
   
   
@@ -261,10 +247,12 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Matrix of samples x samples.
   #________________________________________________________
-  mtx <- as.matrix(bdiv_distmat(
+  dm  <- bdiv_distmat(
     biom     = biom, 
-    method   = params[['metric']], 
-    weighted = params[['weighted']] ))
+    bdiv     = params[['bdiv']], 
+    weighted = params[['weighted']], 
+    tree     = params[['tree']] )
+  mtx <- as.matrix(dm)
   
   
   
@@ -274,18 +262,19 @@ bdiv_heatmap <- function (
   excl <- setdiff(formalArgs(bdiv_heatmap), formalArgs(plot_heatmap))
   excl <- c(excl, names(params)[startsWith(names(params), '.')])
   args <- params[setdiff(names(params), excl)]
-  args[['mtx']] <- mtx
+  args[['mtx']]  <- mtx
+  args[['dist']] <- dm
   
   within(args, {
     labs.title %||=% ifelse(
       test = isTRUE(params[['weighted']]), 
-      yes  = paste0("Weighted\n",   params[['metric']], "\nDistance"), 
-      no   = paste0("Unweighted\n", params[['metric']], "\nDistance") )})
+      yes  = paste0("Weighted\n",   params[['bdiv']], "\nDistance"), 
+      no   = paste0("Unweighted\n", params[['bdiv']], "\nDistance") )})
   
   for (md_col in names(params[['color.by']]))
     params[['color.by']][[md_col]] %<>% within({
       colors <- values
-      values <- metadata(biom, md_col)
+      values <- sample_metadata(biom, md_col)
     })
   args[['tracks']] <- params[['color.by']]
   

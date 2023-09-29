@@ -7,8 +7,8 @@
 unifrac(biom, weighted = TRUE, tree = NULL)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-object, as returned from \link{read_biom}. For matrices, the rows and 
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
+object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
 
 \item{weighted}{Use weighted UniFrac, which takes abundance into account
@@ -22,12 +22,12 @@ loaded from \code{biom}, if encoded there.}
 A distance matrix of class \code{dist}.
 }
 \description{
-This is a wrapper around \link{bdiv_distmat} for a common use case.
+This is a wrapper around \code{\link[=bdiv_distmat]{bdiv_distmat()}} for a common use case.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
-    biom <- select(hmp50, 1:10)
+    biom <- sample_select(hmp50, 1:10)
     
     dm <- unifrac(biom)
     plot(hclust(dm), cex=.8)

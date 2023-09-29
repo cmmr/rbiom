@@ -2,6 +2,7 @@
 
 
 #' Common code for writers.
+#' @noRd
 #'
 #' @param outfile   The file to open a connection to.
 #' 
@@ -10,11 +11,9 @@
 #' 
 #' @return The normalized filepath that was written to (invisibly).
 #' 
-#' @export
-#' 
 write_wrapper <- function (outfile, callback) {
   
-  stopifnot(is_scalar_character(outfile))
+  stopifnot(is_scalar_character(outfile) && !is_na(outfile))
   stopifnot(isTRUE(nchar(outfile) > 0))
   
   
@@ -135,12 +134,7 @@ write_taxonomy <- function (biom, file) {
 #' 
 #' @export
 
-write_fasta <- function (seqs, file = NULL, outfile = NULL) {
-  
-  if (!missing(outfile)) {
-    warning("In write.fasta(), `outfile` is deprecated. Use `file` instead.")
-    file <- outfile
-  }
+write_fasta <- function (seqs, file = NULL) {
   
   
   if (is(seqs, 'BIOM'))
@@ -163,8 +157,8 @@ write_fasta <- function (seqs, file = NULL, outfile = NULL) {
 
 #' Write a newick formatted phylogenetic tree.
 #' 
-#' @param tree  A \code{phylo} object, as returned from \link{read_tree}. Also 
-#'         accepts a \code{BIOM} object if it has a phylogentic tree.
+#' @param tree  A \code{phylo} object, as returned from [read_tree()]. Also 
+#'        accepts a \code{BIOM} object if it has a phylogentic tree.
 #'         
 #' @param file  Filename or connection to write the newick file to (optional).
 #' 
@@ -173,7 +167,7 @@ write_fasta <- function (seqs, file = NULL, outfile = NULL) {
 #'         
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     infile <- system.file("extdata", "newick.tre", package = "rbiom")
 #'     tree   <- read_tree(infile)

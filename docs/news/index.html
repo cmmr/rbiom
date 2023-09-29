@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,42 +45,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.3.9040" id="rbiom-1039040">rbiom 1.0.3.9040<a class="anchor" aria-label="anchor" href="#rbiom-1039040"></a></h2>
-<ul><li>Can now disable rarefaction in write.xlsx().</li>
-<li>Support for ‘Decontam’ and ‘MicrobiomeDB’ generated BIOM files.</li>
-<li>Rarefy now handles samples and taxa with zero observations.</li>
-<li>write.xlsx exports ‘dist’ and ‘matrix’ attributes in addition to ’data.frame’s</li>
-<li>Optionally change e.g. “Bacteria; Gracilibacteria; c” into “Bacteria; Gracilibacteria; Phylum Gracilibacteria (c)”</li>
-<li>Fixed crash when rarefying biom files and last taxa is not dropped first.</li>
-<li>Easily pull a single column of metadata with metadata(biom, field).</li>
-<li>Added apcoa function for covariate adjusted principal coordinates analysis.</li>
-<li>Switched from rjson to jsonlite for better handling of non-UTF characters.</li>
-<li>Support for writing out biom files compressed with gzip or bzip2.</li>
-<li>Added init.cache() function to memoise the functions that do heavy-lifting.</li>
-<li>Can now download files with odd characters in their name.</li>
-<li>Prevent NUL from being appended to read.biom’s text inputs.</li>
-<li>alpha.div can now return metadata and/or subset of adiv metrics in wide or long format.</li>
-<li>Automagically remove NAs and update factors when using subset().</li>
-<li>taxa.rollup can now return with metadata in wide or long format.</li>
-<li>beta.div can now return with metadata in long format.</li>
-<li>Added stats.table function to compute p-vals for alpha, beta, and taxa metrics.</li>
-<li>Added sample.sums function to count the number of observations per sample.</li>
-<li>New functions: depth(), is.rarefied(), has.phylogeny(), and has.sequences().</li>
-<li>Added plot function - provides stat brackets, patterned fills, overlaid geoms and more.</li>
-<li>plot() can now create heatmaps.</li>
-<li>plot() can now create stacked barplots.</li>
-<li>Fleshed out plot()’s ordination abilities.</li>
-<li>plot() can now graph regressions (continuous x variable).</li>
-<li>Added bdply() function for working piecemeal on a BIOM object, a la the plyr R package.</li>
-<li>Provenance tracking in BIOM object’s ‘history’ attribute.</li>
-<li>‘hmp50’ dataset now loads with rbiom.</li>
-<li>subset() can now also subset taxa.</li>
-<li>Added setter functions for many BIOM object attributes.</li>
-</ul><div class="section level4">
-<h4 id="breaking-changes-1-0-3-9040">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-0-3-9040"></a></h4>
-<ul><li>The data.frame returned from taxa.rollup() used to arrange sample names across columns for wide format without metadata, and sample names across rows otherwise. Now, sample names are always the rownames for wide format.</li>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="rbiom-200">rbiom 2.0.0<a class="anchor" aria-label="anchor" href="#rbiom-200"></a></h2>
+<ul><li>Major release with significant new features.</li>
+<li>Plotting added.</li>
+<li>Statistics added.</li>
+<li>Caching added.</li>
+<li>Clearer naming scheme for functions. Previous names still work but are deprecated.</li>
+<li>Generation of human-readable ggplot2 code for modifying plots outside of rbiom.</li>
+<li>Provenience tracking for BIOM objects and derivatives.</li>
 </ul></div>
-</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.3" id="rbiom-103">rbiom 1.0.3<a class="anchor" aria-label="anchor" href="#rbiom-103"></a></h2><p class="text-muted">CRAN release: 2021-11-05</p>
 <ul><li>Corrects for breaking changes in ‘rhdf5’ package.</li>

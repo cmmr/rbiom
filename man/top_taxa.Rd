@@ -7,15 +7,15 @@
 top_taxa(biom, rank = "OTU", n = Inf)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
 \item{rank}{The taxonomic rank of interest. Default: \code{"OTU"}.}
 
 \item{n}{The number of taxa names to return. Default: \code{Inf}.}
 }
 \value{
-A character vector of the names of the top n most abundant taxa, 
-        ordered from most abundant to least abundant.
+A character vector of the names of the top n most abundant taxa,
+ordered from most abundant to least abundant.
 }
 \description{
 Get the names of the most abundant taxa.

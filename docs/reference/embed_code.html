@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,37 +78,37 @@
 <span class="r-in"><span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">hmp50</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">'cmd'</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">embed_code</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~~ {.R}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ggplot(data = data) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ggplot(data) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   geom_rect(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes(xmin = -Inf, xmax = Inf, ymin = 4, ymax = Inf), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color   = NA, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = "white", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(xmax = Inf, xmin = -Inf, ymax = Inf, ymin = 4) ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = "white" ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   geom_bar(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha    = 0.6, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fun      = "mean", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes_string(".all", ".y", color = "`Body Site`", fill = "`Body Site`"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     position = position_dodge(width = 0.8), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes(x = .all, y = .y, color = `Body Site`, fill = `Body Site`), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     stat     = "summary", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     width    = 0.7 ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     position = position_dodge(width = 0.8), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     width    = 0.7, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha    = 0.6, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fun      = "mean" ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ggbeeswarm::geom_quasirandom(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping     = aes_string(".all", ".y", group = "`Body Site`"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping     = aes(x = .all, y = .y, group = `Body Site`), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     dodge.width = 0.8, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     alpha       = 0.4, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color       = "black", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     size        = 1.14, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     stroke      = 0 ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   geom_linerange(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes(x = .all, y = .y, ymin = .ymin, ymax = .ymax, color = `Body Site`), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data     = ~attr(., "vline"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = aes_string(".all", ".y", color = "`Body Site`", ymax = ".ymax", ymin = ".ymin"), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     position = position_dodge(width = 0.8) ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   geom_segment(</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = ~attr(., "stat_brackets"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(".x", ".y", xend = ".xend", yend = ".yend") ) +</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes(x = .x, xend = .xend, y = .y, yend = .yend), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = ~attr(., "stat_brackets") ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   geom_text(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes(x = .x, y = .y, label = .label), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data    = ~attr(., "stat_labels"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     hjust   = 0.5, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = aes_string(".x", ".y", label = ".label"), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     parse   = TRUE, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hjust   = 0.5, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     size    = 3, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     vjust   = 0 ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   labs(</span>
@@ -122,12 +122,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>     expand = c(0.02, 0, 0.08, 0) ) +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   theme_bw() +</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   theme(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     text               = element_text(size = 14), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.title.x       = element_blank(), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     axis.text.x        = element_blank(), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     axis.ticks.x       = element_blank(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.title.x       = element_blank(), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     panel.grid.major.x = element_blank(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.subtitle      = element_text(size = 9), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     text               = element_text(size = 14) )</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.subtitle      = element_text(size = 9) )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>

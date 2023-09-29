@@ -7,28 +7,19 @@
 
 cmd_wrap <- function (pkg, fn) {
   
+  if (nzchar(system.file(package = pkg))) {
   
-  # Case when an optional dependency is not installed.
-  #________________________________________________________
-  if (nchar(system.file(package = pkg)) == 0) {
+    fun    <- getFromNamespace(x = fn, ns = pkg)
+    pkgfn  <- ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn))
     
-    assign(fn, pos = ENV, function (...) {
-      stop("R package", pkg, "must be installed to use this feature.")
-    })
-    
-    
-  } else {
-  
-    fun <- do.call(`::`, list(pkg, fn))
-    
-    assign(fn, pos = ENV, function (..., .indent = 0, .display = NULL, .lhs = NULL) {
+    newfun <- function (..., .indent = 0, .display = NULL, .lhs = NULL) {
+      
       res <- fun(...)
       
-      if (is_null(.display))
-        .display <- sprintf(
-          fmt = "%s(%s)", 
-          ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn)), 
-          as.args(list(...), fun = fun, indent = .indent) )
+      if (is_null(.display)) {
+        argstr   <- as.args(list(...), fun = fun, indent = .indent)
+        .display <- sprintf(fmt = "%s(%s)", pkgfn, argstr)
+      }
       
       if (is_null(.lhs)) {
         attr(res, 'display') <- .display
@@ -38,8 +29,19 @@ cmd_wrap <- function (pkg, fn) {
       }
       
       
-      
       return (res)
+    }
+    newfun %<>% aa(fn = fn, pkgfn = pkgfn)
+    assign(x = fn, value = newfun, pos = ENV)
+    
+    
+  } else {
+    
+    # Case when an optional dependency is not installed.
+    #________________________________________________________
+    
+    assign(fn, pos = ENV, function (...) {
+      stop("R package '", pkg, "' must be installed to use this feature.")
     })
   }
 }
@@ -68,6 +70,7 @@ basewrap <- function (pkg, fn) {
     return (res)
   })
 }
+
 
 #________________________________________________________
 # Add a layer to a list of layers.

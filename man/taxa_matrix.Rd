@@ -2,7 +2,7 @@
 % Please edit documentation in R/taxa_rollup.r
 \name{taxa_matrix}
 \alias{taxa_matrix}
-\title{Generate a matrix of samples by taxa, at the specified taxonomic rank.}
+\title{Taxa abundances per sample, at the specified taxonomic rank.}
 \usage{
 taxa_matrix(
   biom,
@@ -16,71 +16,80 @@ taxa_matrix(
 )
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-object, as returned from \link{read_biom}. For matrices, the rows and 
+\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
+object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
 
-\item{rank}{The taxonomic rank. E.g. \code{rank = "OTU"}, 
+\item{rank}{The taxonomic rank. E.g. \code{rank = "OTU"},
 \code{rank = "Phylum"}, etc. May also be given numerically: 0 for
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
-of taxonomic ranks encoded in the original biom file. Run 
+of taxonomic ranks encoded in the original biom file. Run
 \code{taxa_ranks(biom)} to fetch the names of all available ranks.}
 
-\item{taxa}{Limit the number of taxa returned in the matrix. Depending on 
+\item{taxa}{Limit the number of taxa returned in the matrix. Depending on
 the value type, a different filter is applied.
-\describe{
-  \item{\code{NULL}}{ Retain all taxa. (The default.) }
-  \item{Integer >= 1}{ The N most abundant taxa are retained. Example:
-    \code{taxa_matrix(biom, 'Genus', 5)} returned the five most
-    abundant genera. }
-  \item{Numeric between 0 and 1}{ Taxa are retained if their abundance 
-    is greater than or equal to N. Example: 
-    \code{taxa_matrix(biom, 'Phylum', 0.1)} returns all phyla with a
-    relative abundance of at least 10 \%. }
-  \item{Character vector}{ Only these taxa names are retained. Example: 
-    \code{taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))}
-    will only retain those two phyla. }
-}}
+\itemize{
+\item{\code{NULL} - }{ Retain all taxa. }
+\item{\emph{integer} >= 1 - }{
+The N most abundant taxa are retained. \cr
+Example: \code{taxa_matrix(biom, 'Genus', 5)} returns the five
+most abundant genera. }
+\item{\emph{numeric} between 0 and 1 - }{
+Retain taxa if their abundance is greater than or equal to N. \cr
+Example: \code{taxa_matrix(biom, 'Phylum', 0.1)} returns all
+phyla with a relative abundance of at least 10 percent. }
+\item{\emph{character vector} - }{
+Only these taxa names are retained. \cr
+Example:
+\code{taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))}
+will only retain those two phyla. }
+}
+Default: \code{NULL}}
 
 \item{map}{A character matrix defining the value that each taxa IDs is
 assigned for each taxonomic rank. If \code{map=NULL} and \code{biom} is a
-\code{BIOM} class object, the map will be automatically loaded from 
-\code{biom$taxonomy}. \code{map} must not be \code{null} when \code{biom}
+\code{BIOM} class object, the map will be automatically loaded from
+\code{biom$taxonomy}. \code{map} must not be \code{NULL} when \code{biom}
 is a \code{matrix} or \code{simple_triplet_matrix}. See the example below
-for an example of \code{map}'s structure.}
+for an example of \code{map}'s structure. Default: \code{NULL}}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
-setting to \code{TRUE} will produce 
-\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}. 
+setting to \code{TRUE} will produce
+\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
 Whereas setting to \code{FALSE} (the default) will return simply
 \code{Coriobacteriales}. You want to set this to TRUE if you have
 genus names (such as \emph{Incertae_Sedis}) that map to multiple higher
-level ranks.}
+level ranks. Default: \code{FALSE}}
 
-\item{sparse}{If true, returns a sparse matrix as described by 
+\item{sparse}{If true, returns a sparse matrix as described by
 \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 matrix object. Sparse matrices will likely be considerably more
-memory efficient in this scenario.}
+memory efficient in this scenario. Default: \code{FALSE}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
-taxa names. The default, \code{"singly"}/\code{"s"}, replaces them 
-with the OTU name. Other options are \code{"grouped"}/\code{"g"}, 
-which replaces them with a higher rank's name, \code{"drop"}/\code{"d"} 
-which excludes them from the result, and \code{"asis"}/\code{"a"} to
-not check/modify any taxa names.}
+taxa names. Options are:
+\itemize{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Non-ambiguous abbreviations are allowed}
 
-\item{other}{Sum all non-itemized taxa into an "Other" taxa. The default,
-\code{FALSE}, only returns taxa matched by the \code{`taxa`} 
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{`taxa`}
 argument. Specifying \code{TRUE} adds "Other" to the returned set.
 A string can also be given to imply \code{TRUE}, but with that
-value as the name to use in place of "Other".}
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 }
 \value{
-A numeric matrix with samples as column names, and taxonomic
-        identifiers as row names.
+A numeric matrix with samples as row names, and taxonomic
+identifiers as column names.
 }
 \description{
-Generate a matrix of samples by taxa, at the specified taxonomic rank.
+Taxa abundances per sample, at the specified taxonomic rank.
 }
 \examples{
     library(rbiom)
@@ -91,8 +100,8 @@ Generate a matrix of samples by taxa, at the specified taxonomic rank.
     phyla[1:4,1:6]
     
     # Custom matrices should be formatted like so:
-    counts <- counts(hmp50)
-    map    <- taxonomy(hmp50)
+    counts <- otu_matrix(hmp50)
+    map    <- otu_taxonomy(hmp50)
     
     counts[1:3,1:6]
     map[1:3,1:4]

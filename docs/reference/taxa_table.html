@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,101 +66,96 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code> 
-object, as returned from <a href="read_biom.html">read_biom</a>. For matrices, the rows and 
+<dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code>
+object, as returned from <code><a href="read_biom.html">read_biom()</a></code>. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.</p></dd>
 
 
 <dt>rank</dt>
-<dd><p>The taxonomic rank. E.g. <code>rank = "OTU"</code>, 
+<dd><p>The taxonomic rank. E.g. <code>rank = "OTU"</code>,
 <code>rank = "Phylum"</code>, etc. May also be given numerically: 0 for
 OTU, 1 for the highest level (i.e. Kingdom), and extending to the number
-of taxonomic ranks encoded in the original biom file. Run 
+of taxonomic ranks encoded in the original biom file. Run
 <code>taxa_ranks(biom)</code> to fetch the names of all available ranks.</p></dd>
 
 
 <dt>taxa</dt>
-<dd><p>Limit the number of taxa returned in the matrix. Depending on 
-the value type, a different filter is applied.</p><dl><dt><code>NULL</code></dt>
-<dd><p>Retain all taxa. (The default.)</p></dd>
-
-  <dt>Integer &gt;= 1</dt>
-<dd><p>The N most abundant taxa are retained. Example:
-    <code>taxa_matrix(biom, 'Genus', 5)</code> returned the five most
-    abundant genera.</p></dd>
-
-  <dt>Numeric between 0 and 1</dt>
-<dd><p>Taxa are retained if their abundance 
-    is greater than or equal to N. Example: 
-    <code>taxa_matrix(biom, 'Phylum', 0.1)</code> returns all phyla with a
-    relative abundance of at least 10 %.</p></dd>
-
-  <dt>Character vector</dt>
-<dd><p>Only these taxa names are retained. Example: 
-    <code>taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))</code>
-    will only retain those two phyla.</p></dd>
-
-
-</dl></dd>
+<dd><p>Limit the number of taxa returned in the matrix. Depending on
+the value type, a different filter is applied.</p><ul><li><p><code>NULL</code> -  Retain all taxa.</p></li>
+<li><p><em>integer</em> &gt;= 1 - 
+The N most abundant taxa are retained. <br>
+Example: <code>taxa_matrix(biom, 'Genus', 5)</code> returns the five
+most abundant genera.</p></li>
+<li><p><em>numeric</em> between 0 and 1 - 
+Retain taxa if their abundance is greater than or equal to N. <br>
+Example: <code>taxa_matrix(biom, 'Phylum', 0.1)</code> returns all
+phyla with a relative abundance of at least 10 percent.</p></li>
+<li><p><em>character vector</em> - 
+Only these taxa names are retained. <br>
+Example:
+<code>taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))</code>
+will only retain those two phyla.</p></li>
+</ul><p>Default: <code>NULL</code></p></dd>
 
 
 <dt>map</dt>
 <dd><p>A character matrix defining the value that each taxa IDs is
 assigned for each taxonomic rank. If <code>map=NULL</code> and <code>biom</code> is a
-<code>BIOM</code> class object, the map will be automatically loaded from 
-<code>biom$taxonomy</code>. <code>map</code> must not be <code>null</code> when <code>biom</code>
+<code>BIOM</code> class object, the map will be automatically loaded from
+<code>biom$taxonomy</code>. <code>map</code> must not be <code>NULL</code> when <code>biom</code>
 is a <code>matrix</code> or <code>simple_triplet_matrix</code>. See the example below
-for an example of <code>map</code>'s structure.</p></dd>
+for an example of <code>map</code>'s structure. Default: <code>NULL</code></p></dd>
 
 
 <dt>lineage</dt>
 <dd><p>Include all ranks in the name of the taxa. For instance,
-setting to <code>TRUE</code> will produce 
-<code>Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales</code>. 
+setting to <code>TRUE</code> will produce
+<code>Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales</code>.
 Whereas setting to <code>FALSE</code> (the default) will return simply
 <code>Coriobacteriales</code>. You want to set this to TRUE if you have
 genus names (such as <em>Incertae_Sedis</em>) that map to multiple higher
-level ranks.</p></dd>
+level ranks. Default: <code>FALSE</code></p></dd>
 
 
 <dt>md</dt>
-<dd><p>Include metadata in the output data frame? Options are:</p><dl><dt><code>FALSE</code></dt>
-<dd><p>Don't include metadata. (Default)</p></dd>
-
-  <dt><code>TRUE</code></dt>
-<dd><p>Include all metadata.</p></dd>
-
-  <dt><em>character vector</em></dt>
-<dd><p>Include only the specified metadata columns.</p></dd>
-
-
-</dl></dd>
+<dd><p>Include metadata in the output data frame? Options are:</p><ul><li><p><code>FALSE</code> -  Don't include metadata.</p></li>
+<li><p><code>TRUE</code> -  Include all metadata.</p></li>
+<li><p><em>character vector</em> -  Include only the specified metadata columns.</p></li>
+</ul><p>Default: <code>FALSE</code></p></dd>
 
 
 <dt>unc</dt>
 <dd><p>How to handle unclassified, uncultured, and similarly ambiguous
-taxa names. The default, <code>"singly"</code>/<code>"s"</code>, replaces them 
-with the OTU name. Other options are <code>"grouped"</code>/<code>"g"</code>, 
-which replaces them with a higher rank's name, <code>"drop"</code>/<code>"d"</code> 
-which excludes them from the result, and <code>"asis"</code>/<code>"a"</code> to
-not check/modify any taxa names.</p></dd>
+taxa names. Options are:</p><ul><li><p><code>"singly"</code> -  Replaces them with the OTU name.</p></li>
+<li><p><code>"grouped"</code> -  Replaces them with a higher rank's name.</p></li>
+<li><p><code>"drop"</code> -  Excludes them from the result.</p></li>
+<li><p><code>"asis"</code> -  To not check/modify any taxa names.</p></li>
+</ul><p>Default: <code>"singly"</code> <br><br>
+Non-ambiguous abbreviations are allowed</p></dd>
 
 
 <dt>other</dt>
-<dd><p>Sum all non-itemized taxa into an "Other" taxa. The default,
-<code>FALSE</code>, only returns taxa matched by the <code>`taxa`</code> 
+<dd><p>Sum all non-itemized taxa into an "Other" taxa. When
+<code>FALSE</code>, only returns taxa matched by the <code>`taxa`</code>
 argument. Specifying <code>TRUE</code> adds "Other" to the returned set.
 A string can also be given to imply <code>TRUE</code>, but with that
-value as the name to use in place of "Other".</p></dd>
+value as the name to use instead of "Other".
+Default: <code>FALSE</code></p></dd>
+
+
+<dt>long</dt>
+<dd><p>Format of returned data. When <code>FALSE</code>, returns a matrix of
+samples by taxa. If set to <code>TRUE</code>, returns a data frame with
+column names 'Samples', 'Taxa', and 'Abundance'.
+Default: <code>FALSE</code></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A numeric matrix with samples as column names, and taxonomic
-        identifiers as row names. Or a data.frame if metadata is requested 
-        with <code>md</code>.</p>
+<p>A data.frame with column names ".sample", ".taxa", ".abundance", and
+any metadata requested with <code>md</code>.</p>
     </div>
 
     <div class="section level2">
@@ -170,13 +165,18 @@ value as the name to use in place of "Other".</p></dd>
 <span class="r-in"><span>    <span class="fu"><a href="taxa_ranks.html">taxa_ranks</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(phyla, 1:4, 1:6):</span> undefined columns selected</span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">taxa_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample          .taxa .abundance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   HMP01 Actinobacteria         18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   HMP02 Actinobacteria         60</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   HMP03 Actinobacteria        126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   HMP04 Actinobacteria        120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   HMP05 Actinobacteria         30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   HMP06 Actinobacteria         71</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Custom matrices should be formatted like so:</span></span></span>
-<span class="r-in"><span>    <span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="counts.html">counts</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">map</span>    <span class="op">&lt;-</span> <span class="fu"><a href="taxonomy.html">taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="otu_matrix.html">otu_matrix</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">map</span>    <span class="op">&lt;-</span> <span class="fu"><a href="otu_taxonomy.html">otu_taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">counts</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06</span>
@@ -189,9 +189,14 @@ value as the name to use in place of "Other".</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101 "Bacteria" "Firmicutes"     "Clostridia"     "Clostridiales"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2 "Bacteria" "Actinobacteria" "Actinobacteria" "Actinomycetales"</span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu">taxa_table</span><span class="op">(</span><span class="va">counts</span>, <span class="st">'Phylum'</span>, map<span class="op">=</span><span class="va">map</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">phyla</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(phyla, 1:3, 1:6):</span> undefined columns selected</span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">taxa_table</span><span class="op">(</span><span class="va">counts</span>, <span class="st">'Phylum'</span>, map<span class="op">=</span><span class="va">map</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample          .taxa .abundance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   HMP01 Actinobacteria         18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   HMP02 Actinobacteria         60</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   HMP03 Actinobacteria        126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   HMP04 Actinobacteria        120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   HMP05 Actinobacteria         30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   HMP06 Actinobacteria         71</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

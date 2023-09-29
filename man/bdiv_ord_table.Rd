@@ -2,127 +2,159 @@
 % Please edit documentation in R/bdiv_ord_table.r
 \name{bdiv_ord_table}
 \alias{bdiv_ord_table}
-\title{Reduce a distance matrix to two or three dimensions}
+\title{Calculate PCoA and other ordinations, including taxa biplots and statistics.}
 \usage{
 bdiv_ord_table(
   biom,
-  dist = "Bray-Curtis",
+  bdiv = "Bray-Curtis",
   ord = "UMAP",
   weighted = TRUE,
-  tree = NULL,
   md = NULL,
   k = 2,
   split.by = NULL,
   stat.by = NULL,
+  tree = NULL,
+  test = "adonis2",
   seed = 0,
-  perms = 1000,
+  permutations = 999,
   rank = NULL,
   taxa = 5,
+  p.top = Inf,
   p.adj = "fdr",
-  p.top = 5,
+  unc = "singly",
   ...
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.
-Alternatively, a distance matrix, such as from \link{bdiv_distmat}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.
+Alternatively, a {dist} class distance matrix can be given, in which
+case only the parameters \code{ord}, \code{k}, and \code{...} are
+allowed.}
 
-\item{dist}{The distance algorithm to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"}, 
+\item{bdiv}{The beta diversity distance algorithm to use. Options are:
+\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. A phylogenetic tree must be
 present in \code{biom} or explicitly provided via \code{tree=} to use
-the UniFrac methods. Ignored if \code{biom} is a distance matrix.
+the UniFrac methods.
 Multiple values allowed. Default: \code{"Bray-Curtis"}.}
 
-\item{ord}{Method for reducing the dimensionality of a distance matrix.
-Multiple values allowed. Options are:
-\describe{
-    \item{\code{"UMAP"} (default)}{
-      Uniform manifold approximation and projection,
-      via \code{\link[uwot]{umap}}. }
-    \item{\code{"PCoA"}}{
-      Principal coordinate analysis,
-      via \code{\link[ape]{pcoa}}. }
-    \item{\code{"NMDS"}}{
-      Nonmetric multidimensional scaling,
-      via \code{\link[vegan]{metaMDS}}. }
-    \item{\code{"tSNE"}}{
-      t-distributed stochastic neighbor embedding,
-      via \code{\link[tsne]{tsne}}. }
-   }}
+\item{ord}{Method for reducing dimensionality. Options are:
+\itemize{
+\item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
+\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
+\item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
+\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
+}
+Default: \code{"UMAP"} \cr\cr
+Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
-\item{weighted}{Take relative abundances into account. When 
+\item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
- Ignored if \code{biom} is a distance matrix. Multiple values 
- allowed. (Default: \code{TRUE})}
+Multiple values allowed. Default: \code{TRUE}}
+
+\item{md}{Include metadata in the output data frame? Options are:
+\itemize{
+\item{\code{NULL} - }{ Don't include metadata. (Default) }
+\item{\code{TRUE} - }{ Include all metadata. }
+\item{\emph{character vector} - }{ Include only the specified metadata columns. }
+}
+Default: \code{NULL}}
+
+\item{k}{Number of ordination dimensions to return. Either \code{2L} or
+\code{3L}. Default: \code{2L}}
+
+\item{split.by}{Name(s) of metadata columns that the data should be split
+by prior to calculating distance matrices, ordinations, and statistics.
+Equivalent to the \code{facet.by} parameter in \code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}}.
+Default: \code{NULL}}
+
+\item{stat.by}{Name of the metadata column for statistical groups.
+Equivalent to the \code{color.by} parameter in \code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}}.
+Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Will be taken from the tree
-embedded in the \code{biom} object if not explicitly specified. Only
-required for computing UniFrac distance matrices.  Ignored if 
-\code{biom} is a distance matrix.}
+defined in \code{biom} if not explicitly specified. Only required
+when computing UniFrac distance matrices. Default: \code{NULL}}
 
-\item{md}{Include metadata in the output data frame? Ignored if 
-\code{biom} is a distance matrix. Options are: 
-\describe{
-  \item{\code{NULL}}{ Don't include metadata. (Default) }
-  \item{\code{TRUE}}{ Include all metadata. }
-  \item{\emph{character vector}}{ Include only the specified metadata columns. }
-}}
+\item{test, seed, permutations}{Passthrough parameters to \code{\link[=distmat_stats]{distmat_stats()}}
+for assessing significance of \code{stat.by} and \code{rank} groups.
+Default: \code{test="adonis2", seed=0, permutations=999}}
 
-\item{k}{Number of dimensions to return. (Default: \code{2})}
+\item{rank}{\link{Biplot} What rank of taxa to use for the biplot (e.g.
+"Phylum"), or \code{NULL} for no biplot. Run \code{taxa_ranks()} to
+see all options for a given BIOM object. Default: \code{NULL}}
 
-\item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to calculating distance matrices, ordinations, and statistics.}
-
-\item{stat.by, seed, perms}{Passthrough parameters to \code{bdiv_distmat()} 
-for computing adonis statistics. (Default: \code{stat.by=NULL, seed=0, 
-perms=1000})}
-
-\item{rank}{[Biplot] What rank of taxa to display (e.g. "Phylum"), or 
-\code{NULL} for no biplot. Run \code{taxa_ranks()} to see all options 
-for a given BIOM object. (Default: \code{NULL})}
-
-\item{taxa}{[Biplot] Which taxa to display. An integer value will return 
-the top n most abundant taxa. A value 0 <= n < 1 will return any taxa 
+\item{taxa}{\link{Biplot} Which taxa to include. An integer value will return
+the top n most abundant taxa. A value 0 <= n < 1 will return any taxa
 with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. (Default: \code{5})}
+taxon names will show only those taxa. Default: \code{5}}
 
-\item{p.adj}{[Biplot] Method to use for multiple comparisons adjustment of 
+\item{p.top}{\link{Biplot} Only return taxa with the most significant
+differences in abundance. If \code{p.top} is >= 1, then the
+\code{p.top} most significant taxa are displayed. If \code{p.top}
+is less than one, all taxa with an adjusted p-value <= \code{p.top}
+are displayed. Recommended to be used in combination with the
+\code{taxa} parameter to set a lower bound on the mean abundance of
+considered taxa. Default: \code{Inf}}
+
+\item{p.adj}{\link{Biplot} Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+Default: \code{fdr}}
 
-\item{p.top}{[Biplot] Only returns taxa with the most significant 
-differences in abundance. If \code{p.top} is >= 1, then the 
-\code{p.top} most significant taxa are displayed. If \code{p.top} 
-is less than one, all taxa with an adjusted p-value <= \code{p.top} 
-are displayed. Recommended to be used in combination with the 
-\code{taxa} parameter to set a lower bound on the mean abundance of 
-considered taxa. (Default: \code{Inf})}
+\item{unc}{\link{Biplot} How to handle unclassified, uncultured, and similarly
+ambiguous taxa names. Options are:
+\itemize{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Non-ambiguous abbreviations are allowed.}
 
-\item{...}{Additional arguments to pass on to \code{\link[ape]{pcoa}}, 
-\code{\link[vegan]{metaMDS}}, or \code{\link[tsne]{tsne}}.}
+\item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
+\code{\link[ape:pcoa]{ape::pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
 }
 \value{
-A data.frame with columns .axis.1, .axis.2, ..., axis.k as well as 
-        columns given by \code{md}, \code{split.by}, and \code{stat.by}. 
-        Sample IDs are in column \code{'.sample'} and the metric used in 
-        column \code{'.metric'}. For pcoa ordinations, 
-        \code{attr(, 'eig')} will contain the eigenvalues useful for 
-        construction of ".. % variation explained" labels. 
-        \code{attr(, 'stats_raw')} and \code{attr(,'stats_tbl')} contain the 
-        raw and tabular adonis statistics when \code{stat.by} is set. 
-        Distance matrices are in \code{attr(, 'dm')}. When \code{rank} is
-        non-NULL, or \code{taxa} is a list of taxon names, a data.frame of
-        biplot coordinates will be given by \code{attr(,'biplot')}.
+A data.frame with columns \code{.sample}, \code{.ord}, \code{.x},
+\code{.y}, and (optionally) \code{.z}.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    If \code{biom} is a \code{BIOM} object, then \code{.weighted}, 
+    \code{.bdiv}, and any columns given by \code{md}, \code{split.by}, 
+    and \code{stat.by} are included as well.
+    
+    If \code{stat.by} is given, then \code{attr(, 'sample_stats')}
+    and \code{attr(, 'sample_stats_cmds')} are set.
+    
+    If \code{rank} is given, then \code{attr(, 'taxa_coords')},
+    \code{attr(, 'taxa_stats')}, and \code{attr(, 'taxa_stats_cmds')} 
+    are set.
+}\if{html}{\out{</div>}}
 }
 \description{
-Reduce a distance matrix to two or three dimensions
+Calculate PCoA and other ordinations, including taxa biplots and statistics.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
-    ord <- bdiv_ord_table(hmp50, "bray-curtis", "pcoa")
+    ord <- bdiv_ord_table(hmp50, "bray", "pcoa", stat.by="Body Site", rank="g")
     head(ord)
+    attr(ord, 'sample_stats')
+    attr(ord, 'taxa_stats')
+    
     
 }
+\seealso{
+Other ordination: 
+\code{\link{bdiv_ord_plot}()}
+
+Other beta_diversity: 
+\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{bdiv_ord_plot}()},
+\code{\link{bdiv_table}()},
+\code{\link{distmat_stats}()}
+}
+\concept{beta_diversity}
+\concept{ordination}

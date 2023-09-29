@@ -4,10 +4,12 @@
 \alias{bdply}
 \title{Split BIOM by metadata, apply function, and return results in a data frame.}
 \usage{
-bdply(biom, vars, FUN, ..., fast = TRUE)
+bdply(biom, vars, FUN, ..., iters = list(), prefix = FALSE, fast = TRUE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}. Technically
+accepts all types of objects, but only BIOM objects allow using the
+\code{vars} option, below.}
 
 \item{vars}{A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted BIOM
@@ -21,14 +23,22 @@ before being returned from \code{bdply}.}
 
 \item{...}{Additional arguments to pass on to \code{FUN}.}
 
+\item{iters}{A named list of values to pass to \code{FUN}. Unlike
+\code{...}, these will be iterated over in all combinations.
+Default: \code{list()}}
+
+\item{prefix}{When \code{TRUE}, prefixes the names in in \code{iters} with
+a '.' in the split_labels attribute of the returned object.
+Default: \code{FALSE}}
+
 \item{fast}{If \code{TRUE} (the default), the subsetted BIOM objects will
-still contain the full taxa table and phylogenetic tree. Set 
-\code{fast = FALSE} to run the slow steps of subsetting these 
+still contain the full taxa table and phylogenetic tree. Set
+\code{fast = FALSE} to run the slow steps of subsetting these
 elements as well.}
 }
 \value{
 A data.frame comprising the merged outputs of \code{FUN}, along with
-        the columns specified by \code{vars}.
+the columns specified by \code{vars}.
 }
 \description{
 Calls \code{plyr::ddply} internally.
@@ -36,16 +46,17 @@ Calls \code{plyr::ddply} internally.
 \examples{
     library(rbiom)
     
-    bdply(hmp50, "Sex", nsamples)
+    bdply(hmp50, "Sex", n_samples)
     
     bdply(hmp50, c("Body Site", "Sex"), function (b) {
-      ad <- adiv_table(b)[,c("Shannon", "Simpson")]
+      ad <- adiv_table(b, adiv = "all")[,c(".Shannon", ".Simpson")]
       apply(ad, 2L, mean)
     })
     
-    bdply(hmp50, "Body Site", function (b) {
-      r <- range(bdiv_distmat(b, "bray"))
-      data.frame(bray.min = r[[1]], bray.max = r[[2]])
+    iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
+    bdply(hmp50, "Sex", iters = iters, function (b, w, d) {
+      r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+      round(data.frame(min = r[[1]], max = r[[2]]))
     })
     
     

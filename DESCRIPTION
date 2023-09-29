@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
-Title: Read/Write, Transform, and Summarize 'BIOM' Data
-Version: 1.0.3.9098
-Date: 2023-07-27
+Title: Read/Write, Analyze, and Visualize 'BIOM' Data
+Version: 2.0.0.9001
+Date: 2023-09-29
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith01@gmail.com", 
@@ -23,6 +23,9 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.2.0)
 Additional_repositories: https://cmmr.github.io/rbiom
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+Config/testthat/parallel: true
 LinkingTo: 
     Rcpp,
     RcppParallel
@@ -50,7 +53,6 @@ Imports:
     R.utils,
     slam,
     tidyr,
-    treeio,
     tsne,
     uwot,
     vegan
@@ -58,7 +60,9 @@ Suggests:
     ggdensity,
     ggpattern,
     ggtree,
+    phyloseq,
     rhdf5,
-    testthat
+    testthat,
+    vdiffr
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr

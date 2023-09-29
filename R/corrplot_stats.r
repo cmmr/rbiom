@@ -17,11 +17,8 @@ corrplot_stats <- function (layers) {
   p.adj     <- params[['p.adj']]
   level     <- ifelse(is.numeric(ci), ci / 100, 0.95)
   
-  color.by   <- unique(setdiff(color.by, facet.by))
-  facet.by   <- unique(facet.by)
-  emm_specs  <- if (!is.null(color.by)) color.by else facet.by
-  emm_by     <- if (!is.null(color.by)) facet.by else NULL
-  predictors <- c(emm_specs, emm_by)
+  color.by  <- unique(setdiff(color.by, facet.by))
+  facet.by  <- unique(facet.by)
   
   stopifnot(is_string(p.adj, stats::p.adjust.methods))
   
@@ -46,8 +43,9 @@ corrplot_stats <- function (layers) {
       model_args[['formula']] <- local({
         replacements <- list(x = as.symbol(xcol), y = as.symbol(ycol))
         f <- eval(do.call(substitute, list(model_args[['formula']], replacements)))
-        if (is_null(color.by)) return (update(f, ~ . + 0))
-        update(f, sprintf("~ . * %s + 0", backtick(color.by)))
+        if (!is_null(color.by))
+          f <- update(f, sprintf("~ . * %s", backtick(color.by)))
+        return (f)
       })
       
       err <- function (...) data.frame()[1,]
@@ -56,24 +54,13 @@ corrplot_stats <- function (layers) {
       
       results <- plyr::dlply(ggdata, ply_cols(facet.by), function (df) {
         
-        
-        #________________________________________________________
-        # Can't run stats on just a single factor level.
-        #________________________________________________________
-        if (!is_null(color.by) && length(unique(df[[color.by]])) < 2) {
-          
-          x <- data.frame()[1,]
-          if (length(facet.by) > 0)
-            for (i in facet.by) x[[i]] <- df[1,i]
-            
-          return (list(
-            'df' = df, 'fit' = x, 'terms' = x, 
-            'emmeans'  = x, 'emm_pairs' = x, 'emm_eff_size' = x, 
-            'emtrends' = x, 'emt_pairs' = x, 'emt_eff_size' = x ))
-        }
-        
-        
         res <- list()
+        
+        # adiv_corrplot(sample_rarefy(hmp50), x = "Age", layers = "trs", color.by="Sex", facet.by="Body Site")
+        # cat(file = stderr(), paste(collapse = ", ", unique(df[['Body Site']])), "\n")
+        # if ("Mid vagina" %in% df[['Body Site']])
+        #   browser()
+        
         
         #________________________________________________________
         # Create a model just for this subset (facet) of ggdata.
@@ -82,52 +69,72 @@ corrplot_stats <- function (layers) {
         m <- do.call(model_function, model_args, envir = baseenv())
         
         
+        #________________________________________________________
+        # Basic and EMM stats for all models.
+        #________________________________________________________
+        res[['df' ]]   <- broom::augment(m)
+        res[['terms']] <- broom::tidy(x = m, conf.int = TRUE, conf.level = level)
+        res[['fit'  ]] <- broom::glance(x = m)
+        
+        emm <- try(silent = TRUE, emmeans::emmeans( object = m, specs = c(xcol, color.by),    level = level, infer = TRUE))
+        emt <- try(silent = TRUE, emmeans::emtrends(object = m, specs = color.by, var = xcol, level = level, infer = TRUE))
+        res[['emmeans']]  <- tryCatch(summary(object = emm, adjust = 'none'), error = err, warning = err)
+        res[['emtrends']] <- tryCatch(summary(object = emt, adjust = 'none'), error = err, warning = err)
+        
+        for (i in head(which(endsWith(names(res[['emtrends']]), ".trend")), 1))
+          names(res[['emtrends']])[[i]] <- "slope"
+        
         
         #________________________________________________________
-        # Stats that come into play for color.by
+        # EMM Pairs and Effect Sizes need >= 2 color.by levels.
         #________________________________________________________
-        if (length(color.by) > 0) {
+        if (!is_null(color.by) && length(unique(df[[color.by]])) >= 2) {
           
-          
-          #________________________________________________________
-          # Look at estimated means.
-          #________________________________________________________
-          emm <- try(silent = TRUE, emmeans::emmeans(object = m, specs = c(xcol, color.by), level = level, infer = TRUE))
-          res[['emmeans']]      <- tryCatch(summary(object = emm, adjust = 'none'),                                            error = err, warning = err)
           res[['emm_pairs']]    <- tryCatch(pairs(x = emm, adjust = 'none', simple = color.by),                                error = err, warning = err)
           res[['emm_eff_size']] <- tryCatch(eff_size(object = emm, sigma = sigma(m), edf = df.residual(m), simple = color.by), error = err, warning = err)
           
-          
-          #________________________________________________________
-          # Look at linear trends (slopes).
-          #________________________________________________________
-          emt <- try(silent = TRUE, emmeans::emtrends(object = m, specs = color.by, var = xcol, level = level, infer = TRUE))
-          res[['emtrends']]     <- tryCatch(summary(object = emt, adjust = 'none'),                         error = err, warning = err)
           res[['emt_pairs']]    <- tryCatch(pairs(x = emt, adjust = 'none'),                                error = err, warning = err)
           res[['emt_eff_size']] <- tryCatch(eff_size(object = emt, sigma = sigma(m), edf = df.residual(m)), error = err, warning = err)
           
-          for (i in head(which(endsWith(names(res[['emtrends']]), ".trend")), 1))
-            names(res[['emtrends']])[[i]] <- "slope"
+        } else {
           
+          #________________________________________________________
+          # Dummy data frames when 'color.by' < two levels.
+          #________________________________________________________
+          x <- data.frame()[1,]
+          if (length(facet.by) > 0)
+            for (i in facet.by) x[[i]] <- df[1,i]
+          res[['emm_pairs']]    <- x
+          res[['emt_pairs']]    <- x
+          res[['emm_eff_size']] <- x
+          res[['emt_eff_size']] <- x
+          
+          
+          #________________________________________________________
+          # Automatically switch from invalid stats tables.
+          #________________________________________________________
+          if (identical(params[['stats']], "emm_pairs")) params[['stats']] <- "emmeans"
+          if (identical(params[['stats']], "emt_pairs")) params[['stats']] <- "emtrends"
         }
         
         
         
         #________________________________________________________
-        # Basic stats for all models.
+        # Drop xcol from stats tables.
         #________________________________________________________
-        res[['df' ]]   <- broom::augment(m, data = df)
-        res[['terms']] <- broom::tidy(x = m)
-        res[['fit'  ]] <- broom::glance(x = m)
+        res[['df']] <- as.data.frame(res[['df']])
+        for (i in setdiff(names(res), 'df')) {
+          res[[i]] <- as.data.frame(res[[i]])
+          res[[i]] <- res[[i]][,colnames(res[[i]]) != xcol,drop=FALSE]
+        }
         
         
         #________________________________________________________
-        # Prepend facet columns to the data frames; drop xcol.
+        # Prepend facet columns to the data frames.
         #________________________________________________________
         res <- lapply(res, function (x) {
-          x <- as.data.frame(x)
           for (i in facet.by) x[[i]] <- df[1,i]
-          x <- x[,setdiff(unique(c(facet.by, colnames(x))), xcol),drop=FALSE]
+          x <- x[,unique(c(facet.by, colnames(x))),drop=FALSE]
           return (x)
         })
         
@@ -161,20 +168,21 @@ corrplot_stats <- function (layers) {
         
         model_fn      <- attr(model_function, 'fn', exact = TRUE)
         model_arg_str <- as.args(model_args)
-        facet_str     <- as.args(list(facet.by))
-        color.by_str  <- glue::double_quote(color.by)
-        xcol_str      <- glue::double_quote(xcol)
+        xcol_str      <- as.args(list(xcol))
+        color.by_str  <- as.args(list(color.by))
+        facet.by_str  <- as.args(list(facet.by))
+        specs_str     <- as.args(list(c(xcol, color.by)))
         
         emm_template <- ifelse(
           test = is.null(facet.by), 
           yes  = paste0(
             sprintf("model <- %s(%s, data = data)\n", model_fn, model_arg_str),
-            sprintf("emm   <- emmeans(object = model, specs = c(%s, %s), level = %s, infer = TRUE)\n", xcol_str, color.by_str, level),
+            sprintf("emm   <- emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
             sprintf("stats <- {cmd}") ),
           no   = paste0(
-            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet_str),
+            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
             sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
-            sprintf("  emm   <- emmeans(object = model, specs = c(%s, %s), level = %s, infer = TRUE)\n", xcol_str, color.by_str, level),
+            sprintf("  emm   <- emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
             sprintf("  {cmd}\n}") ))
         
         if (hasName(stats, 'emmeans'))
@@ -200,7 +208,7 @@ corrplot_stats <- function (layers) {
             sprintf("emt   <- emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", color.by_str, xcol_str, level),
             sprintf("stats <- {cmd}") ),
           no   = paste0(
-            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet_str),
+            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
             sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
             sprintf("  emt   <- emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", color.by_str, xcol_str, level),
             sprintf("  {cmd}\n}") ))
@@ -226,7 +234,7 @@ corrplot_stats <- function (layers) {
             sprintf("model <- %s(%s, data = data)\n", model_fn, model_arg_str),
             sprintf("stats <- {cmd}") ),
           no   = paste0(
-            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet_str),
+            sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
             sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
             sprintf("  {cmd}\n}") ))
         
@@ -303,6 +311,43 @@ corrplot_stats <- function (layers) {
   
   
   
+  #________________________________________________________
+  # Show p-values on the plot. One per facet.
+  #________________________________________________________
+  if (hasName(stats, params[['stats']])) {
+    
+    attr(ggdata, 'stat_labels') <- plyr::ddply(
+      .data      = stats[[params[['stats']]]], 
+      .variables = ply_cols(facet.by), 
+      .fun       = function (df) {
+        p <- min(df[['p.value']], Inf, na.rm = TRUE)
+        if (is.infinite(p)) return (NULL)
+        fmt <- ifelse(nrow(df) == 1, "%s: *p* = %s", "%s: min(*p*) = %s")
+        data.frame(.label = sprintf(fmt, params[['stats']], format(p, digits=2)))
+      })
+    
+    
+    setLayer(
+      'layer'         = "stats_ggtext",
+      'size'          = 3,
+      'fill'          = "#FFFFFFBB",
+      'width'         = NULL,
+      'box.size'      = 0,
+      'box.padding'   = unit(c(3,6,3,6), "pt"),
+      'hjust'         = -0.1,
+      'vjust'         = 1.2,
+      'mapping|x'     = -Inf,
+      'mapping|y'     =  Inf,
+      'mapping|label' = ".label" )
+    
+    setLayer(
+      'layer'  = "yaxis",
+      'expand' = c(0, 0, .1, 0) )
+    
+  }
+  
+  
+  
   # if (!is.null(stats[['fit']])) {
   #   
   #   stats_text <- sprintf(
@@ -350,6 +395,19 @@ corrplot_stats <- function (layers) {
   #   setLayer("theme", plot.subtitle = element_markdown(size = 11, lineheight = 1.2))
   #   
   # }
+  
+  
+  if (hasLayer("residual")) {
+    
+    attr(ggdata, 'residual') <- stats[['df']][,c(xcol, ycol, '.fitted', color.by, facet.by), drop=FALSE]
+    
+    setLayer(
+      'layer'        = "residual",
+      'mapping|x'    = xcol,
+      'mapping|xend' = xcol,
+      'mapping|y'    = ycol,
+      'mapping|yend' = ".fitted" )
+  }
   
   
   params[['stats']] <- NULL

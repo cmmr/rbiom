@@ -1,11 +1,11 @@
-#' Combines rare_corrplot and depths_barplot into a single figure.
+#' Combines rare_corrplot and rare_barplot into a single figure.
 #' 
 #' @name rare_multiplot
 #' 
 #' @inherit rare_corrplot params
 #' @inherit adiv_corrplot params sections return
 #' 
-#' @family plotting
+#' @family visualization
 #'        
 #' @param labels   Show sample names under each bar. Default: \code{FALSE}.
 #'        
@@ -32,10 +32,10 @@
 #'     
 
 rare_multiplot <- function (
-    biom, metric = "OTUs", depths = NULL, layers = "t", rline = TRUE,
+    biom, adiv = "OTUs", depths = NULL, layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    model = "logarithmic", p.adj = "fdr", ci = 95, caption = FALSE, 
-    labels = FALSE, trans = "log10", ...) {
+    model = "log", stats = "emtrends", p.adj = "fdr", ci = 95, 
+    caption = FALSE, labels = FALSE, trans = "log10", ...) {
   
   
   #________________________________________________________
@@ -64,10 +64,10 @@ rare_multiplot <- function (
   # Build the two subplots, then arrange them together.
   #________________________________________________________
   corrplot_params <- params[intersect(formalArgs(rare_corrplot),  names(params))]
-  barplot_params  <- params[intersect(formalArgs(depths_barplot), names(params))]
+  barplot_params  <- params[intersect(formalArgs(rare_barplot), names(params))]
   
   corrplot <- do.call(rare_corrplot,  c(corrplot_params, dots))
-  barplot  <- do.call(depths_barplot, c(barplot_params,  dots))
+  barplot  <- do.call(rare_barplot, c(barplot_params,  dots))
   plots    <- list(corrplot = corrplot, barplot = barplot)
   
   p <- patchwork::wrap_plots(plots, ncol = 1)

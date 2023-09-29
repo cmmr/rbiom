@@ -9,7 +9,10 @@
 #' @export
 #' @examples
 #'     library(rbiom)
-#'     p <- plot(hmp50, Bray ~ Sex)
+#'     
+#'     biom <- sample_rarefy(hmp50)
+#'     p    <- bdiv_ord_plot(biom, color.by="Sex")
+#'     
 #'     attr(p, 'stats') %>% embed_csv(row.names=FALSE) %>% cat("\n\n")
 #' @md
 #'

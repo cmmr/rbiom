@@ -1,34 +1,35 @@
 #' List all the options for each type of metric.
 #' 
-#' @name metrics
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' @noRd
+#' 
+#' @param biom   A BIOM object, as returned from [read_biom()].
 #' 
 #' @param mode   One of the following options:
 #' \itemize{
 #'   \item{\bold{ord} - }{ Ordination }
 #'   \item{\bold{adiv} - }{ Alpha Diversity }
-#'   \item{\bold{dist} - }{ Distance (Beta Diversity) }
+#'   \item{\bold{bdiv} - }{ Beta Diversity }
 #'   \item{\bold{clust} - }{ Clustering }
+#'   \item{\bold{dist} - }{ The ones that [stats::dist()] knows. }
+#'   \item{\bold{meta} - }{ Metadata Fields }
 #'   \item{\bold{rank} - }{ Taxonomic Rank }
 #'   \item{\bold{taxon} - }{ Taxa Names }
-#'   \item{\bold{meta} - }{ Metadata Fields }
 #'   \item{\bold{all} - }{ All of the Above }
 #' }
 #'        
 #' @return A character vector of supported values. 
 #'         For \code{mode = "all"}, a named \code{list()} of character vectors.
-#' @export
-#' @seealso \code{\link{adiv_table}} \code{\link{bdiv_table}} \code{\link{ordinate}}
+#' 
 #' @examples
 #'     library(rbiom)
 #'     
 #'     metrics(hmp50, 'adiv')
-#'     metrics(hmp50, 'dist')
+#'     metrics(hmp50, 'bdiv')
 #'
 metrics <- function (biom, mode = "all", tree=NULL) {
   
   mode  <- tolower(mode)
-  modes <- c('ord', 'adiv', 'dist', 'clust', 'rank', 'taxon', 'meta', 'bdiv')
+  modes <- c('ord', 'adiv', 'bdiv', 'dist', 'clust', 'rank', 'taxon', 'meta', 'weighted')
   stopifnot(is_string(mode, c(modes, 'all')))
   
   if (is.data.frame(biom) && identical(mode, 'meta'))
@@ -41,15 +42,16 @@ metrics <- function (biom, mode = "all", tree=NULL) {
     return (sapply(X = modes, FUN = rbiom::metrics, biom=biom, tree=tree))
   
   
-  if        (mode == 'ord')   { c("PCoA", "tSNE", "NMDS", "UMAP") 
-  } else if (mode == 'adiv')  { c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson") 
-  } else if (mode == 'dist')  { c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
-  } else if (mode == 'clust') { c("average", "ward", "mcquitty", "single", "median", "complete", "centroid") 
-  } else if (mode == 'rank')  { unique(c(taxa_ranks(biom), 'OTU'))
-  } else if (mode == 'taxon') { unique(c(as.character(taxonomy(biom)), taxa_names(biom)))
-  } else if (mode == 'meta')  { colnames(metadata(biom))
-  } else if (mode == 'bdiv')  {
-    hasTree <- ifelse(is(biom, 'BIOM'), has_phylogeny(biom), FALSE) || is(tree, 'phylo')
+  if        (mode == 'ord')      { c("PCoA", "tSNE", "NMDS", "UMAP") 
+  } else if (mode == 'adiv')     { c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson") 
+  } else if (mode == 'dist')     { c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski") 
+  } else if (mode == 'clust')    { c("average", "ward", "mcquitty", "single", "median", "complete", "centroid") 
+  } else if (mode == 'rank')     { unique(c(taxa_ranks(biom), 'OTU'))
+  } else if (mode == 'taxon')    { unique(c(as.character(otu_taxonomy(biom)), otu_names(biom)))
+  } else if (mode == 'meta')     { colnames(sample_metadata(biom))
+  } else if (mode == 'weighted') { c(TRUE, FALSE)
+  } else if (mode == 'bdiv')     {
+    hasTree <- ifelse(is(biom, 'BIOM'), has_tree(biom), FALSE) || is(tree, 'phylo')
     if (hasTree) { c("UniFrac", "Jaccard", "Bray-Curtis", "Manhattan", "Euclidean")
     } else       { c("Jaccard", "Bray-Curtis", "Manhattan", "Euclidean") }
   } else { NULL }
@@ -63,13 +65,16 @@ validate_arg <- function (
   
   n_min   <- ifelse(is_null(n), 0,   min(n))
   n_max   <- ifelse(is_null(n), Inf, max(n))
-  options <- metrics(biom, mode, tree)
+  choices <- metrics(biom, mode, tree)
+  
+  if (identical(tolower(vals), "all"))
+    vals <- choices
   
   if (is_null(vals)) {
-    if (is.function(default))  return (default(options))
+    if (is.function(default))  return (default(choices))
     if (is.character(default)) return (default)
-    if (isTRUE(default))       return (options[[1]])
-    if (is.integer(default))   return (options[[default]])
+    if (isTRUE(default))       return (choices[[1]])
+    if (is.integer(default))   return (choices[[default]])
     if (n_min == 0)            return (NULL)
     stop("No value given for `", arg, "` parameter.")
   }
@@ -77,21 +82,26 @@ validate_arg <- function (
   if (length(vals) < n_min) stop("For `", arg, "`, length must be >= ", n_min, ".")
   if (length(vals) > n_max) stop("For `", arg, "`, length must be <= ", n_max, ".")
   
+  
   for (i in seq_along(vals)) {
     
     val <- vals[[i]]
     if (is_na(val) && isTRUE(allow_na)) next
     
-    opt <- options[which(startsWith(tolower(options), tolower(val)))]
-    if (length(opt) != 1) stop("Invalid argument for ", arg, ": ", val)
-    vals[[i]] <- opt
+    if (is.character(choices)) {
+      sel <- choices[which(startsWith(tolower(choices), tolower(val)))]
+    } else {
+      sel <- choices[which(sapply(choices, identical, val))]
+    }
+    if (length(sel) != 1) stop("Invalid argument for ", arg, ": ", val)
+    vals[[i]] <- sel
     
     if (!is_null(col_type)) {
-      md_vals <- if (is.data.frame(biom)) biom[[opt]] else metadata(biom, opt)
+      md_vals <- if (is.data.frame(biom)) biom[[sel]] else sample_metadata(biom, sel)
       is_cat  <- is.factor(md_vals) || is.character(md_vals)
       is_num  <- is.numeric(md_vals)
-      if (identical(col_type, "cat") && !is_cat) stop("Metadata column ", opt, " is not categorical.")
-      if (identical(col_type, "num") && !is_num) stop("Metadata column ", opt, " is not numeric.")
+      if (identical(col_type, "cat") && !is_cat) stop("Metadata column `", sel, "` is not categorical.")
+      if (identical(col_type, "num") && !is_num) stop("Metadata column `", sel, "` is not numeric.")
     }
   }
   
@@ -105,6 +115,7 @@ validate_arg <- function (
 #' Cleanup dynamic options that we can recognize
 #' 
 #' @name validate_metrics
+#' @noRd
 #'     
 validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE, ...) {
   
@@ -181,7 +192,7 @@ validate_metrics <- function (biom, metrics, mode=NULL, multi=FALSE, mixed=FALSE
     
     # Further classify as 'factor' or 'numeric'
     #________________________________________________________
-    cl <- class(metadata(biom, vals))
+    cl <- class(sample_metadata(biom, vals))
     if (any(cl %in% c('factor', 'character', 'logical'))) {
       attr(vals, 'mode') <- "factor"
       

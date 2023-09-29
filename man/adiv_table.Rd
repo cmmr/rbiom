@@ -2,76 +2,72 @@
 % Please edit documentation in R/adiv_table.r
 \name{adiv_table}
 \alias{adiv_table}
-\title{Estimate the diversity of each sample.}
+\title{Calculate the alpha diversity of each sample.}
 \usage{
-adiv_table(biom, rarefy = FALSE, metrics = "all", long = FALSE, md = FALSE)
+adiv_table(biom, rarefy = FALSE, adiv = "Shannon", long = FALSE, md = FALSE)
 }
 \arguments{
 \item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, as returned from \link{read_biom}. For matrices, the rows and
+object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
 columns are assumed to be the taxa and samples, respectively.}
 
-\item{rarefy}{Control how/whether rarefactions are done prior to alpha 
-diversity computations. Options are: 
-\describe{
+\item{rarefy}{Control how/whether rarefactions are done prior to alpha
+diversity computations. Options are:
+\itemize{
+\item{\code{FALSE} - }{
+Use each sample's current set of observations without applying
+any rarefaction.}
+\item{\code{TRUE} - }{
+Automatically select and apply a single rarefaction. }
+\item{\code{"multi"}, \code{"multi_log"}, \code{"multi_even"} - }{
+Automatically select and apply multiple rarefactions.
+\code{"multi"} provides \code{"multi_log"} at the low end
+and \code{"multi_even"} at the high end. }
+\item{\emph{integer vector} - }{
+Rarefy at the specified depth(s). }
+}
+Default: \code{FALSE}}
 
-  \item{\code{FALSE}}{
-    Use each sample's current set of observations without applying
-    any rarefaction. (Default) }
-    
-  \item{\code{TRUE}}{
-    Automatically select and apply a single rarefaction. }
-    
-  \item{\code{"multi"}, \code{"multi_log"}, \code{"multi_even"}}{
-    Automatically select and apply multiple rarefactions.
-    \code{"multi"} provides \code{"multi_log"} at the low end 
-    and \code{"multi_even"} at the high end. }
-    
-  \item{\emph{integer vector}}{
-    Rarefy at the specified depth(s). }
-}}
-
-\item{metrics}{Character vector of one or more of the following: 
-\code{depth}, \code{otus}, \code{shannon}, \code{chao1}, 
-\code{simpson}, \code{inv_simp}. Non-ambiguous abbreviations are 
-also accepted. A ".depth" column will always be included when alpha 
-diversity is calculated at different rarefaction levels. 
-The default, \code{all}, returns all metrics.}
+\item{adiv}{One or more alpha diversity measures to use. Options are:
+\code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"},
+and/or \code{"InvSimpson"}. Non-ambiguous abbreviations are also
+accepted. You can use \code{adiv="all"} as shortcut for
+\code{adiv=c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")}
+Default: \code{"Shannon"}.}
 
 \item{long}{Pivot the returned data to long format?
-\describe{
-  \item{\bold{FALSE} (Default)}{
-    Each metric always has its own column, named ".depth", ".otus", 
-    ".shannon", etc. }
-  \item{\bold{TRUE}}{
-    The name of the metric is in a ".metric" column, and the 
-    alpha diversity values are in a ".diversity" column. }
-}}
+\itemize{
+\item{\bold{FALSE} - }{
+Each alpha diversity metric always has its own column, named
+".OTUs", ".Shannon", etc. }
+\item{\bold{TRUE} - }{
+The name of the metric is in an ".adiv" column, and the
+alpha diversity values are in a ".diversity" column. }
+}
+Default: \code{FALSE}}
 
-\item{md}{Include metadata in the output data frame? Options are: 
-\describe{
-  \item{\code{FALSE} (Default)}{ Don't include metadata. }
-  \item{\code{TRUE}}{ Include all metadata. }
-  \item{\emph{character vector}}{
-    Include only the specified metadata columns. }
-}}
+\item{md}{Include metadata in the output data frame? Options are:
+\itemize{
+\item{\code{FALSE} - }{ Don't include metadata. }
+\item{\code{TRUE} - }{ Include all metadata. }
+\item{\emph{character vector} - }{
+Include only the specified metadata columns. }
+}
+Default: \code{FALSE}}
 }
 \value{
-A data frame of diversity values for each sample in \code{biom}. The 
-        first column name is \bold{.sample}. Remaining column names are 
-        dependent on the function's arguments.
+A data frame of diversity values for each sample in \code{biom}. The
+first column name is \bold{.sample}. Remaining column names are
+dependent on the function's arguments.
 }
 \description{
-Estimate the diversity of each sample.
+Calculate the alpha diversity of each sample.
 }
 \examples{
     library(rbiom)
     
-    ad <- adiv_table(hmp50)
-    head(ad)
+    biom <- sample_select(hmp50, 1:6)
     
-    biom <- subset(hmp50, `Body Site` == "Saliva" & Age < 26)
-    ad   <- adiv_table(biom, "multi")
-    boxplot(.shannon ~ .depth, data=ad, xlab="Reads", ylab="Diversity")
-    
+    adiv_table(biom, adiv="all")
+    adiv_table(biom, long = TRUE, md = TRUE)
 }

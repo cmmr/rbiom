@@ -283,7 +283,7 @@ NumericVector rcpp_beta_div(int iJob, int nJobs, List sparseMatrix, const char* 
 //   library(slam)
 //   
 //   infile <- system.file("extdata", "hmp50.biom", package = "rbiom")
-//   biom   <- read.biom(infile)
+//   biom   <- read_biom(infile)
 //   
 //   otus   <- biom$counts
 //   ord    <- order(otus$j, otus$i)

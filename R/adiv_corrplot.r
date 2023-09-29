@@ -4,17 +4,12 @@
 
 #' Visualize alpha diversity with scatterplots and trendlines.
 #' 
-#' @name adiv_corrplot
+#' @inherit adiv_boxplot params
+#' @family visualization
 #' 
-#' @family plotting
-#' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' @param biom   A BIOM object, as returned from [read_biom()].
 #' 
 #' @param x   A numeric metadata column name to use for the x-axis. Required.
-#' 
-#' @param metric   Alpha diversity metric(s) to use. Options are: 
-#'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
-#'        and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.
 #'           
 #' @param layers   \code{"trend"}, \code{"scatter"}. Single letter 
 #'        abbreviations are also accepted. For instance, 
@@ -26,20 +21,43 @@
 #'        and partitioning. See below for details. Default: \code{NULL}
 #'        
 #' @param model   What type of trendline to fit to the data. Options are: 
-#'        \code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
-#'        alternatively provide a list of length two where the first element is
-#'        a character vector of length 1 naming a function, and the second 
-#'        element is a list of arguments to pass to that function. One of the 
-#'        function's arguments must be named 'formula'. For example, 
-#'        \code{model = list("stats::lm", list(formula = y ~ x))}.
-#'        Default: \code{"linear"}.
+#'        \itemize{
+#'          \item{\code{"lm"} - }{  Linear model: \code{stats::lm(formula = y ~ x)}.) }
+#'          \item{\code{"log"} - }{ Logarithmic model: \code{stats::lm(formula = y ~ log(x))}. }
+#'          \item{\code{"gam"} - }{ Generalized additive model: \code{mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")}. }
+#'        }
+#'        Default: \code{"lm"} \cr\cr
+#'        You can alternatively provide a list of length two where the first 
+#'        element is a character vector of length 1 naming a function, and the 
+#'        second element is a list of arguments to pass to that function. One 
+#'        of the function's arguments must be named 'formula'. 
+#'        For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+#'        
+#' @param stats   Which statistic to display on the plot. Options are: 
+#'        \itemize{
+#'          \item{\code{"fit"} - }{ How well does the model fit the data? }
+#'          \item{\code{"terms"} - }{ How strongly does 'x' influence 'y'? }
+#'          \item{\code{"emmeans"} - }{ Is the average 'y' value non-zero? }
+#'          \item{\code{"emtrends"} - }{ Does any trendline have a non-zero slope? }
+#'          \item{\code{"emm_pairs"} - }{ Are the means of any trendlines different? }
+#'          \item{\code{"emt_pairs"} - }{ Are the slopes of any trendlines different? }
+#'          \item{\code{"hide"} - }{ Don't show stats on the plot, but still compute them. }
+#'          \item{\code{"none"} - }{ Do not compute or show statistics. }
+#'        }
+#'        Default: \code{"emtrends"} \cr\cr
+#'        Note: \code{"emm_pairs"} and \code{"emt_pairs"} can only be calculated
+#'        when using a \code{color.by} metadata column with more than one level. \cr\cr
+#'        Statistical tests are run separately on each facet. P-values are 
+#'        adjusted for multiple comparisons by considering all facets together. 
+#'        Unless \code{stats = "none"}, all stats are attached to the plot as 
+#'        \code{attr(,'stats')}.
 #'
 #' @param p.adj   Method to use for multiple comparisons adjustment of p-values.
 #'        Run \code{p.adjust.methods} for a list of available options.
 #'        Default: \code{"fdr"}.
 #' 
-#' @param ci   The confidence interval to display around the fitted curve. Set
-#'        to \code{FALSE} to hide the confidence interval. Default: \code{95}.
+#' @param ci   The confidence interval to display around the trendline. 
+#'        Default: \code{95}.
 #'        
 #' @param caption   Display information about the method used for trendline
 #'        fitting beneath the plot. Default: \code{FALSE}.
@@ -106,12 +124,14 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     adiv_corrplot(rarefy(hmp50), "Age", color.by="Body Site", metric=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
+#'     biom <- sample_rarefy(hmp50)
+#'     adiv_corrplot(biom, "Age", color.by="Body Site", adiv=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
 #'     
 adiv_corrplot <- function (
-    biom, x, metric = "OTUs", layers = "t", 
+    biom, x, adiv = "Shannon", layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    model = "linear", p.adj = "fdr", ci = 95, caption = FALSE, ...) {
+    model = "lm", stats = "emtrends", 
+    p.adj = "fdr", ci = 95, caption = FALSE, ...) {
   
   
   #________________________________________________________
@@ -138,7 +158,7 @@ adiv_corrplot <- function (
   #________________________________________________________
   params %<>% within({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    adiv %<>% validate_arg(biom, 'adiv', 'adiv', n = c(1,Inf))
   })
   
   
@@ -156,32 +176,32 @@ adiv_corrplot <- function (
   # Compute alpha diversity values.
   #________________________________________________________
   data <- adiv_table(
-    biom    = params[['biom']],
-    metrics = params[['metric']],
-    long    = TRUE,
-    md      = unique(c(
+    biom = params[['biom']],
+    adiv = params[['adiv']],
+    long = TRUE,
+    md   = unique(c(
       params[['x']], 
       names(params[['color.by']]), 
       params[['facet.by']] )))
   
   
   #________________________________________________________
-  # Facet by metric when there's more than one.
+  # Facet by adiv metric when there's more than one.
   #________________________________________________________
   ylab <- NULL
   ycol <- attr(data, 'response', exact = TRUE)
   hist <- attr(data, 'history',  exact = TRUE)
   
-  if (length(unique(data[['.metric']])) > 1) {
+  if (length(unique(data[['.adiv']])) > 1) {
     ylab <- "Diversity (multiple metrics)"
     data <- drop_cols(data, '.depth')
-    params[['facet.by']] <- unique(c(params[['facet.by']], ".metric"))
+    params[['facet.by']] <- unique(c(params[['facet.by']], ".adiv"))
     
   } else {
-    data <- rename_response(data, paste0(".", unique(data[['.metric']])))
+    data <- rename_response(data, paste0(".", unique(data[['.adiv']])))
     ycol <- attr(data, 'response', exact = TRUE)
-    ylab <- sprintf("Diversity (%s)", unique(data[['.metric']]))
-    data <- drop_cols(data, '.depth', '.metric')
+    ylab <- sprintf("Diversity (%s)", unique(data[['.adiv']]))
+    data <- drop_cols(data, '.depth', '.adiv')
   }
   
   if (!is_rarefied(params[['biom']]))
@@ -196,14 +216,15 @@ adiv_corrplot <- function (
   # Convert user's `layers` spec to layer names.
   #________________________________________________________
   layer_names <- local({
-    layerlist <- c('t' = "trend", 's' = "scatter")
+    layerlist <- c(
+      't' = "trend", 'c' = "confidence", 
+      's' = "scatter", 'n' = "name", 'r' = "residual")
     
     layer_match(params[['layers']], choices = layerlist, default = "t") %>%
       c('ggplot', ., 'labs', 'theme_bw')
   })
   
   if (!'scatter' %in% layer_names) params[['shape.by']] <- NULL
-  
   
   
   #________________________________________________________
@@ -218,11 +239,20 @@ adiv_corrplot <- function (
     'ycol'     = attr(data, 'response', exact = TRUE),
     'xmode'    = "numeric" )
   
-  initLayer(layer_names)
+  initLayer(setdiff(layer_names, c('trend', 'confidence')))
   
   if (!is_null(params[['color.by']])) initLayer("color")
   if (!is_null(params[['shape.by']])) initLayer("shape")
   
+  
+  #________________________________________________________
+  # Merge trend and confidence into a single layer.
+  #________________________________________________________
+  if (any(c('trend', 'confidence') %in% layer_names)) {
+    initLayer("trend")
+    if (!'trend'      %in% layer_names) setLayer("trend", color = NA)
+    if (!'confidence' %in% layer_names) setLayer("trend", se = FALSE)
+  }
   
   
   #________________________________________________________
@@ -230,7 +260,7 @@ adiv_corrplot <- function (
   #________________________________________________________
   setLayer("ggplot", mapping = list(x = params[['x']], y = attr(data, 'response', exact = TRUE)))
   setLayer("labs", x = params[['x']], y = ylab)
-  if (length(params[['metric']]) > 1) setLayer("facet", scales = "free_y")
+  if (length(params[['adiv']]) > 1) setLayer("facet", scales = "free_y")
   
   
   

@@ -1,11 +1,9 @@
 
 
-#' Generate a matrix of samples by taxa, at the specified taxonomic rank.
+#' Generate a data.frame of taxa abundance for each sample at the specified taxonomic rank.
 #' 
-#' @name taxa_rollup
-#'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'        object, as returned from \link{read_biom}. For matrices, the rows and 
+#'        object, as returned from [read_biom()]. For matrices, the rows and 
 #'        columns are assumed to be the taxa and samples, respectively.
 #'        
 #' @param rank  The taxonomic rank. E.g. \code{rank = "OTU"}, 
@@ -16,26 +14,30 @@
 #'        
 #' @param taxa   Limit the number of taxa returned in the matrix. Depending on 
 #'        the value type, a different filter is applied.
-#'        \describe{
-#'          \item{\code{NULL}}{ Retain all taxa. (The default.) }
-#'          \item{Integer >= 1}{ The N most abundant taxa are retained. Example:
-#'            \code{taxa_matrix(biom, 'Genus', 5)} returned the five most
-#'            abundant genera. }
-#'          \item{Numeric between 0 and 1}{ Taxa are retained if their abundance 
-#'            is greater than or equal to N. Example: 
-#'            \code{taxa_matrix(biom, 'Phylum', 0.1)} returns all phyla with a
-#'            relative abundance of at least 10 \%. }
-#'          \item{Character vector}{ Only these taxa names are retained. Example: 
+#'        \itemize{
+#'          \item{\code{NULL} - }{ Retain all taxa. }
+#'          \item{\emph{integer} >= 1 - }{
+#'            The N most abundant taxa are retained. \cr
+#'            Example: \code{taxa_matrix(biom, 'Genus', 5)} returns the five 
+#'            most abundant genera. }
+#'          \item{\emph{numeric} between 0 and 1 - }{
+#'            Retain taxa if their abundance is greater than or equal to N. \cr
+#'            Example: \code{taxa_matrix(biom, 'Phylum', 0.1)} returns all 
+#'            phyla with a relative abundance of at least 10 percent. }
+#'          \item{\emph{character vector} - }{
+#'            Only these taxa names are retained. \cr
+#'            Example:
 #'            \code{taxa_matrix(biom, 'Phylum', c("Firmicutes", "Bacteroidetes"))}
 #'            will only retain those two phyla. }
 #'        }
+#'        Default: \code{NULL}
 #'        
 #' @param map  A character matrix defining the value that each taxa IDs is
 #'        assigned for each taxonomic rank. If \code{map=NULL} and \code{biom} is a
 #'        \code{BIOM} class object, the map will be automatically loaded from 
-#'        \code{biom$taxonomy}. \code{map} must not be \code{null} when \code{biom}
+#'        \code{biom$taxonomy}. \code{map} must not be \code{NULL} when \code{biom}
 #'        is a \code{matrix} or \code{simple_triplet_matrix}. See the example below
-#'        for an example of \code{map}'s structure.
+#'        for an example of \code{map}'s structure. Default: \code{NULL}
 #'        
 #' @param lineage  Include all ranks in the name of the taxa. For instance,
 #'        setting to \code{TRUE} will produce 
@@ -43,39 +45,92 @@
 #'        Whereas setting to \code{FALSE} (the default) will return simply
 #'        \code{Coriobacteriales}. You want to set this to TRUE if you have
 #'        genus names (such as \emph{Incertae_Sedis}) that map to multiple higher
-#'        level ranks.
+#'        level ranks. Default: \code{FALSE}
+#'        
+#' @param long  Format of returned data. When \code{FALSE}, returns a matrix of 
+#'        samples by taxa. If set to \code{TRUE}, returns a data frame with 
+#'        column names 'Samples', 'Taxa', and 'Abundance'. 
+#'        Default: \code{FALSE}
+#'        
+#' @param md  Include metadata in the output data frame? Options are: 
+#'        \itemize{
+#'          \item{\code{FALSE} - }{ Don't include metadata. }
+#'          \item{\code{TRUE} - }{ Include all metadata. }
+#'          \item{\emph{character vector} - }{ Include only the specified metadata columns. }
+#'        }
+#'        Default: \code{FALSE}
+#'        
+#' @param unc  How to handle unclassified, uncultured, and similarly ambiguous
+#'        taxa names. Options are: 
+#'        \itemize{
+#'          \item{\code{"singly"} - }{ Replaces them with the OTU name. }
+#'          \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+#'          \item{\code{"drop"} - }{ Excludes them from the result. }
+#'          \item{\code{"asis"} - }{ To not check/modify any taxa names. }
+#'        }
+#'        Default: \code{"singly"} \cr\cr
+#'        Non-ambiguous abbreviations are allowed
+#'        
+#' @param other  Sum all non-itemized taxa into an "Other" taxa. When 
+#'        \code{FALSE}, only returns taxa matched by the \code{`taxa`} 
+#'        argument. Specifying \code{TRUE} adds "Other" to the returned set.
+#'        A string can also be given to imply \code{TRUE}, but with that
+#'        value as the name to use instead of "Other".
+#'        Default: \code{FALSE}
+#'        
+#' @return A data.frame with column names ".sample", ".taxa", ".abundance", and
+#'         any metadata requested with \code{md}.
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     taxa_ranks(hmp50)
+#'     
+#'     head(taxa_table(hmp50, 'Phylum'))
+#'     
+#'     # Custom matrices should be formatted like so:
+#'     counts <- otu_matrix(hmp50)
+#'     map    <- otu_taxonomy(hmp50)
+#'     
+#'     counts[1:3,1:6]
+#'     map[1:3,1:4]
+#'     
+#'     head(taxa_table(counts, 'Phylum', map=map))
+#'
+
+taxa_table <- function (
+    biom, rank = 'OTU', taxa = NULL, map = NULL, 
+    lineage = FALSE, md = FALSE, unc = "singly", 
+    other = FALSE ) {
+  
+  df <- taxa_rollup(
+    biom    = biom, 
+    rank    = rank, 
+    taxa    = taxa, 
+    map     = map, 
+    lineage = lineage, 
+    md      = md, 
+    unc     = unc, 
+    other   = other, 
+    long    = TRUE )
+  
+  return (df)
+}
+
+
+
+#' Taxa abundances per sample, at the specified taxonomic rank.
+#' 
+#' @inherit taxa_table params
 #'        
 #' @param sparse  If true, returns a sparse matrix as described by 
 #'        \code{slam::simple_triplet_matrix}, otherwise returns a normal R
 #'        matrix object. Sparse matrices will likely be considerably more
-#'        memory efficient in this scenario.
+#'        memory efficient in this scenario. Default: \code{FALSE}
 #'        
-#' @param long  Format of returned data. The default, \code{FALSE}, returns a
-#'        matrix of samples by taxa. If set to \code{TRUE}, returns a data
-#'        frame with column names 'Samples', 'Taxa', and 'Abundance'.
-#'        
-#' @param md  Include metadata in the output data frame? Options are: 
-#'        \describe{
-#'          \item{\code{FALSE}}{ Don't include metadata. (Default) }
-#'          \item{\code{TRUE}}{ Include all metadata. }
-#'          \item{\emph{character vector}}{ Include only the specified metadata columns. }
-#'        }
-#'        
-#' @param unc  How to handle unclassified, uncultured, and similarly ambiguous
-#'        taxa names. The default, \code{"singly"}/\code{"s"}, replaces them 
-#'        with the OTU name. Other options are \code{"grouped"}/\code{"g"}, 
-#'        which replaces them with a higher rank's name, \code{"drop"}/\code{"d"} 
-#'        which excludes them from the result, and \code{"asis"}/\code{"a"} to
-#'        not check/modify any taxa names.
-#'        
-#' @param other  Sum all non-itemized taxa into an "Other" taxa. The default,
-#'        \code{FALSE}, only returns taxa matched by the \code{`taxa`} 
-#'        argument. Specifying \code{TRUE} adds "Other" to the returned set.
-#'        A string can also be given to imply \code{TRUE}, but with that
-#'        value as the name to use in place of "Other".
-#'        
-#' @return A numeric matrix with samples as column names, and taxonomic
-#'         identifiers as row names.
+#' @return A numeric matrix with samples as row names, and taxonomic
+#'         identifiers as column names.
+#' 
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -86,14 +141,44 @@
 #'     phyla[1:4,1:6]
 #'     
 #'     # Custom matrices should be formatted like so:
-#'     counts <- counts(hmp50)
-#'     map    <- taxonomy(hmp50)
+#'     counts <- otu_matrix(hmp50)
+#'     map    <- otu_taxonomy(hmp50)
 #'     
 #'     counts[1:3,1:6]
 #'     map[1:3,1:4]
 #'     
 #'     phyla <- taxa_matrix(counts, 'Phylum', map=map)
 #'     phyla[1:3,1:6]
+#'
+
+taxa_matrix <- function (
+    biom, rank = 'OTU', taxa = NULL, map = NULL, 
+    lineage = FALSE, sparse = FALSE, unc = "singly", 
+    other = FALSE ) {
+  
+  mtx <- taxa_rollup(
+    biom    = biom, 
+    rank    = rank, 
+    taxa    = taxa, 
+    map     = map, 
+    lineage = lineage, 
+    sparse  = sparse, 
+    unc     = unc, 
+    other   = other )
+  
+  return (mtx)
+}
+
+
+
+#' Generate a data.frame or matrix of samples by taxa, at the specified taxonomic rank.
+#' 
+#' @noRd
+#' 
+#' @inherit taxa_table params
+#'        
+#' @return A data.frame or numeric matrix with samples as column names, and 
+#'         taxonomic identifiers as row names.
 #'
 
 taxa_rollup <- function (
@@ -117,7 +202,7 @@ taxa_rollup <- function (
   } else if (is(biom, "BIOM"))           { counts <- biom$counts
   } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
   } else {
-    stop(simpleError("biom must be a matrix, simple_triplet_matrix, or BIOM object."))
+    stop("biom must be a matrix, simple_triplet_matrix, or BIOM object.")
   }
   
   
@@ -125,10 +210,9 @@ taxa_rollup <- function (
   # Ensure we have a valid taxonomy map.
   #________________________________________________________
   if (is.matrix(map)) {
-    stopifnot(is(map, "matrix"))
     stopifnot(identical(typeof(map), "character"))
-    stopifnot(!is.null(rownames(biom)))
-    stopifnot(!is.null(colnames(biom)))
+    stopifnot(is_null(rownames(map)) || is_character(rownames(map)))
+    stopifnot(is_null(colnames(map)) || is_character(colnames(map)))
     stopifnot(all(rownames(counts) %in% rownames(map)))
     
   } else if (is(biom, "BIOM")) {
@@ -161,7 +245,7 @@ taxa_rollup <- function (
     
       if (isTRUE(lineage)) rank <- range(c(1,rank))
       
-      map <- taxonomy(biom = map, ranks = rank, unc = unc)
+      map <- otu_taxonomy(biom = map, ranks = rank, unc = unc)
       map <- apply(map, 1L, paste, collapse="; ")
       
       return (map)
@@ -306,7 +390,7 @@ taxa_rollup <- function (
   #________________________________________________________
   if (!isFALSE(md)) {
     
-    md <- metadata(biom)[,unique(md),drop=F]
+    md <- sample_metadata(biom)[,unique(md),drop=F]
     
     if (isTRUE(long)) {
       df <- merge(df, md, by.x = ".sample", by.y = "row.names")
@@ -329,105 +413,3 @@ taxa_rollup <- function (
   return (df)
 }
 
-
-
-
-
-
-
-
-#' Generate a data.frame of taxa abundance for each sample at the specified taxonomic rank.
-#' 
-#' @name taxa_table
-#' 
-#' @inherit taxa_rollup params
-#'        
-#' @return A numeric matrix with samples as column names, and taxonomic
-#'         identifiers as row names. Or a data.frame if metadata is requested 
-#'         with \code{md}.
-#' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     taxa_ranks(hmp50)
-#'     
-#'     phyla <- taxa_table(hmp50, 'Phylum')
-#'     phyla[1:4,1:6]
-#'     
-#'     # Custom matrices should be formatted like so:
-#'     counts <- counts(hmp50)
-#'     map    <- taxonomy(hmp50)
-#'     
-#'     counts[1:3,1:6]
-#'     map[1:3,1:4]
-#'     
-#'     phyla <- taxa_table(counts, 'Phylum', map=map)
-#'     phyla[1:3,1:6]
-#'
-
-taxa_table <- function (
-    biom, rank = 'OTU', taxa = NULL, map = NULL, 
-    lineage = FALSE, md = FALSE, unc = "singly", 
-    other = FALSE ) {
-  
-  df <- taxa_rollup(
-    biom    = biom, 
-    rank    = rank, 
-    taxa    = taxa, 
-    map     = map, 
-    lineage = lineage, 
-    md      = md, 
-    unc     = unc, 
-    other   = other, 
-    long    = TRUE )
-  
-  return (df)
-}
-
-
-
-#' Generate a matrix of samples by taxa, at the specified taxonomic rank.
-#' 
-#' @name taxa_matrix
-#' 
-#' @inherit taxa_rollup params
-#'        
-#' @return A numeric matrix with samples as column names, and taxonomic
-#'         identifiers as row names.
-#' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     taxa_ranks(hmp50)
-#'     
-#'     phyla <- taxa_matrix(hmp50, 'Phylum')
-#'     phyla[1:4,1:6]
-#'     
-#'     # Custom matrices should be formatted like so:
-#'     counts <- counts(hmp50)
-#'     map    <- taxonomy(hmp50)
-#'     
-#'     counts[1:3,1:6]
-#'     map[1:3,1:4]
-#'     
-#'     phyla <- taxa_matrix(counts, 'Phylum', map=map)
-#'     phyla[1:3,1:6]
-#'
-
-taxa_matrix <- function (
-    biom, rank = 'OTU', taxa = NULL, map = NULL, 
-    lineage = FALSE, sparse = FALSE, unc = "singly", 
-    other = FALSE ) {
-  
-  mtx <- taxa_rollup(
-    biom    = biom, 
-    rank    = rank, 
-    taxa    = taxa, 
-    map     = map, 
-    lineage = lineage, 
-    sparse  = sparse, 
-    unc     = unc, 
-    other   = other )
-  
-  return (mtx)
-}

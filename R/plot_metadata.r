@@ -2,6 +2,9 @@
 
 #________________________________________________________
 #' Convert all *.by params into long form.
+#' 
+#' @noRd
+#' @keywords internal
 #'
 #' Examples values for color.by:
 #' 
@@ -23,7 +26,7 @@ metadata_params <- function (params, contraints = list()) {
   
   
   biom   <- params[['biom']]
-  md     <- if (is(biom, "BIOM")) metadata(biom) else biom
+  md     <- if (is(biom, "BIOM")) sample_metadata(biom) else biom
   new_md <- md
   
   by_params <- c(
@@ -95,7 +98,7 @@ metadata_params <- function (params, contraints = list()) {
       }
       
       
-      stopifnot(is_scalar_character(col_name))
+      stopifnot(is_scalar_character(col_name) && !is_na(col_name))
       
       
       #________________________________________________________
@@ -163,8 +166,8 @@ metadata_params <- function (params, contraints = list()) {
       
       
       
-      if (param %in% group_params)   group_by %<>% c(col_name)
-      if (hasName(new_md, col_name)) md_cols  %<>% c(col_name)
+      if (param %in% group_params && col_type == "cat") group_by %<>% c(col_name)
+      if (hasName(new_md, col_name))                    md_cols  %<>% c(col_name)
       
       results[[col_name]] <- result
     }
@@ -287,9 +290,9 @@ metadata_params <- function (params, contraints = list()) {
   
   
   if (is(biom, 'BIOM')) {
-    biom             <- select(biom, rownames(new_md))
-    metadata(biom)   <- new_md
-    params[['biom']] <- biom
+    biom                  <- sample_select(biom, rownames(new_md))
+    sample_metadata(biom) <- new_md
+    params[['biom']]      <- biom
     
   } else {
     params[['biom']] <- new_md
@@ -403,7 +406,7 @@ metadata_group <- function (ggdata, params = NULL) {
 #   # Drop columns not referenced above
 #   #________________________________________________________
 #   groupvars       <- attr(ggdata, 'groupvars', exact = TRUE)
-#   non_ggdata_cols <- setdiff(colnames(ggdata), colnames(metadata(biom)))
+#   non_ggdata_cols <- setdiff(colnames(ggdata), colnames(sample_metadata(biom)))
 #   ggdata <- ggdata[, unique(c(non_ggdata_cols, groupvars)), drop=FALSE]
 #   
 #   remove("non_ggdata_cols")

@@ -28,29 +28,29 @@ taxa_boxplot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{x}{A categorical metadata column name to use for the x-axis. The 
+\item{x}{A categorical metadata column name to use for the x-axis. The
 default, \code{NULL} puts taxa along the x-axis.}
 
-\item{rank}{What rank(s) of taxa to display. E.g. "Phylum", "Genus", etc. 
-Run \code{taxa_ranks()} to see all options for a given BIOM object. 
+\item{rank}{What rank(s) of taxa to display. E.g. "Phylum", "Genus", etc.
+Run \code{taxa_ranks()} to see all options for a given BIOM object.
 The default, \code{NULL}, selects the lowest level.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
-most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that
 mean abundance or greater (e.g. 0.1). A character vector of
 taxon names will show only those taxa. Default: \code{5}.}
 
-\item{layers}{\code{"box" ("x")}, \code{"bar"}, \code{"violin"}, 
-\code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
-\code{"linerange"}, and \code{"pointrange"}. Single letter 
-abbreviations are also accepted. For instance, \code{c("box", "dot")} 
+\item{layers}{\code{"box" ("x")}, \code{"bar"}, \code{"violin"},
+\code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
+\code{"linerange"}, and \code{"pointrange"}. Single letter
+abbreviations are also accepted. For instance, \code{c("box", "dot")}
 is equivalent to \code{c("x", "d")} and \code{"xd"}.
 See \code{vignette("boxplots")} for examples of each.
 Default: \code{"lsb"}.}
 
-\item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to 
+\item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for aesthetics and partitioning. See below for details.
 Default: \code{NULL}}
 
@@ -59,60 +59,58 @@ of columns. Default: \code{FALSE}}
 
 \item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
-\item{p.top}{Only display taxa with the most significant differences in 
-abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
-significant taxa are displayed. If \code{p.top} is less than one, all 
-taxa with an adjusted p-value <= \code{p.top} are displayed. 
-Recommended to be used in combination with the \code{taxa} parameter 
-to set a lower bound on the mean abundance of considered taxa. 
+\item{p.top}{Only display taxa with the most significant differences in
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most
+significant taxa are displayed. If \code{p.top} is less than one, all
+taxa with an adjusted p-value <= \code{p.top} are displayed.
+Recommended to be used in combination with the \code{taxa} parameter
+to set a lower bound on the mean abundance of considered taxa.
 Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
 (Default: \code{fdr})}
 
-\item{p.label}{Minimum adjusted p-value to display on the plot with a 
+\item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
 \itemize{
-  \item{\code{p.label = 0.05} - }{ Use this specific value. }
-  \item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
-  \item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
-  \item{\code{p.label = Inf} - }{ display all p-values }
-  \item{\code{p.label = NULL} - }{ do not calculate stats }
+\item{\code{p.label = 0.05} - }{ Use this specific value. }
+\item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
+\item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
+\item{\code{p.label = Inf} - }{ display all p-values }
+\item{\code{p.label = NULL} - }{ do not calculate stats }
 }
-If a numeric vector with more than one value is 
+If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
 Default: \code{TRUE}}
 
-\item{ci}{How to calculate min/max of the \bold{crossbar}, 
+\item{ci}{How to calculate min/max of the \bold{crossbar},
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
 Provide a number between 75 and 100 to define a confidence interval's
-confidence level, commonly 95 or 97.5. Other options are: 
-\bold{range}, 
-\bold{sd} (standard deviation), 
-\bold{se} (standard error), and 
-\bold{mad} (median absolute deviation). 
-The center mark of \code{crossbar} and \code{pointrange} represents
-the mean, except for \bold{mad} in which case it represents
-the median. Trendlines require a confidence interval value. 
-Set to \code{NULL} to disable. Default: \code{95}}
+confidence level, commonly 95 or 97.5. Other options are:
+\code{"range"}, \code{"sd"} (standard deviation),
+\code{"se"} (standard error), and
+\code{"mad"} (median absolute deviation).
+The center mark of \bold{crossbar} and \bold{pointrange} represents
+the mean, except for code{"mad"} in which case it represents
+the median. Set to \code{NULL} to disable. Default: \code{95}}
 
-\item{outliers}{Show boxplot outliers? \code{TRUE} to always show. 
+\item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when
 overlaying a dot or strip chart.  Default: \code{NULL}}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis. 
-\bold{'auto'} (the default), automatically selects a rotation value. 
-\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal, 
+\item{xlab.angle}{How to rotate the tick labels on the x-axis.
+\bold{'auto'} (the default), automatically selects a rotation value.
+\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal,
 angled, and vertical, respectively.}
 
-\item{y.trans}{The transformation to apply to the y-axis. Visualizing 
+\item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
-a non-linear axis. Options are: 
+a non-linear axis. Options are:
 \itemize{
-  \item{\code{"sqrt"} - }{ square-root transformation }
-  \item{\code{"log1p"} - }{ log(y + 1) transformation }
-  \item{\emph{anything else} - }{ no transformation }
+\item{\code{"sqrt"} - }{ square-root transformation }
+\item{\code{"log1p"} - }{ log(y + 1) transformation }
+\item{\code{NULL} - }{ no transformation }
 }
 These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
@@ -121,14 +119,13 @@ observations. Default: \code{"sqrt"}}
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
-instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
+instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the
 dotplot layer has its size set to \code{2}. The special prefix
 \code{pt.} will control both the dot and strip layers.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics will 
-        be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
-        respectively.
+A \code{ggplot2} plot. The computed data points and statistics are
+available as \code{$data} and \code{$stats}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
@@ -136,10 +133,9 @@ Visualize BIOM data with boxplots.
 \section{Aesthetics and Partitions}{
 
 
-Metadata can be used to flexibly subset, partition, and apply aesthetics 
-when creating a plot. Common use cases are provided below. More thorough 
+Metadata can be used to flexibly subset, partition, and apply aesthetics
+when creating a plot. Common use cases are provided below. More thorough
 documentation is available at \url{https://cmmr.github.io/rbiom}.
-
 
 \preformatted{  ## Colors ----------------------------
   color.by = "Body Site"
@@ -169,58 +165,57 @@ documentation is available at \url{https://cmmr.github.io/rbiom}.
 }
 
 \itemize{
-  \item{\code{color.by} - }{A categorical metadata column. (Max 1)}
-  \item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
-  \item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
-  \item{\code{facet.by} - }{Categorical metadata column(s) only.}
-  \item{\code{limit.by} - }{Any metadata column(s).}
+\item{\code{color.by} - }{A categorical metadata column. (Max 1)}
+\item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
+\item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
+\item{\code{facet.by} - }{Categorical metadata column(s) only.}
+\item{\code{limit.by} - }{Any metadata column(s).}
 }
 
-All built-in color palettes are colorblind-friendly. The available 
-categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"}, 
+All built-in color palettes are colorblind-friendly. The available
+categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
 \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
 
-Patterns are sourced from the magick R package. Pattern names are: 
-\code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"}, 
-\code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"}, 
-\code{"checkerboard"}, \code{"octagons"}, \code{"right45"}, 
-\code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"}, 
-\code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"}, 
-\code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"}, 
+Patterns are sourced from the magick R package. Pattern names are:
+\code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"},
+\code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"},
+\code{"checkerboard"}, \code{"octagons"}, \code{"right45"},
+\code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"},
+\code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"},
+\code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"},
 \code{"verticalleftshingle"}, and \code{"verticalrightshingle"}.
 
 Shapes can be given as per base R - numbers 0 through 17 for various shapes,
-or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use 
+or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
 letters instead of shapes on the plot. Character strings may used as well.
 }
 
 \examples{
     library(rbiom)
     
-    biom <- rarefy(hmp50) 
+    biom <- sample_rarefy(hmp50) 
     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
     taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
     
 
 }
 \seealso{
-\code{\link{stats_table}}
+\code{\link[=biom_stats]{biom_stats()}}
 
-Other plotting: 
+Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
-\code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
-\code{\link{depths_barplot}()},
+\code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
+\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{taxa_barplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{tree_plot}()}
+\code{\link{taxa_heatmap}()}
 }
-\concept{plotting}
+\concept{visualization}

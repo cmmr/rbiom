@@ -7,16 +7,16 @@
 tree_data(biom, reads = TRUE, clades = TRUE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{reads}{Include a 'reads' column indicating the sum of taxa 
+\item{reads}{Include a 'reads' column indicating the sum of taxa
 observations belonging to each node/leaf. Default: \code{TRUE}.}
 
 \item{clades}{Notate top-most monophyletic nodes. The default,
 \code{TRUE}, adds a column for every rank in the biom object. A
 character vector of ranks can also be passed in. If the vector is
 named, then those names are used for naming the columns in the
-returned treedata object. Set to \code{NULL} to not return any 
+returned treedata object. Set to \code{NULL} to not return any
 clade notations.}
 }
 \description{
@@ -25,7 +25,10 @@ Provides a 'treedata' S4 object for use in ggtree functions.
 \examples{
     library(rbiom)
     
-    tree_data(hmp50)
+    # Needs the optional ggtree package
+    if (nzchar(system.file(package = "ggtree"))) {
     
-
+      tree_data(hmp50)
+      
+    }
 }

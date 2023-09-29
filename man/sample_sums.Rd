@@ -7,11 +7,11 @@
 sample_sums(biom, long = FALSE, md = FALSE)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 }
 \value{
-A named numeric vector of the number of observations in each 
-        sample. The names are the sample IDs.
+A named numeric vector of the number of observations in each
+sample. The names are the sample IDs.
 }
 \description{
 Sum the observations in each sample.
@@ -22,26 +22,12 @@ Sum the observations in each sample.
     sample_sums(hmp50) \%>\% sort() \%>\% head()
     
     hist(sample_sums(hmp50))
-
 }
 \seealso{
+\code{\link[=rare_depth]{rare_depth()}}
+
 Other accessors: 
-\code{\link{comments}()},
-\code{\link{counts}()},
-\code{\link{depth}()},
-\code{\link{has_phylogeny}()},
-\code{\link{has_sequences}()},
-\code{\link{id}()},
-\code{\link{info}()},
-\code{\link{is_rarefied}()},
-\code{\link{metadata}()},
-\code{\link{nsamples}()},
-\code{\link{ntaxa}()},
-\code{\link{phylogeny}()},
-\code{\link{sample_names}()},
-\code{\link{sequences}()},
-\code{\link{taxa_names}()},
-\code{\link{taxa_ranks}()},
-\code{\link{taxonomy}()}
+\code{\link{biom_info}()},
+\code{\link{n_samples}()}
 }
 \concept{accessors}

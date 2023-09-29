@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +53,9 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_heatmap</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  metric <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
+<span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Distance"</span>, colors <span class="op">=</span> <span class="st">"-bilbao"</span><span class="op">)</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -62,12 +63,11 @@
 <span>  label <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  label_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rescale <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>  trees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  ratio <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  clust <span class="op">=</span> <span class="st">"complete"</span>,</span>
-<span>  dist <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span>  trees <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tree_height <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  track_height <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  ratio <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  legend <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -77,36 +77,49 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+<dd><p>A <code>BIOM</code> object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.
+Alternatively, a dist class distance matrix can be given, in which
+case only the parameters <code>ord</code>, <code>k</code>, and <code>...</code> are
+allowed.</p></dd>
 
 
-<dt>metric</dt>
-<dd><p>Beta diversity metric(s) to use. Options are 
-<code>"Manhattan"</code>, <code>"Euclidean"</code>, <code>"Bray-Curtis"</code>, 
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. UniFrac requires a 
-phylogenetic tree. Default: <code>"Bray-Curtis"</code>.</p></dd>
+<dt>bdiv</dt>
+<dd><p>The beta diversity distance algorithm to use. Options are:
+<code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
+<code>"Jaccard"</code>, and <code>"UniFrac"</code>. A phylogenetic tree must be
+present in <code>biom</code> or explicitly provided via <code>tree=</code> to use
+the UniFrac methods.
+Multiple values allowed. Default: <code>"Bray-Curtis"</code>.</p></dd>
 
 
 <dt>weighted</dt>
-<dd><p>Should the beta diversity metric be weighted by 
-abundances? Default: <code>TRUE</code>.</p></dd>
+<dd><p>Take relative abundances into account. When
+<code>weighted=FALSE</code>, only presence/absence is considered.
+Multiple values allowed. Default: <code>TRUE</code></p></dd>
+
+
+<dt>tree</dt>
+<dd><p>A <code>phylo</code> object representing the phylogenetic
+relationships of the taxa in <code>biom</code>. Will be taken from the tree
+defined in <code>biom</code> if not explicitly specified. Only required
+when computing UniFrac distance matrices. Default: <code>NULL</code></p></dd>
 
 
 <dt>grid</dt>
-<dd><p>Color palette name, or a list with entries for <code>label</code>, 
-<code>colors</code>, <code>range</code>, <code>bins</code>, <code>na.color</code>, and/or 
+<dd><p>Color palette name, or a list with entries for <code>label</code>,
+<code>colors</code>, <code>range</code>, <code>bins</code>, <code>na.color</code>, and/or
 <code>guide</code>. See the Track Definitions section for details.
 Default: <code>list(label = "Distance", colors = "-bilbao")</code>.</p></dd>
 
 
 <dt>color.by</dt>
-<dd><p>Add annotation tracks for these metadata column(s). 
+<dd><p>Add annotation tracks for these metadata column(s).
 See "Annotation Tracks" section below for details.
 Default: <code>NULL</code></p></dd>
 
 
 <dt>order.by</dt>
-<dd><p>Which metadata column(s) to use for ordering the samples 
+<dd><p>Which metadata column(s) to use for ordering the samples
 across the x and y axes. Overrides any <code>clust</code> argument.
 See "Ordering and Limiting" section below for details.
 Default: <code>NULL</code></p></dd>
@@ -114,16 +127,16 @@ Default: <code>NULL</code></p></dd>
 
 <dt>limit.by</dt>
 <dd><p>Metadata definition(s) to use for sample subsetting prior
-to calculations. 
+to calculations.
 See "Ordering and Limiting" section below for details.
 Default: <code>NULL</code></p></dd>
 
 
 <dt>label</dt>
 <dd><p>Label the matrix rows and columns. You can supply a list
-or logical vector of length two to control row labels and column 
-labels separately, for example 
-<code>label = c(rows = TRUE, cols = FALSE)</code>, or simply 
+or logical vector of length two to control row labels and column
+labels separately, for example
+<code>label = c(rows = TRUE, cols = FALSE)</code>, or simply
 <code>label = c(T, F)</code>. Other valid options are <code>"rows"</code>,
 <code>"cols"</code>, <code>"both"</code>, <code>"bottom"</code>, <code>"right"</code>,
 and <code>"none"</code>.
@@ -131,11 +144,11 @@ Default: <code>TRUE</code>.</p></dd>
 
 
 <dt>label_size</dt>
-<dd><p>The font size to use for the row and column labels. You 
-can supply a numeric vector of length two to control row label sizes 
-and column label sizes separately, for example 
+<dd><p>The font size to use for the row and column labels. You
+can supply a numeric vector of length two to control row label sizes
+and column label sizes separately, for example
 <code>c(rows = 20, cols = 8)</code>, or simply <code>c(20, 8)</code>.
-Default: <code>NULL</code>, which computes: 
+Default: <code>NULL</code>, which computes:
 <code>pmax(8, pmin(20, 100 / dim(mtx)))</code>.</p></dd>
 
 
@@ -145,58 +158,46 @@ Options: <code>"none"</code>, <code>"rows"</code>, or <code>"cols"</code>.
 Default: <code>"none"</code>.</p></dd>
 
 
-<dt>trees</dt>
-<dd><p>Draw a dendrogram for rows (left) and columns (top). You can 
-supply a list or logical vector of length two to control the row tree 
-and column tree separately, for example 
-<code>trees = c(rows = T, cols = F)</code>, or simply <code>trees = c(T, F)</code>. 
-Other valid options are <code>"rows"</code>, <code>"cols"</code>, <code>"both"</code>, 
-<code>"left"</code>, <code>"top"</code>, and <code>"none"</code>.
-Default: <code>TRUE</code>.</p></dd>
+<dt>ratio</dt>
+<dd><p>Height/width ratio for entire grid.
+Default: <code>1</code> (square).</p></dd>
 
 
 <dt>clust</dt>
-<dd><p>Clustering algorithm for reordering the rows and columns by 
-similarity. You can supply a list or character vector of length two to 
-control the row and column clustering separately, for example 
-<code>clust = c(rows = "complete", cols = NA)</code>, or simply 
+<dd><p>Clustering algorithm for reordering the rows and columns by
+similarity. You can supply a list or character vector of length two to
+control the row and column clustering separately, for example
+<code>clust = c(rows = "complete", cols = NA)</code>, or simply
 <code>clust = c("complete", NA)</code>.
 Default: <code>"complete"</code>.</p>
-<p>Options are:</p><ul><li><p><code>FALSE</code> or <code>NA</code> -  Disable reordering.</p></li>
-<li><p>An <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object</p></li>
-<li><p>A method name -  <code>"ward.D"</code>, 
-    <code>"ward.D2"</code>, <code>"single"</code>, <code>"complete"</code>, 
-    <code>"average"</code>, <code>"mcquitty"</code>, <code>"median"</code>, or 
-    <code>"centroid"</code>.</p></li>
-</ul></dd>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>   Options are<span class="sc">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>   \itemize{</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>     \item{\code{<span class="cn">FALSE</span>} or \code{<span class="cn">NA</span>} <span class="sc">-</span> }{ Disable reordering. }</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>     \item{An \code{hclust} class object} { E.g. from [stats<span class="sc">::</span><span class="fu">hclust</span>()]. }</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>     \item{A method name <span class="sc">-</span> }{ \code{<span class="st">"ward.D"</span>}, </span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>       \code{<span class="st">"ward.D2"</span>}, \code{<span class="st">"single"</span>}, \code{<span class="st">"complete"</span>}, </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>       \code{<span class="st">"average"</span>}, \code{<span class="st">"mcquitty"</span>}, \code{<span class="st">"median"</span>}, or </span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>       \code{<span class="st">"centroid"</span>}. }</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>   }</span></code></pre><p></p></div></dd>
 
 
-<dt>dist</dt>
-<dd><p>Distance algorithm to use when reordering the rows and columns 
-by similarity. You can supply a list or character vector of length
-two to control the row and column clustering separately, for example 
-<code>dist = c(rows = "euclidean", cols = "maximum")</code>, or simply 
-<code>dist = c("euclidean", "maximum")</code>.
-Default: <code>"euclidean"</code>.</p>
-<p>Options are:</p><ul><li><p>A <a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object</p></li>
-<li><p>A method name -  <code>"euclidean"</code>, 
-    <code>"maximum"</code>, <code>"manhattan"</code>, <code>"canberra"</code>, 
-    <code>"binary"</code>, or <code>"minkowski"</code>.</p></li>
-</ul></dd>
+<dt>trees</dt>
+<dd><p>Draw a dendrogram for rows (left) and columns (top). You can
+supply a list or logical vector of length two to control the row tree
+and column tree separately, for example
+<code>trees = c(rows = T, cols = F)</code>, or simply <code>trees = c(T, F)</code>.
+Other valid options are <code>"rows"</code>, <code>"cols"</code>, <code>"both"</code>,
+<code>"left"</code>, <code>"top"</code>, and <code>"none"</code>.
+Default: <code>TRUE</code>.</p></dd>
 
 
 <dt>tree_height, track_height</dt>
 <dd><p>The height of the dendrogram or annotation
 tracks in multiples (or fractions) of the smaller dimension of the
 grid cell size. Use a numeric vector of length two to assign
-<code>c(left, top)</code> independently. 
+<code>c(left, top)</code> independently.
 Default: <code>NULL</code>, which computes:
 <code>tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4</code>.</p></dd>
-
-
-<dt>ratio</dt>
-<dd><p>Height/width ratio for entire grid. 
-Default: <code>1</code> (square).</p></dd>
 
 
 <dt>legend</dt>
@@ -205,8 +206,8 @@ Default: <code>1</code> (square).</p></dd>
 
 
 <dt>xlab.angle</dt>
-<dd><p>Angle of the labels at the bottom of the plot. 
-Options are <code>"auto"</code>, <code>0</code>, <code>30</code>, and <code>90</code>. 
+<dd><p>Angle of the labels at the bottom of the plot.
+Options are <code>"auto"</code>, <code>0</code>, <code>30</code>, and <code>90</code>.
 Default: <code>"auto"</code>.</p></dd>
 
 
@@ -214,27 +215,22 @@ Default: <code>"auto"</code>.</p></dd>
 <dd><p>Additional arguments to pass on to ggplot2::theme().
 For example, <code>labs.title = "Plot Title"</code>.</p></dd>
 
-
-<dt>tree</dt>
-<dd><p>A phylogenetic tree for use in calculating UniFrac distance.
-The default, <code>NULL</code>, will use the BIOM object's tree.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The computed data points will be attached as</p>
-<p></p>
-<p><code>attr(, 'data')</code>.</p>
+<p>A <code>ggplot2</code> plot. The constructed ggplot command will be
+attached as <code>attr(,'cmd')</code>, and the underlying computed data
+as <code>$data</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="annotation-tracks">Annotation Tracks<a class="anchor" aria-label="anchor" href="#annotation-tracks"></a></h2>
     
 
 
-<p>Metadata can be displayed as colored tracks above the heatmap. Common use 
-cases are provided below, with more thorough documentation available at 
+<p>Metadata can be displayed as colored tracks above the heatmap. Common use
+cases are provided below, with more thorough documentation available at
 https://cmmr.github.io/rbiom .</p>
 <div class="sourceCode"><pre><code><span>  <span class="co">## Categorical ----------------------------</span></span>
 <span><span class="va">color.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
@@ -264,17 +260,17 @@ https://cmmr.github.io/rbiom .</p>
 <li><p><code>bins</code> -  Bin a gradient into this many bins/steps.</p></li>
 <li><p><code>guide</code> -  A list of arguments for guide_colorbar() or guide_legend().</p></li>
 </ul><p>All built-in color palettes are colorblind-friendly.</p>
-<p>Categorical palette names: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>, 
-<code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>, 
-<code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, <code>"classic"</code>, 
+<p>Categorical palette names: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>,
+<code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>,
+<code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, <code>"classic"</code>,
 <code>"alphabet"</code>, <code>"tableau20"</code>, <code>"kelly"</code>, and <code>"fishy"</code>.</p>
-<p>Numeric palette names: <code>"reds"</code>, <code>"oranges"</code>, <code>"greens"</code>, 
-<code>"purples"</code>, <code>"grays"</code>, <code>"acton"</code>, <code>"bamako"</code>, 
-<code>"batlow"</code>, <code>"bilbao"</code>, <code>"buda"</code>, <code>"davos"</code>, 
-<code>"devon"</code>, <code>"grayC"</code>, <code>"hawaii"</code>, <code>"imola"</code>, 
-<code>"lajolla"</code>, <code>"lapaz"</code>, <code>"nuuk"</code>, <code>"oslo"</code>, 
-<code>"tokyo"</code>, <code>"turku"</code>, <code>"bam"</code>, <code>"berlin"</code>, 
-<code>"broc"</code>, <code>"cork"</code>, <code>"lisbon"</code>, <code>"roma"</code>, 
+<p>Numeric palette names: <code>"reds"</code>, <code>"oranges"</code>, <code>"greens"</code>,
+<code>"purples"</code>, <code>"grays"</code>, <code>"acton"</code>, <code>"bamako"</code>,
+<code>"batlow"</code>, <code>"bilbao"</code>, <code>"buda"</code>, <code>"davos"</code>,
+<code>"devon"</code>, <code>"grayC"</code>, <code>"hawaii"</code>, <code>"imola"</code>,
+<code>"lajolla"</code>, <code>"lapaz"</code>, <code>"nuuk"</code>, <code>"oslo"</code>,
+<code>"tokyo"</code>, <code>"turku"</code>, <code>"bam"</code>, <code>"berlin"</code>,
+<code>"broc"</code>, <code>"cork"</code>, <code>"lisbon"</code>, <code>"roma"</code>,
 <code>"tofino"</code>, <code>"vanimo"</code>, and <code>"vik"</code>.</p>
     </div>
     <div class="section level2">
@@ -283,8 +279,8 @@ https://cmmr.github.io/rbiom .</p>
 
 
 <p><b><code>order.by</code></b> controls which metadata column(s) are used to arrange
-samples on the plot. It also enables subsetting to a particular set or 
-range of values. Prefix a column name with <code>-</code> to arrange values in 
+samples on the plot. It also enables subsetting to a particular set or
+range of values. Prefix a column name with <code>-</code> to arrange values in
 descending order rather than ascending.</p>
 <div class="sourceCode"><pre><code><span>  <span class="co">## Categorical ----------------------------</span></span>
 <span><span class="va">order.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
@@ -298,7 +294,6 @@ descending order rather than ascending.</p>
 <span><span class="co">## Multiple / Mixed -----------------------</span></span>
 <span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span></span>
 <span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">'-Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-
 
 <p><b><code>limit.by</code></b> is used to specify a subset of samples without any
 side-effects on aesthetics. It is especially useful for limiting the data
@@ -321,27 +316,32 @@ limit.by = list(
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other plotting: 
+    <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
+<code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="bdiv_table.html">bdiv_table</a>()</code>,
+<code><a href="distmat_stats.html">distmat_stats</a>()</code></p>
+<p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
-<code><a href="bdiv_biplot.html">bdiv_biplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
-<code><a href="depths_barplot.html">depths_barplot</a>()</code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
+<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
+<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
-<code><a href="taxa_stacked.html">taxa_stacked</a>()</code>,
-<code><a href="tree_plot.html">tree_plot</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span> <span class="op">%&gt;%</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span> <span class="op">%&gt;%</span> <span class="fu"><a href="sample_rarefy.html">sample_rarefy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="sample_select.html">sample_select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="bdiv_heatmap-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>

@@ -21,7 +21,7 @@
 
 write_biom <- function (biom, file, format="json") {
   
-  stopifnot(is_scalar_character(file))
+  stopifnot(is_scalar_character(file) && !is_na(file))
   stopifnot(is_string(format, c("tab", "json", "hdf5")))
   
   
@@ -150,8 +150,8 @@ write_biom.1.0 <- function (biom, file) {
     
     # Attributes
     #________________________________________________________
-    id                  = biom$info$id,
-    type                = biom$info$type,
+    id                  = biom$info$id   %||% "",
+    type                = biom$info$type %||% "",
     format              = "1.0.0", 
     format_url          = "http://biom-format.org",
     generated_by        = paste("rbiom", utils::packageDescription('rbiom')$Version),
@@ -159,12 +159,12 @@ write_biom.1.0 <- function (biom, file) {
     matrix_type         = "sparse",
     matrix_element_type = ifelse(sum(biom$counts$v %% 1) == 0, "int", "float"),
     shape               = c(biom$counts$nrow, biom$counts$ncol),
-    comment             = comment(biom) %||% "",
+    comment             = biom$info$comment %||% "",
     
     
     # Phylogenetic Tree
     #________________________________________________________
-    phylogeny = ifelse(is_null(biom$phylogeny), "", rbiom::write_tree(biom$phylogeny)),
+    phylogeny = ifelse(is_null(biom$phylogeny), "", write_tree(biom$phylogeny)),
     
     
     # Taxonomy
@@ -209,7 +209,7 @@ write_biom.1.0 <- function (biom, file) {
   
   res <- try(writeChar(json, con, eos=NULL), silent = TRUE)
   if (is(res, "try-error"))
-    stop(simpleError(sprintf("Can't save to '%s': %s", file, res)))
+    stop(sprintf("Can't save to '%s': %s", file, res))
   
   close(con)
   
@@ -226,18 +226,18 @@ write_biom.1.0 <- function (biom, file) {
 write_biom.2.1 <- function (biom, file) {
   
   if (!requireNamespace("rhdf5", quietly = TRUE)) {
-    stop(simpleError(paste0(
+    stop(paste0(
       "\n",
       "Error: rbiom requires the R package 'rhdf5' to be installed\n",
       "in order to read and write HDF5 formatted BIOM files.\n\n",
       "Please run the following commands to install 'rhdf5':\n",
       "   install.packages('BiocManager')\n",
-      "   BiocManager::install('rhdf5')\n\n" )))
+      "   BiocManager::install('rhdf5')\n\n" ))
   }
   
   res <- try(rhdf5::h5createFile(file), silent = TRUE)
   if (!identical(res, TRUE))
-    stop(simpleError(sprintf("Can't create file '%s': %s", file, as.character(res))))
+    stop(sprintf("Can't create file '%s': %s", file, as.character(res)))
   
   invisible(rhdf5::h5createGroup(file, '/observation'))
   invisible(rhdf5::h5createGroup(file, '/observation/matrix'))
@@ -250,7 +250,7 @@ write_biom.2.1 <- function (biom, file) {
   
   h5 <- try(rhdf5::H5Fopen(file), silent = TRUE)
   if (!is(h5, "H5IdComponent"))
-    stop(simpleError(sprintf("Can't open file '%s': %s", file, as.character(h5))))
+    stop(sprintf("Can't open file '%s': %s", file, as.character(h5)))
   
   
   
@@ -339,7 +339,7 @@ write_biom.2.1 <- function (biom, file) {
   if (is(biom[['phylogeny']], "phylo")) {
     
     h5path <- '/observation/group-metadata/phylogeny'
-    x      <- rbiom::write_tree(biom[['phylogeny']])
+    x      <- write_tree(biom[['phylogeny']])
     rhdf5::h5writeDataset(x, h5, h5path)
     
     h5path <- h5&'observation'&'group-metadata'&'phylogeny'

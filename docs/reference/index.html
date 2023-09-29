@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,22 +68,12 @@
           
           <code><a href="adiv_table.html">adiv_table()</a></code> 
         </dt>
-        <dd>Estimate the diversity of each sample.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="apcoa.html">apcoa()</a></code> 
-        </dt>
-        <dd>PCoA adjusted for corvariates.</dd>
+        <dd>Calculate the alpha diversity of each sample.</dd>
       </dl><dl><dt>
           
           <code><a href="as_percent.html">as_percent()</a></code> 
         </dt>
         <dd>Convert absolute counts to relative abundances.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bdiv_biplot.html">bdiv_biplot()</a></code> 
-        </dt>
-        <dd>Display distances between samples as a 2-D scatter plot.</dd>
       </dl><dl><dt>
           
           <code><a href="bdiv_boxplot.html">bdiv_boxplot()</a></code> 
@@ -101,9 +91,14 @@
         <dd>Display beta diversities in an all vs all grid.</dd>
       </dl><dl><dt>
           
+          <code><a href="bdiv_ord_plot.html">bdiv_ord_plot()</a></code> 
+        </dt>
+        <dd>Ordinate samples and taxa on a 2D plane based on beta diversity distances.</dd>
+      </dl><dl><dt>
+          
           <code><a href="bdiv_ord_table.html">bdiv_ord_table()</a></code> 
         </dt>
-        <dd>Reduce a distance matrix to two or three dimensions</dd>
+        <dd>Calculate PCoA and other ordinations, including taxa biplots and statistics.</dd>
       </dl><dl><dt>
           
           <code><a href="bdiv_table.html">bdiv_table()</a></code> 
@@ -116,59 +111,44 @@
         <dd>Split BIOM by metadata, apply function, and return results in a data frame.</dd>
       </dl><dl><dt>
           
+          <code><a href="biom_build.html">biom_build()</a></code> 
+        </dt>
+        <dd>Create a BIOM object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biom_id.html">biom_id()</a></code> <code><a href="biom_id.html">`biom_id&lt;-`()</a></code> <code><a href="biom_id.html">biom_comment()</a></code> <code><a href="biom_id.html">`biom_comment&lt;-`()</a></code> 
+        </dt>
+        <dd>Get or set a <code>BIOM</code> object's id or comment.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biom_info.html">biom_info()</a></code> 
+        </dt>
+        <dd>Get <code>BIOM</code> object's miscellaneous information.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biom_merge.html">biom_merge()</a></code> 
+        </dt>
+        <dd>Combine several BIOM datasets into one.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biom_repair.html">biom_repair()</a></code> 
+        </dt>
+        <dd>Run after manually editing a BIOM object's content.</dd>
+      </dl><dl><dt>
+          
           <code><a href="blply.html">blply()</a></code> 
         </dt>
         <dd>Split BIOM by metadata, apply function, and return results in a list.</dd>
       </dl><dl><dt>
           
-          <code><a href="build_biom.html">build_biom()</a></code> 
+          <code><a href="convert_from_phyloseq.html">convert_from_phyloseq()</a></code> 
         </dt>
-        <dd>Create a BIOM object.</dd>
+        <dd>Convert a phyloseq object to an rbiom BIOM object.</dd>
       </dl><dl><dt>
           
-          <code><a href="clear_cache.html">clear_cache()</a></code> 
+          <code><a href="distmat_stats.html">distmat_stats()</a></code> 
         </dt>
-        <dd>Delete all the cached files.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="comments-set.html">`comments&lt;-`()</a></code> 
-        </dt>
-        <dd>Set a <code>BIOM</code> object's comment.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="comments.html">comments()</a></code> 
-        </dt>
-        <dd>Get <code>BIOM</code> object's comments.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="counts-set.html">`counts&lt;-`()</a></code> 
-        </dt>
-        <dd>Set the abundance counts.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="counts.html">counts()</a></code> 
-        </dt>
-        <dd>Get the abundance counts.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="default_rarefaction_depth.html">default_rarefaction_depth()</a></code> 
-        </dt>
-        <dd>Pick a 'good' rarefaction depth.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="depth.html">depth()</a></code> 
-        </dt>
-        <dd>The rarefaction depth of a BIOM object.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="depths_barplot.html">depths_barplot()</a></code> 
-        </dt>
-        <dd>Visualize the number of observations per sample.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="distill.html">distill()</a></code> 
-        </dt>
-        <dd>Convert to a data.frame with metadata and diversity/abundance values.</dd>
+        <dd>Run statistics on a distance matrix vs a categorical or numeric variable.</dd>
       </dl><dl><dt>
           
           <code><a href="embed_code.html">embed_code()</a></code> 
@@ -181,90 +161,39 @@
         <dd>Converts a data.frame to a download link.</dd>
       </dl><dl><dt>
           
-          <code><a href="guess_format.html">guess_format()</a></code> 
-        </dt>
-        <dd>Inspects a file to see if it's most likely hdf5, json, or tab-delimited.
-Also reports gzip or bzip2 compression.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="has_phylogeny.html">has_phylogeny()</a></code> 
-        </dt>
-        <dd>Checks if a phylogenetic tree is present.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="has_sequences.html">has_sequences()</a></code> 
-        </dt>
-        <dd>Checks if DNA sequences are present.</dd>
-      </dl><dl><dt>
-          
           <code><a href="hmp50.html">hmp50</a></code> 
         </dt>
         <dd>Human Microbiome Project - 50 sample demo dataset.</dd>
       </dl><dl><dt>
           
-          <code><a href="id-set.html">`id&lt;-`()</a></code> 
+          <code><a href="n_samples.html">n_samples()</a></code> <code><a href="n_samples.html">n_otus()</a></code> <code><a href="n_samples.html">n_ranks()</a></code> 
         </dt>
-        <dd>Set a <code>BIOM</code> object's id.</dd>
+        <dd>Report the number of samples, otus, or ranks in a BIOM.</dd>
       </dl><dl><dt>
           
-          <code><a href="id.html">id()</a></code> 
+          <code><a href="otu_matrix.html">otu_matrix()</a></code> <code><a href="otu_matrix.html">`otu_matrix&lt;-`()</a></code> 
         </dt>
-        <dd>Get <code>BIOM</code> object's identifier / title.</dd>
+        <dd>Get or set the abundance counts.</dd>
       </dl><dl><dt>
           
-          <code><a href="import_table.html">import_table()</a></code> 
+          <code><a href="otu_names.html">otu_names()</a></code> <code><a href="otu_names.html">`otu_names&lt;-`()</a></code> 
         </dt>
-        <dd>Read a data.frame from a filename/URL. Auto-detects separator.</dd>
+        <dd>Get or set the OTU names.</dd>
       </dl><dl><dt>
           
-          <code><a href="info.html">info()</a></code> 
+          <code><a href="otu_sequences.html">otu_sequences()</a></code> <code><a href="otu_sequences.html">`otu_sequences&lt;-`()</a></code> 
         </dt>
-        <dd>Get <code>BIOM</code> object's miscellaneous information.</dd>
+        <dd>Get or set the nucleotide sequences associated with each OTU.</dd>
       </dl><dl><dt>
           
-          <code><a href="is_rarefied.html">is_rarefied()</a></code> 
+          <code><a href="otu_taxonomy.html">otu_taxonomy()</a></code> <code><a href="otu_taxonomy.html">`otu_taxonomy&lt;-`()</a></code> 
         </dt>
-        <dd>Checks if a BIOM object is rarefied.</dd>
+        <dd>Get or set the taxonomy table.</dd>
       </dl><dl><dt>
           
-          <code><a href="metadata-set.html">`metadata&lt;-`()</a></code> 
+          <code><a href="otu_tree.html">otu_tree()</a></code> <code><a href="otu_tree.html">`otu_tree&lt;-`()</a></code> 
         </dt>
-        <dd>Set the <code>BIOM</code> object's metadata.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="metadata.html">metadata()</a></code> 
-        </dt>
-        <dd>Get the sample metadata.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="metadata_params.html">metadata_params()</a></code> 
-        </dt>
-        <dd>Convert all *.by params into long form.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="metrics.html">metrics()</a></code> 
-        </dt>
-        <dd>List all the options for each type of metric.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="nsamples.html">nsamples()</a></code> 
-        </dt>
-        <dd>Number of samples in a BIOM.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="ntaxa.html">ntaxa()</a></code> 
-        </dt>
-        <dd>Number of taxa in a BIOM.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="phylogeny-set.html">`phylogeny&lt;-`()</a></code> 
-        </dt>
-        <dd>Set the phylogenetic tree.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="phylogeny.html">phylogeny()</a></code> 
-        </dt>
-        <dd>Get the phylogenetic tree.</dd>
+        <dd>Get or set the phylogenetic tree.</dd>
       </dl><dl><dt>
           
           <code><a href="plot_heatmap.html">plot_heatmap()</a></code> 
@@ -277,9 +206,14 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Summarize the contents of a BIOM object</dd>
       </dl><dl><dt>
           
-          <code><a href="rarefy.html">rarefy()</a></code> 
+          <code><a href="properties.html">has_tree()</a></code> <code><a href="properties.html">has_sequences()</a></code> <code><a href="properties.html">is_rarefied()</a></code> 
         </dt>
-        <dd>Subset counts so that all samples have the same number of observations.</dd>
+        <dd>Check specific properties of a BIOM object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rare_barplot.html">rare_barplot()</a></code> 
+        </dt>
+        <dd>Visualize the number of observations per sample.</dd>
       </dl><dl><dt>
           
           <code><a href="rare_corrplot.html">rare_corrplot()</a></code> 
@@ -287,9 +221,19 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Visualize rarefaction curves with scatterplots and trendlines.</dd>
       </dl><dl><dt>
           
+          <code><a href="rare_depth.html">rare_depth()</a></code> 
+        </dt>
+        <dd>If the samples are rarefied, report the level (depth).</dd>
+      </dl><dl><dt>
+          
           <code><a href="rare_multiplot.html">rare_multiplot()</a></code> 
         </dt>
-        <dd>Combines rare_corrplot and depths_barplot into a single figure.</dd>
+        <dd>Combines rare_corrplot and rare_barplot into a single figure.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rare_suggest.html">rare_suggest()</a></code> 
+        </dt>
+        <dd>Suggest a 'good' rarefaction depth.</dd>
       </dl><dl><dt>
           
           <code><a href="rbiom.html">rbiom</a></code> 
@@ -312,19 +256,29 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Read a newick formatted phylogenetic tree.</dd>
       </dl><dl><dt>
           
-          <code><a href="repair.html">repair()</a></code> 
+          <code><a href="sample_metadata.html">sample_metadata()</a></code> <code><a href="sample_metadata.html">`sample_metadata&lt;-`()</a></code> 
         </dt>
-        <dd>Run after manually editing a BIOM object's content.</dd>
+        <dd>Get or set the sample metadata.</dd>
       </dl><dl><dt>
           
-          <code><a href="sample_names-set.html">`sample_names&lt;-`()</a></code> 
+          <code><a href="sample_names.html">sample_names()</a></code> <code><a href="sample_names.html">`sample_names&lt;-`()</a></code> 
         </dt>
-        <dd>Set the sample names.</dd>
+        <dd>Get or set the sample names.</dd>
       </dl><dl><dt>
           
-          <code><a href="sample_names.html">sample_names()</a></code> 
+          <code><a href="sample_rarefy.html">sample_rarefy()</a></code> 
         </dt>
-        <dd>Get the sample names.</dd>
+        <dd>Subset counts so that all samples have the same number of observations.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="sample_select.html">sample_select()</a></code> 
+        </dt>
+        <dd>Reduce samples to a specific list</dd>
+      </dl><dl><dt>
+          
+          <code><a href="sample_subset.html">sample_subset()</a></code> 
+        </dt>
+        <dd>Subset samples using the BIOM's metadata or taxonomy.</dd>
       </dl><dl><dt>
           
           <code><a href="sample_sums.html">sample_sums()</a></code> 
@@ -332,34 +286,9 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Sum the observations in each sample.</dd>
       </dl><dl><dt>
           
-          <code><a href="select.html">select()</a></code> 
+          <code><a href="taxa_barplot.html">taxa_barplot()</a></code> 
         </dt>
-        <dd>Reduce samples to a specific list</dd>
-      </dl><dl><dt>
-          
-          <code><a href="sequences-set.html">`sequences&lt;-`()</a></code> 
-        </dt>
-        <dd>Set nucleotide sequences associated with each taxonomic identifier.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="sequences.html">sequences()</a></code> 
-        </dt>
-        <dd>Nucleotide sequences associated with each taxonomic identifier.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="stats_table.html">stats_table()</a></code> 
-        </dt>
-        <dd>Compute p-values for data vs categorical metadata.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="subset.html">subset(<i>&lt;BIOM&gt;</i>)</a></code> 
-        </dt>
-        <dd>Subset samples using the BIOM's metadata or taxonomy.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="subtree.html">subtree()</a></code> 
-        </dt>
-        <dd>Create a subtree by specifying tips to keep.</dd>
+        <dd>Display taxa abundances as a stacked bar graph.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_boxplot.html">taxa_boxplot()</a></code> 
@@ -379,7 +308,7 @@ Also reports gzip or bzip2 compression.</dd>
           
           <code><a href="taxa_matrix.html">taxa_matrix()</a></code> 
         </dt>
-        <dd>Generate a matrix of samples by taxa, at the specified taxonomic rank.</dd>
+        <dd>Taxa abundances per sample, at the specified taxonomic rank.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_means.html">taxa_means()</a></code> 
@@ -387,34 +316,9 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Get the taxa abundances.</dd>
       </dl><dl><dt>
           
-          <code><a href="taxa_names-set.html">`taxa_names&lt;-`()</a></code> 
+          <code><a href="taxa_ranks.html">taxa_ranks()</a></code> <code><a href="taxa_ranks.html">`taxa_ranks&lt;-`()</a></code> 
         </dt>
-        <dd>Set the taxa names.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_names.html">taxa_names()</a></code> 
-        </dt>
-        <dd>Get the taxa names.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_ranks-set.html">`taxa_ranks&lt;-`()</a></code> 
-        </dt>
-        <dd>Set the taxa rank names.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_ranks.html">taxa_ranks()</a></code> 
-        </dt>
-        <dd>Get the taxa ranks.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_rollup.html">taxa_rollup()</a></code> 
-        </dt>
-        <dd>Generate a matrix of samples by taxa, at the specified taxonomic rank.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_stacked.html">taxa_stacked()</a></code> 
-        </dt>
-        <dd>Display taxa abundances as a stacked bar graph.</dd>
+        <dd>Get or set the names of the taxonomic ranks.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_sums.html">taxa_sums()</a></code> 
@@ -425,21 +329,6 @@ Also reports gzip or bzip2 compression.</dd>
           <code><a href="taxa_table.html">taxa_table()</a></code> 
         </dt>
         <dd>Generate a data.frame of taxa abundance for each sample at the specified taxonomic rank.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxonomy-set.html">`taxonomy&lt;-`()</a></code> 
-        </dt>
-        <dd>Set the taxonomy table.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxonomy.html">taxonomy()</a></code> 
-        </dt>
-        <dd>Get the taxonomy table.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tips.html">tips()</a></code> 
-        </dt>
-        <dd>Names of a phylogenetic tree's tips/leafs.</dd>
       </dl><dl><dt>
           
           <code><a href="top_taxa.html">top_taxa()</a></code> 
@@ -457,19 +346,19 @@ Also reports gzip or bzip2 compression.</dd>
         <dd>Display a dendrogram of the phylogenetic tree.</dd>
       </dl><dl><dt>
           
+          <code><a href="tree_subset.html">tree_subset()</a></code> 
+        </dt>
+        <dd>Create a subtree by specifying tips to keep.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tree_tips.html">tree_tips()</a></code> 
+        </dt>
+        <dd>Names of a phylogenetic tree's tips/leafs.</dd>
+      </dl><dl><dt>
+          
           <code><a href="unifrac.html">unifrac()</a></code> 
         </dt>
         <dd>Compute Weighted and Unweighted UniFrac distance matrices.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="validate_metrics.html">validate_metrics()</a></code> 
-        </dt>
-        <dd>Cleanup dynamic options that we can recognize</dd>
-      </dl><dl><dt>
-          
-          <code><a href="with_cache.html">with_cache()</a></code> 
-        </dt>
-        <dd>Speeds up repetitive computations by storing results of functions calls.</dd>
       </dl><dl><dt>
           
           <code><a href="write_biom.html">write_biom()</a></code> 
@@ -500,11 +389,6 @@ Also reports gzip or bzip2 compression.</dd>
           <code><a href="write_tree.html">write_tree()</a></code> 
         </dt>
         <dd>Write a newick formatted phylogenetic tree.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="write_wrapper.html">write_wrapper()</a></code> 
-        </dt>
-        <dd>Common code for writers.</dd>
       </dl><dl><dt>
           
           <code><a href="write_xlsx.html">write_xlsx()</a></code> 

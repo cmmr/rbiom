@@ -7,9 +7,9 @@
 \description{
 A toolkit for working with Biological Observation Matrix (BIOM) files.
 Features include reading/writing all BIOM formats, rarefaction, alpha
-diversity, beta diversity (including UniFrac), summarizing counts by 
-taxonomic level, and sample subsetting. Standalone functions for 
-reading, writing, and subsetting phylogenetic trees are also provided. 
+diversity, beta diversity (including UniFrac), summarizing counts by
+taxonomic level, and sample subsetting. Standalone functions for
+reading, writing, and subsetting phylogenetic trees are also provided.
 All CPU intensive operations are encoded in C with multi-thread support.
 }
 \section{Multithreading}{

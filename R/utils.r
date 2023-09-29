@@ -26,45 +26,28 @@
 #____________________________________________________________________
 layer_match <- function (x, choices, default) {
   
-  if (is_null(default))        default        <- choices[[1]]
-  if (is_null(x))              x              <- default 
-  # if (is_null(names(choices))) names(choices) <- unlist(substr(choices, 1, 1))
+  result <- c()
   
-  x <- x[nchar(x) > 0]
-  if (length(x) == 0) return (default)
-  if (all(nchar(x) == 1)) x <- paste(collapse = "", x)
+  for (i in tolower(x[nchar(x) > 0]))
+    result <- c(result, local({
+      
+      if (i %in% names(choices)) return (choices[[i]])
+      
+      pm <- pmatch(i, choices)
+      ii <- strsplit(i, '')[[1]]
+      
+      if (length(x) > 1 && !is.na(pm)) return (choices[[pm]])
+      if (all(ii %in% names(choices))) return (choices[ii])
+      if (!is.na(pm))                  return (choices[[pm]])
+      return (choices[intersect(ii, names(choices))])
+    }))
   
-  x    <- tolower(x)
-  vals <- unname(choices)
+  result <- result[!is.na(result)]
   
-  if (length(x) > 1) {
-    x <- vals[pmatch(x, tolower(vals))] # c("d", "bar") => c("dot", "bar")
-    
-  } else if (nchar(x) == 1) {
-    if (is_null(names(choices))) {
-      x <- vals[pmatch(x, tolower(vals))]
-    } else {
-      x <- unname(choices[x])  # "r" => "bar"
-    }
-    
-  } else if (is.na(pmatch(x, tolower(vals)))) {
-    x <- strsplit(x, '')[[1]]
-    
-    if (is_null(names(choices))) {
-      x <- vals[pmatch(x, tolower(vals))]
-    } else {
-      x <- unname(choices[x]) # "dr" => c("dot", "bar")
-    }
-    
-  } else {
-    x <- vals[pmatch(x, tolower(vals))] # "do" => "dot"
-  }
+  if (length(result) == 0)
+    result <- choices[strsplit(default, '')[[1]]]
   
-  x <- x[!is.na(x)]
-  
-  if (length(x) == 0) return (default)
-  
-  return (x)
+  return (result)
 }
 
 
@@ -120,7 +103,7 @@ run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=NULL) {
 as.args <- function (args = list(), indent = 0, fun = NULL) {
   
   stopifnot(is_list(args))
-  stopifnot(is_integerish(indent))
+  stopifnot(is_scalar_integerish(indent) && !is_na(indent))
   
   
   # Discard arguments with `display = FALSE` attribute.
@@ -237,7 +220,7 @@ aes_toString <- function (x) {
   for (key in keys) {
     
     val <- x[[key]]
-    val <- if (is(val, 'quosure')) { as_label(val)
+    val <- if (is(val, 'quosure')) { capture.output(rlang::quo_get_expr(val))
     } else if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
     } else if (is.logical(val))    { as.character(val)
     } else if (is.numeric(val))    { as.character(val)
@@ -251,6 +234,25 @@ aes_toString <- function (x) {
   
   return (sprintf("aes(%s)", paste(collapse = ", ", results)))
 }
+
+
+#____________________________________________________________________
+# A command as a string. Assumes dist=dist, ord=ord, etc.
+# Example: fmt("dm <- %s", bdiv_distmat, biom, weighted, tree)
+#____________________________________________________________________
+fmt_cmd <- function (.fmt, .fun, ...) {
+  x    <- all.vars(match.call())[-c(1,2)]
+  fn   <- deparse(substitute(.fun))
+  env  <- parent.frame()
+  args <- sapply(x, simplify = FALSE, function (i) {
+    if (endsWith(i, "_"))
+      return (aa(NA, display = substr(i, 1, nchar(i) - 1)))
+    get(i, envir = env, inherits = TRUE)
+  })
+  names(args) %<>% sub("_$", "", .)
+  sprintf(.fmt, sprintf("%s(%s)", fn, as.args(args, fun = .fun)))
+}
+
 
 
 #____________________________________________________________________
@@ -274,8 +276,9 @@ append_df <- function (...) {
 #____________________________________________________________________
 aa <- function (obj, ...) {
   dots <- list(...)
-  for (k in names(dots))
-    attr(obj, k) <- dots[[k]]
+  if (!is.null(obj))
+    for (k in names(dots))
+      attr(obj, k) <- dots[[k]]
   return (obj)
 }
 
@@ -294,19 +297,21 @@ drop_empty <- function (df) {
   df[,apply(df, 2L, function (x) !all(is.na(x))),drop=FALSE]
 }
 keep_cols <- function (df, ...) {
-  cols <- unlist(list(...))
+  cols <- unique(unlist(list(...)))
   if (is_null(cols) || is_null(df)) return (NULL)
-  df[,intersect(colnames(df), cols),drop=FALSE]
+  df[,intersect(cols, colnames(df)),drop=FALSE]
 }
 rename_cols <- function(df, ...) {
   vals <- list(...)
+  x    <- attr(df, 'names', exact = TRUE)
   for (i in names(vals))
-    names(df)[which(names(df) == i)] <- vals[[i]]
+    x[which(x == i)] <- vals[[i]]
+  attr(df, 'names') <- x
   return (df)
 }
 rename_response <- function(df, new) {
   old <- attr(df, 'response', exact = TRUE)
-  stopifnot(is_scalar_character(old))
+  stopifnot(is_scalar_character(old) && !is_na(old))
   stopifnot(is_string(old, colnames(old)))
   names(df)[which(names(df) == old)] <- new
   attr(df, 'response') <- new
@@ -318,9 +323,13 @@ rename_response <- function(df, new) {
 # Decorate column names for plyr
 #____________________________________________________________________
 ply_cols <- function (cols) {
+  
+  if (is(cols, 'quoted')) return (cols)
+  
   vars <- NULL
   for (col in cols)
     vars <- c(plyr::as.quoted(as.name(col)), vars)
+  
   return (vars)
 }
 

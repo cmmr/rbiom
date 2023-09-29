@@ -4,28 +4,31 @@
 #' adjusted principal coordinates analysis. Bioinformatics. 2020 Jul 
 #' 1;36(13):4099-4101. doi: 10.1093/bioinformatics/btaa276.
 #' 
-#' @name apcoa
+#' @noRd
 #' 
 #' @param distmat  A distance matrix (\code{dist} class object) that you want
 #'      to run the aPCoA on.
+#' 
 #' @param covariates  A data.frame with the confounding covariate(s). The row 
 #'      names of this data frame should match the labels of the distance matrix.
+#' 
 #' @return A numeric matrix with the same row names as \code{covariates}, and
 #'      one column for each of the computed adjusted principal coordinates.
-#' @export
+#' 
 #' @examples
 #'     library(rbiom)
 #'     library(ggplot2)
 #'     
-#'     dm <- unifrac(hmp50)
+#'     biom <- sample_rarefy(hmp50)
+#'     dm   <- unifrac(biom)
 #'     reg_pcoa <- ape::pcoa(dm)[['vectors']]
-#'     adj_pcoa <- apcoa(dm, metadata(biom)[,'Sex',drop=FALSE])
+#'     adj_pcoa <- apcoa(dm, sample_metadata(biom)[,'Sex',drop=FALSE])
 #'     
-#'     ids   <- sample_names(hmp50)
-#'     color <- metadata(hmp50, 'Sex')
+#'     ids   <- sample_names(biom)
+#'     color <- sample_metadata(biom, 'Sex')
 #'     ggplot(mapping=aes(x=reg_pcoa[ids, 1], y=reg_pcoa[ids, 2], color=color)) + geom_point()
 #'     ggplot(mapping=aes(x=adj_pcoa[ids, 1], y=adj_pcoa[ids, 2], color=color)) + geom_point()
-#'     
+
 apcoa <- function (distmat, covariates)  {
   
   

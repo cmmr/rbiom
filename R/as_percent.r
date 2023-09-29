@@ -3,19 +3,22 @@
 #' 
 #' @name as_percent
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
 #' @return A \code{BIOM} object.
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
-#'     counts(hmp50)[1:4,1:5]
+#'     otu_matrix(hmp50)[1:4,1:5]
 #'     
 #'     biom <- as_percent(hmp50)
-#'     counts(biom)[1:4,1:5]
+#'     otu_matrix(biom)[1:4,1:5]
 #'
 
 as_percent <- function (biom) {
+  
+  stopifnot(is(biom, 'BIOM'))
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
@@ -26,10 +29,7 @@ as_percent <- function (biom) {
     return (readRDS(cache_file))
   
   
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In as_percent(), biom must be a BIOM-class object.'))
-  
-  if (attr(biom, 'rarefaction') == 1)
+  if (identical(attr(biom, 'rarefaction'), 1))
     return (biom)
   
   divisor <- if (is_rarefied(biom)) { attr(biom, 'rarefaction', exact = TRUE)

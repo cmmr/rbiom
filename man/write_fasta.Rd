@@ -4,14 +4,14 @@
 \alias{write_fasta}
 \title{Write DNA sequences to a file in fasta format.}
 \usage{
-write_fasta(seqs, file = NULL, outfile = NULL)
+write_fasta(seqs, file = NULL)
 }
 \arguments{
 \item{seqs}{A named character vector where names are sequence names and
-values are the sequences. Also accepts a \code{BIOM} object which 
+values are the sequences. Also accepts a \code{BIOM} object which
 contains sequences.}
 
-\item{file}{Path to the output fasta file. Filenames ending in 
+\item{file}{Path to the output fasta file. Filenames ending in
 \code{.gz} or \code{.bz2} will be compressed accordingly.}
 }
 \value{

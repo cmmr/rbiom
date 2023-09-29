@@ -1,41 +1,13 @@
-# rbiom 1.0.3.9040
 
-* Can now disable rarefaction in write.xlsx().
-* Support for 'Decontam' and 'MicrobiomeDB' generated BIOM files.
-* Rarefy now handles samples and taxa with zero observations.
-* write.xlsx exports 'dist' and 'matrix' attributes in addition to 'data.frame's
-* Optionally change e.g. "Bacteria; Gracilibacteria; c" into "Bacteria; Gracilibacteria; Phylum Gracilibacteria (c)"
-* Fixed crash when rarefying biom files and last taxa is not dropped first.
-* Easily pull a single column of metadata with metadata(biom, field).
-* Added apcoa function for covariate adjusted principal coordinates analysis.
-* Switched from rjson to jsonlite for better handling of non-UTF characters.
-* Support for writing out biom files compressed with gzip or bzip2.
-* Added init.cache() function to memoise the functions that do heavy-lifting.
-* Can now download files with odd characters in their name.
-* Prevent NUL from being appended to read.biom's text inputs.
-* alpha.div can now return metadata and/or subset of adiv metrics in wide or long format.
-* Automagically remove NAs and update factors when using subset().
-* taxa.rollup can now return with metadata in wide or long format.
-* beta.div can now return with metadata in long format.
-* Added stats.table function to compute p-vals for alpha, beta, and taxa metrics.
-* Added sample.sums function to count the number of observations per sample.
-* New functions: depth(), is.rarefied(), has.phylogeny(), and has.sequences().
-* Added plot function - provides stat brackets, patterned fills, overlaid geoms and more.
-* plot() can now create heatmaps.
-* plot() can now create stacked barplots.
-* Fleshed out plot()'s ordination abilities.
-* plot() can now graph regressions (continuous x variable).
-* Added bdply() function for working piecemeal on a BIOM object, a la the plyr R package.
-* Provenance tracking in BIOM object's 'history' attribute.
-* 'hmp50' dataset now loads with rbiom.
-* subset() can now also subset taxa.
-* Added setter functions for many BIOM object attributes.
+# rbiom 2.0.0
 
-### Breaking Changes
-
-* The data.frame returned from taxa.rollup() used to arrange sample names across
-  columns for wide format without metadata, and sample names across rows otherwise.
-  Now, sample names are always the rownames for wide format.
+* Major release with significant new features.
+* Plotting added.
+* Statistics added.
+* Caching added.
+* Clearer naming scheme for functions. Previous names still work but are deprecated.
+* Generation of human-readable ggplot2 code for modifying plots outside of rbiom.
+* Provenience tracking for BIOM objects and derivatives.
 
 
 # rbiom 1.0.3

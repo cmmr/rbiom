@@ -2,7 +2,7 @@
 #' 
 #' @name plot_heatmap
 #' 
-#' @family plotting
+#' @family visualization
 #' 
 #' @param mtx   A numeric \code{matrix} with named rows and columns.
 #' 
@@ -34,7 +34,7 @@
 #'        Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
 #'        Default: \code{"none"}.
 #'        
-#' @param trees  Draw a dendrogram for rows (left) and columns (top). You can 
+#' @param trees   Draw a dendrogram for rows (left) and columns (top). You can 
 #'        supply a list or logical vector of length two to control the row tree 
 #'        and column tree separately, for example 
 #'        \code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}. 
@@ -52,7 +52,7 @@
 #'        Options are:
 #'        \itemize{
 #'          \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
-#'          \item{An \link[stats]{hclust} object} { }
+#'          \item{An \code{hclust} class object} { E.g. from [stats::hclust()]. }
 #'          \item{A method name - }{ \code{"ward.D"}, 
 #'            \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
 #'            \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
@@ -68,7 +68,7 @@
 #'        
 #'        Options are:
 #'        \itemize{
-#'          \item{A \link[stats]{dist} object} { }
+#'          \item{A \code{dist} class object} { E.g. from [stats::dist()] or [bdiv_distmat()]. }
 #'          \item{A method name - }{ \code{"euclidean"}, 
 #'            \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
 #'            \code{"binary"}, or \code{"minkowski"}. }
@@ -187,7 +187,7 @@ plot_heatmap <- function (
     mtx, grid = list(label = "Grid Value", colors = "imola"), tracks = NULL,
     label = TRUE, label_size = NULL, rescale = "none",
     trees = TRUE, clust = "complete", dist = "euclidean",
-    tree_height  = NULL, track_height = NULL, ratio=1, 
+    ratio = 1, tree_height = NULL, track_height = NULL, 
     legend = "right", xlab.angle = "auto", ... ) {
   
   
@@ -222,7 +222,7 @@ plot_heatmap <- function (
   stopifnot(is_null(label_size)   || (is_double(label_size)   && length(label_size)   <= 2) )
   stopifnot(is_null(tree_height)  || (is_double(tree_height)  && length(tree_height)  <= 2))
   stopifnot(is_null(track_height) || (is_double(track_height) && length(track_height) <= 2))
-  stopifnot(is_scalar_double(ratio))
+  stopifnot(is_scalar_double(ratio) && !is_na(ratio))
   stopifnot(is_string(rescale, c("none", "rows", "cols")))
   stopifnot(is_string(legend, c("right", "bottom")))
   stopifnot(is_string(as.character(xlab.angle), c("auto", "0", "30", "90")))

@@ -4,22 +4,10 @@
 #' 
 #' @name blply
 #' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
-#' 
-#' @param vars   A character vector of metadata fields. Each unique combination
-#'        of values in these columns will be used to create a subsetted BIOM
-#'        object to pass to \code{FUN}. Unambiguous abbreviations of metadata
-#'        fields are also accepted.
+#' @inherit bdply params
 #'           
 #' @param FUN   The function to execute on each BIOM subset. \code{FUN} may
 #'        return any object, all of which will be returned in a named list.
-#'                 
-#' @param ...   Additional arguments to pass on to \code{FUN}.
-#'        
-#' @param fast   If \code{TRUE} (the default), the subsetted BIOM objects will
-#'        still contain the full taxa table and phylogenetic tree. Set 
-#'        \code{fast = FALSE} to run the slow steps of subsetting these 
-#'        elements as well.
 #'        
 #' @return A list with the function outputs.
 #' 
@@ -29,49 +17,101 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     blply(hmp50, "Sex", nsamples)
+#'     blply(hmp50, "Sex", n_samples)
 #'     
 #'     blply(hmp50, c("Body Site", "Sex"), function (b) {
-#'       ad <- adiv_table(b)[,c("Shannon", "Simpson")]
+#'       ad <- adiv_table(b, adiv = "all")[,c(".Shannon", ".Simpson")]
 #'       apply(ad, 2L, mean)
 #'     })
 #'     
-#'     blply(hmp50, "Body Site", function (b) {
-#'       r <- range(bdiv_distmat(b, "bray"))
-#'       data.frame(bray.min = r[[1]], bray.max = r[[2]])
+#'     iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
+#'     blply(hmp50, "Sex", iters = iters, function (b, w, d) {
+#'       r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+#'       round(data.frame(min = r[[1]], max = r[[2]]))
 #'     })
 #'     
 #'     
 #'
-blply <- function (biom, vars, FUN, ..., fast = TRUE) {
+blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE, fast = TRUE) {
   
   
   #________________________________________________________
   # Sanity checks
   #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
   if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
-  vars <- validate_metrics(biom, vars, mode = "meta", multi = TRUE)
   
   
-  #________________________________________________________
-  # Pass-through for case of no variables to ply by
-  #________________________________________________________
-  if (length(vars) < 1)
-    vars <- NULL
+  dots  <- list(...)
+  iters <- expand.grid(iters, stringsAsFactors = FALSE)
+  
   
   
   #________________________________________________________
-  # Run user's function on subsetted BIOM objects
+  # Simple cases where we're not faceting by metadata.
   #________________________________________________________
-  .data <- metadata(biom, id = ".id")
-  .vars <- if (is(vars, 'quoted')) vars else ply_cols(vars)
-  .fun  <- function (df, ...) {
-    subBIOM <- select(biom, df[['.id']], fast = fast)
-    do.call(FUN, c(list(subBIOM), list(...)))
+  if (is.null(vars)) {
+  
+    if (nrow(iters) == 0) {
+      result <- list(do.call(FUN, c(list(biom), dots)))
+      
+    } else {
+      result <- plyr::alply(iters, 1L, function (iter) {
+        do.call(FUN, c(list(biom), dots, as.list(iter)))
+      })
+    }
+    
+  } else {
+    
+    if (!is(biom, 'BIOM'))
+      stop("Can't apply metadata partitions to non-BIOM object.")
+    
+    
+    data <- sample_metadata(biom, id = ".id")
+    vars %<>% validate_arg(biom, 'meta', col_type = 'cat')
+    
+    result <- plyr::dlply(data, ply_cols(vars), function (df) {
+      
+      sub_biom <- sample_select(biom, df[['.id']], fast = fast)
+      
+      if (nrow(iters) == 0)
+        return (do.call(FUN, c(list(sub_biom), dots)))
+      
+      plyr::alply(iters, 1L, function (iter) {
+        do.call(FUN, c(list(sub_biom), dots, as.list(iter))) })
+    })
+    
+    
+    #________________________________________________________
+    # Un-nest lists created by dlply(adply()) call.
+    #________________________________________________________
+    if (nrow(iters) > 0) {
+      
+      split_labels <- attr(result, 'split_labels', exact = TRUE)
+      result       <- do.call(c, result)
+      
+      if (is.null(split_labels)) {
+        attr(result, 'split_labels') <- iters
+        
+      } else {
+        attr(result, 'split_labels') <- plyr::adply(
+          .data    = split_labels, 
+          .margins = 1L, 
+          .fun     = function (x) iters )
+      }
+    }
+    
   }
   
-  plyr::dlply(.data, .vars, .fun, ...)
   
+  if (isTRUE(prefix) && nrow(iters) > 0)
+    attr(result, 'split_labels') <- local({
+      df <- attr(result, 'split_labels')
+      i  <- seq_len(ncol(iters)) + length(vars)
+      colnames(df)[i] <- paste0(".", colnames(iters))
+      return (df)
+    })
+  
+  
+  return (result)
 }
 

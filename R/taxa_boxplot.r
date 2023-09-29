@@ -7,7 +7,7 @@
 #' 
 #' @inherit adiv_boxplot params sections return
 #' 
-#' @family plotting
+#' @family visualization
 #' 
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
@@ -36,7 +36,7 @@
 #'        \itemize{
 #'          \item{\code{"sqrt"} - }{ square-root transformation }
 #'          \item{\code{"log1p"} - }{ log(y + 1) transformation }
-#'          \item{\emph{anything else} - }{ no transformation }
+#'          \item{\code{NULL} - }{ no transformation }
 #'        }
 #'        These methods allow visualization of both high- and low-abundance
 #'        taxa simultaneously, without complaint about 'zero' count
@@ -51,11 +51,11 @@
 #' 
 #' 
 #' @export
-#' @seealso \code{\link{stats_table}}
+#' @seealso [biom_stats()]
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- rarefy(hmp50) 
+#'     biom <- sample_rarefy(hmp50) 
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
 #'     taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
 #'     

@@ -40,13 +40,13 @@ Usage
 library(rbiom)
 
 infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-biom <- read.biom(infile)
+biom <- read_biom(infile)
 
 # Rarefy to 1000 reads per sample
-biom <- rarefy(biom, depth=1000)
+biom <- sample_rarefy(biom, depth=1000)
 
 # Summarize counts by phylum
-phyla <- taxa.rollup(biom, 'Phylum')
+phyla <- taxa_rollup(biom, 'Phylum')
 phyla[1:4,1:6]
 
 # Work with metadata
@@ -57,7 +57,7 @@ sprintf("Mean age: %.1f", mean(biom$metadata$Age))
 plot(biom$phylogeny)
 
 # Get unifrac distance matrix
-dm <- beta.div(biom, 'unifrac')
+dm <- bdiv_distmat(biom, 'unifrac')
 ```
 
 

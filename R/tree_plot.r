@@ -1,12 +1,8 @@
 #' Display a dendrogram of the phylogenetic tree.
 #' 
-#' @name tree_plot
+#' @param biom   A BIOM object, as returned from [read_biom()].
 #' 
-#' @family plotting
-#' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
-#' 
-#' @param layout   Any layout option supported by \link{ggtree::ggtree}:
+#' @param layout   Any layout option supported by [ggtree::ggtree()]:
 #'        \code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"}, 
 #'        \code{"ellipse"}, \code{"roundrect"}, \code{"fan"}, 
 #'        \code{"circular"}, \code{"inward_circular"}, \code{"radial"}, 
@@ -31,21 +27,28 @@
 #'        right half of the plotting area for non-tree elements.
 #'        Default: \code{NULL}.
 #' 
-#' 
-#' @export
 #' @examples
-#'     library(rbiom) 
-#'      
-#'     tree_plot(hmp50)
+#'     library(rbiom)
 #'     
-#'     hmp1 <- select(hmp50, samples = "HMP10")
-#'     tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
-#'     tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
-#'
+#'     hmp1 <- sample_select(hmp50, samples = "HMP10")
+#'     
+#'     # Needs the optional ggtree package
+#'     if (nzchar(system.file(package = "ggtree")))
+#'       tree_plot(hmp50)
+#'       
+#'     if (nzchar(system.file(package = "ggtree")))
+#'       tree_plot(hmp1, cladelab = "Phylum", layout = "roundrect")
+#'     
+#'     if (nzchar(system.file(package = "ggtree")))
+#'       tree_plot(hmp1, tiplab = "Genus", layout = "fan", color.by = ".reads")
+
 tree_plot <- function (
     biom, layout = "rectangular", 
     tiplab = NULL, color.by = NULL, label = NULL, cladelab = NULL, 
     top = NULL, right = NULL, bottom = NULL, left = NULL, ...) {
+  
+  if (nchar(system.file(package = "ggtree")) == 0)
+    stop("Bioconductor R package 'ggtree' must be installed to use tree_plot().")
   
   
   #________________________________________________________
@@ -62,8 +65,8 @@ tree_plot <- function (
   #________________________________________________________
   local({
     
-    if (!is(biom, 'BIOM'))    stop("Please provide a BIOM object.")
-    if (!has_phylogeny(biom)) stop("No phylogenetic data present.")
+    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
+    if (!has_tree(biom))   stop("No phylogenetic data present.")
     
     if(!is_null(c(tiplab, label, cladelab))) {
       ranks <- metrics(biom, 'rank')
@@ -130,7 +133,7 @@ tree_plot <- function (
       if (nrow(df) == 0)
         df <- attr(tr, 'extraInfo', exact = TRUE)[,'node']
       
-      df[['tiplab']] <- taxonomy(biom, tiplab)[phy$tip.label,1][df[['node']]]
+      df[['tiplab']] <- otu_taxonomy(biom, tiplab)[phy$tip.label,1][df[['node']]]
       
       attr(layers[['ggtree']][['tr']], 'data') <- df
       remove("df", "phy")
@@ -210,9 +213,7 @@ tree_plot <- function (
 
 #' Provides a 'treedata' S4 object for use in ggtree functions.
 #' 
-#' @name tree_data
-#' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' @param biom   A BIOM object, as returned from [read_biom()].
 #' 
 #' @param reads   Include a 'reads' column indicating the sum of taxa 
 #'        observations belonging to each node/leaf. Default: \code{TRUE}.
@@ -224,15 +225,20 @@ tree_plot <- function (
 #'        returned treedata object. Set to \code{NULL} to not return any 
 #'        clade notations.
 #' 
-#' 
-#' @export
 #' @examples
 #'     library(rbiom)
 #'     
-#'     tree_data(hmp50)
+#'     # Needs the optional ggtree package
+#'     if (nzchar(system.file(package = "ggtree"))) {
 #'     
-#'
+#'       tree_data(hmp50)
+#'       
+#'     }
+
 tree_data <- function (biom, reads = TRUE, clades = TRUE) {
+  
+  if (nchar(system.file(package = "ggtree")) == 0)
+    stop("Bioconductor R package 'ggtree' must be installed to use tree_data().")
   
   #________________________________________________________
   # See if this result is already in the cache.
@@ -246,9 +252,9 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   # Sanity checks
   #________________________________________________________
   if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  stopifnot(is.logical(reads) && length(reads) == 1)
+  stopifnot(is_scalar_logical(reads) && !is_na(reads))
   
-  tree   <- phylogeny(biom)
+  tree   <- otu_tree(biom)
   ranks  <- taxa_ranks(biom)
   labels <- tree$tip.label
   nTips  <- length(labels)
@@ -282,7 +288,7 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
     df[1:nTips, 'reads'] <- as.vector(taxa_sums(biom)[labels])
   
   for (i in seq_along(ranks))
-    df[1:nTips, names(ranks)[[i]]] <- as.vector(taxonomy(biom, ranks[[i]])[labels,1])
+    df[1:nTips, names(ranks)[[i]]] <- as.vector(otu_taxonomy(biom, ranks[[i]])[labels,1])
   
   df[1:nTips, 'OTU'] <- labels
   
@@ -313,8 +319,206 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   
   # Convert phylo object to treedata object.
   #________________________________________________________
-  tree <- treeio::full_join(tree, df, by = "node")
+  tree <- tidytree::full_join(tree, df, by = "node")
   
   set_cache_value(cache_file, tree)
   return (tree)
 }
+
+
+#' Names of a phylogenetic tree's tips/leafs.
+#' 
+#' @param x  A phylo object, as returned from [read_tree()].
+#' @return A character vector with the leaf names.
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "newick.tre", package = "rbiom")
+#'     tree  <- read_tree(infile)
+#'     leafs <- tree_tips(tree)
+#'     head(leafs)
+#'
+tree_tips <- function (x) {
+  x$tip.label
+}
+
+
+
+#' Create a subtree by specifying tips to keep.
+#' 
+#' @name tree_subset
+#' 
+#' @param tree  A phylo object, as returned from [read_tree()].
+#' @param tips  A character, numeric, or logical vector of tips to keep.
+#' @return A \code{phylo} object for the subtree.
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     infile <- system.file("extdata", "newick.tre", package = "rbiom")
+#'     tree <- read_tree(infile)
+#'     tree
+#'     
+#'     subtree <- tree_subset(tree, tips = head(tree_tips(tree)))
+#'     subtree
+#'
+tree_subset <- function (tree, tips) {
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  params     <- lapply(as.list(environment()), eval)
+  cache_file <- get_cache_file("tree_subset", params)
+  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Did we get a tree?
+  #________________________________________________________
+  
+  if (!is(tree, "phylo"))
+    stop("Must provide a phylo object as the tree.")
+  
+  nTips <- length(setdiff(tree$edge[,2], tree$edge[,1]))
+  
+  
+  #________________________________________________________
+  # Tips specified as strings c("SteSpe52", "HrbSpe65", ...)
+  #________________________________________________________
+  
+  if (is.character(tips)) {
+    
+    if (!all(tips %in% tree$tip.label)) {
+      missing <- tips[!tips %in% tree$tip.label]
+      if (length(missing) > 5) missing <- c(missing[1:5], "...")
+      missing <- paste(collapse=", ", missing)
+      stop(sprintf("Tips missing from tree: %s", missing))
+    }
+    
+    tips <- which(tree$tip.label %in% tips)
+  }
+  
+  
+  #________________________________________________________
+  # Tips specified as logicals c(TRUE, TRUE, FALSE, TRUE, ...)
+  #________________________________________________________
+  
+  if (is.logical(tips)) {
+    
+    if (length(tips) != nTips)
+      stop("Logical vector must be same length as tips.")
+    
+    tips <- which(tips)
+  }
+  
+  
+  #________________________________________________________
+  # Tips specified as numeric c(5, 1, 2, 31, 3, 12, ...)
+  #________________________________________________________
+  
+  if (is.numeric(tips)) {
+    if (max(tips) > nTips)  stop("There aren't that many tips in the tree.")
+    if (min(tips) < 1)      stop("Tips with index < 1 are not allowed.")
+    if (any(tips %% 1 > 0)) stop("Tip indices must be whole numbers.")
+    
+  } else {
+    stop("Tips must be given as character, logical, or numeric.")
+  }
+  
+  
+  #________________________________________________________
+  # Keeping zero or all tips?
+  #________________________________________________________
+  
+  tips <- unique(tips)
+  
+  if (length(tips) < 2)
+    stop("At least two tips must be specified.")
+  
+  if (length(tips) == nTips) {
+    set_cache_value(cache_file, tree)
+    return (tree)
+  }
+  
+  
+  #________________________________________________________
+  # Prune the tree
+  #________________________________________________________
+  
+  root      <- setdiff(tree$edge[,1], tree$edge[,2])
+  childAt   <- order(c(tree$edge[,2], root))
+  nChildren <- c(rep(0, nTips), unname(table(tree$edge[,1])))
+  
+  eLength   <- tree$edge.length
+  if (is_null(eLength))
+    eLength <- rep(0, nrow(tree$edge))
+  
+  for (tip in setdiff(1:nTips, tips)) repeat {
+    
+    tipIdx <- childAt[tip]
+    parent <- tree$edge[tipIdx,1]
+    
+    nChildren[parent] <- nChildren[parent] - 1
+    eLength[tipIdx] <- NA
+    
+    if (nChildren[parent] > 0) break
+    tip <- parent
+  }
+  
+  
+  #________________________________________________________
+  # Merge branches
+  #________________________________________________________
+  
+  for (tip in tips) repeat {
+    
+    if (tip == root) break
+    
+    tipIdx <- childAt[tip]
+    parent <- tree$edge[tipIdx,1]
+    
+    if (nChildren[parent] == 1 && parent != root) {
+      
+      parentIdx                   <- childAt[parent]
+      tree$edge[parentIdx, 2]     <- tree$edge[tipIdx, 2]
+      eLength[parentIdx] <- eLength[parentIdx] + eLength[tipIdx]
+      eLength[tipIdx]    <- NA
+      
+      nChildren[parent] <- 0
+    }
+    
+    tip <- parent
+  }
+  
+  
+  #________________________________________________________
+  # Move the root
+  #________________________________________________________
+  
+  if (nChildren[root] == 1)
+    eLength[which(tree$edge[,1] == root)] <- NA
+  
+  
+  #________________________________________________________
+  # Discard nodes flagged with NA; make the new subtree
+  #________________________________________________________
+  
+  tree$edge  <- tree$edge[!is.na(eLength),]
+  tree$Nnode <- length(unique(tree$edge[,1]))
+  
+  if (!is_null(tree$edge.length)) tree$edge.length <- eLength[!is.na(eLength)]
+  if (!is_null(tree$tip.label))   tree$tip.label   <- tree$tip.label[tips]
+  if (!is_null(tree$node.label))  tree$node.label  <- tree$tip.label[unique(sort(tree$edge[,1]))]
+  
+  tree$edge <- matrix(as.numeric(factor(as.vector(tree$edge))), ncol=2)
+  
+  
+  set_cache_value(cache_file, tree)
+  return (tree)
+}
+
+
+
+

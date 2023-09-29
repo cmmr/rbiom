@@ -3,12 +3,15 @@
 #' 
 #' @name taxa_sums
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
+#' 
 #' @param rank  The taxonomic rank to return sums for. The default, 
-#'        \code{NULL}, return OTU sums in the same order as they appear in 
-#'        \link{counts}. If not \code{NULL}, returned sums are ordered from
-#'        most abundance to least abundant.
+#'        \code{NULL}, returns OTU sums in the same order as they appear in 
+#'        [otu_matrix()]. If not \code{NULL}, returned sums are ordered from
+#'        most abundant to least abundant.
+#'        
 #' @return A numeric vector, named with the taxa names.
+#' 
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -18,6 +21,8 @@
 
 taxa_sums <- function (biom, rank = NULL) {
   
+  stopifnot(is(biom, 'BIOM'))
+  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
@@ -26,9 +31,6 @@ taxa_sums <- function (biom, rank = NULL) {
   if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
     return (readRDS(cache_file))
   
-  
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
   
   if (is_null(rank)) {
     x <- slam::row_sums(biom$counts)
@@ -46,10 +48,10 @@ taxa_sums <- function (biom, rank = NULL) {
 #' 
 #' @name taxa_means
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
 #' @param rank  The taxonomic rank to return means for. The default, 
 #'        \code{NULL}, return OTU means in the same order as they appear in 
-#'        \link{counts}. If not \code{NULL}, returned means are ordered from
+#'        [otu_matrix()]. If not \code{NULL}, returned means are ordered from
 #'        most abundance to least abundant.
 #' @return A numeric vector, named with the taxa names.
 #' @export
@@ -61,6 +63,8 @@ taxa_sums <- function (biom, rank = NULL) {
 
 taxa_means <- function (biom, rank = NULL) {
   
+  stopifnot(is(biom, 'BIOM'))
+  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
@@ -69,9 +73,6 @@ taxa_means <- function (biom, rank = NULL) {
   if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
     return (readRDS(cache_file))
   
-  
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_means(), biom must be a BIOM-class object.'))
   
   if (is_null(rank)) {
     x <- slam::row_means(biom$counts)
@@ -89,7 +90,7 @@ taxa_means <- function (biom, rank = NULL) {
 #' 
 #' @name top_taxa
 #' 
-#' @param biom  A \code{BIOM} object, as returned from \link{read_biom}.
+#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
 #' @param rank  The taxonomic rank of interest. Default: \code{"OTU"}.
 #' @param n  The number of taxa names to return. Default: \code{Inf}.
 #' @return A character vector of the names of the top n most abundant taxa, 
@@ -103,6 +104,9 @@ taxa_means <- function (biom, rank = NULL) {
 
 top_taxa <- function (biom, rank = 'OTU', n = Inf) {
   
+  stopifnot(is(biom, 'BIOM'))
+  
+  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
@@ -111,9 +115,6 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
   if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
     return (readRDS(cache_file))
   
-  
-  if (!is(biom, 'BIOM'))
-    stop (simpleError('In taxa_sums(), biom must be a BIOM-class object.'))
   
   x <- taxa_sums(biom, rank) %>% names() %>% head(n)
   

@@ -1,8 +1,6 @@
 #' Write data and summary information to a Microsoft Excel-compatible workbook.
 #' 
-#' @name write_xlsx
-#' 
-#' @inherit taxonomy params
+#' @inherit otu_taxonomy params
 #'
 #' @param biom   The BIOM object to save to the file.
 #' 
@@ -26,27 +24,23 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
-#'     biom <- select(hmp50, 1:10) %>% rarefy()
-#'     
-#'     attr(biom, "Weighted UniFrac")   <- unifrac(biom)
-#'     attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
-#'     
-#'     outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
-#'
+#'     if (FALSE) {
+#'       
+#'       biom <- sample_select(hmp50, 1:10) %>% sample_rarefy()
+#'       
+#'       attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+#'       attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
+#'       
+#'       outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
+#'     }
 
 
-write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis", outfile = NULL) {
-  
-  if (!missing(outfile)) {
-    warning("In write.fasta(), `outfile` is deprecated. Use `file` instead.")
-    file <- outfile
-  }
-  
+write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
   
   stopifnot(is(biom, "BIOM"))
-  stopifnot(is_scalar_character(file))
+  stopifnot(is_scalar_character(file) && !is_na(file))
   
   
   #________________________________________________________
@@ -88,9 +82,9 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis", out
     # prior to rarefying
     #________________________________________________________
     
-    RawCounts <- data.frame(counts(biom),              check.names=FALSE)
-    Taxonomy  <- data.frame(taxonomy(biom, unc = unc), check.names=FALSE)
-    Metadata  <- data.frame(metadata(biom),            check.names=FALSE)
+    RawCounts <- data.frame(otu_matrix(biom),              check.names=FALSE)
+    Taxonomy  <- data.frame(otu_taxonomy(biom, unc = unc), check.names=FALSE)
+    Metadata  <- data.frame(sample_metadata(biom),         check.names=FALSE)
     
     # Set the full taxonomy string as the first column of RawCounts
     TaxaStrings <- data.frame(Taxonomy=apply(biom$taxonomy, 1L, paste, collapse="; "))
@@ -111,13 +105,13 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis", out
     #________________________________________________________
     
     # Allow the user to override rarefaction by setting depth = 0.
-    if (identical(depth, 0) || isTRUE(is_rarefied(biom))) {
+    if (identical(depth, 0) || identical(depth, 0L) || isTRUE(is_rarefied(biom))) {
       rare <- biom
     } else {
-      rare <- rarefy(biom, depth, seed)
+      rare <- sample_rarefy(biom = biom, depth = depth, seed = seed)
     }
     
-    RareCounts <- data.frame(counts(rare), check.names=FALSE)
+    RareCounts <- data.frame(otu_matrix(rare), check.names=FALSE)
     AlphaDiv   <- adiv_table(biom = rare)
     
     # Set the full taxonomy string as the first column of RareCounts
@@ -232,8 +226,8 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis", out
     # Output totals, taxonomy/seqs, & adiv_table
     #________________________________________________________
     
-    AlphaDiv  <- data.frame(adiv_table(biom),          check.names=FALSE)
-    Taxonomy  <- data.frame(taxonomy(biom, unc = unc), check.names=FALSE)
+    AlphaDiv  <- data.frame(adiv_table(biom),              check.names=FALSE)
+    Taxonomy  <- data.frame(otu_taxonomy(biom, unc = unc), check.names=FALSE)
     
     # Set the centroid sequence as the first column of Taxonomy
     if (is(biom[['sequences']], "character"))

@@ -66,7 +66,7 @@ boxplot_stats <- function (layers) {
         # Brackets between x-values
         #________________________________________________________
         stats_title <- "pairwise"
-        stats       <- stats_table(
+        stats       <- biom_stats(
           biom        = ggdata, 
           x           = xcol, 
           y           = ycol, 
@@ -207,7 +207,7 @@ boxplot_stats <- function (layers) {
       # P-value for each x position
       #________________________________________________________
       stats_title <- "groupwise"
-      stats       <- stats_table(
+      stats       <- biom_stats(
         biom        = ggdata, 
         x           = setdiff(c(color.by, pattern.by, shape.by), xcol), 
         y           = ycol, 
@@ -383,11 +383,11 @@ boxplot_stats <- function (layers) {
         'layer'   = "stats_bg",
         'color'   = NA,
         'fill'    = "white",
-        'mapping' = aes_string(
-          xmin = -Inf, 
-          xmax = Inf, 
-          ymin = signif(min(stats[['y.pos']]), 3), 
-          ymax = Inf ))
+        'mapping' = aes(
+          xmin = !!-Inf, 
+          xmax = !!Inf, 
+          ymin = !!signif(min(stats[['y.pos']]), 3), 
+          ymax = !!Inf ))
     }
     
     

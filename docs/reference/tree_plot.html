@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,14 +69,14 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <a href="read_biom.html">read_biom</a>.</p></dd>
+<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
 
 
 <dt>layout</dt>
-<dd><p>Any layout option supported by ggtree::ggtree:
-<code>"rectangular"</code>, <code>"dendrogram"</code>, <code>"slanted"</code>, 
-<code>"ellipse"</code>, <code>"roundrect"</code>, <code>"fan"</code>, 
-<code>"circular"</code>, <code>"inward_circular"</code>, <code>"radial"</code>, 
+<dd><p>Any layout option supported by <code><a href="https://rdrr.io/pkg/ggtree/man/ggtree.html" class="external-link">ggtree::ggtree()</a></code>:
+<code>"rectangular"</code>, <code>"dendrogram"</code>, <code>"slanted"</code>,
+<code>"ellipse"</code>, <code>"roundrect"</code>, <code>"fan"</code>,
+<code>"circular"</code>, <code>"inward_circular"</code>, <code>"radial"</code>,
 <code>"equal_angle"</code>, <code>"daylight"</code> or <code>"ape"</code>.
 Default: <code>"rectangular"</code>.</p></dd>
 
@@ -89,55 +89,43 @@ Default: <code>"rectangular"</code>.</p></dd>
 
 <dt>color.by</dt>
 <dd><p>How to color the tree. Currently only supports the options
-<code>NULL</code> (no coloring) or <code>'.reads'</code> (color by number of taxa 
+<code>NULL</code> (no coloring) or <code>'.reads'</code> (color by number of taxa
 observations). Default: <code>NULL</code>.</p></dd>
 
 
 <dt>label, cladelab</dt>
 <dd><p>Label monophyletic clades. You can specify the
-same or different taxonomic ranks for internal (label) and external 
+same or different taxonomic ranks for internal (label) and external
 (cladelab) annotations. Default: <code>NULL</code>.</p></dd>
 
 
 <dt>top, right, bottom, left</dt>
 <dd><p>Add additional space around the tree.
 Sometimes necessary for wide text annotations. Set as fraction of
-tree's width/height. For instance, <code>right = 1</code> reserves the 
+tree's width/height. For instance, <code>right = 1</code> reserves the
 right half of the plotting area for non-tree elements.
 Default: <code>NULL</code>.</p></dd>
 
 </dl></div>
-    <div class="section level2">
-    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other plotting: 
-<code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
-<code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
-<code><a href="bdiv_biplot.html">bdiv_biplot</a>()</code>,
-<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
-<code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
-<code><a href="depths_barplot.html">depths_barplot</a>()</code>,
-<code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
-<code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
-<code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
-<code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
-<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
-    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
-<span class="r-in"><span>     </span></span>
-<span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="tree_plot-1.png" alt="" width="700" height="433"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">hmp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="select.html">select</a></span><span class="op">(</span><span class="va">hmp50</span>, samples <span class="op">=</span> <span class="st">"HMP10"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, cladelab <span class="op">=</span> <span class="st">"Phylum"</span>, layout <span class="op">=</span> <span class="st">"roundrect"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">hmp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="sample_select.html">sample_select</a></span><span class="op">(</span><span class="va">hmp50</span>, samples <span class="op">=</span> <span class="st">"HMP10"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># Needs the optional ggtree package</span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"ggtree"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="tree_plot-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span>      </span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"ggtree"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, cladelab <span class="op">=</span> <span class="st">"Phylum"</span>, layout <span class="op">=</span> <span class="st">"roundrect"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tree_plot-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span>    <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, tiplab <span class="op">=</span> <span class="st">"Genus"</span>, layout <span class="op">=</span> <span class="st">"fan"</span>, color.by <span class="op">=</span> <span class="st">".reads"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"ggtree"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu">tree_plot</span><span class="op">(</span><span class="va">hmp1</span>, tiplab <span class="op">=</span> <span class="st">"Genus"</span>, layout <span class="op">=</span> <span class="st">"fan"</span>, color.by <span class="op">=</span> <span class="st">".reads"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tree_plot-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

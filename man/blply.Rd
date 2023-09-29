@@ -4,14 +4,17 @@
 \alias{blply}
 \title{Split BIOM by metadata, apply function, and return results in a list.}
 \usage{
-blply(biom, vars, FUN, ..., fast = TRUE)
+blply(biom, vars, FUN, ..., iters = list(), prefix = FALSE, fast = TRUE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}. Technically
+accepts all types of objects, but only BIOM objects allow using the
+\code{vars} option, below.}
 
 \item{vars}{A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted BIOM
-object to pass to \code{FUN}. Unambiguous abbreviations of metadata
+object to pass to \code{FUN}. If \code{NULL}, \code{biom} will be
+passed to \code{FUN} unaltered. Unambiguous abbreviations of metadata
 fields are also accepted.}
 
 \item{FUN}{The function to execute on each BIOM subset. \code{FUN} may
@@ -19,9 +22,17 @@ return any object, all of which will be returned in a named list.}
 
 \item{...}{Additional arguments to pass on to \code{FUN}.}
 
+\item{iters}{A named list of values to pass to \code{FUN}. Unlike
+\code{...}, these will be iterated over in all combinations.
+Default: \code{list()}}
+
+\item{prefix}{When \code{TRUE}, prefixes the names in in \code{iters} with
+a '.' in the split_labels attribute of the returned object.
+Default: \code{FALSE}}
+
 \item{fast}{If \code{TRUE} (the default), the subsetted BIOM objects will
-still contain the full taxa table and phylogenetic tree. Set 
-\code{fast = FALSE} to run the slow steps of subsetting these 
+still contain the full taxa table and phylogenetic tree. Set
+\code{fast = FALSE} to run the slow steps of subsetting these
 elements as well.}
 }
 \value{
@@ -33,16 +44,17 @@ Calls \code{plyr::dlply} internally.
 \examples{
     library(rbiom)
     
-    blply(hmp50, "Sex", nsamples)
+    blply(hmp50, "Sex", n_samples)
     
     blply(hmp50, c("Body Site", "Sex"), function (b) {
-      ad <- adiv_table(b)[,c("Shannon", "Simpson")]
+      ad <- adiv_table(b, adiv = "all")[,c(".Shannon", ".Simpson")]
       apply(ad, 2L, mean)
     })
     
-    blply(hmp50, "Body Site", function (b) {
-      r <- range(bdiv_distmat(b, "bray"))
-      data.frame(bray.min = r[[1]], bray.max = r[[2]])
+    iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
+    blply(hmp50, "Sex", iters = iters, function (b, w, d) {
+      r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+      round(data.frame(min = r[[1]], max = r[[2]]))
     })
     
     

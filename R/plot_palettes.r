@@ -79,7 +79,7 @@ is_palette <- function (palette) {
 #________________________________________________________
 get_palette <- function (palette) {
   
-  stopifnot(is_scalar_character(palette))
+  stopifnot(is_scalar_character(palette) && !is_na(palette))
   palette <- tolower(palette)
   
   if (identical(substr(palette, 1, 1), "-")) {
@@ -101,7 +101,7 @@ get_palette <- function (palette) {
 #________________________________________________________
 get_n_colors <- function (n, palette = NULL) {
   
-  stopifnot(is_scalar_integerish(n))
+  stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(palette)) palette <- NULL
   
   if (is_null(palette)) {
@@ -124,7 +124,7 @@ get_n_colors <- function (n, palette = NULL) {
 #________________________________________________________
 get_n_shapes <- function (n, values = NULL) {
   
-  stopifnot(is_scalar_integerish(n))
+  stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(values)) values <- NULL
   
   if (is_null(values))
@@ -144,7 +144,7 @@ get_n_shapes <- function (n, values = NULL) {
 #________________________________________________________
 get_n_patterns <- function (n, values = NULL) {
   
-  stopifnot(is_scalar_integerish(n))
+  stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(values)) values <- NULL
   
   if (is_null(values))

@@ -5,7 +5,7 @@
 #' @inherit plot_heatmap params return
 #' @inherit bdiv_heatmap params sections
 #' 
-#' @family plotting
+#' @family visualization
 #'        
 #' @param rank   What rank(s) of taxa to display, for example \code{"Phylum"} 
 #'        or \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a 
@@ -33,7 +33,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- hmp50 %>% rarefy() %>% select(1:10)
+#'     biom <- hmp50 %>% sample_rarefy() %>% sample_select(1:10)
 #'     taxa_heatmap(biom, rank="Phylum", color.by="Body Site")
 #'     
 taxa_heatmap <- function (
@@ -70,7 +70,7 @@ taxa_heatmap <- function (
   #________________________________________________________
   params %<>% within({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_scalar_atomic(taxa))
+    stopifnot(is_scalar_atomic(taxa) && !is_na(taxa))
     rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
     
     if (!is_list(grid)) grid <- list(label = "{rank} Abundance", colors = grid)
@@ -128,7 +128,7 @@ taxa_heatmap <- function (
   #________________________________________________________
   # Sanity Check
   #________________________________________________________
-  if (nsamples(biom) < 1)
+  if (n_samples(biom) < 1)
     stop("At least one sample is needed for a taxa heatmap.")
   
   
@@ -156,7 +156,7 @@ taxa_heatmap <- function (
   for (md_col in names(params[['color.by']]))
     params[['color.by']][[md_col]] %<>% within({
       colors <- values
-      values <- metadata(biom, md_col)
+      values <- sample_metadata(biom, md_col)
     })
   args[['tracks']] <- params[['color.by']]
   

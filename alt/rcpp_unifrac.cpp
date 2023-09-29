@@ -190,7 +190,7 @@ NumericVector rcpp_unifrac(int iJob, int nJobs, List sparseMatrix, List tree, bo
 // library(rbiom)
 // 
 // infile        <- system.file("extdata", "hmp50.biom", package = "rbiom")
-// biom          <- select(read.biom(infile), 1:3)
+// biom          <- sample_select(read_biom(infile), 1:3)
 // 
 // biom$counts   <- biom$counts[as.character(biom$phylogeny$tip.label),]
 // 

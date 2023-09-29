@@ -1,6 +1,8 @@
 
 #' Read a data.frame from a filename/URL. Auto-detects separator.
 #' 
+#' @noRd
+#' 
 #' @param filename  A file name or URL. Must be tab- or comma-separated 
 #'        content. Either all or no fields should be quoted.
 #' 
@@ -12,13 +14,11 @@
 #' 
 #' @return A data.frame or matrix.
 #' 
-#' @export
-#'
 
 import_table <- function (filename, matrix = FALSE, ...) {
   
   read_table_args <- list(...)
-  stopifnot(is_scalar_character(filename))
+  stopifnot(is_scalar_character(filename) && !is.na(filename))
     
     
   #________________________________________________________

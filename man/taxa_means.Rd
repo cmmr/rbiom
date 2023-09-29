@@ -7,11 +7,11 @@
 taxa_means(biom, rank = NULL)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{rank}{The taxonomic rank to return means for. The default, 
-\code{NULL}, return OTU means in the same order as they appear in 
-\link{counts}. If not \code{NULL}, returned means are ordered from
+\item{rank}{The taxonomic rank to return means for. The default,
+\code{NULL}, return OTU means in the same order as they appear in
+\code{\link[=otu_matrix]{otu_matrix()}}. If not \code{NULL}, returned means are ordered from
 most abundance to least abundant.}
 }
 \value{

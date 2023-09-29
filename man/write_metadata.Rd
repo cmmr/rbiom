@@ -9,7 +9,7 @@ write_metadata(biom, file)
 \arguments{
 \item{biom}{A BIOM object}
 
-\item{file}{Path to the output file. Filenames ending in 
+\item{file}{Path to the output file. Filenames ending in
 \code{.gz} or \code{.bz2} will be compressed accordingly.}
 }
 \value{

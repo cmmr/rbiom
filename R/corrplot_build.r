@@ -6,7 +6,6 @@ corrplot_build <- function (layers) {
   
   ci       <- params[['ci']]
   color.by <- names(params[['color.by']])
-  stopifnot(is_null(color.by) || is_scalar_character(color.by))
   
   
   #________________________________________________________
@@ -22,6 +21,9 @@ corrplot_build <- function (layers) {
     
     if (hasName(layers, 'scatter'))
       setLayer("scatter", "mapping|color" = color.by)
+    
+    if (hasName(layers, 'residual'))
+      setLayer("residual", "mapping|color" = color.by)
     
     if (hasName(layers, 'trend')) {
       setLayer("trend", "mapping|color" = color.by)
@@ -53,9 +55,9 @@ corrplot_build <- function (layers) {
       model <- local({
         
         models <- list(
-          'linear'      = list("stats::lm", list(formula = y ~ x      )), 
-          'logarithmic' = list("stats::lm", list(formula = y ~ log(x) )), 
-          'local'       = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML" )) )
+          'lm'  = list("stats::lm", list(formula = y ~ x      )), 
+          'log' = list("stats::lm", list(formula = y ~ log(x) )), 
+          'gam' = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML" )) )
         
         i <- pmatch(tolower(model), names(models), NA)
         if (isTRUE(is.na(i)))
@@ -69,10 +71,10 @@ corrplot_build <- function (layers) {
     #________________________________________________________
     # Sanity check model function.
     #________________________________________________________
-    stopifnot(is.list(model))
+    stopifnot(is_list(model))
     stopifnot(identical(length(model), 2L))
-    stopifnot(is.list(model[[2]]))
-    stopifnot(is_scalar_character(model[[1]]))
+    stopifnot(is_list(model[[2]]))
+    stopifnot(is_scalar_character(model[[1]]) && !is_na(model[[1]]))
     stopifnot(is_formula(model[[2]][['formula']]))
     
     model[[1]] <- local({
@@ -96,7 +98,6 @@ corrplot_build <- function (layers) {
     setLayer("trend", method = method)
     
     
-    if (is.logical(ci)) setLayer("trend", se    = ci)
     if (is.numeric(ci)) setLayer("trend", level = ci / 100)
     params[grep("(^|\\.)(se|level)$", names(params))] <- NULL
     

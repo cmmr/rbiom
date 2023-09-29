@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9098</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>tree</dt>
-<dd><p>A <code>phylo</code> object, as returned from <a href="read_tree.html">read_tree</a>. Also 
+<dd><p>A <code>phylo</code> object, as returned from <code><a href="read_tree.html">read_tree()</a></code>. Also
 accepts a <code>BIOM</code> object if it has a phylogentic tree.</p></dd>
 
 
@@ -70,12 +70,12 @@ accepts a <code>BIOM</code> object if it has a phylogentic tree.</p></dd>
     
 
 <p>If file is NULL, the newick string as a character vector. Otherwise,
-        the normalized filepath that was written to (invisibly).</p>
+the normalized filepath that was written to (invisibly).</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"newick.tre"</span>, package <span class="op">=</span> <span class="st">"rbiom"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">tree</span>   <span class="op">&lt;-</span> <span class="fu"><a href="read_tree.html">read_tree</a></span><span class="op">(</span><span class="va">infile</span><span class="op">)</span></span></span>

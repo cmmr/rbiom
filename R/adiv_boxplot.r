@@ -2,16 +2,19 @@
 #' 
 #' @name adiv_boxplot
 #' 
-#' @family plotting
+#' @family visualization
 #' 
-#' @param biom   A BIOM object, as returned from \link{read_biom}.
+#' @param biom   A BIOM object, as returned from [read_biom()].
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
 #'        default, \code{NULL}, groups all samples into a single category. 
 #' 
-#' @param metric   Alpha diversity metric(s) to use. Options are: \code{"OTUs"}, 
-#'        \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or 
-#'        \code{"InvSimpson"}. Default: \code{"Shannon"}.
+#' @param adiv   One or more alpha diversity measures to use. Options are: 
+#'        \code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
+#'        and/or \code{"InvSimpson"}. Non-ambiguous abbreviations are also 
+#'        accepted. You can use \code{adiv="all"} as shortcut for 
+#'        \code{adiv=c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")}
+#'        Default: \code{"Shannon"}.
 #'           
 #' @param layers   \code{"box" ("x")}, \code{"bar"}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -51,14 +54,12 @@
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
 #'        Provide a number between 75 and 100 to define a confidence interval's
 #'        confidence level, commonly 95 or 97.5. Other options are: 
-#'        \bold{range}, 
-#'        \bold{sd} (standard deviation), 
-#'        \bold{se} (standard error), and 
-#'        \bold{mad} (median absolute deviation). 
-#'        The center mark of \code{crossbar} and \code{pointrange} represents
-#'        the mean, except for \bold{mad} in which case it represents
-#'        the median. Trendlines require a confidence interval value. 
-#'        Set to \code{NULL} to disable. Default: \code{95}
+#'        \code{"range"}, \code{"sd"} (standard deviation), 
+#'        \code{"se"} (standard error), and 
+#'        \code{"mad"} (median absolute deviation). 
+#'        The center mark of \bold{crossbar} and \bold{pointrange} represents
+#'        the mean, except for code{"mad"} in which case it represents
+#'        the median. Set to \code{NULL} to disable. Default: \code{95}
 #'        
 #' @param outliers   Show boxplot outliers? \code{TRUE} to always show. 
 #'        \code{FALSE} to always hide. \code{NULL} to only hide them when
@@ -76,9 +77,8 @@
 #'        dotplot layer has its size set to \code{2}. The special prefix
 #'        \code{pt.} will control both the dot and strip layers.
 #'        
-#' @return A \code{ggplot2} plot. The computed data points and statistics will 
-#'         be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
-#'         respectively.
+#' @return A \code{ggplot2} plot. The computed data points and statistics are 
+#'         available as \code{$data} and \code{$stats}, respectively.
 #' 
 #' 
 #' @section Aesthetics and Partitions:
@@ -143,19 +143,19 @@
 #' letters instead of shapes on the plot. Character strings may used as well.
 #' 
 #' @export
-#' @seealso \code{\link{stats_table}}
+#' @seealso [biom_stats()]
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- rarefy(hmp50)
+#'     biom <- sample_rarefy(hmp50)
 #'     
-#'     adiv_boxplot(biom, x = "Body Site", metric = "Shannon")
-#'     adiv_boxplot(biom, x = "Sex", metric = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
-#'     adiv_boxplot(biom, x = "Body Site", metric = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
+#'     adiv_boxplot(biom, x = "Body Site", adiv = "Shannon")
+#'     adiv_boxplot(biom, x = "Sex", adiv = c("OTUs", "Shannon"), layers="b", color.by="Body Site", scales="free")
+#'     adiv_boxplot(biom, x = "Body Site", adiv = "Simpson", layers="p", color.by="Sex", xlab.angle=30)
 #'     
 
 adiv_boxplot <- function (
-    biom, x = NULL, metric = "Shannon", layers = "lsb",
+    biom, x = NULL, adiv = "Shannon", layers = "lsb",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = flip, p.adj = "fdr", p.label = 0.05, ci = 95, outliers = NULL,
     xlab.angle = 'auto', ...) {
@@ -185,7 +185,7 @@ adiv_boxplot <- function (
   #________________________________________________________
   params %<>% within({
     if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    metric %<>% validate_arg(biom, 'metric', 'adiv', n = c(1,Inf))
+    adiv %<>% validate_arg(NULL, 'adiv', 'adiv', n = c(1,Inf))
   })
   
   
@@ -213,23 +213,23 @@ adiv_boxplot <- function (
 adiv_boxplot_data <- function (params) {
   
   ggdata <- adiv_table(
-    biom    = params[['biom']], 
-    metrics = params[['metric']],
-    md      = TRUE,
-    long    = TRUE )
+    biom = params[['biom']], 
+    adiv = params[['adiv']],
+    md   = TRUE,
+    long = TRUE )
   
   
   
-  # Always put .metric last in facet.by list.
+  # Always put .adiv last in facet.by list.
   #________________________________________________________
-  metric <- params[['metric']]
-  if (length(metric) > 1) {
-    facet.by <- setdiff(params[['facet.by']], ".metric")
-    params[['facet.by']] <- c(facet.by, ".metric")
-    ggdata[['.metric']] %<>% factor(levels = metric)
+  adiv <- params[['adiv']]
+  if (length(adiv) > 1) {
+    facet.by <- setdiff(params[['facet.by']], ".adiv")
+    params[['facet.by']] <- c(facet.by, ".adiv")
+    ggdata[['.adiv']] %<>% factor(levels = adiv)
     remove("facet.by")
   }
-  remove("metric")
+  remove("adiv")
   
   
   
@@ -250,7 +250,7 @@ adiv_boxplot_layers <- function (layers) {
   
   # y-axis title
   #________________________________________________________
-  yraw <- attr(layers, 'params', exact = TRUE)[['metric']]
+  yraw <- attr(layers, 'params', exact = TRUE)[['adiv']]
   
   if (length(yraw) > 1) {
     ylab <- structure(

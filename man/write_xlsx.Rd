@@ -4,14 +4,7 @@
 \alias{write_xlsx}
 \title{Write data and summary information to a Microsoft Excel-compatible workbook.}
 \usage{
-write_xlsx(
-  biom,
-  file = NULL,
-  depth = NULL,
-  seed = 0,
-  unc = "asis",
-  outfile = NULL
-)
+write_xlsx(biom, file = NULL, depth = NULL, seed = 0, unc = "asis")
 }
 \arguments{
 \item{biom}{The BIOM object to save to the file.}
@@ -19,8 +12,8 @@ write_xlsx(
 \item{file}{Path to the output xlsx file.}
 
 \item{depth}{Depth to rarefy to. See \code{rarefy} function for details.
-\code{depth = NULL} auto-selects a rarefaction level. 
-\code{depth = 0} disables rarefaction. Only use \code{depth} with 
+\code{depth = NULL} auto-selects a rarefaction level.
+\code{depth = 0} disables rarefaction. Only use \code{depth} with
 \code{BIOM} files of type 'OTU table' and integer count values.}
 
 \item{seed}{Random seed to use in rarefying. See \code{rarefy} function
@@ -29,10 +22,10 @@ for details.}
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Default: \code{"asis"}
 \itemize{
-  \item{\code{"asis"} - }{ Don't check/modify any taxa names. }
-  \item{\code{"singly"} - }{ Replace with "Unc. <OTU ID>". }
-  \item{\code{"grouped"} - }{ Replace with "Unc. <Higher Rank>". }
-  \item{\code{"drop"} - }{ Don't include in the returned matrix. }
+\item{\code{"asis"} - }{ Don't check/modify any taxa names. }
+\item{\code{"singly"} - }{ Replace with "Unc. \if{html}{\out{<OTU ID>}}". }
+\item{\code{"grouped"} - }{ Replace with "Unc. \if{html}{\out{<Higher Rank>}}". }
+\item{\code{"drop"} - }{ Don't include in the returned matrix. }
 }}
 }
 \value{
@@ -43,20 +36,22 @@ Write data and summary information to a Microsoft Excel-compatible workbook.
 }
 \section{Note}{
 
-Any \code{data frame}, \code{matrix}, or \code{dist} attributes on 
-\code{biom} will be included as separate worksheets. An attribute named 
-'Reads Per Step' is treated specially and merged with the usual 'Reads Per 
+Any \code{data frame}, \code{matrix}, or \code{dist} attributes on
+\code{biom} will be included as separate worksheets. An attribute named
+'Reads Per Step' is treated specially and merged with the usual 'Reads Per
 Sample' tab.
 }
 
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
-    biom <- select(hmp50, 1:10) \%>\% rarefy()
-    
-    attr(biom, "Weighted UniFrac")   <- unifrac(biom)
-    attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
-    
-    outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
-
+    if (FALSE) {
+      
+      biom <- sample_select(hmp50, 1:10) \%>\% sample_rarefy()
+      
+      attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+      attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
+      
+      outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
+    }
 }

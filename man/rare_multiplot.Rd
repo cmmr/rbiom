@@ -2,18 +2,19 @@
 % Please edit documentation in R/rare_multiplot.r
 \name{rare_multiplot}
 \alias{rare_multiplot}
-\title{Combines rare_corrplot and depths_barplot into a single figure.}
+\title{Combines rare_corrplot and rare_barplot into a single figure.}
 \usage{
 rare_multiplot(
   biom,
-  metric = "OTUs",
+  adiv = "OTUs",
   depths = NULL,
   layers = "t",
   rline = TRUE,
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
-  model = "logarithmic",
+  model = "log",
+  stats = "emtrends",
   p.adj = "fdr",
   ci = 95,
   caption = FALSE,
@@ -23,74 +24,97 @@ rare_multiplot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \link{read_biom}.}
+\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{metric}{Alpha diversity metric(s) to use. Options are: 
-\code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, 
-and/or \code{"InvSimpson"}. Default: \code{"OTUs"}.}
+\item{adiv}{One or more alpha diversity measures to use. Options are:
+\code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"},
+and/or \code{"InvSimpson"}. Non-ambiguous abbreviations are also
+accepted. You can use \code{adiv="all"} as shortcut for
+\code{adiv=c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")}
+Default: \code{"Shannon"}.}
 
 \item{depths}{Rarefaction depths to show in the plot. Passed to
-\link{adiv_table}. The default, \code{"multi_even"}, uses a heuristic
+\code{\link[=adiv_table]{adiv_table()}}. The default, \code{"multi_even"}, uses a heuristic
 to pick 10 evenly spaced depths.}
 
-\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter 
-abbreviations are also accepted. For instance, 
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and 
-\code{"ts"}. See \code{vignette("corrplots")} for examples of each. 
+\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
+abbreviations are also accepted. For instance,
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and
+\code{"ts"}. See \code{vignette("corrplots")} for examples of each.
 Default: \code{"t"}.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
-a particular rarefaction depth. Set to \code{TRUE} to show an 
+a particular rarefaction depth. Set to \code{TRUE} to show an
 auto-selected rarefaction depth or \code{NULL} to not show a line.
 Default: \code{NULL}.}
 
-\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics 
+\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
 
-\item{model}{What type of trendline to fit to the data. Options are: 
-\code{"linear"}, \code{"logarithmic"}, or \code{"local"}. You can
-alternatively provide a list of length two where the first element is
-a character vector of length 1 naming a function, and the second 
-element is a list of arguments to pass to that function. One of the 
-function's arguments must be named 'formula'. For example, 
+\item{model}{What type of trendline to fit to the data. Options are:
+\code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
+(generalized additive). You can alternatively provide a list of
+length two where the first element is a character vector of length 1
+naming a function, and the second element is a list of arguments to
+pass to that function. One of the function's arguments must be named
+'formula'. For example,
 \code{model = list("stats::lm", list(formula = y ~ x))}.
-Default: \code{"logarithmic"}.}
+Default: \code{"log"}.}
+
+\item{stats}{Which statistic to display on the plot. Options are:
+\itemize{
+\item{\code{"fit"} - }{ How well does the model fit the data? }
+\item{\code{"terms"} - }{ How strongly does 'x' influence 'y'? }
+\item{\code{"emmeans"} - }{ Is the average 'y' value non-zero? }
+\item{\code{"emtrends"} - }{ Does any trendline have a non-zero slope? }
+\item{\code{"emm_pairs"} - }{ Are the means of any trendlines different? }
+\item{\code{"emt_pairs"} - }{ Are the slopes of any trendlines different? }
+\item{\code{"hide"} - }{ Don't show stats on the plot, but still compute them. }
+\item{\code{"none"} - }{ Do not compute or show statistics. }
+}
+Default: \code{"emtrends"} \cr\cr
+Note: \code{"emm_pairs"} and \code{"emt_pairs"} can only be calculated
+when using a \code{color.by} metadata column with more than one level. \cr\cr
+Statistical tests are run separately on each facet. P-values are
+adjusted for multiple comparisons by considering all facets together.
+Unless \code{stats = "none"}, all stats are attached to the plot as
+\code{attr(,'stats')}.}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
 Run \code{p.adjust.methods} for a list of available options.
 Default: \code{"fdr"}.}
 
-\item{ci}{The confidence interval to display around the fitted curve. Set
-to \code{FALSE} to hide the confidence interval. Default: \code{95}.}
+\item{ci}{The confidence interval to display around the trendline.
+Default: \code{95}.}
 
 \item{caption}{Display information about the method used for trendline
 fitting beneath the plot. Default: \code{FALSE}.}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}.}
 
-\item{trans}{Y-axis transformation. Options are \code{"log10"} or 
+\item{trans}{Y-axis transformation. Options are \code{"log10"} or
 \code{NULL}.  Default: \code{"log10"}.}
 
-\item{...}{Additional parameters to pass along to ggplot2 
-functions. Prefix a parameter name with either \code{t.} or 
+\item{...}{Additional parameters to pass along to ggplot2
+functions. Prefix a parameter name with either \code{t.} or
 \code{s.}/\code{pt.} to ensure it gets passed to (and only to)
-\link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
-respectively. For instance, \code{s.size = 2} ensures only the points 
+\link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point},
+respectively. For instance, \code{s.size = 2} ensures only the points
 have their size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics will 
-        be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')}, 
-        respectively.
+A \code{ggplot2} plot. The computed data points and statistics will
+be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')},
+respectively.
 }
 \description{
-Combines rare_corrplot and depths_barplot into a single figure.
+Combines rare_corrplot and rare_barplot into a single figure.
 }
 \section{Aesthetics and Partitions}{
 
 
-Metadata can be used to flexibly subset, partition, and apply aesthetics 
-when creating a plot. Common use cases are provided below. More thorough 
+Metadata can be used to flexibly subset, partition, and apply aesthetics
+when creating a plot. Common use cases are provided below. More thorough
 documentation is available at \url{https://cmmr.github.io/rbiom}.
 
 \preformatted{  ## Colors ----------------------------
@@ -111,26 +135,26 @@ documentation is available at \url{https://cmmr.github.io/rbiom}.
 }
 
 \itemize{
-  \item{\code{color.by} - }{Any metadata column. (Max 1)}
-  \item{\code{facet.by} - }{Only categorical metadata column(s).}
-  \item{\code{limit.by} - }{Any metadata column(s).}
+\item{\code{color.by} - }{Any metadata column. (Max 1)}
+\item{\code{facet.by} - }{Only categorical metadata column(s).}
+\item{\code{limit.by} - }{Any metadata column(s).}
 }
 
 All built-in color palettes are colorblind-friendly.
 
-The available categorical palette names are: \code{"okabe"}, \code{"carto"}, 
-\code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"}, 
-\code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, 
-\code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, 
+The available categorical palette names are: \code{"okabe"}, \code{"carto"},
+\code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"},
+\code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"},
+\code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"},
 and \code{"fishy"}.
 
-The available numeric palette names are: \code{"reds"}, \code{"oranges"}, 
-\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"}, 
-\code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, 
-\code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"}, 
-\code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, 
-\code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"}, 
-\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"}, 
+The available numeric palette names are: \code{"reds"}, \code{"oranges"},
+\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"},
+\code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"},
+\code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"},
+\code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"},
+\code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"},
+\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"},
 \code{"roma"}, \code{"tofino"}, \code{"vanimo"}, \code{"vik"}
 }
 
@@ -141,19 +165,18 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
     
 }
 \seealso{
-Other plotting: 
+Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
-\code{\link{bdiv_biplot}()},
 \code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
-\code{\link{depths_barplot}()},
+\code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
+\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
+\code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{tree_plot}()}
+\code{\link{taxa_heatmap}()}
 }
-\concept{plotting}
+\concept{visualization}

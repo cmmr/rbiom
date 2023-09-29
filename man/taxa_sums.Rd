@@ -7,12 +7,12 @@
 taxa_sums(biom, rank = NULL)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \link{read_biom}.}
+\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
-\item{rank}{The taxonomic rank to return sums for. The default, 
-\code{NULL}, return OTU sums in the same order as they appear in 
-\link{counts}. If not \code{NULL}, returned sums are ordered from
-most abundance to least abundant.}
+\item{rank}{The taxonomic rank to return sums for. The default,
+\code{NULL}, returns OTU sums in the same order as they appear in
+\code{\link[=otu_matrix]{otu_matrix()}}. If not \code{NULL}, returned sums are ordered from
+most abundant to least abundant.}
 }
 \value{
 A numeric vector, named with the taxa names.

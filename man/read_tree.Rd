@@ -7,7 +7,7 @@
 read_tree(src)
 }
 \arguments{
-\item{src}{Input data as either a file path, URL, or Newick string. 
+\item{src}{Input data as either a file path, URL, or Newick string.
 Compressed (gzip or bzip2) files are also supported.}
 }
 \value{
@@ -15,7 +15,7 @@ A \code{phylo} class object representing the tree.
 }
 \description{
 A phylogenetic tree is required for computing UniFrac distance matrices.
-You can load a tree from a file or by providing the tree string directly. 
+You can load a tree from a file or by providing the tree string directly.
 This tree must be in Newick format, also known as parenthetic format and
 New Hampshire format.
 }

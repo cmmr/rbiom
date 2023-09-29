@@ -1,23 +1,27 @@
 #' Compute Weighted and Unweighted UniFrac distance matrices.
 #' 
-#' This is a wrapper around \link{bdiv_distmat} for a common use case.
+#' This is a wrapper around [bdiv_distmat()] for a common use case.
 #' 
 #' @name unifrac
 #'
 #' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM} 
-#'     object, as returned from \link{read_biom}. For matrices, the rows and 
-#'     columns are assumed to be the taxa and samples, respectively.
+#'        object, as returned from [read_biom()]. For matrices, the rows and 
+#'        columns are assumed to be the taxa and samples, respectively.
+#'     
 #' @param weighted  Use weighted UniFrac, which takes abundance into account
-#'     rather than simply presence/absence.
+#'        rather than simply presence/absence.
+#'     
 #' @param tree  A \code{phylo} object providing a phylogenetic tree for the
-#'     taxa names in \code{biom}. If \code{tree=NULL}, then the tree will be
-#'     loaded from \code{biom}, if encoded there.
+#'        taxa names in \code{biom}. If \code{tree=NULL}, then the tree will be
+#'        loaded from \code{biom}, if encoded there.
+#'        
 #' @return A distance matrix of class \code{dist}.
+#' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
-#'     biom <- select(hmp50, 1:10)
+#'     biom <- sample_select(hmp50, 1:10)
 #'     
 #'     dm <- unifrac(biom)
 #'     plot(hclust(dm), cex=.8)
@@ -34,9 +38,9 @@
 
 unifrac <- function (biom, weighted=TRUE, tree=NULL) {
   
-  rbiom::bdiv_distmat(
+  bdiv_distmat(
     biom     = biom, 
-    method   = 'unifrac', 
+    bdiv     = 'unifrac', 
     weighted = weighted, 
     tree     = tree )
   

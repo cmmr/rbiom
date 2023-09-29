@@ -224,7 +224,7 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   layer <- "dot"
   if (hasLayer()) {
     
-    setLayer(cex = 0.5, size = ptsize)
+    setLayer(cex = 0.5, method="center", size = ptsize)
     
     if (packageVersion("ggbeeswarm") >= "0.7.0.9000") {
       setLayer(corral = "random", corral.width = 0.9)
