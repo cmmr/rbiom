@@ -37,3 +37,70 @@ convert_from_phyloseq <- function (phy) {
   biom <- biom_repair(biom, prune = TRUE)
   return (biom)
 }
+
+
+
+#' Convert a BIOM object to a TreeSummarizedExperiment object.
+#' 
+#' Requires the Bioconductor R package 'TreeSummarizedExperiment' to be installed.
+#' 
+#' @inherit adiv_boxplot params
+#' 
+#' @return A TreeSummarizedExperiment object.
+#' 
+#' @export
+#' @examples
+#'   \dontrun{
+#'     library(rbiom)
+#'     
+#'     biom <- sample_rarefy(hmp50)
+#'     tse  <- convert_to_TreeSummarizedExperiment(biom)
+#'  }
+
+convert_to_TreeSummarizedExperiment <- function (biom) {
+  
+  stopifnot(is(biom, "BIOM"))
+  
+  if (nchar(system.file(package = "TreeSummarizedExperiment")) == 0)
+    stop("Bioconductor R package 'TreeSummarizedExperiment' must be installed to use convert_to_TreeSummarizedExperiment().")
+  
+  TreeSummarizedExperiment::TreeSummarizedExperiment(
+    assays       = list(otu_matrix(biom)),
+    rowData      = otu_taxonomy(biom),
+    colData      = sample_metadata(biom),
+    rowTree      = otu_tree(biom),
+    referenceSeq = otu_sequences(biom) )
+}
+
+
+
+#' Convert a BIOM object to a SummarizedExperiment object.
+#' 
+#' Requires the Bioconductor R package 'SummarizedExperiment' to be installed.
+#' 
+#' @inherit adiv_boxplot params
+#' 
+#' @return A SummarizedExperiment object.
+#' 
+#' @export
+#' @examples
+#'   \dontrun{
+#'     library(rbiom)
+#'     
+#'     biom <- sample_rarefy(hmp50)
+#'     se   <- convert_to_SummarizedExperiment(biom)
+#'  }
+
+convert_to_SummarizedExperiment <- function (biom) {
+  
+  stopifnot(is(biom, "BIOM"))
+  
+  if (nchar(system.file(package = "SummarizedExperiment")) == 0)
+    stop("Bioconductor R package 'SummarizedExperiment' must be installed to use convert_to_SummarizedExperiment().")
+  
+  SummarizedExperiment::SummarizedExperiment(
+    assays  = list(otu_matrix(biom)),
+    rowData = otu_taxonomy(biom),
+    colData = sample_metadata(biom) )
+}
+

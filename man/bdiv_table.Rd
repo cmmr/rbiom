@@ -9,7 +9,9 @@ bdiv_table(
   bdiv = "Bray-Curtis",
   weighted = TRUE,
   tree = NULL,
-  md = FALSE
+  md = FALSE,
+  within = NULL,
+  between = NULL
 )
 }
 \arguments{
@@ -43,6 +45,9 @@ indicate that only within or between groupings, respectively, are to
 be kept. See examples below. }
 }
 Default: \code{FALSE}}
+
+\item{within, between}{Metadata column name(s) for intra- or inter- sample
+comparisons. Default: \code{within=NULL, between=NULL}}
 }
 \value{
 A data.frame with first three columns named ".sample1", ".sample2",

@@ -161,8 +161,8 @@ taxa_ranks <- function (biom) {
 #' @param value A numeric matrix. Rownames and colnames must be identical to
 #'        the current [otu_matrix()] value.
 #'        
-#' @return A numeric matrix with samples as row names, and OTU identifiers as 
-#'         column names.
+#' @return A numeric matrix with samples as column names, and OTU identifiers 
+#'         as row names.
 #' @export
 #' @examples
 #'     library(rbiom)

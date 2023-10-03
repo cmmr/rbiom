@@ -16,8 +16,8 @@ otu_matrix(x) <- value
 the current \code{\link[=otu_matrix]{otu_matrix()}} value.}
 }
 \value{
-A numeric matrix with samples as row names, and OTU identifiers as
-column names.
+A numeric matrix with samples as column names, and OTU identifiers
+as row names.
 }
 \description{
 Get or set the abundance counts.

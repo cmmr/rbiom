@@ -14,6 +14,8 @@ bdiv_boxplot(
   shape.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  within = NULL,
+  between = NULL,
   flip = FALSE,
   stripe = flip,
   p.adj = "fdr",
@@ -53,6 +55,9 @@ Default: \code{"lsb"}.}
 use for data partitioning. Prefix the column name with
 \code{==} or \code{!=} to limit comparisons to within or between
 groups, respectively. Default: \code{NULL}}
+
+\item{within, between}{Metadata column name(s) for intra- or inter- sample
+comparisons. Default: \code{within=NULL, between=NULL}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}

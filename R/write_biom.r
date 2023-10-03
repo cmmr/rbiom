@@ -5,10 +5,10 @@
 #'        object is given, it will be coerced to matrix and output in
 #'        tabular format, provided it is numeric with rownames and colnames.
 #' 
-#' @param file  Path to the output file. If the file name ends in \code{.gz} 
-#'        or \code{.bz2}, the file contents will be compressed accordingly.
+#' @param file  Path to the output file. If the file name ends in \code{".gz"} 
+#'        or \code{".bz2"}, the file contents will be compressed accordingly.
 #' 
-#' @param format  Options are \bold{tab}, \bold{json}, and \bold{hdf5}, 
+#' @param format  Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"}, 
 #'        corresponding to classic tabular format, biom format version 1.0 and 
 #'        biom version 2.1, respectively. 
 #'        See \url{http://biom-format.org/documentation/} for details.

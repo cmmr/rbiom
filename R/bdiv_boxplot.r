@@ -4,6 +4,7 @@
 #' 
 #' @inherit adiv_boxplot params sections return
 #' @inherit bdiv_distmat params
+#' @inherit bdiv_table params
 #' 
 #' @family visualization
 #' 
@@ -41,8 +42,8 @@
 bdiv_boxplot <- function (
   biom, x = NULL, bdiv = "Bray-Curtis", layers = "lsb",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-  flip = FALSE, stripe = flip, p.adj = "fdr", p.label = TRUE, ci = 95, outliers = NULL, 
-  xlab.angle = 'auto', weighted = TRUE, tree = NULL, ...) {
+  within = NULL, between = NULL, flip = FALSE, stripe = flip, p.adj = "fdr", p.label = TRUE, 
+  ci = 95, outliers = NULL, xlab.angle = 'auto', weighted = TRUE, tree = NULL, ...) {
   
   
   #________________________________________________________
@@ -73,6 +74,40 @@ bdiv_boxplot <- function (
   })
   
   
+  #________________________________________________________
+  # Remove "!=" and "==" prefixes.
+  #________________________________________________________
+  md <- NULL
+  for (i in c('x', 'color.by', 'pattern.by', 'shape.by', 'facet.by', 'limit.by')) {
+    
+    if (is.null(params[[i]])) next
+    
+    if (is.null(names(params[[i]]))) {
+      md %<>% c(as.vector(params[[i]]))
+      params[[i]] %<>% sub("^[!=]=", "", .)
+      
+    } else {
+      md %<>% c(names(params[[i]]))
+      names(params[[i]]) %<>% sub("^[!=]=", "", .)
+    }
+  }
+  
+  params %<>% within({
+    
+    within   <- unique(sub("^[!=]=", "", c(within,  md[startsWith(md, "==")])))
+    between  <- unique(sub("^[!=]=", "", c(between, md[startsWith(md, "!=")])))
+    .md_cols <- unique(sub("^[!=]=", "", c(md, within, between)))
+    
+    if (any(within %in% between))
+      stop(
+        "Metadata name '", 
+        paste0(intersect(within, between), collapse = ", "), 
+        "' cannot be set as both a within (==) and between (!=) grouping.")
+  })
+  
+  remove("md", "i")
+  
+  
   
   #________________________________________________________
   # Defaults
@@ -82,7 +117,6 @@ bdiv_boxplot <- function (
     params[['biom']][['metadata']][[".all"]] <- factor("all")
   }
   params[['weighted']] %<>% as.logical()
-  params[['.cmp']]    <- TRUE
   
   
   
@@ -118,8 +152,10 @@ bdiv_boxplot_data <- function (params) {
         biom     = params[['biom']], 
         bdiv     = as.character(x[1, '.bdiv']), 
         weighted = x[1, '.weighted'],
-        md       = paste0(params[['.md.cmps']], names(params[['.md.cmps']])),
-        tree     = params[['tree']] )
+        tree     = params[['tree']],
+        md       = params[['.md_cols']],
+        within   = params[['within']],
+        between  = params[['between']] )
       
       if (!is_null(params[['filter.fun']]))
         tbl <- params[['filter.fun']](tbl)
@@ -154,9 +190,13 @@ bdiv_boxplot_data <- function (params) {
 #______________________________________________________________
 bdiv_boxplot_layers <- function (layers) {
   
+  params <- attr(layers, 'params', exact = TRUE)
+  
+  
+  #________________________________________________________
   # y-axis title
   #________________________________________________________
-  yraw <- attr(layers, 'params', exact = TRUE)[['bdiv']]
+  yraw <- params[['bdiv']]
   
   if (length(yraw) > 1) {
     ylab <- structure(
@@ -168,6 +208,21 @@ bdiv_boxplot_layers <- function (layers) {
   }
   
   setLayer("labs", y = ylab)
+  
+  
+  #________________________________________________________
+  # Note any within/between groups in the plot caption.
+  #________________________________________________________
+  within  <- paste(collapse = ", ", params[['within']])
+  between <- paste(collapse = ", ", params[['between']])
+  
+  caption <- paste(collapse = "\n", c(
+    if (hasName(layers, 'labs')) layers[['labs']][['caption']] else NULL,
+    if (nzchar(within))  paste("Within groups:",  within)      else NULL,
+    if (nzchar(between)) paste("Between groups:", between)     else NULL ))
+  
+  if (nchar(caption))
+    setLayer("labs", caption = caption)
   
   
   return (layers)

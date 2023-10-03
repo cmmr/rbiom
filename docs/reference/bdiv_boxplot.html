@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,8 @@
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  flip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  stripe <span class="op">=</span> <span class="va">flip</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
@@ -111,6 +113,11 @@ Default: <code>"lsb"</code>.</p></dd>
 use for data partitioning. Prefix the column name with
 <code>==</code> or <code>!=</code> to limit comparisons to within or between
 groups, respectively. Default: <code>NULL</code></p></dd>
+
+
+<dt>within, between</dt>
+<dd><p>Metadata column name(s) for intra- or inter- sample
+comparisons. Default: <code>within=NULL, between=NULL</code></p></dd>
 
 
 <dt>flip</dt>

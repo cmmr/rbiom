@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9001
-Date: 2023-09-29
+Version: 2.0.0.9003
+Date: 2023-10-03
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith01@gmail.com", 
@@ -13,8 +13,7 @@ Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Features include reading/writing all 'BIOM' formats, rarefaction, alpha
     diversity, beta diversity (including 'UniFrac'), summarizing counts by 
-    taxonomic level, and sample subsetting. Standalone functions for 
-    reading, writing, and subsetting phylogenetic trees are also provided. 
+    taxonomic level, subsetting, visualizations, and statistical analysis. 
     All CPU intensive operations are encoded in C with multi-thread support.
 URL: https://cmmr.github.io/rbiom/index.html
 BugReports: https://github.com/cmmr/rbiom/issues

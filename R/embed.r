@@ -1,12 +1,14 @@
 #' Converts a data.frame to a download link.
 #' 
+#' @noRd
+#' 
 #' @param x   An object coercable to a \code{data.frame}.
 #' @param title   Text/HTML label for the link. Default: \code{"Download Data (CSV)"}.
 #' @param filename   Default filename to download as. Default: \code{"data.csv"}.
 #' @param ...   Additional arguments to pass to \code{write.csv()}.
 #' @return An HTML string in which the object is encoded in base64.
 #' @family embed
-#' @export
+#' 
 #' @examples
 #'     library(rbiom)
 #'     
@@ -14,7 +16,6 @@
 #'     p    <- bdiv_ord_plot(biom, color.by="Sex")
 #'     
 #'     attr(p, 'stats') %>% embed_csv(row.names=FALSE) %>% cat("\n\n")
-#' @md
 #'
 
 embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...) {
@@ -33,10 +34,12 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
 
 #' Wraps R code with Markdown syntax highlighting.
 #' 
+#' @noRd
+#' 
 #' @param x   Some R code.
 #' @return Markdown-compatible syntax highlighted code block.
 #' @family embed
-#' @export
+#' 
 #' @examples
 #'     library(rbiom)
 #'     p <- adiv_boxplot(hmp50, color.by = "Body Site")

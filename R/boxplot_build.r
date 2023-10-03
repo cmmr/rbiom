@@ -14,13 +14,15 @@ boxplot_build <- function (params, plot_func, data_func, layers_func) {
   #________________________________________________________
   # Subset biom by requested metadata and aes.
   #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    x          = list(col_type = "cat", n = 0:1),
-    color.by   = list(col_type = "cat", n = 0:1),
-    pattern.by = list(col_type = "cat", n = 0:1),
-    shape.by   = list(col_type = "cat", n = 0:1),
-    facet.by   = list(col_type = "cat"),
-    limit.by   = list() ))
+  params %<>% metadata_params(
+    contraints = list(
+      x          = list(col_type = "cat", n = 0:1),
+      color.by   = list(col_type = "cat", n = 0:1),
+      pattern.by = list(col_type = "cat", n = 0:1),
+      shape.by   = list(col_type = "cat", n = 0:1),
+      facet.by   = list(col_type = "cat"),
+      limit.by   = list() ),
+    final_cols = params[['.md_cols']] )
   
   
   #________________________________________________________

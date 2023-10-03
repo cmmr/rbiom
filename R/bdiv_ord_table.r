@@ -119,8 +119,9 @@
 
 bdiv_ord_table <- function (
     biom, bdiv="Bray-Curtis", ord="UMAP", weighted=TRUE, md=NULL, k=2, 
-    split.by=NULL, stat.by=NULL, tree=NULL, test="adonis2", seed=0, 
-    permutations=999, rank=NULL, taxa=5, p.top=Inf, p.adj='fdr', unc="singly", ...) {
+    split.by=NULL, stat.by=NULL, tree=NULL, 
+    test="adonis2", seed=0, permutations=999, rank=NULL, taxa=5, 
+    p.top=Inf, p.adj='fdr', unc="singly", ...) {
   
   
   #________________________________________________________
@@ -252,6 +253,11 @@ bdiv_ord_table <- function (
   sample_stats  <- plyr::ldply(results, attr, 'sample_stats')
   taxa_coords   <- plyr::ldply(results, attr, 'taxa_coords')
   taxa_stats    <- plyr::ldply(results, attr, 'taxa_stats')
+  
+  if (nrow(sample_coords) == 0) sample_coords <- NULL
+  if (nrow(sample_stats)  == 0) sample_stats  <- NULL
+  if (nrow(taxa_coords)   == 0) taxa_coords   <- NULL
+  if (nrow(taxa_stats)    == 0) taxa_stats    <- NULL
   
   
   if (!is.null(sample_stats)) {

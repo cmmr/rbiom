@@ -73,13 +73,16 @@
     <loc>https://cmmr.github.io/rbiom/reference/convert_from_phyloseq.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/convert_to_SummarizedExperiment.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/convert_to_TreeSummarizedExperiment.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/distmat_stats.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/embed_code.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/embed_csv.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/hmp50.html</loc>

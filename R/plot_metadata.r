@@ -22,7 +22,7 @@
 #' c("Body Site" = "okabe", "Sex" = "muted")
 #' list("Body Site", "Sex")
 #' 
-metadata_params <- function (params, contraints = list()) {
+metadata_params <- function (params, contraints = list(), final_cols = NULL) {
   
   
   biom   <- params[['biom']]
@@ -112,19 +112,6 @@ metadata_params <- function (params, contraints = list()) {
       }
       
       
-      #________________________________________________________
-      # For bdiv_boxplot, hande within/between/all comparisons.
-      #________________________________________________________
-      if (isTRUE(params[['.cmp']])) {
-        prefix   <- substr(col_name, 1, 2)
-        col_name <- sub("^[!=]=", "", col_name)
-        if (!hasName(md_cmps, col_name)) md_cmps[[col_name]] <- ""
-        if (identical(prefix, "=="))     md_cmps[[col_name]] <- "=="
-        if (identical(prefix, "!="))     md_cmps[[col_name]] <- "!="
-        remove("prefix")
-      }
-      
-      
       
       if (hasName(result, 'range')) {
         
@@ -200,15 +187,14 @@ metadata_params <- function (params, contraints = list()) {
   #________________________________________________________
   # Other column and column attribute tracking.
   #________________________________________________________
-  params[['.md.cols']]  <- unique(md_cols)
-  params[['.md.cmps']]  <- md_cmps
+  params[['.md.cols']] <- unique(md_cols)
   
   
   
   #________________________________________________________
   # Drop rows with NA's from the metadata table.
   #________________________________________________________
-  new_md <- new_md[,unique(md_cols),drop=FALSE]
+  new_md <- new_md[,unique(c(md_cols, final_cols)),drop=FALSE]
   new_md <- new_md[complete.cases(new_md),,drop=FALSE]
   
   
@@ -233,12 +219,11 @@ metadata_params <- function (params, contraints = list()) {
         
         
         # Will need additional colors/shapes/patterns for bdiv.
-        if (isTRUE(params[['.cmp']]) && n > 1)
+        if (hasName(params, 'bdiv') && n > 1)
           n <- as.integer(local({
-            cmp <- md_cmps[[col_name]]
-            if (identical(cmp, "==")) return (n)
-            if (identical(cmp, "!=")) return ((n * (n - 1) / 2))
-            if (identical(cmp, ""))   return ((n * (n - 1) / 2) + n)
+            if (col_name %in% params[['within']])  return (n)
+            if (col_name %in% params[['between']]) return ((n * (n - 1) / 2))
+            return ((n * (n - 1) / 2) + n)
           }))
         
         
