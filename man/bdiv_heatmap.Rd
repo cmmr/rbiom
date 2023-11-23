@@ -27,26 +27,24 @@ bdiv_heatmap(
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.
-Alternatively, a {dist} class distance matrix can be given, in which
-case only the parameters \code{ord}, \code{k}, and \code{...} are
-allowed.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{bdiv}{The beta diversity distance algorithm to use. Options are:
+\item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. A phylogenetic tree must be
-present in \code{biom} or explicitly provided via \code{tree=} to use
-the UniFrac methods.
-Multiple values allowed. Default: \code{"Bray-Curtis"}.}
+\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
+phylogenetic tree must be present in \code{biom} or explicitly
+provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+Multiple/abbreviated values allowed.}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+Default: \code{TRUE} \cr\cr
+Multiple values allowed.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
-relationships of the taxa in \code{biom}. Will be taken from the tree
-defined in \code{biom} if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: \code{NULL}}
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{otu_tree(biom)}}
 
 \item{grid}{Color palette name, or a list with entries for \code{label},
 \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
@@ -94,19 +92,16 @@ Default: \code{1} (square).}
 similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 \code{clust = c(rows = "complete", cols = NA)}, or simply
-\code{clust = c("complete", NA)}.
-Default: \code{"complete"}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
-   \\itemize\{
-     \\item\{\code{FALSE} or \code{NA} - \}\{ Disable reordering. \}
-     \\item\{An \code{hclust} class object\} \{ E.g. from [stats::hclust()]. \}
-     \\item\{A method name - \}\{ \code{"ward.D"}, 
-       \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
-       \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
-       \code{"centroid"}. \}
-   \}
-}\if{html}{\out{</div>}}}
+\code{clust = c("complete", NA)}. Options are:
+\itemize{
+\item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
+\item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
+\item{A method name - }{ \code{"ward.D"},
+\code{"ward.D2"}, \code{"single"}, \code{"complete"},
+\code{"average"}, \code{"mcquitty"}, \code{"median"}, or
+\code{"centroid"}. }
+}
+Default: \code{"complete"}.}
 
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
 supply a list or logical vector of length two to control the row tree
@@ -127,16 +122,16 @@ Default: \code{NULL}, which computes:
 \code{"bottom"}. Default: \code{"right"}.}
 
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
-Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
 For example, \code{labs.title = "Plot Title"}.}
 }
 \value{
-A \code{ggplot2} plot. The constructed ggplot command will be
-attached as \code{attr(,'cmd')}, and the underlying computed data
-as \code{$data}.
+A \code{ggplot2} plot. \cr The computed data points, ggplot command,
+and object history are available as \code{$data}, \code{$code}, and
+\code{$history}, respectively.
 }
 \description{
 Display beta diversities in an all vs all grid.
@@ -148,7 +143,7 @@ Metadata can be displayed as colored tracks above the heatmap. Common use
 cases are provided below, with more thorough documentation available at
 https://cmmr.github.io/rbiom .
 
-\preformatted{  ## Categorical ----------------------------
+\preformatted{## Categorical ----------------------------
 color.by = "Body Site"
 color.by = list('Body Site' = "bright")
 color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
@@ -205,7 +200,7 @@ samples on the plot. It also enables subsetting to a particular set or
 range of values. Prefix a column name with \code{-} to arrange values in
 descending order rather than ascending.
 
-\preformatted{  ## Categorical ----------------------------
+\preformatted{## Categorical ----------------------------
 order.by = "Body Site"
 order.by = list('Body Site' = c("Stool", "Saliva"))
 
@@ -224,7 +219,7 @@ side-effects on aesthetics. It is especially useful for limiting the data
 to a single categorical metadata value. Unlike the other *.by parameters,
 \code{limit.by} must always be a named \code{list()}.
 
-\preformatted{  ## Categorical ----------------------------
+\preformatted{## Categorical ----------------------------
 limit.by = list('Sex' = "Male")
 
 ## Numeric --------------------------------
@@ -240,17 +235,21 @@ limit.by = list(
 }
 
 \examples{
-  library(rbiom) 
+  library(rbiom)
   
   biom <- hmp50 \%>\% sample_rarefy() \%>\% sample_select(1:10)
-  bdiv_heatmap(biom, color.by="Body Site")
+  bdiv_heatmap(biom, color.by=c("Body Site", "Age"))
+  
+  bdiv_heatmap(biom, bdiv="uni", weighted=c(T,F), color.by="sex")
     
 }
 \seealso{
 Other beta_diversity: 
+\code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_distmat}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
+\code{\link{bdiv_stats}()},
 \code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 

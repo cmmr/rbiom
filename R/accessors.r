@@ -2,13 +2,12 @@
 
 
 
-#' Get \code{BIOM} object's miscellaneous information.
-#' 
-#' @param biom   A \code{BIOM} object, as returned from [read_biom()].
-#' 
-#' @return A list of the top-level metadata in \code{biom}.
+#' Get \code{rbiom} object's miscellaneous information.
 #' 
 #' @family accessors
+#' @inherit documentation_default
+#' 
+#' @return A list of the top-level metadata in \code{biom}.
 #' 
 #' @export
 #' @examples
@@ -17,8 +16,41 @@
 #'
 
 biom_info <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
-  return (biom[['info']])
+  validate_biom(clone = FALSE)
+  return(biom[['info']])
+}
+
+
+
+#' Check which metadata columns are numeric.
+#' 
+#' @family accessors
+#' @inherit documentation_default
+#' 
+#' @return A named logical vector indicating if each metadata column is 
+#'         numeric.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     metadata_numeric(hmp50)
+#'
+
+metadata_numeric <- function (biom) {
+  validate_biom(clone = FALSE)
+  return (sapply(as.list(biom[['metadata']][,-1]), is.numeric))
+}
+
+
+
+#' Get the '.sample' metadata column's factor levels.
+#' 
+#' @noRd
+#' @keywords internal
+#' 
+sample_levels <- function (biom) {
+  validate_biom(clone = FALSE)
+  return (levels(biom[['metadata']][['.sample']]))
 }
 
 
@@ -26,13 +58,12 @@ biom_info <- function (biom) {
 #' Sum the observations in each sample.
 #' 
 #' @family accessors
-#' 
-#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
+#' @inherit documentation_default
 #' 
 #' @return A named numeric vector of the number of observations in each 
 #'         sample. The names are the sample IDs.
 #'         
-#' @seealso [rare_depth()]
+#' @seealso [rare_depth()], [rare_barplot()]
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -41,44 +72,9 @@ biom_info <- function (biom) {
 #'     
 #'     hist(sample_sums(hmp50))
 
-sample_sums <- function (biom, long=FALSE, md=FALSE) {
-  
-  stopifnot(is(biom, 'BIOM'))
-  
-  #________________________________________________________
-  # See if this result is already in the cache.
-  #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("sample_sums", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
-    return (readRDS(cache_file))
-  
-  
-  result <- slam::col_sums(biom[['counts']])
-  
-  if (isTRUE(long) || !isFALSE(md)) {
-    
-    #________________________________________________________
-    # Convert to long format
-    #________________________________________________________
-    result <- data.frame(
-      stringsAsFactors = FALSE,
-      'Sample' = names(result),
-      'Reads'  = unname(result)
-      )
-    
-    #________________________________________________________
-    # Add Metadata
-    #________________________________________________________
-    if (identical(md, TRUE))  md <- colnames(sample_metadata(biom))
-    if (identical(md, FALSE)) md <- c()
-    for (i in unique(md))
-      result[[i]] <- sample_metadata(biom, i)[result[['Sample']]]
-    
-  }
-  
-  set_cache_value(cache_file, result)
-  return (result)
+sample_sums <- function (biom) {
+  validate_biom(clone = FALSE)
+  return (slam::col_sums(biom[['counts']]))
 }
 
 
@@ -89,9 +85,9 @@ sample_sums <- function (biom, long=FALSE, md=FALSE) {
 #' [rare_depth()] to \code{1}, even though that function sets all 
 #' [sample_sums()] to \code{1}.
 #' 
-#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
+#' @inherit documentation_default
 #' 
-#' @return The rarefaction depth, or \code{NULL} If the BIOM object is not 
+#' @return The rarefaction depth, or \code{NULL} if \code{biom} is not 
 #'         rarefied.
 #' 
 #' @seealso [sample_sums()]
@@ -106,16 +102,15 @@ sample_sums <- function (biom, long=FALSE, md=FALSE) {
 #'
 
 rare_depth <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (attr(biom, 'rarefaction', exact = TRUE))
 }
 
 
-#' Check specific properties of a BIOM object.
+#' Check specific properties of an rbiom object.
 #' 
-#' @name properties
+#' @inherit documentation_default
 #' 
-#' @param biom  A \code{BIOM} object, as returned from [read_biom()].
 #' @return \code{TRUE} if it has the property, \code{FALSE} otherwise.
 #' @examples
 #'     library(rbiom)
@@ -123,41 +118,38 @@ rare_depth <- function (biom) {
 #'     has_tree(hmp50)
 #'     has_sequences(hmp50)
 #'     is_rarefied(hmp50)
-NULL
-
-
-#' @rdname properties
+#'     
 #' @export
+#' 
 has_tree <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (is(biom[['phylogeny']], 'phylo'))
 }
 
 
-#' @rdname properties
+#' @rdname has_tree
 #' @export
 has_sequences <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (!is_null(biom[['sequences']]))
 }
 
 
-#' @rdname properties
+#' @rdname has_tree
 #' @export
 is_rarefied <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (isTRUE(attr(biom, 'rarefaction', exact=TRUE) > 0))
 }
 
 
 
-#' Report the number of samples, otus, or ranks in a BIOM.
-#' 
-#' @param biom   A \code{BIOM} object, as returned from [read_biom()].
-#' 
-#' @return The number of samples, otus, or ranks present.
+#' Report the number of samples, otus, or ranks in an rbiom.
 #' 
 #' @family accessors
+#' @inherit documentation_default
+#' 
+#' @return The number of samples, otus, taxa ranks, or metadata columns present.
 #' 
 #' @export
 #' @examples
@@ -166,29 +158,39 @@ is_rarefied <- function (biom) {
 #'     n_samples(hmp50)
 #'     n_otus(hmp50)
 #'     n_ranks(hmp50)
+#'     n_metadata(hmp50)
 #'
 
 n_samples <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (ncol(biom[['counts']]))
 }
 
 
 #' @rdname n_samples
-#' @family accessors
 #' @export
 
 n_otus <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (nrow(biom[['counts']]))
 }
 
 
 #' @rdname n_samples
-#' @family accessors
 #' @export
 
 n_ranks <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
-  return (ncol(biom[['taxonomy']]))
+  validate_biom(clone = FALSE)
+  n <- ncol(biom[['taxonomy']])
+  return (n)
+}
+
+
+#' @rdname n_samples
+#' @export
+
+n_metadata <- function (biom) {
+  validate_biom(clone = FALSE)
+  n <- ncol(biom[['metadata']])
+  return (n)
 }

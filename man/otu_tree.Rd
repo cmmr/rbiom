@@ -7,10 +7,11 @@
 \usage{
 otu_tree(biom)
 
-otu_tree(x) <- value
+otu_tree(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{value}{A \code{phylo} class object with tip.labels matching
 \code{otu_names(x)}. If there are more tip.labels than
@@ -34,6 +35,7 @@ Get or set the phylogenetic tree.
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,32 +77,30 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>BIOM</code> object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.
-Alternatively, a dist class distance matrix can be given, in which
-case only the parameters <code>ord</code>, <code>k</code>, and <code>...</code> are
-allowed.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>bdiv</dt>
-<dd><p>The beta diversity distance algorithm to use. Options are:
+<dd><p>Beta diversity distance algorithm(s) to use. Options are:
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. A phylogenetic tree must be
-present in <code>biom</code> or explicitly provided via <code>tree=</code> to use
-the UniFrac methods.
-Multiple values allowed. Default: <code>"Bray-Curtis"</code>.</p></dd>
+<code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
+phylogenetic tree must be present in <code>biom</code> or explicitly
+provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
+Multiple/abbreviated values allowed.</p></dd>
 
 
 <dt>weighted</dt>
 <dd><p>Take relative abundances into account. When
 <code>weighted=FALSE</code>, only presence/absence is considered.
-Multiple values allowed. Default: <code>TRUE</code></p></dd>
+Default: <code>TRUE</code> <br><br>
+Multiple values allowed.</p></dd>
 
 
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-defined in <code>biom</code> if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: <code>NULL</code></p></dd>
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>otu_tree(biom)</code></p></dd>
 
 
 <dt>grid</dt>
@@ -168,17 +166,13 @@ Default: <code>1</code> (square).</p></dd>
 similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 <code>clust = c(rows = "complete", cols = NA)</code>, or simply
-<code>clust = c("complete", NA)</code>.
-Default: <code>"complete"</code>.</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>   Options are<span class="sc">:</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>   \itemize{</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>     \item{\code{<span class="cn">FALSE</span>} or \code{<span class="cn">NA</span>} <span class="sc">-</span> }{ Disable reordering. }</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>     \item{An \code{hclust} class object} { E.g. from [stats<span class="sc">::</span><span class="fu">hclust</span>()]. }</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>     \item{A method name <span class="sc">-</span> }{ \code{<span class="st">"ward.D"</span>}, </span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>       \code{<span class="st">"ward.D2"</span>}, \code{<span class="st">"single"</span>}, \code{<span class="st">"complete"</span>}, </span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>       \code{<span class="st">"average"</span>}, \code{<span class="st">"mcquitty"</span>}, \code{<span class="st">"median"</span>}, or </span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>       \code{<span class="st">"centroid"</span>}. }</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>   }</span></code></pre><p></p></div></dd>
+<code>clust = c("complete", NA)</code>. Options are:</p><ul><li><p><code>FALSE</code> or <code>NA</code> -  Disable reordering.</p></li>
+<li><p>An <code>hclust</code> class object E.g. from <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">stats::hclust()</a></code>.</p></li>
+<li><p>A method name -  <code>"ward.D"</code>,
+<code>"ward.D2"</code>, <code>"single"</code>, <code>"complete"</code>,
+<code>"average"</code>, <code>"mcquitty"</code>, <code>"median"</code>, or
+<code>"centroid"</code>.</p></li>
+</ul><p>Default: <code>"complete"</code>.</p></dd>
 
 
 <dt>trees</dt>
@@ -207,7 +201,7 @@ Default: <code>NULL</code>, which computes:
 
 <dt>xlab.angle</dt>
 <dd><p>Angle of the labels at the bottom of the plot.
-Options are <code>"auto"</code>, <code>0</code>, <code>30</code>, and <code>90</code>.
+Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>'90'</code>.
 Default: <code>"auto"</code>.</p></dd>
 
 
@@ -220,9 +214,9 @@ For example, <code>labs.title = "Plot Title"</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The constructed ggplot command will be
-attached as <code>attr(,'cmd')</code>, and the underlying computed data
-as <code>$data</code>.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points, ggplot command,
+and object history are available as <code>$data</code>, <code>$code</code>, and
+<code>$history</code>, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="annotation-tracks">Annotation Tracks<a class="anchor" aria-label="anchor" href="#annotation-tracks"></a></h2>
@@ -232,7 +226,7 @@ as <code>$data</code>.</p>
 <p>Metadata can be displayed as colored tracks above the heatmap. Common use
 cases are provided below, with more thorough documentation available at
 https://cmmr.github.io/rbiom .</p>
-<div class="sourceCode"><pre><code><span>  <span class="co">## Categorical ----------------------------</span></span>
+<div class="sourceCode"><pre><code><span><span class="co">## Categorical ----------------------------</span></span>
 <span><span class="va">color.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
 <span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
 <span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span>, <span class="st">'colors'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
@@ -282,7 +276,7 @@ https://cmmr.github.io/rbiom .</p>
 samples on the plot. It also enables subsetting to a particular set or
 range of values. Prefix a column name with <code>-</code> to arrange values in
 descending order rather than ascending.</p>
-<div class="sourceCode"><pre><code><span>  <span class="co">## Categorical ----------------------------</span></span>
+<div class="sourceCode"><pre><code><span><span class="co">## Categorical ----------------------------</span></span>
 <span><span class="va">order.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
 <span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -299,7 +293,7 @@ descending order rather than ascending.</p>
 side-effects on aesthetics. It is especially useful for limiting the data
 to a single categorical metadata value. Unlike the other *.by parameters,
 <code>limit.by</code> must always be a named <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
-<div class="sourceCode"><pre><code>  ## Categorical ----------------------------
+<div class="sourceCode"><pre><code>## Categorical ----------------------------
 limit.by = list('Sex' = "Male")
 
 ## Numeric --------------------------------
@@ -317,9 +311,11 @@ limit.by = list(
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
 <code><a href="bdiv_table.html">bdiv_table</a>()</code>,
 <code><a href="distmat_stats.html">distmat_stats</a>()</code></p>
 <p>Other visualization: 
@@ -339,11 +335,14 @@ limit.by = list(
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span> <span class="op">%&gt;%</span> <span class="fu"><a href="sample_rarefy.html">sample_rarefy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="sample_select.html">sample_select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, color.by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="bdiv_heatmap-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">biom</span>, bdiv<span class="op">=</span><span class="st">"uni"</span>, weighted<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>,<span class="cn">F</span><span class="op">)</span>, color.by<span class="op">=</span><span class="st">"sex"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="bdiv_heatmap-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

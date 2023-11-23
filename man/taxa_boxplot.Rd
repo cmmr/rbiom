@@ -7,20 +7,23 @@
 taxa_boxplot(
   biom,
   x = NULL,
-  rank = NULL,
-  taxa = 5,
-  layers = "lsb",
+  rank = -1,
+  taxa = 6,
+  layers = "bld",
+  unc = "singly",
+  other = FALSE,
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
   flip = FALSE,
-  stripe = flip,
+  stripe = NULL,
   p.top = Inf,
   p.adj = "fdr",
-  p.label = TRUE,
-  ci = 95,
+  p.label = 0.05,
+  ci = "ci",
+  level = 0.95,
   outliers = NULL,
   xlab.angle = "auto",
   y.trans = "sqrt",
@@ -28,31 +31,53 @@ taxa_boxplot(
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. The
 default, \code{NULL} puts taxa along the x-axis.}
 
-\item{rank}{What rank(s) of taxa to display. E.g. "Phylum", "Genus", etc.
-Run \code{taxa_ranks()} to see all options for a given BIOM object.
-The default, \code{NULL}, selects the lowest level.}
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
+see all options for a given \code{rbiom} object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
-mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: \code{5}.}
+mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
+character vector of taxa names will show only those named taxa.
+Default: \code{6}.}
 
-\item{layers}{\code{"box" ("x")}, \code{"bar"}, \code{"violin"},
+\item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
 \code{"linerange"}, and \code{"pointrange"}. Single letter
 abbreviations are also accepted. For instance, \code{c("box", "dot")}
 is equivalent to \code{c("x", "d")} and \code{"xd"}.
 See \code{vignette("boxplots")} for examples of each.
-Default: \code{"lsb"}.}
+Default: \code{"bld"}.}
+
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
+\itemize{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
+
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{taxa}
+argument. Specifying \code{TRUE} adds "Other" to the returned set.
+A string can also be given to imply \code{TRUE}, but with that
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
-use for aesthetics and partitioning. See below for details.
-Default: \code{NULL}}
+use for aesthetics and partitioning. Default: \code{NULL}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
@@ -67,42 +92,40 @@ Recommended to be used in combination with the \code{taxa} parameter
 to set a lower bound on the mean abundance of considered taxa.
 Default: \code{Inf}}
 
-\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
-Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+\item{p.adj}{Method to use for multiple comparisons adjustment of
+p-values. Run \code{p.adjust.methods} for a list of available
+options. Default: \code{"fdr"}.}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
 \itemize{
-\item{\code{p.label = 0.05} - }{ Use this specific value. }
-\item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
-\item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
-\item{\code{p.label = Inf} - }{ display all p-values }
-\item{\code{p.label = NULL} - }{ do not calculate stats }
+\item{\code{p.label = 0.05} - }{ Show p-values that are <= 0.05. }
+\item{\code{p.label = 0} - }{ Don't show any p-values on the plot. }
+\item{\code{p.label = 1} - }{ Show all p-values on the plot. }
 }
 If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
-Default: \code{TRUE}}
+Default: \code{0.05}}
 
 \item{ci}{How to calculate min/max of the \bold{crossbar},
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
-Provide a number between 75 and 100 to define a confidence interval's
-confidence level, commonly 95 or 97.5. Other options are:
-\code{"range"}, \code{"sd"} (standard deviation),
-\code{"se"} (standard error), and
+Options are: \code{"ci"} (confidence interval), \code{"range"},
+\code{"sd"} (standard deviation), \code{"se"} (standard error), and
 \code{"mad"} (median absolute deviation).
 The center mark of \bold{crossbar} and \bold{pointrange} represents
 the mean, except for code{"mad"} in which case it represents
-the median. Set to \code{NULL} to disable. Default: \code{95}}
+the median. Default: \code{"ci"}}
+
+\item{level}{The confidence level for calculating a confidence interval.
+Default: \code{0.95}}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when
 overlaying a dot or strip chart.  Default: \code{NULL}}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis.
-\bold{'auto'} (the default), automatically selects a rotation value.
-\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal,
-angled, and vertical, respectively.}
+\item{xlab.angle}{Angle of the labels at the bottom of the plot.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
+Default: \code{"auto"}.}
 
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
@@ -124,85 +147,29 @@ dotplot layer has its size set to \code{2}. The special prefix
 \code{pt.} will control both the dot and strip layers.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics are
-available as \code{$data} and \code{$stats}, respectively.
+A \code{ggplot2} plot. \cr The computed data points, statistics,
+ggplot command, and object history are available as \code{$data},
+\code{$stats}, \code{$code}, and \code{$history}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
 }
-\section{Aesthetics and Partitions}{
-
-
-Metadata can be used to flexibly subset, partition, and apply aesthetics
-when creating a plot. Common use cases are provided below. More thorough
-documentation is available at \url{https://cmmr.github.io/rbiom}.
-
-\preformatted{  ## Colors ----------------------------
-  color.by = "Body Site"
-  color.by = list('Body Site' = "bright")
-  color.by = list('Body Site' = c("Stool", "Saliva"))
-  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
-  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-  
-  ## Patterns --------------------------
-  pattern.by = "Body Site"
-  pattern.by = list('Body Site' = c("Stool", "Saliva"))
-  pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
-  
-  ## Shapes ----------------------------
-  shape.by = "Body Site"
-  shape.by = list('Body Site' = c("Stool", "Saliva"))
-  shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
-  
-  ## Facets ----------------------------
-  facet.by = "Body Site"
-  facet.by = c("Body Site", "Sex")
-  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
-  
-  ## Limits ----------------------------
-  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
-  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
-}
-
-\itemize{
-\item{\code{color.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{facet.by} - }{Categorical metadata column(s) only.}
-\item{\code{limit.by} - }{Any metadata column(s).}
-}
-
-All built-in color palettes are colorblind-friendly. The available
-categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
-\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
-
-Patterns are sourced from the magick R package. Pattern names are:
-\code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"},
-\code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"},
-\code{"checkerboard"}, \code{"octagons"}, \code{"right45"},
-\code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"},
-\code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"},
-\code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"},
-\code{"verticalleftshingle"}, and \code{"verticalrightshingle"}.
-
-Shapes can be given as per base R - numbers 0 through 17 for various shapes,
-or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
-letters instead of shapes on the plot. Character strings may used as well.
-}
-
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50) 
+    biom <- sample_rarefy(hmp50)
     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
-    taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
+    taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
     
-
 }
 \seealso{
-\code{\link[=biom_stats]{biom_stats()}}
+Other taxa_abundance: 
+\code{\link{taxa_barplot}()},
+\code{\link{taxa_corrplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_matrix}()},
+\code{\link{taxa_stats}()},
+\code{\link{taxa_table}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},
@@ -218,4 +185,5 @@ Other visualization:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}
 }
+\concept{taxa_abundance}
 \concept{visualization}

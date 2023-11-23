@@ -2,7 +2,7 @@
 % Please edit documentation in R/biom_build.r
 \name{biom_build}
 \alias{biom_build}
-\title{Create a BIOM object.}
+\title{Create an rbiom object.}
 \usage{
 biom_build(
   counts,
@@ -16,7 +16,7 @@ biom_build(
 }
 \arguments{
 \item{counts}{The count data as a numeric matrix, where column names are
-the sample names and row names are the OTU names. A BIOM object or
+the sample names and row names are the OTU names. An rbiom object or
 a filename/URL compatible with \code{\link[=read_biom]{read_biom()}} is also acceptable.}
 
 \item{metadata}{A data.frame with sample names as the row names and
@@ -38,46 +38,53 @@ filename/URL with fasta format data.
 choosing.}
 }
 \value{
-A \code{BIOM} class object containing the parsed data. This object
+An \code{rbiom} class object containing the parsed data. This object
 can be treated as a list with the following named elements:
 \itemize{
 \item{\code{$counts} - }{
-A numeric \code{slam} sparse matrix of observation counts. Taxa
-(OTUs) as rows and samples as columns. }
+A numeric \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} (sparse matrix) of
+observation counts. Taxa (OTUs) as rows and samples as columns.
+Access or modify using \code{\link[=otu_matrix]{otu_matrix()}}. }
 \item{\code{$metadata} - }{
-A data frame containing any embedded metadata. Row names are
-sample IDs. }
+A \code{\link[tibble:tibble]{tibble::tibble()}} (data frame) containing any embedded
+metadata. Sample IDs are in the \code{.sample} column.
+Access or modify using \code{\link[=sample_metadata]{sample_metadata()}}. }
 \item{\code{$taxonomy} - }{
-Character matrix of taxonomic names, if given. Row names are taxa
-(OTU) IDs. Column rows are named Kingdom, Phylum, Class, Order,
+A \code{\link[tibble:tibble]{tibble::tibble()}} (data frame) mapping OTU IDs to taxonomic
+clades. Columns are named .otu, Kingdom, Phylum, Class, Order,
 Family, Genus, Species, and Strain, or TaxLvl.1, TaxLvl.2, ... ,
 TaxLvl.N when more than 8 levels of taxonomy are encoded in the
-biom file. }
+biom file. Access or modify using \code{\link[=otu_taxonomy]{otu_taxonomy()}}. }
 \item{\code{$phylogeny} - }{
 An object of class \code{phylo} defining the phylogenetic
-relationships between the taxa. Although the official
+relationships between the OTUs. Although the official
 specification for BIOM only includes phylogenetic trees in BIOM
-version 2.1, if a BIOM version 1.0 file includes a
+version 2.1, if an rbiom version 1.0 file includes a
 \code{phylogeny} entry with newick data, then it will be loaded
 here as well. The \pkg{ape} package has additional functions for
-working with \code{phylo} objects.}
+working with \code{phylo} objects. Access or modify using
+\code{\link[=otu_tree]{otu_tree()}}. }
 \item{\code{$sequences} - }{
-A named character vector, where the names are taxonomic
-identifiers and the values are the sequences they represent.
+A named character vector, where the names are OTU IDs and the
+values are the nucleic acid sequences they represent.
 These values are not part of the official BIOM specification, but
-will be read and written when defined. }
+will be read and written when defined. Access or modify using
+\code{\link[=otu_sequences]{otu_sequences()}}. }
 \item{\code{$info} - }{
 A list of other attributes defined in the BIOM file, such as
 \code{id}, \code{type}, \code{format}, \code{format_url},
 \code{generated_by}, \code{date}, \code{matrix_type},
-\code{matrix_element_type}, \code{Comment}, and \code{shape}. }
+\code{matrix_element_type}, \code{comment}, and \code{shape}.
+Access using \code{\link[=biom_info]{biom_info()}}. Access/set with \code{\link[=biom_id]{biom_id()}} or
+\code{\link[=biom_comment]{biom_comment()}}. }
 }
 \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
-components of the BIOM file specification and therefore will be empty
-in the returned object when they are not provided by the BIOM file.
+components of the BIOM file specification and therefore will be NULL
+or simple placeholders in the returned object when they are not provided
+by the BIOM file.
 }
 \description{
-Create a BIOM object.
+Create an rbiom object.
 }
 \examples{
     library(rbiom)
@@ -98,8 +105,8 @@ Create a BIOM object.
     cat(readChar(tre, nchars = 50L), "\n\n")
     cat(readChar(fas, nchars = 50L), "\n\n")
     
-    # Re-assemble the BIOM object.
-    biom <- biom_build(ct, md, tax, tre, id = "New BIOM")
+    # Re-assemble the rbiom object.
+    biom <- biom_build(ct, md, tax, tre, id = "New")
     print(biom)
     
     # Remove temporary files.

@@ -3,27 +3,115 @@
 # Assemble faceting formula and attach nrow/ncol/etc attributes
 #________________________________________________________
 
-plot_facets <- function (layers) {
+plot_facets <- function (params) {
   
-  data   <- attr(layers, "data",   exact = TRUE)
-  params <- attr(layers, 'params', exact = TRUE)
+  stopifnot(is_bare_environment(params))
   
-  facet.by <- params[['facet.by']]
+  ggdata   <- params$.ggdata
+  facet.by <- params$facet.by
   
   
   #________________________________________________________
   # No facets
   #________________________________________________________
-  if (is_null(facet.by)) {
+  if (is_null(facet.by) || plyr::empty(ggdata)) {
     
-    layers[['facet']] <- NULL
+    del_layer(params, 'facet')
     
-    attr(layers, 'facet.nrow')  <- 1
-    attr(layers, 'facet.ncol')  <- 1
-    attr(layers, 'facet.count') <- 1
+    params$.plot_attrs$facet.nrow  <- 1
+    params$.plot_attrs$facet.ncol  <- 1
+    params$.plot_attrs$facet.count <- 1
     
-    return (layers)
+    return (invisible(params))
   }
+  
+  
+  
+  
+  #________________________________________________________
+  # Use user's or auto-selected free_x/y scales.
+  #________________________________________________________
+  set_layer(params, 'facet', scales = local({
+    
+    
+    #________________________________________________________
+    # User has explicitly defined scales.
+    #________________________________________________________
+    scales <- params$layers[['facet']][['scales']]
+    
+    if (!is.null(scales)) {
+      
+      stopifnot(is_string(scales, c('fixed', 'free', 'free_x', 'free_y')))
+      
+      params$.free_x <- scales %in% c('free', 'free_x')
+      params$.free_y <- scales %in% c('free', 'free_y')
+      
+      return (scales)
+    }
+    
+    
+    
+    #________________________________________________________
+    # Examine the variance in min/max per facet.
+    #________________________________________________________
+    
+    stopifnot(is_scalar_character(xmode <- params$.xmode))
+    stopifnot(is_scalar_character(xcol  <- params$.xcol))
+    stopifnot(is_scalar_character(ycol  <- params$.ycol))
+    
+    df <- if (xmode == "numeric") {
+      
+      plyr::ddply(ggdata, ply_cols(facet.by), function (d) {
+        data.frame(
+          x_min = min(c(d[[xcol]], 0), na.rm = TRUE),
+          x_max = max(c(d[[xcol]], 0), na.rm = TRUE),
+          x_pct = 1,
+          y_min = min(c(d[[ycol]], 0), na.rm = TRUE),
+          y_max = max(c(d[[ycol]], 0), na.rm = TRUE) )
+      })
+      
+    } else {
+      
+      plyr::ddply(ggdata, ply_cols(facet.by), function (d) {
+        
+        data.frame(
+          x_min = 0,
+          x_max = 1,
+          x_pct = length(unique(d[[xcol]])) / nlevels(d[[xcol]]),
+          y_min = min(c(d[[ycol]], 0), na.rm = TRUE),
+          y_max = max(c(d[[ycol]], 0), na.rm = TRUE) )
+      })
+      
+    }
+    
+    
+    
+    #________________________________________________________
+    # Automatically free the scales if ggdata needs it.
+    #________________________________________________________
+    
+    params$.free_x <- with(df, any(
+      isTRUE(params$.free_x),
+      min(x_pct) < 0.9,
+      diff(range(x_max)) > abs(max(x_max) / 2),
+      diff(range(x_min)) > abs(min(x_min) / 2) ))
+    
+    params$.free_y <- with(df, any(
+      isTRUE(params$.free_y),
+      diff(range(y_max)) > abs(max(y_max) / 2),
+      diff(range(y_min)) > abs(min(y_min) / 2) ))
+    
+    return (switch(
+      paste(params$.free_x, params$.free_y),
+      'TRUE TRUE'   = "free", 
+      'TRUE FALSE'  = "free_x", 
+      'FALSE TRUE'  = "free_y",
+      'FALSE FALSE' = "fixed" ))
+    
+  }))
+  
+  
+  
   
   
   #________________________________________________________
@@ -58,24 +146,24 @@ plot_facets <- function (layers) {
       capture.output(as.name(facet.by[[1]])) ) %>%
       as.formula()
     
-    f_rows <- length(unique(data[[facet.by[[2]]]]))
-    f_cols <- length(unique(data[[facet.by[[1]]]]))
+    f_rows <- length(unique(ggdata[[facet.by[[2]]]]))
+    f_cols <- length(unique(ggdata[[facet.by[[1]]]]))
     
-    attr(layers, 'facet.nrow')  <- f_rows
-    attr(layers, 'facet.ncol')  <- f_cols
-    attr(layers, 'facet.count') <- f_rows * f_cols
+    params$.plot_attrs$facet.nrow  <- f_rows
+    params$.plot_attrs$facet.ncol  <- f_cols
+    params$.plot_attrs$facet.count <- f_rows * f_cols
     
   } else {
     
-    nfacets <- data[,facet.by,drop=F] %>%
+    nfacets <- ggdata[,facet.by,drop=F] %>%
       apply(1L, paste, collapse="|@#|") %>%
       unique() %>%
       length()
     
     autodim <- ggplot2::wrap_dims(
       n    = nfacets,
-      nrow = layers[['facet']][['nrow']],
-      ncol = layers[['facet']][['ncol']] )
+      nrow = params$layers[['facet']][['nrow']],
+      ncol = params$layers[['facet']][['ncol']] )
     
     args[['facets']] <- do.call(ggplot2::vars, lapply(facet.by, as.name))
     
@@ -85,177 +173,17 @@ plot_facets <- function (layers) {
         paste(collapse = ", ") %>%
         sprintf(fmt = "vars(%s)")
     
-    attr(layers, 'facet.nrow')  <- autodim[[1]]
-    attr(layers, 'facet.ncol')  <- autodim[[2]]
-    attr(layers, 'facet.count') <- nfacets
+    params$.plot_attrs$facet.nrow  <- autodim[[1]]
+    params$.plot_attrs$facet.ncol  <- autodim[[2]]
+    params$.plot_attrs$facet.count <- nfacets
     
   }
   
-  setLayer(layer = "facet", args)
+  set_layer(params, 'facet', args)
   
-  return (layers)
+  # To enable %>% chaining
+  return (invisible(params))
 }
 
 
-
-#________________________________________________________
-# Specify individual y-axis limits and breaks for each facet.
-#________________________________________________________
-
-boxplot_facets <- function (layers) {
-  
-  ggdata   <- attr(layers, 'data', exact = TRUE)
-  params   <- attr(layers, 'params', exact = TRUE)
-  facet.by <- params[['facet.by']]
-  
-  
-  #________________________________________________________
-  # When facet.by=NULL, just pass layers on to plot_facets()
-  #________________________________________________________
-  if (!is_null(facet.by)) {
-    
-    
-    #________________________________________________________
-    # Pull facet's scales parameter from user args
-    #________________________________________________________
-    if (!hasLayer('facet'))
-      initLayer("facet")
-    
-    
-    #________________________________________________________
-    # Automatically pick scales (free, fixed, free_x, or free_y)
-    #________________________________________________________
-    if (is_null(layers[['facet']][['scales']]) && nrow(ggdata) > 0) {
-      
-      xcol <- attr(layers, 'xcol', exact = TRUE)
-      ycol <- attr(layers, 'ycol', exact = TRUE)
-      
-      plyby <- ply_cols(facet.by)
-      
-      
-      # Don't get hung up on NA values in the plyby columns
-      #________________________________________________________
-      clean_df <- ggdata[,c(facet.by, xcol, ycol),drop=FALSE]
-      clean_df <- clean_df[complete.cases(clean_df),,drop=FALSE]
-      
-      
-      # Set free_y=TRUE for facets with very different max(y).
-      #________________________________________________________
-      free_y <- local({
-        y_maxs <- plyr::daply(clean_df, plyby, function (df) { max(df[[ycol]], na.rm = TRUE) })
-        y_maxs <- y_maxs[!is.na(y_maxs)]
-        if (length(y_maxs) < 2) return (FALSE)
-        isTRUE(mean(y_maxs) * 1.5 < max(y_maxs))
-      })
-      
-      
-      # All x categories need to be present >50% of the time.
-      #________________________________________________________
-      x_cats <- sapply(levels(ggdata[[xcol]]), function (xval) {
-        mean(plyr::daply(clean_df, plyby, function (df) { xval %in% df[[xcol]] }))
-      })
-      free_x <- isTRUE(any(x_cats <= 0.5))
-      
-      remove("clean_df")
-      
-      
-      # Override free_x and free_y with layer attribute settings
-      #________________________________________________________
-      for (i in c('free_x', 'free_y'))
-        if (!is_null(attr(layers, i, exact = TRUE)))
-          assign(i, attr(layers, i, exact = TRUE))
-      
-      
-      scales <- if (free_x && free_y) { "free" 
-      } else    if (free_x)           { "free_x"
-      } else    if (free_y)           { "free_y"
-      } else                          { "fixed" }
-      
-      
-      if (isTRUE(params[['flip']]) && scales %in% c("free_x", "free_y"))
-        scales <- ifelse(scales == "free_x", "free_y", "free_x")
-      
-      
-      setLayer(layer = "facet", scales = scales)
-    }
-    
-  }
-  
-  
-  #________________________________________________________
-  # Usual faceting configurations
-  #________________________________________________________
-  layers <- plot_facets(layers)
-  
-  
-  #________________________________________________________
-  # Rotate the x-axis tick mark labels to avoid overlap
-  #________________________________________________________
-  layer <- "theme"
-  xcol  <- attr(layers, 'xcol', exact = TRUE)
-  
-  if (identical(xcol, '.all')) {
-    
-    if (isTRUE(params[['flip']])) {
-      setLayer(
-        axis.title.y = element_blank(),
-        axis.text.y  = element_blank(),
-        axis.ticks.y = element_blank() )
-      
-    } else {
-      setLayer(
-        axis.title.x = element_blank(),
-        axis.text.x  = element_blank(),
-        axis.ticks.x = element_blank() )
-    }
-    
-  } else {
-    
-    if (identical(substr(xcol, 1, 1), ".")) {
-      if (isTRUE(params[['flip']])) { setLayer(axis.title.y = element_blank())
-      } else                        { setLayer(axis.title.x = element_blank()) }
-    }
-      
-    
-    ggdata     <- attr(layers, 'data',       exact = TRUE)
-    facet.cols <- attr(layers, 'facet.ncol', exact = TRUE)
-    color.by   <- names(params[['color.by']])
-    xlab.angle <- params[['xlab.angle']] %||% "auto"
-    
-    # x-axis Text Angle
-    if (tolower(xlab.angle) == 'auto') {
-      if (!is_null(xcol) && !isTRUE(params[['flip']])) {
-        charCount <- sum(nchar(unique(as.character(ggdata[[xcol]]))), na.rm = TRUE)
-        charCount <- charCount * facet.cols
-        if (charCount > 40)
-          xlab.angle <- 30
-        remove("charCount")
-      }
-    }
-    
-    if (xlab.angle == 90 || tolower(xlab.angle) == "vertical") {
-      setLayer(axis.text.x = element_text(angle=-90, vjust=0.3, hjust=0))
-      
-    } else if (xlab.angle == 30 || tolower(xlab.angle) == "angled") {
-      setLayer(axis.text.x = element_text(angle=-30, vjust=1, hjust=0))
-      
-      # Ensure long x-axis labels don't get truncated at the figure's edge
-      rpad <- strwidth(tail(levels(ggdata[[xcol]]), 1), units="inches")
-      rpad <- rpad * 0.8660254 # sin((90-30) * pi / 180) / sin(90 * pi / 180)
-      if (!is_null(color.by))
-        rpad <- rpad - max(c(
-          strwidth(color.by, units="inches", cex=1.2) + .20,
-          strwidth(levels(ggdata[[color.by]]), units="inches") + .52 ))
-      rpad <- max(.1, signif(rpad, digits = 3))
-      setLayer(plot.margin = as.cmd(unit(x=c(.1, rpad, .1, .1), units='inches'), list(rpad=rpad)))
-    }
-    
-    remove("ggdata", "facet.cols", "color.by", "xlab.angle")
-  }
-  remove("layer", "xcol")
-  
-  
-  
-  return (layers)
-}
 

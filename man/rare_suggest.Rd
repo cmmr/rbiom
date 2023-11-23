@@ -7,13 +7,18 @@
 rare_suggest(biom)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
-columns are assumed to be the taxa and samples, respectively.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
 An integer.
 }
 \description{
 Suggest a 'good' rarefaction depth.
+}
+\examples{
+    library(rbiom)
+
+    rare_suggest(hmp50)
+
 }

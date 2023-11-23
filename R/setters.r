@@ -1,8 +1,9 @@
+
 #' Get or set the sample names.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x   A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value   A character vector of the new sample names.
 #' 
@@ -20,7 +21,7 @@
 #'     head(sample_names(biom))
 
 sample_names <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (colnames(biom[['counts']]))
 }
 
@@ -28,30 +29,42 @@ sample_names <- function (biom) {
 #' @rdname sample_names
 #' @export
 
-`sample_names<-` <- function (x, value) {
+`sample_names<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
+  lvls <- levels(value)
+  if (is.factor(value)) {
+    value %<>% as.character()
+    lvls  %<>% intersect(value)
+  }
+  
   stopifnot(is_character(value))
   stopifnot(all(!is.na(value)))
   stopifnot(all(nchar(value) > 0))
   stopifnot(all(!duplicated(value)))
-  stopifnot(length(value) == n_samples(x))
+  stopifnot(length(value) == n_samples(biom))
   
   value <- unname(value)
   
-  rownames(x[['metadata']]) <- value
-  colnames(x[['counts']])   <- value
+  colnames(biom[['counts']]) <- value
   
-  return (x)
+  if (!is.null(lvls)) { value %<>% factor(levels = lvls)
+  } else              { value %<>% as.factor() }
+  
+  biom[['metadata']][['.sample']] <- value
+  
+  invalidate_biom()
+  return (biom)
 }
 
 
 
 #' Get or set the OTU names.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x   A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value   A character vector with the new OTU names.
 #' 
@@ -69,7 +82,7 @@ sample_names <- function (biom) {
 #'     head(otu_names(biom))
 
 otu_names <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (rownames(biom[['counts']]))
 }
 
@@ -77,38 +90,51 @@ otu_names <- function (biom) {
 #' @rdname otu_names
 #' @export
 
-`otu_names<-` <- function (x, value) {
+`otu_names<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
+  lvls <- levels(value)
+  if (is.factor(value)) {
+    value %<>% as.character()
+    lvls  %<>% intersect(value)
+  }
+  
   stopifnot(is_character(value))
-  stopifnot(all(!is.na(value)))
-  stopifnot(all(nchar(value) > 0))
-  stopifnot(all(!duplicated(value)))
-  stopifnot(length(value) == n_otus(x))
+  stopifnot(!is.na(value))
+  stopifnot(nchar(value) > 0)
+  stopifnot(!duplicated(value))
+  stopifnot(length(value) == n_otus(biom))
   
   value <- unname(value)
   
-  if (has_tree(x)) { # Likely ordered differently
-    idx <- match(otu_names(x), x[['phylogeny']][['tip.label']])
-    x[['phylogeny']][['tip.label']][idx] <- value
+  if (has_tree(biom)) { # Likely ordered differently
+    idx <- match(otu_names(biom), biom[['phylogeny']][['tip.label']])
+    biom[['phylogeny']][['tip.label']][idx] <- value
   }
   
-  if (has_sequences(x))
-    names(x[['sequences']]) <- value
+  if (has_sequences(biom))
+    names(biom[['sequences']]) <- value
   
-  rownames(x[['counts']])   <- value
-  rownames(x[['taxonomy']]) <- value
+  rownames(biom[['counts']]) <- value
   
-  return (x)
+  
+  if (!is.null(lvls)) { value %<>% factor(levels = lvls)
+  } else              { value %<>% as.factor() }
+  
+  biom[['taxonomy']][['.otu']] <- value
+  
+  invalidate_biom()
+  return (biom)
 }
 
 
 
 #' Get or set the names of the taxonomic ranks.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value  A character vector the new taxa rank names.
 #' 
@@ -122,43 +148,100 @@ otu_names <- function (biom) {
 #'     
 #'     taxa_ranks(biom)
 #'     
-#'     taxa_ranks(biom) <- paste0("Level", seq_len(n_ranks(biom)))
+#'     taxa_ranks(biom) <- c('.otu', paste0("Level", seq_len(n_ranks(biom) - 1)))
 #'     taxa_ranks(biom)
 
 taxa_ranks <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
-  return (colnames(biom[['taxonomy']]))
+  validate_biom(clone = FALSE)
+  res <- colnames(biom[['taxonomy']])
+  return (res)
 }
 
 
 #' @rdname taxa_ranks
 #' @export
 
-`taxa_ranks<-` <- function (x, value) {
+`taxa_ranks<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
   stopifnot(is_character(value))
-  stopifnot(all(!is.na(value)))
-  stopifnot(all(nchar(value) > 0))
-  stopifnot(all(!duplicated(value)))
-  stopifnot(length(value) == n_ranks(x))
+  stopifnot(!is.na(value))
+  stopifnot(nchar(value) > 0)
+  stopifnot(!duplicated(value))
+  stopifnot(length(value) == n_ranks(biom))
+  stopifnot(eq(value[[1]], '.otu'))
+  stopifnot(!startsWith(value, '.') | value == '.otu')
   
-  value <- unname(value)
+  colnames(biom[['taxonomy']]) <- unname(value)
   
-  colnames(x[['taxonomy']]) <- value
+  invalidate_biom()
+  return (biom)
+}
+
+
+
+#' Get or set the metadata column names.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family setters
+#' 
+#' @param value  A character vector of the new metadata column names. Names
+#'        cannot start with a \code{.} character. Leading and trailing
+#'        whitespace is automatically removed.
+#' 
+#' @return A character vector of the metadata column names in \code{biom}.
+#'        
+#' @export
+#' @examples
+#'     library(rbiom) 
+#'     
+#'     biom <- hmp50
+#'     
+#'     metadata_names(biom)
+#'     
+#'     metadata_names(biom) <- sub(' ', '_', tolower(metadata_names(biom)))
+#'     metadata_names(biom)
+
+metadata_names <- function (biom) {
+  validate_biom(clone = FALSE)
+  res <- colnames(biom[['metadata']])
+  return (res)
+}
+
+
+#' @rdname metadata_names
+#' @export
+
+`metadata_names<-` <- function (biom, value) {
   
-  return (x)
+  validate_biom(clone = TRUE)
+  
+  stopifnot(is_character(value))
+  stopifnot(!anyNA(value))
+  
+  value <- trimws(as.vector(value))
+  stopifnot(nchar(value) > 0)
+  stopifnot(!duplicated(value))
+  stopifnot(length(value) == n_metadata(biom))
+  stopifnot(eq(value[[1]], '.sample'))
+  stopifnot(!startsWith(value, '.') | value == '.sample')
+  
+  colnames(biom[['metadata']]) <- value
+  
+  return (biom)
 }
 
 
 
 #' Get or set the abundance counts.
+#' 
+#' @inherit documentation_default
 #'
 #' @family setters
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
-#' 
-#' @param value A numeric matrix. Rownames and colnames must be identical to
+#' @param value A numeric matrix. Rownames and colnames must be eq to
 #'        the current [otu_matrix()] value.
 #'        
 #' @return A numeric matrix with samples as column names, and OTU identifiers 
@@ -178,35 +261,51 @@ taxa_ranks <- function (biom) {
 #'     otu_matrix(biom) <- otu_matrix(biom) / 100
 #'     otu_matrix(biom)[taxa,1:5]
 
-otu_matrix <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
-  return (as.matrix(biom[['counts']]))
+otu_matrix <- function (biom, sparse = FALSE) {
+  validate_biom(clone = FALSE)
+  if (isTRUE(sparse)) { biom[['counts']]
+  } else              { as.matrix(biom[['counts']]) }
 }
 
 
 #' @rdname otu_matrix
 #' @export
-`otu_matrix<-` <- function (x, value) {
+`otu_matrix<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
-  stopifnot(is.matrix(value))
-  stopifnot(is.numeric(value))
+  validate_biom(clone = TRUE)
   
-  stopifnot(identical(dimnames(otu_matrix(x)), dimnames(value)))
+  if (!slam::is.simple_triplet_matrix(value)) {
+    stopifnot(is.matrix(value))
+    stopifnot(is.numeric(value))
+    value <- slam::as.simple_triplet_matrix(value)
+  }
   
-  x[['counts']] <- slam::as.simple_triplet_matrix(value)
+  biom[['counts']] <- value
+  biom %<>% biom_repair()
   
-  return (x)
+  invalidate_biom()
+  return (biom)
 }
+
+
+#' @rdname otu_matrix
+#' @keywords internal
+#' @export
+dimnames.rbiom <- function (x) { dimnames(x$counts) }
+
+#' @rdname otu_matrix
+#' @keywords internal
+#' @export
+dim.rbiom <- function (x) { dim(x$counts) }
 
 
 
 
 #' Get or set the phylogenetic tree.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value A \code{phylo} class object with tip.labels matching 
 #'        \code{otu_names(x)}. If there are more tip.labels than
@@ -225,7 +324,7 @@ otu_matrix <- function (biom) {
 #' 
 
 otu_tree <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (biom[['phylogeny']])
 }
 
@@ -233,31 +332,35 @@ otu_tree <- function (biom) {
 #' @rdname otu_tree
 #' @export
 
-`otu_tree<-` <- function (x, value) {
+`otu_tree<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
   
-  if (is_scalar_character(value))
-    value <- read_tree(value)
+  if (!is.null(value)) {
+    
+    if (is_scalar_character(value))
+      value <- read_tree(value)
+    
+    stopifnot(is(value, 'phylo'))
+    stopifnot(all(otu_names(biom) %in% value$tip.label))
+    
+    if (length(value$tip.labels) > length(otu_names(biom)))
+      value <- tree_subset(value, otu_names(biom))
+  }
   
-  stopifnot(is(value, 'phylo'))
-  stopifnot(all(otu_names(x) %in% value$tip.label))
+  biom[['phylogeny']] <- value
   
-  if (length(value$tip.labels) > length(otu_names(x)))
-    value <- tree_subset(value, otu_names(x))
-  
-  x[['phylogeny']] <- value
-  
-  return (x)
+  invalidate_biom()
+  return (biom)
 }
 
 
 
 #' Get or set the nucleotide sequences associated with each OTU.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value A named character vector. Names must match \code{otu_names(x)}.
 #' 
@@ -288,7 +391,7 @@ otu_tree <- function (biom) {
 #' 
 
 otu_sequences <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (biom[['sequences']])
 }
 
@@ -296,31 +399,33 @@ otu_sequences <- function (biom) {
 #' @rdname otu_sequences
 #' @export
 
-`otu_sequences<-` <- function (x, value) {
+`otu_sequences<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
   stopifnot(is_null(value) || is_character(value))
   
   if (length(value) == 1 && is.null(names(value)))
-    value <- read_fasta(value, ids = otu_names(x))
+    value <- read_fasta(value, ids = otu_names(biom))
   
-  stopifnot(all(otu_names(x) %in% names(value)))
+  stopifnot(all(otu_names(biom) %in% names(value)))
   
-  x[['sequences']] <- value[otu_names(x)]
+  biom[['sequences']] <- value[otu_names(biom)]
   
-  return (x)
+  invalidate_biom()
+  return (biom)
 }
 
 
 
-#' Get or set a \code{BIOM} object's id or comment.
+#' Get or set an \code{rbiom} object's id or comment.
 #' 
 #' The BIOM specification includes \code{id} and \code{comment} fields
 #' for free-form text.
 #' 
-#' @family setters
+#' @inherit documentation_default
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
+#' @family setters
 #' 
 #' @param value The identifier to add (character vector of length 1).
 #' 
@@ -341,7 +446,7 @@ otu_sequences <- function (biom) {
 #'
 
 biom_id <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (biom[['info']][['id']])
 }
 
@@ -349,16 +454,18 @@ biom_id <- function (biom) {
 #' @rdname biom_id
 #' @export
 
-`biom_id<-` <- function (x, value) {
+`biom_id<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
   stopifnot(is_scalar_character(value) && !is_na(value))
   
   value <- trimws(value, whitespace = "[\\h\\v]")
   
-  x[['info']][['id']] <- value
+  biom[['info']][['id']] <- value
   
-  return (x)
+  invalidate_biom()
+  return (biom)
 }
 
 
@@ -366,7 +473,7 @@ biom_id <- function (biom) {
 #' @family setters
 #' @export
 biom_comment <- function (biom) {
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   return (biom[['info']][['comment']])
 }
 
@@ -374,16 +481,18 @@ biom_comment <- function (biom) {
 #' @rdname biom_id
 #' @export
 
-`biom_comment<-` <- function (x, value) {
+`biom_comment<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
+  
   stopifnot(is_scalar_character(value) && !is_na(value))
   
   value <- trimws(value, whitespace = "[\\h\\v]")
   
-  x[['info']][['comment']] <- value
+  biom[['info']][['comment']] <- value
   
-  return (x)
+  invalidate_biom()
+  return (biom)
 }
 
 

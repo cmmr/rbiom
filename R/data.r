@@ -1,6 +1,6 @@
 #' Human Microbiome Project - 50 sample demo dataset.
 #'
-#' @format A BIOM object with 50 samples. 
+#' @format An rbiom object with 50 samples. 
 #'         Includes metadata, taxonomy, phylogeny, and sequences.
 #' \itemize{
 #'   \item{Sex - }{Male or Female}

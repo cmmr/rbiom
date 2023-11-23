@@ -45,7 +45,7 @@ write_wrapper <- function (outfile, callback) {
 
 #' Write BIOM metadata to a tab-separated value (tsv) file.
 #'
-#' @param biom   A BIOM object
+#' @param biom   An rbiom object
 #' 
 #' @param file   Path to the output file. Filenames ending in 
 #'        \code{.gz} or \code{.bz2} will be compressed accordingly.
@@ -56,17 +56,13 @@ write_wrapper <- function (outfile, callback) {
 
 write_metadata <- function (biom, file) {
   
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   
   write_wrapper(file, function (con) {
-    md     <- biom[['metadata']]
-    header <- c("SampleID", colnames(md))
-    cat(file = con, paste(collapse = "\t", header), "\n")
     write.table(
-      x         = md, 
-      file      = con,
-      col.names = FALSE,
-      append    = TRUE,
+      x         = sample_metadata(biom), 
+      file      = con, 
+      row.names = FALSE, 
       quote     = FALSE, 
       sep       = "\t" )
   })
@@ -77,7 +73,7 @@ write_metadata <- function (biom, file) {
 
 #' Write BIOM counts to a tab-separated value (tsv) file.
 #'
-#' @param biom   A BIOM object
+#' @param biom   An rbiom object
 #' 
 #' @param file   Path to the output file. File names ending in 
 #'        \code{.gz} or \code{.bz2} will be compressed accordingly.
@@ -87,7 +83,9 @@ write_metadata <- function (biom, file) {
 #' @export
 
 write_counts <- function (biom, file) {
-  write_biom(as.matrix(biom[['counts']]), file)
+  validate_biom(clone = FALSE)
+  write_biom_tsv(list(counts = biom[['counts']]), file)
+  return (normalizePath(file, winslash = "/"))
 }
 
 
@@ -95,7 +93,7 @@ write_counts <- function (biom, file) {
 
 #' Write BIOM taxonomy map to a tab-separated value (tsv) file.
 #'
-#' @param biom   A BIOM object
+#' @param biom   An rbiom object
 #' 
 #' @param file   Path to the output file. Filenames ending in 
 #'        \code{.gz} or \code{.bz2} will be compressed accordingly.
@@ -106,15 +104,18 @@ write_counts <- function (biom, file) {
 
 write_taxonomy <- function (biom, file) {
   
-  stopifnot(is(biom, 'BIOM'))
+  validate_biom(clone = FALSE)
   
   write_wrapper(file, function (con) {
-    write.table(
-      x         = biom[['taxonomy']], 
-      file      = con, 
-      quote     = FALSE, 
-      sep       = "\t", 
-      col.names = FALSE )
+    
+    otu_taxonomy(biom) %>%
+      relocate(.otu) %>%
+      write.table(
+        file      = con, 
+        sep       = "\t", 
+        quote     = FALSE, 
+        row.names = FALSE,
+        col.names = FALSE )
   })
 }
 
@@ -124,7 +125,7 @@ write_taxonomy <- function (biom, file) {
 #' Write DNA sequences to a file in fasta format.
 #'
 #' @param seqs   A named character vector where names are sequence names and
-#'        values are the sequences. Also accepts a \code{BIOM} object which 
+#'        values are the sequences. Also accepts an \code{rbiom} object which 
 #'        contains sequences.
 #' 
 #' @param file   Path to the output fasta file. Filenames ending in 
@@ -137,11 +138,11 @@ write_taxonomy <- function (biom, file) {
 write_fasta <- function (seqs, file = NULL) {
   
   
-  if (is(seqs, 'BIOM'))
+  if (is(seqs, 'rbiom'))
     seqs <- seqs[['sequences']]
   
   if (!is(seqs, 'character') || !is(names(seqs), 'character'))
-    stop("In write_fasta(), seqs must be a named character vector or a BIOM-class object.")
+    stop("In write_fasta(), seqs must be a named character vector or an rbiom-class object.")
   
   if (length(seqs) == 0)
     warning("In write_fasta(), seqs is empty.")
@@ -158,7 +159,7 @@ write_fasta <- function (seqs, file = NULL) {
 #' Write a newick formatted phylogenetic tree.
 #' 
 #' @param tree  A \code{phylo} object, as returned from [read_tree()]. Also 
-#'        accepts a \code{BIOM} object if it has a phylogentic tree.
+#'        accepts an \code{rbiom} object if it has a phylogentic tree.
 #'         
 #' @param file  Filename or connection to write the newick file to (optional).
 #' 
@@ -175,11 +176,16 @@ write_fasta <- function (seqs, file = NULL) {
 #'
 write_tree <- function (tree, file=NULL) {
   
-  if (is(tree, "BIOM"))
+  if (!is(tree, "phylo")) {
+    
+    try(silent = TRUE, validate_biom("tree", clone = FALSE))
+    if (!is(tree, 'rbiom'))
+      stop("Provided tree is not a 'phylo' or 'rbiom' class object.")
+    
     tree <- tree[['phylogeny']]
-  
-  if (!is(tree, "phylo"))
-    stop("Provided tree is not a 'phylo' or 'BIOM' class object.")
+    if (is.null(tree))
+      stop("rbiom object does not have a tree.")
+  }
   
   
   rootNode <- setdiff(tree$edge[,1], tree$edge[,2])

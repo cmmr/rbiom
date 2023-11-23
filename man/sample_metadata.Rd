@@ -5,33 +5,28 @@
 \alias{sample_metadata<-}
 \title{Get or set the sample metadata.}
 \usage{
-sample_metadata(biom, field = NULL, id = NULL, cleanup = FALSE)
+sample_metadata(biom, field = NULL)
 
-sample_metadata(x) <- value
+sample_metadata(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{field}{The name of a single metadata column to retrieve. If provided,
-a named vector will be returned instead of a data.frame.
+\item{field}{The name of a single metadata column to retrieve. When
+provided, a named vector will be returned instead of a data.frame.
 Default: \code{NULL}}
 
-\item{id}{Copy the sample names (rownames) into this column.
-Default: \code{NULL}}
-
-\item{cleanup}{Change character columns to factor or dates. Date formats
-recognized are: "\%Y-\%m-\%d" or "\%m/\%d/\%Y" (four-digit year). Also
-replace '.' with '_' in column names when '.' is the first character
-in order to avoid conflicts with auto-generated columns.
-Default: \code{FALSE}}
-
-\item{value}{A data.frame with the metadata. All the \code{rownames()} must
-be in \code{sample_names(biom)}. If there are fewer rows of
-\code{value} than samples, then the \code{biom} object will be subset.}
+\item{value}{A data.frame with the metadata. Its row names or '.sample'
+column must match the IDs in \code{sample_names(x)}. The returned
+rbiom object will be subset to just the samples in the new metadata.
+With the exception of '.sample', all character columns will be
+converted to factor.}
 }
 \value{
-A data frame of the metadata in \code{biom}. If \code{field} is
-given, will return a named vector of the field's values.
+A tibble (data.frame) of the metadata in \code{biom}. '.sample' will
+always be the first column. If \code{field} is given, will instead
+return a named vector of the field's values.
 }
 \description{
 Get or set the sample metadata.
@@ -39,21 +34,20 @@ Get or set the sample metadata.
 \examples{
     library(rbiom)
     
-    sample_metadata(hmp50)[1:4,1:3]
+    sample_metadata(hmp50) \%>\% head(4)
     
-    head(sample_metadata(hmp50, "Body Site"))
-    
-    head(sample_metadata(hmp50, "Body Site", cleanup=TRUE))
+    sample_metadata(hmp50, "Body Site") \%>\% head(4)
     
     md <- sample_metadata(hmp50)
-    md <- md[,c('Sex', 'Body Site')]
+    md <- md[,c('.sample', 'Sex', 'Body Site')]
     sample_metadata(hmp50) <- md
-    head(sample_metadata(hmp50))
+    sample_metadata(hmp50) \%>\% head(4)
 
 }
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

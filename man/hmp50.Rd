@@ -5,7 +5,7 @@
 \alias{hmp50}
 \title{Human Microbiome Project - 50 sample demo dataset.}
 \format{
-A BIOM object with 50 samples.
+An rbiom object with 50 samples.
 Includes metadata, taxonomy, phylogeny, and sequences.
 \itemize{
 \item{Sex - }{Male or Female}

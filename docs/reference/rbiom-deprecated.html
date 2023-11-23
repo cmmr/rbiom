@@ -12,11 +12,11 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'><!-- mathjax --><scri
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,16 +68,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">info</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">depths_barplot</span><span class="op">(</span></span>
-<span>  <span class="va">biom</span>,</span>
-<span>  rline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  trans <span class="op">=</span> <span class="st">"log10"</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">metadata</span><span class="op">(</span><span class="va">biom</span>, field <span class="op">=</span> <span class="cn">NULL</span>, id <span class="op">=</span> <span class="cn">NULL</span>, cleanup <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">metadata</span><span class="op">(</span><span class="va">biom</span>, field <span class="op">=</span> <span class="cn">NULL</span>, cleanup <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">nsamples</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
@@ -95,14 +86,9 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">sample.names</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">repair</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">select</span><span class="op">(</span><span class="va">biom</span>, samples <span class="op">=</span> <span class="cn">NULL</span>, nTop <span class="op">=</span> <span class="cn">NULL</span>, nRandom <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sequences</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for BIOM</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">subtree</span><span class="op">(</span><span class="va">tree</span>, <span class="va">tips</span><span class="op">)</span></span>
 <span></span>
@@ -113,10 +99,10 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span><span class="fu">taxa.rollup</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
 <span>  rank <span class="op">=</span> <span class="st">"OTU"</span>,</span>
-<span>  taxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  map <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sparse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  taxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  long <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  md <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
@@ -124,6 +110,8 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span><span class="fu">taxonomy</span><span class="op">(</span><span class="va">biom</span>, ranks <span class="op">=</span> <span class="cn">NULL</span>, unc <span class="op">=</span> <span class="st">"asis"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">tips</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">unifrac</span><span class="op">(</span><span class="va">biom</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, tree <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">write.biom</span><span class="op">(</span><span class="va">biom</span>, <span class="va">file</span>, format <span class="op">=</span> <span class="st">"json"</span><span class="op">)</span></span>
 <span></span>
@@ -139,6 +127,15 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">depth</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">depths_barplot</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  rline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"log10"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">has.phylogeny</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">has.sequences</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
@@ -147,9 +144,11 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">is.rarefied</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sample.sums</span><span class="op">(</span><span class="va">biom</span>, long <span class="op">=</span> <span class="cn">FALSE</span>, md <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">repair</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">stats.table</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sample_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sample.sums</span><span class="op">(</span><span class="va">biom</span>, long <span class="op">=</span> <span class="cn">FALSE</span>, md <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">taxa.means</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -157,7 +156,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">top.taxa</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"OTU"</span>, n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/rbiom/man/rbiom-deprecated.html" class="external-link">top_taxa</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"OTU"</span>, n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
+<span><span class="fu">top_taxa</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"OTU"</span>, n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">comments</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
@@ -184,7 +183,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="alpha-div"><code>alpha.div</code><a class="anchor" aria-label="anchor" href="#alpha-div"></a></h2>
     
 
-<p>Use <code><a href="adiv_table.html">adiv_table()</a></code> instead.</p>
+<p>Use <code><a href="adiv_matrix.html">adiv_matrix()</a></code> or <code><a href="adiv_table.html">adiv_table()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="beta-div"><code>beta.div</code><a class="anchor" aria-label="anchor" href="#beta-div"></a></h2>
@@ -203,12 +202,6 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     
 
 <p>Use <code><a href="biom_info.html">biom_info()</a></code> instead.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="depths-barplot"><code>depths_barplot</code><a class="anchor" aria-label="anchor" href="#depths-barplot"></a></h2>
-    
-
-<p>Use <code><a href="rare_barplot.html">rare_barplot()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="metadata"><code>metadata</code><a class="anchor" aria-label="anchor" href="#metadata"></a></h2>
@@ -265,28 +258,16 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <p>Use <code><a href="sample_names.html">sample_names()</a></code> instead.</p>
     </div>
     <div class="section level2">
-    <h2 id="repair"><code>repair</code><a class="anchor" aria-label="anchor" href="#repair"></a></h2>
-    
-
-<p>Use <code><a href="biom_repair.html">biom_repair()</a></code> instead.</p>
-    </div>
-    <div class="section level2">
     <h2 id="select"><code>select</code><a class="anchor" aria-label="anchor" href="#select"></a></h2>
     
 
-<p>Use <code><a href="sample_select.html">sample_select()</a></code> instead.</p>
+<p>Use <code><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="sequences"><code>sequences</code><a class="anchor" aria-label="anchor" href="#sequences"></a></h2>
     
 
 <p>Use <code><a href="otu_sequences.html">otu_sequences()</a></code> instead.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="subset"><code>subset</code><a class="anchor" aria-label="anchor" href="#subset"></a></h2>
-    
-
-<p>Use <code><a href="sample_subset.html">sample_subset()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="subtree"><code>subtree</code><a class="anchor" aria-label="anchor" href="#subtree"></a></h2>
@@ -325,6 +306,12 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <p>Use <code><a href="tree_tips.html">tree_tips()</a></code> instead.</p>
     </div>
     <div class="section level2">
+    <h2 id="unifrac"><code>unifrac</code><a class="anchor" aria-label="anchor" href="#unifrac"></a></h2>
+    
+
+<p>Use <code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> or <code><a href="bdiv_table.html">bdiv_table()</a></code> instead.</p>
+    </div>
+    <div class="section level2">
     <h2 id="write-biom"><code>write.biom</code><a class="anchor" aria-label="anchor" href="#write-biom"></a></h2>
     
 
@@ -358,7 +345,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="comments"><code>comments</code><a class="anchor" aria-label="anchor" href="#comments"></a></h2>
     
 
-<p>Use <code><a href="biom_info.html">biom_info()</a></code> instead.</p>
+<p>Use <code><a href="biom_id.html">biom_comment()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="depth"><code>depth</code><a class="anchor" aria-label="anchor" href="#depth"></a></h2>
@@ -367,46 +354,58 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <p>Use <code><a href="sample_sums.html">sample_sums()</a></code> instead.</p>
     </div>
     <div class="section level2">
+    <h2 id="depths-barplot"><code>depths_barplot</code><a class="anchor" aria-label="anchor" href="#depths-barplot"></a></h2>
+    
+
+<p>Use <code><a href="rare_barplot.html">rare_barplot()</a></code> instead.</p>
+    </div>
+    <div class="section level2">
     <h2 id="has-phylogeny"><code>has.phylogeny</code><a class="anchor" aria-label="anchor" href="#has-phylogeny"></a></h2>
     
 
-<p>Use <code><a href="properties.html">has_tree()</a></code> instead.</p>
+<p>Use <code><a href="has_tree.html">has_tree()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="has-sequences"><code>has.sequences</code><a class="anchor" aria-label="anchor" href="#has-sequences"></a></h2>
     
 
-<p>Use <code><a href="properties.html">has_sequences()</a></code> instead.</p>
+<p>Use <code><a href="has_tree.html">has_sequences()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="id"><code>id</code><a class="anchor" aria-label="anchor" href="#id"></a></h2>
     
 
-<p>Use <code><a href="biom_info.html">biom_info()</a></code> instead.</p>
+<p>Use <code><a href="biom_id.html">biom_id()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="is-rarefied"><code>is.rarefied</code><a class="anchor" aria-label="anchor" href="#is-rarefied"></a></h2>
     
 
-<p>Use <code><a href="properties.html">is_rarefied()</a></code> instead.</p>
+<p>Use <code><a href="has_tree.html">is_rarefied()</a></code> instead.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="repair"><code>repair</code><a class="anchor" aria-label="anchor" href="#repair"></a></h2>
+    
+
+<p>Use <code><a href="biom_repair.html">biom_repair()</a></code> instead.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="sample-subset"><code>sample_subset</code><a class="anchor" aria-label="anchor" href="#sample-subset"></a></h2>
+    
+
+<p>Use <code><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="sample-sums"><code>sample.sums</code><a class="anchor" aria-label="anchor" href="#sample-sums"></a></h2>
     
 
-<p>Use <code><a href="sample_sums.html">sample_sums()</a></code> instead.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="stats-table"><code>stats.table</code><a class="anchor" aria-label="anchor" href="#stats-table"></a></h2>
-    
-
-<p>Use <code>biom_stats()</code> instead.</p>
+<p>Use <code><a href="sample_sums.html">sample_sums()</a></code> or <code><a href="adiv_table.html">adiv_table()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="taxa-means"><code>taxa.means</code><a class="anchor" aria-label="anchor" href="#taxa-means"></a></h2>
     
 
-<p>Use <code><a href="taxa_means.html">taxa_means()</a></code> instead.</p>
+<p>Use <code><a href="taxa_sums.html">taxa_means()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="taxa-sums"><code>taxa.sums</code><a class="anchor" aria-label="anchor" href="#taxa-sums"></a></h2>

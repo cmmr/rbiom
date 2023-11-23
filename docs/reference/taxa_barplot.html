@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">taxa_barplot</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  taxa <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  patterns <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -64,6 +64,8 @@
 <span>  dist <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
 <span>  clust <span class="op">=</span> <span class="st">"complete"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
+<span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -72,21 +74,25 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>rank</dt>
-<dd><p>What rank(s) of taxa to display, for example <code>"Phylum"</code>
-or <code>"Genus"</code>. Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a
-given BIOM object. The default, <code>NULL</code>, selects the lowest
-level.</p></dd>
+<dd><p>What rank(s) of taxa to display. E.g. <code>"Phylum"</code>,
+<code>"Genus"</code>, <code>".otu"</code>, etc. An integer vector can also be
+given, where <code>1</code> is the highest rank, <code>2</code> is the second
+highest, <code>-1</code> is the lowest rank, <code>-2</code> is the second
+lowest, and <code>0</code> is the OTU "rank". Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to
+see all options for a given <code>rbiom</code> object. Default: <code>-1</code>.</p></dd>
 
 
 <dt>taxa</dt>
-<dd><p>Which taxa to give separate colors. An integer value will show
-the top n most abundant taxa. A value 0 &lt;= n &lt; 1 will show all taxa
-with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: <code>6</code>.</p></dd>
+<dd><p>Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that
+mean abundance or greater (e.g. <code>0.1</code> implies &gt;= 10%). A
+character vector of taxa names will show only those named taxa.
+Default: <code>6</code>.</p></dd>
 
 
 <dt>colors, patterns</dt>
@@ -112,18 +118,43 @@ use for data partitioning. Default: <code>NULL</code></p></dd>
 <dt>dist, clust</dt>
 <dd><p>Distance (<code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>) and clustering
 (<code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">stats::hclust()</a></code>) methods to use for automatically arranging
-samples along the x-axis. Group samples with similar composition near
+samples along the x-axis to put samples with similar composition near
 one another. Default: <code>dist="euclidean", clust="complete"</code>.</p></dd>
 
 
 <dt>other</dt>
-<dd><p>Add an 'Other' taxa that ensures all bars sum to 100%.
-Default: <code>TRUE</code>.</p></dd>
+<dd><p>Sum all non-itemized taxa into an "Other" taxa. When
+<code>FALSE</code>, only returns taxa matched by the <code>taxa</code>
+argument. Specifying <code>TRUE</code> adds "Other" to the returned set.
+A string can also be given to imply <code>TRUE</code>, but with that
+value as the name to use instead of "Other".
+Default: <code>FALSE</code></p></dd>
+
+
+<dt>unc</dt>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:</p><ul><li><p><code>"singly"</code> -  Replaces them with the OTU name.</p></li>
+<li><p><code>"grouped"</code> -  Replaces them with a higher rank's name.</p></li>
+<li><p><code>"drop"</code> -  Excludes them from the result.</p></li>
+<li><p><code>"asis"</code> -  To not check/modify any taxa names.</p></li>
+</ul><p>Default: <code>"singly"</code> <br><br>
+Abbreviations are allowed.</p></dd>
+
+
+<dt>lineage</dt>
+<dd><p>Include all ranks in the name of the taxa. For instance,
+setting to <code>TRUE</code> will produce
+<code>Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales</code>.
+Otherwise the taxa name will simply be <code>Coriobacteriales</code>. You
+want to set this to TRUE when <code>unc = "asis"</code> and you have taxa
+names (such as <em>Incertae_Sedis</em>) that map to multiple higher
+level ranks. Default: <code>FALSE</code></p></dd>
 
 
 <dt>xlab.angle</dt>
-<dd><p>How to rotate the tick labels on the x-axis.
-Options are <code>90</code> (the default) or <code>30</code>.</p></dd>
+<dd><p>Angle of the labels at the bottom of the plot.
+Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>'90'</code>.
+Default: <code>"auto"</code>.</p></dd>
 
 
 <dt>...</dt>
@@ -136,12 +167,20 @@ and only to, that layer.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The computed data points will be attached as
-<code>attr(, 'data')</code>.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points, ggplot command,
+and object history are available as <code>$data</code>, <code>$code</code>, and
+<code>$history</code>, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other visualization: 
+    <div class="dont-index"><p>Other taxa_abundance: 
+<code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
+<code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_matrix.html">taxa_matrix</a>()</code>,
+<code><a href="taxa_stats.html">taxa_stats</a>()</code>,
+<code><a href="taxa_table.html">taxa_table</a>()</code></p>
+<p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,

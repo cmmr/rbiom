@@ -7,10 +7,11 @@
 \usage{
 taxa_ranks(biom)
 
-taxa_ranks(x) <- value
+taxa_ranks(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{value}{A character vector the new taxa rank names.}
 }
@@ -27,12 +28,13 @@ Get or set the names of the taxonomic ranks.
     
     taxa_ranks(biom)
     
-    taxa_ranks(biom) <- paste0("Level", seq_len(n_ranks(biom)))
+    taxa_ranks(biom) <- c('.otu', paste0("Level", seq_len(n_ranks(biom) - 1)))
     taxa_ranks(biom)
 }
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

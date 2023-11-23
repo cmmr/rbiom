@@ -8,7 +8,7 @@ write_fasta(seqs, file = NULL)
 }
 \arguments{
 \item{seqs}{A named character vector where names are sequence names and
-values are the sequences. Also accepts a \code{BIOM} object which
+values are the sequences. Also accepts an \code{rbiom} object which
 contains sequences.}
 
 \item{file}{Path to the output fasta file. Filenames ending in

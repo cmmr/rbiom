@@ -7,10 +7,11 @@
 \usage{
 sample_names(biom)
 
-sample_names(x) <- value
+sample_names(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{value}{A character vector of the new sample names.}
 }
@@ -33,6 +34,7 @@ Get or set the sample names.
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

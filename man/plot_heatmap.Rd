@@ -19,6 +19,7 @@ plot_heatmap(
   track_height = NULL,
   legend = "right",
   xlab.angle = "auto",
+  labs.title = NULL,
   ...
 )
 }
@@ -65,35 +66,29 @@ Default: \code{TRUE}.}
 similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 \code{clust = c(rows = "complete", cols = NA)}, or simply
-\code{clust = c("complete", NA)}.
-Default: \code{"complete"}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
-   \\itemize\{
-     \\item\{\code{FALSE} or \code{NA} - \}\{ Disable reordering. \}
-     \\item\{An \code{hclust} class object\} \{ E.g. from [stats::hclust()]. \}
-     \\item\{A method name - \}\{ \code{"ward.D"}, 
-       \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
-       \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
-       \code{"centroid"}. \}
-   \}
-}\if{html}{\out{</div>}}}
+\code{clust = c("complete", NA)}. Options are:
+\itemize{
+\item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
+\item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
+\item{A method name - }{ \code{"ward.D"},
+\code{"ward.D2"}, \code{"single"}, \code{"complete"},
+\code{"average"}, \code{"mcquitty"}, \code{"median"}, or
+\code{"centroid"}. }
+}
+Default: \code{"complete"}.}
 
 \item{dist}{Distance algorithm to use when reordering the rows and columns
 by similarity. You can supply a list or character vector of length
 two to control the row and column clustering separately, for example
 \code{dist = c(rows = "euclidean", cols = "maximum")}, or simply
-\code{dist = c("euclidean", "maximum")}.
-Default: \code{"euclidean"}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
-   \\itemize\{
-     \\item\{A \code{dist} class object\} \{ E.g. from [stats::dist()] or [bdiv_distmat()]. \}
-     \\item\{A method name - \}\{ \code{"euclidean"}, 
-       \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
-       \code{"binary"}, or \code{"minkowski"}. \}
-   \}
-}\if{html}{\out{</div>}}}
+\code{dist = c("euclidean", "maximum")}. Options are:
+\itemize{
+\item{A \code{dist} class object}{ E.g. from \code{\link[stats:dist]{stats::dist()}} or \code{\link[=bdiv_distmat]{bdiv_distmat()}}. }
+\item{A method name - }{ \code{"euclidean"},
+\code{"maximum"}, \code{"manhattan"}, \code{"canberra"},
+\code{"binary"}, or \code{"minkowski"}. }
+}
+Default: \code{"euclidean"}.}
 
 \item{ratio}{Height/width ratio for entire grid.
 Default: \code{1} (square).}
@@ -109,16 +104,17 @@ Default: \code{NULL}, which computes:
 \code{"bottom"}. Default: \code{"right"}.}
 
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
-Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
-\item{...}{Additional arguments to pass on to ggplot2::theme().
-For example, \code{labs.title = "Plot Title"}.}
+\item{labs.title}{Plot title. Default: \code{NULL}.}
+
+\item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. The constructed ggplot command will be
-attached as \code{attr(,'cmd')}, and the underlying computed data
-as \code{$data}.
+A \code{ggplot2} plot. \cr The computed data points, ggplot command,
+and object history are available as \code{$data}, \code{$code}, and
+\code{$history}, respectively.
 }
 \description{
 Create a heatmap with tracks and dendrograms from any matrix.

@@ -1,28 +1,58 @@
 
 
-
-get_cache_file <- function (fn, params) {
+#________________________________________________________
+# Fetch the cache directory.
+#________________________________________________________
+get_cache_dir <- function () {
   
-  
-  #________________________________________________________
-  # Fetch the cache directory.
-  #________________________________________________________
   cache <- getOption("rbiom.cache_dir", default = "")
-  if (identical(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
-  if (identical(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
-  if (!is_scalar_character(cache) || identical(cache, "FALSE"))   return (NULL)
+  if (eq(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
+  if (eq(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
+  if (!is_scalar_character(cache) || eq(cache, "FALSE"))   return (NULL)
   if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (NULL)
   
+  return (cache)
+}
+
+
+#________________________________________________________
+# The function for hashing cached objects.
+#________________________________________________________
+get_hash_fun <- function () {
   
-  #________________________________________________________
-  # Hash the call into a cache file.
-  #________________________________________________________
+  if (is.null(get_cache_dir())) {
+    hash_fun <- function (obj) NULL
+    
+  } else {
+    hash_fun <- getOption("rbiom.cache_hash", default = "")
+    if (!is.function(hash_fun)) hash_fun <- rlang::hash
+  }
+  
+  return (hash_fun)
+}
+
+
+
+#________________________________________________________
+# Hash a function call to a cache file.
+#________________________________________________________
+get_cache_file <- function (fn = NULL, params = NULL) {
+  
+  cache_dir <- get_cache_dir()
+  if (is.null(cache_dir)) return (NULL)
+  
   hash <- getOption("rbiom.cache_hash", default = "")
   if (!is.function(hash)) hash <- rlang::hash
   
+  if (is.null(fn))     fn     <- capture.output(rlang::caller_call()[[1]])
+  if (is.null(params)) params <- get('params', pos = parent.frame(), inherits = FALSE)
+  
+  params  %<>% lapply(function (x) if.null(attr(x, 'hash', exact = TRUE), hash(x)))
   cache_key  <- hash(c(list(fn), params[order(names(params))]))
-  cache_file <- file.path(cache, paste0(cache_key, ".rds"))
+  cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   cache_file <- normalizePath(cache_file, winslash = "/", mustWork = FALSE)
+  
+  attr(cache_file, 'exists') <- Sys.setFileTime(cache_file, Sys.time())
   
   
   return (cache_file)

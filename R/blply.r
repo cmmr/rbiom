@@ -1,13 +1,13 @@
-#' Split BIOM by metadata, apply function, and return results in a list.
+#' Split an rbiom object by metadata, apply function, and return results in a 
+#' list.
 #' 
-#' Calls \code{plyr::dlply} internally.
-#' 
-#' @name blply
+#' Calls \code{plyr::dlply} internally. Consider setting 
+#' \code{otu_tree(biom) <- NULL} to speed up creation of subseted rbiom objects.
 #' 
 #' @inherit bdply params
 #'           
-#' @param FUN   The function to execute on each BIOM subset. \code{FUN} may
-#'        return any object, all of which will be returned in a named list.
+#' @param FUN   The function to execute on each \code{biom} subset. \code{FUN} 
+#'        may return any object, all of which will be returned in a named list.
 #'        
 #' @return A list with the function outputs.
 #' 
@@ -15,13 +15,13 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     blply(hmp50, "Sex", n_samples)
 #'     
 #'     blply(hmp50, c("Body Site", "Sex"), function (b) {
-#'       ad <- adiv_table(b, adiv = "all")[,c(".Shannon", ".Simpson")]
-#'       apply(ad, 2L, mean)
+#'       adm <- adiv_matrix(b)[,c("Shannon", "Simpson")]
+#'       apply(adm, 2L, mean)
 #'     })
 #'     
 #'     iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
@@ -32,7 +32,7 @@
 #'     
 #'     
 #'
-blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE, fast = TRUE) {
+blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   
   
   #________________________________________________________
@@ -62,16 +62,17 @@ blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE, fast = 
     
   } else {
     
-    if (!is(biom, 'BIOM'))
-      stop("Can't apply metadata partitions to non-BIOM object.")
+    try(silent = TRUE, validate_biom(clone = FALSE))
+    if (!is(biom, 'rbiom'))
+      stop("Can't apply metadata partitions to non-rbiom object.")
     
     
-    data <- sample_metadata(biom, id = ".id")
-    vars %<>% validate_arg(biom, 'meta', col_type = 'cat')
+    data <- sample_metadata(biom)
+    validate_meta('vars', col_type = 'cat', max = Inf, null_ok = TRUE)
     
     result <- plyr::dlply(data, ply_cols(vars), function (df) {
       
-      sub_biom <- sample_select(biom, df[['.id']], fast = fast)
+      sub_biom <- sample_select(biom, as.character(df[['.sample']]))
       
       if (nrow(iters) == 0)
         return (do.call(FUN, c(list(sub_biom), dots)))

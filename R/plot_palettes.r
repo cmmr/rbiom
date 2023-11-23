@@ -63,7 +63,7 @@ is_palette <- function (palette) {
   if (!is_scalar_character(palette)) return (FALSE)
   
   palette <- tolower(palette)
-  if (identical(substr(palette, 1, 1), "-"))
+  if (eq(substr(palette, 1, 1), "-"))
     palette <- substr(palette, 2, nchar(palette))
   
   if (!is_string(palette, names(PALETTES))) return (FALSE)
@@ -82,7 +82,7 @@ get_palette <- function (palette) {
   stopifnot(is_scalar_character(palette) && !is_na(palette))
   palette <- tolower(palette)
   
-  if (identical(substr(palette, 1, 1), "-")) {
+  if (eq(substr(palette, 1, 1), "-")) {
     palette <- substr(palette, 2, nchar(palette))
     
     stopifnot(is_string(palette, names(PALETTES)))

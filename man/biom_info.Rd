@@ -2,18 +2,19 @@
 % Please edit documentation in R/accessors.r
 \name{biom_info}
 \alias{biom_info}
-\title{Get \code{BIOM} object's miscellaneous information.}
+\title{Get \code{rbiom} object's miscellaneous information.}
 \usage{
 biom_info(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
 A list of the top-level metadata in \code{biom}.
 }
 \description{
-Get \code{BIOM} object's miscellaneous information.
+Get \code{rbiom} object's miscellaneous information.
 }
 \examples{
     library(rbiom)
@@ -22,6 +23,7 @@ Get \code{BIOM} object's miscellaneous information.
 }
 \seealso{
 Other accessors: 
+\code{\link{metadata_numeric}()},
 \code{\link{n_samples}()},
 \code{\link{sample_sums}()}
 }

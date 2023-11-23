@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,9 +57,8 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code>
-object, as returned from <code><a href="read_biom.html">read_biom()</a></code>. For matrices, the rows and
-columns are assumed to be the taxa and samples, respectively.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>depth</dt>
@@ -74,7 +73,7 @@ to integers between 1 and <code>depth</code> such that they sum to
 <dt>seed</dt>
 <dd><p>An integer to use for seeding the random number generator. If
 you need to create different random rarefactions of the same
-<code>BIOM</code> object, set this seed value to a different number each
+<code>rbiom</code> object, set this seed value to a different number each
 time.</p></dd>
 
 </dl></div>
@@ -82,25 +81,18 @@ time.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code></p>
-
-
-<p>object, depending on the input object type. The type of object
-provided is the same type that is returned. The retained
-observations are randomly selected, based on a seed value derived
-from the <code>BIOM</code> object. Therefore, rarefying the same biom to
-the same depth will always produce the same resultant rarefaction.</p>
+<p>The rarefied <code>rbiom</code> object.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu">slam</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slam/man/sums.html" class="external-link">col_sums</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]   182 22117</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">sample_rarefy</span><span class="op">(</span><span class="va">hmp50</span>, depth<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu">slam</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slam/man/sums.html" class="external-link">col_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1000 1000</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

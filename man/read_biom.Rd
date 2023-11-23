@@ -4,7 +4,7 @@
 \alias{read_biom}
 \title{Extracts counts, metadata, taxonomy, and phylogeny from a biom file.}
 \usage{
-read_biom(src, tree = "auto", cleanup = FALSE, prune = cleanup)
+read_biom(src, tree = "auto")
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or JSON string.
@@ -20,56 +20,56 @@ files, the BioConductor R package \code{rhdf5} must be installed.}
 \item{tree}{By default, the tree will be read from the BIOM file specified
 in \code{src}. Specifying \code{tree=TRUE} will do the same, but will
 generate an error message if a tree is not present. Setting
-\code{tree=FALSE} will return a \code{BIOM} object without any tree
+\code{tree=FALSE} will return an \code{rbiom} object without any tree
 data. You may also provide a file path, URL, or Newick string to load
-that tree data into the returned \code{BIOM} object.
+that tree data into the returned \code{rbiom} object.
 Default: \code{"auto"}}
-
-\item{cleanup}{Renames ambiguous taxons and removes leading underscores.
-Also converts character metadata into factors and dates based on
-heuristics. Default: \code{FALSE}}
-
-\item{prune}{Should samples and taxa with zero observations be discarded?
-Default: \code{cleanup}}
 }
 \value{
-A \code{BIOM} class object containing the parsed data. This object
+An \code{rbiom} class object containing the parsed data. This object
 can be treated as a list with the following named elements:
 \itemize{
 \item{\code{$counts} - }{
-A numeric \code{slam} sparse matrix of observation counts. Taxa
-(OTUs) as rows and samples as columns. }
+A numeric \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} (sparse matrix) of
+observation counts. Taxa (OTUs) as rows and samples as columns.
+Access or modify using \code{\link[=otu_matrix]{otu_matrix()}}. }
 \item{\code{$metadata} - }{
-A data frame containing any embedded metadata. Row names are
-sample IDs. }
+A \code{\link[tibble:tibble]{tibble::tibble()}} (data frame) containing any embedded
+metadata. Sample IDs are in the \code{.sample} column.
+Access or modify using \code{\link[=sample_metadata]{sample_metadata()}}. }
 \item{\code{$taxonomy} - }{
-Character matrix of taxonomic names, if given. Row names are taxa
-(OTU) IDs. Column rows are named Kingdom, Phylum, Class, Order,
+A \code{\link[tibble:tibble]{tibble::tibble()}} (data frame) mapping OTU IDs to taxonomic
+clades. Columns are named .otu, Kingdom, Phylum, Class, Order,
 Family, Genus, Species, and Strain, or TaxLvl.1, TaxLvl.2, ... ,
 TaxLvl.N when more than 8 levels of taxonomy are encoded in the
-biom file. }
+biom file. Access or modify using \code{\link[=otu_taxonomy]{otu_taxonomy()}}. }
 \item{\code{$phylogeny} - }{
 An object of class \code{phylo} defining the phylogenetic
-relationships between the taxa. Although the official
+relationships between the OTUs. Although the official
 specification for BIOM only includes phylogenetic trees in BIOM
-version 2.1, if a BIOM version 1.0 file includes a
+version 2.1, if an rbiom version 1.0 file includes a
 \code{phylogeny} entry with newick data, then it will be loaded
 here as well. The \pkg{ape} package has additional functions for
-working with \code{phylo} objects.}
+working with \code{phylo} objects. Access or modify using
+\code{\link[=otu_tree]{otu_tree()}}. }
 \item{\code{$sequences} - }{
-A named character vector, where the names are taxonomic
-identifiers and the values are the sequences they represent.
+A named character vector, where the names are OTU IDs and the
+values are the nucleic acid sequences they represent.
 These values are not part of the official BIOM specification, but
-will be read and written when defined. }
+will be read and written when defined. Access or modify using
+\code{\link[=otu_sequences]{otu_sequences()}}. }
 \item{\code{$info} - }{
 A list of other attributes defined in the BIOM file, such as
 \code{id}, \code{type}, \code{format}, \code{format_url},
 \code{generated_by}, \code{date}, \code{matrix_type},
-\code{matrix_element_type}, \code{Comment}, and \code{shape}. }
+\code{matrix_element_type}, \code{comment}, and \code{shape}.
+Access using \code{\link[=biom_info]{biom_info()}}. Access/set with \code{\link[=biom_id]{biom_id()}} or
+\code{\link[=biom_comment]{biom_comment()}}. }
 }
 \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
-components of the BIOM file specification and therefore will be empty
-in the returned object when they are not provided by the BIOM file.
+components of the BIOM file specification and therefore will be NULL
+or simple placeholders in the returned object when they are not provided
+by the BIOM file.
 }
 \description{
 Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
@@ -83,19 +83,20 @@ Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
     print(biom)
 
     # Taxa Abundances
-    as.matrix(biom$counts[1:4,1:4])
-
-    top5 <- names(head(rev(sort(slam::row_sums(biom$counts))), 5))
-    biom$taxonomy[top5,c('Family', 'Genus')]
-    as.matrix(biom$counts[top5, 1:6])
+    otu_matrix(biom)[,1:10] \%>\% as.matrix() \%>\% head()
+    
+    otu_taxonomy(biom) \%>\% head()
 
     # Metadata
+    sample_metadata(biom) \%>\% head()
+    
     table(biom$metadata$Sex, biom$metadata$`Body Site`)
+    
     sprintf("Mean age: \%.1f", mean(biom$metadata$Age))
 
     # Phylogenetic tree
-    tree <- biom$phylogeny
-    top5.tree <- tree_subset(tree, top5)
-    ape::plot.phylo(top5.tree)
+    otu_tree(biom) \%>\%
+      tree_subset(1:10) \%>\%
+      ape::plot.phylo()
 
 }

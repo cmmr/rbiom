@@ -2,27 +2,31 @@
 % Please edit documentation in R/taxa_sums.r
 \name{taxa_sums}
 \alias{taxa_sums}
-\title{Get the taxa abundances.}
+\alias{taxa_means}
+\title{Get summary taxa abundances.}
 \usage{
-taxa_sums(biom, rank = NULL)
+taxa_sums(biom, rank = 0)
+
+taxa_means(biom, rank = 0)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{rank}{The taxonomic rank to return sums for. The default,
-\code{NULL}, returns OTU sums in the same order as they appear in
-\code{\link[=otu_matrix]{otu_matrix()}}. If not \code{NULL}, returned sums are ordered from
-most abundant to least abundant.}
+\item{rank}{The taxonomic rank to return sums or means for. The default,
+\code{0}, returns per-OTU summaries.}
 }
 \value{
-A numeric vector, named with the taxa names.
+A named, sorted numeric vector.
 }
 \description{
-Get the taxa abundances.
+Get summary taxa abundances.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
-    taxa_sums(hmp50, 'Genus') \%>\% head(10)
+    taxa_sums(hmp50) \%>\% head(4)
+    
+    taxa_means(hmp50, 'Family') \%>\% head(5)
 
 }

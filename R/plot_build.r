@@ -3,12 +3,13 @@
 # Create the plot and add each layer with its arguments.
 # Also attach a human-readable version of the plot command.
 #______________________________________________________________
-plot_build <- function (layers) {
+plot_build <- function (params) {
   
-  stopifnot(has_name(layers, 'ggplot'))
   
-  ggdata <- attr(layers, 'data',   exact = TRUE)
-  params <- attr(layers, 'params', exact = TRUE)
+  ggdata <- params$.ggdata
+  layers <- params$layers
+  
+  stopifnot(has_layer(params, 'ggplot'))
   stopifnot(is(ggdata, 'data.frame'))
   
   
@@ -20,8 +21,9 @@ plot_build <- function (layers) {
       geom_text(mapping = aes(x=1,y=1), label="No Data to Display") + 
       theme_void()
     p$plot_env <- emptyenv()
-    attr(p, 'facet.nrow') <- 1
-    attr(p, 'facet.ncol') <- 1
+    attr(p, 'facet.nrow')  <- 1
+    attr(p, 'facet.ncol')  <- 1
+    attr(p, 'facet.count') <- 1
     return (p)
   }
   
@@ -29,37 +31,16 @@ plot_build <- function (layers) {
   #________________________________________________________
   # Add in coord_flip when flip=TRUE
   #________________________________________________________
-  if (isTRUE(params[['flip']])) initLayer('flip')
-  
-  
-  #________________________________________________________
-  # Shade background of x-axis positions
-  #________________________________________________________
-  if (isTRUE(params[['stripe']])) {
-    
-    x <- ceiling(range(as.numeric(ggdata[[attr(layers, 'xcol')]])))
-    
-    if (diff(x) > 0) {
-      x1 <- x[[1]] + 1
-      x2 <- x[[2]]
-      setLayer('stripe',
-        data    = as.cmd(data.frame(x = seq(x1, x2, 2)), list(x1 = x1, x2 = x2)),
-        mapping = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf),
-        fill    = 'black', color = NA, alpha = 0.05 )
-      remove("x1", "x2")
-    }
-    remove("x")
-    
-  }
+  if (isTRUE(params$flip)) add_layer(params, 'flip')
   
   
   #______________________________________________________________
   # Suppress vertical gridlines (horizontal if flipped).
   #______________________________________________________________
-  if (isTRUE(params[['flip']])) {
-    setLayer("theme", panel.grid.major.y = element_blank())
+  if (isTRUE(params$flip)) {
+    set_layer(params, 'theme', panel.grid.major.y = element_blank())
   } else {
-    setLayer("theme", panel.grid.major.x = element_blank())
+    set_layer(params, 'theme', panel.grid.major.x = element_blank())
   }
   
   
@@ -75,25 +56,34 @@ plot_build <- function (layers) {
     'scale_size', 'facet', # 'free_y', 
     'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
   layer_order <- c(
-    intersect(layer_order, names(layers)),
-    setdiff(names(layers), layer_order) )
+    intersect(layer_order, env_names(layers)),
+    setdiff(env_names(layers), layer_order) )
   
   
   #______________________________________________________________
-  # Suppress x-axis labels when they're identical to facet labels
+  # Suppress x-axis labels when they're eq to facet labels
   #______________________________________________________________
-  if(attr(layers, 'xcol', exact = TRUE) %in% params[['facet.by']]) {
-    if (isTRUE(params[['flip']])) {
-      layers[['theme']][['axis.text.x']]        <- element_blank()
-      layers[['theme']][['axis.ticks.x']]       <- element_blank()
-      layers[['theme']][['axis.title.x']]       <- element_blank()
-      layers[['theme']][['panel.grid.major.x']] <- element_blank()
+  if(params$.xcol %in% params$facet.by) {
+    
+    if (isTRUE(params$flip)) {
+      set_layer(
+        params     = params, 
+        layer      = 'theme', 
+        .overwrite = TRUE,
+        'axis.text.x'        = element_blank(),
+        'axis.ticks.x'       = element_blank(),
+        'axis.title.x'       = element_blank(),
+        'panel.grid.major.x' = element_blank() )
       
     } else {
-      layers[['theme']][['axis.text.y']]        <- element_blank()
-      layers[['theme']][['axis.ticks.y']]       <- element_blank()
-      layers[['theme']][['axis.title.y']]       <- element_blank()
-      layers[['theme']][['panel.grid.major.y']] <- element_blank()
+      set_layer(
+        params     = params, 
+        layer      = 'theme', 
+        .overwrite = TRUE,
+        'axis.text.y'        = element_blank(),
+        'axis.ticks.y'       = element_blank(),
+        'axis.title.y'       = element_blank(),
+        'panel.grid.major.y' = element_blank() )
     }
   }
   
@@ -116,8 +106,11 @@ plot_build <- function (layers) {
     gvals <- ggdata[['.group']] %>% as.character() %>% factor() %>% as.numeric()
     gvals[is.na(gvals)] <- 0
     
-    prefer <- params[grep("^(x|.+\\.by)$", names(params))] %>% unlist() %>% unname()
-    mcols  <- grep("^\\.", names(ggdata), invert = TRUE, value = TRUE)
+    
+    prefer <- lapply(env_names(params), function (i) {
+      if (grepl("^(x|.+\\.by)$", i)) params[[i]] else NULL
+    }) %>% unlist() %>% unname()
+    mcols  <- grep("^\\.", colnames(ggdata), invert = TRUE, value = TRUE)
     mcols  <- mcols[order(!mcols %in% prefer)]
     
     for (i in mcols) {
@@ -139,7 +132,7 @@ plot_build <- function (layers) {
   #______________________________________________________________
   # Track which columns in `data` the plot command uses
   #______________________________________________________________
-  mapped_cols <- params[['facet.by']]
+  mapped_cols <- params$facet.by
   
   
   #______________________________________________________________
@@ -181,8 +174,8 @@ plot_build <- function (layers) {
           
           val <- as.vector(aes_args[[arg]])
           
-          # if (identical(val, ".all"))   val <- NA
-          if (identical(val, ".group")) val <- gcol
+          # if (eq(val, ".all"))   val <- NA
+          if (eq(val, ".group")) val <- gcol
           
           
           if (is.character(val) && length(val) == 1) {
@@ -231,7 +224,7 @@ plot_build <- function (layers) {
     #______________________________________________________________
     defaults <- formals(fun)
     for (i in intersect(names(defaults), names(args)))
-      if (identical(defaults[[i]], args[[i]]))
+      if (eq(defaults[[i]], args[[i]]))
         args[[i]] <- NULL
     
     
@@ -258,24 +251,24 @@ plot_build <- function (layers) {
     
     # Skip theme() unless it has arguments
     #______________________________________________________________
-    if (layer == "theme" && length(args) == 0)
+    if (layer == 'theme' && length(args) == 0)
       next
     
     
     # Force sqrt scale to display zero tick mark.
     # Handle sqrt- and log1p- transforming of Inf and -Inf
     #______________________________________________________________
-    if (layer == "yaxis") {
+    if (layer == 'yaxis') {
       
-      if (identical(args[['trans']], "sqrt")) {
-        if (isTRUE(params[['stripe']])) {
+      if (eq(args[['trans']], "sqrt")) {
+        if (isTRUE(params$stripe)) {
           args[['trans']] <- as.cmd(scales::trans_new("sqrt0", function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, function(y) ifelse(y<0, 0, y^2)))
         } else {
           args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
         }
         
-      } else if (identical(args[['trans']], "log1p")) {
-        if (isTRUE(params[['stripe']])) {
+      } else if (eq(args[['trans']], "log1p")) {
+        if (isTRUE(params$stripe)) {
           args[['trans']] <- as.cmd(scales::trans_new("log1p0", function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, base::expm1))
         }
       }
@@ -301,16 +294,20 @@ plot_build <- function (layers) {
   
   
   #______________________________________________________________
-  # Attach the number of facet rows and cols as plot attributes
+  # Attach code, facet info, etc
   #______________________________________________________________
-  attr(p, 'facet.nrow') <- attr(layers, 'facet.nrow', exact = TRUE)
-  attr(p, 'facet.ncol') <- attr(layers, 'facet.ncol', exact = TRUE)
+  for (i in names(params$.plot_attrs))
+    attr(p, i) <- params$.plot_attrs[[i]]
+  
+  attr(p, 'code') <- cmds %>% 
+    paste(collapse=" +\n  ") %>% 
+    add_class('rbiom_code')
   
   
-  attr(p, 'cmd')   <- paste(collapse=" +\n  ", cmds)
-  #attr(p, 'data')  <- ggdata
-  #attr(p, 'stats') <- attr(layers, "stats", exact = TRUE)
-  p$stats <- attr(layers, "stats", exact = TRUE)
+  #________________________________________________________
+  # Enable accessing attributes with `$`.
+  #________________________________________________________
+  p %<>% add_class('rbiom_plot')
   
   
   #______________________________________________________________

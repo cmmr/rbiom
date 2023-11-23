@@ -7,10 +7,11 @@
 \usage{
 otu_names(biom)
 
-otu_names(x) <- value
+otu_names(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{value}{A character vector with the new OTU names.}
 }
@@ -33,6 +34,7 @@ Get or set the OTU names.
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_sequences}()},
 \code{\link{otu_taxonomy}()},

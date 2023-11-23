@@ -12,25 +12,25 @@ adiv_corrplot(
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
+  test = "trends",
   model = "lm",
-  stats = "emtrends",
   p.adj = "fdr",
-  ci = 95,
+  level = 0.95,
   caption = FALSE,
   ...
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{x}{A numeric metadata column name to use for the x-axis. Required.}
+\item{x}{A numeric metadata field to use for the x-axis. Required.}
 
-\item{adiv}{One or more alpha diversity measures to use. Options are:
-\code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"},
-and/or \code{"InvSimpson"}. Non-ambiguous abbreviations are also
-accepted. You can use \code{adiv="all"} as shortcut for
-\code{adiv=c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")}
-Default: \code{"Shannon"}.}
+\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
+\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
+\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+Default: \code{"Shannon"} \cr\cr
+Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
 \item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
 abbreviations are also accepted. For instance,
@@ -41,46 +41,26 @@ Default: \code{"t"}.}
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
 
-\item{model}{What type of trendline to fit to the data. Options are:
-\itemize{
-\item{\code{"lm"} - }{  Linear model: \code{stats::lm(formula = y ~ x)}.) }
-\item{\code{"log"} - }{ Logarithmic model: \code{stats::lm(formula = y ~ log(x))}. }
-\item{\code{"gam"} - }{ Generalized additive model: \code{mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")}. }
-}
-Default: \code{"lm"} \cr\cr
-You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, \code{model = list("stats::lm", list(formula = y ~ x))}.}
+\item{test}{The statistic of interest. An overview of options can be
+found in the "Statistical Tests" section below. One of
+\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
+\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
+\code{"pw_means"}, or \code{"pw_trends"}.
+Default: \code{"trends"}}
 
-\item{stats}{Which statistic to display on the plot. Options are:
-\itemize{
-\item{\code{"fit"} - }{ How well does the model fit the data? }
-\item{\code{"terms"} - }{ How strongly does 'x' influence 'y'? }
-\item{\code{"emmeans"} - }{ Is the average 'y' value non-zero? }
-\item{\code{"emtrends"} - }{ Does any trendline have a non-zero slope? }
-\item{\code{"emm_pairs"} - }{ Are the means of any trendlines different? }
-\item{\code{"emt_pairs"} - }{ Are the slopes of any trendlines different? }
-\item{\code{"hide"} - }{ Don't show stats on the plot, but still compute them. }
-\item{\code{"none"} - }{ Do not compute or show statistics. }
-}
-Default: \code{"emtrends"} \cr\cr
-Note: \code{"emm_pairs"} and \code{"emt_pairs"} can only be calculated
-when using a \code{color.by} metadata column with more than one level. \cr\cr
-Statistical tests are run separately on each facet. P-values are
-adjusted for multiple comparisons by considering all facets together.
-Unless \code{stats = "none"}, all stats are attached to the plot as
-\code{attr(,'stats')}.}
+\item{model}{What type of trend model to fit to the data. Options are:
+\code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
+(generalized additive). See the "Model Options" section below for
+additional details. Default: \code{"lm"}}
 
-\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
-Run \code{p.adjust.methods} for a list of available options.
-Default: \code{"fdr"}.}
+\item{p.adj}{Method to use for multiple comparisons adjustment of
+p-values. Run \code{p.adjust.methods} for a list of available
+options. Default: \code{"fdr"}.}
 
-\item{ci}{The confidence interval to display around the trendline.
-Default: \code{95}.}
+\item{level}{The confidence level for calculating a confidence interval.
+Default: \code{0.95}}
 
-\item{caption}{Display information about the method used for trendline
+\item{caption}{Display information about the method used for trend line
 fitting beneath the plot. Default: \code{FALSE}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
@@ -91,13 +71,63 @@ respectively. For instance, \code{s.size = 2} ensures only the
 scatterplot points have their size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics will
-be attached as \code{attr(p, 'data')} and \code{attr(p, 'stats')},
-respectively.
+A \code{ggplot2} plot. \cr The computed data points, statistics,
+ggplot command, and object history are available as \code{$data},
+\code{$stats}, \code{$code}, and \code{$history}, respectively.
 }
 \description{
 Visualize alpha diversity with scatterplots and trendlines.
 }
+\section{Statistical Tests}{
+
+
+\itemize{
+\item{\code{"predict"} - }{
+Augments original data with fitted information. See
+\code{\link[broom:augment.lm]{broom::augment.lm()}}. }
+\item{\code{"terms"} - }{ Summary information about the model's
+terms, including p-value, r-squared, AIC, BIC, and confidence
+interval at \code{level}. See \code{\link[broom:tidy.lm]{broom::tidy.lm()}}. }
+\item{\code{"fit"} - }{ Goodness of fit measures, p-values, and
+more for the overall model. See \code{\link[broom:glance.lm]{broom::glance.lm()}}. }
+\item{\code{"means"} - }{ The estimated marginal mean (EMM) for
+each \code{stat.by} group, along with confidence intervals (CI),
+standard errors (SE), t-ratios, and p-values testing for mean = zero.
+See \code{\link[emmeans:emmeans]{emmeans::emmeans()}} and \code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
+\item{\code{"trends"} - }{ The trendline slope for each
+\code{stat.by} group, along with CI and SE and p-value testing for
+slope = zero. See \code{\link[emmeans:emtrends]{emmeans::emtrends()}} and
+\code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
+\item{\code{"pw_means"} - }{ Pairwise means. All \code{stat.by} groups are
+compared to each other and the difference in means is estimated
+along with SE, t-ratios, and p-values testing if the two means
+are the same. See \code{\link[emmeans:contrast]{emmeans::pairs.emmGrid()}}. }
+\item{\code{"pw_trends"} - }{ Pairwise trends. As above, but
+comparing trendline slopes instead of means. }
+\item{\code{"es_means"} - }{ Effect sizes for pairwise differences
+of means, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
+\item{\code{"es_trends"} - }{ Effect sizes for pairwise differences
+of slopes, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
+}
+}
+
+\section{Model Options}{
+
+
+The predefined options are:
+\itemize{
+\item{\code{"lm"} - }{  Linear model: \code{stats::lm(formula = y ~ x)}.) }
+\item{\code{"log"} - }{ Logarithmic model: \code{stats::lm(formula = y ~ log(x))}. }
+\item{\code{"gam"} - }{ Generalized additive model: \code{mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")}. }
+}
+
+You can alternatively provide a list of length two where the first
+element is a character vector of length 1 naming a function, and the
+second element is a list of arguments to pass to that function. One
+of the function's arguments must be named 'formula'.
+For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+}
+
 \section{Aesthetics and Partitions}{
 
 
@@ -150,10 +180,15 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
     library(rbiom)
     
     biom <- sample_rarefy(hmp50)
-    adiv_corrplot(biom, "Age", color.by="Body Site", adiv=c("shannon", "otus"), facet.by = "Sex", ci = 90) 
+    adiv_corrplot(biom, "age", color.by="body", adiv=c("sha", "otu"), facet.by="sex")
     
 }
 \seealso{
+Other alpha_diversity: 
+\code{\link{adiv_boxplot}()},
+\code{\link{adiv_stats}()},
+\code{\link{adiv_table}()}
+
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{bdiv_boxplot}()},
@@ -168,4 +203,5 @@ Other visualization:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}
 }
+\concept{alpha_diversity}
 \concept{visualization}

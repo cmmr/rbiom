@@ -6,12 +6,15 @@
 \usage{
 taxa_heatmap(
   biom,
-  rank = NULL,
+  rank = -1,
   taxa = 6,
   grid = list(label = "{rank} Abundance", colors = "bilbao"),
   color.by = NULL,
   order.by = NULL,
   limit.by = NULL,
+  other = FALSE,
+  unc = "singly",
+  lineage = FALSE,
   label = TRUE,
   label_size = NULL,
   rescale = "none",
@@ -27,39 +30,52 @@ taxa_heatmap(
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.
-Alternatively, a {dist} class distance matrix can be given, in which
-case only the parameters \code{ord}, \code{k}, and \code{...} are
-allowed.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{rank}{What rank(s) of taxa to display, for example \code{"Phylum"}
-or \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a
-given BIOM object. The default, \code{NULL}, selects the lowest
-level.}
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
+see all options for a given \code{rbiom} object. Default: \code{-1}.}
 
-\item{taxa}{Which taxa to give separate rows. An integer value will show
-the top n most abundant taxa. A value 0 <= n < 1 will show all taxa
-with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: \code{6}.}
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that
+mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
+character vector of taxa names will show only those named taxa.
+Default: \code{6}.}
 
 \item{grid}{Color palette name, or a list with entries for \code{label},
 \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
 \code{guide}. See the Track Definitions section for details.
 Default: \code{list(label = "{rank} Abundance", colors = "bilbao")}.}
 
-\item{color.by}{Add annotation tracks for these metadata column(s).
-See "Annotation Tracks" section below for details.
-Default: \code{NULL}}
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{taxa}
+argument. Specifying \code{TRUE} adds "Other" to the returned set.
+A string can also be given to imply \code{TRUE}, but with that
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 
-\item{order.by}{Which metadata column(s) to use for ordering the samples
-across the x and y axes. Overrides any \code{clust} argument.
-See "Ordering and Limiting" section below for details.
-Default: \code{NULL}}
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
+\itemize{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
 
-\item{limit.by}{Metadata definition(s) to use for sample subsetting prior
-to calculations.
-See "Ordering and Limiting" section below for details.
-Default: \code{NULL}}
+\item{lineage}{Include all ranks in the name of the taxa. For instance,
+setting to \code{TRUE} will produce
+\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+Otherwise the taxa name will simply be \code{Coriobacteriales}. You
+want to set this to TRUE when \code{unc = "asis"} and you have taxa
+names (such as \emph{Incertae_Sedis}) that map to multiple higher
+level ranks. Default: \code{FALSE}}
 
 \item{label}{Label the matrix rows and columns. You can supply a list
 or logical vector of length two to control row labels and column
@@ -93,35 +109,29 @@ Default: \code{TRUE}.}
 similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 \code{clust = c(rows = "complete", cols = NA)}, or simply
-\code{clust = c("complete", NA)}.
-Default: \code{"complete"}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
-   \\itemize\{
-     \\item\{\code{FALSE} or \code{NA} - \}\{ Disable reordering. \}
-     \\item\{An \code{hclust} class object\} \{ E.g. from [stats::hclust()]. \}
-     \\item\{A method name - \}\{ \code{"ward.D"}, 
-       \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
-       \code{"average"}, \code{"mcquitty"}, \code{"median"}, or 
-       \code{"centroid"}. \}
-   \}
-}\if{html}{\out{</div>}}}
+\code{clust = c("complete", NA)}. Options are:
+\itemize{
+\item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
+\item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
+\item{A method name - }{ \code{"ward.D"},
+\code{"ward.D2"}, \code{"single"}, \code{"complete"},
+\code{"average"}, \code{"mcquitty"}, \code{"median"}, or
+\code{"centroid"}. }
+}
+Default: \code{"complete"}.}
 
 \item{dist}{Distance algorithm to use when reordering the rows and columns
 by similarity. You can supply a list or character vector of length
 two to control the row and column clustering separately, for example
 \code{dist = c(rows = "euclidean", cols = "maximum")}, or simply
-\code{dist = c("euclidean", "maximum")}.
-Default: \code{"euclidean"}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   Options are:
-   \\itemize\{
-     \\item\{A \code{dist} class object\} \{ E.g. from [stats::dist()] or [bdiv_distmat()]. \}
-     \\item\{A method name - \}\{ \code{"euclidean"}, 
-       \code{"maximum"}, \code{"manhattan"}, \code{"canberra"}, 
-       \code{"binary"}, or \code{"minkowski"}. \}
-   \}
-}\if{html}{\out{</div>}}}
+\code{dist = c("euclidean", "maximum")}. Options are:
+\itemize{
+\item{A \code{dist} class object}{ E.g. from \code{\link[stats:dist]{stats::dist()}} or \code{\link[=bdiv_distmat]{bdiv_distmat()}}. }
+\item{A method name - }{ \code{"euclidean"},
+\code{"maximum"}, \code{"manhattan"}, \code{"canberra"},
+\code{"binary"}, or \code{"minkowski"}. }
+}
+Default: \code{"euclidean"}.}
 
 \item{tree_height, track_height}{The height of the dendrogram or annotation
 tracks in multiples (or fractions) of the smaller dimension of the
@@ -137,117 +147,19 @@ Default: \code{1} (square).}
 \code{"bottom"}. Default: \code{"right"}.}
 
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
-Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
-\item{...}{Additional arguments to pass on to ggplot2::theme().
-For example, \code{labs.title = "Plot Title"}.}
+\item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. The computed data points will be attached as
-\code{attr(, 'data')}.
+A \code{ggplot2} plot. \cr The computed data points, ggplot command,
+and object history are available as \code{$data}, \code{$code}, and
+\code{$history}, respectively.
 }
 \description{
 Display taxa abundances as a heatmap.
 }
-\section{Annotation Tracks}{
-
-
-Metadata can be displayed as colored tracks above the heatmap. Common use
-cases are provided below, with more thorough documentation available at
-https://cmmr.github.io/rbiom .
-
-\preformatted{  ## Categorical ----------------------------
-color.by = "Body Site"
-color.by = list('Body Site' = "bright")
-color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
-color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-
-## Numeric --------------------------------
-color.by = "Age"
-color.by = list('Age' = "reds")
-color.by = list('Age' = c(20,NA), 'colors' = "reds") # at least 20 years old
-color.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple Tracks ------------------------
-color.by = c("Body Site", "Age")
-color.by = list('Body Site' = "bright", 'Age' = "reds")
-color.by = list(
-  'Body Site' = c('Stool' = "blue", 'Saliva' = "green"),
-  'Age'       = list(range = c(20,40), 'colors' = "reds") )
-}
-
-The following entries in the track definitions are understood:
-
-\itemize{
-\item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
-\item{\code{range} - }{ The c(min,max) to use for scale values. }
-\item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
-\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
-\item{\code{na.color} - }{ The color to use for \code{NA} values. }
-\item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
-\item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
-}
-
-All built-in color palettes are colorblind-friendly.
-
-Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
-\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
-
-Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
-\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
-\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
-\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
-\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
-\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
-\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
-\code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
-}
-
-\section{Ordering and Limiting}{
-
-
-\bold{\code{order.by}} controls which metadata column(s) are used to arrange
-samples on the plot. It also enables subsetting to a particular set or
-range of values. Prefix a column name with \code{-} to arrange values in
-descending order rather than ascending.
-
-\preformatted{  ## Categorical ----------------------------
-order.by = "Body Site"
-order.by = list('Body Site' = c("Stool", "Saliva"))
-
-## Numeric --------------------------------
-order.by = "-Age"
-order.by = list('Age'  = c(20,NA)) # at least 20 years old
-order.by = list('-Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple / Mixed -----------------------
-order.by = c("-Body Site", "Age")
-order.by = list("Body Site", '-Age' = c(20,40))
-}
-
-\bold{\code{limit.by}} is used to specify a subset of samples without any
-side-effects on aesthetics. It is especially useful for limiting the data
-to a single categorical metadata value. Unlike the other *.by parameters,
-\code{limit.by} must always be a named \code{list()}.
-
-\preformatted{  ## Categorical ----------------------------
-limit.by = list('Sex' = "Male")
-
-## Numeric --------------------------------
-limit.by = list('Age' = c(20,NA)) # at least 20 years old
-limit.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple / Mixed -----------------------
-limit.by = list(
-  'Sex'       = "Male", 
-  'Body Site' = c("Stool", "Saliva")
-  'Age'       = c(20,40) )
-}
-}
-
 \examples{
     library(rbiom)
     
@@ -256,6 +168,14 @@ limit.by = list(
     
 }
 \seealso{
+Other taxa_abundance: 
+\code{\link{taxa_barplot}()},
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_corrplot}()},
+\code{\link{taxa_matrix}()},
+\code{\link{taxa_stats}()},
+\code{\link{taxa_table}()}
+
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
@@ -270,4 +190,5 @@ Other visualization:
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()}
 }
+\concept{taxa_abundance}
 \concept{visualization}

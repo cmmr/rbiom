@@ -9,7 +9,7 @@ ENV <- environment(NULL)
 .onLoad <- function(libname, pkgname) {
   
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(
-    'ggplot', # ggplot2::aes is intentionally omitted here
+    'ggplot', # `aes` is intentionally omitted here
     'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'facet_grid', 'facet_wrap', 'expansion', 'labs', 'margin', 
@@ -38,11 +38,10 @@ ENV <- environment(NULL)
   lapply(FUN = cmd_wrap, pkg="ggtree", {c(
     'ggtree', 'geom_tiplab', 'geom_cladelab', 
     'gheatmap', 'hexpand', 'vexpand' )})
-
-  lapply(FUN = cmd_wrap, pkg="ggdensity", {c(
-    'geom_hdr', 'geom_hdr_lines' )})
   
   
+  lapply(FUN = cmd_wrap, pkg="ggrepel",    {c('geom_text_repel', 'geom_label_repel' )})
+  lapply(FUN = cmd_wrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines' )})
   lapply(FUN = cmd_wrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
   lapply(FUN = cmd_wrap, pkg="ggh4x",      {c('facetted_pos_scales')})
   lapply(FUN = cmd_wrap, pkg="ggnewscale", {c('new_scale_fill')})
@@ -50,19 +49,23 @@ ENV <- environment(NULL)
   lapply(FUN = cmd_wrap, pkg="ggtext",     {c('element_markdown', 'geom_textbox')})
   lapply(FUN = cmd_wrap, pkg="grid",       {c('arrow', 'unit')})
   lapply(FUN = cmd_wrap, pkg="scales",     {c('alpha')})
-  lapply(FUN = cmd_wrap, pkg="emmeans",    {c('emmeans', 'emtrends')})
+  lapply(FUN = cmd_wrap, pkg="generics",   {c('tidy', 'glance', 'augment')})
+  lapply(FUN = cmd_wrap, pkg="emmeans",    {c('emmeans', 'emtrends', 'eff_size')})
+  lapply(FUN = cmd_wrap, pkg="graphics",   {c('pairs')})
+  lapply(FUN = cmd_wrap, pkg="stats",      {c('sigma', 'df.residual')})
   
-  lapply(FUN = basewrap, pkg="base", {c('c', 'rep')})
+  lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
   
   
-  # #________________________________________________________
-  # # aes() uses non-standard evaluation. Quote as is.
-  # #________________________________________________________
-  # assign('aes', pos = ENV, function (..., .indent = 0) {
-  #   res <- ggplot2::aes(...)
-  #   cmd <- trimws(capture.output(match.call()))
-  #   attr(res, 'display') <- paste(collapse = " ", cmd)
-  #   return (res)
-  # })
+  
+  #________________________________________________________
+  # Trigger/catch the once-per-session ggbeeswarm warning.
+  #________________________________________________________
+  rlang::catch_cnd(
+    ggplot2::ggsave(
+      filename = nullfile(), 
+      plot = ggplot2::ggplot(iris, ggplot2::aes(Species, Sepal.Length)) +
+        ggbeeswarm::geom_beeswarm(method="center"), 
+      device = 'png', width = 7, height = 7, units = "in") )
   
 }

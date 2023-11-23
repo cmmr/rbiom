@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,16 @@
         <dd>Visualize alpha diversity with scatterplots and trendlines.</dd>
       </dl><dl><dt>
           
+          <code><a href="adiv_matrix.html">adiv_matrix()</a></code> 
+        </dt>
+        <dd>Create a matrix of samples x alpha diversity metrics.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="adiv_stats.html">adiv_stats()</a></code> 
+        </dt>
+        <dd>Test alpha diversity differences for significance.</dd>
+      </dl><dl><dt>
+          
           <code><a href="adiv_table.html">adiv_table()</a></code> 
         </dt>
         <dd>Calculate the alpha diversity of each sample.</dd>
@@ -74,6 +84,11 @@
           <code><a href="as_percent.html">as_percent()</a></code> 
         </dt>
         <dd>Convert absolute counts to relative abundances.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="as_rbiom.html">as_rbiom()</a></code> 
+        </dt>
+        <dd>Convert BIOM data to an rbiom object.</dd>
       </dl><dl><dt>
           
           <code><a href="bdiv_boxplot.html">bdiv_boxplot()</a></code> 
@@ -101,6 +116,11 @@
         <dd>Calculate PCoA and other ordinations, including taxa biplots and statistics.</dd>
       </dl><dl><dt>
           
+          <code><a href="bdiv_stats.html">bdiv_stats()</a></code> 
+        </dt>
+        <dd>Test beta diversity vs categorical or numeric metadata.</dd>
+      </dl><dl><dt>
+          
           <code><a href="bdiv_table.html">bdiv_table()</a></code> 
         </dt>
         <dd>Make a data.frame of distances between samples.</dd>
@@ -108,52 +128,59 @@
           
           <code><a href="bdply.html">bdply()</a></code> 
         </dt>
-        <dd>Split BIOM by metadata, apply function, and return results in a data frame.</dd>
+        <dd>Split an rbiom object by metadata, apply function, and return results in a
+data frame.</dd>
       </dl><dl><dt>
           
           <code><a href="biom_build.html">biom_build()</a></code> 
         </dt>
-        <dd>Create a BIOM object.</dd>
+        <dd>Create an rbiom object.</dd>
       </dl><dl><dt>
           
           <code><a href="biom_id.html">biom_id()</a></code> <code><a href="biom_id.html">`biom_id&lt;-`()</a></code> <code><a href="biom_id.html">biom_comment()</a></code> <code><a href="biom_id.html">`biom_comment&lt;-`()</a></code> 
         </dt>
-        <dd>Get or set a <code>BIOM</code> object's id or comment.</dd>
+        <dd>Get or set an <code>rbiom</code> object's id or comment.</dd>
       </dl><dl><dt>
           
           <code><a href="biom_info.html">biom_info()</a></code> 
         </dt>
-        <dd>Get <code>BIOM</code> object's miscellaneous information.</dd>
+        <dd>Get <code>rbiom</code> object's miscellaneous information.</dd>
       </dl><dl><dt>
           
           <code><a href="biom_merge.html">biom_merge()</a></code> 
         </dt>
-        <dd>Combine several BIOM datasets into one.</dd>
+        <dd>Combine several rbiom objects into one.</dd>
       </dl><dl><dt>
           
           <code><a href="biom_repair.html">biom_repair()</a></code> 
         </dt>
-        <dd>Run after manually editing a BIOM object's content.</dd>
+        <dd>Run after manually editing an rbiom object's content.</dd>
       </dl><dl><dt>
           
           <code><a href="blply.html">blply()</a></code> 
         </dt>
-        <dd>Split BIOM by metadata, apply function, and return results in a list.</dd>
+        <dd>Split an rbiom object by metadata, apply function, and return results in a
+list.</dd>
       </dl><dl><dt>
           
           <code><a href="convert_from_phyloseq.html">convert_from_phyloseq()</a></code> 
         </dt>
-        <dd>Convert a phyloseq object to an rbiom BIOM object.</dd>
+        <dd>Convert a phyloseq object to an rbiom object.</dd>
       </dl><dl><dt>
           
-          <code><a href="convert_to_SummarizedExperiment.html">convert_to_SummarizedExperiment()</a></code> 
+          <code><a href="convert_to_SE.html">convert_to_SE()</a></code> 
         </dt>
-        <dd>Convert a BIOM object to a SummarizedExperiment object.</dd>
+        <dd>Convert an rbiom object to a SummarizedExperiment object.</dd>
       </dl><dl><dt>
           
-          <code><a href="convert_to_TreeSummarizedExperiment.html">convert_to_TreeSummarizedExperiment()</a></code> 
+          <code><a href="convert_to_TSE.html">convert_to_TSE()</a></code> 
         </dt>
-        <dd>Convert a BIOM object to a TreeSummarizedExperiment object.</dd>
+        <dd>Convert an rbiom object to a TreeSummarizedExperiment object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="distmat_ord_table.html">distmat_ord_table()</a></code> 
+        </dt>
+        <dd>Run ordinations on a distance matrix.</dd>
       </dl><dl><dt>
           
           <code><a href="distmat_stats.html">distmat_stats()</a></code> 
@@ -161,19 +188,29 @@
         <dd>Run statistics on a distance matrix vs a categorical or numeric variable.</dd>
       </dl><dl><dt>
           
+          <code><a href="has_tree.html">has_tree()</a></code> <code><a href="has_tree.html">has_sequences()</a></code> <code><a href="has_tree.html">is_rarefied()</a></code> 
+        </dt>
+        <dd>Check specific properties of an rbiom object.</dd>
+      </dl><dl><dt>
+          
           <code><a href="hmp50.html">hmp50</a></code> 
         </dt>
         <dd>Human Microbiome Project - 50 sample demo dataset.</dd>
       </dl><dl><dt>
           
-          <code><a href="n_samples.html">n_samples()</a></code> <code><a href="n_samples.html">n_otus()</a></code> <code><a href="n_samples.html">n_ranks()</a></code> 
+          <code><a href="metadata_names.html">metadata_names()</a></code> <code><a href="metadata_names.html">`metadata_names&lt;-`()</a></code> 
         </dt>
-        <dd>Report the number of samples, otus, or ranks in a BIOM.</dd>
+        <dd>Get or set the metadata column names.</dd>
       </dl><dl><dt>
           
-          <code><a href="otu_matrix.html">otu_matrix()</a></code> <code><a href="otu_matrix.html">`otu_matrix&lt;-`()</a></code> 
+          <code><a href="metadata_numeric.html">metadata_numeric()</a></code> 
         </dt>
-        <dd>Get or set the abundance counts.</dd>
+        <dd>Check which metadata columns are numeric.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="n_samples.html">n_samples()</a></code> <code><a href="n_samples.html">n_otus()</a></code> <code><a href="n_samples.html">n_ranks()</a></code> <code><a href="n_samples.html">n_metadata()</a></code> 
+        </dt>
+        <dd>Report the number of samples, otus, or ranks in an rbiom.</dd>
       </dl><dl><dt>
           
           <code><a href="otu_names.html">otu_names()</a></code> <code><a href="otu_names.html">`otu_names&lt;-`()</a></code> 
@@ -199,16 +236,6 @@
           <code><a href="plot_heatmap.html">plot_heatmap()</a></code> 
         </dt>
         <dd>Create a heatmap with tracks and dendrograms from any matrix.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="print.html">print(<i>&lt;BIOM&gt;</i>)</a></code> 
-        </dt>
-        <dd>Summarize the contents of a BIOM object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="properties.html">has_tree()</a></code> <code><a href="properties.html">has_sequences()</a></code> <code><a href="properties.html">is_rarefied()</a></code> 
-        </dt>
-        <dd>Check specific properties of a BIOM object.</dd>
       </dl><dl><dt>
           
           <code><a href="rare_barplot.html">rare_barplot()</a></code> 
@@ -276,14 +303,19 @@
         <dd>Reduce samples to a specific list</dd>
       </dl><dl><dt>
           
-          <code><a href="sample_subset.html">sample_subset()</a></code> 
-        </dt>
-        <dd>Subset samples using the BIOM's metadata or taxonomy.</dd>
-      </dl><dl><dt>
-          
           <code><a href="sample_sums.html">sample_sums()</a></code> 
         </dt>
         <dd>Sum the observations in each sample.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="stats_table.html">stats_table()</a></code> 
+        </dt>
+        <dd>Run non-parametric statistics on a data.frame.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="subset.rbiom.html">subset(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Subset by sample metadata.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_barplot.html">taxa_barplot()</a></code> 
@@ -311,39 +343,29 @@
         <dd>Taxa abundances per sample, at the specified taxonomic rank.</dd>
       </dl><dl><dt>
           
-          <code><a href="taxa_means.html">taxa_means()</a></code> 
-        </dt>
-        <dd>Get the taxa abundances.</dd>
-      </dl><dl><dt>
-          
           <code><a href="taxa_ranks.html">taxa_ranks()</a></code> <code><a href="taxa_ranks.html">`taxa_ranks&lt;-`()</a></code> 
         </dt>
         <dd>Get or set the names of the taxonomic ranks.</dd>
       </dl><dl><dt>
           
-          <code><a href="taxa_sums.html">taxa_sums()</a></code> 
+          <code><a href="taxa_stats.html">taxa_stats()</a></code> 
         </dt>
-        <dd>Get the taxa abundances.</dd>
+        <dd>Test taxa abundances for significant differences.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="taxa_sums.html">taxa_sums()</a></code> <code><a href="taxa_sums.html">taxa_means()</a></code> 
+        </dt>
+        <dd>Get summary taxa abundances.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_table.html">taxa_table()</a></code> 
         </dt>
-        <dd>Generate a data.frame of taxa abundance for each sample at the specified taxonomic rank.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="top_taxa.html">top_taxa()</a></code> 
-        </dt>
-        <dd>Get the names of the most abundant taxa.</dd>
+        <dd>Abundance table of taxa per sample at the specified rank.</dd>
       </dl><dl><dt>
           
           <code><a href="tree_data.html">tree_data()</a></code> 
         </dt>
         <dd>Provides a 'treedata' S4 object for use in ggtree functions.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tree_plot.html">tree_plot()</a></code> 
-        </dt>
-        <dd>Display a dendrogram of the phylogenetic tree.</dd>
       </dl><dl><dt>
           
           <code><a href="tree_subset.html">tree_subset()</a></code> 
@@ -356,9 +378,9 @@
         <dd>Names of a phylogenetic tree's tips/leafs.</dd>
       </dl><dl><dt>
           
-          <code><a href="unifrac.html">unifrac()</a></code> 
+          <code><a href="within.rbiom.html">within(<i>&lt;rbiom&gt;</i>)</a></code> 
         </dt>
-        <dd>Compute Weighted and Unweighted UniFrac distance matrices.</dd>
+        <dd>Modify sample metadata.</dd>
       </dl><dl><dt>
           
           <code><a href="write_biom.html">write_biom()</a></code> 

@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,18 +57,16 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>matrix</code>, <code>simple_triplet_matrix</code>, or <code>BIOM</code>
-object (e.g. as returned from <code><a href="read_biom.html">read_biom()</a></code>). For matrices, the
-rows and columns are assumed to be the taxa and samples, respectively.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>bdiv</dt>
-<dd><p>The beta diversity distance algorithm to use. Options are:
+<dd><p>Beta diversity distance algorithm(s) to use. Options are:
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. Non-ambiguous abbreviations
-of the algorithm names are also accepted. For <code>"UniFrac"</code>, a
+<code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
 phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code>.</p></dd>
+provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code></p></dd>
 
 
 <dt>weighted</dt>
@@ -79,23 +77,24 @@ Default: <code>TRUE</code></p></dd>
 
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-defined in <code>biom</code> if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: <code>NULL</code></p></dd>
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>otu_tree(biom)</code></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A distance matrix.</p>
+<p>A <code>dist</code>-class distance matrix.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
 <code><a href="bdiv_table.html">bdiv_table</a>()</code>,
 <code><a href="distmat_stats.html">distmat_stats</a>()</code></p></div>
     </div>

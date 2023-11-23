@@ -4,22 +4,15 @@
 \alias{sample_select}
 \title{Reduce samples to a specific list}
 \usage{
-sample_select(
-  biom,
-  samples = NULL,
-  nTop = NULL,
-  nRandom = NULL,
-  seed = 0,
-  fast = FALSE
-)
+sample_select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}. Objects of
-class \code{matrix} or \code{simple_triplet_matrix} are also accepted.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{samples}{Sample names, indices, or a logical vector identifying
 the samples to keep. The latter two should be based on the order of
-sample names given by \code{colnames(biom$counts)}.}
+sample names given by \code{sample_names(biom)}.}
 
 \item{nTop}{Selects this number of samples, taking the sample with the most
 observations first, then the sample with the second-most observations,
@@ -31,24 +24,21 @@ See note.}
 number of samples in the dataset, the entire dataset will be returned.
 See note.}
 
-\item{seed}{Random seed, used when selecting \code{nRandom} samples.}
-
-\item{fast}{Should subsetting the phylogenetic tree and sequences be
-skipped? These slow steps are often not necessary. (Default: FALSE)
+\item{seed}{Random seed, used when selecting \code{nRandom} samples.
 
 Note: Generally, you will specify only one of the filters: \code{samples},
 \code{nTop}, or \code{nRandom}. However, specifying multiple filters is
 allowed; they will be applied in the order listed above.}
 }
 \value{
-An object of the same class as \code{biom}, subsetted as requested.
+A \code{rbiom} object, subsetted as requested.
 }
 \description{
 Reduce samples to a specific list
 }
 \examples{
   \dontrun{
-    library(rbiom)
+    library(rbiom) 
     
     ex1 <- sample_select(hmp50, c('HMP14', 'HMP22', 'HMP03'))
     ex2 <- sample_select(hmp50, c(32, 11, 28, 16, 46, 5))
@@ -59,5 +49,8 @@ Reduce samples to a specific list
  }
 }
 \seealso{
-\code{\link[=sample_subset]{sample_subset()}}
+Other metadata: 
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()}
 }
+\concept{metadata}

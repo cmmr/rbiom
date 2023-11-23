@@ -33,7 +33,7 @@ read_fasta <- function (file, ids = NULL) {
   
   while (length(line <- readLines(con, 1)) > 0) {
     
-    if (identical(substr(line, 1, 1), ">")) {
+    if (eq(substr(line, 1, 1), ">")) {
       sid <- substr(line, 2, nchar(line))
       
       if (sid %in% names(res)) {

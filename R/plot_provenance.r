@@ -14,18 +14,23 @@ cmd_wrap <- function (pkg, fn) {
     
     newfun <- function (..., .indent = 0, .display = NULL, .lhs = NULL) {
       
-      res <- fun(...)
+      dots <- list(...)
+      res  <- fun(...)
+      
       
       if (is_null(.display)) {
-        argstr   <- as.args(list(...), fun = fun, indent = .indent)
+        argstr   <- as.args(dots, fun = fun, indent = .indent)
         .display <- sprintf(fmt = "%s(%s)", pkgfn, argstr)
       }
       
       if (is_null(.lhs)) {
         attr(res, 'display') <- .display
       } else {
-        attr(res, 'cmd')     <- sprintf("%s <- %s", .lhs, .display)
         attr(res, 'display') <- .lhs
+        attr(res, 'code')    <- paste(collapse = "\n", c(
+            if (length(dots) > 0) attr(dots[[1]], 'code', exact = TRUE) else NULL,
+            sprintf("%s <- %s", .lhs, .display) )) %>% 
+          add_class('rbiom_code')
       }
       
       
@@ -72,46 +77,3 @@ basewrap <- function (pkg, fn) {
 }
 
 
-#________________________________________________________
-# Add a layer to a list of layers.
-#________________________________________________________
-
-ggpush <- function (gglayers, gglayer) {
-  gglayers[[length(gglayers) + 1]] <- gglayer
-  return (gglayers)
-}
-
-
-#________________________________________________________
-# Combine a list of logged commands into a plot.
-#________________________________________________________
-
-ggbuild <- function (gglayers) {
-  
-  p   <- NULL
-  cmd <- NULL
-  
-  for (i in seq_along(gglayers)) {
-    
-    gglayer <- gglayers[[i]]
-    
-    # In case this layer was built by initLayer / setLayer
-    if (!is_null(fun <- attr(gglayer, 'function', exact = TRUE)))
-      gglayer <- do.call(fun, c(gglayer, '.indent' = 4))
-    
-    if (is_null(p)) {
-      p   <- gglayer
-      cmd <- attr(gglayer, 'display')
-    } else {
-      p   <- ggplot2::`%+%`(p, gglayer)
-      cmd <- sprintf("%s +\n  %s", cmd, attr(gglayer, 'display'))
-    }
-  }
-  
-  attr(p, 'display') <- NULL
-  attr(p, 'cmd')     <- cmd
-  
-  p$plot_env <- emptyenv()
-  
-  return (p)
-}

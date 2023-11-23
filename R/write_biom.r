@@ -1,15 +1,13 @@
 
 #' Write counts, metadata, taxonomy, and phylogeny to a biom file.
 #' 
-#' @param biom  The BIOM object to save to the file. If another class of
-#'        object is given, it will be coerced to matrix and output in
-#'        tabular format, provided it is numeric with rownames and colnames.
+#' @param biom  The \code{rbiom} object to save to the file.
 #' 
 #' @param file  Path to the output file. If the file name ends in \code{".gz"} 
 #'        or \code{".bz2"}, the file contents will be compressed accordingly.
 #' 
 #' @param format  Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"}, 
-#'        corresponding to classic tabular format, biom format version 1.0 and 
+#'        corresponding to classic tabular format, BIOM format version 1.0 and 
 #'        biom version 2.1, respectively. 
 #'        See \url{http://biom-format.org/documentation/} for details.
 #'         NOTE: to write HDF5 formatted BIOM files, the BioConductor R package 
@@ -20,6 +18,8 @@
 
 
 write_biom <- function (biom, file, format="json") {
+  
+  validate_biom(clone = TRUE)
   
   stopifnot(is_scalar_character(file) && !is_na(file))
   stopifnot(is_string(format, c("tab", "json", "hdf5")))
@@ -38,38 +38,42 @@ write_biom <- function (biom, file, format="json") {
       stop("Output file already exists: ", file)
   
   
+  #________________________________________________________
+  # BIOM fields pertaining to BIOM generator.
+  #________________________________________________________
+  
+  biom[['info']][['type']]         <- if.null("OTU table")
+  biom[['info']][['format_url']]   <- "http://biom-format.org"
+  biom[['info']][['generated_by']] <- if.null(paste("rbiom", packageVersion("rbiom")))
+  biom[['info']][['date']]         <- if.null(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"))
+  biom[['info']][['shape']]        <- dim(biom[['counts']])
+  biom[['info']][['matrix_type']]  <- "sparse"
+  biom[['info']][['nnz']]          <- length(biom[['counts']][['v']])
+  biom[['info']][['matrix_element_type']] <- ifelse(
+    test = all(biom[['counts']][['v']] %% 1 == 0), 
+    yes  = "int", 
+    no   = "float" )
+  
+  
   
   #________________________________________________________
-  # Try to convert non-BIOM objects to a matrix for tsv output.
+  # Convert factors to character, tibbles to base types.
   #________________________________________________________
-  if (!is(biom, "BIOM")) {
+  metadata <- metadata %>%
+    mutate(across(where(as.factor), as.character)) %>%
+    tibble::column_to_rownames('.sample') %>%
+    as.data.frame()
+  
+  taxonomy <- taxonomy %>%
+    tibble::column_to_rownames('.otu') %>%
+    as.matrix()
+  
+  
     
-    mtx <- try(as.matrix(biom), silent = TRUE)
-    if (is.matrix(mtx) && is.numeric(mtx))
-      if (!is_null(rownames(mtx)) && !is_null(colnames(mtx)))
-        return (write_biom.tsv(mtx, file))
-    
-    stop("Invalid BIOM object.")
-  }
-  
-  
-  #________________________________________________________
-  # Default values for required fields
-  #________________________________________________________
-  
-  if (is_null(biom$info$type))     biom$info$type <- "OTU table"
-  if (is.na(biom$info$type))       biom$info$type <- "OTU table"
-  if (length(biom$info$type) != 1) biom$info$id   <- "OTU table"
-  if (nchar(biom$info$type) == 0)  biom$info$type <- "OTU table"
-  if (is_null(biom$info$id))       biom$info$id   <- "NA"
-  if (is.na(biom$info$id))         biom$info$id   <- "NA"
-  if (length(biom$info$id) != 1)   biom$info$id   <- "NA"
-  if (nchar(biom$info$id) == 0)    biom$info$id   <- "NA"
-  
   switch (format, 
-    "hdf5" = write_biom.2.1(biom, file),
-    "json" = write_biom.1.0(biom, file),
-    "tab"  = write_biom.tsv(biom, file),
+    "hdf5" = write_biom_hdf5(biom, file),
+    "json" = write_biom_json(biom, file),
+    "tab"  = write_biom_tsv(biom, file),
     stop("unknown output format: ", format)
   )
 }
@@ -80,11 +84,10 @@ write_biom <- function (biom, file, format="json") {
 # BIOM Classic - Tabular
 #________________________________________________________
 
-write_biom.tsv <- function (biom, file) {
+write_biom_tsv <- function (biom, file) {
   
-  # biom could be either a BIOM or matrix object
-  counts   <- if (is(biom, "BIOM")) biom$counts   else biom
-  taxonomy <- if (is(biom, "BIOM")) biom$taxonomy else NULL
+  counts   <- biom[['counts']]
+  taxonomy <- biom[['taxonomy']]
   
   mtx <- {
     rbind(
@@ -136,71 +139,74 @@ write_biom.tsv <- function (biom, file) {
 # BIOM v1.0 - JSON
 #________________________________________________________
 
-write_biom.1.0 <- function (biom, file) {
-  
-  for (i in names(biom$metadata))
-    if (is(biom$metadata[[i]], "factor"))
-      biom$metadata[[i]] <- as.character(biom$metadata[[i]])
+write_biom_json <- function (biom, file) {
   
   
-  json <- jsonlite::toJSON(
-    auto_unbox = TRUE, 
-    x          = list(
+  json <- with(biom, {
     
     
-    # Attributes
-    #________________________________________________________
-    id                  = biom$info$id   %||% "",
-    type                = biom$info$type %||% "",
-    format              = "1.0.0", 
-    format_url          = "http://biom-format.org",
-    generated_by        = paste("rbiom", utils::packageDescription('rbiom')$Version),
-    date                = strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),
-    matrix_type         = "sparse",
-    matrix_element_type = ifelse(sum(biom$counts$v %% 1) == 0, "int", "float"),
-    shape               = c(biom$counts$nrow, biom$counts$ncol),
-    comment             = biom$info$comment %||% "",
     
+    json <- jsonlite::toJSON(
+      auto_unbox = TRUE, 
+      x          = list(
+        
+        
+        # Attributes
+        #________________________________________________________
+        format              = "1.0.0", 
+        id                  = info[['id']],
+        type                = info[['type']],
+        format_url          = info[['format_url']],
+        generated_by        = info[['generated_by']],
+        date                = info[['date']],
+        matrix_type         = info[['matrix_type']],
+        matrix_element_type = info[['matrix_element_type']],
+        shape               = info[['shape']],
+        comment             = info[['comment']],
+        
+        
+        # Phylogenetic Tree
+        #________________________________________________________
+        phylogeny = ifelse(is_null(phylogeny), "", write_tree(phylogeny)),
+        
+        
+        # Taxonomy
+        #________________________________________________________
+        rows = lapply(1:counts$nrow, function (i) {
+          TaxaID   <- counts$dimnames[[1]][i]
+          Metadata <- list(taxonomy=unname(taxonomy[i,]))
+          
+          if (is(biom[['sequences']], "character"))
+            Metadata[['sequence']] <- sequences[[TaxaID]]
+          
+          list(id=TaxaID, metadata=Metadata)
+        }),
+        
+        
+        # Sample IDs and Metadata
+        #________________________________________________________
+        columns = lapply(1:counts$ncol, function (j) list(
+          id = counts$dimnames[[2]][j],
+          metadata = {
+            md_fields <- names(metadata)
+            if (length(md_fields) > 0) {
+              as.list(metadata[j,,drop=FALSE])
+            } else {
+              NULL
+            }
+          }
+        )),
+        
+        
+        # Read counts
+        #________________________________________________________
+        data = lapply(seq_along(counts$v), function (k) 
+          c(counts$i[k] - 1, counts$j[k] - 1, counts$v[k])
+        )
+      ))
     
-    # Phylogenetic Tree
-    #________________________________________________________
-    phylogeny = ifelse(is_null(biom$phylogeny), "", write_tree(biom$phylogeny)),
-    
-    
-    # Taxonomy
-    #________________________________________________________
-    rows = lapply(1:biom$counts$nrow, function (i) {
-      TaxaID   <- biom$counts$dimnames[[1]][i]
-      Metadata <- list(taxonomy=unname(biom$taxonomy[i,]))
-      
-      if (is(biom[['sequences']], "character"))
-        Metadata[['sequence']] <- biom$sequences[[TaxaID]]
-      
-      list(id=TaxaID, metadata=Metadata)
-    }),
-    
-    
-    # Sample IDs and Metadata
-    #________________________________________________________
-    columns = lapply(1:biom$counts$ncol, function (j) list(
-      id = biom$counts$dimnames[[2]][j],
-      metadata = {
-        md_fields <- names(biom$metadata)
-        if (length(md_fields) > 0) {
-          as.list(biom$metadata[j,,drop=FALSE])
-        } else {
-          NULL
-        }
-      }
-    )),
-    
-    
-    # Read counts
-    #________________________________________________________
-    data = lapply(seq_along(biom$counts$v), function (k) 
-      c(biom$counts$i[k] - 1, biom$counts$j[k] - 1, biom$counts$v[k])
-    )
-  ))
+    return (json)
+  })
   
   
   if        (grepl("\\.gz$",  tolower(file))) { con <- gzfile(file, "w")
@@ -223,7 +229,7 @@ write_biom.1.0 <- function (biom, file) {
 # BIOM v2.1 - HDF5
 #________________________________________________________
 
-write_biom.2.1 <- function (biom, file) {
+write_biom_hdf5 <- function (biom, file) {
   
   if (!requireNamespace("rhdf5", quietly = TRUE)) {
     stop(paste0(
@@ -236,7 +242,7 @@ write_biom.2.1 <- function (biom, file) {
   }
   
   res <- try(rhdf5::h5createFile(file), silent = TRUE)
-  if (!identical(res, TRUE))
+  if (!eq(res, TRUE))
     stop(sprintf("Can't create file '%s': %s", file, as.character(res)))
   
   invisible(rhdf5::h5createGroup(file, '/observation'))
@@ -254,97 +260,103 @@ write_biom.2.1 <- function (biom, file) {
   
   
   
-  # Attributes
-  #________________________________________________________
-  rhdf5::h5writeAttribute(as.character(biom$info$id      %||% ""),                    h5, 'id')
-  rhdf5::h5writeAttribute(as.character(biom$info$type    %||% ""),                    h5, 'type')
-  rhdf5::h5writeAttribute(as.character(biom$info$comment %||% ""),                    h5, 'comment')
-  rhdf5::h5writeAttribute("http://biom-format.org",                                   h5, 'format-url')
-  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),                                       h5, 'format-version', 3)
-  rhdf5::h5writeAttribute(paste("rbiom", utils::packageDescription('rbiom')$Version), h5, 'generated-by')
-  rhdf5::h5writeAttribute(strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC"),       h5, 'creation-date')
-  rhdf5::h5writeAttribute(as.integer(c(biom$counts$nrow, biom$counts$ncol)),          h5, 'shape', 2)
-  rhdf5::h5writeAttribute(as.integer(length(biom$counts$v)),                          h5, 'nnz')
-  
-  
-  
-  
-  # Read counts by taxa (rows)
-  #________________________________________________________
-  x <- matrix(c(biom$counts$i - 1, biom$counts$j - 1, biom$counts$v), byrow=FALSE, ncol=3)
-  x <- x[order(x[,1]),,drop=FALSE]
-  rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[1]]),                                h5, 'observation/ids')
-  rhdf5::h5writeDataset(as.numeric(x[,3]),                                                      h5, 'observation/matrix/data')
-  rhdf5::h5writeDataset(as.integer(x[,2]),                                                      h5, 'observation/matrix/indices')
-  rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,1]+1, 0:biom$counts$nrow))))), h5, 'observation/matrix/indptr')
-  
-  
-  
-  # Read counts by sample (columns)
-  #________________________________________________________
-  x <- x[order(x[,2]),,drop=FALSE]
-  rhdf5::h5writeDataset(as.character(biom$counts$dimnames[[2]]),                                h5, 'sample/ids')
-  rhdf5::h5writeDataset(as.numeric(x[,3]),                                                      h5, 'sample/matrix/data')
-  rhdf5::h5writeDataset(as.integer(x[,1]),                                                      h5, 'sample/matrix/indices')
-  rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,2]+1, 0:biom$counts$ncol))))), h5, 'sample/matrix/indptr')
-  
-  
-  
-  # Sample Metadata
-  #________________________________________________________
-  if (is(biom[['metadata']], "data.frame")) {
-    plyr::l_ply(setdiff(names(biom$metadata), 'SampleID'), function (field) {
-      
-      h5path <- sprintf("/sample/metadata/%s", field)
-      values <- biom$metadata[biom$counts$dimnames[[2]], field]
-      
-      if (is.numeric(values)) {
-        if (all(values %% 1 == 0, na.rm=TRUE))
-          values <- as.integer(values)
+  with(biom, {
+    
+    
+    # Attributes
+    #________________________________________________________
+    rhdf5::h5writeAttribute(as.character(info[['id']]),           h5, 'id')
+    rhdf5::h5writeAttribute(as.character(info[['type']]),         h5, 'type')
+    rhdf5::h5writeAttribute(as.character(info[['comment']]),      h5, 'comment')
+    rhdf5::h5writeAttribute(as.character(info[['format_url']]),   h5, 'format-url')
+    rhdf5::h5writeAttribute(as.integer(c(2,1,0)),                 h5, 'format-version', 3)
+    rhdf5::h5writeAttribute(as.character(info[['generated_by']]), h5, 'generated-by')
+    rhdf5::h5writeAttribute(as.character(info[['date']]),         h5, 'creation-date')
+    rhdf5::h5writeAttribute(as.integer(info[['shape']]),          h5, 'shape', 2)
+    rhdf5::h5writeAttribute(as.integer(info[['nnz']]),            h5, 'nnz')
+    
+    
+    
+    
+    # Read counts by taxa (rows)
+    #________________________________________________________
+    x <- matrix(c(counts$i - 1, counts$j - 1, counts$v), byrow=FALSE, ncol=3)
+    x <- x[order(x[,1]),,drop=FALSE]
+    rhdf5::h5writeDataset(as.character(counts$dimnames[[1]]),                                h5, 'observation/ids')
+    rhdf5::h5writeDataset(as.numeric(x[,3]),                                                 h5, 'observation/matrix/data')
+    rhdf5::h5writeDataset(as.integer(x[,2]),                                                 h5, 'observation/matrix/indices')
+    rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,1]+1, 0:counts$nrow))))), h5, 'observation/matrix/indptr')
+    
+    
+    
+    # Read counts by sample (columns)
+    #________________________________________________________
+    x <- x[order(x[,2]),,drop=FALSE]
+    rhdf5::h5writeDataset(as.character(counts$dimnames[[2]]),                                h5, 'sample/ids')
+    rhdf5::h5writeDataset(as.numeric(x[,3]),                                                 h5, 'sample/matrix/data')
+    rhdf5::h5writeDataset(as.integer(x[,1]),                                                 h5, 'sample/matrix/indices')
+    rhdf5::h5writeDataset(as.integer(cumsum(unname(table(factor(x[,2]+1, 0:counts$ncol))))), h5, 'sample/matrix/indptr')
+    
+    
+    
+    # Sample Metadata
+    #________________________________________________________
+    if (is(biom[['metadata']], "data.frame")) {
+      plyr::l_ply(setdiff(names(metadata), 'SampleID'), function (field) {
         
-      } else if (!is.logical(values)) {
-        values <- as.character(values)
-      }
-      
-      rhdf5::h5writeDataset(values, h5, h5path)
-      
-    })
-  }
-  
-  
-  
-  # Taxonomy
-  #________________________________________________________
-  if (is(biom[['taxonomy']], "matrix")) {
-    h5path      <- 'observation/metadata/taxonomy'
-    x           <- t(biom$taxonomy[biom$counts$dimnames[[1]],,drop=FALSE])
-    dimnames(x) <- list(NULL, NULL)
-    rhdf5::h5writeDataset(x, h5, h5path)
-  }
-  
-  
-  
-  # Sequences
-  #________________________________________________________
-  if (is(biom[['sequences']], "character")) {
-    h5path <- 'observation/metadata/sequences'
-    x      <- unname(biom$sequences[biom$counts$dimnames[[1]]])
-    rhdf5::h5writeDataset(x, h5, h5path)
-  }
-  
-  
-  
-  # Phylogenetic Tree
-  #________________________________________________________
-  if (is(biom[['phylogeny']], "phylo")) {
+        h5path <- sprintf("/sample/metadata/%s", field)
+        values <- metadata[counts$dimnames[[2]], field]
+        
+        if (is.numeric(values)) {
+          if (all(values %% 1 == 0, na.rm=TRUE))
+            values <- as.integer(values)
+          
+        } else if (!is.logical(values)) {
+          values <- as.character(values)
+        }
+        
+        rhdf5::h5writeDataset(values, h5, h5path)
+        
+      })
+    }
     
-    h5path <- '/observation/group-metadata/phylogeny'
-    x      <- write_tree(biom[['phylogeny']])
-    rhdf5::h5writeDataset(x, h5, h5path)
     
-    h5path <- h5&'observation'&'group-metadata'&'phylogeny'
-    rhdf5::h5writeAttribute("newick", h5path, 'data_type')
-  }
+    
+    # Taxonomy
+    #________________________________________________________
+    if (is(biom[['taxonomy']], "matrix")) {
+      h5path      <- 'observation/metadata/taxonomy'
+      x           <- t(taxonomy[counts$dimnames[[1]],,drop=FALSE])
+      dimnames(x) <- list(NULL, NULL)
+      rhdf5::h5writeDataset(x, h5, h5path)
+    }
+    
+    
+    
+    # Sequences
+    #________________________________________________________
+    if (is(biom[['sequences']], "character")) {
+      h5path <- 'observation/metadata/sequences'
+      x      <- unname(sequences[counts$dimnames[[1]]])
+      rhdf5::h5writeDataset(x, h5, h5path)
+    }
+    
+    
+    
+    # Phylogenetic Tree
+    #________________________________________________________
+    if (is(biom[['phylogeny']], "phylo")) {
+      
+      h5path <- '/observation/group-metadata/phylogeny'
+      x      <- write_tree(biom[['phylogeny']])
+      rhdf5::h5writeDataset(x, h5, h5path)
+      
+      h5path <- h5&'observation'&'group-metadata'&'phylogeny'
+      rhdf5::h5writeAttribute("newick", h5path, 'data_type')
+    }
+    
+  })
+  
   
   rhdf5::H5Fflush(h5)
   rhdf5::H5Fclose(h5)

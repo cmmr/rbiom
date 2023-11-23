@@ -1,98 +1,71 @@
 #' Get or set the taxonomy table.
 #' 
+#' @inherit documentation_default
+#' 
 #' @family setters
 #' 
-#' @param biom,x  A \code{BIOM} object, as returned from [read_biom()].
 #' 
-#' @param ranks  The taxonomic ranks to return in the matrix, or \code{NULL} 
-#'        for all of them. Default: \code{NULL}
-#'        
-#' @param unc  How to handle unclassified, uncultured, and similarly ambiguous
-#'        taxa names. Default: \code{"asis"}
-#'        \itemize{
-#'          \item{\code{"asis"} - }{ Don't check/modify any taxa names. }
-#'          \item{\code{"singly"} - }{ Replace with "Unc. <OTU ID>". }
-#'          \item{\code{"grouped"} - }{ Replace with "Unc. <Higher Rank>". }
-#'          \item{\code{"drop"} - }{ Don't include in the returned matrix. }
-#'        }
+#' @param rank  A single taxonomic rank to return as a named vector, or 
+#'        \code{NULL} to return the complete table. Default: \code{NULL}
 #' 
-#' @param value  A character matrix with rownames \code{otu_names(x)}. If
-#'        there are more rownames than taxa names, the matrix will be subset.
-#'        May also be a character vector of length one with a file or URL
-#'        where the matrix is saved in either comma- or tab-separated format.
+#' @param value  An object coercible with [tibble::as_tibble()]. Must either 
+#'        have rownames or an '.otu' column with OTU names matching 
+#'        [otu_names(x)].
 #' 
-#' @return A character matrix with taxa/OTU IDs as row names and taxa ranks as
-#'         column names. An 'OTU' column is always added as the last column and
-#'         matches the row names.
+#' @return Depending on \code{rank}, a named character vector or a tibble data 
+#'         frame with '.otu' as the first column name.
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
-#'     otu_taxonomy(hmp50)[1:4,]
-#'     otu_taxonomy(hmp50, c("Family", "Genus"))[1:4,]
-#'     head(otu_taxonomy(hmp50, "Genus")[,])
+#'     # Display the full taxonomic data for each OTU ------------------------
+#'     otu_taxonomy(hmp50)
 #'     
-#'     # Sometimes taxonomic names are incomplete
-#'     otu_taxonomy(hmp50)[c(53,107,139), 2:6]
+#'     # Only show the OTU -> Genus mapping  ---------------------------------
+#'     otu_taxonomy(hmp50, "Genus") %>% head()
 #'     
-#'     # rbiom can insert more descriptive placeholders
-#'     otu_taxonomy(hmp50, unc = "singly")[c(53,107,139), 3:6]
-#'     otu_taxonomy(hmp50, unc = "grouped")[c(53,107,139), 4:6]
+#'     # Sometimes taxonomic names are incomplete ----------------------------
+#'     otu_taxonomy(hmp50)[,4:7] %>%
+#'       dplyr::filter(.otu %in% c('GemAsacc', 'GcbBacte', 'Unc58411'))
+#'     
+#'     # rbiom can insert more descriptive placeholders ----------------------
+#'     otu_taxonomy(hmp50, unc = "singly")[,4:7] %>%
+#'       dplyr::filter(.otu %in% c('GemAsacc', 'GcbBacte', 'Unc58411'))
+#'     
+#'     # Or collapse them into groups ----------------------------------------
+#'     otu_taxonomy(hmp50, unc = "grouped")[,4:7] %>%
+#'       dplyr::filter(.otu %in% c('GemAsacc', 'GcbBacte', 'Unc58411'))
 #'
 
-otu_taxonomy <- function (biom, ranks = NULL, unc = "asis") {
+otu_taxonomy <- function (biom, rank = NULL, unc = "asis", lineage = FALSE) {
+  
+  validate_biom(clone = FALSE)
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("taxonomy", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  params     <- eval_envir(environment())
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   
   #________________________________________________________
-  # Check that `biom` looks right.
+  # Validate user's arguments.
   #________________________________________________________
-  map <- tryCatch(
-    expr = local({
-  
-      stopifnot(is(biom, "BIOM") || is(biom, "matrix"))
-      if (is(biom, 'BIOM')) biom <- biom[['taxonomy']]
-      stopifnot(identical(typeof(biom), "character"))
-      stopifnot(!is.null(rownames(biom)))
-      stopifnot(!is.null(colnames(biom)) || ncol(biom) == 0)
-    
-      return (biom)
-    }), 
-    error = function (e)
-      stop(
-        "Invalid argument for `biom` in otu_taxonomy(). ",
-        "Must be a BIOM object or a character matrix with ",
-        "OTU ids as row names and taxa ranks as column names.",
-        "\n\nError: ", e, "\n\n" ))
+  validate_rank(null_ok = TRUE)
+  validate_unc()
+  validate_bool("lineage")
   
   
   #________________________________________________________
-  # Make sure the last column is 'OTU'.
+  # Move '.otu' to last column of taxonomy map.
   #________________________________________________________
-  if ("OTU" %in% colnames(map))
-    map <- map[,which(colnames(map) != "OTU"),drop=FALSE]
-  map <- cbind(map, 'OTU' = rownames(map))
-  
-  
-  
-  #________________________________________________________
-  # Sanity check `ranks` and `unc` arguments.
-  #________________________________________________________
-  if (is_null(ranks))      ranks <- seq_len(ncol(map))
-  if (is_character(ranks)) ranks <- pmatch(tolower(ranks), tolower(colnames(map)))
-  stopifnot(!any(is.na(ranks)))
-  stopifnot(is_integerish(ranks) && all(ranks > 0) && all(ranks <= ncol(map)))
-  
-  unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
+  tbl <- relocate(biom[['taxonomy']], .otu, .after = last_col())
+  if (!is.null(rank)) rank <- which(colnames(tbl) == rank)
   
   
   
@@ -100,31 +73,35 @@ otu_taxonomy <- function (biom, ranks = NULL, unc = "asis") {
   # Transform the taxa names.
   #________________________________________________________
   if (unc != "asis")
-    map <- tryCatch(
+    tbl <- tryCatch(
       expr = local({
+        
+        mtx <- tbl %>% 
+          as.matrix()
+        
       
         # Discard technical prefixes/suffixes.
         #________________________________________________________
-        map <- sub("^.__", "", map) # Remove leading p__ c__ etc
-        map <- sub("^_+",  "", map) # Remove leading underscores
-        map <- sub(";$",   "", map) # Remove trailing semicolons
+        mtx <- sub("^.__", "", mtx) # Remove leading p__ c__ etc
+        mtx <- sub("^_+",  "", mtx) # Remove leading underscores
+        mtx <- sub(";$",   "", mtx) # Remove trailing semicolons
         
         
         # "g" => NA; "Unknown Order" => NA
         #________________________________________________________
         regex <- ".*(unknown|uncultured|unclassified|unidentified|incertae.sedis).*"
-        map[which(nchar(map) < 2)] <- NA
-        map[grep(regex, map, ignore.case = TRUE)] <- NA
+        mtx[which(nchar(mtx) < 2)] <- NA
+        mtx[grep(regex, mtx, ignore.case = TRUE)] <- NA
         
         
         # "R_7_group" => "R_7"
         #________________________________________________________
-        map[] <- sub("_group$", "", map, ignore.case = TRUE)
+        mtx[] <- sub("_group$", "", mtx, ignore.case = TRUE)
         
         
         # "Family XIII" => "Clostridiales XIII"
         #________________________________________________________
-        map <- t(apply(map, 1L, function (x) {
+        mtx <- t(apply(mtx, 1L, function (x) {
           regex <- "^family\\s"
           if (!is.null(prefixed <- grep(regex, x, ignore.case = TRUE)))
             for (i in prefixed)
@@ -137,75 +114,136 @@ otu_taxonomy <- function (biom, ranks = NULL, unc = "asis") {
         
         # Replace NA with "Unc. <OTU ID>".
         #________________________________________________________
-        if (identical(unc, "singly")) {
-          x <- which(is.na(map))
-          map[x] <- paste("Unc.", rownames(map)[row(map)[x]])
+        if (eq(unc, "singly")) {
+          x <- which(is.na(mtx))
+          mtx[x] <- paste("Unc.", mtx[row(mtx)[x], '.otu'])
         }
         
         
         # Replace NA with "Unc. <Higher Rank>".
         #________________________________________________________
-        if (identical(unc, "grouped"))
-          for (i in which(!complete.cases(map)))
-            for (j in rev(which(is.na(map[i,]))))
-              if (!is.null(x <- na.omit(c("N/A", map[i,seq_len(j - 1)]))))
-                map[i,j] <- paste("Unc. ", tail(x, 1))
+        if (eq(unc, "grouped"))
+          for (i in which(!complete.cases(mtx)))
+            for (j in rev(which(is.na(mtx[i,]))))
+              if (!is.null(x <- na.omit(c("N/A", mtx[i,seq_len(j - 1)]))))
+                mtx[i,j] <- paste("Unc.", tail(x, 1))
         
         
-        # Drop any row with an NA in one of the ranks column.
+        # Drop any row with an NA in a higher-order rank column.
         #________________________________________________________
-        if (identical(unc, "drop"))
-          map <- map[complete.cases(map[,ranks,drop=FALSE]),,drop=FALSE]
+        if (eq(unc, "drop"))
+          mtx <- mtx[complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE]),,drop=FALSE]
         
         
-        return (map)
+        tbl <- as_tibble(mtx) %>%
+          relocate(.otu) %>%
+          mutate(across(everything(), as.factor))
+        
+        return (tbl)
       }), 
       
       error = function (e)
-        stop("Error in renaming taxa with otu_taxonomy() call: ", e) )
+        stop("Error in renaming taxa: ", e) )
   
   
-  map <- map[,ranks,drop=FALSE]
+  
+  tbl %<>% relocate(.otu, .after = last_col())
+  if (!is.null(rank)) {
+    
+    if (isTRUE(lineage)) {
+      tbl <- setNames(
+        object = plyr::splat(paste)(as.list(tbl[,1:rank]), sep = "; "),
+        nm     = as.character(tbl[['.otu']]) )
+      
+    } else {
+      tbl <- setNames(tbl[[rank]], as.character(tbl[['.otu']]))
+    }
+  }
   
   
-  set_cache_value(cache_file, map)
-  return (map)
+  set_cache_value(cache_file, tbl)
+  return (tbl)
 }
 
 
 #' @rdname otu_taxonomy
 #' @export
 
-`otu_taxonomy<-` <- function (x, value) {
+`otu_taxonomy<-` <- function (biom, value) {
   
-  stopifnot(is(x, 'BIOM'))
+  validate_biom(clone = TRUE)
   
   
   #________________________________________________________
   # Parse a file/URL.
   #________________________________________________________
   if (is_scalar_character(value)) {
-    value <- import_table(value, matrix = "character", row.names = 1)
-    colnames(value) <- default_taxa_ranks(ncol(value))
+    value <- import_table(value)
+    colnames(value) <- c('.otu', default_taxa_ranks(ncol(value) - 1))
   }
   
+  otus <- otu_names(biom)
+  
+  
   
   #________________________________________________________
-  # Row names of taxonomy matrix must include all TaxaIDs.
+  # Convert data.frame/matrix to tibble with .otu column.
   #________________________________________________________
-  missing <- setdiff(otu_names(x), rownames(value))
-  n       <- length(missing)
+  value <- as_tibble(value, rownames = NA)
+  stopifnot(xor(hasName(value, '.otu'), has_rownames(value)))
+  
+  if (has_rownames(value))
+    value %<>% rownames_to_column(var = ".otu")
+  
+  value %<>% relocate(.otu)
+  value %<>% mutate(across(everything() & !.otu, as.factor))
+  
+  
+  
+  #________________________________________________________
+  # Ignore OTUs that aren't currently in the rbiom object.
+  #________________________________________________________
+  ignored <- setdiff(as.character(value[['.otu']]), otus)
+  n       <- length(ignored)
   if (n > 0) {
-    if (n > 4) missing <- c(head(missing, 4), "...")
-    missing <- paste(collapse = ", ", missing)
-    msg <- "%i Taxa ID%s missing from the taxonomy map: %s"
-    stop(sprintf(msg, n, ifelse(n == 1, " is", "s are"), missing))
+    if (n > 4) ignored <- c(head(ignored, 4), "...")
+    ignored <- paste(collapse = ", ", ignored)
+    msg <- "Ignoring %i extra OTU ID%s: %s"
+    message(sprintf(msg, n, ifelse(n == 1, "", "s"), ignored))
   }
   
   
-  x[['taxonomy']] <- value[otu_names(x),]
   
-  return (x) 
+  #________________________________________________________
+  # Drop any OTUs that aren't in the new taxonomy map.
+  #________________________________________________________
+  drop <- setdiff(otus, as.character(value[['.otu']]))
+  n    <- length(drop)
+  if (n > 0) {
+    if (n > 4) drop <- c(head(drop, 4), "...")
+    drop <- paste(collapse = ", ", drop)
+    msg <- "Dropping %i OTU%s from the otu matrix: %s"
+    message(sprintf(msg, n, ifelse(n == 1, "", "s"), drop))
+  }
+  
+  
+  
+  #________________________________________________________
+  # Reorder and subset to match incoming OTU ids.
+  #________________________________________________________
+  otus <- intersect(as.character(value[['.otu']]), otus)
+  biom[['counts']]   <- biom[['counts']][otus,]
+  biom[['taxonomy']] <- left_join(
+    x  = tibble(.otu = otus),
+    y  = value, 
+    by = ".otu" )
+  
+  
+  
+  biom <- biom_repair(biom)
+  
+  invalidate_biom()
+  return (biom) 
 }
 
 

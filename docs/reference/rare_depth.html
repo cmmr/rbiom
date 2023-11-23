@@ -12,11 +12,11 @@ sample_sums() to 1."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,14 +66,15 @@ calls to <code><a href="sample_rarefy.html">sample_rarefy()</a></code>. Calling 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>BIOM</code> object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The rarefaction depth, or <code>NULL</code> If the BIOM object is not
+<p>The rarefaction depth, or <code>NULL</code> if <code>biom</code> is not
 rarefied.</p>
     </div>
     <div class="section level2">

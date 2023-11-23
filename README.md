@@ -19,7 +19,7 @@ Source code can be found at https://github.com/cmmr/rbiom
 Installation
 ------------
 
-The latest stable version can be downloaded from CRAN.
+The latest stable version can be installed from CRAN.
 
 ```r
 install.packages("rbiom")

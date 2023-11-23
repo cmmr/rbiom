@@ -20,9 +20,9 @@
 #'     library(ggplot2)
 #'     
 #'     biom <- sample_rarefy(hmp50)
-#'     dm   <- unifrac(biom)
+#'     dm   <- bdiv_distmat(biom, 'unifrac')
 #'     reg_pcoa <- ape::pcoa(dm)[['vectors']]
-#'     adj_pcoa <- apcoa(dm, sample_metadata(biom)[,'Sex',drop=FALSE])
+#'     adj_pcoa <- apcoa(dm, sample_metadata(biom)[,'Sex'])
 #'     
 #'     ids   <- sample_names(biom)
 #'     color <- sample_metadata(biom, 'Sex')
@@ -35,10 +35,11 @@ apcoa <- function (distmat, covariates)  {
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("apcoa", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  params     <- eval_envir(environment())
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
+  remove("params")
   
   
   if (!is(distmat,    "dist"))       stop ("distmat must be of class 'dist'.")

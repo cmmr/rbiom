@@ -14,13 +14,13 @@ rare_barplot(
 )
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
-columns are assumed to be the taxa and samples, respectively.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
-auto-selected rarefaction depth or \code{NULL} to not show a line.
+auto-selected rarefaction depth, \code{FALSE} to not show a line, or
+an integer for a custom position.
 Default: \code{TRUE}.}
 
 \item{counts}{Display the number of samples and reads remaining after
@@ -32,14 +32,15 @@ rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 \code{NULL}.  Default: \code{"log10"}.}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
-Prefix a parameter name with either \code{r.} to ensure it gets
-passed to (and only to) \link[ggplot2]{geom_vline}. For instance,
-\code{r.color = "black"} ensures only the vertical rarefaction line
+Prefix a parameter name with \code{r.} to ensure it gets
+passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
+\code{r.color = "black"} ensures only the horizontal rarefaction line
 has its color set to \code{"black"}.}
 }
 \value{
-A \code{ggplot2} plot. The underlying dataset will be attached as
-\code{attr(p, 'data')}.
+A \code{ggplot2} plot. \cr The computed data points, ggplot command,
+and object history are available as \code{$data}, \code{$code}, and
+\code{$history}, respectively.
 }
 \description{
 Visualize the number of observations per sample.
@@ -47,10 +48,19 @@ Visualize the number of observations per sample.
 \examples{
     library(rbiom)
     
-    rare_barplot(hmp50, rline=TRUE)
+    rare_barplot(hmp50)
+    
+    rare_barplot(hmp50, rline = 500, r.size = 2, r.linetype = "twodash")
+    
+    fig <- rare_barplot(hmp50, counts = FALSE)
+    fig$code
     
 }
 \seealso{
+Other rarefaction: 
+\code{\link{rare_corrplot}()},
+\code{\link{rare_multiplot}()}
+
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
@@ -65,4 +75,5 @@ Other visualization:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}
 }
+\concept{rarefaction}
 \concept{visualization}

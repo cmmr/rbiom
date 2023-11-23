@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Run statistics on a distance matrix vs a categorical or numeric variable.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/bdiv_distmat.r" class="external-link"><code>R/bdiv_distmat.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/distmat_stats.r" class="external-link"><code>R/distmat_stats.r</code></a></small>
       <div class="d-none name"><code>distmat_stats.Rd</code></div>
     </div>
 
@@ -51,33 +51,27 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">distmat_stats</span><span class="op">(</span></span>
-<span>  <span class="va">dm</span>,</span>
-<span>  <span class="va">groups</span>,</span>
-<span>  test <span class="op">=</span> <span class="st">"adonis2"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  permutations <span class="op">=</span> <span class="fl">999</span>,</span>
-<span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, <span class="va">groups</span>, test <span class="op">=</span> <span class="st">"adonis2"</span>, seed <span class="op">=</span> <span class="fl">0</span>, permutations <span class="op">=</span> <span class="fl">999</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>dm</dt>
-<dd><p>The distance matrix as a <code>dist</code> object, or a list of
-<code>dist</code> objects.</p></dd>
+<dd><p>A <code>dist</code>-class distance matrix, as returned from
+<code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> or <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>. Required.</p></dd>
 
 
 <dt>groups</dt>
 <dd><p>A named vector of grouping values. The names should
-correspond to <code>attr(dm, 'Labels')</code>.</p></dd>
+correspond to <code>attr(dm, 'Labels')</code>. Values can be either
+categorical or numeric. Required.</p></dd>
 
 
 <dt>test</dt>
-<dd><p>The name of the function from the <code>vegan</code> R package to
-use. Options are: <code>"adonis2"</code> and <code>"mrpp"</code>. Non-ambiguous
-abbreviations of the function names are also accepted.
-Default: <code>"adonis2"</code></p></dd>
+<dd><p>Permutational test for accessing significance. Options are:</p><ul><li><p><code>"adonis2"</code> -  Permutational MANOVA; <code><a href="https://rdrr.io/pkg/vegan/man/vegan-deprecated.html" class="external-link">vegan::adonis2()</a></code>.</p></li>
+<li><p><code>"mrpp"</code> -  Multiple response permutation procedure; <code><a href="https://rdrr.io/pkg/vegan/man/mrpp.html" class="external-link">vegan::mrpp()</a></code>.</p></li>
+</ul><p>Default: <code>"adonis2"</code> <br><br>
+Abbreviations are allowed.</p></dd>
 
 
 <dt>seed</dt>
@@ -88,45 +82,78 @@ Default: <code>"adonis2"</code></p></dd>
 <dd><p>Number of random permutations to use.
 Default: <code>999</code></p></dd>
 
-
-<dt>p.adj</dt>
-<dd><p>Method to use for multiple comparisons adjustment of
-p-values. Run <code>p.adjust.methods</code> for a list of available
-options. Default: <code>"fdr"</code>.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A data.frame with summary statistics from <code><a href="https://rdrr.io/pkg/vegan/man/permustats.html" class="external-link">vegan::permustats()</a></code>. The columns are:</p><ul><li><p><em>stat</em> -  The observed statistic. For mrpp, this is the overall weighted mean of group mean distances.</p></li>
-<li><p><em>z</em> -  The difference of observed statistic and mean of permutations divided by the standard deviation of permutations (also known as z-values). Evaluated from permuted values without observed statistic.</p></li>
-<li><p><em>p.val</em> -  Include only the specified metadata columns.</p></li>
-<li><p><em>adj.p</em> -  P-value after correcting for the false discovery rate with the <code>p.adj</code> method.</p></li>
-<li><p><em>test</em> -  The <code>test</code> and <code>p.adj</code> methods used.</p></li>
-</ul></div>
+<p>A data.frame with summary statistics from <code><a href="https://rdrr.io/pkg/vegan/man/permustats.html" class="external-link">vegan::permustats()</a></code>.
+The columns are:</p><ul><li><p><em>.n</em> -  The size of the distance matrix.</p></li>
+<li><p><em>.stat</em> - 
+The observed statistic. For mrpp, this is the overall
+weighted mean of group mean distances.</p></li>
+<li><p><em>.z</em> - 
+The difference of observed statistic and mean of permutations
+divided by the standard deviation of permutations (also known
+as z-values). Evaluated from permuted values without observed
+statistic.</p></li>
+<li><p><em>.p.val</em> -  Probability calculated by <code>test</code>.</p></li>
+</ul><p><br></p>
+
+
+<p>R commands for reproducing the results are in <code>$code</code> and
+object history in <code>$history</code>.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
-<code><a href="bdiv_table.html">bdiv_table</a>()</code></p></div>
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
+<code><a href="bdiv_table.html">bdiv_table</a>()</code></p>
+<p>Other stats_tables: 
+<code><a href="adiv_stats.html">adiv_stats</a>()</code>,
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
+<code><a href="stats_table.html">stats_table</a>()</code>,
+<code><a href="taxa_stats.html">taxa_stats</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="sample_select.html">sample_select</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">dm</span>   <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="sample_metadata.html">sample_metadata</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Body Site'</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .stat .z .p.val .adj.p        .test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  9.27 11  0.001  0.001 adonis2; fdr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      .n .stat    .z .p.val</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10  9.27  11.0  0.001</span>
+<span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="sample_metadata.html">sample_metadata</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .stat   .z .p.val .adj.p        .test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  4.13 3.56  0.012  0.012 adonis2; fdr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      .n .stat    .z .p.val</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10  4.13  3.56  0.012</span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># See the R code used to calculate these statistics:</span></span></span>
+<span class="r-in"><span>    <span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="sample_metadata.html">sample_metadata</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">stats</span><span class="op">$</span><span class="va">code</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> grouping <span style="color: #00BB00;">&lt;-</span> groups<span style="color: #BBBB00;">[</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>dm, <span style="color: #BBBB00;">'Labels'</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">set.seed</span><span style="color: #BBBB00;">(</span><span style="color: #BB00BB;">0</span><span style="color: #BBBB00;">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> vegan::<span style="color: #00BBBB;">adonis2</span><span style="color: #BBBB00;">(</span>formula = dm <span style="color: #00BB00;">~</span> grouping, permutations = <span style="color: #BB00BB;">999</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">%&gt;%</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   vegan::<span style="color: #00BBBB;">permustats</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">%&gt;%</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">summary</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">%&gt;%</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">with</span><span style="color: #BBBB00;">(</span><span style="color: #00BBBB;">data.frame</span><span style="color: #BB00BB;">(</span>.stat = statistic, .z = z, .p.val = p<span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">%&gt;%</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">tryCatch</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     error   = <span style="color: #BB0000;">function</span> <span style="color: #BB00BB;">(</span>e<span style="color: #BB00BB;">)</span> <span style="color: #00BBBB;">data.frame</span><span style="color: #BB00BB;">(</span>.stat=<span style="color: #BB00BB;">NA</span>, .z=<span style="color: #BB00BB;">NA</span>, .p.val=<span style="color: #BB00BB;">NA)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     warning = <span style="color: #BB0000;">function</span> <span style="color: #BB00BB;">(</span>w<span style="color: #BB00BB;">)</span> <span style="color: #00BBBB;">data.frame</span><span style="color: #BB00BB;">(</span>.stat=<span style="color: #BB00BB;">NA</span>, .z=<span style="color: #BB00BB;">NA</span>, .p.val=<span style="color: #BB00BB;">NA)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">%&gt;%</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">data.frame</span><span style="color: #BBBB00;">(</span>row.names = <span style="color: #BB00BB; font-weight: bold;">NULL</span>, .n = <span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>dm, <span style="color: #BBBB00;">'Size'</span><span style="color: #BB00BB;">)</span>, .<span style="color: #BBBB00;">)</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

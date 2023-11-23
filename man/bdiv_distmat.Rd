@@ -7,28 +7,25 @@
 bdiv_distmat(biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object (e.g. as returned from \code{\link[=read_biom]{read_biom()}}). For matrices, the
-rows and columns are assumed to be the taxa and samples, respectively.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{bdiv}{The beta diversity distance algorithm to use. Options are:
+\item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. Non-ambiguous abbreviations
-of the algorithm names are also accepted. For \code{"UniFrac"}, a
+\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"}.}
+provided via \code{tree=}. Default: \code{"Bray-Curtis"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
 Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
-relationships of the taxa in \code{biom}. Will be taken from the tree
-defined in \code{biom} if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: \code{NULL}}
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{otu_tree(biom)}}
 }
 \value{
-A distance matrix.
+A \code{dist}-class distance matrix.
 }
 \description{
 Make a distance matrix of samples vs samples.
@@ -44,9 +41,11 @@ Make a distance matrix of samples vs samples.
 }
 \seealso{
 Other beta_diversity: 
+\code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
+\code{\link{bdiv_stats}()},
 \code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 }

@@ -10,8 +10,6 @@
 \alias{counts}
 \alias{info-deprecated}
 \alias{info}
-\alias{depths_barplot-deprecated}
-\alias{depths_barplot}
 \alias{metadata-deprecated}
 \alias{metadata}
 \alias{nsamples-deprecated}
@@ -30,14 +28,10 @@
 \alias{read.tree}
 \alias{sample.names-deprecated}
 \alias{sample.names}
-\alias{repair-deprecated}
-\alias{repair}
 \alias{select-deprecated}
 \alias{select}
 \alias{sequences-deprecated}
 \alias{sequences}
-\alias{subset.BIOM-deprecated}
-\alias{subset.BIOM}
 \alias{subtree-deprecated}
 \alias{subtree}
 \alias{taxa.names-deprecated}
@@ -50,6 +44,8 @@
 \alias{taxonomy}
 \alias{tips-deprecated}
 \alias{tips}
+\alias{unifrac-deprecated}
+\alias{unifrac}
 \alias{write.biom-deprecated}
 \alias{write.biom}
 \alias{write.fasta-deprecated}
@@ -64,6 +60,8 @@
 \alias{comments}
 \alias{depth-deprecated}
 \alias{depth}
+\alias{depths_barplot-deprecated}
+\alias{depths_barplot}
 \alias{has.phylogeny-deprecated}
 \alias{has.phylogeny}
 \alias{has.sequences-deprecated}
@@ -72,10 +70,12 @@
 \alias{id}
 \alias{is.rarefied-deprecated}
 \alias{is.rarefied}
+\alias{repair-deprecated}
+\alias{repair}
+\alias{sample_subset-deprecated}
+\alias{sample_subset}
 \alias{sample.sums-deprecated}
 \alias{sample.sums}
-\alias{stats.table-deprecated}
-\alias{stats.table}
 \alias{taxa.means-deprecated}
 \alias{taxa.means}
 \alias{taxa.sums-deprecated}
@@ -114,16 +114,7 @@ counts(biom)
 
 info(biom)
 
-depths_barplot(
-  biom,
-  rline = TRUE,
-  counts = TRUE,
-  labels = TRUE,
-  trans = "log10",
-  ...
-)
-
-metadata(biom, field = NULL, id = NULL, cleanup = FALSE)
+metadata(biom, field = NULL, cleanup = FALSE)
 
 nsamples(biom)
 
@@ -141,13 +132,9 @@ read.tree(src)
 
 sample.names(biom)
 
-repair(biom)
-
 select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
 
 sequences(biom)
-
-\method{subset}{BIOM}(x, ...)
 
 subtree(tree, tips)
 
@@ -158,10 +145,10 @@ taxa.ranks(biom)
 taxa.rollup(
   biom,
   rank = "OTU",
-  taxa = NULL,
   map = NULL,
   lineage = FALSE,
   sparse = FALSE,
+  taxa = NULL,
   long = FALSE,
   md = FALSE
 )
@@ -169,6 +156,8 @@ taxa.rollup(
 taxonomy(biom, ranks = NULL, unc = "asis")
 
 tips(x)
+
+unifrac(biom, weighted = TRUE, tree = NULL)
 
 write.biom(biom, file, format = "json")
 
@@ -184,6 +173,15 @@ comments(biom)
 
 depth(biom)
 
+depths_barplot(
+  biom,
+  rline = TRUE,
+  counts = TRUE,
+  labels = TRUE,
+  trans = "log10",
+  ...
+)
+
 has.phylogeny(biom)
 
 has.sequences(biom)
@@ -192,9 +190,11 @@ id(biom)
 
 is.rarefied(biom)
 
-sample.sums(biom, long = FALSE, md = FALSE)
+repair(biom)
 
-stats.table(...)
+sample_subset(x, ...)
+
+sample.sums(biom, long = FALSE, md = FALSE)
 
 taxa.means(biom, rank = NULL)
 
@@ -232,7 +232,7 @@ available at \code{help("<function>-deprecated")}.
 }
 \section{\code{alpha.div}}{
 
-Use \code{\link[=adiv_table]{adiv_table()}} instead.
+Use \code{\link[=adiv_matrix]{adiv_matrix()}} or \code{\link[=adiv_table]{adiv_table()}} instead.
 }
 
 \section{\code{beta.div}}{
@@ -248,11 +248,6 @@ Use \code{\link[=otu_matrix]{otu_matrix()}} instead.
 \section{\code{info}}{
 
 Use \code{\link[=biom_info]{biom_info()}} instead.
-}
-
-\section{\code{depths_barplot}}{
-
-Use \code{\link[=rare_barplot]{rare_barplot()}} instead.
 }
 
 \section{\code{metadata}}{
@@ -300,24 +295,14 @@ Use \code{\link[=read_tree]{read_tree()}} instead.
 Use \code{\link[=sample_names]{sample_names()}} instead.
 }
 
-\section{\code{repair}}{
-
-Use \code{\link[=biom_repair]{biom_repair()}} instead.
-}
-
 \section{\code{select}}{
 
-Use \code{\link[=sample_select]{sample_select()}} instead.
+Use \code{\link[=subset]{subset()}} instead.
 }
 
 \section{\code{sequences}}{
 
 Use \code{\link[=otu_sequences]{otu_sequences()}} instead.
-}
-
-\section{\code{subset}}{
-
-Use \code{\link[=sample_subset]{sample_subset()}} instead.
 }
 
 \section{\code{subtree}}{
@@ -350,6 +335,11 @@ Use \code{\link[=otu_taxonomy]{otu_taxonomy()}} instead.
 Use \code{\link[=tree_tips]{tree_tips()}} instead.
 }
 
+\section{\code{unifrac}}{
+
+Use \code{\link[=bdiv_distmat]{bdiv_distmat()}} or \code{\link[=bdiv_table]{bdiv_table()}} instead.
+}
+
 \section{\code{write.biom}}{
 
 Use \code{\link[=write_biom]{write_biom()}} instead.
@@ -377,12 +367,17 @@ Use \code{\link[=as_percent]{as_percent()}} instead.
 
 \section{\code{comments}}{
 
-Use \code{\link[=biom_info]{biom_info()}} instead.
+Use \code{\link[=biom_comment]{biom_comment()}} instead.
 }
 
 \section{\code{depth}}{
 
 Use \code{\link[=sample_sums]{sample_sums()}} instead.
+}
+
+\section{\code{depths_barplot}}{
+
+Use \code{\link[=rare_barplot]{rare_barplot()}} instead.
 }
 
 \section{\code{has.phylogeny}}{
@@ -397,7 +392,7 @@ Use \code{\link[=has_sequences]{has_sequences()}} instead.
 
 \section{\code{id}}{
 
-Use \code{\link[=biom_info]{biom_info()}} instead.
+Use \code{\link[=biom_id]{biom_id()}} instead.
 }
 
 \section{\code{is.rarefied}}{
@@ -405,14 +400,19 @@ Use \code{\link[=biom_info]{biom_info()}} instead.
 Use \code{\link[=is_rarefied]{is_rarefied()}} instead.
 }
 
-\section{\code{sample.sums}}{
+\section{\code{repair}}{
 
-Use \code{\link[=sample_sums]{sample_sums()}} instead.
+Use \code{\link[=biom_repair]{biom_repair()}} instead.
 }
 
-\section{\code{stats.table}}{
+\section{\code{sample_subset}}{
 
-Use \code{\link[=biom_stats]{biom_stats()}} instead.
+Use \code{\link[=subset]{subset()}} instead.
+}
+
+\section{\code{sample.sums}}{
+
+Use \code{\link[=sample_sums]{sample_sums()}} or \code{\link[=adiv_table]{adiv_table()}} instead.
 }
 
 \section{\code{taxa.means}}{

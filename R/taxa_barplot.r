@@ -1,20 +1,10 @@
 #' Display taxa abundances as a stacked bar graph.
 #' 
-#' @name taxa_barplot
+#' @inherit documentation_default
+#' @inherit documentation_plot_return return
 #' 
+#' @family taxa_abundance
 #' @family visualization
-#' 
-#' @param biom   A BIOM object, as returned from [read_biom()].
-#'        
-#' @param rank   What rank(s) of taxa to display, for example \code{"Phylum"} 
-#'        or \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a 
-#'        given BIOM object. The default, \code{NULL}, selects the lowest
-#'        level.
-#'        
-#' @param taxa   Which taxa to give separate colors. An integer value will show
-#'        the top n most abundant taxa. A value 0 <= n < 1 will show all taxa 
-#'        with that mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. Default: \code{6}.
 #'                 
 #' @param colors,patterns   A character vector of colors or patterns to use in
 #'        the graph. A named character vector can be used to map taxon names to 
@@ -32,21 +22,12 @@
 #'                 
 #' @param dist,clust   Distance ([stats::dist()]) and clustering 
 #'        ([stats::hclust()]) methods to use for automatically arranging 
-#'        samples along the x-axis. Group samples with similar composition near 
+#'        samples along the x-axis to put samples with similar composition near 
 #'        one another. Default: \code{dist="euclidean", clust="complete"}.
-#'                 
-#' @param other   Add an 'Other' taxa that ensures all bars sum to 100%. 
-#'        Default: \code{TRUE}.
-#'        
-#' @param xlab.angle   How to rotate the tick labels on the x-axis.
-#'        Options are \code{90} (the default) or \code{30}.
 #'        
 #' @param ...   Parameters for underlying functions. Prefixing parameter names 
 #'        with a layer name ensures that a particular parameter is passed to, 
 #'        and only to, that layer.
-#'        
-#' @return A \code{ggplot2} plot. The computed data points will be attached as 
-#'         \code{attr(, 'data')}.
 #' 
 #' 
 #' @export
@@ -57,72 +38,59 @@
 #'     taxa_barplot(biom, rank="Phylum")
 #'     
 taxa_barplot <- function (
-    biom, rank = NULL, taxa = 6, colors = TRUE, patterns = FALSE,
+    biom, rank = -1, taxa = 6, colors = TRUE, patterns = FALSE,
     label.by = NULL, order.by = NULL, facet.by = NULL, limit.by = NULL, 
-    dist = "euclidean", clust = "complete", 
-    other = TRUE, xlab.angle = 90, ...) {
+    dist = "euclidean", clust = "complete", other = TRUE, 
+    unc = "singly", lineage = FALSE, xlab.angle = 90, ...) {
+  
+  validate_biom(clone = FALSE)
+  
+  params  <- eval_envir(environment(), ...)
+  history <- append_history('fig ', params)
+  remove(list = intersect(env_names(params), ls()))
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("taxa_barplot", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  arg_str <- as.args(params, fun = taxa_barplot, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- taxa_barplot(%s)", arg_str) ))
-  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    rank  %<>% validate_arg(biom, 'rank',  n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
-    dist  %<>% validate_arg(biom, 'dist',  n = 1)
-    clust %<>% validate_arg(biom, 'clust', n = 1)
-  })
   
   
   #________________________________________________________
   # Handle multiple ranks with recursive subcalls.
   #________________________________________________________
-  if (length(params[['rank']]) > 1) {
+  validate_rank(max = Inf, env = params)
+  
+  if (length(params$rank) > 1) {
     
-    ranks <- params[['rank']]
+    ranks <- params$rank
     
     plots <- sapply(ranks, simplify = FALSE, function (rank) {
-      args                 <- params
-      args[['rank']]       <- rank
-      args[['labs.title']] <- rank
-      do.call(taxa_barplot, args)
+      params[['rank']]       <- rank
+      params[['labs.title']] <- rank
+      do.call(taxa_barplot, fun_params(taxa_barplot, params))
     })
     
-    p <- patchwork::wrap_plots(plots, ncol = 1)
+    p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
+      add_class('rbiom_plot')
     
     attr(p, 'history') <- history
     attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
-    attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
+    
+    attr(p, 'code') <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
         sub(
-          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+          x           = attr(plots[[i]], 'code', exact = TRUE), 
           pattern     = "ggplot(data)", 
           replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
           fixed       = TRUE )
       })
       c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
-    }))
-    
-    remove("ranks", "plots")
+      
+    })) %>% add_class('rbiom_code')
     
     set_cache_value(cache_file, p)
     return (p)
@@ -131,150 +99,114 @@ taxa_barplot <- function (
   
   
   #________________________________________________________
-  # Subset biom by requested metadata and aes.
+  # Sanity Checks
   #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    label.by = list(n = 0:1),
-    order.by = list(),
-    facet.by = list(col_type = "cat"),
-    limit.by = list() ))
-  
-  biom <- params[['biom']]
-  
-  
-  # #________________________________________________________
-  # # Subset before calculating relative abundances
-  # #________________________________________________________
-  # sample_metadata(biom) %<>% subset_by_params(params)
-  
-  
-  #________________________________________________________
-  # Sanity Check
-  #________________________________________________________
-  if (n_samples(biom) < 1)
-    stop("At least one sample is needed for a stacked bar plot.")
-  
-  
-  
-  #________________________________________________________
-  # Limit to top n taxa, min abundance, or custom list
-  #________________________________________________________
-  ggdata <- local({
+  with(params, {
     
-    taxa <- params[['taxa']]
-    mat  <- t(taxa_matrix(biom, rank = params[['rank']]))
+    validate_dist()
+    validate_clust()
+    
+    validate_meta_aes('label.by', null_ok = TRUE)
+    validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
+    validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
+    
+    sync_metadata()
+    
+    if (n_samples(biom) < 1)
+      stop("At least one sample is needed for a stacked bar plot.")
+  })
   
-    if (is.numeric(taxa)) {
-      rel <- sort(rowMeans(t(t(mat) / colSums(mat))), decreasing = TRUE)
-      if (taxa >= 1) { taxa <- head(names(rel), taxa) 
-      } else         { taxa <- names(rel)[rel >= taxa] }
-      
-    } else {
-      taxa <- intersect(as.character(taxa), rownames(mat))
-    }
+  
+  
+  
+  #________________________________________________________
+  # Compute taxa abundance values.
+  #________________________________________________________
+  with(params, {
     
-    if (length(taxa) == 0)
-      stop("No taxa match the criteria: ", capture.output(str(taxa)))
-    
-    #________________________________________________________
-    # Sum the remaining taxa into an "Other" category
-    #________________________________________________________
-    if (length(taxa) == nrow(mat) || isFALSE(params[['other']])) {
-      mat <- mat[taxa,,drop=FALSE]
+    .ggdata <- local({
       
-    } else {
       
-      mat <- local({
+      # The matrix will be needed for similarity clustering.
+      #________________________________________________________
+      mtx <- taxa_matrix(
+        biom    = biom, 
+        rank    = rank, 
+        taxa    = taxa, 
+        lineage = lineage,
+        sparse  = FALSE, 
+        unc     = unc, 
+        other   = other )
       
-        other <- params[['other']]
-        if (identical(other, TRUE)) other <- "Other"
-        stopifnot(is_scalar_character(other))
+      
+      
+      # Pivot to long-form and add metadata.
+      #________________________________________________________
+      tbl <- tibble(
+          '.rank'      = rank,
+          '.sample'    = colnames(mtx)[col(mtx)],
+          '.taxa'      = rownames(mtx)[row(mtx)] %>% factor(rownames(mtx)),
+          '.abundance' = as.numeric(mtx) ) %>%
+        left_join(sample_metadata(biom), by = '.sample') %>%
+        add_class('rbiom_tbl')
+      
+      
+      
+      # Factor levels on .sample control x-axis ordering.
+      #________________________________________________________
+      tbl[['.sample']] %<>% factor(levels = local({
         
-        mat1 <- mat[taxa,,drop=FALSE]
-        mat2 <- mat[!rownames(mat) %in% taxa,,drop=FALSE] %>%
-          colSums() %>% 
-          matrix(nrow = 1, dimnames = list(other, NULL))
+        dm   <- dist(x = t(mtx), method = dist)
+        hc   <- hclust(d = dm, method = clust)
+        lvls <- hc$labels[hc$order]
         
-        return (rbind(mat1, mat2))
-      })
-    }
-    
+        if (!is.null(order.by)) {
+          
+          sns <- sample_names(biom)
+          md  <- sample_metadata(biom)[,order.by]
+          md[['.sort']] <- match(sns, lvls)
+          
+          lvls <- sns[base::rank(do.call(order, unname(as.list(md))))]
+        }
+        
+        return (lvls)
+        
+      }))
       
-    #________________________________________________________
-    # Cluster samples by composition similarity or order.by
-    #________________________________________________________
-    sorted <- local({
-      if (is_null(params[['order.by']])) {
-        dm <- dist(x = t(mat), method = params[['dist']])
-        hc <- hclust(d = dm, method = params[['clust']])
-        setNames(seq_along(hc$labels), hc$labels[hc$order])
-      } else {
-        rank(sample_metadata(biom, params[['order.by']]))
-      }
+      
+      
+      return (tbl)
     })
     
     
-    #________________________________________________________
-    # Convert counts matrix to a data.frame
-    #________________________________________________________
-    data.frame(
-      check.names = FALSE,
-      stringsAsFactors = FALSE,
-      '.sample'    = colnames(mat)[col(mat)],
-      '.rank'      = params[['rank']],
-      '.taxa'      = rownames(mat)[row(mat)],
-      '.abundance' = as.numeric(mat),
-      '.sort'      = sorted[colnames(mat)[col(mat)]] )
+    .xcol  <- '.sample'
+    .ycol  <- '.abundance'
+    .xmode <- 'factor'
+    
   })
   
-  attr(ggdata, 'response') <- ".abundance"
-  
-  
-  
-  #________________________________________________________
-  # Convert taxa names to a factor
-  #________________________________________________________
-  vals  <- sort(unique(ggdata[['.taxa']]))
-  taxa  <- params[['taxa']]
-  taxa  <- if (is.character(taxa)) intersect(taxa, vals) else vals
-  other <- params[['other']]
-  if (identical(other, TRUE)) other <- "Other"
-  if (is_scalar_character(other) && other %in% vals)
-    taxa <- c(setdiff(taxa, other), other)
-  ggdata[['.taxa']] %<>% factor(levels = taxa)
-  
-  remove("vals", "taxa", "other")
-  
-  
-  
-  #________________________________________________________
-  # Order samples on x-axis by similarity or order.by
-  #________________________________________________________
-  lvls <- ggdata[!duplicated(ggdata[['.sample']]), , drop=FALSE]
-  lvls <- lvls[order(lvls[['.sort']]), '.sample', drop=TRUE]
-  ggdata[['.sample']] %<>% factor(levels = lvls)
-  remove("lvls")
   
   
   #________________________________________________________
   # Inject color.by and pattern.by arguments as needed.
   #________________________________________________________
   
-  taxa <- levels(ggdata[['.taxa']])
+  taxa <- levels(params$.ggdata[['.taxa']])
   n    <- length(taxa)
   
-  if (!isFALSE(values <- params[['colors']])) {
-    if (!is_null(names(values))) { values <- params[['colors']][taxa]
+  if (!isFALSE(values <- params$colors)) {
+    if (!is_null(names(values))) { values <- params$colors[taxa]
     } else                       { values <- get_n_colors(n, values) }
-    params[['color.by']] <- list('.taxa' = list('values' = values))
-    attr(params[['color.by']], 'display') <- FALSE
+    params$color.by <- list('.taxa' = list('values' = values))
+    attr(params$color.by, 'display') <- FALSE
   }
   
-  if (!isFALSE(values <- params[['patterns']])) {
-    if (!is_null(names(values))) { values <- params[['patterns']][taxa]
+  if (!isFALSE(values <- params$patterns)) {
+    if (!is_null(names(values))) { values <- params$patterns[taxa]
     } else                       { values <- get_n_patterns(n, values) }
-    params[['pattern.by']] <- list('.taxa' = list('values' = values))
-    attr(params[['pattern.by']], 'display') <- FALSE
+    params$pattern.by <- list('.taxa' = list('values' = values))
+    attr(params$pattern.by, 'display') <- FALSE
   }
   
   remove("taxa", "n")
@@ -282,72 +214,41 @@ taxa_barplot <- function (
   
   
   #________________________________________________________
-  # Initialize the `layers` object
+  # Initialize the `layers` object.
   #________________________________________________________
-  layers <- list()
+  do_init <- "stack"
+  if (!is_null(params$color.by))   do_init %<>% c("fill")
+  if (!is_null(params$pattern.by)) do_init %<>% c("pattern")
+  if (!is_null(params$facet.by))   do_init %<>% c("facet")
   
-  attr(layers, 'biom')     <- biom
-  attr(layers, 'data')     <- ggdata
-  attr(layers, 'params')   <- params
-  attr(layers, 'function') <- taxa_barplot
-  attr(layers, 'xcol')     <- ".sample"
-  attr(layers, 'ycol')     <- attr(ggdata, 'response', exact = TRUE)
-  attr(layers, 'xmode')    <- "factor"
-  attr(layers, 'ymode')    <- "numeric"
-  
-  layer_names <- c('ggplot', 'stack', 'labs', 'theme', 'theme_bw')
-  
-  if (!is_null(params[['color.by']]))   layer_names %<>% c("fill")
-  if (!is_null(params[['pattern.by']])) layer_names %<>% c("pattern")
-  
-  initLayer(layer_names)
-  
-  remove("layer_names", "ggdata")
-  
-  
-  
-  #________________________________________________________
-  # Add in facet.by columns
-  #________________________________________________________
-  if (!is_null(params[['facet.by']])) {
-    ggdata <- attr(layers, 'data', exact = TRUE)
-    
-    ids <- as.character(ggdata[['.sample']])
-    for (i in params[['facet.by']])
-      ggdata[[i]] <- sample_metadata(biom, i)[ids]
-    
-    attr(layers, 'data') <- ggdata
-    remove("ggdata", "ids", "i")
-    
-    setLayer(layer = "facet", scales = "free_x")
-  }
+  init_layers(params, do_init = do_init)
   
   
   
   #________________________________________________________
   # Display a label on the x-axis other than sample name.
   #________________________________________________________
-  if (!is_null(params[['label.by']])) {
+  if (!is_null(params$label.by)) {
     
     # Convert `.sample` to "<int>-<label>" format for easy parsing.
-    ggdata <- attr(layers, 'data', exact = TRUE)
-    levels(ggdata[['.sample']]) <- local({
-      levels <- levels(ggdata[['.sample']])
-      labels <- sample_metadata(biom, params[['label.by']])
-      paste(sep="-", seq_along(levels), labels[levels])
+    with(params, {
+      levels(.ggdata[['.sample']]) <- local({
+        lvls <- levels(.ggdata[['.sample']])
+        labs <- sample_metadata(biom, label.by)
+        paste(sep="-", seq_along(lvls), labs[lvls])
+      })
     })
-    attr(layers, 'data') <- ggdata
-    remove("ggdata")
     
-    setLayer(layer = "xaxis", 'labels' = ~ sub("^\\d+\\-", "", .))
+    set_layer(params, 'xaxis', 'labels' = ~ sub("^\\d+\\-", "", .))
   }
   
   
   #________________________________________________________
   # Caption about labeling and ordering
   #________________________________________________________
-  setLayer(
-    layer = "labs", 
+  set_layer(
+    params = params, 
+    layer  = 'labs', 
     'x'        = "Sample",
     'subtitle' = with(params, glue(
     
@@ -362,64 +263,62 @@ taxa_barplot <- function (
         
       } else {
         ifelse(
-          test = identical(label.by, order.by), 
+          test = eq(label.by, order.by), 
           yes  = "Samples are labeled and ordered by {label.by}.", 
           no   = "Samples are labeled by {label.by} and ordered by {order.by}." )
       }
     )))
-  setLayer(layer = "theme", 'plot.subtitle' = element_text(size = 9, lineheight = 1.2))
+  set_layer(params, 'theme', 'plot.subtitle' = element_text(size = 9, lineheight = 1.2))
   
   
   #________________________________________________________
   # Control the values displayed on the y axis
   #________________________________________________________
   
-  if (is_rarefied(biom)) {
-    ggdata <- attr(layers, 'data', exact = TRUE)
+  if (is_rarefied(params$biom)) {
     
-    ycol  <- attr(ggdata, 'response',    exact = TRUE)
-    depth <- rare_depth(biom)
-    ggdata[[ycol]] <- ggdata[[ycol]] / depth
-    remove("ycol", "depth")
+    with(params, {
+      .ggdata[[.ycol]] <- .ggdata[[.ycol]] / rare_depth(biom)
+    })
     
-    setLayer(
-      layer = "yaxis",
+    set_layer(
+      params = params, 
+      layer  = 'labs', 
+      'y' = "Relative Abundance" )
+    
+    set_layer(
+      params = params, 
+      layer  = 'yaxis',
       'expand' = c(0,0),
       'limits' = c(0,1),
       'labels' = scales::percent )
     
-    setLayer(
-      layer = "theme", 
+    set_layer(
+      params = params, 
+      layer  = 'theme', 
       'panel.grid'  = element_blank(),
       'plot.margin' = as.cmd(unit(c(1,1,1,1), "lines")) )
     
-    setLayer(
-      layer = "labs", 
-      'y' = "Relative Abundance" )
-    
-    attr(layers, 'data') <- ggdata
-    remove("ggdata")
     
   } else {
     
-    ggdata <- attr(layers, 'data', exact = TRUE)
-    breaks <- base::pretty(ggdata[[attr(ggdata, 'response', exact = TRUE)]])
-    labels <- si_units
-    
-    setLayer(
-      layer = "labs",  
+    set_layer(
+      params = params, 
+      layer  = 'labs',  
       'y' = "Raw Abundance" )
-    setLayer(
-      layer = "yaxis", 
+    
+    set_layer(
+      params = params, 
+      layer  = 'yaxis', 
       'expand' = c(0, 0, 0.02, 0),
-      'breaks' = breaks,
-      'labels' = labels )
-    setLayer(
-      layer = "theme",
+      'breaks' = with(params, base::pretty(.ggdata[[.ycol]])),
+      'labels' = si_units )
+    
+    set_layer(
+      params = params, 
+      layer  = 'theme',
       'panel.grid.major.x' = element_blank(),
       'panel.grid.minor.y' = element_blank() )
-    
-    remove("ggdata", "breaks", "labels")
   }
   
   
@@ -427,31 +326,33 @@ taxa_barplot <- function (
   #________________________________________________________
   # aes() parameters
   #________________________________________________________
-  setLayer(
-    layer = "stack", 
-    'mapping|x' = attr(layers, 'xcol'), 
-    'mapping|y' = attr(layers, 'ycol') )
+  set_layer(
+    params = params, 
+    layer  = 'stack', 
+    'mapping|x' = params$.xcol, 
+    'mapping|y' = params$.ycol )
   
   
   #________________________________________________________
   # Pattern-specific aes / non-aes mappings
   #________________________________________________________
-  layer <- "stack"
-  if (hasName(layers, "pattern")) {
-    setLayer(
+  if (has_layer(params, 'pattern')) {
+    
+    set_layer(
+      params = params, 
+      layer  = 'stack',
       'mapping|pattern_type' = ".taxa", 
       'pattern'              = "magick", 
       'pattern_res'          = 120,
       'fill'                 = "white",
       'color'                = "black" )
     
-    if (isFALSE(params[['colors']])) { setLayer('pattern_fill'         = "black")
-    } else                           { setLayer('mapping|pattern_fill' = ".taxa") }
+    if (isFALSE(params$colors)) { set_layer(params, 'stack', 'pattern_fill'         = "black")
+    } else                      { set_layer(params, 'stack', 'mapping|pattern_fill' = ".taxa") }
     
   } else {
-    setLayer('mapping|fill' = ".taxa")
+    set_layer(params, 'stack', 'mapping|fill' = ".taxa")
   }
-  remove("layer")
   
   
   
@@ -459,22 +360,22 @@ taxa_barplot <- function (
   #________________________________________________________
   # Non-aes parameters
   #________________________________________________________
-  legend_title <- ifelse(identical(params[['labs.title']], params[['rank']]), "", params[['rank']])
-  if (hasName(layers, "pattern")) {
-                                  setLayer(layer = "labs", pattern_type  = legend_title)
-    if (hasName(layers, "fill"))  setLayer(layer = "labs", pattern_fill  = legend_title)
-    if (hasName(layers, "color")) setLayer(layer = "labs", pattern_color = legend_title)
+  legend_title <- ifelse(eq(params$labs.title, params$rank), "", params$rank)
+  if (has_layer(params, 'pattern')) {
+                                    set_layer(params, 'labs', pattern_type  = legend_title)
+    if (has_layer(params, 'fill'))  set_layer(params, 'labs', pattern_fill  = legend_title)
+    if (has_layer(params, 'color')) set_layer(params, 'labs', pattern_color = legend_title)
     
   } else {
-    if (hasName(layers, "fill"))  setLayer(layer = "labs", fill  = legend_title)
-    if (hasName(layers, "color")) setLayer(layer = "labs", color = legend_title)
+    if (has_layer(params, 'fill'))  set_layer(params, 'labs', fill  = legend_title)
+    if (has_layer(params, 'color')) set_layer(params, 'labs', color = legend_title)
   }
   remove("legend_title")
   
-  if (isTRUE(params[['xlab.angle']] == 30)) {
-    setLayer(layer = "theme", 'axis.text.x' = element_text(angle=-30, vjust=1, hjust=0))
+  if (isTRUE(params$xlab.angle == 30)) {
+    set_layer(params, 'theme', 'axis.text.x' = element_text(angle=-30, vjust=1, hjust=0))
   } else {
-    setLayer(layer = "theme", 'axis.text.x' = element_text(angle=-90, vjust=0.3, hjust=0))
+    set_layer(params, 'theme', 'axis.text.x' = element_text(angle=-90, vjust=0.3, hjust=0))
   }
     
   
@@ -484,7 +385,7 @@ taxa_barplot <- function (
   # Create the plot and add each layer with its arguments.
   # Also attaches a human-readable version of the plot command.
   #________________________________________________________
-  p <- layers %>%
+  p <- params %>%
     plot_facets() %>%
     plot_build()
   

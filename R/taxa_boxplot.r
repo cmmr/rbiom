@@ -3,191 +3,143 @@
 
 #' Visualize BIOM data with boxplots.
 #' 
-#' @name taxa_boxplot
+#' @inherit documentation_boxplot
+#' @inherit documentation_default
 #' 
-#' @inherit adiv_boxplot params sections return
-#' 
+#' @family taxa_abundance
 #' @family visualization
-#' 
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
 #'        default, \code{NULL} puts taxa along the x-axis.
-#'        
-#' @param rank   What rank(s) of taxa to display. E.g. "Phylum", "Genus", etc. 
-#'        Run \code{taxa_ranks()} to see all options for a given BIOM object. 
-#'        The default, \code{NULL}, selects the lowest level.
-#'        
-#' @param taxa   Which taxa to display. An integer value will show the top n
-#'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
-#'        mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. Default: \code{5}.
-#'
-#' @param p.top   Only display taxa with the most significant differences in 
-#'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
-#'        significant taxa are displayed. If \code{p.top} is less than one, all 
-#'        taxa with an adjusted p-value <= \code{p.top} are displayed. 
-#'        Recommended to be used in combination with the \code{taxa} parameter 
-#'        to set a lower bound on the mean abundance of considered taxa. 
-#'        Default: \code{Inf}
-#'        
-#' @param y.trans   The transformation to apply to the y-axis. Visualizing 
-#'        differences of both high- and low-abundance taxa is best done with
-#'        a non-linear axis. Options are: 
-#'        \itemize{
-#'          \item{\code{"sqrt"} - }{ square-root transformation }
-#'          \item{\code{"log1p"} - }{ log(y + 1) transformation }
-#'          \item{\code{NULL} - }{ no transformation }
-#'        }
-#'        These methods allow visualization of both high- and low-abundance
-#'        taxa simultaneously, without complaint about 'zero' count
-#'        observations. Default: \code{"sqrt"}
-#'        
-#' @param ...   Parameters are matched to formal arguments of ggplot2
-#'        functions. Prefixing parameter names with a layer name ensures that
-#'        a particular parameter is passed to, and only to, that layer. For
-#'        instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the 
-#'        dotplot layer has its size set to \code{2}. The special prefix
-#'        \code{pt.} will control both the dot and strip layers.
-#' 
 #' 
 #' @export
-#' @seealso [biom_stats()]
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50) 
+#'     biom <- sample_rarefy(hmp50)
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
-#'     taxa_boxplot(biom, rank = "Genus", taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
+#'     taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
 #'     
-#'
+
 taxa_boxplot <- function (
-    biom, x = NULL, rank = NULL, taxa = 5, layers = "lsb",
+    biom, x = NULL, rank = -1, taxa = 6, layers = 'bld', unc = 'singly', other = FALSE,
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-    flip = FALSE, stripe = flip, p.top = Inf, p.adj = "fdr", p.label = TRUE, 
-    ci = 95, outliers = NULL, xlab.angle = 'auto', y.trans = "sqrt", ...) {
+    flip = FALSE, stripe = NULL, p.top = Inf, p.adj = 'fdr', p.label = 0.05, 
+    ci = 'ci', level = 0.95, outliers = NULL, xlab.angle = 'auto', y.trans = 'sqrt', ...) {
+  
+  validate_biom(clone = FALSE)
+  
+  params  <- eval_envir(environment(), ...)
+  history <- append_history('fig ', params)
+  remove(list = intersect(env_names(params), ls()))
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("taxa_boxplot", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   #________________________________________________________
-  # Record the function call in a human-readable format.
+  # Validate and restructure user's arguments.
   #________________________________________________________
-  arg_str <- as.args(params, fun = taxa_boxplot, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- taxa_boxplot(%s)", arg_str) ))
-  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
-  
-  
-  #________________________________________________________
-  # Sanity checks. x and *.by are checked by boxplot_build.
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
+  with(params, {
+    
+    validate_rank(max = Inf)
+    validate_var_range('p.top', c(0, Inf))
+    
+    validate_meta_aes('x',          col_type = "cat", null_ok = TRUE)
+    validate_meta_aes('color.by',   col_type = "cat", null_ok = TRUE)
+    validate_meta_aes('pattern.by', col_type = "cat", null_ok = TRUE)
+    validate_meta_aes('shape.by',   col_type = "cat", null_ok = TRUE)
+    validate_meta_aes('facet.by',   col_type = "cat", null_ok = TRUE, max = Inf)
+    validate_meta_aes('limit.by',                     null_ok = TRUE, max = Inf)
+    
+    sync_metadata()
   })
   
   
   #________________________________________________________
-  # initLayer ignores formalArgs, so copy into equivalent.
+  # init_layers ignores formalArgs, so copy into equivalent.
   #________________________________________________________
-  if (isTRUE(tolower(params[['y.trans']]) %in% c("sqrt", "log1p")))
-    params[['yaxis.trans']] <- tolower(params[['y.trans']])
+  if (isTRUE(tolower(params$y.trans) %in% c("sqrt", "log1p")))
+    params$yaxis.trans <- tolower(params$y.trans)
   
   
   
   #________________________________________________________
-  # Use the generalized boxplot function to make the plot
+  # Compute taxa abundances and set up taxa/rank facet.
   #________________________________________________________
-  p <- boxplot_build(params, taxa_boxplot, taxa_boxplot_data, taxa_boxplot_layers)
-  
-  attr(p, 'history') <- history
-  
-  
-  set_cache_value(cache_file, p)
-  return (p)
-}
-
-
-#______________________________________________________________
-# Convert biom object to a data.frame
-#______________________________________________________________
-taxa_boxplot_data <- function (params) {
-  
-  biom  <- params[['biom']]
-  ranks <- params[['rank']]
-  taxa  <- params[['taxa']]
-  
-  # Convert abundance spec to taxa names
-  if (is.numeric(taxa))
-    taxa <- as.vector(sapply(ranks, function (rank) {
-      means <- taxa_means(as_percent(biom), rank)
-      if (taxa < 1) { return (names(which(means >= taxa)))
-      } else        { return (head(names(means), taxa)) }
-    }))
-  
-  if (is_rarefied(biom))
-    biom <- as_percent(biom)
-  
-  ggdata <- plyr::ldply(ranks, function (rank) {
+  with(params, {
     
-    df <- taxa_table(
-      biom = biom,
-      rank = rank,
-      md   = TRUE )
+    # Compute each rank's abundances separately.
+    #________________________________________________________
+    .ggdata <- taxa_table(
+      biom    = biom, 
+      rank    = rank, 
+      taxa    = taxa, 
+      md      = TRUE, 
+      unc     = unc, 
+      other   = other )
     
-    df <- df[df[['.taxa']] %in% taxa,,drop=FALSE]
-    if (nrow(df) == 0) return (NULL)
     
-    df[['.rank']]      <- rank
-    df[['.abundance']] <- df[[attr(df, 'response', exact = TRUE)]]
-    return (df)
+    # Set .taxa as `x` or `facet.by`.
+    #________________________________________________________
+    if (nlevels(.ggdata[['.taxa']]) > 1) {
+      
+      if (is.null(x)) { x <- '.taxa'
+      } else          { facet.by %<>% c('.taxa', .) }
+    }
+    
+    
+    # Facet on multiple ranks
+    #________________________________________________________
+    if (length(rank) > 1)
+      facet.by %<>% c('.rank', .)
+    
   })
-  attr(ggdata, 'response') <- ".abundance"
   
   
-  ggdata[['.taxa']] %<>% factor(levels = taxa)
-  ggdata[['.rank']] %<>% factor(levels = ranks)
-  params[['.group.by']] %<>% c(".taxa", .)
   
-  
-  # Default to taxa along x-axis instead of all together.
   #________________________________________________________
-  if (identical(params[['x']], ".all")) {
+  # Initialize the layers environment.
+  #________________________________________________________
+  init_boxplot_layers(params)
+  
+  
+  
+  #________________________________________________________
+  # y-axis title
+  #________________________________________________________
+  if (any(params$.ggdata[['.y']] > 1)) {
     
-    params[['x']] <- ".taxa"
-    params[['.group.by']] %<>% setdiff(".all")
-    
-    if (length(ranks) > 1) params[['facet.by']] %<>% c(".rank", .)
+    biom <- params$biom
+    if (is_rarefied(biom)) { set_layer(params, 'labs', y = "Rarefied Counts")
+    } else                 { set_layer(params, 'labs', y = "Unrarefied Counts") }
     
   } else {
-    params[['facet.by']] %<>% c(".taxa", .)
+    set_layer(params, 'labs', y = "Relative Abundance")
+    set_layer(params, 'yaxis', labels = scales::percent)
   }
   
   
-  attr(ggdata, 'params') <- params
-  attr(ggdata, 'xcol')   <- params[['x']]
-  attr(ggdata, 'ycol')   <- attr(ggdata, 'response', exact = TRUE)
   
-  return (ggdata)
+  #________________________________________________________
+  # Use the generalized boxplot functions to make the plot
+  #________________________________________________________
+  fig <- params %>%
+    boxplot_facets() %>%
+    boxplot_stats() %>%
+    plot_build()
+  
+  
+  
+  attr(fig, 'history') <- history
+  set_cache_value(cache_file, fig)
+  
+  return (fig)
 }
 
 
-#______________________________________________________________
-# Make taxa-specific layer tweaks
-#______________________________________________________________
-taxa_boxplot_layers <- function (layers) {
-  
-  setLayer("labs", y = "Relative Abundance")
-  setLayer("yaxis", labels = scales::percent)
-  
-  return (layers)
-  
-}

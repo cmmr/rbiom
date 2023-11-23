@@ -1,11 +1,10 @@
+
 #' Calculate the alpha diversity of each sample.
 #' 
-#' @inherit adiv_boxplot params
+#' @inherit documentation_default
 #' 
-#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-#'        object, as returned from [read_biom()]. For matrices, the rows and
-#'        columns are assumed to be the taxa and samples, respectively.
-#'     
+#' @family alpha_diversity
+#' 
 #' @param rarefy  Control how/whether rarefactions are done prior to alpha 
 #'        diversity computations. Options are: 
 #'        \itemize{
@@ -22,168 +21,210 @@
 #'            Rarefy at the specified depth(s). }
 #'        }
 #'        Default: \code{FALSE}
-#'     
-#' @param long  Pivot the returned data to long format?
-#'        \itemize{
-#'          \item{\bold{FALSE} - }{
-#'            Each alpha diversity metric always has its own column, named 
-#'            ".OTUs", ".Shannon", etc. }
-#'          \item{\bold{TRUE} - }{
-#'            The name of the metric is in an ".adiv" column, and the 
-#'            alpha diversity values are in a ".diversity" column. }
-#'        }
-#'        Default: \code{FALSE}
-#'     
-#' @param md  Include metadata in the output data frame? Options are: 
-#'        \itemize{
-#'          \item{\code{FALSE} - }{ Don't include metadata. }
-#'          \item{\code{TRUE} - }{ Include all metadata. }
-#'          \item{\emph{character vector} - }{
-#'            Include only the specified metadata columns. }
-#'        }
-#'        Default: \code{FALSE}
 #'        
-#' @return A data frame of diversity values for each sample in \code{biom}. The 
-#'         first column name is \bold{.sample}. Remaining column names are 
-#'         dependent on the function's arguments.
-#'     
+#' @return A data frame of alpha diversity values. \cr
+#'         Each combination of sample/depth/\code{adiv} has its own row. \cr
+#'         Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv}, 
+#'         and \bold{.diversity}, followed by any metadata fields requested by 
+#'         \code{md}.
+#' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     biom <- sample_select(hmp50, 1:6)
 #'     
-#'     adiv_table(biom, adiv="all")
-#'     adiv_table(biom, long = TRUE, md = TRUE)
+#'     adiv_table(biom)
+#'     
+#'     adiv_table(sample_rarefy(biom), adiv = "all", md = FALSE)
 
-adiv_table <- function (biom, rarefy=FALSE, adiv="Shannon", long=FALSE, md=FALSE) {
+adiv_table <- function (
+    biom, rarefy = FALSE, adiv = "Shannon", md = TRUE ) {
+  
+  validate_biom()
+  
+  params  <- eval_envir(environment())
+  history <- append_history('tbl ', params)
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("adiv_table", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
-      return (readRDS(cache_file))
-  remove("params")
-  
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
   
   
   #________________________________________________________
-  # Enable abbreviations of adiv metric names.
+  # Check for valid arguments.
   #________________________________________________________
-  adiv <- paste0(".", validate_arg(adiv, NULL, 'adiv', 'adiv'))
-  
-  
-  
-  
-  #________________________________________________________
-  # Get the input into a simple_triplet_matrix
-  #________________________________________________________
-  if (is(biom, "simple_triplet_matrix")) { counts <- biom
-  } else if (is(biom, "BIOM"))           { counts <- biom$counts
-  } else if (is(biom, "matrix"))         { counts <- slam::as.simple_triplet_matrix(biom)
-  } else {
-    stop("biom must be a matrix, simple_triplet_matrix, or BIOM object.")
-  }
+  validate_adiv(max = Inf)
+  validate_meta('md', null_ok = TRUE, max = Inf)
   
   
   #________________________________________________________
   # Define the rarefaction depths to sample at
   #________________________________________________________
-  rLvls <- NA
+  rLvls  <- NA
   
-  if (identical(rarefy, TRUE)) {
-    counts <- sample_rarefy(counts)
+  if (eq(rarefy, TRUE)) {
+    rLvls <- rare_suggest(biom)
     
   } else if (is.numeric(rarefy)) {
     rLvls <- sort(rarefy)
     
   } else if (is.character(rarefy)) {
-    upper <- fivenum(slam::col_sums(counts))[[4]]
+    upper <- fivenum(sample_sums(biom))[[4]]
     
-    if (identical(rarefy, "multi")) {
+    if (eq(rarefy, "multi")) {
       
       # Log intervals until rLvl/2, then even intervals until rLvl*2
-      rLvl  <- rare_suggest(counts)
+      rLvl  <- rare_suggest(biom)
       rLvls <- 10 ** (c(1,3,5,7,8,9) * (log10(rLvl / 2) / 10))
       rLvls <- c(rLvls, seq(from = rLvl / 2, to = rLvl * 2, length.out = 5))
       rLvls <- floor(rLvls)
       remove("rLvl")
       
-    } else if (identical(rarefy, "multi_log")) {
+    } else if (eq(rarefy, "multi_log")) {
       rLvls <- floor(10 ** (c(1:10) * (log10(upper) / 10)))
       
-    } else if (identical(rarefy, "multi_even")) {
+    } else if (eq(rarefy, "multi_even")) {
       rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
     }
     remove("upper")
   }
   
   
-  result <- NULL
+  
+  #________________________________________________________
+  # Compute adiv values at each rLvl.
+  #________________________________________________________
+  tbl    <- NULL
+  counts <- otu_matrix(biom, sparse = TRUE)
+  
+  # If non-integer counts, scale each sample to 10k "reads".
+  if (!all(counts$v %% 1 == 0))
+    counts <- sample_rarefy(biom) %>% otu_matrix(sparse = TRUE)
   
   for (rLvl in rLvls) {
     
-    otus <- if (is.na(rLvl)) counts else sample_rarefy(counts, rLvl)
+    otus <- if (is.na(rLvl)) counts else rcpp_rarefy(counts, rLvl, 0)
     df   <- rcpp_alpha_div(otus)
+    mtx  <- as.matrix(df[,adiv,drop=FALSE])
     
     
     #________________________________________________________
     # Pivot Longer
     #________________________________________________________
-    if (isTRUE(long)) {
-      
-      mtx <- as.matrix(df[,adiv,drop=F])
-      colnames(mtx) %<>% sub(".", "", ., fixed = TRUE)
-      
-      df <- data.frame(
-        stringsAsFactors = FALSE,
-        '.sample'    = df[['.sample']][row(mtx)],
-        '.depth'     = df[['.depth']][row(mtx)],
-        '.adiv'      = colnames(mtx)[col(mtx)],
-        '.diversity' = as.numeric(mtx)
-      )
-        
-    } else {
-      
-      #________________________________________________________
-      # The adiv metrics of interest in wide format
-      #________________________________________________________
-      if (length(rLvls) == 1) {
-        df <- df[,c('.sample', adiv),drop=F]
-      } else {
-        df <- df[,unique(c('.sample', '.depth', adiv)),drop=F]
-      }
-    }
+    df <- tibble(
+      '.sample'    = df[['.sample']][row(mtx)],
+      '.depth'     = df[['Depth']][row(mtx)],
+      '.adiv'      = colnames(mtx)[col(mtx)],
+      '.diversity' = as.numeric(mtx) )
     
     
-    result <- rbind(result, df)
+    tbl <- rbind(tbl, df)
   }
   
-  
-  
-  #________________________________________________________
-  # Add rownames and facet attribute when appropriate
-  #________________________________________________________
-  if (isTRUE(long)) {
-    attr(result, 'response') <- ".diversity"
-    result[['.adiv']] %<>% factor(levels = sub(".", "", adiv, fixed = TRUE))
-    if (length(adiv) > 1) attr(result, 'facet') <- '.adiv'
-  }
+  tbl[['.adiv']] %<>% factor(levels = adiv)
   
   
   
   #________________________________________________________
   # Add Metadata
   #________________________________________________________
-  if (identical(md, TRUE))  md <- colnames(sample_metadata(biom))
-  if (identical(md, FALSE)) md <- c()
-  for (i in unique(md))
-    result[[i]] <- sample_metadata(biom, i)[result[['.sample']]]
+  if (is.null(md)) {
+    tbl[['.sample']] %<>% as.factor()
+    
+  } else {
+    tbl %<>% left_join(
+      y  = sample_metadata(biom)[,unique(c('.sample', md))], 
+      by = '.sample' )
+  }
   
   
-  set_cache_value(cache_file, result)
+  #________________________________________________________
+  # Command history tracking and other attributes.
+  #________________________________________________________
+  attr(tbl, 'response') <- ".diversity"
   
-  return (result)
+  
+  attr(tbl, 'history') <- history
+  set_cache_value(cache_file, tbl)
+  
+  return (tbl)
+}
+
+
+
+#' Create a matrix of samples x alpha diversity metrics.
+#' 
+#' @inherit documentation_default
+#'     
+#' @param rarefy  Control how/whether rarefactions are done prior to alpha 
+#'        diversity computations. Options are: 
+#'        \itemize{
+#'          \item{\code{FALSE} - }{
+#'            Use each sample's current set of observations without applying
+#'            any rarefaction.}
+#'          \item{\code{TRUE} - }{
+#'            Automatically select and apply a single rarefaction. }
+#'          \item{\emph{integer} - }{
+#'            Rarefy to the specified depth. }
+#'        }
+#'        Default: \code{FALSE}
+#'        
+#' @return A numeric matrix with samples as rows and columns named 
+#'         \bold{Depth}, \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, 
+#'         \bold{Simpson}, and \bold{InvSimpson}.
+#'     
+#' @export
+#' @examples
+#'     library(rbiom) 
+#'     
+#'     biom <- sample_select(hmp50, 1:6)
+#'     adiv_matrix(biom)
+
+adiv_matrix <- function (biom, rarefy=FALSE) {
+  
+  validate_biom()
+  
+  params  <- eval_envir(environment())
+  history <- append_history('mtx ', params)
+  
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
+  remove("params")
+  
+  
+  #________________________________________________________
+  # Rarefy unless `rarefy`=FALSE.
+  #________________________________________________________
+  if (!isFALSE(rarefy)) {
+    
+    if (!(is_scalar_integerish(rarefy) || is_na(rarefy)))
+      rarefy <- NULL
+    
+    biom <- sample_rarefy(biom, depth = rarefy)
+  }
+  
+  
+  #________________________________________________________
+  # We want a numeric matrix of samples x adiv metrics
+  #________________________________________________________
+  df <- rcpp_alpha_div(biom[['counts']])
+  rownames(df) <- df[['.sample']]
+  mtx <- as.matrix(df[,-1,drop=FALSE])
+  
+  
+  
+  attr(mtx, 'history') <- history
+  set_cache_value(cache_file, mtx)
+  
+  return (mtx)
 }

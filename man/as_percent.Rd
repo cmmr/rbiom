@@ -7,10 +7,11 @@
 as_percent(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
-A \code{BIOM} object.
+An \code{rbiom} object.
 }
 \description{
 Convert absolute counts to relative abundances.

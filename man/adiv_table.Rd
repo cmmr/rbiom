@@ -4,12 +4,11 @@
 \alias{adiv_table}
 \title{Calculate the alpha diversity of each sample.}
 \usage{
-adiv_table(biom, rarefy = FALSE, adiv = "Shannon", long = FALSE, md = FALSE)
+adiv_table(biom, rarefy = FALSE, adiv = "Shannon", md = TRUE)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
-columns are assumed to be the taxa and samples, respectively.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rarefy}{Control how/whether rarefactions are done prior to alpha
 diversity computations. Options are:
@@ -28,46 +27,44 @@ Rarefy at the specified depth(s). }
 }
 Default: \code{FALSE}}
 
-\item{adiv}{One or more alpha diversity measures to use. Options are:
-\code{"OTUs"}, \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"},
-and/or \code{"InvSimpson"}. Non-ambiguous abbreviations are also
-accepted. You can use \code{adiv="all"} as shortcut for
-\code{adiv=c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")}
-Default: \code{"Shannon"}.}
-
-\item{long}{Pivot the returned data to long format?
-\itemize{
-\item{\bold{FALSE} - }{
-Each alpha diversity metric always has its own column, named
-".OTUs", ".Shannon", etc. }
-\item{\bold{TRUE} - }{
-The name of the metric is in an ".adiv" column, and the
-alpha diversity values are in a ".diversity" column. }
-}
-Default: \code{FALSE}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
+\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
+\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+Default: \code{"Shannon"} \cr\cr
+Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
 \item{md}{Include metadata in the output data frame? Options are:
 \itemize{
-\item{\code{FALSE} - }{ Don't include metadata. }
+\item{\code{NULL} - }{ Don't include metadata. }
 \item{\code{TRUE} - }{ Include all metadata. }
 \item{\emph{character vector} - }{
 Include only the specified metadata columns. }
 }
-Default: \code{FALSE}}
+Default: \code{TRUE}}
 }
 \value{
-A data frame of diversity values for each sample in \code{biom}. The
-first column name is \bold{.sample}. Remaining column names are
-dependent on the function's arguments.
+A data frame of alpha diversity values. \cr
+Each combination of sample/depth/\code{adiv} has its own row. \cr
+Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv},
+and \bold{.diversity}, followed by any metadata fields requested by
+\code{md}.
 }
 \description{
 Calculate the alpha diversity of each sample.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     biom <- sample_select(hmp50, 1:6)
     
-    adiv_table(biom, adiv="all")
-    adiv_table(biom, long = TRUE, md = TRUE)
+    adiv_table(biom)
+    
+    adiv_table(sample_rarefy(biom), adiv = "all", md = FALSE)
 }
+\seealso{
+Other alpha_diversity: 
+\code{\link{adiv_boxplot}()},
+\code{\link{adiv_corrplot}()},
+\code{\link{adiv_stats}()}
+}
+\concept{alpha_diversity}

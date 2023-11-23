@@ -4,10 +4,11 @@
 \alias{sample_sums}
 \title{Sum the observations in each sample.}
 \usage{
-sample_sums(biom, long = FALSE, md = FALSE)
+sample_sums(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
 A named numeric vector of the number of observations in each
@@ -24,10 +25,11 @@ Sum the observations in each sample.
     hist(sample_sums(hmp50))
 }
 \seealso{
-\code{\link[=rare_depth]{rare_depth()}}
+\code{\link[=rare_depth]{rare_depth()}}, \code{\link[=rare_barplot]{rare_barplot()}}
 
 Other accessors: 
 \code{\link{biom_info}()},
+\code{\link{metadata_numeric}()},
 \code{\link{n_samples}()}
 }
 \concept{accessors}

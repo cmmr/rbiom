@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,17 +54,18 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">taxa_corrplot</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
 <span>  <span class="va">x</span>,</span>
-<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  taxa <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  layers <span class="op">=</span> <span class="st">"t"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  test <span class="op">=</span> <span class="st">"trends"</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  stats <span class="op">=</span> <span class="st">"emtrends"</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
-<span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -72,24 +73,29 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>x</dt>
-<dd><p>A numeric metadata column name to use for the x-axis. Required.</p></dd>
+<dd><p>A numeric metadata field to use for the x-axis. Required.</p></dd>
 
 
 <dt>rank</dt>
-<dd><p>What rank of taxa to display. E.g. "Phylum", "Genus", etc.
-Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a given BIOM object.
-The default, <code>NULL</code>, selects the lowest level.</p></dd>
+<dd><p>What rank(s) of taxa to display. E.g. <code>"Phylum"</code>,
+<code>"Genus"</code>, <code>".otu"</code>, etc. An integer vector can also be
+given, where <code>1</code> is the highest rank, <code>2</code> is the second
+highest, <code>-1</code> is the lowest rank, <code>-2</code> is the second
+lowest, and <code>0</code> is the OTU "rank". Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to
+see all options for a given <code>rbiom</code> object. Default: <code>-1</code>.</p></dd>
 
 
 <dt>taxa</dt>
 <dd><p>Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that
-mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: <code>6</code>.</p></dd>
+mean abundance or greater (e.g. <code>0.1</code> implies &gt;= 10%). A
+character vector of taxa names will show only those named taxa.
+Default: <code>6</code>.</p></dd>
 
 
 <dt>layers</dt>
@@ -105,34 +111,25 @@ Default: <code>"t"</code>.</p></dd>
 and partitioning. See below for details. Default: <code>NULL</code></p></dd>
 
 
+<dt>test</dt>
+<dd><p>The statistic of interest. An overview of options can be
+found in the "Statistical Tests" section below. One of
+<code>"predict"</code>, <code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>,
+<code>"trends"</code>, <code>"es_means"</code>, <code>"es_trends"</code>,
+<code>"pw_means"</code>, or <code>"pw_trends"</code>.
+Default: <code>"trends"</code></p></dd>
+
+
 <dt>model</dt>
-<dd><p>What type of trendline to fit to the data. Options are:</p><ul><li><p><code>"lm"</code> -   Linear model: <code>stats::lm(formula = y ~ x)</code>.)</p></li>
-<li><p><code>"log"</code> -  Logarithmic model: <code>stats::lm(formula = y ~ log(x))</code>.</p></li>
-<li><p><code>"gam"</code> -  Generalized additive model: <code>mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")</code>.</p></li>
-</ul><p>Default: <code>"lm"</code> <br><br>
-You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p></dd>
+<dd><p>What type of trend model to fit to the data. Options are:
+<code>"lm"</code> (linear), <code>"log"</code> (logarithmic), or <code>"gam"</code>
+(generalized additive). See the "Model Options" section below for
+additional details. Default: <code>"lm"</code></p></dd>
 
 
-<dt>stats</dt>
-<dd><p>Which statistic to display on the plot. Options are:</p><ul><li><p><code>"fit"</code> -  How well does the model fit the data?</p></li>
-<li><p><code>"terms"</code> -  How strongly does 'x' influence 'y'?</p></li>
-<li><p><code>"emmeans"</code> -  Is the average 'y' value non-zero?</p></li>
-<li><p><code>"emtrends"</code> -  Does any trendline have a non-zero slope?</p></li>
-<li><p><code>"emm_pairs"</code> -  Are the means of any trendlines different?</p></li>
-<li><p><code>"emt_pairs"</code> -  Are the slopes of any trendlines different?</p></li>
-<li><p><code>"hide"</code> -  Don't show stats on the plot, but still compute them.</p></li>
-<li><p><code>"none"</code> -  Do not compute or show statistics.</p></li>
-</ul><p>Default: <code>"emtrends"</code> <br><br>
-Note: <code>"emm_pairs"</code> and <code>"emt_pairs"</code> can only be calculated
-when using a <code>color.by</code> metadata column with more than one level. <br><br>
-Statistical tests are run separately on each facet. P-values are
-adjusted for multiple comparisons by considering all facets together.
-Unless <code>stats = "none"</code>, all stats are attached to the plot as
-<code>attr(,'stats')</code>.</p></dd>
+<dt>level</dt>
+<dd><p>The confidence level for calculating a confidence interval.
+Default: <code>0.95</code></p></dd>
 
 
 <dt>p.top</dt>
@@ -146,14 +143,14 @@ Default: <code>Inf</code></p></dd>
 
 
 <dt>p.adj</dt>
-<dd><p>Method to use for multiple comparisons adjustment of p-values.
-Run <code>p.adjust.methods</code> for a list of available options.
-Default: <code>"fdr"</code>.</p></dd>
+<dd><p>Method to use for multiple comparisons adjustment of
+p-values. Run <code>p.adjust.methods</code> for a list of available
+options. Default: <code>"fdr"</code>.</p></dd>
 
 
-<dt>ci</dt>
-<dd><p>The confidence interval to display around the trendline.
-Default: <code>95</code>.</p></dd>
+<dt>caption</dt>
+<dd><p>Display information about the method used for trend line
+fitting beneath the plot. Default: <code>FALSE</code>.</p></dd>
 
 
 <dt>...</dt>
@@ -169,9 +166,55 @@ scatterplot points have their size set to <code>2</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The computed data points and statistics will
-be attached as <code>attr(p, 'data')</code> and <code>attr(p, 'stats')</code>,
-respectively.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points, statistics,
+ggplot command, and object history are available as <code>$data</code>,
+<code>$stats</code>, <code>$code</code>, and <code>$history</code>, respectively.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="statistical-tests">Statistical Tests<a class="anchor" aria-label="anchor" href="#statistical-tests"></a></h2>
+    
+
+
+<ul><li><p><code>"predict"</code> - 
+Augments original data with fitted information. See
+<code><a href="https://broom.tidymodels.org/reference/augment.lm.html" class="external-link">broom::augment.lm()</a></code>.</p></li>
+<li><p><code>"terms"</code> -  Summary information about the model's
+terms, including p-value, r-squared, AIC, BIC, and confidence
+interval at <code>level</code>. See <code><a href="https://broom.tidymodels.org/reference/tidy.lm.html" class="external-link">broom::tidy.lm()</a></code>.</p></li>
+<li><p><code>"fit"</code> -  Goodness of fit measures, p-values, and
+more for the overall model. See <code><a href="https://broom.tidymodels.org/reference/glance.lm.html" class="external-link">broom::glance.lm()</a></code>.</p></li>
+<li><p><code>"means"</code> -  The estimated marginal mean (EMM) for
+each <code>stat.by</code> group, along with confidence intervals (CI),
+standard errors (SE), t-ratios, and p-values testing for mean = zero.
+See <code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code> and <code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
+<li><p><code>"trends"</code> -  The trendline slope for each
+<code>stat.by</code> group, along with CI and SE and p-value testing for
+slope = zero. See <code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code> and
+<code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
+<li><p><code>"pw_means"</code> -  Pairwise means. All <code>stat.by</code> groups are
+compared to each other and the difference in means is estimated
+along with SE, t-ratios, and p-values testing if the two means
+are the same. See <code><a href="https://rdrr.io/pkg/emmeans/man/contrast.html" class="external-link">emmeans::pairs.emmGrid()</a></code>.</p></li>
+<li><p><code>"pw_trends"</code> -  Pairwise trends. As above, but
+comparing trendline slopes instead of means.</p></li>
+<li><p><code>"es_means"</code> -  Effect sizes for pairwise differences
+of means, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
+<li><p><code>"es_trends"</code> -  Effect sizes for pairwise differences
+of slopes, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="model-options">Model Options<a class="anchor" aria-label="anchor" href="#model-options"></a></h2>
+    
+
+
+<p>The predefined options are:</p><ul><li><p><code>"lm"</code> -   Linear model: <code>stats::lm(formula = y ~ x)</code>.)</p></li>
+<li><p><code>"log"</code> -  Logarithmic model: <code>stats::lm(formula = y ~ log(x))</code>.</p></li>
+<li><p><code>"gam"</code> -  Generalized additive model: <code>mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")</code>.</p></li>
+</ul><p>You can alternatively provide a list of length two where the first
+element is a character vector of length 1 naming a function, and the
+second element is a list of arguments to pass to that function. One
+of the function's arguments must be named 'formula'.
+For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>
@@ -217,7 +260,14 @@ and <code>"fishy"</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other visualization: 
+    <div class="dont-index"><p>Other taxa_abundance: 
+<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
+<code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_matrix.html">taxa_matrix</a>()</code>,
+<code><a href="taxa_stats.html">taxa_stats</a>()</code>,
+<code><a href="taxa_table.html">taxa_table</a>()</code></p>
+<p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
@@ -238,7 +288,6 @@ and <code>"fishy"</code>.</p>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="sample_rarefy.html">sample_rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">taxa_corrplot</span><span class="op">(</span><span class="va">biom</span>, <span class="st">"BMI"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, taxa <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> `geom_smooth()` using formula = 'y ~ x'</span>
 <span class="r-plt img"><img src="taxa_corrplot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>

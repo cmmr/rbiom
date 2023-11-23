@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,9 @@
 <span>  <span class="va">biom</span>,</span>
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"lsb"</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"bld"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pattern.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -64,14 +66,13 @@
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  flip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  stripe <span class="op">=</span> <span class="va">flip</span>,</span>
+<span>  stripe <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
-<span>  p.label <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  ci <span class="op">=</span> <span class="fl">95</span>,</span>
+<span>  p.label <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  ci <span class="op">=</span> <span class="st">"ci"</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  outliers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -79,7 +80,8 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>x</dt>
@@ -90,22 +92,35 @@ into a single column.</p></dd>
 
 
 <dt>bdiv</dt>
-<dd><p>The beta diversity distance algorithm to use. Options are:
+<dd><p>Beta diversity distance algorithm(s) to use. Options are:
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. Non-ambiguous abbreviations
-of the algorithm names are also accepted. For <code>"UniFrac"</code>, a
+<code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
 phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code>.</p></dd>
+provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
+Multiple/abbreviated values allowed.</p></dd>
+
+
+<dt>weighted</dt>
+<dd><p>Take relative abundances into account. When
+<code>weighted=FALSE</code>, only presence/absence is considered.
+Default: <code>TRUE</code> <br><br>
+Multiple values allowed.</p></dd>
+
+
+<dt>tree</dt>
+<dd><p>A <code>phylo</code> object representing the phylogenetic
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>otu_tree(biom)</code></p></dd>
 
 
 <dt>layers</dt>
-<dd><p><code>"box" ("x")</code>, <code>"bar"</code>, <code>"violin"</code>,
+<dd><p><code>"bar"</code>, <code>"box" ("x")</code>, <code>"violin"</code>,
 <code>"dot"</code>, <code>"strip"</code>, <code>"crossbar"</code>, <code>"errorbar"</code>,
 <code>"linerange"</code>, and <code>"pointrange"</code>. Single letter
 abbreviations are also accepted. For instance, <code>c("box", "dot")</code>
 is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
 See <code>vignette("boxplots")</code> for examples of each.
-Default: <code>"lsb"</code>.</p></dd>
+Default: <code>"bld"</code>.</p></dd>
 
 
 <dt>color.by, pattern.by, shape.by, facet.by, limit.by</dt>
@@ -116,8 +131,8 @@ groups, respectively. Default: <code>NULL</code></p></dd>
 
 
 <dt>within, between</dt>
-<dd><p>Metadata column name(s) for intra- or inter- sample
-comparisons. Default: <code>within=NULL, between=NULL</code></p></dd>
+<dd><p>Metadata field(s) for intra- or inter- sample
+comparisons. Default: <code>NULL</code></p></dd>
 
 
 <dt>flip</dt>
@@ -130,34 +145,35 @@ of columns. Default: <code>FALSE</code></p></dd>
 
 
 <dt>p.adj</dt>
-<dd><p>Method to use for multiple comparisons adjustment of p-values.
-Run <code>p.adjust.methods</code> for a list of available options.
-(Default: <code>fdr</code>)</p></dd>
+<dd><p>Method to use for multiple comparisons adjustment of
+p-values. Run <code>p.adjust.methods</code> for a list of available
+options. Default: <code>"fdr"</code>.</p></dd>
 
 
 <dt>p.label</dt>
 <dd><p>Minimum adjusted p-value to display on the plot with a
-bracket.</p><ul><li><p><code>p.label = 0.05</code> -  Use this specific value.</p></li>
-<li><p><code>p.label = TRUE</code> -  equivalent to <code>p.label = 0.05</code></p></li>
-<li><p><code>p.label = FALSE</code> -  do not show any stats on the plot</p></li>
-<li><p><code>p.label = Inf</code> -  display all p-values</p></li>
-<li><p><code>p.label = NULL</code> -  do not calculate stats</p></li>
+bracket.</p><ul><li><p><code>p.label = 0.05</code> -  Show p-values that are &lt;= 0.05.</p></li>
+<li><p><code>p.label = 0</code> -  Don't show any p-values on the plot.</p></li>
+<li><p><code>p.label = 1</code> -  Show all p-values on the plot.</p></li>
 </ul><p>If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
-Default: <code>TRUE</code></p></dd>
+Default: <code>0.05</code></p></dd>
 
 
 <dt>ci</dt>
 <dd><p>How to calculate min/max of the <b>crossbar</b>,
 <b>errorbar</b>, <b>linerange</b>, and <b>pointrange</b> layers.
-Provide a number between 75 and 100 to define a confidence interval's
-confidence level, commonly 95 or 97.5. Other options are:
-<code>"range"</code>, <code>"sd"</code> (standard deviation),
-<code>"se"</code> (standard error), and
+Options are: <code>"ci"</code> (confidence interval), <code>"range"</code>,
+<code>"sd"</code> (standard deviation), <code>"se"</code> (standard error), and
 <code>"mad"</code> (median absolute deviation).
 The center mark of <b>crossbar</b> and <b>pointrange</b> represents
 the mean, except for code"mad" in which case it represents
-the median. Set to <code>NULL</code> to disable. Default: <code>95</code></p></dd>
+the median. Default: <code>"ci"</code></p></dd>
+
+
+<dt>level</dt>
+<dd><p>The confidence level for calculating a confidence interval.
+Default: <code>0.95</code></p></dd>
 
 
 <dt>outliers</dt>
@@ -167,23 +183,9 @@ overlaying a dot or strip chart.  Default: <code>NULL</code></p></dd>
 
 
 <dt>xlab.angle</dt>
-<dd><p>How to rotate the tick labels on the x-axis.
-<b>'auto'</b> (the default), automatically selects a rotation value.
-<b>0</b>, <b>30</b>, and <b>90</b> sets the angle to horizontal,
-angled, and vertical, respectively.</p></dd>
-
-
-<dt>weighted</dt>
-<dd><p>Take relative abundances into account. When
-<code>weighted=FALSE</code>, only presence/absence is considered.
-Default: <code>TRUE</code></p></dd>
-
-
-<dt>tree</dt>
-<dd><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-defined in <code>biom</code> if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: <code>NULL</code></p></dd>
+<dd><p>Angle of the labels at the bottom of the plot.
+Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>'90'</code>.
+Default: <code>"auto"</code>.</p></dd>
 
 
 <dt>...</dt>
@@ -194,79 +196,25 @@ instance, <code>dot.size = 2</code> or <code>d.size = 2</code> ensures only the
 dotplot layer has its size set to <code>2</code>. The special prefix
 <code>pt.</code> will control both the dot and strip layers.</p></dd>
 
-
-<dt>filter.fun</dt>
-<dd><p>A function that takes a <code><a href="bdiv_table.html">bdiv_table()</a></code> as input and
-returns a <code><a href="bdiv_table.html">bdiv_table()</a></code> as output. This modified table will be
-used for plotting. Default: <code>NULL</code>.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. The computed data points and statistics are
-available as <code>$data</code> and <code>$stats</code>, respectively.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>
-    
-
-
-<p>Metadata can be used to flexibly subset, partition, and apply aesthetics
-when creating a plot. Common use cases are provided below. More thorough
-documentation is available at <a href="https://cmmr.github.io/rbiom">https://cmmr.github.io/rbiom</a>.</p>
-<div class="sourceCode"><pre><code><span>  <span class="co">## Colors ----------------------------</span></span>
-<span>  <span class="va">color.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span>  <span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
-<span>  <span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'values'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span>, <span class="st">'colors'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co">## Patterns --------------------------</span></span>
-<span>  <span class="va">pattern.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span>  <span class="va">pattern.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">pattern.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"left45"</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"hs_cross"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co">## Shapes ----------------------------</span></span>
-<span>  <span class="va">shape.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span>  <span class="va">shape.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">shape.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="fl">7</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co">## Facets ----------------------------</span></span>
-<span>  <span class="va">facet.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span>  <span class="va">facet.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span></span>
-<span>  <span class="va">facet.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span>, <span class="st">"Sex"</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co">## Limits ----------------------------</span></span>
-<span>  <span class="va">limit.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Sex'</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">'Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">limit.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Saliva"</span>, <span class="st">"Anterior nares"</span><span class="op">)</span>, <span class="st">'Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="fl">35</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-
-<ul><li><p><code>color.by</code> - A categorical metadata column. (Max 1)</p></li>
-<li><p><code>pattern.by</code> - A categorical metadata column. (Max 1)</p></li>
-<li><p><code>shape.by</code> - A categorical metadata column. (Max 1)</p></li>
-<li><p><code>facet.by</code> - Categorical metadata column(s) only.</p></li>
-<li><p><code>limit.by</code> - Any metadata column(s).</p></li>
-</ul><p>All built-in color palettes are colorblind-friendly. The available
-categorical palette names are: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>,
-<code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>,
-<code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, <code>"classic"</code>,
-<code>"alphabet"</code>, <code>"tableau20"</code>, <code>"kelly"</code>, and <code>"fishy"</code>.</p>
-<p>Patterns are sourced from the magick R package. Pattern names are:
-<code>"bricks"</code>, <code>"hexagons"</code>, <code>"horizontalsaw"</code>,
-<code>"hs_fdiagonal"</code>, <code>"fishscales"</code>, <code>"verticalsaw"</code>,
-<code>"checkerboard"</code>, <code>"octagons"</code>, <code>"right45"</code>,
-<code>"hs_cross"</code>, <code>"hs_bdiagonal"</code>, <code>"hs_diagcross"</code>,
-<code>"hs_horizontal"</code>, <code>"hs_vertical"</code>, <code>"left45"</code>,
-<code>"leftshingle"</code>, <code>"rightshingle"</code>, <code>"verticalbricks"</code>,
-<code>"verticalleftshingle"</code>, and <code>"verticalrightshingle"</code>.</p>
-<p>Shapes can be given as per base R - numbers 0 through 17 for various shapes,
-or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
-letters instead of shapes on the plot. Character strings may used as well.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points, statistics,
+ggplot command, and object history are available as <code>$data</code>,
+<code>$stats</code>, <code>$code</code>, and <code>$history</code>, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>biom_stats()</code></p>
+    <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
+<code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
+<code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
+<code><a href="bdiv_table.html">bdiv_table</a>()</code>,
+<code><a href="distmat_stats.html">distmat_stats</a>()</code></p>
 <p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,

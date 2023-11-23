@@ -25,10 +25,19 @@
     <loc>https://cmmr.github.io/rbiom/reference/adiv_corrplot.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/adiv_matrix.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/adiv_stats.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/adiv_table.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/as_percent.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/as_rbiom.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_boxplot.html</loc>
@@ -44,6 +53,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_ord_table.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_stats.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_table.html</loc>
@@ -73,22 +85,79 @@
     <loc>https://cmmr.github.io/rbiom/reference/convert_from_phyloseq.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/convert_to_SummarizedExperiment.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/convert_to_SE.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/convert_to_TreeSummarizedExperiment.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/convert_to_TSE.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/distmat_ord_table.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/distmat_stats.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/embed_code.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_boxplot_aes_section.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_cmp.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_corrplot.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_default.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_dist_test.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_model.lm.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_model.log.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_model_section.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_plot_return.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_plot_stats_return.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_stats_return.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_test.ifelse.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_test.pw_means.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_test.trends.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/has_tree.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/hmp50.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/metadata_names.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/metadata_numeric.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/n_samples.html</loc>
@@ -110,12 +179,6 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/plot_heatmap.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/print.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/properties.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/rare_barplot.html</loc>
@@ -160,10 +223,13 @@
     <loc>https://cmmr.github.io/rbiom/reference/sample_select.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/sample_subset.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sample_sums.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/sample_sums.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/subset.rbiom.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_barplot.html</loc>
@@ -181,10 +247,10 @@
     <loc>https://cmmr.github.io/rbiom/reference/taxa_matrix.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/taxa_means.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_ranks.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/taxa_ranks.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_stats.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_sums.html</loc>
@@ -193,13 +259,7 @@
     <loc>https://cmmr.github.io/rbiom/reference/taxa_table.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/top_taxa.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/tree_data.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/tree_plot.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/tree_subset.html</loc>
@@ -208,7 +268,7 @@
     <loc>https://cmmr.github.io/rbiom/reference/tree_tips.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/unifrac.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/within.rbiom.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_biom.html</loc>

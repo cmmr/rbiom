@@ -7,7 +7,7 @@
 tree_data(biom, reads = TRUE, clades = TRUE)
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An rbiom object, as returned from \code{\link[=read_biom]{read_biom()}}.}
 
 \item{reads}{Include a 'reads' column indicating the sum of taxa
 observations belonging to each node/leaf. Default: \code{TRUE}.}

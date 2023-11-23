@@ -32,7 +32,7 @@ import_table <- function (filename, matrix = FALSE, ...) {
     res <- tryCatch(
       expr  = download.file(filename, tmp, quiet=TRUE),
       error = function (e) stop("Can't download ", filename,"\n", e) )
-    if (!identical(res, 0L) || !file.exists(tmp))
+    if (!eq(res, 0L) || !file.exists(tmp))
       stop("Download failed for ", filename)
     
     filename <- tmp

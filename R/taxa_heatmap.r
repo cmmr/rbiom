@@ -1,33 +1,15 @@
 #' Display taxa abundances as a heatmap.
 #' 
-#' @name taxa_heatmap
+#' @inherit documentation_heatmap
+#' @inherit documentation_default
 #' 
-#' @inherit plot_heatmap params return
-#' @inherit bdiv_heatmap params sections
-#' 
+#' @family taxa_abundance
 #' @family visualization
-#'        
-#' @param rank   What rank(s) of taxa to display, for example \code{"Phylum"} 
-#'        or \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a 
-#'        given BIOM object. The default, \code{NULL}, selects the lowest
-#'        level.
-#'        
-#' @param taxa   Which taxa to give separate rows. An integer value will show
-#'        the top n most abundant taxa. A value 0 <= n < 1 will show all taxa 
-#'        with that mean abundance or greater (e.g. 0.1). A character vector of
-#'        taxon names will show only those taxa. Default: \code{6}.
 #' 
 #' @param grid   Color palette name, or a list with entries for \code{label}, 
 #'        \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
 #'        \code{guide}. See the Track Definitions section for details.
 #'        Default: \code{list(label = "{rank} Abundance", colors = "bilbao")}.
-#'        
-#' @param ...   Additional arguments to pass on to ggplot2::theme().
-#'        For example, \code{labs.title = "Plot Title"}.
-#'        
-#' @return A \code{ggplot2} plot. The computed data points will be attached as 
-#'         \code{attr(, 'data')}.
-#' 
 #' 
 #' @export
 #' @examples
@@ -37,131 +19,140 @@
 #'     taxa_heatmap(biom, rank="Phylum", color.by="Body Site")
 #'     
 taxa_heatmap <- function (
-    biom, rank = NULL, taxa = 6,
+    biom, rank = -1, taxa = 6,
     grid = list(label = "{rank} Abundance", colors = "bilbao"),
     color.by = NULL, order.by = NULL, limit.by = NULL, 
+    other = FALSE, unc = "singly", lineage = FALSE, 
     label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
     clust = "complete", dist = "euclidean", 
     tree_height = NULL, track_height = NULL, ratio=1, 
     legend = "right", xlab.angle = "auto", ...) {
   
+  validate_biom(clone = FALSE)
+  
+  params  <- eval_envir(environment(), ...)
+  history <- append_history('fig ', params)
+  remove(list = intersect(env_names(params), ls()))
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("taxa_heatmap", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  arg_str <- as.args(params, fun = taxa_heatmap, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- taxa_heatmap(%s)", arg_str) ))
-  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
-  
-  
-  #________________________________________________________
-  # Sanity Checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_scalar_atomic(taxa) && !is_na(taxa))
-    rank %<>% validate_arg(biom, 'rank', n = c(1,Inf), default = tail(c('OTU', taxa_ranks(biom)), 1))
-    
-    if (!is_list(grid)) grid <- list(label = "{rank} Abundance", colors = grid)
-    if (length(clust)    < 1) clust <- "complete"
-    if (length(order.by) > 0) clust <- c(clust[[1]], NA)
-  })
   
   
   #________________________________________________________
   # Handle multiple ranks with recursive subcalls.
   #________________________________________________________
-  if (length(params[['rank']]) > 1) {
+  validate_rank(max = Inf, env = params)
+  
+  if (length(params$rank) > 1) {
     
-    ranks <- params[['rank']]
+    ranks <- params$rank
     
     plots <- sapply(ranks, simplify = FALSE, function (rank) {
-      args                 <- params
-      args[['rank']]       <- rank
-      args[['labs.title']] <- rank
-      do.call(taxa_heatmap, args)
+      params[['rank']]       <- rank
+      params[['labs.title']] <- rank
+      do.call(taxa_heatmap, fun_params(taxa_heatmap, params))
     })
     
-    p <- patchwork::wrap_plots(plots, ncol = 1)
+    p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
+      add_class('rbiom_plot')
     
     attr(p, 'history') <- history
     attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
-    attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
+    
+    attr(p, 'code') <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
         sub(
-          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+          x           = plots[[i]][['ggcmd']], 
           pattern     = "ggplot(data)", 
           replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
           fixed       = TRUE )
       })
       c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
-    }))
+      
+    })) %>% add_class('rbiom_code')
     
-    remove("ranks", "plots")
-    
+    set_cache_value(cache_file, p)
     return (p)
   }
   
   
   #________________________________________________________
-  # Subset biom by requested metadata and aes.
+  # Default values
   #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    color.by = list(),
-    order.by = list(),
-    limit.by = list() ))
+  with(params, {
+    
+    if (!is_list(grid))                   grid       <- list(colors = grid)
+    if (!is_scalar_character(grid$label)) grid$label <- "{rank} Abundance"
+    grid$label %<>% sub("{rank}", rank, ., fixed = TRUE)
+    
+    if (length(clust)    < 1) clust <- "complete"
+    if (length(order.by) > 0) clust <- c(clust[[1]], NA)
+  })
   
-  biom <- params[['biom']]
   
   
   #________________________________________________________
-  # Sanity Check
+  # Validate and restructure user's arguments.
   #________________________________________________________
-  if (n_samples(biom) < 1)
-    stop("At least one sample is needed for a taxa heatmap.")
+  with(params, {
+    
+    validate_taxa()
+    
+    validate_meta_aes('color.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
+    
+    sync_metadata()
+    
+    if (n_samples(biom) < 1)
+      stop("At least one sample is needed for a heatmap.")
+  })
   
   
   
   #________________________________________________________
   # Matrix with samples in columns and taxa in rows.
   #________________________________________________________
-  mtx <- t(taxa_matrix(
-    biom = biom, 
-    rank = params[['rank']], 
-    taxa = params[['taxa']] ))
+  with(params, {
+    
+    mtx <- taxa_matrix(
+      biom    = biom, 
+      rank    = rank, 
+      taxa    = taxa,
+      lineage = lineage, 
+      sparse  = FALSE, 
+      unc     = unc, 
+      other   = other )
+    
+  })
+  
+  
+  
+  #________________________________________________________
+  # Convert aes `color.by` spec to `tracks` format.
+  #________________________________________________________
+  for (md_col in names(params$color.by))
+    params$color.by[[md_col]] %<>% within({
+      colors <- values
+      values <- sample_metadata(biom, md_col)
+    })
+  params[['tracks']] <- params$color.by
   
   
   
   #________________________________________________________
   # Arguments to pass on to plot_heatmap
   #________________________________________________________
-  excl <- setdiff(formalArgs(taxa_heatmap), formalArgs(plot_heatmap))
-  excl <- c(excl, names(params)[startsWith(names(params), '.')])
-  args <- params[setdiff(names(params), excl)]
+  args <- intersect(formalArgs(plot_heatmap), env_names(params))
+  args <- c(mget(args, envir = params), params$.dots)
+  p    <- do.call(plot_heatmap, args)
   
-  args[['mtx']] <- mtx
-  args[['grid']][['label']] %<>% sub("{rank}", params[['rank']], ., fixed = TRUE)
-  
-  for (md_col in names(params[['color.by']]))
-    params[['color.by']][[md_col]] %<>% within({
-      colors <- values
-      values <- sample_metadata(biom, md_col)
-    })
-  args[['tracks']] <- params[['color.by']]
-  
-  
-  p <- do.call(plot_heatmap, args)
   
   attr(p, 'history') <- history
   

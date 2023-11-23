@@ -3,16 +3,27 @@
 \name{otu_matrix}
 \alias{otu_matrix}
 \alias{otu_matrix<-}
+\alias{dimnames.rbiom}
+\alias{dim.rbiom}
 \title{Get or set the abundance counts.}
 \usage{
-otu_matrix(biom)
+otu_matrix(biom, sparse = FALSE)
 
-otu_matrix(x) <- value
+otu_matrix(biom) <- value
+
+\method{dimnames}{rbiom}(x)
+
+\method{dim}{rbiom}(x)
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{value}{A numeric matrix. Rownames and colnames must be identical to
+\item{sparse}{If true, returns a sparse matrix as described by
+\code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a normal R
+matrix object. Default: \code{FALSE}}
+
+\item{value}{A numeric matrix. Rownames and colnames must be eq to
 the current \code{\link[=otu_matrix]{otu_matrix()}} value.}
 }
 \value{
@@ -39,6 +50,7 @@ Get or set the abundance counts.
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},
 \code{\link{otu_taxonomy}()},
@@ -48,3 +60,4 @@ Other setters:
 \code{\link{taxa_ranks}()}
 }
 \concept{setters}
+\keyword{internal}

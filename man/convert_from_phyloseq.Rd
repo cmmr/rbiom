@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert.r
 \name{convert_from_phyloseq}
 \alias{convert_from_phyloseq}
-\title{Convert a phyloseq object to an rbiom BIOM object.}
+\title{Convert a phyloseq object to an rbiom object.}
 \usage{
 convert_from_phyloseq(phy)
 }
@@ -10,10 +10,10 @@ convert_from_phyloseq(phy)
 \item{phy}{A phyloseq object.}
 }
 \value{
-A BIOM object.
+An rbiom object.
 }
 \description{
-Convert a phyloseq object to an rbiom BIOM object.
+Convert a phyloseq object to an rbiom object.
 }
 \examples{
   \dontrun{

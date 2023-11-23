@@ -43,7 +43,7 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
 #' @examples
 #'     library(rbiom)
 #'     p <- adiv_boxplot(hmp50, color.by = "Body Site")
-#'     attr(p, 'cmd') %>% embed_code() %>% cat("\n\n")
+#'     attr(p, 'code') %>% embed_code() %>% cat("\n\n")
 
 embed_code <- function (x) {
   paste0("~~~~ {.R}\n", x, "\n~~~~\n\n")

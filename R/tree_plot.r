@@ -1,6 +1,11 @@
 #' Display a dendrogram of the phylogenetic tree.
 #' 
-#' @param biom   A BIOM object, as returned from [read_biom()].
+#' @noRd
+#' @keywords internal
+#' 
+#' @inherit documentation_default
+#' 
+#' @family visualization
 #' 
 #' @param layout   Any layout option supported by [ggtree::ggtree()]:
 #'        \code{"rectangular"}, \code{"dendrogram"}, \code{"slanted"}, 
@@ -50,51 +55,31 @@ tree_plot <- function (
   if (nchar(system.file(package = "ggtree")) == 0)
     stop("Bioconductor R package 'ggtree' must be installed to use tree_plot().")
   
+  validate_biom(clone = FALSE)
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("tree_plot", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  params     <- eval_envir(environment(), ...)
+  history    <- append_history('fig ', params)
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   #________________________________________________________
   # Sanity checks
   #________________________________________________________
-  local({
-    
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    if (!has_tree(biom))   stop("No phylogenetic data present.")
-    
-    if(!is_null(c(tiplab, label, cladelab))) {
-      ranks <- metrics(biom, 'rank')
-      for (i in c('tiplab', 'label', 'cladelab')) {
-        rank <- get(i)
-        if (is_null(rank)) next
-        if (!is.character(rank)) stop(i, " must be NULL or character")
-        if (length(rank) > 1)    stop(i, " must be NULL or length 1")
-        if (!rank %in% ranks)
-          stop(i, " must be one of NULL, '", paste(collapse = "', '", ranks), "'")
-      }
-    }
-  })
-  
-  
-  #________________________________________________________
-  # Package and print this call
-  #________________________________________________________
-  arg_str <- as.args(params, fun = tree_plot, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- tree_plot(%s)", arg_str) ))
-  remove("arg_str")
+  stopifnot(has_tree(biom))
+  validate_rank("tiplab",   null_ok = TRUE)
+  validate_rank("label",    null_ok = TRUE)
+  validate_rank("cladelab", null_ok = TRUE)
   
   
   
   #________________________________________________________
-  # Assemble the plot layers with initLayer / setLayer.
+  # Assemble the plot layers with init_layers / set_layer.
   #________________________________________________________
   layers <- list()
   attr(layers, 'params')   <- params
@@ -107,15 +92,15 @@ tree_plot <- function (
   #________________________________________________________
   tr <- tree_data(biom)
   attr(tr, 'display') <- "tree_data(biom)"
-  setLayer("ggtree", layout = layout, tr = tr)
+  set_layer(params, 'ggtree', layout = layout, tr = tr)
   
   
   #________________________________________________________
   # Coloring by reads requires an aes mapping.
   #________________________________________________________
-  if (identical(color.by, '.reads')) {
-    setLayer("ggtree", mapping = as.cmd(aes(color=log(reads))))
-    setLayer("scale_color_continuous", low='darkgreen', high='red')
+  if (eq(color.by, '.reads')) {
+    set_layer(params, 'ggtree', mapping = as.cmd(aes(color=log(reads))))
+    set_layer(params, 'scale_color_continuous', low='darkgreen', high='red')
   }
   
   
@@ -123,9 +108,10 @@ tree_plot <- function (
   # Add OTU names at the tree tips.
   #________________________________________________________
   if (!is_null(tiplab)) {
-    initLayer("tiplab")
     
-    if (!identical(tiplab, 'OTU')) {
+    add_layer(params, 'tiplab')
+    
+    if (!tiplab == '.otu') {
       
       df  <- attr(layers[['ggtree']][['tr']], 'data',  exact = TRUE)
       phy <- attr(layers[['ggtree']][['tr']], 'phylo', exact = TRUE)
@@ -133,15 +119,16 @@ tree_plot <- function (
       if (nrow(df) == 0)
         df <- attr(tr, 'extraInfo', exact = TRUE)[,'node']
       
-      df[['tiplab']] <- otu_taxonomy(biom, tiplab)[phy$tip.label,1][df[['node']]]
+      df[['tiplab']] <- otu_taxonomy(biom, tiplab)[phy$tip.label][df[['node']]]
       
       attr(layers[['ggtree']][['tr']], 'data') <- df
       remove("df", "phy")
       
-      setLayer(
-        layer   = "tiplab", 
-        data    = as.cmd(function (x) { subset(x, !is.na(tiplab)) }), 
-        mapping = aes(label=tiplab) )
+      set_layer(
+        params = params, 
+        layer  = 'tiplab', 
+        'data'    = as.cmd(function (x) { subset(x, !is.na(tiplab)) }), 
+        'mapping' = aes(label=tiplab) )
     }
   }
   
@@ -152,14 +139,15 @@ tree_plot <- function (
   if (!is_null(label)) {
     
     mapping <- aes(x=branch, label=!!as.name(label))
-    if (identical(color.by, '.reads'))
+    if (eq(color.by, '.reads'))
       mapping <- aes(x=branch, label=!!as.name(label), color=log(reads))
     
-    setLayer(
-      layer   = "label",
-      data    = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(label))), 
-      mapping = mapping, 
-      fill    = 'white' )
+    set_layer(
+      params = params, 
+      layer  = 'label',
+      'data'    = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(label))), 
+      'mapping' = mapping, 
+      'fill'    = 'white' )
   }
   
   
@@ -169,15 +157,16 @@ tree_plot <- function (
   if (!is_null(cladelab)) {
     
     mapping <- aes(node=node, label=!!as.name(cladelab))
-    if (identical(color.by, '.reads'))
+    if (eq(color.by, '.reads'))
       mapping <- aes(node=node, label=!!as.name(cladelab), color=log(reads))
     
-    setLayer(
-      layer       = "cladelab",
-      data        = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(cladelab))), 
-      mapping     = mapping,
-      offset      = 0.02,
-      offset.text = 0.02 )
+    set_layer(
+      params = params, 
+      layer  = 'cladelab',
+      'data'        = as.cmd(function (x) { subset(x, !is.na(y)) }, list(y = as.name(cladelab))), 
+      'mapping'     = mapping,
+      'offset'      = 0.02,
+      'offset.text' = 0.02 )
   }
   
   
@@ -191,29 +180,26 @@ tree_plot <- function (
   if (!is_null(cladelab))
     right %<>% if.null(0.2)
   
-  if (!is_null(top))    setLayer('top',    .fn = 'vexpand', direction =  1, ratio = top)
-  if (!is_null(right))  setLayer('right',  .fn = 'hexpand', direction =  1, ratio = right)
-  if (!is_null(bottom)) setLayer('bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
-  if (!is_null(left))   setLayer('left',   .fn = 'hexpand', direction = -1, ratio = left)
+  if (!is_null(top))    set_layer(params, 'top',    .fn = 'vexpand', direction =  1, ratio = top)
+  if (!is_null(right))  set_layer(params, 'right',  .fn = 'hexpand', direction =  1, ratio = right)
+  if (!is_null(bottom)) set_layer(params, 'bottom', .fn = 'vexpand', direction = -1, ratio = bottom)
+  if (!is_null(left))   set_layer(params, 'left',   .fn = 'hexpand', direction = -1, ratio = left)
   
   
   p <- suppressMessages(ggbuild(layers))
   
   
-  #________________________________________________________
-  # Attach history of biom modifications and this call
-  #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
-  
-  
+  attr(p, 'history') <- history
   set_cache_value(cache_file, p)
+  
   return (p)
 }
 
 
+
 #' Provides a 'treedata' S4 object for use in ggtree functions.
 #' 
-#' @param biom   A BIOM object, as returned from [read_biom()].
+#' @param biom   An rbiom object, as returned from [read_biom()].
 #' 
 #' @param reads   Include a 'reads' column indicating the sum of taxa 
 #'        observations belonging to each node/leaf. Default: \code{TRUE}.
@@ -240,18 +226,20 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
   if (nchar(system.file(package = "ggtree")) == 0)
     stop("Bioconductor R package 'ggtree' must be installed to use tree_data().")
   
+  validate_biom(clone = FALSE)
+  
+  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("tree_data", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  params     <- eval_envir(environment())
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   # Sanity checks
   #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
   stopifnot(is_scalar_logical(reads) && !is_na(reads))
   
   tree   <- otu_tree(biom)
@@ -268,9 +256,9 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
     stopifnot(is.logical(clades) || is.character(clades))
     
     if (isFALSE(clades)) return (NULL)
-    if (isTRUE(clades))  return (taxa_ranks(biom) %>% setNames(., .))
+    if (isTRUE(clades))  return (ranks %>% setNames(., .))
     
-    if (length(bad <- setdiff(clades, taxa_ranks(biom))) > 0)
+    if (length(bad <- setdiff(clades, ranks)) > 0)
       stop("Invalid taxonomic rank: ", paste(collapse = ", ", bad))
       
     if (is_null(names(clades))) return (setNames(clades, clades))
@@ -288,7 +276,7 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
     df[1:nTips, 'reads'] <- as.vector(taxa_sums(biom)[labels])
   
   for (i in seq_along(ranks))
-    df[1:nTips, names(ranks)[[i]]] <- as.vector(otu_taxonomy(biom, ranks[[i]])[labels,1])
+    df[1:nTips, names(ranks)[[i]]] <- as.vector(otu_taxonomy(biom, ranks[[i]])[labels])
   
   df[1:nTips, 'OTU'] <- labels
   
@@ -340,6 +328,7 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
 #'     head(leafs)
 #'
 tree_tips <- function (x) {
+  stopifnot(is(x, 'phylo'))
   x$tip.label
 }
 
@@ -368,9 +357,9 @@ tree_subset <- function (tree, tips) {
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(as.list(environment()), eval)
-  cache_file <- get_cache_file("tree_subset", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  params     <- eval_envir(environment())
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   

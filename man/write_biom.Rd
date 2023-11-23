@@ -7,15 +7,13 @@
 write_biom(biom, file, format = "json")
 }
 \arguments{
-\item{biom}{The BIOM object to save to the file. If another class of
-object is given, it will be coerced to matrix and output in
-tabular format, provided it is numeric with rownames and colnames.}
+\item{biom}{The \code{rbiom} object to save to the file.}
 
 \item{file}{Path to the output file. If the file name ends in \code{".gz"}
 or \code{".bz2"}, the file contents will be compressed accordingly.}
 
 \item{format}{Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"},
-corresponding to classic tabular format, biom format version 1.0 and
+corresponding to classic tabular format, BIOM format version 1.0 and
 biom version 2.1, respectively.
 See \url{http://biom-format.org/documentation/} for details.
 NOTE: to write HDF5 formatted BIOM files, the BioConductor R package

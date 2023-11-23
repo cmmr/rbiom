@@ -14,10 +14,12 @@ bdiv_ord_table(
   split.by = NULL,
   stat.by = NULL,
   tree = NULL,
+  within = NULL,
+  between = NULL,
   test = "adonis2",
   seed = 0,
   permutations = 999,
-  rank = NULL,
+  rank = -1,
   taxa = 5,
   p.top = Inf,
   p.adj = "fdr",
@@ -26,17 +28,15 @@ bdiv_ord_table(
 )
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.
-Alternatively, a {dist} class distance matrix can be given, in which
-case only the parameters \code{ord}, \code{k}, and \code{...} are
-allowed.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{bdiv}{The beta diversity distance algorithm to use. Options are:
+\item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. A phylogenetic tree must be
-present in \code{biom} or explicitly provided via \code{tree=} to use
-the UniFrac methods.
-Multiple values allowed. Default: \code{"Bray-Curtis"}.}
+\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
+phylogenetic tree must be present in \code{biom} or explicitly
+provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+Multiple/abbreviated values allowed.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \itemize{
@@ -50,60 +50,74 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+Default: \code{TRUE} \cr\cr
+Multiple values allowed.}
 
 \item{md}{Include metadata in the output data frame? Options are:
 \itemize{
-\item{\code{NULL} - }{ Don't include metadata. (Default) }
+\item{\code{NULL} - }{ Don't include metadata. }
 \item{\code{TRUE} - }{ Include all metadata. }
-\item{\emph{character vector} - }{ Include only the specified metadata columns. }
+\item{\emph{character vector} - }{
+Include only the specified metadata columns. }
 }
-Default: \code{NULL}}
+Default: \code{TRUE}}
 
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}
 
 \item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to calculating distance matrices, ordinations, and statistics.
-Equivalent to the \code{facet.by} parameter in \code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}}.
-Default: \code{NULL}}
+by prior to any calculations. Default: \code{NULL}}
 
-\item{stat.by}{Name of the metadata column for statistical groups.
-Equivalent to the \code{color.by} parameter in \code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}}.
-Default: \code{NULL}}
+\item{stat.by}{The categorical or numeric metadata field over which
+statistics should be calculated. Required.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
-relationships of the taxa in \code{biom}. Will be taken from the tree
-defined in \code{biom} if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: \code{NULL}}
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{otu_tree(biom)}}
 
-\item{test, seed, permutations}{Passthrough parameters to \code{\link[=distmat_stats]{distmat_stats()}}
-for assessing significance of \code{stat.by} and \code{rank} groups.
-Default: \code{test="adonis2", seed=0, permutations=999}}
+\item{within, between}{Metadata field(s) for intra- or inter- sample
+comparisons. Default: \code{NULL}}
 
-\item{rank}{\link{Biplot} What rank of taxa to use for the biplot (e.g.
-"Phylum"), or \code{NULL} for no biplot. Run \code{taxa_ranks()} to
-see all options for a given BIOM object. Default: \code{NULL}}
+\item{test}{Permutational test for accessing significance. Options are:
+\itemize{
+\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
+\item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+}
+Default: \code{"adonis2"} \cr\cr
+Abbreviations are allowed.}
 
-\item{taxa}{\link{Biplot} Which taxa to include. An integer value will return
-the top n most abundant taxa. A value 0 <= n < 1 will return any taxa
-with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: \code{5}}
+\item{seed}{Random seed for permutations. Default: \code{0}}
 
-\item{p.top}{\link{Biplot} Only return taxa with the most significant
-differences in abundance. If \code{p.top} is >= 1, then the
-\code{p.top} most significant taxa are displayed. If \code{p.top}
-is less than one, all taxa with an adjusted p-value <= \code{p.top}
-are displayed. Recommended to be used in combination with the
-\code{taxa} parameter to set a lower bound on the mean abundance of
-considered taxa. Default: \code{Inf}}
+\item{permutations}{Number of random permutations to use.
+Default: \code{999}}
 
-\item{p.adj}{\link{Biplot} Method to use for multiple comparisons adjustment of
-p-values. Run \code{p.adjust.methods} for a list of available options.
-Default: \code{fdr}}
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
+see all options for a given \code{rbiom} object. Default: \code{-1}.}
 
-\item{unc}{\link{Biplot} How to handle unclassified, uncultured, and similarly
-ambiguous taxa names. Options are:
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that
+mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
+character vector of taxa names will show only those named taxa.
+Default: \code{6}.}
+
+\item{p.top}{Only display taxa with the most significant differences in
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most
+significant taxa are displayed. If \code{p.top} is less than one, all
+taxa with an adjusted p-value <= \code{p.top} are displayed.
+Recommended to be used in combination with the \code{taxa} parameter
+to set a lower bound on the mean abundance of considered taxa.
+Default: \code{Inf}}
+
+\item{p.adj}{Method to use for multiple comparisons adjustment of
+p-values. Run \code{p.adjust.methods} for a list of available
+options. Default: \code{"fdr"}.}
+
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
 \itemize{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
@@ -111,50 +125,50 @@ ambiguous taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Default: \code{"singly"} \cr\cr
-Non-ambiguous abbreviations are allowed.}
+Abbreviations are allowed.}
 
 \item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
 \code{\link[ape:pcoa]{ape::pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
 }
 \value{
-A data.frame with columns \code{.sample}, \code{.ord}, \code{.x},
-\code{.y}, and (optionally) \code{.z}.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{    If \code{biom} is a \code{BIOM} object, then \code{.weighted}, 
-    \code{.bdiv}, and any columns given by \code{md}, \code{split.by}, 
-    and \code{stat.by} are included as well.
-    
-    If \code{stat.by} is given, then \code{attr(, 'sample_stats')}
-    and \code{attr(, 'sample_stats_cmds')} are set.
-    
-    If \code{rank} is given, then \code{attr(, 'taxa_coords')},
-    \code{attr(, 'taxa_stats')}, and \code{attr(, 'taxa_stats_cmds')} 
-    are set.
-}\if{html}{\out{</div>}}
+A data.frame with columns \code{.sample}, \code{.weighted},
+\code{.bdiv}, \code{.ord}, \code{.x}, \code{.y}, and (optionally)
+\code{.z}. Any columns given by \code{md}, \code{split.by}, and
+\code{stat.by} are included as well.\cr
+If \code{stat.by} is given, then \code{$stats} and
+\code{$stats$code)} are set.\cr
+If \code{rank} is given, then \code{$taxa_coords},
+\code{$taxa_stats}, and \code{$taxa_stats$code} are set.
 }
 \description{
-Calculate PCoA and other ordinations, including taxa biplots and statistics.
+The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
+\code{p.adj}) only only have an effect when \code{rank} is not \code{NULL}.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     ord <- bdiv_ord_table(hmp50, "bray", "pcoa", stat.by="Body Site", rank="g")
     head(ord)
-    attr(ord, 'sample_stats')
-    attr(ord, 'taxa_stats')
+    
+    ord$stats
+    
+    ord$taxa_stats
     
     
 }
 \seealso{
-Other ordination: 
-\code{\link{bdiv_ord_plot}()}
-
 Other beta_diversity: 
+\code{\link{bdiv_boxplot}()},
 \code{\link{bdiv_distmat}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
+\code{\link{bdiv_stats}()},
 \code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
+
+Other ordination: 
+\code{\link{bdiv_ord_plot}()},
+\code{\link{distmat_ord_table}()}
 }
 \concept{beta_diversity}
 \concept{ordination}

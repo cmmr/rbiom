@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>The BIOM object to save to the file.</p></dd>
+<dd><p>The <code>rbiom</code> object to save to the file.</p></dd>
 
 
 <dt>file</dt>
@@ -65,24 +65,25 @@
 
 
 <dt>depth</dt>
-<dd><p>Depth to rarefy to. See <code>rarefy</code> function for details.
+<dd><p>Depth to rarefy to. See <code><a href="sample_rarefy.html">sample_rarefy()</a></code> function for details.
 <code>depth = NULL</code> auto-selects a rarefaction level.
 <code>depth = 0</code> disables rarefaction. Only use <code>depth</code> with
-<code>BIOM</code> files of type 'OTU table' and integer count values.</p></dd>
+'OTU table' data and integer count values.</p></dd>
 
 
 <dt>seed</dt>
-<dd><p>Random seed to use in rarefying. See <code>rarefy</code> function
+<dd><p>Random seed to use in rarefying. See <code><a href="sample_rarefy.html">sample_rarefy()</a></code> function
 for details.</p></dd>
 
 
 <dt>unc</dt>
 <dd><p>How to handle unclassified, uncultured, and similarly ambiguous
-taxa names. Default: <code>"asis"</code></p><ul><li><p><code>"asis"</code> -  Don't check/modify any taxa names.</p></li>
-<li><p><code>"singly"</code> -  Replace with "Unc. <otu id>".</otu></p></li>
-<li><p><code>"grouped"</code> -  Replace with "Unc. <higher rank>".</higher></p></li>
-<li><p><code>"drop"</code> -  Don't include in the returned matrix.</p></li>
-</ul></dd>
+taxa names. Options are:</p><ul><li><p><code>"singly"</code> -  Replaces them with the OTU name.</p></li>
+<li><p><code>"grouped"</code> -  Replaces them with a higher rank's name.</p></li>
+<li><p><code>"drop"</code> -  Excludes them from the result.</p></li>
+<li><p><code>"asis"</code> -  To not check/modify any taxa names.</p></li>
+</ul><p>Default: <code>"singly"</code> <br><br>
+Abbreviations are allowed.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -109,7 +110,7 @@ Sample' tab.</p>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>      <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="sample_select.html">sample_select</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="sample_rarefy.html">sample_rarefy</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      </span></span>
-<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">"Weighted UniFrac"</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="unifrac.html">unifrac</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">"Weighted UniFrac"</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">"Unweighted Jaccard"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'jaccard'</span>, weighted<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>      <span class="va">outfile</span> <span class="op">&lt;-</span> <span class="fu">write_xlsx</span><span class="op">(</span><span class="va">biom</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".xlsx"</span><span class="op">)</span><span class="op">)</span></span></span>

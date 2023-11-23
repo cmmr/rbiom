@@ -6,7 +6,7 @@
 \usage{
 taxa_barplot(
   biom,
-  rank = NULL,
+  rank = -1,
   taxa = 6,
   colors = TRUE,
   patterns = FALSE,
@@ -17,22 +17,28 @@ taxa_barplot(
   dist = "euclidean",
   clust = "complete",
   other = TRUE,
+  unc = "singly",
+  lineage = FALSE,
   xlab.angle = 90,
   ...
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{rank}{What rank(s) of taxa to display, for example \code{"Phylum"}
-or \code{"Genus"}. Run \code{taxa_ranks()} to see all options for a
-given BIOM object. The default, \code{NULL}, selects the lowest
-level.}
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
+see all options for a given \code{rbiom} object. Default: \code{-1}.}
 
-\item{taxa}{Which taxa to give separate colors. An integer value will show
-the top n most abundant taxa. A value 0 <= n < 1 will show all taxa
-with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: \code{6}.}
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that
+mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
+character vector of taxa names will show only those named taxa.
+Default: \code{6}.}
 
 \item{colors, patterns}{A character vector of colors or patterns to use in
 the graph. A named character vector can be used to map taxon names to
@@ -50,22 +56,47 @@ use for data partitioning. Default: \code{NULL}}
 
 \item{dist, clust}{Distance (\code{\link[stats:dist]{stats::dist()}}) and clustering
 (\code{\link[stats:hclust]{stats::hclust()}}) methods to use for automatically arranging
-samples along the x-axis. Group samples with similar composition near
+samples along the x-axis to put samples with similar composition near
 one another. Default: \code{dist="euclidean", clust="complete"}.}
 
-\item{other}{Add an 'Other' taxa that ensures all bars sum to 100\%.
-Default: \code{TRUE}.}
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{taxa}
+argument. Specifying \code{TRUE} adds "Other" to the returned set.
+A string can also be given to imply \code{TRUE}, but with that
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis.
-Options are \code{90} (the default) or \code{30}.}
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
+\itemize{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
+
+\item{lineage}{Include all ranks in the name of the taxa. For instance,
+setting to \code{TRUE} will produce
+\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+Otherwise the taxa name will simply be \code{Coriobacteriales}. You
+want to set this to TRUE when \code{unc = "asis"} and you have taxa
+names (such as \emph{Incertae_Sedis}) that map to multiple higher
+level ranks. Default: \code{FALSE}}
+
+\item{xlab.angle}{Angle of the labels at the bottom of the plot.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
+Default: \code{"auto"}.}
 
 \item{...}{Parameters for underlying functions. Prefixing parameter names
 with a layer name ensures that a particular parameter is passed to,
 and only to, that layer.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points will be attached as
-\code{attr(, 'data')}.
+A \code{ggplot2} plot. \cr The computed data points, ggplot command,
+and object history are available as \code{$data}, \code{$code}, and
+\code{$history}, respectively.
 }
 \description{
 Display taxa abundances as a stacked bar graph.
@@ -78,6 +109,14 @@ Display taxa abundances as a stacked bar graph.
     
 }
 \seealso{
+Other taxa_abundance: 
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_corrplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_matrix}()},
+\code{\link{taxa_stats}()},
+\code{\link{taxa_table}()}
+
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
@@ -92,4 +131,5 @@ Other visualization:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}
 }
+\concept{taxa_abundance}
 \concept{visualization}

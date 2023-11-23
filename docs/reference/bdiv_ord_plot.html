@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,7 @@
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
 <span>  ord <span class="op">=</span> <span class="st">"UMAP"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"pe"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"petm"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -65,7 +65,7 @@
 <span>  test <span class="op">=</span> <span class="st">"adonis2"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  permutations <span class="op">=</span> <span class="fl">999</span>,</span>
-<span>  rank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  taxa <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
@@ -77,19 +77,17 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A <code>BIOM</code> object, as returned from <code><a href="read_biom.html">read_biom()</a></code>.
-Alternatively, a dist class distance matrix can be given, in which
-case only the parameters <code>ord</code>, <code>k</code>, and <code>...</code> are
-allowed.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>bdiv</dt>
-<dd><p>The beta diversity distance algorithm to use. Options are:
+<dd><p>Beta diversity distance algorithm(s) to use. Options are:
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. A phylogenetic tree must be
-present in <code>biom</code> or explicitly provided via <code>tree=</code> to use
-the UniFrac methods.
-Multiple values allowed. Default: <code>"Bray-Curtis"</code>.</p></dd>
+<code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
+phylogenetic tree must be present in <code>biom</code> or explicitly
+provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
+Multiple/abbreviated values allowed.</p></dd>
 
 
 <dt>ord</dt>
@@ -104,7 +102,8 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 <dt>weighted</dt>
 <dd><p>Take relative abundances into account. When
 <code>weighted=FALSE</code>, only presence/absence is considered.
-Multiple values allowed. Default: <code>TRUE</code></p></dd>
+Default: <code>TRUE</code> <br><br>
+Multiple values allowed.</p></dd>
 
 
 <dt>layers</dt>
@@ -119,62 +118,74 @@ Default: <code>"pe"</code></p></dd>
 
 
 <dt>color.by, shape.by, facet.by, limit.by</dt>
-<dd><p>Metadata columns to
-use for <code>vignette("data partitioning")</code>. Default:
-<code>color.by=NULL, shape.by=NULL, facet.by=NULL, limit.by=NULL</code></p></dd>
+<dd><p>Metadata columns to use for
+aesthetics and partitioning. See below for details.
+Default: <code>NULL</code></p></dd>
 
 
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Will be taken from the tree
-defined in <code>biom</code> if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: <code>NULL</code></p></dd>
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>otu_tree(biom)</code></p></dd>
 
 
-<dt>test, seed, permutations</dt>
-<dd><p>Passthrough parameters to <code><a href="distmat_stats.html">distmat_stats()</a></code>
-for assessing significance of <code>stat.by</code> and <code>rank</code> groups.
-Default: <code>test="adonis2", seed=0, permutations=999</code></p></dd>
+<dt>test</dt>
+<dd><p>Permutational test for accessing significance. Options are:</p><ul><li><p><code>"adonis2"</code> -  Permutational MANOVA; <code><a href="https://rdrr.io/pkg/vegan/man/vegan-deprecated.html" class="external-link">vegan::adonis2()</a></code>.</p></li>
+<li><p><code>"mrpp"</code> -  Multiple response permutation procedure; <code><a href="https://rdrr.io/pkg/vegan/man/mrpp.html" class="external-link">vegan::mrpp()</a></code>.</p></li>
+</ul><p>Default: <code>"adonis2"</code> <br><br>
+Abbreviations are allowed.</p></dd>
+
+
+<dt>seed</dt>
+<dd><p>Random seed for permutations. Default: <code>0</code></p></dd>
+
+
+<dt>permutations</dt>
+<dd><p>Number of random permutations to use.
+Default: <code>999</code></p></dd>
 
 
 <dt>rank</dt>
-<dd><p>What rank of taxa to display, for example <code>"Phylum"</code> or
-<code>"Genus"</code>. Use <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to see all options for a
-given BIOM object. The default, <code>NULL</code>, selects the lowest
-level.</p></dd>
+<dd><p>What rank(s) of taxa to display. E.g. <code>"Phylum"</code>,
+<code>"Genus"</code>, <code>".otu"</code>, etc. An integer vector can also be
+given, where <code>1</code> is the highest rank, <code>2</code> is the second
+highest, <code>-1</code> is the lowest rank, <code>-2</code> is the second
+lowest, and <code>0</code> is the OTU "rank". Run <code><a href="taxa_ranks.html">taxa_ranks()</a></code> to
+see all options for a given <code>rbiom</code> object. Default: <code>-1</code>.</p></dd>
 
 
 <dt>taxa</dt>
-<dd><p>Biplot Which taxa to include. An integer value will return
-the top n most abundant taxa. A value 0 &lt;= n &lt; 1 will return any taxa
-with that mean abundance or greater (e.g. 0.1). A character vector of
-taxon names will show only those taxa. Default: <code>5</code></p></dd>
+<dd><p>Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 &lt;= n &lt; 1 will show any taxa with that
+mean abundance or greater (e.g. <code>0.1</code> implies &gt;= 10%). A
+character vector of taxa names will show only those named taxa.
+Default: <code>6</code>.</p></dd>
 
 
 <dt>p.top</dt>
-<dd><p>Biplot Only return taxa with the most significant
-differences in abundance. If <code>p.top</code> is &gt;= 1, then the
-<code>p.top</code> most significant taxa are displayed. If <code>p.top</code>
-is less than one, all taxa with an adjusted p-value &lt;= <code>p.top</code>
-are displayed. Recommended to be used in combination with the
-<code>taxa</code> parameter to set a lower bound on the mean abundance of
-considered taxa. Default: <code>Inf</code></p></dd>
+<dd><p>Only display taxa with the most significant differences in
+abundance. If <code>p.top</code> is &gt;= 1, then the <code>p.top</code> most
+significant taxa are displayed. If <code>p.top</code> is less than one, all
+taxa with an adjusted p-value &lt;= <code>p.top</code> are displayed.
+Recommended to be used in combination with the <code>taxa</code> parameter
+to set a lower bound on the mean abundance of considered taxa.
+Default: <code>Inf</code></p></dd>
 
 
 <dt>p.adj</dt>
-<dd><p>Biplot Method to use for multiple comparisons adjustment of
-p-values. Run <code>p.adjust.methods</code> for a list of available options.
-Default: <code>fdr</code></p></dd>
+<dd><p>Method to use for multiple comparisons adjustment of
+p-values. Run <code>p.adjust.methods</code> for a list of available
+options. Default: <code>"fdr"</code>.</p></dd>
 
 
 <dt>unc</dt>
-<dd><p>Biplot How to handle unclassified, uncultured, and similarly
-ambiguous taxa names. Options are:</p><ul><li><p><code>"singly"</code> -  Replaces them with the OTU name.</p></li>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:</p><ul><li><p><code>"singly"</code> -  Replaces them with the OTU name.</p></li>
 <li><p><code>"grouped"</code> -  Replaces them with a higher rank's name.</p></li>
 <li><p><code>"drop"</code> -  Excludes them from the result.</p></li>
 <li><p><code>"asis"</code> -  To not check/modify any taxa names.</p></li>
 </ul><p>Default: <code>"singly"</code> <br><br>
-Non-ambiguous abbreviations are allowed.</p></dd>
+Abbreviations are allowed.</p></dd>
 
 
 <dt>...</dt>
@@ -190,30 +201,34 @@ the <code>pt.</code> prefix.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot</code> object.</p>
+<p>A <code>ggplot2</code> plot. <br></p>
 
 
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>    The computed sample coordinates are <span class="cf">in</span> \code{p<span class="sc">$</span>data<span class="er">)</span>}.</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    </span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    If \code{color.by} is given, then \code{<span class="fu">attr</span>(p, <span class="st">'stats'</span>)} and </span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    \code{<span class="fu">attr</span>(p, <span class="st">'stats_cmds'</span>)} are set.</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    </span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    If \code{rank} is given, then \code{<span class="fu">attr</span>(p<span class="sc">$</span>data, <span class="st">'taxa_coords'</span>)}, </span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    \code{<span class="fu">attr</span>(p, <span class="st">'taxa_stats'</span>)}, and \code{<span class="fu">attr</span>(p, <span class="st">'taxa_stats_cmds'</span>)} </span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>    are set.</span></code></pre><p></p></div>
+<p>The computed sample coordinates, ggplot command, and object history
+are available as <code>$data</code>, <code>$code</code>, and <code>$history</code>,
+respectively. <br></p>
 
 
+<p>If <code>color.by</code> is given, then <code>$stats</code> and
+<code>$stats$code</code> are set. <br></p>
+
+
+<p>If <code>rank</code> is given, then <code>$data$taxa_coords</code>,
+<code>$taxa_stats</code>, and <code>$taxa_stats$code</code> are set.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other ordination: 
-<code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code></p>
-<p>Other beta_diversity: 
+    <div class="dont-index"><p>Other beta_diversity: 
+<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
 <code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
 <code><a href="bdiv_table.html">bdiv_table</a>()</code>,
 <code><a href="distmat_stats.html">distmat_stats</a>()</code></p>
+<p>Other ordination: 
+<code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
+<code><a href="distmat_ord_table.html">distmat_ord_table</a>()</code></p>
 <p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,

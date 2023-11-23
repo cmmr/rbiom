@@ -2,16 +2,16 @@
 #' 
 #' @inherit otu_taxonomy params
 #'
-#' @param biom   The BIOM object to save to the file.
+#' @param biom   The \code{rbiom} object to save to the file.
 #' 
 #' @param file   Path to the output xlsx file.
 #' 
-#' @param depth   Depth to rarefy to. See \code{rarefy} function for details.
+#' @param depth   Depth to rarefy to. See [sample_rarefy()] function for details.
 #'        \code{depth = NULL} auto-selects a rarefaction level. 
 #'        \code{depth = 0} disables rarefaction. Only use \code{depth} with 
-#'        \code{BIOM} files of type 'OTU table' and integer count values.
+#'        'OTU table' data and integer count values.
 #'                   
-#' @param seed   Random seed to use in rarefying. See \code{rarefy} function
+#' @param seed   Random seed to use in rarefying. See [sample_rarefy()] function
 #'        for details.
 #' 
 #' @return The normalized filepath that was written to (invisibly).
@@ -30,7 +30,7 @@
 #'       
 #'       biom <- sample_select(hmp50, 1:10) %>% sample_rarefy()
 #'       
-#'       attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+#'       attr(biom, "Weighted UniFrac")   <- bdiv_distmat(biom, 'unifrac')
 #'       attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
 #'       
 #'       outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
@@ -39,7 +39,8 @@
 
 write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
   
-  stopifnot(is(biom, "BIOM"))
+  validate_biom(clone = FALSE)
+  
   stopifnot(is_scalar_character(file) && !is_na(file))
   
   
@@ -60,7 +61,7 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
   # Biom is an 'OTU table' and all counts are int
   #________________________________________________________
   
-  if (identical(tolower(biom$info$type), 'otu table') && !any(biom$counts$v %% 1 > 0)) {
+  if (eq(tolower(biom$info$type), 'otu table') && !any(biom$counts$v %% 1 > 0)) {
     
     #________________________________________________________
     # Define the initial structure of our workbook
@@ -105,7 +106,7 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
     #________________________________________________________
     
     # Allow the user to override rarefaction by setting depth = 0.
-    if (identical(depth, 0) || identical(depth, 0L) || isTRUE(is_rarefied(biom))) {
+    if (eq(depth, 0) || eq(depth, 0L) || isTRUE(is_rarefied(biom))) {
       rare <- biom
     } else {
       rare <- sample_rarefy(biom = biom, depth = depth, seed = seed)
@@ -153,11 +154,11 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
       
       val <- attr(biom, key, exact = TRUE)
       
-      if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
-      if (identical(class(val), "matrix")) val <- data.frame(val)
-      if (!identical(class(val), "data.frame")) next
+      if (eq(class(val), "dist"))   val <- data.frame(as.matrix(val))
+      if (eq(class(val), "matrix")) val <- data.frame(val)
+      if (!eq(class(val), "data.frame")) next
       
-      rn <- !identical(rownames(val), as.character(1:nrow(val)))
+      rn <- !eq(rownames(val), as.character(1:nrow(val)))
       openxlsx::addWorksheet(wb, key)
       openxlsx::writeData(wb, key, val, rowNames = rn)
       remove("val", "rn")
@@ -171,9 +172,7 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
     # Roll up abundances at each taxonomic level
     #________________________________________________________
     
-    ranks <- unique(c('OTU', taxa_ranks(biom)))
-    
-    for (rank in ranks) {
+    for (rank in taxa_ranks(biom)) {
       
       df <- t(taxa_rollup(biom, rank, lineage = TRUE))
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
@@ -251,11 +250,11 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
       
       val <- attr(biom, key, exact = TRUE)
       
-      if (identical(class(val), "dist"))   val <- data.frame(as.matrix(val))
-      if (identical(class(val), "matrix")) val <- data.frame(val)
-      if (!identical(class(val), "data.frame")) next
+      if (eq(class(val), "dist"))   val <- data.frame(as.matrix(val))
+      if (eq(class(val), "matrix")) val <- data.frame(val)
+      if (!eq(class(val), "data.frame")) next
       
-      rn <- !identical(rownames(val), as.character(1:nrow(val)))
+      rn <- !eq(rownames(val), as.character(1:nrow(val)))
       openxlsx::addWorksheet(wb, key)
       openxlsx::writeData(wb, key, val, rowNames = rn)
       remove("val", "rn")
@@ -275,7 +274,7 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
       df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
       
       # Set the full taxonomy string as the first column
-      if (identical(i, 1L)) {
+      if (eq(i, 1L)) {
         Description <- data.frame(Description=apply(biom$taxonomy, 1L, paste, collapse="; "))
         df          <- cbind(Description, df[rownames(Description),,F])
       }

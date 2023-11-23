@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9100</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,27 +51,20 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_select</span><span class="op">(</span></span>
-<span>  <span class="va">biom</span>,</span>
-<span>  samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nTop <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nRandom <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  fast <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_select</span><span class="op">(</span><span class="va">biom</span>, samples <span class="op">=</span> <span class="cn">NULL</span>, nTop <span class="op">=</span> <span class="cn">NULL</span>, nRandom <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>biom</dt>
-<dd><p>A BIOM object, as returned from <code><a href="read_biom.html">read_biom()</a></code>. Objects of
-class <code>matrix</code> or <code>simple_triplet_matrix</code> are also accepted.</p></dd>
+<dd><p>An <code>rbiom</code>-class object, or data coercible with
+<code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt>samples</dt>
 <dd><p>Sample names, indices, or a logical vector identifying
 the samples to keep. The latter two should be based on the order of
-sample names given by <code>colnames(biom$counts)</code>.</p></dd>
+sample names given by <code>sample_names(biom)</code>.</p></dd>
 
 
 <dt>nTop</dt>
@@ -89,12 +82,7 @@ See note.</p></dd>
 
 
 <dt>seed</dt>
-<dd><p>Random seed, used when selecting <code>nRandom</code> samples.</p></dd>
-
-
-<dt>fast</dt>
-<dd><p>Should subsetting the phylogenetic tree and sequences be
-skipped? These slow steps are often not necessary. (Default: FALSE)</p>
+<dd><p>Random seed, used when selecting <code>nRandom</code> samples.</p>
 <p>Note: Generally, you will specify only one of the filters: <code>samples</code>,
 <code>nTop</code>, or <code>nRandom</code>. However, specifying multiple filters is
 allowed; they will be applied in the order listed above.</p></dd>
@@ -104,17 +92,19 @@ allowed; they will be applied in the order listed above.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object of the same class as <code>biom</code>, subsetted as requested.</p>
+<p>A <code>rbiom</code> object, subsetted as requested.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="sample_subset.html">sample_subset()</a></code></p></div>
+    <div class="dont-index"><p>Other metadata: 
+<code><a href="subset.rbiom.html">subset.rbiom</a>()</code>,
+<code><a href="within.rbiom.html">within.rbiom</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">ex1</span> <span class="op">&lt;-</span> <span class="fu">sample_select</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'HMP14'</span>, <span class="st">'HMP22'</span>, <span class="st">'HMP03'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">ex2</span> <span class="op">&lt;-</span> <span class="fu">sample_select</span><span class="op">(</span><span class="va">hmp50</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">32</span>, <span class="fl">11</span>, <span class="fl">28</span>, <span class="fl">16</span>, <span class="fl">46</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>

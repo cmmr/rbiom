@@ -7,7 +7,7 @@
 write_taxonomy(biom, file)
 }
 \arguments{
-\item{biom}{A BIOM object}
+\item{biom}{An rbiom object}
 
 \item{file}{Path to the output file. Filenames ending in
 \code{.gz} or \code{.bz2} will be compressed accordingly.}

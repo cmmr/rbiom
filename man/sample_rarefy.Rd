@@ -7,9 +7,8 @@
 sample_rarefy(biom, depth = NULL, seed = 0)
 }
 \arguments{
-\item{biom}{A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, as returned from \code{\link[=read_biom]{read_biom()}}. For matrices, the rows and
-columns are assumed to be the taxa and samples, respectively.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{depth}{The number of observations to keep, per sample. If set to
 \code{NULL}, a depth will be automatically selected. Samples that
@@ -20,16 +19,11 @@ to integers between 1 and \code{depth} such that they sum to
 
 \item{seed}{An integer to use for seeding the random number generator. If
 you need to create different random rarefactions of the same
-\code{BIOM} object, set this seed value to a different number each
+\code{rbiom} object, set this seed value to a different number each
 time.}
 }
 \value{
-A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-object, depending on the input object type. The type of object
-provided is the same type that is returned. The retained
-observations are randomly selected, based on a seed value derived
-from the \code{BIOM} object. Therefore, rarefying the same biom to
-the same depth will always produce the same resultant rarefaction.
+The rarefied \code{rbiom} object.
 }
 \description{
 Subset counts so that all samples have the same number of observations.
@@ -37,9 +31,9 @@ Subset counts so that all samples have the same number of observations.
 \examples{
     library(rbiom)
 
-    range(slam::col_sums(hmp50$counts))
+    range(sample_sums(hmp50))
 
     biom <- sample_rarefy(hmp50, depth=1000)
-    range(slam::col_sums(biom$counts))
+    range(sample_sums(biom))
 
 }

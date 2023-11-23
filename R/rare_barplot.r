@@ -1,16 +1,15 @@
 #' Visualize the number of observations per sample.
 #' 
-#' @name rare_barplot
+#' @inherit documentation_default
+#' @inherit documentation_plot_return return
 #' 
+#' @family rarefaction
 #' @family visualization
-#' 
-#' @param biom  A \code{matrix}, \code{simple_triplet_matrix}, or \code{BIOM}
-#'        object, as returned from [read_biom()]. For matrices, the rows and
-#'        columns are assumed to be the taxa and samples, respectively.
 #'        
 #' @param rline   Where to draw a horizontal line on the plot, intended to show
 #'        a particular rarefaction depth. Set to \code{TRUE} to show an 
-#'        auto-selected rarefaction depth or \code{NULL} to not show a line.
+#'        auto-selected rarefaction depth, \code{FALSE} to not show a line, or
+#'        an integer for a custom position.
 #'        Default: \code{TRUE}.
 #' 
 #' @param counts   Display the number of samples and reads remaining after
@@ -22,141 +21,137 @@
 #'        \code{NULL}.  Default: \code{"log10"}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 functions. 
-#'        Prefix a parameter name with either \code{r.} to ensure it gets 
-#'        passed to (and only to) \link[ggplot2]{geom_vline}. For instance, 
-#'        \code{r.color = "black"} ensures only the vertical rarefaction line 
+#'        Prefix a parameter name with \code{r.} to ensure it gets 
+#'        passed to (and only to) \link[ggplot2]{geom_hline}. For instance, 
+#'        \code{r.color = "black"} ensures only the horizontal rarefaction line 
 #'        has its color set to \code{"black"}.
-#'        
-#' @return A \code{ggplot2} plot. The underlying dataset will be attached as 
-#'         \code{attr(p, 'data')}.
 #' 
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
-#'     rare_barplot(hmp50, rline=TRUE)
+#'     rare_barplot(hmp50)
+#'     
+#'     rare_barplot(hmp50, rline = 500, r.size = 2, r.linetype = "twodash")
+#'     
+#'     fig <- rare_barplot(hmp50, counts = FALSE)
+#'     fig$code
 #'     
 
 rare_barplot <- function (
     biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
+  validate_biom(clone = FALSE)
+  
+  params  <- eval_envir(environment(), ...)
+  history <- append_history('fig ', params)
+  remove(list = intersect(env_names(params), ls()))
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("rare_barplot", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-  stopifnot(is.logical(rline) || is_null(rline) || is.numeric(rline))
-  
-  
-  #________________________________________________________
-  # Record the function call in a human-readable format.
-  #________________________________________________________
-  arg_str <- as.args(params, fun = rare_barplot, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- rare_barplot(%s)", arg_str) ))
-  remove("arg_str")
-  
-  
-  
-  #________________________________________________________
-  # Find the number of observations per sample.
-  #________________________________________________________
-  ss  <- if (is(biom, "simple_triplet_matrix")) { slam::col_sums(biom)
-  } else if (is(biom, "BIOM"))                  { sample_sums(biom)
-  } else if (is(biom, "matrix"))                { colSums(biom)
-  } else { stop("biom must be a matrix, simple_triplet_matrix, or BIOM object.") }
-  ss <- sort(ss)
-  
-  
-  #________________________________________________________
-  # Default rarefaction depth.
-  #________________________________________________________
-  if (isFALSE(rline)) rline <- NULL
-    
-  if (isTRUE(rline)) {
-    rline <- (sum(ss) * .1) / length(ss)
-    rline <- min(ss[ss >= rline])
-  }
+  with(params, {
+    stopifnot(is_scalar_logical(rline) || is_scalar_integerish(rline))
+    stopifnot(!is.na(rline))
+  })
   
   
   #________________________________________________________
   # Split the counts into kept/dropped.
   #________________________________________________________
-  data <- if (is_null(rline)) {
-    data.frame(
-      check.names = FALSE,
-      '.x'    = factor(names(ss), levels = names(ss)), 
-      '.xmin' = seq_along(ss) - 0.4,
-      '.xmax' = seq_along(ss) + 0.4,
-      '.ymin' = 1,
-      '.ymax' = as.vector(ss) )
+  with(params, {
     
-  } else {
-    data.frame(
-      check.names = FALSE,
-      '.x'     = factor(names(ss), levels = names(ss)),
-      '.group' = factor(rep(c("Excluded", "Retained"), each = length(ss))),
-      '.xmin'  = seq_along(ss) - 0.4,
-      '.xmax'  = seq_along(ss) + 0.4,
-      '.ymin'  = as.vector(c(ifelse(ss  < rline, 1, rline), ifelse(ss < rline, 0, 1))),
-      '.ymax'  = as.vector(c(ifelse(ss == rline, 0, ss),    ifelse(ss < rline, 0, rline))) )
-  }
-  data %<>% subset(.ymin > 0 & .ymax > 0)
+    
+    # Find the number of observations per sample.
+    #________________________________________________________
+    .ss <- sort(sample_sums(biom))
+    
+    
+    # Default rarefaction depth.
+    #________________________________________________________
+    if (isTRUE(rline)) {
+      rline <- (sum(.ss) * .1) / length(.ss)
+      rline <- min(.ss[.ss >= rline])
+    }
+    
+    
+    if (isFALSE(rline)) {
+      
+      .ggdata <- data.frame(
+        check.names = FALSE,
+        '.x'    = factor(names(.ss), levels = names(.ss)), 
+        '.xmin' = seq_along(.ss) - 0.4,
+        '.xmax' = seq_along(.ss) + 0.4,
+        '.ymin' = 1,
+        '.ymax' = as.vector(.ss) )
+      
+    } else {
+      .ggdata <- data.frame(
+        check.names = FALSE,
+        '.x'     = factor(names(.ss), levels = names(.ss)),
+        '.group' = factor(rep(c("Excluded", "Retained"), each = length(.ss))),
+        '.xmin'  = seq_along(.ss) - 0.4,
+        '.xmax'  = seq_along(.ss) + 0.4,
+        '.ymin'  = as.vector(c(ifelse(.ss  < rline, 1, rline), ifelse(.ss < rline, 0, 1))),
+        '.ymax'  = as.vector(c(ifelse(.ss == rline, 0, .ss),   ifelse(.ss < rline, 0, rline))) )
+    }
+    
+    .ggdata %<>% subset(.ymin > 0 & .ymax > 0) %>% as_rbiom_tbl()
+    
+    .xcol  <- ".sample"
+    .ycol  <- ".ymax"
+    .xmode <- "factor"
+  })
+  
   
   
   #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
-  layers <- structure(
-    list(),
-    'data'     = data,
-    'params'   = params,
-    'function' = rare_barplot,
-    'xcol'     = ".sample",
-    'xmode'    = "factor" )
-  
-  initLayer(c('ggplot', 'xaxis', 'yaxis', 'theme_bw'))
+  init_layers(params)
   
   
   #________________________________________________________
   # Add default layer parameters.
   #________________________________________________________
-  setLayer("rect",  mapping = .qw(xmin, xmax, ymin, ymax), color=NA)
-  setLayer("labs",  x = "Sample", y = "Sequencing Depth")
-  setLayer("yaxis", expand = c(0,0))
-  setLayer("theme", panel.grid.major.x = element_blank())
+  set_layer(params, 'rect',  mapping = .qw(xmin, xmax, ymin, ymax), color=NA)
+  set_layer(params, 'labs',  x = "Sample", y = "Sequencing Depth")
+  set_layer(params, 'yaxis', expand = c(0,0))
+  set_layer(params, 'theme', panel.grid.major.x = element_blank())
   
-  if (identical(trans, "log10")) {
-    setLayer("yaxis", c(loglabels(ss), trans="log10"))
+  if (params$trans == "log10") {
+    set_layer(params, 'yaxis', c(loglabels(params$.ss), trans="log10"))
   } else {
-    setLayer("yaxis", labels = si_units)
+    set_layer(params, 'yaxis', labels = si_units)
   }
   
   if (isTRUE(labels)) {
-    setLayer("point", mapping     = list(x = ".x"), y = 1, alpha = 0)
-    setLayer("theme", axis.text.x = element_text(angle=-30, vjust=1, hjust=0) )
-    setLayer("labs",  x = NULL)
+    set_layer(params, 'point', mapping     = list(x = ".x"), y = 1, alpha = 0)
+    set_layer(params, 'theme', axis.text.x = element_text(angle=-30, vjust=1, hjust=0) )
+    set_layer(params, 'labs',  x = NULL)
   }
   
-  if (!is_null(rline)) {
+  if (!isFALSE(params$rline)) {
     
-    setLayer("rect", 'mapping|fill' = ".group")
-    setLayer("labs",  fill = "Reads")
-    setLayer("hline", yintercept = rline, color = "red", linetype="dashed")
+    rline <- params$rline
+    ss    <- params$.ss
     
-    if (isTRUE(counts))
-      setLayer("labs",  subtitle = local({
+    set_layer(params, 'rect', 'mapping|fill' = ".group")
+    set_layer(params, 'labs',  fill = "Reads")
+    set_layer(params, 'hline', yintercept = rline, color = "red", linetype="dashed")
+    
+    if (isTRUE(params$counts))
+      set_layer(params, 'labs', subtitle = local({
         
         samples_before = length(ss)
         samples_after  = sum(ss >= rline)
@@ -177,22 +172,20 @@ rare_barplot <- function (
         return (paste0(samples_retained, "\n", reads_retained))
       }))
       
+    remove("rline", "ss")
   }
   
   
   
   # Convert layer definitions into a plot.
   #________________________________________________________
-  p <- plot_build(layers)
+  fig <- plot_build(params)
   
   
-  # Attach history of biom modifications and this call.
-  #________________________________________________________
-  attr(p, 'history') <- c(attr(biom, 'history'), history)
+  attr(fig, 'history') <- history
+  set_cache_value(cache_file, fig)
   
-  
-  set_cache_value(cache_file, p)
-  return (p)
+  return (fig)
 }
 
 

@@ -1,21 +1,17 @@
+
 # Helper functions called by the plot_*.r scripts.
 
+
+
 #____________________________________________________________________
-# Assign RHS to LHS if LHS is NULL.
+# Check if two objects are identical, ignoring attr(,'hash').
 #____________________________________________________________________
-`%||=%` <- function(.lhs, .rhs) {
-  .lhs_quo <- enquo(.lhs)
-  .lhs_str <- quo_name(.lhs_quo)
-  .lhs_env <- get_env(.lhs_quo)
-  
-  if (!exists(.lhs_str, envir = get_env(.lhs_quo)))
-    .lhs <- NULL
-  
-  assign(
-    x     = .lhs_str, 
-    value = if (is_null(.lhs)) .rhs else .lhs, 
-    envir = .lhs_env )
+eq <- function (x, y) {
+  if (hasName(attributes(x), 'hash')) attr(x, 'hash') <- NULL
+  if (hasName(attributes(y), 'hash')) attr(y, 'hash') <- NULL
+  identical(x, y)
 }
+
 
 
 #____________________________________________________________________
@@ -53,6 +49,103 @@ layer_match <- function (x, choices, default) {
 
 
 #____________________________________________________________________
+# Append parent call to existing history.
+#____________________________________________________________________
+append_history <- function (dest = "biom", params = parent.frame()) {
+  
+  fun <- sys.function(-1)
+  src <- formalArgs(fun)[[1]]
+  cl  <- rlang::caller_call()
+  
+  
+  # Handle assignment pipe.
+  if (eq(format(params[[src]]), ".")) {
+    
+    assignment <- "%<>%"
+    cl <- cl[-2]
+    
+  } else {
+    
+    assignment <- "<-"
+  
+    # The root ancestor should be preserved as is.
+    if (is.null(attr(params[[src]], 'display', exact = TRUE)))
+      attr(params[[src]], 'display') <- capture.output(cl[[src]]) # e.g. "phyloseqObj"
+  }
+  
+  
+  history <- paste0(collapse = "\n", c(
+    attr(params[[src]], 'history', exact = TRUE),
+    sprintf(
+      fmt = paste(dest, assignment, "%s(%s)"), 
+      capture.output(cl[[1]]), # e.g. "sample_rarefy"
+      as.args(fun_params(fun, params), fun = fun) ))) %>%
+    add_class('rbiom_code')
+  
+  return (history)
+}
+
+
+
+#____________________________________________________________________
+# Convert to tibble and add 'rbiom_tbl' class.
+#____________________________________________________________________
+as_rbiom_tbl <- function (df) {
+  add_class(as_tibble(df), 'rbiom_tbl')
+}
+
+
+
+#____________________________________________________________________
+# Create an environment of evaluated variables in caller's env.
+#____________________________________________________________________
+eval_envir <- function (env, ...) {
+  
+  dots <- list(...)
+  
+  
+  #____________________________________________________________________
+  # Evaluate and hash all arguments into a clean env.
+  #____________________________________________________________________
+  params <- lapply(as.list(env), function(x) {
+      x <- eval(x)
+      if (!is.null(x) && is.null(attr(x, 'hash', exact = TRUE)))
+        attr(x, 'hash') <- rlang::hash(x)
+      return (x)
+    }) %>%
+    rlang::new_environment(parent = rlang::ns_env('rbiom'))
+  
+  
+  #____________________________________________________________________
+  # Check if obviously wrong parameters are going into dots.
+  #____________________________________________________________________
+  if (length(dots) > 0) {
+    
+    invalid <- paste(collapse = ", ", c(
+      names(dots)[startsWith(names(dots), '.')],
+      intersect(
+        x = names(dots),
+        y = c(
+          'x', 'color.by', 'shape.by', 'facet.by', 
+          'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
+          'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
+          'within', 'between', 'tree', 'params', 'history' ))))
+    
+    if (nzchar(invalid)) {
+      fn <- deparse(rlang::caller_call()[[1]])
+      stop (sprintf("%s does not accept parameter(s): %s", fn, invalid))
+    }
+    
+  }
+  params$.dots <- lapply(dots, eval)
+  
+  
+  return (params)
+}
+
+
+
+#____________________________________________________________________
 # Explicitly define the code to be displayed in cmd
 #____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
@@ -75,7 +168,7 @@ as.cmd <- function (expr, env=NULL) {
 #____________________________________________________________________
 # Run a command and add attr(,cmd) and attr(,display) to result.
 #____________________________________________________________________
-run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=NULL) {
+run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=lhs, envir = parent.frame()) {
   
   fn  <- as.character(substitute(f))
   fun <- f
@@ -86,11 +179,26 @@ run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=NULL) {
   }
   
   cmd <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
-  if (is.null(display)) display <- cmd
+  if (is.null(display)) display <- if.null(lhs, cmd)
   if (!is.null(lhs))    cmd <- sprintf("%s <- %s", lhs, cmd)
-  if (!is.null(hist))   cmd <- sprintf("%s\n%s", attr(hist, 'cmd'), cmd)
+  if (!is.null(hist))   cmd <- paste(collapse = "\n", c(attr(hist, 'code'), cmd))
   
-  return (aa(do.call(fun, args), display = display, cmd = cmd))
+  return (aa(do.call(fun, args), display = display, code = cmd))
+}
+
+
+#____________________________________________________________________
+# Take attr(,'code') from `hist` and append `lhs <- fn(args)`.
+#____________________________________________________________________
+append.cmd <- function (x, fn, args, lhs = NULL, hist = NULL, display = lhs, fun = get(fn)) {
+  
+  cmd <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
+  
+  if (is.null(display)) display <- if.null(lhs, cmd)
+  if (!is.null(lhs))    cmd <- sprintf("%s <- %s", lhs, cmd)
+  if (!is.null(hist))   cmd <- paste(collapse = "\n", c(attr(hist, 'code'), cmd))
+  
+  return (aa(x, display = display, code = cmd))
 }
 
 
@@ -117,14 +225,14 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     f_args <- formals(fun)
     
     for (i in names(args))
-      if (hasName(f_args, i) && identical(args[[i]], f_args[[i]]))
+      if (hasName(f_args, i) && eq(args[[i]], f_args[[i]]))
         args[[i]] <- NULL
     
     f_args <- names(f_args)
     args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
     if (isTRUE(indent == 0))
       for (i in seq_along(args))
-        if (identical(names(args)[[i]], f_args[[i]])) names(args)[i] <- "" else break
+        if (eq(names(args)[[i]], f_args[[i]])) names(args)[i] <- "" else break
   }
   
   # Right-pad parameter names.
@@ -142,20 +250,20 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     
     display <- attr(val, 'display', exact = TRUE)
     
-    val <- if (is_null(val))        { "NULL"
-    } else if (!is_null(display))   { display
-    } else if (is_character(val))   { double_quote(val) 
-    } else if (is_logical(val))     { as.character(val) %>% setNames(names(val))
-    } else if (is.numeric(val))     { as.character(val) %>% setNames(names(val))
-    } else if (is(val, 'quosures')) { as.character(val)
-    } else if (is(val, 'BIOM'))     { "biom"
-    } else if (is.data.frame(val))  { "data"
-    } else if (is(val, 'formula'))  { capture.output(val)[[1]]
-    } else if (is.function(val))    { fun_toString(val)
-    } else if (is(val, 'uneval'))   { aes_toString(val)
-    } else if (is.factor(val))      { as.character(val) %>% setNames(names(val))
-    } else if (is_list(val))        { paste0("list(", as.args(val), ")")
-    } else                          { capture.output(val) }
+    val <- if (is_null(val))          { "NULL"
+    } else if (!is_null(display))     { display
+    } else if (is_character(val))     { double_quote(val) 
+    } else if (is_logical(val))       { as.character(val) %>% setNames(names(val))
+    } else if (is.numeric(val))       { as.character(val) %>% setNames(names(val))
+    } else if (is(val, 'quosures'))   { as.character(val)
+    } else if (is(val, 'rbiom'))      { "biom"
+    } else if (is.data.frame(val))    { "data"
+    } else if (is(val, 'formula'))    { format(val)
+    } else if (is.function(val))      { fun_toString(val)
+    } else if (is(val, 'uneval'))     { aes_toString(val)
+    } else if (is.factor(val))        { as.character(val) %>% setNames(names(val))
+    } else if (is_list(val))          { paste0("list(", as.args(val), ")")
+    } else                            { capture.output(val) }
     
     
     if (isTRUE(is_character(val) && !is_null(names(val))))
@@ -189,7 +297,7 @@ fun_toString <- function (x) {
   pkg <- environment(x)[['.packageName']]
   if (!is_null(pkg))
     for (fn in getNamespaceExports(pkg))
-      if (identical(x, do.call(`::`, list(pkg, fn)))) {
+      if (eq(x, do.call(`::`, list(pkg, fn)))) {
         if (!pkg %in% getOption("defaultPackages"))
           fn <- sprintf("%s::%s", pkg, fn)
         return (fn)
@@ -302,10 +410,15 @@ keep_cols <- function (df, ...) {
   df[,intersect(cols, colnames(df)),drop=FALSE]
 }
 rename_cols <- function(df, ...) {
+  
   vals <- list(...)
-  x    <- attr(df, 'names', exact = TRUE)
+  if (length(vals) == 1) vals <- as.list(vals[[1]])
+  
+  x <- attr(df, 'names', exact = TRUE)
   for (i in names(vals))
-    x[which(x == i)] <- vals[[i]]
+    if (i %in% x)
+      x[which(x == i)] <- vals[[i]]
+  
   attr(df, 'names') <- x
   return (df)
 }
@@ -446,6 +559,33 @@ qw <- function (...) {
 
 
 #____________________________________________________________________
+# Capture Output As Name
+#____________________________________________________________________
+coan <- function (nm) {
+  if (is.null(nm)) return ('')
+  capture.output(as.name(nm))
+}
+
+
+#____________________________________________________________________
+# String describing object's class.
+#____________________________________________________________________
+of_class <- function (x) {
+  paste0(" of class ", paste(collapse = " / ", class(x)))
+}
+
+
+#____________________________________________________________________
+# Prepend a new class to an object's class list.
+#____________________________________________________________________
+add_class <- function (obj, cls) {
+  if (!is.null(obj))
+    class(obj) <- c(cls, setdiff(class(obj), cls))
+  return (obj)
+}
+
+
+#____________________________________________________________________
 # Test if ALL arguments are NULL
 #____________________________________________________________________
 all.null <- function (...) {
@@ -496,4 +636,24 @@ bool_switch <- function (test, yes, no) {
   return (res)
 }
 
+
+#____________________________________________________________________
+# Find which parameters can be passed to a function.
+#____________________________________________________________________
+fun_params <- function (fun, params) {
+  
+  stopifnot(is.function(fun))
+  
+  if (is.environment(params))
+    params <- as.list(params, all.names = TRUE)
+  
+  stopifnot(is.list(params))
+  
+  if (is.list(params$.dots))
+    params <- c(params[names(params) != ".dots"], params$.dots)
+  
+  fetch <- intersect(formalArgs(fun), names(params))
+  
+  return (params[fetch])
+}
 

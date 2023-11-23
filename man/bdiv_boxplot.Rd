@@ -8,7 +8,9 @@ bdiv_boxplot(
   biom,
   x = NULL,
   bdiv = "Bray-Curtis",
-  layers = "lsb",
+  weighted = TRUE,
+  tree = NULL,
+  layers = "bld",
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
@@ -17,98 +19,96 @@ bdiv_boxplot(
   within = NULL,
   between = NULL,
   flip = FALSE,
-  stripe = flip,
+  stripe = NULL,
   p.adj = "fdr",
-  p.label = TRUE,
-  ci = 95,
+  p.label = 0.05,
+  ci = "ci",
+  level = 0.95,
   outliers = NULL,
   xlab.angle = "auto",
-  weighted = TRUE,
-  tree = NULL,
   ...
 )
 }
 \arguments{
-\item{biom}{A BIOM object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name. Prefix the column name with
 \code{==} or \code{!=} to limit comparisons to within or between
 groups, respectively. The default, \code{NULL} groups all distances
 into a single column.}
 
-\item{bdiv}{The beta diversity distance algorithm to use. Options are:
+\item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. Non-ambiguous abbreviations
-of the algorithm names are also accepted. For \code{"UniFrac"}, a
+\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"}.}
+provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+Multiple/abbreviated values allowed.}
 
-\item{layers}{\code{"box" ("x")}, \code{"bar"}, \code{"violin"},
+\item{weighted}{Take relative abundances into account. When
+\code{weighted=FALSE}, only presence/absence is considered.
+Default: \code{TRUE} \cr\cr
+Multiple values allowed.}
+
+\item{tree}{A \code{phylo} object representing the phylogenetic
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{otu_tree(biom)}}
+
+\item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
 \code{"linerange"}, and \code{"pointrange"}. Single letter
 abbreviations are also accepted. For instance, \code{c("box", "dot")}
 is equivalent to \code{c("x", "d")} and \code{"xd"}.
 See \code{vignette("boxplots")} for examples of each.
-Default: \code{"lsb"}.}
+Default: \code{"bld"}.}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for data partitioning. Prefix the column name with
 \code{==} or \code{!=} to limit comparisons to within or between
 groups, respectively. Default: \code{NULL}}
 
-\item{within, between}{Metadata column name(s) for intra- or inter- sample
-comparisons. Default: \code{within=NULL, between=NULL}}
+\item{within, between}{Metadata field(s) for intra- or inter- sample
+comparisons. Default: \code{NULL}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
 
 \item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
-\item{p.adj}{Method to use for multiple comparisons adjustment of p-values.
-Run \code{p.adjust.methods} for a list of available options.
-(Default: \code{fdr})}
+\item{p.adj}{Method to use for multiple comparisons adjustment of
+p-values. Run \code{p.adjust.methods} for a list of available
+options. Default: \code{"fdr"}.}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
 \itemize{
-\item{\code{p.label = 0.05} - }{ Use this specific value. }
-\item{\code{p.label = TRUE} - }{ equivalent to \code{p.label = 0.05} }
-\item{\code{p.label = FALSE} - }{ do not show any stats on the plot }
-\item{\code{p.label = Inf} - }{ display all p-values }
-\item{\code{p.label = NULL} - }{ do not calculate stats }
+\item{\code{p.label = 0.05} - }{ Show p-values that are <= 0.05. }
+\item{\code{p.label = 0} - }{ Don't show any p-values on the plot. }
+\item{\code{p.label = 1} - }{ Show all p-values on the plot. }
 }
 If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
-Default: \code{TRUE}}
+Default: \code{0.05}}
 
 \item{ci}{How to calculate min/max of the \bold{crossbar},
 \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
-Provide a number between 75 and 100 to define a confidence interval's
-confidence level, commonly 95 or 97.5. Other options are:
-\code{"range"}, \code{"sd"} (standard deviation),
-\code{"se"} (standard error), and
+Options are: \code{"ci"} (confidence interval), \code{"range"},
+\code{"sd"} (standard deviation), \code{"se"} (standard error), and
 \code{"mad"} (median absolute deviation).
 The center mark of \bold{crossbar} and \bold{pointrange} represents
 the mean, except for code{"mad"} in which case it represents
-the median. Set to \code{NULL} to disable. Default: \code{95}}
+the median. Default: \code{"ci"}}
+
+\item{level}{The confidence level for calculating a confidence interval.
+Default: \code{0.95}}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when
 overlaying a dot or strip chart.  Default: \code{NULL}}
 
-\item{xlab.angle}{How to rotate the tick labels on the x-axis.
-\bold{'auto'} (the default), automatically selects a rotation value.
-\bold{0}, \bold{30}, and \bold{90} sets the angle to horizontal,
-angled, and vertical, respectively.}
-
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE}}
-
-\item{tree}{A \code{phylo} object representing the phylogenetic
-relationships of the taxa in \code{biom}. Will be taken from the tree
-defined in \code{biom} if not explicitly specified. Only required
-when computing UniFrac distance matrices. Default: \code{NULL}}
+\item{xlab.angle}{Angle of the labels at the bottom of the plot.
+Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
+Default: \code{"auto"}.}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
@@ -116,80 +116,15 @@ a particular parameter is passed to, and only to, that layer. For
 instance, \code{dot.size = 2} or \code{d.size = 2} ensures only the
 dotplot layer has its size set to \code{2}. The special prefix
 \code{pt.} will control both the dot and strip layers.}
-
-\item{filter.fun}{A function that takes a \code{bdiv_table()} as input and
-returns a \code{bdiv_table()} as output. This modified table will be
-used for plotting. Default: \code{NULL}.}
 }
 \value{
-A \code{ggplot2} plot. The computed data points and statistics are
-available as \code{$data} and \code{$stats}, respectively.
+A \code{ggplot2} plot. \cr The computed data points, statistics,
+ggplot command, and object history are available as \code{$data},
+\code{$stats}, \code{$code}, and \code{$history}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
 }
-\section{Aesthetics and Partitions}{
-
-
-Metadata can be used to flexibly subset, partition, and apply aesthetics
-when creating a plot. Common use cases are provided below. More thorough
-documentation is available at \url{https://cmmr.github.io/rbiom}.
-
-\preformatted{  ## Colors ----------------------------
-  color.by = "Body Site"
-  color.by = list('Body Site' = "bright")
-  color.by = list('Body Site' = c("Stool", "Saliva"))
-  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
-  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-  
-  ## Patterns --------------------------
-  pattern.by = "Body Site"
-  pattern.by = list('Body Site' = c("Stool", "Saliva"))
-  pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
-  
-  ## Shapes ----------------------------
-  shape.by = "Body Site"
-  shape.by = list('Body Site' = c("Stool", "Saliva"))
-  shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
-  
-  ## Facets ----------------------------
-  facet.by = "Body Site"
-  facet.by = c("Body Site", "Sex")
-  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
-  
-  ## Limits ----------------------------
-  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
-  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
-}
-
-\itemize{
-\item{\code{color.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{pattern.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{shape.by} - }{A categorical metadata column. (Max 1)}
-\item{\code{facet.by} - }{Categorical metadata column(s) only.}
-\item{\code{limit.by} - }{Any metadata column(s).}
-}
-
-All built-in color palettes are colorblind-friendly. The available
-categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
-\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
-
-Patterns are sourced from the magick R package. Pattern names are:
-\code{"bricks"}, \code{"hexagons"}, \code{"horizontalsaw"},
-\code{"hs_fdiagonal"}, \code{"fishscales"}, \code{"verticalsaw"},
-\code{"checkerboard"}, \code{"octagons"}, \code{"right45"},
-\code{"hs_cross"}, \code{"hs_bdiagonal"}, \code{"hs_diagcross"},
-\code{"hs_horizontal"}, \code{"hs_vertical"}, \code{"left45"},
-\code{"leftshingle"}, \code{"rightshingle"}, \code{"verticalbricks"},
-\code{"verticalleftshingle"}, and \code{"verticalrightshingle"}.
-
-Shapes can be given as per base R - numbers 0 through 17 for various shapes,
-or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
-letters instead of shapes on the plot. Character strings may used as well.
-}
-
 \examples{
     library(rbiom)
     
@@ -199,7 +134,14 @@ letters instead of shapes on the plot. Character strings may used as well.
 
 }
 \seealso{
-\code{\link[=biom_stats]{biom_stats()}}
+Other beta_diversity: 
+\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_heatmap}()},
+\code{\link{bdiv_ord_plot}()},
+\code{\link{bdiv_ord_table}()},
+\code{\link{bdiv_stats}()},
+\code{\link{bdiv_table}()},
+\code{\link{distmat_stats}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},
@@ -215,4 +157,5 @@ Other visualization:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}
 }
+\concept{beta_diversity}
 \concept{visualization}

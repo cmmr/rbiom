@@ -5,56 +5,73 @@
 \alias{otu_taxonomy<-}
 \title{Get or set the taxonomy table.}
 \usage{
-otu_taxonomy(biom, ranks = NULL, unc = "asis")
+otu_taxonomy(biom, rank = NULL, unc = "asis", lineage = FALSE)
 
-otu_taxonomy(x) <- value
+otu_taxonomy(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{ranks}{The taxonomic ranks to return in the matrix, or \code{NULL}
-for all of them. Default: \code{NULL}}
+\item{rank}{A single taxonomic rank to return as a named vector, or
+\code{NULL} to return the complete table. Default: \code{NULL}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
-taxa names. Default: \code{"asis"}
+taxa names. Options are:
 \itemize{
-\item{\code{"asis"} - }{ Don't check/modify any taxa names. }
-\item{\code{"singly"} - }{ Replace with "Unc. \if{html}{\out{<OTU ID>}}". }
-\item{\code{"grouped"} - }{ Replace with "Unc. \if{html}{\out{<Higher Rank>}}". }
-\item{\code{"drop"} - }{ Don't include in the returned matrix. }
-}}
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
 
-\item{value}{A character matrix with rownames \code{otu_names(x)}. If
-there are more rownames than taxa names, the matrix will be subset.
-May also be a character vector of length one with a file or URL
-where the matrix is saved in either comma- or tab-separated format.}
+\item{lineage}{Include all ranks in the name of the taxa. For instance,
+setting to \code{TRUE} will produce
+\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+Otherwise the taxa name will simply be \code{Coriobacteriales}. You
+want to set this to TRUE when \code{unc = "asis"} and you have taxa
+names (such as \emph{Incertae_Sedis}) that map to multiple higher
+level ranks. Default: \code{FALSE}}
+
+\item{value}{An object coercible with \code{\link[tibble:as_tibble]{tibble::as_tibble()}}. Must either
+have rownames or an '.otu' column with OTU names matching
+\link{otu_names(x)}.}
 }
 \value{
-A character matrix with taxa/OTU IDs as row names and taxa ranks as
-column names. An 'OTU' column is always added as the last column and
-matches the row names.
+Depending on \code{rank}, a named character vector or a tibble data
+frame with '.otu' as the first column name.
 }
 \description{
 Get or set the taxonomy table.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
-    otu_taxonomy(hmp50)[1:4,]
-    otu_taxonomy(hmp50, c("Family", "Genus"))[1:4,]
-    head(otu_taxonomy(hmp50, "Genus")[,])
+    # Display the full taxonomic data for each OTU ------------------------
+    otu_taxonomy(hmp50)
     
-    # Sometimes taxonomic names are incomplete
-    otu_taxonomy(hmp50)[c(53,107,139), 2:6]
+    # Only show the OTU -> Genus mapping  ---------------------------------
+    otu_taxonomy(hmp50, "Genus") \%>\% head()
     
-    # rbiom can insert more descriptive placeholders
-    otu_taxonomy(hmp50, unc = "singly")[c(53,107,139), 3:6]
-    otu_taxonomy(hmp50, unc = "grouped")[c(53,107,139), 4:6]
+    # Sometimes taxonomic names are incomplete ----------------------------
+    otu_taxonomy(hmp50)[,4:7] \%>\%
+      dplyr::filter(.otu \%in\% c('GemAsacc', 'GcbBacte', 'Unc58411'))
+    
+    # rbiom can insert more descriptive placeholders ----------------------
+    otu_taxonomy(hmp50, unc = "singly")[,4:7] \%>\%
+      dplyr::filter(.otu \%in\% c('GemAsacc', 'GcbBacte', 'Unc58411'))
+    
+    # Or collapse them into groups ----------------------------------------
+    otu_taxonomy(hmp50, unc = "grouped")[,4:7] \%>\%
+      dplyr::filter(.otu \%in\% c('GemAsacc', 'GcbBacte', 'Unc58411'))
 
 }
 \seealso{
 Other setters: 
 \code{\link{biom_id}()},
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

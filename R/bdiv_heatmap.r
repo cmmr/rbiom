@@ -1,11 +1,10 @@
 #' Display beta diversities in an all vs all grid.
 #' 
-#' @inherit bdiv_ord_table params
-#' @inherit plot_heatmap params return
+#' @inherit documentation_heatmap
+#' @inherit documentation_default
 #' 
 #' @family beta_diversity
 #' @family visualization
-#' 
 #' 
 #' @param grid   Color palette name, or a list with entries for \code{label}, 
 #'        \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
@@ -36,7 +35,7 @@
 #' cases are provided below, with more thorough documentation available at 
 #' https://cmmr.github.io/rbiom .
 #' 
-#' \preformatted{  ## Categorical ----------------------------
+#' \preformatted{## Categorical ----------------------------
 #' color.by = "Body Site"
 #' color.by = list('Body Site' = "bright")
 #' color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
@@ -92,7 +91,7 @@
 #' range of values. Prefix a column name with \code{-} to arrange values in 
 #' descending order rather than ascending.
 #' 
-#' \preformatted{  ## Categorical ----------------------------
+#' \preformatted{## Categorical ----------------------------
 #' order.by = "Body Site"
 #' order.by = list('Body Site' = c("Stool", "Saliva"))
 #' 
@@ -112,7 +111,7 @@
 #' to a single categorical metadata value. Unlike the other *.by parameters,
 #' \code{limit.by} must always be a named \code{list()}.
 #' 
-#' \preformatted{  ## Categorical ----------------------------
+#' \preformatted{## Categorical ----------------------------
 #' limit.by = list('Sex' = "Male")
 #' 
 #' ## Numeric --------------------------------
@@ -131,10 +130,12 @@
 #' 
 #' @export
 #' @examples
-#'   library(rbiom) 
+#'   library(rbiom)
 #'   
 #'   biom <- hmp50 %>% sample_rarefy() %>% sample_select(1:10)
-#'   bdiv_heatmap(biom, color.by="Body Site")
+#'   bdiv_heatmap(biom, color.by=c("Body Site", "Age"))
+#'   
+#'   bdiv_heatmap(biom, bdiv="uni", weighted=c(T,F), color.by="sex")
 #'     
 bdiv_heatmap <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL,
@@ -144,35 +145,35 @@ bdiv_heatmap <- function (
     clust = "complete", trees = TRUE, tree_height = NULL, track_height = NULL, 
     legend = "right", xlab.angle = "auto", ...) {
   
+  validate_biom(clone = FALSE)
+  validate_tree(null_ok = TRUE)
+  
+  params  <- eval_envir(environment(), ...)
+  history <- append_history('fig ', params)
+  remove(list = intersect(env_names(params), ls()))
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- lapply(c(as.list(environment()), list(...)), eval)
-  cache_file <- get_cache_file("bdiv_heatmap", params)
-  if (!is.null(cache_file) && Sys.setFileTime(cache_file, Sys.time()))
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   #________________________________________________________
-  # Record the function call in a human-readable format.
+  # Validate and restructure user's arguments.
   #________________________________________________________
-  arg_str <- as.args(params, fun = bdiv_heatmap, indent = 2)
-  history <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("fig  <- bdiv_heatmap(%s)", arg_str) ))
-  remove(list = setdiff(ls(), c("params", "history", "cache_file")))
-  
-  
-  #________________________________________________________
-  # Sanity checks
-  #________________________________________________________
-  params %<>% within({
-    if (!is(biom, 'BIOM')) stop("Please provide a BIOM object.")
-    stopifnot(is_logical(weighted) && !any(is.na(weighted)))
-    stopifnot(is_scalar_logical(trees) && !is.na(trees))
-    stopifnot(is_null(tree) || is(tree, 'phylo'))
-    bdiv %<>% validate_arg(biom, 'bdiv', 'bdiv', n = c(1,Inf), tree = tree)
+   with(params, {
+    
+    validate_bdiv(max = Inf)
+    
+    validate_bool("trees")
+    validate_bool("weighted", max = Inf)
+    
+    validate_meta_aes('color.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
     
     if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
     if (length(order.by) > 0) clust <- FALSE
@@ -180,16 +181,16 @@ bdiv_heatmap <- function (
   
   
   #________________________________________________________
-  # Handle multiple ranks with recursive subcalls.
+  # Handle multiple metrics/weightings with recursion.
   #________________________________________________________
-  if (length(params[['bdiv']]) > 1 || length(params[['weighted']]) > 1) {
+  if (length(params$bdiv) > 1 || length(params$weighted) > 1) {
     
     plots <- list()
     
-    for (d in params[['bdiv']])
-      for (w in params[['weighted']])
+    for (d in params$bdiv)
+      for (w in params$weighted)
         plots[[length(plots) + 1]] <- local({
-          args                 <- params
+          args                 <- fun_params(bdiv_heatmap, params)
           args[['bdiv']]       <- d
           args[['weighted']]   <- w
           args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), d)
@@ -198,19 +199,22 @@ bdiv_heatmap <- function (
     
     p <- patchwork::wrap_plots(plots)
     
-    history <- sprintf("bdiv_heatmap(%s)", as.args(params, fun = bdiv_heatmap))
+    history <- sprintf("bdiv_heatmap(%s)", as.args(as.list(params), fun = bdiv_heatmap))
     attr(p, 'history') <- history
     attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
-    attr(p, 'cmd')     <- paste(collapse = "\n\n", local({
-      cmds <- sapply(seq_along(ranks), function (i) {
+    
+    attr(p, 'code') <- paste(collapse = "\n\n", local({
+      
+      cmds <- sapply(seq_along(plots), function (i) {
         sub(
-          x           = attr(plots[[i]], 'cmd', exact = TRUE), 
+          x           = attr(plots[[i]], 'code', exact = TRUE), 
           pattern     = "ggplot(data)", 
-          replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
+          replacement = sprintf("p%i <- ggplot(data[[%i]])", i, i),
           fixed       = TRUE )
       })
-      c(cmds, sprintf("patchwork::wrap_plots(%s)", paste0(collapse = ", ", "p", seq_along(ranks))))
-    }))
+      c(cmds, sprintf("patchwork::wrap_plots(%s)", paste0(collapse = ", ", "p", seq_along(plots))))
+      
+    })) %>% add_class('rbiom_code')
     
     return (p)
   }
@@ -219,21 +223,8 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Subset biom by requested metadata and aes.
   #________________________________________________________
-  params %<>% metadata_params(contraints = list(
-    color.by = list(),
-    order.by = list(),
-    limit.by = list() ))
-  
-  biom <- params[['biom']]
-  
-  
-  # #________________________________________________________
-  # # Subset
-  # #________________________________________________________
-  # if (!is_null(params[['order.by']]) || !is_null(params[['color.by']]))
-  #   sample_metadata(biom) <- subset_by_params(
-  #     df     = sample_metadata(biom),
-  #     params = params[c('order.by', 'orders', 'color.by', 'colors')] )
+  sync_metadata(params)
+  biom <- params$biom
   
   
   #________________________________________________________
@@ -249,9 +240,9 @@ bdiv_heatmap <- function (
   #________________________________________________________
   dm  <- bdiv_distmat(
     biom     = biom, 
-    bdiv     = params[['bdiv']], 
-    weighted = params[['weighted']], 
-    tree     = params[['tree']] )
+    bdiv     = params$bdiv, 
+    weighted = params$weighted, 
+    tree     = params$tree )
   mtx <- as.matrix(dm)
   
   
@@ -259,32 +250,31 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Arguments to pass on to plot_heatmap
   #________________________________________________________
-  excl <- setdiff(formalArgs(bdiv_heatmap), formalArgs(plot_heatmap))
-  excl <- c(excl, names(params)[startsWith(names(params), '.')])
-  args <- params[setdiff(names(params), excl)]
+  args <- fun_params(plot_heatmap, params)
   args[['mtx']]  <- mtx
   args[['dist']] <- dm
   
-  within(args, {
-    labs.title %||=% ifelse(
-      test = isTRUE(params[['weighted']]), 
-      yes  = paste0("Weighted\n",   params[['bdiv']], "\nDistance"), 
-      no   = paste0("Unweighted\n", params[['bdiv']], "\nDistance") )})
+  args[['labs.title']] %<>% if.null(ifelse(
+      test = isTRUE(params$weighted), 
+      yes  = paste("Weighted",   params$bdiv, "Distance"), 
+      no   = paste("Unweighted", params$bdiv, "Distance") ))
   
-  for (md_col in names(params[['color.by']]))
-    params[['color.by']][[md_col]] %<>% within({
-      colors <- values
+  
+  for (md_col in names(params$color.by))
+    params$color.by[[md_col]] %<>% within({
+      if (exists("values", inherits = FALSE))
+        colors <- values
       values <- sample_metadata(biom, md_col)
     })
-  args[['tracks']] <- params[['color.by']]
+  args[['tracks']] <- params$color.by
   
   
-  p <- do.call(plot_heatmap, args)
   
-  attr(p, 'history') <- history
+  fig <- do.call(plot_heatmap, args)
   
+  attr(fig, 'history') <- history
+  set_cache_value(cache_file, fig)
   
-  set_cache_value(cache_file, p)
-  return (p)
+  return (fig)
 }
 

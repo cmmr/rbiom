@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9003
-Date: 2023-10-03
+Version: 2.0.0.9100
+Date: 2023-11-22
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith01@gmail.com", 
@@ -31,6 +31,7 @@ LinkingTo:
 Imports:
     ape,
     broom,
+    dplyr,
     emmeans,
     ggbeeswarm,
     ggnewscale,
@@ -40,6 +41,7 @@ Imports:
     glue,
     jsonlite,
     labeling,
+    lifecycle,
     magrittr,
     methods,
     openxlsx,
@@ -51,7 +53,7 @@ Imports:
     rlang,
     R.utils,
     slam,
-    tidyr,
+    tibble,
     tsne,
     uwot,
     vegan
@@ -60,6 +62,7 @@ Suggests:
     ggpattern,
     ggtree,
     phyloseq,
+    prettycode,
     rhdf5,
     testthat,
     vdiffr

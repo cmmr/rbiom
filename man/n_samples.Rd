@@ -4,22 +4,26 @@
 \alias{n_samples}
 \alias{n_otus}
 \alias{n_ranks}
-\title{Report the number of samples, otus, or ranks in a BIOM.}
+\alias{n_metadata}
+\title{Report the number of samples, otus, or ranks in an rbiom.}
 \usage{
 n_samples(biom)
 
 n_otus(biom)
 
 n_ranks(biom)
+
+n_metadata(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
-The number of samples, otus, or ranks present.
+The number of samples, otus, taxa ranks, or metadata columns present.
 }
 \description{
-Report the number of samples, otus, or ranks in a BIOM.
+Report the number of samples, otus, or ranks in an rbiom.
 }
 \examples{
     library(rbiom)
@@ -27,19 +31,13 @@ Report the number of samples, otus, or ranks in a BIOM.
     n_samples(hmp50)
     n_otus(hmp50)
     n_ranks(hmp50)
+    n_metadata(hmp50)
 
 }
 \seealso{
 Other accessors: 
 \code{\link{biom_info}()},
-\code{\link{sample_sums}()}
-
-Other accessors: 
-\code{\link{biom_info}()},
-\code{\link{sample_sums}()}
-
-Other accessors: 
-\code{\link{biom_info}()},
+\code{\link{metadata_numeric}()},
 \code{\link{sample_sums}()}
 }
 \concept{accessors}

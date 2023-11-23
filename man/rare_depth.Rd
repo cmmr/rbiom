@@ -7,10 +7,11 @@
 rare_depth(biom)
 }
 \arguments{
-\item{biom}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
-The rarefaction depth, or \code{NULL} If the BIOM object is not
+The rarefaction depth, or \code{NULL} if \code{biom} is not
 rarefied.
 }
 \description{

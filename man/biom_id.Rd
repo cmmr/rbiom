@@ -5,18 +5,19 @@
 \alias{biom_id<-}
 \alias{biom_comment}
 \alias{biom_comment<-}
-\title{Get or set a \code{BIOM} object's id or comment.}
+\title{Get or set an \code{rbiom} object's id or comment.}
 \usage{
 biom_id(biom)
 
-biom_id(x) <- value
+biom_id(biom) <- value
 
 biom_comment(biom)
 
-biom_comment(x) <- value
+biom_comment(biom) <- value
 }
 \arguments{
-\item{biom, x}{A \code{BIOM} object, as returned from \code{\link[=read_biom]{read_biom()}}.}
+\item{biom}{An \code{rbiom}-class object, or data coercible with
+\code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{value}{The identifier to add (character vector of length 1).}
 }
@@ -42,6 +43,7 @@ for free-form text.
 }
 \seealso{
 Other setters: 
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},
@@ -52,6 +54,7 @@ Other setters:
 \code{\link{taxa_ranks}()}
 
 Other setters: 
+\code{\link{metadata_names}()},
 \code{\link{otu_matrix}()},
 \code{\link{otu_names}()},
 \code{\link{otu_sequences}()},

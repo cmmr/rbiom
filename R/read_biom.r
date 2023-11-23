@@ -13,55 +13,55 @@
 #' @param tree   By default, the tree will be read from the BIOM file specified 
 #'        in \code{src}. Specifying \code{tree=TRUE} will do the same, but will 
 #'        generate an error message if a tree is not present. Setting 
-#'        \code{tree=FALSE} will return a \code{BIOM} object without any tree 
+#'        \code{tree=FALSE} will return an \code{rbiom} object without any tree 
 #'        data. You may also provide a file path, URL, or Newick string to load 
-#'        that tree data into the returned \code{BIOM} object. 
+#'        that tree data into the returned \code{rbiom} object. 
 #'        Default: \code{"auto"}
 #' 
-#' @param cleanup   Renames ambiguous taxons and removes leading underscores. 
-#'        Also converts character metadata into factors and dates based on 
-#'        heuristics. Default: \code{FALSE}
-#'     
-#' @param prune   Should samples and taxa with zero observations be discarded?
-#'        Default: \code{cleanup}
-#' 
-#' @return A \code{BIOM} class object containing the parsed data. This object
+#' @return An \code{rbiom} class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \itemize{
 #'         \item{\code{$counts} - }{
-#'           A numeric \code{slam} sparse matrix of observation counts. Taxa 
-#'           (OTUs) as rows and samples as columns. }
+#'           A numeric [slam::simple_triplet_matrix()] (sparse matrix) of 
+#'           observation counts. Taxa (OTUs) as rows and samples as columns. 
+#'           Access or modify using [otu_matrix()]. }
 #'         \item{\code{$metadata} - }{
-#'           A data frame containing any embedded metadata. Row names are 
-#'           sample IDs. }
+#'           A [tibble::tibble()] (data frame) containing any embedded 
+#'           metadata. Sample IDs are in the \code{.sample} column. 
+#'           Access or modify using [sample_metadata()]. }
 #'         \item{\code{$taxonomy} - }{
-#'           Character matrix of taxonomic names, if given. Row names are taxa 
-#'           (OTU) IDs. Column rows are named Kingdom, Phylum, Class, Order, 
+#'           A [tibble::tibble()] (data frame) mapping OTU IDs to taxonomic 
+#'           clades. Columns are named .otu, Kingdom, Phylum, Class, Order, 
 #'           Family, Genus, Species, and Strain, or TaxLvl.1, TaxLvl.2, ... , 
 #'           TaxLvl.N when more than 8 levels of taxonomy are encoded in the 
-#'           biom file. }
+#'           biom file. Access or modify using [otu_taxonomy()]. }
 #'         \item{\code{$phylogeny} - }{
 #'           An object of class \code{phylo} defining the phylogenetic 
-#'           relationships between the taxa. Although the official 
+#'           relationships between the OTUs. Although the official 
 #'           specification for BIOM only includes phylogenetic trees in BIOM 
-#'           version 2.1, if a BIOM version 1.0 file includes a 
+#'           version 2.1, if an rbiom version 1.0 file includes a 
 #'           \code{phylogeny} entry with newick data, then it will be loaded
 #'           here as well. The \pkg{ape} package has additional functions for 
-#'           working with \code{phylo} objects.}
+#'           working with \code{phylo} objects. Access or modify using 
+#'           [otu_tree()]. }
 #'         \item{\code{$sequences} - }{
-#'           A named character vector, where the names are taxonomic 
-#'           identifiers and the values are the sequences they represent. 
+#'           A named character vector, where the names are OTU IDs and the 
+#'           values are the nucleic acid sequences they represent. 
 #'           These values are not part of the official BIOM specification, but 
-#'           will be read and written when defined. }
+#'           will be read and written when defined. Access or modify using 
+#'           [otu_sequences()]. }
 #'         \item{\code{$info} - }{
 #'           A list of other attributes defined in the BIOM file, such as 
 #'           \code{id}, \code{type}, \code{format}, \code{format_url},
 #'           \code{generated_by}, \code{date}, \code{matrix_type},
-#'           \code{matrix_element_type}, \code{Comment}, and \code{shape}. }
+#'           \code{matrix_element_type}, \code{comment}, and \code{shape}. 
+#'           Access using [biom_info()]. Access/set with [biom_id()] or 
+#'           [biom_comment()]. }
 #'        }
 #'     \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
-#'     components of the BIOM file specification and therefore will be empty
-#'     in the returned object when they are not provided by the BIOM file.
+#'     components of the BIOM file specification and therefore will be NULL
+#'     or simple placeholders in the returned object when they are not provided 
+#'     by the BIOM file.
 #' 
 #' @export
 #' @examples
@@ -73,24 +73,25 @@
 #'     print(biom)
 #'
 #'     # Taxa Abundances
-#'     as.matrix(biom$counts[1:4,1:4])
-#'
-#'     top5 <- names(head(rev(sort(slam::row_sums(biom$counts))), 5))
-#'     biom$taxonomy[top5,c('Family', 'Genus')]
-#'     as.matrix(biom$counts[top5, 1:6])
+#'     otu_matrix(biom)[,1:10] %>% as.matrix() %>% head()
+#'     
+#'     otu_taxonomy(biom) %>% head()
 #'
 #'     # Metadata
+#'     sample_metadata(biom) %>% head()
+#'     
 #'     table(biom$metadata$Sex, biom$metadata$`Body Site`)
+#'     
 #'     sprintf("Mean age: %.1f", mean(biom$metadata$Age))
 #'
 #'     # Phylogenetic tree
-#'     tree <- biom$phylogeny
-#'     top5.tree <- tree_subset(tree, top5)
-#'     ape::plot.phylo(top5.tree)
+#'     otu_tree(biom) %>%
+#'       tree_subset(1:10) %>%
+#'       ape::plot.phylo()
 #'
 
 
-read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
+read_biom <- function (src, tree='auto') {
 
   #________________________________________________________
   # Sanity check input values
@@ -110,7 +111,7 @@ read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
     on.exit(unlink(fp), add=TRUE)
     
     # To do: switch to curl::curl_download
-    if (!identical(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
+    if (!eq(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(sprintf("Cannot retrieve URL %s", src))
 
   } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
@@ -207,8 +208,8 @@ read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
     # TSV file format   #
     #___________________#
     
-    if (identical(tree, TRUE))
-      stop("It is impossible to load a phylogenetic tree from a BIOM file in tab-separated format.")
+    if (eq(tree, TRUE))
+      stop("It is impossible to load a phylogenetic tree from an rbiom file in tab-separated format.")
     
     mtx       <- read_biom_tsv(fp)
     counts    <- parse_tsv_counts(mtx)
@@ -221,45 +222,17 @@ read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
   
   
   #________________________________________________________
-  # Return everything we've computed as a BIOM class object.
+  # Assemble everything as an rbiom class object.
   #________________________________________________________
   
-  if (!is_scalar_character(info[['comment']]))
-    info[['comment']] <- ""
-  
-  if (is_null(info[['date']])) {
-    if (!is_null(info[['creation-date']])) {
-      info[['date']] <- info[['creation-date']]
-    } else {
-      info[['date']] <- fp_date
-    }
-  }
-  
-  biom <- structure(
-    class   = c("BIOM", "list"),
-    list( 'counts'    = counts,
-          'metadata'  = metadata,
-          'taxonomy'  = taxonomy,
-          'phylogeny' = phylogeny,
-          'sequences' = sequences,
-          'info'      = info )
-  )
-  
-  
-  #________________________________________________________
-  # Clean up taxa names and metadata column classes.
-  #________________________________________________________
-  if (isTRUE(cleanup)) {
-    biom[['taxonomy']] <- otu_taxonomy(biom, unc = "grouped")
-    biom[['metadata']] <- sample_metadata(biom, cleanup = TRUE)
-  }
-  
-  #________________________________________________________
-  # Discard samples/taxa with zero observations
-  #________________________________________________________
-  if (isTRUE(prune)) {
-    biom <- biom_repair(biom, prune=TRUE)
-  }
+  biom <- biom_build(
+    'counts'    = counts,
+    'metadata'  = metadata,
+    'taxonomy'  = taxonomy,
+    'tree'      = phylogeny,
+    'sequences' = sequences,
+    'id'        = info$id,
+    'comment'   = info$comment )
   
   
   #________________________________________________________
@@ -272,6 +245,8 @@ read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
     if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
       cl[i] <- list(val)
   }
+  
+  attr(biom, 'display')     <- "biom"
   attr(biom, 'history') <- paste0(collapse = "\n", c(
     attr(biom, 'history', exact = TRUE),
     sprintf("biom <- %s", deparse1(cl)) ))
@@ -295,7 +270,7 @@ read_biom <- function (src, tree='auto', cleanup=FALSE, prune=cleanup) {
 #' 
 #' @noRd
 #' 
-#' @param file  The path to a BIOM file.
+#' @param file  The path to an rbiom file.
 #' 
 #' @return One of \code{c("tsv", "tsv.gz", "tsv.bz2", "json", "json.gz", 
 #'         "json.bz2", "hdf5")}.
@@ -314,7 +289,7 @@ biom_file_format <- function (file) {
   format <- local({
     first4 <- readChar(con, nchars = min(4L, file.size(file)))
     if (startsWith(first4, '{'))      return ("json")
-    if (identical(first4, "\x89HDF")) return ("hdf5")
+    if (eq(first4, "\x89HDF")) return ("hdf5")
     return ("tsv")
   })
   
@@ -477,7 +452,7 @@ parse_hdf5_metadata <- function (hdf5) {
     
     obj_class <- typeof(hdf5$sample$metadata[[k]])
     
-    if (identical(obj_class, "character")) {
+    if (eq(obj_class, "character")) {
       as(hdf5$sample$metadata[[k]], "character")
     } else {
       as(hdf5$sample$metadata[[k]], "numeric")
@@ -599,7 +574,7 @@ parse_tsv_taxonomy <- function (mtx) {
   colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
 
   # Better to return a completely empty table than one with just the taxa IDs
-  if (identical(unname(taxa_table[,1]), rownames(taxa_table)))
+  if (eq(unname(taxa_table[,1]), rownames(taxa_table)))
     taxa_table <- taxa_table[,-1,drop=FALSE]
 
   return (taxa_table)
@@ -615,7 +590,7 @@ parse_json_taxonomy <- function (json) {
     if (is_null(taxaNames)) {
       
       # MicrobiomeDB puts the taxa string in the 'ID' field, e.g, {"metadata":null,"id":"Archaea;Euryarchaeota;...
-      if (identical(json[['generated_by']], "MicrobiomeDB")) {
+      if (eq(json[['generated_by']], "MicrobiomeDB")) {
         taxaNames <- x[['id']]
       
       # Decontam omits the 'taxonomy' name, as in {"id":"Unc01pdq","metadata":[["Bacteria","__Fusobacteriota", ...
@@ -724,13 +699,13 @@ parse_json_tree <- function (json, tree_mode) {
   
   # Obey the tree argument
   #________________________________________________________
-  if (identical(tree_mode, TRUE)) {
+  if (eq(tree_mode, TRUE)) {
     tree <- unlist(json[['phylogeny']])
     
-  } else if (identical(tree_mode, FALSE)) {
+  } else if (eq(tree_mode, FALSE)) {
     return (NULL)
     
-  } else if (identical(tree_mode, 'auto')) {
+  } else if (eq(tree_mode, 'auto')) {
     tree <- unlist(json[['phylogeny']])
     if (is_null(tree))       return (NULL)
     if (is.na(tree))         return (NULL)
@@ -748,7 +723,7 @@ parse_json_tree <- function (json, tree_mode) {
   tree <- try(read_tree(tree), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
-    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }
@@ -762,7 +737,7 @@ parse_json_tree <- function (json, tree_mode) {
     if (length(missing) > 6)
       missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
     errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
-    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }
@@ -781,10 +756,10 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
   
   # Obey the tree argument
   #________________________________________________________
-  if (identical(tree_mode, FALSE)) {
+  if (eq(tree_mode, FALSE)) {
     return (NULL)
   
-  } else if (identical(tree_mode, TRUE) || identical(tree_mode, 'auto')) {
+  } else if (eq(tree_mode, TRUE) || eq(tree_mode, 'auto')) {
     
     # See if a tree is included in the BIOM file
     #________________________________________________________
@@ -792,7 +767,7 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
     
     errmsg <- NULL
     
-    if (is_null(tree) || identical(tree, character(0))) {
+    if (is_null(tree) || eq(tree, character(0))) {
       errmsg <- "There is no tree in this BIOM file."
       
     } else if (!length(tree)) {
@@ -805,13 +780,13 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
       attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
       if ("data_type" %in% names(attrs)) {
         data_type <- tolower(as.character(attrs[['data_type']]))
-        if (!identical(data_type, "newick"))
+        if (!eq(data_type, "newick"))
           errmsg <- sprintf("Phylogeny is not Newick format, is '%s'.", data_type)
       }
     }
     
     if (!is_null(errmsg)) {
-      if (identical(tree_mode, TRUE)) stop(errmsg)
+      if (eq(tree_mode, TRUE)) stop(errmsg)
       return (NULL)
     }
     
@@ -825,7 +800,7 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
   tree <- try(read_tree(tree), silent=TRUE)
   if (is(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
-    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }
@@ -839,7 +814,7 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
     if (length(missing) > 6)
       missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
     errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
-    if (!identical(tree_mode, 'auto')) stop(errmsg)
+    if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
   }

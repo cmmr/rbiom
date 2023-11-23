@@ -7,26 +7,28 @@
 write_xlsx(biom, file = NULL, depth = NULL, seed = 0, unc = "asis")
 }
 \arguments{
-\item{biom}{The BIOM object to save to the file.}
+\item{biom}{The \code{rbiom} object to save to the file.}
 
 \item{file}{Path to the output xlsx file.}
 
-\item{depth}{Depth to rarefy to. See \code{rarefy} function for details.
+\item{depth}{Depth to rarefy to. See \code{\link[=sample_rarefy]{sample_rarefy()}} function for details.
 \code{depth = NULL} auto-selects a rarefaction level.
 \code{depth = 0} disables rarefaction. Only use \code{depth} with
-\code{BIOM} files of type 'OTU table' and integer count values.}
+'OTU table' data and integer count values.}
 
-\item{seed}{Random seed to use in rarefying. See \code{rarefy} function
+\item{seed}{Random seed to use in rarefying. See \code{\link[=sample_rarefy]{sample_rarefy()}} function
 for details.}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
-taxa names. Default: \code{"asis"}
+taxa names. Options are:
 \itemize{
-\item{\code{"asis"} - }{ Don't check/modify any taxa names. }
-\item{\code{"singly"} - }{ Replace with "Unc. \if{html}{\out{<OTU ID>}}". }
-\item{\code{"grouped"} - }{ Replace with "Unc. \if{html}{\out{<Higher Rank>}}". }
-\item{\code{"drop"} - }{ Don't include in the returned matrix. }
-}}
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
 }
 \value{
 The normalized filepath that was written to (invisibly).
@@ -49,7 +51,7 @@ Sample' tab.
       
       biom <- sample_select(hmp50, 1:10) \%>\% sample_rarefy()
       
-      attr(biom, "Weighted UniFrac")   <- unifrac(biom)
+      attr(biom, "Weighted UniFrac")   <- bdiv_distmat(biom, 'unifrac')
       attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
       
       outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))

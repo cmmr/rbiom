@@ -1,11 +1,11 @@
 
 
-#' Create a BIOM object.
+#' Create an rbiom object.
 #' 
 #' @inherit read_biom return
 #' 
 #' @param counts  The count data as a numeric matrix, where column names are
-#'        the sample names and row names are the OTU names. A BIOM object or
+#'        the sample names and row names are the OTU names. An rbiom object or
 #'        a filename/URL compatible with [read_biom()] is also acceptable.
 #' 
 #' @param metadata  A data.frame with sample names as the row names and 
@@ -46,8 +46,8 @@
 #'     cat(readChar(tre, nchars = 50L), "\n\n")
 #'     cat(readChar(fas, nchars = 50L), "\n\n")
 #'     
-#'     # Re-assemble the BIOM object.
-#'     biom <- biom_build(ct, md, tax, tre, id = "New BIOM")
+#'     # Re-assemble the rbiom object.
+#'     biom <- biom_build(ct, md, tax, tre, id = "New")
 #'     print(biom)
 #'     
 #'     # Remove temporary files.
@@ -64,7 +64,7 @@ biom_build <- function (
   #________________________________________________________
   biom <- local({
     
-    if (is(counts, 'BIOM'))
+    if (is(counts, 'rbiom'))
       return (counts)
     
     if (is_scalar_character(counts))
@@ -86,12 +86,14 @@ biom_build <- function (
     
     
     #________________________________________________________
-    # Construct the minimal BIOM object.
+    # Construct the minimal rbiom object.
     #________________________________________________________
     return (structure(
-      class = c("BIOM", "list"),
+      class = c('rbiom', "list"),
       .Data = list(
-        counts = slam::as.simple_triplet_matrix(counts),
+        counts   = slam::as.simple_triplet_matrix(counts),
+        metadata = tibble(.sample = colnames(counts)),
+        taxonomy = tibble(.otu    = rownames(counts)),
         info   = list(
           id                  = "",
           type                = "OTU table",
@@ -108,14 +110,14 @@ biom_build <- function (
   
   
   #________________________________________________________
-  # Integrate remaining BIOM components.
+  # Integrate remaining rbiom components.
   #________________________________________________________
-  if (!missing(metadata))  sample_metadata(biom)     <- metadata
-  if (!missing(taxonomy))  otu_taxonomy(biom)        <- taxonomy
-  if (!missing(tree))      otu_tree(biom)            <- tree
-  if (!missing(sequences)) otu_sequences(biom)       <- sequences
-  if (!missing(id))        biom_id(biom)             <- id
-  if (!missing(comment))   biom_comment(biom)        <- comment
+  if (!is.null(metadata))  sample_metadata(biom) <- metadata
+  if (!is.null(taxonomy))  otu_taxonomy(biom)    <- taxonomy
+  if (!is.null(tree))      otu_tree(biom)        <- tree
+  if (!is.null(sequences)) otu_sequences(biom)   <- sequences
+  if (!is.null(id))        biom_id(biom)         <- id
+  if (!is.null(comment))   biom_comment(biom)    <- comment
   
   
   biom <- biom_repair(biom)
@@ -128,7 +130,7 @@ biom_build <- function (
 
 
 
-#' Combine several BIOM datasets into one.
+#' Combine several rbiom objects into one.
 #' 
 #' WARNING: It is generally ill-advised to merge BIOM datasets, as OTUs
 #' mappings are dependent on upstream clustering and are not equivalent
@@ -136,8 +138,8 @@ biom_build <- function (
 #' 
 #' @inherit read_biom return
 #' 
-#' @param ...  Any number of BIOM objects (e.g. from [read_biom()]), lists of
-#'        BIOM objects, or valid arguments to the \code{src} parameter of 
+#' @param ...  Any number of rbiom objects (e.g. from [read_biom()]), lists of
+#'        rbiom objects, or valid arguments to the \code{src} parameter of 
 #'        [read_biom()] (for instance file names).
 #'        
 #' @export
@@ -158,15 +160,15 @@ biom_merge <- function (...) {
   dots      <- list(...)
   biom_list <- lapply(dots, function (dot) {
       
-    if (is(dot, 'BIOM'))      return (dot)
-    if (length(dot) > 1)      return (do.call(biom_merge, dot))
-    if (length(dot) < 1)      return (NULL)
-    if (is(dot[[1]], 'BIOM')) return (dot[[1]])
-    if (is.character(dot))    return (read_biom(src = dot))
+    if (is(dot, 'rbiom'))      return (dot)
+    if (length(dot) > 1)       return (do.call(biom_merge, dot))
+    if (length(dot) < 1)       return (NULL)
+    if (is(dot[[1]], 'rbiom')) return (dot[[1]])
+    if (is.character(dot))     return (read_biom(src = dot))
     stop("Unknown argument to biom_merge(): ", dot)
     
   })
-  biom_list <- biom_list[sapply(biom_list, is, 'BIOM')]
+  biom_list <- biom_list[sapply(biom_list, is, 'rbiom')]
   
   if (length(biom_list) == 0) stop("No BIOM datasets provided to biom_merge().")
   if (length(biom_list) == 1) return (biom_list[[1]]) 
@@ -190,21 +192,17 @@ biom_merge <- function (...) {
     dimnames = list(otus, samples) )
   
   
-  metadata           <- plyr::rbind.fill(lapply(biom_list, `[[`, 'metadata'))
-  rownames(metadata) <- do.call(c, lapply(biom_list, function (b) { rownames(b$metadata) }))
+  metadata <- dplyr::bind_rows(lapply(biom_list, `[[`, 'metadata'))
+  taxonomy <- dplyr::bind_rows(lapply(biom_list, `[[`, 'taxonomy'))
   
-  
-  taxonomy           <- plyr::rbind.fill.matrix(lapply(biom_list, `[[`, 'taxonomy'))
-  rownames(taxonomy) <- do.call(c, lapply(biom_list, function (b) { rownames(b$taxonomy) }))
-  
-  if (ncol(taxonomy) > 0) {
+  if (ncol(taxonomy) > 1) {
     taxstrs <- apply(taxonomy, 1L, paste, collapse = "; ")
     for (otu in otus)
       if (length(strs <- unique(taxstrs[which(names(taxstrs) == otu)])) > 1)
         warning("OTU '", otu, "' has multiple taxonomic mappings:", paste("\n  ", strs))
   }
   
-  taxonomy <- taxonomy[!duplicated(rownames(taxonomy)),]
+  taxonomy <- taxonomy[!duplicated(taxonomy[['.otu']]),]
   
   
   sequences <- do.call(c, lapply(biom_list, `[[`, 'sequences'))
@@ -212,7 +210,7 @@ biom_merge <- function (...) {
   
   
   # return (structure(
-  #   class = c("BIOM", "list"),
+  #   class = c('rbiom', "list"),
   #   .Data = list(
   #     counts    = counts,
   #     metadata  = metadata,
