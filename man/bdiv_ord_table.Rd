@@ -53,14 +53,9 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
 
-\item{md}{Include metadata in the output data frame? Options are:
-\itemize{
-\item{\code{NULL} - }{ Don't include metadata. }
-\item{\code{TRUE} - }{ Include all metadata. }
-\item{\emph{character vector} - }{
-Include only the specified metadata columns. }
-}
-Default: \code{TRUE}}
+\item{md}{A character vector naming the metadata fields to include in the
+output data frame, or \code{'.all'} to include all metadata fields.
+Default: \code{'.all'}}
 
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}

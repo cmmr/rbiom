@@ -20,7 +20,7 @@ taxa_corrplot <- function (
     biom, x, rank = -1, taxa = 6, layers = "t",
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     test = "trends", model = "lm", level = 0.95, 
-    p.top = Inf, p.adj = "fdr", caption = FALSE, ...) {
+    p.top = Inf, p.adj = "fdr", caption = TRUE, ...) {
   
   validate_biom(clone = FALSE)
   

@@ -67,7 +67,7 @@ stats_table <- function (
         c("predict", "terms", "fit", "means", "trends", 
           "es_means", "es_trends", "pw_means", "pw_trends" ) })
   
-  if (is.null(stat.by) && !test %in% c('predict', 'fit', 'terms'))
+  if (is.null(stat.by) && !test %in% c('predict', 'fit', 'terms', 'means', 'trends'))
     stop ("Test '", test, "' requires a `stat.by` group.")
   
   

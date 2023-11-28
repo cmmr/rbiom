@@ -5,26 +5,27 @@
 #' 
 #' @family taxa_abundance
 #' @family visualization
-#'                 
+#' 
 #' @param colors,patterns   A character vector of colors or patterns to use in
 #'        the graph. A named character vector can be used to map taxon names to 
 #'        specific colors or patterns. Set to \code{TRUE} to auto-select colors
 #'        or patterns, or to \code{FALSE} to disable per-taxa colors
 #'        or patterns. Default: \code{colors=TRUE, patterns=FALSE}.
-#'        
+#' 
 #' @param facet.by,limit.by   Metadata columns to 
 #'        use for data partitioning. Default: \code{NULL}
-#'                 
+#' 
 #' @param label.by,order.by   What metadata column to use for labeling and/or
-#'        sorting the samples across the x-axis. When \code{order.by=NULL},
-#'        samples are arranged based on \code{dist} and \code{clust}, below.
-#'        Default: \code{NULL}.
-#'                 
+#'        sorting the samples across the x-axis. Set \code{label.by='.sample'} 
+#'        to display sample names. When \code{order.by=NULL}, samples are 
+#'        arranged based on \code{dist} and \code{clust}, below.
+#'        Default: \code{label.by=NULL, order.by=NULL}.
+#' 
 #' @param dist,clust   Distance ([stats::dist()]) and clustering 
 #'        ([stats::hclust()]) methods to use for automatically arranging 
 #'        samples along the x-axis to put samples with similar composition near 
 #'        one another. Default: \code{dist="euclidean", clust="complete"}.
-#'        
+#' 
 #' @param ...   Parameters for underlying functions. Prefixing parameter names 
 #'        with a layer name ensures that a particular parameter is passed to, 
 #'        and only to, that layer.
@@ -228,7 +229,11 @@ taxa_barplot <- function (
   #________________________________________________________
   # Display a label on the x-axis other than sample name.
   #________________________________________________________
-  if (!is_null(params$label.by)) {
+  if (is.null(params$label.by)) {
+    
+    set_layer(params, 'xaxis', labels = NULL, breaks = NULL)
+    
+  } else if (!eq(params$label.by, ".sample")) {
     
     # Convert `.sample` to "<int>-<label>" format for easy parsing.
     with(params, {
@@ -239,7 +244,7 @@ taxa_barplot <- function (
       })
     })
     
-    set_layer(params, 'xaxis', 'labels' = ~ sub("^\\d+\\-", "", .))
+    set_layer(params, 'xaxis', labels = ~ sub("^\\d+\\-", "", .))
   }
   
   
@@ -249,26 +254,26 @@ taxa_barplot <- function (
   set_layer(
     params = params, 
     layer  = 'labs', 
-    'x'        = "Sample",
-    'subtitle' = with(params, glue(
+    'x'       = "Sample",
+    'caption' = with(params, glue(
     
-      if (is_null(label.by) && is_null(order.by)) {
-        "Samples are ordered according to '{clust}' clustering based on {dist} distance."
+      if ((is_null(label.by) || eq(label.by, '.sample')) && is_null(order.by)) {
+        "Arranged by {dist} distance and '{clust}' clustering."
         
-      } else if (is_null(label.by)) {
-        "Samples are ordered by {order.by}."
+      } else if ((is_null(label.by) || eq(label.by, '.sample'))) {
+        "Ordered by {order.by}."
         
       } else if (is_null(order.by)) {
-        "Samples are labeled by {label.by} and ordered according\nto '{clust}' clustering based on {dist} distance."
+        "Labeled by {label.by} and arranged by\n{dist} distance and\n'{clust}' clustering."
         
       } else {
         ifelse(
           test = eq(label.by, order.by), 
-          yes  = "Samples are labeled and ordered by {label.by}.", 
-          no   = "Samples are labeled by {label.by} and ordered by {order.by}." )
+          yes  = "Labeled and ordered by {label.by}.", 
+          no   = "Labeled by {label.by} and ordered by {order.by}." )
       }
     )))
-  set_layer(params, 'theme', 'plot.subtitle' = element_text(size = 9, lineheight = 1.2))
+  set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
   
   
   #________________________________________________________

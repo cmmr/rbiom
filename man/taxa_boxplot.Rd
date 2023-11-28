@@ -27,6 +27,7 @@ taxa_boxplot(
   outliers = NULL,
   xlab.angle = "auto",
   y.trans = "sqrt",
+  caption = TRUE,
   ...
 )
 }
@@ -138,6 +139,9 @@ a non-linear axis. Options are:
 These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
 observations. Default: \code{"sqrt"}}
+
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that

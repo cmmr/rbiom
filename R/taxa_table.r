@@ -18,7 +18,7 @@
 
 taxa_table <- function (
     biom, rank = -1, taxa = NULL, lineage = FALSE, 
-    md = TRUE, unc = "singly", other = FALSE ) {
+    md = ".all", unc = "singly", other = FALSE ) {
   
   validate_biom(clone = FALSE)
   

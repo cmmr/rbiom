@@ -20,7 +20,7 @@ rare_corrplot <- function (
     biom, adiv = "Shannon", depths = NULL, layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     test = "pw_means", model = "log", 
-    p.adj = "fdr", level = 0.95, caption = FALSE, ...) {
+    p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
   validate_biom(clone = FALSE)
   

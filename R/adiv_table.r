@@ -36,10 +36,10 @@
 #'     
 #'     adiv_table(biom)
 #'     
-#'     adiv_table(sample_rarefy(biom), adiv = "all", md = FALSE)
+#'     adiv_table(sample_rarefy(biom), adiv = ".all", md = NULL)
 
 adiv_table <- function (
-    biom, rarefy = FALSE, adiv = "Shannon", md = TRUE ) {
+    biom, rarefy = FALSE, adiv = "Shannon", md = ".all" ) {
   
   validate_biom()
   

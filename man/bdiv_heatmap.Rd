@@ -114,7 +114,7 @@ Default: \code{TRUE}.}
 \item{tree_height, track_height}{The height of the dendrogram or annotation
 tracks in multiples (or fractions) of the smaller dimension of the
 grid cell size. Use a numeric vector of length two to assign
-\code{c(left, top)} independently.
+\code{c(top, left)} independently.
 Default: \code{NULL}, which computes:
 \code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.}
 

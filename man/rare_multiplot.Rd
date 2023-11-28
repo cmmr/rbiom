@@ -17,7 +17,7 @@ rare_multiplot(
   model = "log",
   level = 0.95,
   p.adj = "fdr",
-  caption = FALSE,
+  caption = TRUE,
   labels = FALSE,
   ...
 )
@@ -28,7 +28,7 @@ rare_multiplot(
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
@@ -68,8 +68,8 @@ Default: \code{0.95}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}.}
 
-\item{caption}{Display information about the method used for trend line
-fitting beneath the plot. Default: \code{FALSE}.}
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}.}
 

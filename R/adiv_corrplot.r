@@ -23,7 +23,7 @@ adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     test = "trends", model = "lm", 
-    p.adj = "fdr", level = 0.95, caption = FALSE, ...) {
+    p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
   validate_biom(clone = FALSE)
   

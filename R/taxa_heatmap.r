@@ -139,8 +139,9 @@ taxa_heatmap <- function (
   #________________________________________________________
   for (md_col in names(params$color.by))
     params$color.by[[md_col]] %<>% within({
-      colors <- values
-      values <- sample_metadata(biom, md_col)
+      if (exists('values', inherits = FALSE))
+        colors <- values
+      values <- sample_metadata(params$biom, md_col)
     })
   params[['tracks']] <- params$color.by
   

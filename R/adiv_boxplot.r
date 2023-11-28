@@ -15,7 +15,7 @@
 #'     
 #'     adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
 #'     
-#'     adiv_boxplot(biom, x="body", adiv="all", layers="p", color.by="sex", flip=TRUE)
+#'     adiv_boxplot(biom, x="body", adiv=".all", layers="p", color.by="sex", flip=TRUE)
 #'     
 #'     adiv_boxplot(biom, x="Body Site", color.by="Body Site")
 #'     
@@ -40,7 +40,7 @@ adiv_boxplot <- function (
     biom, x = NULL, adiv = "Shannon", layers = "bld",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = NULL, p.adj = "fdr", p.label = 0.05, ci = "ci", level = 0.95, 
-    outliers = NULL, xlab.angle = 'auto', ...) {
+    outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
   validate_biom(clone = FALSE)
@@ -87,7 +87,7 @@ adiv_boxplot <- function (
     .ggdata <- adiv_table(
       biom = biom, 
       adiv = adiv, 
-      md   = TRUE )
+      md   = ".all" )
     
     
     # Facet on multiple adiv metrics

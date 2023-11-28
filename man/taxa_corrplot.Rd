@@ -18,7 +18,7 @@ taxa_corrplot(
   level = 0.95,
   p.top = Inf,
   p.adj = "fdr",
-  caption = FALSE,
+  caption = TRUE,
   ...
 )
 }
@@ -77,8 +77,8 @@ Default: \code{Inf}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}.}
 
-\item{caption}{Display information about the method used for trend line
-fitting beneath the plot. Default: \code{FALSE}.}
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{t.} or

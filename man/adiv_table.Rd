@@ -4,7 +4,7 @@
 \alias{adiv_table}
 \title{Calculate the alpha diversity of each sample.}
 \usage{
-adiv_table(biom, rarefy = FALSE, adiv = "Shannon", md = TRUE)
+adiv_table(biom, rarefy = FALSE, adiv = "Shannon", md = ".all")
 }
 \arguments{
 \item{biom}{An \code{rbiom}-class object, or data coercible with
@@ -29,18 +29,13 @@ Default: \code{FALSE}}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
-\item{md}{Include metadata in the output data frame? Options are:
-\itemize{
-\item{\code{NULL} - }{ Don't include metadata. }
-\item{\code{TRUE} - }{ Include all metadata. }
-\item{\emph{character vector} - }{
-Include only the specified metadata columns. }
-}
-Default: \code{TRUE}}
+\item{md}{A character vector naming the metadata fields to include in the
+output data frame, or \code{'.all'} to include all metadata fields.
+Default: \code{'.all'}}
 }
 \value{
 A data frame of alpha diversity values. \cr
@@ -59,7 +54,7 @@ Calculate the alpha diversity of each sample.
     
     adiv_table(biom)
     
-    adiv_table(sample_rarefy(biom), adiv = "all", md = FALSE)
+    adiv_table(sample_rarefy(biom), adiv = ".all", md = NULL)
 }
 \seealso{
 Other alpha_diversity: 

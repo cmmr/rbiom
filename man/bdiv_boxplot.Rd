@@ -26,6 +26,7 @@ bdiv_boxplot(
   level = 0.95,
   outliers = NULL,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 }
@@ -109,6 +110,9 @@ overlaying a dot or strip chart.  Default: \code{NULL}}
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
+
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that

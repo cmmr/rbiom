@@ -86,6 +86,8 @@ beta.div <- function (biom, method, weighted = TRUE, tree = NULL, long = FALSE, 
       what    = "beta.div()",
       details = "Please use `bdiv_table()` instead for generating a data.frame." )
     
+    if (isTRUE(md)) md <- ".all"
+    
     bdiv_table(biom = biom, bdiv = method, weighted = weighted, tree = tree, md = md)
     
   } else {
@@ -304,6 +306,8 @@ taxa.rollup <- function (
       when    = "2.0.0",
       what    = "taxa.rollup()",
       details = "Please use `taxa_table()` instead for generating a data.frame." )
+    
+    if (isTRUE(md)) md <- ".all"
     
     taxa_table(
       biom    = biom, 
@@ -540,7 +544,12 @@ sample.sums <- function (biom, long = FALSE, md = FALSE) {
     sample_sums(biom = biom)
     
   } else {
+    
     deprecate_warn("2.0.0", "sample.sums()", "adiv_table()")
+    
+    if (isTRUE(md))  md <- ".all"
+    if (isFALSE(md)) md <- NULL
+    
     adiv_table(biom = biom, md = md) %>% 
       dplyr::mutate(.keep = "none", Sample = .sample, Reads = .depth) %>%
       as.data.frame()

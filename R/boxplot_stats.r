@@ -6,6 +6,7 @@ boxplot_stats <- function (params) {
   
   stopifnot(is_bare_environment(params))
   
+  
   layers <- params$layers
   ggdata <- params$.ggdata
   xcol   <- params$.xcol
@@ -284,7 +285,6 @@ boxplot_stats <- function (params) {
       'mapping|x'     = ".x",
       'mapping|y'     = ".y",
       'mapping|label' = ".label" )
-
     
   }
   
@@ -364,29 +364,31 @@ boxplot_stats <- function (params) {
   
   
   
-  
-  set_layer(params, 'theme', "plot.subtitle" = element_text(size = 9))
-  set_layer(params, 'labs',  "subtitle"      = local({
+  if (isTRUE(params$caption)) {
     
-    test <- switch(
-      EXPR = test,
-      wilcox  = "Mann-Whitney",
-      kruskal = "Kruskal-Wallis" )
-    
-    meth <- switch(
-      EXPR = params$p.adj,
-      holm       = "Holm",                  # (1979)
-      hochberg   = "Hochberg",              # (1988)
-      hommel     = "Hommel",                # (1988)
-      BH         = "Benjamini & Hochberg",  # (1995)
-      fdr        = "Benjamini & Hochberg",  # (1995)
-      BY         = "Benjamini & Yekutieli", # (2001)
-      bonferroni = "Bonferroni",
-      none       = "no" )
-    
-    return(glue("{test} p-values, with {meth} FDR correction."))
-    
-  }))
+    set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+    set_layer(params, 'labs',  caption      = local({
+      
+      test <- switch(
+        EXPR = test,
+        pw_means = "Mann-Whitney",
+        means    = "Kruskal-Wallis" )
+      
+      meth <- switch(
+        EXPR = params$p.adj,
+        holm       = "Holm",                  # (1979)
+        hochberg   = "Hochberg",              # (1988)
+        hommel     = "Hommel",                # (1988)
+        BH         = "Benjamini & Hochberg",  # (1995)
+        fdr        = "Benjamini & Hochberg",  # (1995)
+        BY         = "Benjamini & Yekutieli", # (2001)
+        bonferroni = "Bonferroni",
+        none       = "no" )
+      
+      return(glue("{test} p-values, with {meth} FDR correction."))
+      
+    }))
+  }
   
   
   

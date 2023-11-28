@@ -8,6 +8,7 @@ corrplot_stats <- function (params) {
   stopifnot(is_bare_environment(params))
   
   
+  
   #________________________________________________________
   # Validate and restructure user's arguments.
   #________________________________________________________
@@ -28,10 +29,15 @@ corrplot_stats <- function (params) {
     return (params)
   
   if (!params$test %in% c('fit', 'terms')) {
-    group <- names(params$color.by)
-    if (is.null(group))                       return (params)
-    if (nlevels(params$.ggdata[[group]]) < 2) return (params)
-    remove("group")
+    stat.by <- names(params$color.by)
+    
+    if (is.null(stat.by)) {
+      if (startsWith(params$test, 'pw_')) return (params)
+    } else {
+      if (nlevels(params$.ggdata[[stat.by]]) < 2) return (params)
+    }
+    
+    remove("stat.by")
   }
   
   
@@ -79,8 +85,8 @@ corrplot_stats <- function (params) {
       .fun       = function (df) {
         p <- min(df[['.adj.p']], Inf, na.rm = TRUE)
         if (is.infinite(p)) return (NULL)
-        fmt <- ifelse(nrow(df) == 1, "%s: *p* = %s", "%s: min(*p*) = %s")
-        data.frame(.label = sprintf(fmt, test, format(p, digits=2)))
+        fmt <- ifelse(nrow(df) == 1, "*p* = %s", "min(*p*) = %s")
+        data.frame(.label = sprintf(fmt, format(p, digits=2)))
       }) %>% as_tibble()
   })
   
@@ -103,6 +109,39 @@ corrplot_stats <- function (params) {
     params = params, 
     layer  = 'yaxis',
     'expand' = c(0, 0, .1, 0) )
+  
+  
+  
+  if (isTRUE(params$caption)) {
+    
+    # element_markdown
+    set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+    set_layer(params, 'labs',  caption      = local({
+      
+      test <- switch(
+        EXPR = params$test,
+        fit       = "Pr(fit is expected by chance)",
+        terms     = "Pr(model term's estimate is zero)",
+        means     = "Pr(mean is zero)",
+        trends    = "Pr(trend slope is flat)",
+        pw_means  = "Pr(means are equal)",
+        pw_trends = "Pr(trend slopes are equal)" )
+      
+      meth <- switch(
+        EXPR = params$p.adj,
+        holm       = "Holm",                  # (1979)
+        hochberg   = "Hochberg",              # (1988)
+        hommel     = "Hommel",                # (1988)
+        BH         = "Benjamini & Hochberg",  # (1995)
+        fdr        = "Benjamini & Hochberg",  # (1995)
+        BY         = "Benjamini & Yekutieli", # (2001)
+        bonferroni = "Bonferroni",
+        none       = "no" )
+      
+      return(glue("{test}, with {meth} FDR correction."))
+      
+    }))
+  }
     
   
   

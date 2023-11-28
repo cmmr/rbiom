@@ -9,7 +9,7 @@ taxa_table(
   rank = -1,
   taxa = NULL,
   lineage = FALSE,
-  md = TRUE,
+  md = ".all",
   unc = "singly",
   other = FALSE
 )
@@ -39,14 +39,9 @@ want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
 level ranks. Default: \code{FALSE}}
 
-\item{md}{Include metadata in the output data frame? Options are:
-\itemize{
-\item{\code{NULL} - }{ Don't include metadata. }
-\item{\code{TRUE} - }{ Include all metadata. }
-\item{\emph{character vector} - }{
-Include only the specified metadata columns. }
-}
-Default: \code{TRUE}}
+\item{md}{A character vector naming the metadata fields to include in the
+output data frame, or \code{'.all'} to include all metadata fields.
+Default: \code{'.all'}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:

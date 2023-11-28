@@ -17,7 +17,7 @@ rare_corrplot(
   model = "log",
   p.adj = "fdr",
   level = 0.95,
-  caption = FALSE,
+  caption = TRUE,
   ...
 )
 }
@@ -27,7 +27,7 @@ rare_corrplot(
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
@@ -67,8 +67,8 @@ options. Default: \code{"fdr"}.}
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
-\item{caption}{Display information about the method used for trend line
-fitting beneath the plot. Default: \code{FALSE}.}
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{t.} or

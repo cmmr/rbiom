@@ -30,7 +30,7 @@ statistics will be returned. Default: \code{NULL}}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 

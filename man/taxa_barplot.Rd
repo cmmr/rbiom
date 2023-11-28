@@ -47,9 +47,10 @@ or patterns, or to \code{FALSE} to disable per-taxa colors
 or patterns. Default: \code{colors=TRUE, patterns=FALSE}.}
 
 \item{label.by, order.by}{What metadata column to use for labeling and/or
-sorting the samples across the x-axis. When \code{order.by=NULL},
-samples are arranged based on \code{dist} and \code{clust}, below.
-Default: \code{NULL}.}
+sorting the samples across the x-axis. Set \code{label.by='.sample'}
+to display sample names. When \code{order.by=NULL}, samples are
+arranged based on \code{dist} and \code{clust}, below.
+Default: \code{label.by=NULL, order.by=NULL}.}
 
 \item{facet.by, limit.by}{Metadata columns to
 use for data partitioning. Default: \code{NULL}}

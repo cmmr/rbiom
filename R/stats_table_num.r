@@ -15,6 +15,7 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   #________________________________________________________
   stopifnot(hasName(df, regr) && is.numeric(df[[regr]]))
   stopifnot(!eq(regr, resp))
+  stopifnot(!(stat.by %in% split.by))
   
   
   #________________________________________________________
@@ -41,6 +42,13 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   #________________________________________________________
   stats <- plyr::ddply(df, ply_cols(split.by), function (data) {
     
+    #________________________________________________________
+    # Some facets might only have one level of `stat.by`.
+    #________________________________________________________
+    if (!is.null(stat.by))
+      if (length(unique(data[['.stat.by']])) < 2)
+        return (data.frame()[1,])
+    
     
     #________________________________________________________
     # Apply the model to the provided data from `df`.
@@ -56,8 +64,13 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
     #________________________________________________________
     # These values can be called from multiple places below.
     #________________________________________________________
-    emm <- function () emmeans(object = m,  specs = c('.regr', '.stat.by'),    level = level, infer = TRUE, .lhs = "emm")
-    emt <- function () emtrends(object = m, specs = '.stat.by', var = '.regr', level = level, infer = TRUE)
+    if (is.null(stat.by)) {
+      emm <- function () emmeans(object = m,  specs = '.regr',             level = level, infer = TRUE, .lhs = "emm")
+      emt <- function () emtrends(object = m, specs = NULL, var = '.regr', level = level, infer = TRUE)
+    } else {
+      emm <- function () emmeans(object = m,  specs = c('.regr', '.stat.by'),    level = level, infer = TRUE, .lhs = "emm")
+      emt <- function () emtrends(object = m, specs = '.stat.by', var = '.regr', level = level, infer = TRUE)
+    }
     
     result <- tryCatch(
       error   = function (...) data.frame()[1,], 

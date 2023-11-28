@@ -31,7 +31,7 @@ taxa_stats <- function (
   
   params  <- eval_envir(environment())
   history <- append_history('stats', params)
-  remove(list = env_names(params))
+  remove(list = intersect(env_names(params), ls()))
   
   with(params, {
     md       <- setdiff(unique(c(stat.by, regr, split.by)), ".taxa")
@@ -78,9 +78,11 @@ apply_p.top <- function (params) {
     stats[['.rank']] <- factor(as.character(ggdata[['.rank']][[1]]))
   
   keep_taxa <- plyr::dlply(stats, ply_cols('.rank'), function (x) {
-    taxa_min_p <- sapply(split(x[['.adj.p']], x[['.taxa']]), base::min, 1, na.rm = TRUE)
-    if (p.top >= 1) taxa_min_p %<>% base::rank(ties.method = "first")
-    names(taxa_min_p[taxa_min_p <= p.top])
+    taxa_min_p <- split(x[['.adj.p']], x[['.taxa']]) %>%
+      sapply(base::min, 1, na.rm = TRUE) %>%
+      sort()
+    if (p.top >= 1) { return (head(names(taxa_min_p), p.top))
+    } else          { return (names(which(taxa_min_p <= p.top))) }
   })
   
   
@@ -104,7 +106,7 @@ apply_p.top <- function (params) {
       x[x[['.taxa']] %in% keep_taxa[[rank]],,drop=FALSE]
     }) %>% as_rbiom_tbl()
     
-    df[['.taxa']] %<>% {factor(., intersect(levels(.), .))}
+    df[['.taxa']] %<>% {factor(., unique(unname(unlist(keep_taxa))))}
     
     for (i in names(attrs))
       if (is.null(attr(df, i, exact = TRUE)))

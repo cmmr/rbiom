@@ -19,7 +19,7 @@ rare_multiplot <- function (
     biom, adiv = "OTUs", depths = NULL, layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     test = "pw_means", model = "log", level = 0.95, p.adj = "fdr", 
-    caption = FALSE, labels = FALSE, ...) {
+    caption = TRUE, labels = FALSE, ...) {
   
   validate_biom(clone = FALSE)
   

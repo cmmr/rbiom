@@ -38,7 +38,7 @@ biom_info <- function (biom) {
 
 metadata_numeric <- function (biom) {
   validate_biom(clone = FALSE)
-  return (sapply(as.list(biom[['metadata']][,-1]), is.numeric))
+  return (sapply(as.list(biom[['metadata']]), is.numeric))
 }
 
 

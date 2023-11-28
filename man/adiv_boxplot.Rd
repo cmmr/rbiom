@@ -22,6 +22,7 @@ adiv_boxplot(
   level = 0.95,
   outliers = NULL,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 }
@@ -34,7 +35,7 @@ default, \code{NULL}, groups all samples into a single category.}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
@@ -89,6 +90,9 @@ overlaying a dot or strip chart.  Default: \code{NULL}}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
+
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
 a particular parameter is passed to, and only to, that layer. For
@@ -111,7 +115,7 @@ Visualize alpha diversity with boxplots.
     
     adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
     
-    adiv_boxplot(biom, x="body", adiv="all", layers="p", color.by="sex", flip=TRUE)
+    adiv_boxplot(biom, x="body", adiv=".all", layers="p", color.by="sex", flip=TRUE)
     
     adiv_boxplot(biom, x="Body Site", color.by="Body Site")
     

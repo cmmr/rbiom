@@ -37,10 +37,10 @@
 #'     
 
 bdiv_ord_table <- function (
-    biom, bdiv="Bray-Curtis", ord="UMAP", weighted=TRUE, md=NULL, k=2, 
-    split.by=NULL, stat.by=NULL, tree=NULL, within=NULL, between=NULL,
-    test="adonis2", seed=0, permutations=999, rank=-1, taxa=5, 
-    p.top=Inf, p.adj='fdr', unc="singly", ...) {
+    biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, md = NULL, k = 2, 
+    split.by = NULL, stat.by = NULL, tree = NULL, within = NULL, between = NULL,
+    test = "adonis2", seed = 0, permutations = 999, rank = -1, taxa = 5, 
+    p.top = Inf, p.adj = 'fdr', unc = "singly", ...) {
   
   validate_biom(clone = FALSE)
   validate_tree(null_ok = TRUE)
@@ -179,10 +179,10 @@ bdiv_ord_table <- function (
   # sample_coords %<>% within(.distance <- paste(.weighted, .method))
   # sample_coords %<>% keep_cols(c(".sample", ".distance", ".ord", ".x", ".y", ".z"))
   
-  if (length(c(split.by, stat.by, md)) > 0)
-    sample_coords %<>% left_join(
-      y  = sample_metadata(biom)[,unique(c('.sample', split.by, stat.by, md))], 
-      by = '.sample')
+  
+  for (i in unique(c(split.by, stat.by, md)))
+    if (!hasName(sample_coords, i))
+      sample_coords[[i]] <- sample_metadata(biom, i)[as.character(sample_coords[['.sample']])]
   
   
   

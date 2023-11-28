@@ -31,9 +31,6 @@ when using a \code{color.by} metadata column with more than one level. \cr\cr
 Statistical tests are run separately on each facet. P-values are
 adjusted for multiple comparisons by considering all facets together.}
 
-\item{caption}{Display information about the method used for trend line
-fitting beneath the plot. Default: \code{FALSE}.}
-
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{t.} or
 \code{s.}/\code{pt.} to ensure it gets passed to (and only to)

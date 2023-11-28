@@ -19,10 +19,11 @@ bdiv_ord_plot(
   seed = 0,
   permutations = 999,
   rank = -1,
-  taxa = 5,
+  taxa = 4,
   p.top = Inf,
   p.adj = "fdr",
   unc = "singly",
+  caption = TRUE,
   ...
 )
 }
@@ -117,6 +118,9 @@ taxa names. Options are:
 }
 Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
+
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{...}{Parameters for layer geoms (e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}).
 Prefixing parameter names with a layer name ensures that a particular

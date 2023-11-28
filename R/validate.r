@@ -73,27 +73,27 @@ invalidate_biom <- function (var = "biom", env = parent.frame()) {
 
 validate_adiv <- function (var = "adiv", env = parent.frame(), ...) {
   choices <- c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
-  validate_var_choices(var, choices, env, all_option = "all", ...)
+  validate_var_choices(var, choices, env, all_option = ".all", ...)
 }
 
 validate_bdiv <- function (var = "bdiv", env = parent.frame(), ...) {
   choices <- c("UniFrac", "Jaccard", "Bray-Curtis", "Manhattan", "Euclidean")
-  validate_var_choices(var, choices, env, all_option = "all", ...)
+  validate_var_choices(var, choices, env, all_option = ".all", ...)
 }
 
 validate_ord <- function (var = "ord", env = parent.frame(), ...) {
   choices <- c("PCoA", "tSNE", "NMDS", "UMAP")
-  validate_var_choices(var, choices, env, all_option = "all", ...)
+  validate_var_choices(var, choices, env, all_option = ".all", ...)
 }
 
 validate_dist <- function (var = "dist", env = parent.frame(), ...) {
   choices <- c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski")
-  validate_var_choices(var, choices, env, all_option = "all", ...)
+  validate_var_choices(var, choices, env, all_option = ".all", ...)
 }
 
 validate_clust <- function (var = "clust", env = parent.frame(), ...) {
   choices <- c("average", "ward", "mcquitty", "single", "median", "complete", "centroid")
-  validate_var_choices(var, choices, env, all_option = "all", ...)
+  validate_var_choices(var, choices, env, all_option = ".all", ...)
 }
 
 validate_unc <- function (var = "unc", env = parent.frame(), ...) {
@@ -186,14 +186,30 @@ validate_meta <- function (var = "meta", env = parent.frame(), evar = var, null_
   choices <- metadata_names(biom)
   is_num  <- metadata_numeric(biom)
   
-  if (isTRUE(x))  x <- choices
-  if (isFALSE(x)) x <- NULL
+  
+  if (is_scalar_logical(x)) {
+    
+    warning(evar, " should be a character vector, not ", x, ".")
+    
+    if (isTRUE(x))  x <- choices
+    if (isFALSE(x)) x <- NULL
+  
+    # Exit early if TRUE/FALSE resolved to NULL
+    if (is.null(x) && null_ok) {
+      assign(var, x, pos = env)
+      return (invisible(NULL))
+    }
+  }
   
   
-  # Exit early if TRUE/FALSE resolved to NULL
-  if (is.null(x) && null_ok) {
-    assign(var, x, pos = env)
-    return (invisible(NULL))
+  if (eq(x, '.all')) {
+    x <- choices[-1]
+    
+    # Exit early if '.all' resolved to NULL
+    if (is.null(x) && null_ok) {
+      assign(var, x, pos = env)
+      return (invisible(NULL))
+    }
   }
   
   
@@ -442,6 +458,12 @@ validate_meta_aes <- function (var, env = parent.frame(), null_ok = FALSE, ...) 
   biom    <- get("biom", pos = env, inherits = FALSE)
   choices <- metadata_names(biom)
   is_num  <- metadata_numeric(biom)
+  
+  
+  #________________________________________________________
+  # Allow ".all" option.
+  #________________________________________________________
+  if (eq(x, ".all")) x <- choices[-1]
   
   
   #________________________________________________________

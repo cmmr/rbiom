@@ -10,3 +10,4 @@
 ^\.vignettes$
 ^.*\.Rproj$
 ^vignettes/articles$
+^README\.Rmd$

@@ -20,7 +20,7 @@ bdiv_boxplot <- function (
   biom, x = NULL, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, layers = "bld",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
   within = NULL, between = NULL, flip = FALSE, stripe = NULL, p.adj = "fdr", p.label = 0.05, 
-  ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', ...) {
+  ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
   validate_biom(clone = FALSE)
@@ -76,7 +76,7 @@ bdiv_boxplot <- function (
         bdiv     = bdiv,
         weighted = weighted,
         tree     = tree, 
-        md       = TRUE,
+        md       = ".all",
         within   = within,
         between  = between ) %>%
       within({

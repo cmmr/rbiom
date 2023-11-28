@@ -12,18 +12,13 @@
 #'        relationships of the taxa in \code{biom}. Only required when 
 #'        computing UniFrac distances. Default: \code{otu_tree(biom)}
 #'     
-#' @param md  Include metadata in the output data frame? Options are: 
-#'        \itemize{
-#'          \item{\code{NULL} - }{ Don't include metadata. }
-#'          \item{\code{TRUE} - }{ Include all metadata. }
-#'          \item{\emph{character vector} - }{
-#'            Include only the specified metadata columns. }
-#'        }
-#'        Default: \code{TRUE}
+#' @param md  A character vector naming the metadata fields to include in the 
+#'        output data frame, or \code{'.all'} to include all metadata fields.
+#'        Default: \code{'.all'}
 #' 
 #' @param adiv   Alpha diversity metric(s) to use. Options are: \code{"OTUs"}, 
 #'        \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or 
-#'        \code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+#'        \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 #'        Default: \code{"Shannon"} \cr\cr
 #'        Multiple values allowed. Non-ambiguous abbreviations are allowed.
 #' 
@@ -131,6 +126,9 @@
 #' @param level   The confidence level for calculating a confidence interval. 
 #'        Default: \code{0.95}
 #'        
+#' @param caption   Add methodology caption beneath the plot.
+#'        Default: \code{TRUE}.
+#'        
 #' @param outliers   Show boxplot outliers? \code{TRUE} to always show. 
 #'        \code{FALSE} to always hide. \code{NULL} to only hide them when
 #'        overlaying a dot or strip chart.  Default: \code{NULL}
@@ -179,6 +177,22 @@
 #' 
 #' @param labels   Show sample names under each bar. Default: \code{FALSE}.
 #'   
+NULL
+
+
+
+# taxa - 4 ====
+#' documentation_taxa.4
+#' 
+#' @name documentation_taxa.4
+#' @keywords internal
+#' 
+#' @param taxa   Which taxa to display. An integer value will show the top n
+#'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
+#'        mean abundance or greater (e.g. \code{0.1} implies >= 10%). A 
+#'        character vector of taxa names will show only those named taxa. 
+#'        Default: \code{4}.
+#' 
 NULL
 
 
@@ -358,9 +372,6 @@ NULL
 #'        Statistical tests are run separately on each facet. P-values are 
 #'        adjusted for multiple comparisons by considering all facets together.
 #'        
-#' @param caption   Display information about the method used for trend line
-#'        fitting beneath the plot. Default: \code{FALSE}.
-#'        
 #' @param ...   Additional parameters to pass along to ggplot2
 #'        functions. Prefix a parameter name with either \code{t.} or 
 #'        \code{s.}/\code{pt.} to ensure it gets passed to (and only to) 
@@ -491,7 +502,7 @@ NULL
 #' @param tree_height,track_height   The height of the dendrogram or annotation
 #'        tracks in multiples (or fractions) of the smaller dimension of the
 #'        grid cell size. Use a numeric vector of length two to assign
-#'        \code{c(left, top)} independently. 
+#'        \code{c(top, left)} independently. 
 #'        Default: \code{NULL}, which computes:
 #'        \code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.
 #'        

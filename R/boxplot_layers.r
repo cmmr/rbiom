@@ -14,6 +14,7 @@ init_boxplot_layers <- function (params = parent.frame()) {
     stopifnot(is_tibble(.ggdata))
     
     validate_bool('flip')
+    validate_bool('caption')
     validate_bool('stripe',   default = flip)
     validate_bool('outliers', null_ok = TRUE)
     

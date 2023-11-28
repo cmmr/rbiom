@@ -11,18 +11,13 @@
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{otu_tree(biom)}}
 
-\item{md}{Include metadata in the output data frame? Options are:
-\itemize{
-\item{\code{NULL} - }{ Don't include metadata. }
-\item{\code{TRUE} - }{ Include all metadata. }
-\item{\emph{character vector} - }{
-Include only the specified metadata columns. }
-}
-Default: \code{TRUE}}
+\item{md}{A character vector naming the metadata fields to include in the
+output data frame, or \code{'.all'} to include all metadata fields.
+Default: \code{'.all'}}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. The shortcut \code{adiv="all"} also exists.
+\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
@@ -129,6 +124,9 @@ Default: \code{0.05}}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
+
+\item{caption}{Add methodology caption beneath the plot.
+Default: \code{TRUE}.}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when

@@ -47,10 +47,10 @@
 #'     bdiv_ord_plot(biom, layers="pemt", color.by="Body Site", rank="g")
 #'     
 bdiv_ord_plot <- function (
-    biom, bdiv="Bray-Curtis", ord="UMAP", weighted=TRUE, layers="petm", 
-    color.by=NULL, shape.by=NULL, facet.by=NULL, limit.by=NULL, 
-    tree=NULL, test="adonis2", seed=0, permutations=999, 
-    rank=-1, taxa=5, p.top=Inf, p.adj="fdr", unc="singly", ...) {
+    biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, layers = "petm", 
+    color.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
+    tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
+    rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {
   
   validate_biom(clone = FALSE)
   validate_tree(null_ok = TRUE)
@@ -103,7 +103,7 @@ bdiv_ord_plot <- function (
       bdiv         = bdiv,
       ord          = ord,
       weighted     = weighted,
-      md           = TRUE,
+      md           = ".all",
       split.by     = facet.by,
       stat.by      = names(color.by),
       permutations = permutations,
@@ -343,7 +343,7 @@ ordination_biplot <- function (params) {
 ordination_facets <- function (params) {
   
   ggdata       <- params$.ggdata
-  sample_stats <- attr(ggdata, 'sample_stats', exact = TRUE)
+  sample_stats <- params$.plot_attrs$stats
   taxa_coords  <- attr(ggdata, 'taxa_coords',  exact = TRUE)
   ranks        <- params$rank
   
@@ -358,15 +358,18 @@ ordination_facets <- function (params) {
   # Put facet.by metadata in first.
   #________________________________________________________
   for (i in params$facet.by) {
-    df[[i]] %<>% as.character()
-    df[['.facet']] <- bool_switch(
-      test  = hasName(df, ".facet"), 
-      yes   = sprintf("%s - %s", df[['.facet']], df[[i]]), 
-      no    = df[[i]] )
+    
+    df %<>% within({
+      .facet <- bool_switch(
+        test  = exists(".facet", inherits = FALSE), 
+        yes   = sprintf("%s - %s", .facet, as.character(get(i))), 
+        no    = as.character(get(i)) )
+    })
   }
   
   if (hasName(df, ".facet"))
-    df[['.facet']] %<>% sprintf(fmt="**%s**")
+    df %<>% within(.facet %<>% sprintf(fmt="**%s**"))
+  
   
   
   #________________________________________________________
@@ -432,33 +435,38 @@ ordination_facets <- function (params) {
   if (!is_null(sample_stats)) {
     
     # stats are agnostic of .ord and .rank
-    df <- plyr::join(df, sample_stats, by = c('.weighted', '.bdiv', params$facet.by))
-    
-    stats_text <- sprintf(
-      fmt = "*p* = %s; *stat* = %s; *z* = %s",
-      format(df[['.p.val']], digits=3), 
-      format(df[['.stat']],  digits=3), 
-      format(df[['.z']],     digits=3) )
-    
-    methods_text <- sprintf(
-      fmt = "Statistics computed with %s (%i permutations).", 
-      params$test,
-      params$permutations )
+    stats_text <- with(
+      data = plyr::join(df, sample_stats, by = c('.weighted', '.bdiv', params$facet.by)), 
+      expr = sprintf(
+        fmt = "*p* = %s; *stat* = %s; *z* = %s",
+        format(.p.val, digits=3), 
+        format(.stat,  digits=3), 
+        format(.z,     digits=3) ))
     
     if (length(unique(stats_text)) == 1) {
-      set_layer(params, 'labs',  subtitle = sprintf(
-        fmt = "%s<br><span style='font-size:9pt'>%s</span>",
-        stats_text[[1]],
-        methods_text ))
-      set_layer(params, 'theme', plot.subtitle = element_markdown(size = 11, lineheight = 1.2))
+      set_layer(params, 'labs',  subtitle = stats_text[[1]])
+      set_layer(params, 'theme', plot.subtitle = element_markdown(size = 11))
       
     } else {
       df[['.facet']] <- bool_switch(
         test = hasName(df, ".facet"),
         yes  = sprintf("%s<br>%s", df[['.facet']], stats_text), 
         no   = stats_text )
-      set_layer(params, 'labs', caption = methods_text)
-      set_layer(params, 'theme', plot.caption = element_text(face = "italic"))
+    }
+    
+    
+    # Add caption below plot describing stats method.
+    if (isTRUE(params$caption)) {
+      
+      set_layer(
+        params = params, 
+        layer  = 'labs', 
+        'caption' = sprintf(
+          fmt = "Statistics computed with %s (%i permutations).", 
+          params$test,
+          params$permutations ))
+      
+      set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
     }
     
   }
@@ -468,19 +476,17 @@ ordination_facets <- function (params) {
   # Copy .facet column from df to taxa_coords
   #________________________________________________________
   if (!is_null(taxa_coords) && hasName(df, ".facet"))
-    attr(ggdata, 'taxa_coords') <- local({
+    attr(df, 'taxa_coords') <- local({
       join_cols <- c('.weighted', '.bdiv', '.ord', '.rank', params$facet.by)
       join_cols <- intersect(join_cols, intersect(colnames(df), colnames(taxa_coords)))
       
-      taxa_coords <- plyr::join(
-        x     = taxa_coords, 
-        y     = df[,c(join_cols, '.facet'),drop=FALSE], 
-        by    = join_cols, 
-        match = "first" )
-      
-      taxa_coords %<>% drop_cols(join_cols)
-      
-      return (taxa_coords)
+      plyr::join(
+          x     = taxa_coords, 
+          y     = df[,c(join_cols, '.facet')], 
+          by    = join_cols, 
+          match = "first" ) %>% 
+        drop_cols(join_cols) %>% 
+        as_rbiom_tbl()
     })
   
   
@@ -510,9 +516,9 @@ ordination_facets <- function (params) {
       'strip.background' = element_blank(),
       'strip.text'       = element_markdown(hjust=0) )
     
-    if (!is.null(taxa_coords <- attr(ggdata, 'taxa_coords', exact = TRUE))) {
+    if (!is.null(taxa_coords <- attr(df, 'taxa_coords', exact = TRUE))) {
       taxa_coords[['.facet']] %<>% factor(levels = levels(df[['.facet']]))
-      attr(ggdata, 'taxa_coords') <- taxa_coords
+      attr(df, 'taxa_coords') <- taxa_coords
       remove("taxa_coords")
     }
     

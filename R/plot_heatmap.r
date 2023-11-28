@@ -188,6 +188,111 @@ plot_heatmap <- function (
   }
   
   
+  
+  
+  #________________________________________________________
+  # Heuristics for setting sizes and heights of elements
+  #________________________________________________________
+  if (is_null(tree_height))  tree_height  <- dim(mtx) * 0.15
+  if (is_null(track_height)) track_height <- tree_height / 3
+  
+  ratio <- ratio * ncol(mtx) / nrow(mtx)
+  
+  if (is_null(label_size))         label_size <- pmax(5, pmin(14, 100 / dim(mtx)))
+  if (!is_null(names(label_size))) label_size <- label_size[rev(order(names(label_size)))]
+  label_size_x <- tail(label_size, 1) %>% signif(digits = 3)
+  label_size_y <- head(label_size, 1)
+  
+  n_left <- sum(sapply(tracks, function (x) eq(x[['side']], 'left')))
+  n_top  <- length(tracks) - n_left
+  if (isTRUE(n_left > 0)) label_size_x <- .c(.rep(10, n_left), .rep(label_size_x, ncol(mtx)))
+  if (isTRUE(n_top  > 0)) label_size_y <- .c(.rep(10, n_top),  .rep(label_size_y, nrow(mtx)))
+  label_size_x <- unit(label_size_x, "points")
+  label_size_y <- unit(label_size_y, "points")
+  
+  
+  
+  
+  #________________________________________________________
+  # Use specified height(s) + ratio to compute top & left heights
+  #________________________________________________________
+  stopifnot(is.numeric(tree_height) && is.numeric(track_height) && is.numeric(ratio))
+  stopifnot(length(tree_height) > 0 && length(track_height) > 0 && length(ratio) == 1)
+  tree_height_top   <- head(tree_height,  1) * ifelse(ratio < 1, ratio, 1)
+  tree_height_left  <- tail(tree_height,  1) * ifelse(ratio > 1, ratio, 1)
+  track_height_top  <- head(track_height, 1) * ifelse(ratio < 1, ratio, 1)
+  track_height_left <- tail(track_height, 1) * ifelse(ratio > 1, ratio, 1)
+  remove("tree_height", "track_height")
+  
+  
+  #________________________________________________________
+  # Rescale matrix's row or column values
+  #________________________________________________________
+  if (eq(rescale, "rows")) {
+    mtx <- t(apply(mtx, 1L, scales::rescale))
+    
+  } else if (eq(rescale, "cols")) {
+    mtx <- apply(mtx, 2L, scales::rescale)
+  }
+  
+  
+  #________________________________________________________
+  # Cluster matrix's rows/cols and generate data.frames for dendrograms
+  #________________________________________________________
+  if (!isFALSE(clust_cols) && !is.na(clust_cols)) {
+    
+    dm <- dist_cols
+    hc <- clust_cols
+    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(t(mtx), method = dm)
+    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm,   method = hc)
+    mtx <- mtx[,hc[['order']]]
+    
+    if (isTRUE(trees_cols)) {
+      
+      bounds <- 0.5 + nrow(mtx) + c(0, tree_height_top)
+      if (isTRUE(n_top > 0))
+        bounds <- bounds + (nrow(mtx) / 50) + track_height_top * n_top
+      
+      trees_cols <- dendro(hc, bounds, side = "top")
+    }
+    remove("dm", "hc")
+    
+  } else {
+    trees_cols <- FALSE
+  }
+  
+  if (!isFALSE(clust_rows) && !is.na(clust_rows)) {
+    
+    dm <- dist_rows
+    hc <- clust_rows
+    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
+    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
+    mtx <- mtx[hc[['order']],]
+    
+    if (isTRUE(trees_rows)) {
+      
+      bounds <- 0.5 - c(0, tree_height_left)
+      if (isTRUE(n_left > 0))
+        bounds <- bounds - (ncol(mtx) / 50) - track_height_top * n_left
+      
+      trees_rows <- dendro(hc, bounds, side = "left")
+    }
+    remove("dm", "hc")
+    
+  } else {
+    trees_rows <- FALSE
+  }
+  
+  all_trees <- rbind(
+    if (!isFALSE(trees_cols)) trees_cols else NULL,
+    if (!isFALSE(trees_rows)) trees_rows else NULL )
+  
+  remove("trees_cols", "trees_rows")
+  remove("clust", "clust_rows", "clust_cols")
+  remove("dist", "dist_rows", "dist_cols")
+  
+  
+  
   #________________________________________________________
   # Convert all track definitions to long form.
   #________________________________________________________
@@ -265,111 +370,10 @@ plot_heatmap <- function (
     # Add to either top or left collection.
     #________________________________________________________
     if (eq(track[['side']], "top")) { top_tracks  %<>% c(list(track))
-    } else                                 { left_tracks %<>% c(list(track)) }
+    } else                          { left_tracks %<>% c(list(track)) }
     
   }
-  n_top  <- length(top_tracks)
-  n_left <- length(left_tracks)
   
-  
-  
-  #________________________________________________________
-  # Heuristics for setting sizes and heights of elements
-  #________________________________________________________
-  if (is_null(tree_height))  tree_height  <- min(dim(mtx)) * 0.15
-  if (is_null(track_height)) track_height <- tree_height / 4
-  
-  ratio <- ratio * ncol(mtx) / nrow(mtx)
-  
-  if (is_null(label_size))         label_size <- pmax(5, pmin(14, 100 / dim(mtx)))
-  if (!is_null(names(label_size))) label_size <- label_size[rev(order(names(label_size)))]
-  label_size_x <- tail(label_size, 1)
-  label_size_y <- head(label_size, 1)
-  if (isTRUE(n_left > 0)) label_size_x <- .c(.rep(10, n_left), .rep(label_size_x, ncol(mtx)))
-  if (isTRUE(n_top  > 0)) label_size_y <- .c(.rep(10, n_top),  .rep(label_size_y, nrow(mtx)))
-  label_size_x <- unit(label_size_x, "points")
-  label_size_y <- unit(label_size_y, "points")
-  
-  
-  
-  
-  #________________________________________________________
-  # Use specified height(s) + ratio to compute top & left heights
-  #________________________________________________________
-  stopifnot(is.numeric(tree_height) && is.numeric(track_height) && is.numeric(ratio))
-  stopifnot(length(tree_height) > 0 && length(track_height) > 0 && length(ratio) == 1)
-  tree_height_top   <- tail(tree_height,  1) * ifelse(ratio < 1, ratio, 1)
-  tree_height_left  <- head(tree_height,  1) * ifelse(ratio > 1, ratio, 1)
-  track_height_top  <- tail(track_height, 1) * ifelse(ratio < 1, ratio, 1)
-  track_height_left <- head(track_height, 1) * ifelse(ratio > 1, ratio, 1)
-  remove("tree_height", "track_height")
-  
-  
-  #________________________________________________________
-  # Rescale matrix's row or column values
-  #________________________________________________________
-  if (eq(rescale, "rows")) {
-    mtx <- t(apply(mtx, 1L, scales::rescale))
-    
-  } else if (eq(rescale, "cols")) {
-    mtx <- apply(mtx, 2L, scales::rescale)
-  }
-  
-  
-  #________________________________________________________
-  # Cluster matrix's rows/cols and generate data.frames for dendrograms
-  #________________________________________________________
-  if (!isFALSE(clust_cols) && !is.na(clust_cols)) {
-    
-    dm <- dist_cols
-    hc <- clust_cols
-    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(t(mtx), method = dm)
-    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm,   method = hc)
-    mtx <- mtx[,hc[['order']]]
-    
-    if (isTRUE(trees_cols)) {
-      
-      bounds <- 0.5 + nrow(mtx) + c(0, tree_height_top)
-      if (isTRUE(n_top > 0))
-        bounds <- bounds + (nrow(mtx) / 50) + track_height_top * n_top
-      
-      trees_cols <- dendro(hc, bounds, side = "top")
-    }
-    remove("dm", "hc")
-    
-  } else {
-    trees_cols <- FALSE
-  }
-  
-  if (!isFALSE(clust_rows) && !is.na(clust_rows)) {
-    
-    dm <- dist_rows
-    hc <- clust_rows
-    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
-    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
-    mtx <- mtx[hc[['order']],]
-    
-    if (isTRUE(trees_rows)) {
-      
-      bounds <- 0.5 - c(0, tree_height_left)
-      if (isTRUE(n_left > 0))
-        bounds <- bounds - (ncol(mtx) / 50) - track_height_top * n_left
-      
-      trees_rows <- dendro(hc, bounds, side = "left")
-    }
-    remove("dm", "hc")
-    
-  } else {
-    trees_rows <- FALSE
-  }
-  
-  all_trees <- rbind(
-    if (!isFALSE(trees_cols)) trees_cols else NULL,
-    if (!isFALSE(trees_rows)) trees_rows else NULL )
-  
-  remove("trees_cols", "trees_rows")
-  remove("clust", "clust_rows", "clust_cols")
-  remove("dist", "dist_rows", "dist_cols")
   
   
   #________________________________________________________
@@ -390,9 +394,10 @@ plot_heatmap <- function (
   remove("tree_height_left", "tree_height_top", "track_height_left", "track_height_top")
   
   df <- data.frame(
-    x    = factor(rep(colnames(mtx), each = nrow(mtx)), levels=colnames(mtx)),
-    y    = factor(rep(rownames(mtx),        ncol(mtx)), levels=rownames(mtx)),
-    fill = as.vector(mtx) )
+      x    = factor(rep(colnames(mtx), each = nrow(mtx)), levels=colnames(mtx)),
+      y    = factor(rep(rownames(mtx),        ncol(mtx)), levels=rownames(mtx)),
+      fill = as.vector(mtx) ) %>%
+    as_rbiom_tbl()
   
   
   
@@ -559,7 +564,7 @@ plot_heatmap <- function (
   
   if (!is_null(all_trees)) {
     
-    attr(gglayers[[1]][['data']], 'trees') <- all_trees
+    attr(gglayers[[1]][['data']], 'trees') <- as_rbiom_tbl(all_trees)
     
     gglayers %<>% ggpush(geom_segment( 
       data    = ~ attr(., 'trees', exact = TRUE),
@@ -573,13 +578,13 @@ plot_heatmap <- function (
     track <- all_tracks[[i]]
     layer <- plot_heatmap_layer(track, i)
     
-    attr(gglayers[[1]][['data']], track[['id']]) <- track[['data']]
+    attr(gglayers[[1]][['data']], track[['id']]) <- as_rbiom_tbl(track[['data']])
     data <- as.formula(sprintf("~attr(., '%s', exact = TRUE)", track[['id']]))
     
     gglayers %<>% ggpush(new_scale_fill())
     gglayers %<>% ggpush(geom_tile(data = data, mapping = track[['mapping']], .indent = 4))
     gglayers %<>% ggpush(do.call(layer[['fun']], c(layer[['args']], .indent = 4)))
-    gglayers %<>% ggpush(geom_rect(mapping = track[['outline']], color = "black", fill = NA, size = 0.2 ))
+    gglayers %<>% ggpush(geom_rect(mapping = track[['outline']], color = "black", fill = NA, linewidth = 0.2 ))
   }
   
   
