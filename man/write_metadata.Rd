@@ -18,3 +18,25 @@ The normalized filepath that was written to (invisibly).
 \description{
 Write BIOM metadata to a tab-separated value (tsv) file.
 }
+\seealso{
+Other metadata: 
+\code{\link{bdply}()},
+\code{\link{blply}()},
+\code{\link{metadata_names}()},
+\code{\link{metadata_numeric}()},
+\code{\link{n_metadata}()},
+\code{\link{sample_metadata}()},
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_counts}()},
+\code{\link{write_fasta}()},
+\code{\link{write_taxonomy}()},
+\code{\link{write_tree}()},
+\code{\link{write_xlsx}()}
+}
+\concept{metadata}
+\concept{writers}

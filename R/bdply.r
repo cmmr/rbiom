@@ -6,6 +6,9 @@
 #' 
 #' @inherit documentation_default
 #' 
+#' @family metadata
+#' @family biom
+#' 
 #' @param vars   A character vector of metadata fields. Each unique combination
 #'        of values in these columns will be used to create a subsetted 
 #'        \code{rbiom} object to pass to \code{FUN}. If \code{NULL}, 

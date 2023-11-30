@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9102
-Date: 2023-11-27
+Version: 2.0.0.9104
+Date: 2023-11-29
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith01@gmail.com", 
@@ -15,7 +15,7 @@ Description:
     diversity, beta diversity (including 'UniFrac'), summarizing counts by 
     taxonomic level, subsetting, visualizations, and statistical analysis. 
     All CPU intensive operations are written in C.
-URL: https://cmmr.github.io/rbiom/index.html, https://github.com/cmmr/rbiom
+URL: https://cmmr.github.io/rbiom, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
 License: AGPL-3.0-or-later
 Encoding: UTF-8

@@ -3,6 +3,8 @@
 #' 
 #' @inherit documentation_default
 #' 
+#' @family taxa_abundance
+#' 
 #' @param rank  The taxonomic rank to return sums or means for. The default, 
 #'        \code{0}, returns per-OTU summaries.
 #'        

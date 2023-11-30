@@ -3,7 +3,7 @@
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family samples
 #' 
 #' @param value   A character vector of the new sample names.
 #' 
@@ -64,7 +64,7 @@ sample_names <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family otus
 #' 
 #' @param value   A character vector with the new OTU names.
 #' 
@@ -134,7 +134,7 @@ otu_names <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family taxonomy
 #' 
 #' @param value  A character vector the new taxa rank names.
 #' 
@@ -185,7 +185,7 @@ taxa_ranks <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family metadata
 #' 
 #' @param value  A character vector of the new metadata column names. Names
 #'        cannot start with a \code{.} character. Leading and trailing
@@ -239,7 +239,7 @@ metadata_names <- function (biom) {
 #' 
 #' @inherit documentation_default
 #'
-#' @family setters
+#' @family otus
 #' 
 #' @param value A numeric matrix. Rownames and colnames must be eq to
 #'        the current [otu_matrix()] value.
@@ -305,10 +305,10 @@ dim.rbiom <- function (x) { dim(x$counts) }
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family phylogeny
 #' 
-#' @param value A \code{phylo} class object with tip.labels matching 
-#'        \code{otu_names(x)}. If there are more tip.labels than
+#' @param value A \code{phylo} class object, file name, or newick string with 
+#'        leaf names matching \code{otu_names(x)}. If there are more leafs than
 #'        taxa names, then the tree will be subset.
 #' 
 #' @return A \code{phylo} class object of the tree in \code{biom}.
@@ -360,9 +360,10 @@ otu_tree <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family sequences
 #' 
-#' @param value A named character vector. Names must match \code{otu_names(x)}.
+#' @param value A file name with fasta-formatted sequences or a named character 
+#'        vector. Names must match \code{otu_names(biom)}.
 #' 
 #' @return A named character vector of sequences in \code{biom}. If this data
 #'           is not present, then returns \code{NULL}.
@@ -425,7 +426,7 @@ otu_sequences <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family biom
 #' 
 #' @param value The identifier to add (character vector of length 1).
 #' 
@@ -470,7 +471,6 @@ biom_id <- function (biom) {
 
 
 #' @rdname biom_id
-#' @family setters
 #' @export
 biom_comment <- function (biom) {
   validate_biom(clone = FALSE)

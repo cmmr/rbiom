@@ -107,7 +107,7 @@ eval_envir <- function (env, ...) {
   #____________________________________________________________________
   # Evaluate and hash all arguments into a clean env.
   #____________________________________________________________________
-  params <- lapply(as.list(env), function(x) {
+  params <- lapply(as.list(env), function (x) {
       x <- eval(x)
       if (!is.null(x) && is.null(attr(x, 'hash', exact = TRUE)))
         attr(x, 'hash') <- rlang::hash(x)

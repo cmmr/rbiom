@@ -13,7 +13,8 @@ otu_sequences(biom) <- value
 \item{biom}{An \code{rbiom}-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{value}{A named character vector. Names must match \code{otu_names(x)}.}
+\item{value}{A file name with fasta-formatted sequences or a named character
+vector. Names must match \code{otu_names(biom)}.}
 }
 \value{
 A named character vector of sequences in \code{biom}. If this data
@@ -45,15 +46,8 @@ Get or set the nucleotide sequences associated with each OTU.
 
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+Other sequences: 
+\code{\link{has_sequences}()},
+\code{\link{write_fasta}()}
 }
-\concept{setters}
+\concept{sequences}

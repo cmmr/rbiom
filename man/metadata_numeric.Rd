@@ -23,9 +23,15 @@ Check which metadata columns are numeric.
 
 }
 \seealso{
-Other accessors: 
-\code{\link{biom_info}()},
-\code{\link{n_samples}()},
-\code{\link{sample_sums}()}
+Other metadata: 
+\code{\link{bdply}()},
+\code{\link{blply}()},
+\code{\link{metadata_names}()},
+\code{\link{n_metadata}()},
+\code{\link{sample_metadata}()},
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()},
+\code{\link{write_metadata}()}
 }
-\concept{accessors}
+\concept{metadata}

@@ -18,3 +18,19 @@ The normalized filepath that was written to (invisibly).
 \description{
 Write BIOM taxonomy map to a tab-separated value (tsv) file.
 }
+\seealso{
+Other taxonomy: 
+\code{\link{n_ranks}()},
+\code{\link{otu_taxonomy}()},
+\code{\link{taxa_ranks}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_counts}()},
+\code{\link{write_fasta}()},
+\code{\link{write_metadata}()},
+\code{\link{write_tree}()},
+\code{\link{write_xlsx}()}
+}
+\concept{taxonomy}
+\concept{writers}

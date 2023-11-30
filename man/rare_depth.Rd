@@ -30,5 +30,13 @@ calls to \code{\link[=sample_rarefy]{sample_rarefy()}}. Calling \code{\link[=as_
 
 }
 \seealso{
-\code{\link[=sample_sums]{sample_sums()}}
+Other rarefaction: 
+\code{\link{is_rarefied}()},
+\code{\link{rare_barplot}()},
+\code{\link{rare_corrplot}()},
+\code{\link{rare_multiplot}()},
+\code{\link{rare_suggest}()},
+\code{\link{sample_rarefy}()},
+\code{\link{sample_sums}()}
 }
+\concept{rarefaction}

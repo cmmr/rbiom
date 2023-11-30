@@ -3,6 +3,7 @@
 #' @inherit documentation_default
 #' 
 #' @family metadata
+#' @family samples
 #'        
 #' @param samples   Sample names, indices, or a logical vector identifying
 #'        the samples to keep. The latter two should be based on the order of

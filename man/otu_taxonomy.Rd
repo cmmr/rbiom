@@ -69,15 +69,9 @@ Get or set the taxonomy table.
 
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+Other taxonomy: 
+\code{\link{n_ranks}()},
+\code{\link{taxa_ranks}()},
+\code{\link{write_taxonomy}()}
 }
-\concept{setters}
+\concept{taxonomy}

@@ -32,15 +32,9 @@ Get or set the OTU names.
     head(otu_names(biom))
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
+Other otus: 
+\code{\link{n_otus}()},
 \code{\link{otu_matrix}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+\code{\link{write_counts}()}
 }
-\concept{setters}
+\concept{otus}

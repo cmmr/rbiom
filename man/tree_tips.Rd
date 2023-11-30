@@ -4,10 +4,10 @@
 \alias{tree_tips}
 \title{Names of a phylogenetic tree's tips/leafs.}
 \usage{
-tree_tips(x)
+tree_tips(tree)
 }
 \arguments{
-\item{x}{A phylo object, as returned from \code{\link[=read_tree]{read_tree()}}.}
+\item{tree}{A phylo object, as returned from \code{\link[=read_tree]{read_tree()}}.}
 }
 \value{
 A character vector with the leaf names.
@@ -24,3 +24,13 @@ Names of a phylogenetic tree's tips/leafs.
     head(leafs)
 
 }
+\seealso{
+Other phylogeny: 
+\code{\link{has_tree}()},
+\code{\link{otu_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_data}()},
+\code{\link{tree_subset}()},
+\code{\link{write_tree}()}
+}
+\concept{phylogeny}

@@ -2,15 +2,9 @@
 % Please edit documentation in R/accessors.r
 \name{has_tree}
 \alias{has_tree}
-\alias{has_sequences}
-\alias{is_rarefied}
-\title{Check specific properties of an rbiom object.}
+\title{Check if a phylogenetic tree is included in an rbiom object.}
 \usage{
 has_tree(biom)
-
-has_sequences(biom)
-
-is_rarefied(biom)
 }
 \arguments{
 \item{biom}{An \code{rbiom}-class object, or data coercible with
@@ -20,13 +14,21 @@ is_rarefied(biom)
 \code{TRUE} if it has the property, \code{FALSE} otherwise.
 }
 \description{
-Check specific properties of an rbiom object.
+Check if a phylogenetic tree is included in an rbiom object.
 }
 \examples{
     library(rbiom)
     
     has_tree(hmp50)
-    has_sequences(hmp50)
-    is_rarefied(hmp50)
-    
+
 }
+\seealso{
+Other phylogeny: 
+\code{\link{otu_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_data}()},
+\code{\link{tree_subset}()},
+\code{\link{tree_tips}()},
+\code{\link{write_tree}()}
+}
+\concept{phylogeny}

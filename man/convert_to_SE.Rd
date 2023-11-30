@@ -29,3 +29,10 @@ Requires the Bioconductor R package 'SummarizedExperiment' to be installed.
       print(se)
     }
 }
+\seealso{
+Other conversion: 
+\code{\link{as_rbiom}()},
+\code{\link{convert_from_phyloseq}()},
+\code{\link{convert_to_TSE}()}
+}
+\concept{conversion}

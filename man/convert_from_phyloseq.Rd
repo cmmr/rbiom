@@ -24,3 +24,10 @@ Convert a phyloseq object to an rbiom object.
     biom <- convert_from_phyloseq(phy)
  }
 }
+\seealso{
+Other conversion: 
+\code{\link{as_rbiom}()},
+\code{\link{convert_to_SE}()},
+\code{\link{convert_to_TSE}()}
+}
+\concept{conversion}

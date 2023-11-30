@@ -1,6 +1,9 @@
 #' Write data and summary information to a Microsoft Excel-compatible workbook.
 #' 
 #' @inherit otu_taxonomy params
+#' 
+#' @family biom
+#' @family writers
 #'
 #' @param biom   The \code{rbiom} object to save to the file.
 #' 

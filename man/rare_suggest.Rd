@@ -22,3 +22,14 @@ Suggest a 'good' rarefaction depth.
     rare_suggest(hmp50)
 
 }
+\seealso{
+Other rarefaction: 
+\code{\link{is_rarefied}()},
+\code{\link{rare_barplot}()},
+\code{\link{rare_corrplot}()},
+\code{\link{rare_depth}()},
+\code{\link{rare_multiplot}()},
+\code{\link{sample_rarefy}()},
+\code{\link{sample_sums}()}
+}
+\concept{rarefaction}

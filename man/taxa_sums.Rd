@@ -30,3 +30,14 @@ Get summary taxa abundances.
     taxa_means(hmp50, 'Family') \%>\% head(5)
 
 }
+\seealso{
+Other taxa_abundance: 
+\code{\link{taxa_barplot}()},
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_corrplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_matrix}()},
+\code{\link{taxa_stats}()},
+\code{\link{taxa_table}()}
+}
+\concept{taxa_abundance}

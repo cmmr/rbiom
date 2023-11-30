@@ -5,6 +5,7 @@
 #' 
 #' @inherit documentation_default
 #' 
+#' @family phylogeny
 #' @family visualization
 #' 
 #' @param layout   Any layout option supported by [ggtree::ggtree()]:
@@ -199,6 +200,8 @@ tree_plot <- function (
 
 #' Provides a 'treedata' S4 object for use in ggtree functions.
 #' 
+#' @family phylogeny
+#' 
 #' @param biom   An rbiom object, as returned from [read_biom()].
 #' 
 #' @param reads   Include a 'reads' column indicating the sum of taxa 
@@ -316,7 +319,9 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
 
 #' Names of a phylogenetic tree's tips/leafs.
 #' 
-#' @param x  A phylo object, as returned from [read_tree()].
+#' @family phylogeny
+#' 
+#' @param tree  A phylo object, as returned from [read_tree()].
 #' @return A character vector with the leaf names.
 #' @export
 #' @examples
@@ -327,9 +332,9 @@ tree_data <- function (biom, reads = TRUE, clades = TRUE) {
 #'     leafs <- tree_tips(tree)
 #'     head(leafs)
 #'
-tree_tips <- function (x) {
-  stopifnot(is(x, 'phylo'))
-  x$tip.label
+tree_tips <- function (tree) {
+  stopifnot(is(tree, 'phylo'))
+  tree$tip.label
 }
 
 
@@ -337,6 +342,8 @@ tree_tips <- function (x) {
 #' Create a subtree by specifying tips to keep.
 #' 
 #' @name tree_subset
+#' 
+#' @family phylogeny
 #' 
 #' @param tree  A phylo object, as returned from [read_tree()].
 #' @param tips  A character, numeric, or logical vector of tips to keep.

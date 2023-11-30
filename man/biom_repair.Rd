@@ -15,3 +15,18 @@ An \code{rbiom} object.
 \description{
 Run after manually editing an rbiom object's content.
 }
+\seealso{
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{as_rbiom}()},
+\code{\link{bdply}()},
+\code{\link{biom_build}()},
+\code{\link{biom_id}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{blply}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()},
+\code{\link{write_xlsx}()}
+}
+\concept{biom}

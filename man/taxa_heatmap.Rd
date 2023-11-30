@@ -174,6 +174,7 @@ Other taxa_abundance:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_matrix}()},
 \code{\link{taxa_stats}()},
+\code{\link{taxa_sums}()},
 \code{\link{taxa_table}()}
 
 Other visualization: 

@@ -4,8 +4,9 @@
 
 #' Get \code{rbiom} object's miscellaneous information.
 #' 
-#' @family accessors
 #' @inherit documentation_default
+#' 
+#' @family biom
 #' 
 #' @return A list of the top-level metadata in \code{biom}.
 #' 
@@ -24,8 +25,9 @@ biom_info <- function (biom) {
 
 #' Check which metadata columns are numeric.
 #' 
-#' @family accessors
 #' @inherit documentation_default
+#' 
+#' @family metadata
 #' 
 #' @return A named logical vector indicating if each metadata column is 
 #'         numeric.
@@ -57,13 +59,14 @@ sample_levels <- function (biom) {
 
 #' Sum the observations in each sample.
 #' 
-#' @family accessors
 #' @inherit documentation_default
+#' 
+#' @family samples
+#' @family rarefaction
 #' 
 #' @return A named numeric vector of the number of observations in each 
 #'         sample. The names are the sample IDs.
-#'         
-#' @seealso [rare_depth()], [rare_barplot()]
+#' 
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -87,10 +90,11 @@ sample_sums <- function (biom) {
 #' 
 #' @inherit documentation_default
 #' 
+#' @family rarefaction
+#' 
 #' @return The rarefaction depth, or \code{NULL} if \code{biom} is not 
 #'         rarefied.
 #' 
-#' @seealso [sample_sums()]
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -107,19 +111,19 @@ rare_depth <- function (biom) {
 }
 
 
-#' Check specific properties of an rbiom object.
+#' Check if a phylogenetic tree is included in an rbiom object.
 #' 
 #' @inherit documentation_default
 #' 
+#' @family phylogeny
+#' 
 #' @return \code{TRUE} if it has the property, \code{FALSE} otherwise.
+#'     
+#' @export
 #' @examples
 #'     library(rbiom)
 #'     
 #'     has_tree(hmp50)
-#'     has_sequences(hmp50)
-#'     is_rarefied(hmp50)
-#'     
-#' @export
 #' 
 has_tree <- function (biom) {
   validate_biom(clone = FALSE)
@@ -127,16 +131,40 @@ has_tree <- function (biom) {
 }
 
 
-#' @rdname has_tree
+#' Check if sequences are included in the rbiom object.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family sequences
+#' 
+#' @return \code{TRUE} if \code{biom} has sequences, \code{FALSE} otherwise.
+#'     
 #' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     has_sequences(hmp50)
+#' 
 has_sequences <- function (biom) {
   validate_biom(clone = FALSE)
   return (!is_null(biom[['sequences']]))
 }
 
 
-#' @rdname has_tree
+#' Check if the rbiom object is rarefied.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family rarefaction
+#' 
+#' @return \code{TRUE} if \code{biom} is rarefied, \code{FALSE} otherwise.
+#'     
 #' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     is_rarefied(hmp50)
+#' 
 is_rarefied <- function (biom) {
   validate_biom(clone = FALSE)
   return (isTRUE(attr(biom, 'rarefaction', exact=TRUE) > 0))
@@ -144,41 +172,61 @@ is_rarefied <- function (biom) {
 
 
 
-#' Report the number of samples, otus, or ranks in an rbiom.
+#' Report the number of samples in an rbiom object.
 #' 
-#' @family accessors
 #' @inherit documentation_default
 #' 
-#' @return The number of samples, otus, taxa ranks, or metadata columns present.
+#' @family samples
+#' 
+#' @return The number of samples present.
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
 #'     n_samples(hmp50)
-#'     n_otus(hmp50)
-#'     n_ranks(hmp50)
-#'     n_metadata(hmp50)
 #'
-
 n_samples <- function (biom) {
   validate_biom(clone = FALSE)
   return (ncol(biom[['counts']]))
 }
 
 
-#' @rdname n_samples
+#' Report the number of otus in an rbiom object.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family otus
+#' 
+#' @return The number of otus present.
+#' 
 #' @export
-
+#' @examples
+#'     library(rbiom)
+#'     
+#'     n_otus(hmp50)
+#'     
 n_otus <- function (biom) {
   validate_biom(clone = FALSE)
   return (nrow(biom[['counts']]))
 }
 
 
-#' @rdname n_samples
-#' @export
 
+#' Report the number of ranks in an rbiom object.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family taxonomy
+#' 
+#' @return The number of taxonomic ranks present.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     n_ranks(hmp50)
+#'
 n_ranks <- function (biom) {
   validate_biom(clone = FALSE)
   n <- ncol(biom[['taxonomy']])
@@ -186,9 +234,21 @@ n_ranks <- function (biom) {
 }
 
 
-#' @rdname n_samples
-#' @export
 
+#' Report the number of metadata fields in an rbiom object.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family metadata
+#' 
+#' @return The number of metadata fields present.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     n_metadata(hmp50)
+#'
 n_metadata <- function (biom) {
   validate_biom(clone = FALSE)
   n <- ncol(biom[['metadata']])

@@ -57,3 +57,27 @@ Sample' tab.
       outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
     }
 }
+\seealso{
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{as_rbiom}()},
+\code{\link{bdply}()},
+\code{\link{biom_build}()},
+\code{\link{biom_id}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{biom_repair}()},
+\code{\link{blply}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_counts}()},
+\code{\link{write_fasta}()},
+\code{\link{write_metadata}()},
+\code{\link{write_taxonomy}()},
+\code{\link{write_tree}()}
+}
+\concept{biom}
+\concept{writers}

@@ -96,7 +96,7 @@ print.rbiom_code <- function (x, ...) {
 #' @noRd
 #' @keywords internal
 #' @export
-tbl_sum.rbiom_tbl <- function(x) {
+tbl_sum.rbiom_tbl <- function (x) {
   c(attr(x, 'tbl_sum'), NextMethod())
 }
 

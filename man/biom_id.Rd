@@ -42,26 +42,17 @@ for free-form text.
 
 }
 \seealso{
-Other setters: 
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
-
-Other setters: 
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{as_rbiom}()},
+\code{\link{bdply}()},
+\code{\link{biom_build}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{biom_repair}()},
+\code{\link{blply}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()},
+\code{\link{write_xlsx}()}
 }
-\concept{setters}
+\concept{biom}

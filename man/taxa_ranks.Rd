@@ -32,15 +32,9 @@ Get or set the names of the taxonomic ranks.
     taxa_ranks(biom)
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
+Other taxonomy: 
+\code{\link{n_ranks}()},
 \code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()}
+\code{\link{write_taxonomy}()}
 }
-\concept{setters}
+\concept{taxonomy}

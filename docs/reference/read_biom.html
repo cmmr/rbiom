@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9102</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9104</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,19 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Analysis Basics</h6>
+    <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
+    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
+    <a class="dropdown-item" href="../articles/plot_types.html">Plot Types</a>
+    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -124,70 +137,55 @@ components of the BIOM file specification and therefore will be NULL
 or simple placeholders in the returned object when they are not provided
 by the BIOM file.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other biom: 
+<code><a href="as_percent.html">as_percent</a>()</code>,
+<code><a href="as_rbiom.html">as_rbiom</a>()</code>,
+<code><a href="bdply.html">bdply</a>()</code>,
+<code><a href="biom_build.html">biom_build</a>()</code>,
+<code><a href="biom_id.html">biom_id</a>()</code>,
+<code><a href="biom_info.html">biom_info</a>()</code>,
+<code><a href="biom_merge.html">biom_merge</a>()</code>,
+<code><a href="biom_repair.html">biom_repair</a>()</code>,
+<code><a href="blply.html">blply</a>()</code>,
+<code><a href="write_biom.html">write_biom</a>()</code>,
+<code><a href="write_xlsx.html">write_xlsx</a>()</code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span>, package <span class="op">=</span> <span class="st">"rbiom"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">read_biom</span><span class="op">(</span><span class="va">infile</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `otu_sequences&lt;-`(`*tmp*`, value = sequences):</span> unused argument (value = sequences)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Human Microbiome Project - 50 Sample Demo (2023-11-28)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      50 Samples:  (HMP01, HMP02, HMP03, HMP04, HMP05, HM...)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     490 Taxa:     (UncO2713, UncO4101, AnmMass2, PreBivi...)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       7 Ranks:    (.otu, Kingdom, Phylum, Class, Order, ...)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       5 Metadata: (.sample, Age, BMI, Body Site, and Sex)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Tree:     Present</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Taxa Abundances</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="otu_matrix.html">otu_matrix</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO2713     0     0     0     0     0     0     1     0     0     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UncO4101     1     5     6    18     5    15     0     1     8     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AnmMass2     0     0     0     0     0     0     0     0     0     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PreBivi6     0     0     0     0     0     0     0     0     0     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CprSpeci     0     0     0     0     0     0     0     0     0     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc96922     0     0     0     1     2     5     0     1     0     0</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="otu_taxonomy.html">otu_taxonomy</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Kingdom  Phylum         Class          Order            Family     Genus .otu </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Bacteria Bacteroidetes  Bacteroidia    Bacteroidales    Rikenella… Alis… UncO…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Bacteria Firmicutes     Clostridia     Clostridiales    Lachnospi… Lach… UncO…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Bacteria Actinobacteria Actinobacteria Actinomycetales  Actinomyc… Acti… AnmM…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Bacteria Bacteroidetes  Bacteroidia    Bacteroidales    Prevotell… Prev… PreB…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Bacteria Bacteroidetes  Bacteroidia    Bacteroidales    Porphyrom… Barn… CprS…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Bacteria Bacteroidetes  Flavobacteriia Flavobacteriales Flavobact… Capn… Unc9…</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Metadata</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="sample_metadata.html">sample_metadata</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample   Age   BMI `Body Site`   Sex   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP01      22    20 Buccal mucosa Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP02      24    23 Buccal mucosa Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP03      28    26 Saliva        Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP04      25    23 Saliva        Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> HMP05      27    24 Buccal mucosa Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> HMP06      32    25 Saliva        Male  </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Sex</span>, <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">`Body Site`</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          Anterior nares Buccal mucosa Mid vagina Saliva Stool</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Female              5             5         10      5     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Male                5             5          0      5     5</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Mean age: %.1f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Mean age: 27.8"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Phylogenetic tree</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="otu_tree.html">otu_tree</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="tree_subset.html">tree_subset</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
 <span class="r-in"><span>      <span class="fu">ape</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ape/man/plot.phylo.html" class="external-link">plot.phylo</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="read_biom-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

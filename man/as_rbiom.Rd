@@ -23,4 +23,24 @@ Convert BIOM data to an rbiom object.
 }
 \seealso{
 \code{\link[=biom_build]{biom_build()}}, \code{\link[=read_biom]{read_biom()}}
+
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{bdply}()},
+\code{\link{biom_build}()},
+\code{\link{biom_id}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{biom_repair}()},
+\code{\link{blply}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()},
+\code{\link{write_xlsx}()}
+
+Other conversion: 
+\code{\link{convert_from_phyloseq}()},
+\code{\link{convert_to_SE}()},
+\code{\link{convert_to_TSE}()}
 }
+\concept{biom}
+\concept{conversion}

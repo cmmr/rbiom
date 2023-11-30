@@ -7,21 +7,26 @@ template:
   bslib:
     code-bg: "#2b2b2b"
 
-# navbar:
-#  components:
-#    articles:
-#     text: Articles
-#     menu:
-#     - text: "Analysis Basics"
-#     - text: "Importing Your Data"
-#       href: articles/importing.html
-#     - text: "Diversity Metrics"
-#       href: articles/diversity.html
-#     - text: -------
-#     - text: "Plotting"
-#     - text: "Plot Types"
-#       href: articles/plot_types.html
-#     - text: "Mapping Metadata to Aesthetics"
-#       href: articles/aesthetics.html
-#     - text: "Data Partitioning"
-#       href: articles/partitioning.html
+figures:
+  dev: ragg::agg_png
+  fig.width: 8
+  fig.height: 4
+
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: "Analysis Basics"
+    - text: "Importing Your Data"
+      href: articles/importing.html
+    - text: "Diversity Metrics"
+      href: articles/diversity.html
+    - text: -------
+    - text: "Plotting"
+    - text: "Plot Types"
+      href: articles/plot_types.html
+    - text: "Mapping Metadata to Aesthetics"
+      href: articles/aesthetics.html
+    - text: "Data Partitioning"
+      href: articles/partitioning.html

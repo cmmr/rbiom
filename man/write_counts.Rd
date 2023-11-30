@@ -2,7 +2,7 @@
 % Please edit documentation in R/writers.r
 \name{write_counts}
 \alias{write_counts}
-\title{Write BIOM counts to a tab-separated value (tsv) file.}
+\title{Write OTU counts to a tab-separated value (tsv) file.}
 \usage{
 write_counts(biom, file)
 }
@@ -16,5 +16,21 @@ write_counts(biom, file)
 The normalized filepath that was written to (invisibly).
 }
 \description{
-Write BIOM counts to a tab-separated value (tsv) file.
+Write OTU counts to a tab-separated value (tsv) file.
 }
+\seealso{
+Other otus: 
+\code{\link{n_otus}()},
+\code{\link{otu_matrix}()},
+\code{\link{otu_names}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_fasta}()},
+\code{\link{write_metadata}()},
+\code{\link{write_taxonomy}()},
+\code{\link{write_tree}()},
+\code{\link{write_xlsx}()}
+}
+\concept{otus}
+\concept{writers}

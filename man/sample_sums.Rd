@@ -25,11 +25,22 @@ Sum the observations in each sample.
     hist(sample_sums(hmp50))
 }
 \seealso{
-\code{\link[=rare_depth]{rare_depth()}}, \code{\link[=rare_barplot]{rare_barplot()}}
+Other samples: 
+\code{\link{n_samples}()},
+\code{\link{sample_metadata}()},
+\code{\link{sample_names}()},
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()}
 
-Other accessors: 
-\code{\link{biom_info}()},
-\code{\link{metadata_numeric}()},
-\code{\link{n_samples}()}
+Other rarefaction: 
+\code{\link{is_rarefied}()},
+\code{\link{rare_barplot}()},
+\code{\link{rare_corrplot}()},
+\code{\link{rare_depth}()},
+\code{\link{rare_multiplot}()},
+\code{\link{rare_suggest}()},
+\code{\link{sample_rarefy}()}
 }
-\concept{accessors}
+\concept{rarefaction}
+\concept{samples}

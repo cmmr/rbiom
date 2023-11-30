@@ -3,6 +3,8 @@
 #' 
 #' @inherit documentation_default
 #' 
+#' @family biom
+#' 
 #' @return An \code{rbiom} object.
 #' @export
 #' @examples

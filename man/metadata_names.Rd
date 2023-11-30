@@ -34,15 +34,15 @@ Get or set the metadata column names.
     metadata_names(biom)
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
+Other metadata: 
+\code{\link{bdply}()},
+\code{\link{blply}()},
+\code{\link{metadata_numeric}()},
+\code{\link{n_metadata}()},
 \code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()},
+\code{\link{write_metadata}()}
 }
-\concept{setters}
+\concept{metadata}

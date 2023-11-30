@@ -1,5 +1,8 @@
 #' Convert BIOM data to an rbiom object.
 #' 
+#' @family biom
+#' @family conversion
+#' 
 #' @param biom   Object which can be coerced to an \code{rbiom}-class object.
 #'        For example:
 #'        \itemize{
@@ -64,6 +67,8 @@ as_rbiom <- function (biom) {
 
 
 #' Run after manually editing an rbiom object's content.
+#' 
+#' @family biom
 #'
 #' @param biom  The \code{rbiom} object to repair.
 #'

@@ -45,6 +45,9 @@ write_wrapper <- function (outfile, callback) {
 
 #' Write BIOM metadata to a tab-separated value (tsv) file.
 #'
+#' @family metadata
+#' @family writers
+#' 
 #' @param biom   An rbiom object
 #' 
 #' @param file   Path to the output file. Filenames ending in 
@@ -71,7 +74,10 @@ write_metadata <- function (biom, file) {
 
 
 
-#' Write BIOM counts to a tab-separated value (tsv) file.
+#' Write OTU counts to a tab-separated value (tsv) file.
+#' 
+#' @family otus
+#' @family writers
 #'
 #' @param biom   An rbiom object
 #' 
@@ -93,6 +99,9 @@ write_counts <- function (biom, file) {
 
 #' Write BIOM taxonomy map to a tab-separated value (tsv) file.
 #'
+#' @family taxonomy
+#' @family writers
+#' 
 #' @param biom   An rbiom object
 #' 
 #' @param file   Path to the output file. Filenames ending in 
@@ -123,6 +132,9 @@ write_taxonomy <- function (biom, file) {
 
 
 #' Write DNA sequences to a file in fasta format.
+#' 
+#' @family sequences
+#' @family writers
 #'
 #' @param seqs   A named character vector where names are sequence names and
 #'        values are the sequences. Also accepts an \code{rbiom} object which 
@@ -157,6 +169,9 @@ write_fasta <- function (seqs, file = NULL) {
 
 
 #' Write a newick formatted phylogenetic tree.
+#' 
+#' @family phylogeny
+#' @family writers
 #' 
 #' @param tree  A \code{phylo} object, as returned from [read_tree()]. Also 
 #'        accepts an \code{rbiom} object if it has a phylogentic tree.

@@ -4,6 +4,24 @@
     <loc>https://cmmr.github.io/rbiom/404.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/articles/aesthetics.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/diversity.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/importing.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/partitioning.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/plot_types.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/authors.html</loc>
   </url>
   <url>
@@ -148,6 +166,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/documentation_test.trends.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/has_sequences.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/has_tree.html</loc>
   </url>
   <url>
@@ -157,10 +178,22 @@
     <loc>https://cmmr.github.io/rbiom/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/is_rarefied.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/metadata_names.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/metadata_numeric.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/n_metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/n_otus.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/n_ranks.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/n_samples.html</loc>

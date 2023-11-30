@@ -2,17 +2,17 @@
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family metadata
+#' @family samples
 #' 
 #' @param field   The name of a single metadata column to retrieve. When 
 #'        provided, a named vector will be returned instead of a data.frame.
 #'        Default: \code{NULL}
 #' 
-#' @param value  A data.frame with the metadata. Its row names or '.sample' 
-#'        column must match the IDs in \code{sample_names(x)}. The returned
-#'        rbiom object will be subset to just the samples in the new metadata.
-#'        With the exception of '.sample', all character columns will be 
-#'        converted to factor.
+#' @param value  A data.frame or file name with the metadata. Its row names or 
+#'        '.sample' column must match the IDs in \code{sample_names(x)}. The 
+#'        returned rbiom object will be subset to just the samples in the new 
+#'        metadata. All character columns will be converted to factor.
 #'        
 #' @return A tibble (data.frame) of the metadata in \code{biom}. '.sample' will 
 #'         always be the first column. If \code{field} is given, will instead 
@@ -170,6 +170,7 @@ sample_metadata <- function (biom, field=NULL) {
 #' @inherit documentation_default
 #' 
 #' @family metadata
+#' @family samples
 #' 
 #' @param expr   A single or compound expression to evaluate.
 #'        
@@ -227,6 +228,7 @@ within.rbiom <- function (biom, expr) {
 #' @inherit documentation_default
 #' 
 #' @family metadata
+#' @family samples
 #' 
 #' @param subset   Logical expression indicating elements or rows to keep.
 #' 

@@ -2,21 +2,21 @@
 PALETTES <- list(
   
   # Discrete color palettes from various sources.
-  'okabe'      = c("E69F00", "56B4E9", "009E73", "F0E442", "0072B2", "D55E00", "CC79A7", "999999"),
-  'carto'      = c("88CCEE", "CC6677", "DDCC77", "117733", "332288", "AA4499", "44AA99", "999933", "882255", "661100", "6699CC", "888888"),
-  'r4'         = c("DF536B", "61D04F", "2297E6", "28E2E5", "CD0BBC", "F5C710", "9E9E9E", "000000"),
-  'polychrome' = c("5A5156", "E4E1E3", "F6222E", "FE00FA", "16FF32", "3283FE", "FEAF16", "B00068", "1CFFCE", "90AD1C", "2ED9FF", "DEA0FD", "AA0DFE", "F8A19F", "325A9B", "C4451C", "1C8356", "85660D", "B10DA1", "FBE426", "1CBE4F", "FA0087", "FC1CBF", "F7E1A0", "C075A6", "782AB6", "AAF400", "BDCDFF", "822E1C", "B5EFB5", "7ED7D1", "1C7F93", "D85FF7", "683B79", "66B0FF", "3B00FB"),
-  'tol'        = c("332288", "6699CC", "88CCEE", "44AA99", "117733", "999933", "DDCC77", "661100", "CC6677", "AA4466", "882255", "AA4499"),
   'bright'     = c("4477AA", "EE6677", "228833", "CCBB44", "66CCEE", "AA3377", "BBBBBB"),
+  'vibrant'    = c("EE7733", "0077BB", "33BBEE", "EE3377", "CC3311", "009988", "BBBBBB"),
+  'okabe'      = c("E69F00", "56B4E9", "009E73", "F0E442", "0072B2", "D55E00", "CC79A7", "999999"),
+  'r4'         = c("DF536B", "61D04F", "2297E6", "28E2E5", "CD0BBC", "F5C710", "9E9E9E", "000000"),
   'light'      = c("77AADD", "EE8866", "EEDD88", "FFAABB", "99DDFF", "44BB99", "BBCC33", "AAAA00"),
   'muted'      = c("CC6677", "332288", "DDCC77", "117733", "88CCEE", "882255", "44AA99", "999933", "AA4499"),
-  'vibrant'    = c("EE7733", "0077BB", "33BBEE", "EE3377", "CC3311", "009988", "BBBBBB"),
+  'fishy'      = c("6388B4", "FFAE34", "EF6F6A", "8CC2CA", "C3BC3F", "55AD89", "BB7693", "BAA094", "767676"),
   'tableau'    = c("4E79A7", "F28E2B", "E15759", "76B7B2", "59A14F", "EDC948", "B07AA1", "FF9DA7", "9C755F", "BAB0AC"),
   'classic'    = c("1F77B4", "FF7F0E", "2CA02C", "D62728", "9467BD", "8C564B", "E377C2", "7F7F7F", "BCBD22", "17BECF"),
-  'alphabet'   = c("AA0DFE", "3283FE", "85660D", "782AB6", "565656", "1C8356", "16FF32", "F7E1A0", "E2E2E2", "1CBE4F", "C4451C", "DEA0FD", "FE00FA", "325A9B", "FEAF16", "F8A19F", "90AD1C", "F6222E", "1CFFCE", "2ED9FF", "B10DA1", "C075A6", "FC1CBF", "B00068", "FBE426", "FA0087"),
+  'carto'      = c("88CCEE", "CC6677", "DDCC77", "117733", "332288", "AA4499", "44AA99", "999933", "882255", "661100", "6699CC", "888888"),
+  'tol'        = c("332288", "6699CC", "88CCEE", "44AA99", "117733", "999933", "DDCC77", "661100", "CC6677", "AA4466", "882255", "AA4499"),
   'tableau20'  = c("1F77B4", "AEC7E8", "FF7F0E", "FFBB78", "2CA02C", "98DF8A", "D62728", "FF9896", "9467BD", "C5B0D5", "8C564B", "C49C94", "E377C2", "F7B6D2", "7F7F7F", "C7C7C7", "BCBD22", "DBDB8D", "17BECF", "9EDAE5"),
   'kelly'      = c("F3C300", "875692", "F38400", "A1CAF1", "BE0032", "C2B280", "848482", "008856", "E68FAC", "0067A5", "F99379", "604E97", "F6A600", "B3446C", "DCD300", "882D17", "8DB600", "654522", "E25822", "2B3D26", "222222"),
-  'fishy'      = c("6388B4", "FFAE34", "EF6F6A", "8CC2CA", "C3BC3F", "55AD89", "BB7693", "BAA094", "767676"),
+  'alphabet'   = c("AA0DFE", "3283FE", "85660D", "782AB6", "565656", "1C8356", "16FF32", "F7E1A0", "E2E2E2", "1CBE4F", "C4451C", "DEA0FD", "FE00FA", "325A9B", "FEAF16", "F8A19F", "90AD1C", "F6222E", "1CFFCE", "2ED9FF", "B10DA1", "C075A6", "FC1CBF", "B00068", "FBE426", "FA0087"),
+  'polychrome' = c("5A5156", "E4E1E3", "F6222E", "FE00FA", "16FF32", "3283FE", "FEAF16", "B00068", "1CFFCE", "90AD1C", "2ED9FF", "DEA0FD", "AA0DFE", "F8A19F", "325A9B", "C4451C", "1C8356", "85660D", "B10DA1", "FBE426", "1CBE4F", "FA0087", "FC1CBF", "F7E1A0", "C075A6", "782AB6", "AAF400", "BDCDFF", "822E1C", "B5EFB5", "7ED7D1", "1C7F93", "D85FF7", "683B79", "66B0FF", "3B00FB"),
   
   # Sequential and diverging palettes from khroma R package. khroma::color("acton")(9)
   'acton'      = c("2D204C", "4F3D69", "765985", "9E6592", "C36C99", "D48CB1", "D3A5C4", "D9C5D8", "E5E5F0"),
@@ -26,7 +26,6 @@ PALETTES <- list(
   'buda'       = c("B200B2", "B22D9B", "BA4C90", "C56986", "CC847E", "D39F77", "DABD70", "E3DA68", "FFFF66"),
   'davos'      = c("2C194C", "264477", "3469AF", "5984BF", "7C9AB4", "A1B3AA", "C7CD9E", "E6E6BF", "FFFFFF"),
   'devon'      = c("2B194C", "27386B", "26588D", "3C6FB9", "788BD9", "ACA6ED", "C7C3F3", "E3E0F8", "FFFFFF"),
-  'grayC'      = c("FFFFFF", "DADADA", "B8B8B8", "979797", "767676", "585858", "3A3A3A", "1F1F1F", "000000"),
   'hawaii'     = c("8C0172", "922C54", "964C3E", "9A6D27", "9B951B", "89BB48", "6BD38C", "66E7D2", "B2F2FD"),
   'imola'      = c("1933B2", "2547A7", "305D9D", "3E708D", "52857F", "70A377", "91C36D", "BDE566", "FFFF66"),
   'lajolla'    = c("FFFFCC", "F9E98D", "F2C559", "E99D52", "E0744F", "C24C4A", "873E39", "4B2B1A", "191900"),

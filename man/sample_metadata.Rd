@@ -17,11 +17,10 @@ sample_metadata(biom) <- value
 provided, a named vector will be returned instead of a data.frame.
 Default: \code{NULL}}
 
-\item{value}{A data.frame with the metadata. Its row names or '.sample'
-column must match the IDs in \code{sample_names(x)}. The returned
-rbiom object will be subset to just the samples in the new metadata.
-With the exception of '.sample', all character columns will be
-converted to factor.}
+\item{value}{A data.frame or file name with the metadata. Its row names or
+'.sample' column must match the IDs in \code{sample_names(x)}. The
+returned rbiom object will be subset to just the samples in the new
+metadata. All character columns will be converted to factor.}
 }
 \value{
 A tibble (data.frame) of the metadata in \code{biom}. '.sample' will
@@ -45,15 +44,24 @@ Get or set the sample metadata.
 
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
+Other metadata: 
+\code{\link{bdply}()},
+\code{\link{blply}()},
 \code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
+\code{\link{metadata_numeric}()},
+\code{\link{n_metadata}()},
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()},
+\code{\link{write_metadata}()}
+
+Other samples: 
+\code{\link{n_samples}()},
 \code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+\code{\link{sample_select}()},
+\code{\link{sample_sums}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()}
 }
-\concept{setters}
+\concept{metadata}
+\concept{samples}

@@ -112,3 +112,18 @@ Create an rbiom object.
     # Remove temporary files.
     invisible(file.remove(c(ct, md, tax, fas, tre)))
 }
+\seealso{
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{as_rbiom}()},
+\code{\link{bdply}()},
+\code{\link{biom_id}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{biom_repair}()},
+\code{\link{blply}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()},
+\code{\link{write_xlsx}()}
+}
+\concept{biom}

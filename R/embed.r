@@ -2,7 +2,7 @@
 #' 
 #' @noRd
 #' 
-#' @param x   An object coercable to a \code{data.frame}.
+#' @param df   An object coercable to a \code{data.frame}.
 #' @param title   Text/HTML label for the link. Default: \code{"Download Data (CSV)"}.
 #' @param filename   Default filename to download as. Default: \code{"data.csv"}.
 #' @param ...   Additional arguments to pass to \code{write.csv()}.
@@ -18,9 +18,9 @@
 #'     attr(p, 'stats') %>% embed_csv(row.names=FALSE) %>% cat("\n\n")
 #'
 
-embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...) {
+embed_csv <- function (df, label="Download Data (CSV)", filename="data.csv", ...) {
   
-  as.data.frame(x) %>%
+  as.data.frame(df) %>%
     write.csv(...) %>%
     capture.output() %>%
     paste(collapse = "\n") %>%
@@ -36,7 +36,7 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
 #' 
 #' @noRd
 #' 
-#' @param x   Some R code.
+#' @param text   Some R code.
 #' @return Markdown-compatible syntax highlighted code block.
 #' @family embed
 #' 
@@ -45,6 +45,6 @@ embed_csv <- function (x, label="Download Data (CSV)", filename="data.csv", ...)
 #'     p <- adiv_boxplot(hmp50, color.by = "Body Site")
 #'     attr(p, 'code') %>% embed_code() %>% cat("\n\n")
 
-embed_code <- function (x) {
-  paste0("~~~~ {.R}\n", x, "\n~~~~\n\n")
+embed_code <- function (text) {
+  paste0("~~~~ {.R}\n", text, "\n~~~~\n\n")
 }

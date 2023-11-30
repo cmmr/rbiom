@@ -32,3 +32,13 @@ Provides a 'treedata' S4 object for use in ggtree functions.
       
     }
 }
+\seealso{
+Other phylogeny: 
+\code{\link{has_tree}()},
+\code{\link{otu_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_subset}()},
+\code{\link{tree_tips}()},
+\code{\link{write_tree}()}
+}
+\concept{phylogeny}

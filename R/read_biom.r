@@ -1,4 +1,6 @@
 #' Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
+#' 
+#' @family biom
 #'
 #' @param src   Input data as either a file path, URL, or JSON string.
 #'        BIOM files can be formatted according to 

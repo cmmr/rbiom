@@ -27,3 +27,22 @@ Write a newick formatted phylogenetic tree.
     newick <- write_tree(tree)
 
 }
+\seealso{
+Other phylogeny: 
+\code{\link{has_tree}()},
+\code{\link{otu_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_data}()},
+\code{\link{tree_subset}()},
+\code{\link{tree_tips}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_counts}()},
+\code{\link{write_fasta}()},
+\code{\link{write_metadata}()},
+\code{\link{write_taxonomy}()},
+\code{\link{write_xlsx}()}
+}
+\concept{phylogeny}
+\concept{writers}

@@ -32,7 +32,23 @@ Subset by sample metadata.
 }
 \seealso{
 Other metadata: 
+\code{\link{bdply}()},
+\code{\link{blply}()},
+\code{\link{metadata_names}()},
+\code{\link{metadata_numeric}()},
+\code{\link{n_metadata}()},
+\code{\link{sample_metadata}()},
 \code{\link{sample_select}()},
+\code{\link{within.rbiom}()},
+\code{\link{write_metadata}()}
+
+Other samples: 
+\code{\link{n_samples}()},
+\code{\link{sample_metadata}()},
+\code{\link{sample_names}()},
+\code{\link{sample_select}()},
+\code{\link{sample_sums}()},
 \code{\link{within.rbiom}()}
 }
 \concept{metadata}
+\concept{samples}

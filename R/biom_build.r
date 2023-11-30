@@ -4,6 +4,8 @@
 #' 
 #' @inherit read_biom return
 #' 
+#' @family biom
+#' 
 #' @param counts  The count data as a numeric matrix, where column names are
 #'        the sample names and row names are the OTU names. An rbiom object or
 #'        a filename/URL compatible with [read_biom()] is also acceptable.
@@ -137,6 +139,8 @@ biom_build <- function (
 #' between BIOM files.
 #' 
 #' @inherit read_biom return
+#' 
+#' @family biom
 #' 
 #' @param ...  Any number of rbiom objects (e.g. from [read_biom()]), lists of
 #'        rbiom objects, or valid arguments to the \code{src} parameter of 

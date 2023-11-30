@@ -20,3 +20,18 @@ The normalized filepath that was written to (invisibly).
 \description{
 Write DNA sequences to a file in fasta format.
 }
+\seealso{
+Other sequences: 
+\code{\link{has_sequences}()},
+\code{\link{otu_sequences}()}
+
+Other writers: 
+\code{\link{write_biom}()},
+\code{\link{write_counts}()},
+\code{\link{write_metadata}()},
+\code{\link{write_taxonomy}()},
+\code{\link{write_tree}()},
+\code{\link{write_xlsx}()}
+}
+\concept{sequences}
+\concept{writers}

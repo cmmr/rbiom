@@ -1,0 +1,111 @@
+---
+title: "Importing Your Data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+# Create an rbiom object
+
+The fastest way to make an rbiom object is with `as_rbiom()`, which accepts:
+
+* A filepath or URL to a BIOM file.
+* An abundance matrix with OTUs in rows and samples in columns.
+* A `phyloseq`-class object, from the phyloseq Bioconductor R package.
+
+
+```{r as_rbiom}
+library(rbiom)
+
+# create a simple matrix ------------------------
+mtx <- matrix(
+  data     = floor(runif(24) * 1000), 
+  nrow     = 6, 
+  dimnames = list(paste0("OTU", 1:6), paste0("Sample", 1:4)) )
+print(mtx)
+
+# convert matrix to rbiom -----------------------
+biom <- as_rbiom(biom = mtx)
+print(biom)
+```
+
+
+Now we have `biom`, an rbiom-class object that can be used with this package's functions. If you loaded your data from a BIOM file or phyloseq object, it might already include metadata, ranks, and a tree. These attributes are technically optional, however, more analyses are possible when extra information about samples and OTUs are present.
+
+
+
+
+# Attach metadata
+
+`sample_metadata()` lets you set arbitrary data for each sample.
+
+Some quick rules:
+
+* `.sample` should be the first column.
+* Other column names cannot start with a dot (`.`).
+* Sample names need to match `sample_names(biom)`.
+
+
+```{r add_metadata}
+# create example metadata -----------------------
+md <- data.frame(
+  .sample   = paste0("Sample", 1:4),
+  state     = c("TX", "TX", "WA", "WA"),
+  age       = c(32, 19, 36, 40),
+  treatment = c(1, 2, 1, 2) )
+print(md)
+
+# add metadata to rbiom object ------------------
+sample_metadata(biom) <- md
+print(biom)
+```
+
+
+## Setting categorical variables
+
+Any categorical metadata variable that looks numerical, such as "treatment" in the above example, will need to be manually changed to a categorical variable.
+
+
+```{r set_categorical}
+biom %<>% within(treatment %<>% as.factor())
+metadata_numeric(biom)
+```
+
+
+
+# Attach a tree
+
+Use `otu_tree()` to set the tree. You can specify a phylo object, newick file, or newick string.
+
+
+```{r add_tree}
+# define a random tree --------------------------
+otu_tree(biom) <- "(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"
+print(biom)
+```
+
+
+
+
+# Attach taxonomy
+
+Use `otu_taxonomy()` to define taxonomic clades for each OTU.
+
+
+```{r add_taxonomy}
+# .otu must match otu_names(biom) ---------------
+map <- data.frame(
+  .otu   = paste0("OTU", 1:6),
+  Phylum = c("Bacteroidetes", "Firmicutes", "Firmicutes"),
+  Order  = c("Bacteroidia", "Clostridiales", "Bacillales") )
+print(map)
+
+otu_taxonomy(biom) <- map
+print(biom)
+```

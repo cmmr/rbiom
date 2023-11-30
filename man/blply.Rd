@@ -56,3 +56,30 @@ Calls \code{plyr::dlply} internally. Consider setting
     
 
 }
+\seealso{
+Other metadata: 
+\code{\link{bdply}()},
+\code{\link{metadata_names}()},
+\code{\link{metadata_numeric}()},
+\code{\link{n_metadata}()},
+\code{\link{sample_metadata}()},
+\code{\link{sample_select}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()},
+\code{\link{write_metadata}()}
+
+Other biom: 
+\code{\link{as_percent}()},
+\code{\link{as_rbiom}()},
+\code{\link{bdply}()},
+\code{\link{biom_build}()},
+\code{\link{biom_id}()},
+\code{\link{biom_info}()},
+\code{\link{biom_merge}()},
+\code{\link{biom_repair}()},
+\code{\link{read_biom}()},
+\code{\link{write_biom}()},
+\code{\link{write_xlsx}()}
+}
+\concept{biom}
+\concept{metadata}

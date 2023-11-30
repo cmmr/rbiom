@@ -5,6 +5,9 @@
 #' \code{otu_tree(biom) <- NULL} to speed up creation of subseted rbiom objects.
 #' 
 #' @inherit bdply params
+#' 
+#' @family metadata
+#' @family biom
 #'           
 #' @param FUN   The function to execute on each \code{biom} subset. \code{FUN} 
 #'        may return any object, all of which will be returned in a named list.

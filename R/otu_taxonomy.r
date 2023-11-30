@@ -2,7 +2,7 @@
 #' 
 #' @inherit documentation_default
 #' 
-#' @family setters
+#' @family taxonomy
 #' 
 #' 
 #' @param rank  A single taxonomic rank to return as a named vector, or 

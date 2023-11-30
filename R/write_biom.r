@@ -1,6 +1,9 @@
 
 #' Write counts, metadata, taxonomy, and phylogeny to a biom file.
 #' 
+#' @family biom
+#' @family writers
+#' 
 #' @param biom  The \code{rbiom} object to save to the file.
 #' 
 #' @param file  Path to the output file. If the file name ends in \code{".gz"} 

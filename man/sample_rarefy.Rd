@@ -37,3 +37,14 @@ Subset counts so that all samples have the same number of observations.
     range(sample_sums(biom))
 
 }
+\seealso{
+Other rarefaction: 
+\code{\link{is_rarefied}()},
+\code{\link{rare_barplot}()},
+\code{\link{rare_corrplot}()},
+\code{\link{rare_depth}()},
+\code{\link{rare_multiplot}()},
+\code{\link{rare_suggest}()},
+\code{\link{sample_sums}()}
+}
+\concept{rarefaction}

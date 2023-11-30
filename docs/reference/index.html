@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9102</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9104</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,19 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Analysis Basics</h6>
+    <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
+    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
+    <a class="dropdown-item" href="../articles/plot_types.html">Plot Types</a>
+    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -188,14 +201,24 @@ list.</dd>
         <dd>Run statistics on a distance matrix vs a categorical or numeric variable.</dd>
       </dl><dl><dt>
           
-          <code><a href="has_tree.html">has_tree()</a></code> <code><a href="has_tree.html">has_sequences()</a></code> <code><a href="has_tree.html">is_rarefied()</a></code> 
+          <code><a href="has_sequences.html">has_sequences()</a></code> 
         </dt>
-        <dd>Check specific properties of an rbiom object.</dd>
+        <dd>Check if sequences are included in the rbiom object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="has_tree.html">has_tree()</a></code> 
+        </dt>
+        <dd>Check if a phylogenetic tree is included in an rbiom object.</dd>
       </dl><dl><dt>
           
           <code><a href="hmp50.html">hmp50</a></code> 
         </dt>
         <dd>Human Microbiome Project - 50 sample demo dataset.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="is_rarefied.html">is_rarefied()</a></code> 
+        </dt>
+        <dd>Check if the rbiom object is rarefied.</dd>
       </dl><dl><dt>
           
           <code><a href="metadata_names.html">metadata_names()</a></code> <code><a href="metadata_names.html">`metadata_names&lt;-`()</a></code> 
@@ -208,9 +231,24 @@ list.</dd>
         <dd>Check which metadata columns are numeric.</dd>
       </dl><dl><dt>
           
-          <code><a href="n_samples.html">n_samples()</a></code> <code><a href="n_samples.html">n_otus()</a></code> <code><a href="n_samples.html">n_ranks()</a></code> <code><a href="n_samples.html">n_metadata()</a></code> 
+          <code><a href="n_metadata.html">n_metadata()</a></code> 
         </dt>
-        <dd>Report the number of samples, otus, or ranks in an rbiom.</dd>
+        <dd>Report the number of metadata fields in an rbiom object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="n_otus.html">n_otus()</a></code> 
+        </dt>
+        <dd>Report the number of otus in an rbiom object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="n_ranks.html">n_ranks()</a></code> 
+        </dt>
+        <dd>Report the number of ranks in an rbiom object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="n_samples.html">n_samples()</a></code> 
+        </dt>
+        <dd>Report the number of samples in an rbiom object.</dd>
       </dl><dl><dt>
           
           <code><a href="otu_names.html">otu_names()</a></code> <code><a href="otu_names.html">`otu_names&lt;-`()</a></code> 
@@ -390,7 +428,7 @@ list.</dd>
           
           <code><a href="write_counts.html">write_counts()</a></code> 
         </dt>
-        <dd>Write BIOM counts to a tab-separated value (tsv) file.</dd>
+        <dd>Write OTU counts to a tab-separated value (tsv) file.</dd>
       </dl><dl><dt>
           
           <code><a href="write_fasta.html">write_fasta()</a></code> 

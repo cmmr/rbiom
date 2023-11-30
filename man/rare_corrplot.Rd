@@ -191,8 +191,13 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 }
 \seealso{
 Other rarefaction: 
+\code{\link{is_rarefied}()},
 \code{\link{rare_barplot}()},
-\code{\link{rare_multiplot}()}
+\code{\link{rare_depth}()},
+\code{\link{rare_multiplot}()},
+\code{\link{rare_suggest}()},
+\code{\link{sample_rarefy}()},
+\code{\link{sample_sums}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},

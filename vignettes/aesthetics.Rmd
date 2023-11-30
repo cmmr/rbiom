@@ -1,0 +1,293 @@
+---
+title: "Mapping Metadata to Aesthetics"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+pals <- sapply(simplify = FALSE, names(rbiom:::PALETTES), function (i) {
+  sprintf("<td align='right' style='padding-left:20px; padding-right:0'>%s</td><td>%s</td>", i, 
+    paste0(collapse = '', "<span style='color:#", rbiom:::PALETTES[[i]], "'>&#9608;</span>") )})
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+Metadata can be used to flexibly subset, partition, and apply aesthetics 
+when creating a plot.
+
+
+# Syntax examples
+
+
+``` r
+## Colors ----------------------------
+color.by = "Body Site"
+color.by = list('Body Site' = "bright")
+color.by = list('Body Site' = c("Stool", "Saliva"))
+color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "tol"))
+color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+
+## Patterns --------------------------
+pattern.by = "Body Site"
+pattern.by = list('Body Site' = c("Stool", "Saliva"))
+pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
+
+## Shapes ----------------------------
+shape.by = "Body Site"
+shape.by = list('Body Site' = c("Stool", "Saliva"))
+shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
+
+## Facets ----------------------------
+facet.by = "Body Site"
+facet.by = c("Body Site", "Sex")
+facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
+
+## Limits ----------------------------
+limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+```
+
+
+
+
+# Colors
+
+
+## Automatic colors
+
+All `color.by` needs is the name of the metadata field you'd like to color by.
+Specifying a subset can be done here too. In these cases, rbiom will select an
+appropriate color-blind safe palette to use.
+
+``` r
+color.by = "Sex"
+color.by = list('Body Site' = c("Saliva", "Stool"))
+```
+
+
+
+## Custom colors
+
+You can map your metadata values to any color you'd like using the syntax 
+in the following examples. You can use hexadecimal codes or any of the 657 
+named R colors (type `colors()` for the list).
+
+``` r
+color.by = list('Sex' = c('Male' = "cyan", 'Female' = "#FFC83D"))
+color.by = list('Age' = c("lightblue", "darkblue"))
+color.by = list('Age' = list(colors = c("red", "blue"), range = c(30, NA)))
+```
+
+
+## Built-in palettes
+
+A collection of color-blind friendly palettes are pre-defined in rbiom. They have been compiled from multiple sources:
+
+* Crameri, Fabio (2023). *Scientific colour maps*. [website](https://www.fabiocrameri.ch/colourmaps/) &nbsp; [doi](https://doi.org/10.5281/zenodo.8409685)
+* Frerebeau, Nicolas (2023). *khroma: Colour Schemes for Scientific Data Visualization*. [website](https://packages.tesselle.org/khroma/) &nbsp; [doi](https://doi.org/10.5281/zenodo.1472077)
+* Neuwirth, Erich (2022). *ColorBrewer Palettes*. [website](http://colorbrewer2.org)
+* Okabe, Masataka, and Ito, Key (2008). *Color Universal Design (CUD): How to Make Figures and Presentations That Are Friendly to Colorblind People*. [website](https://jfly.uni-koeln.de/color/)
+* Tol, Paul (2021). *Colour Schemes*. [pdf](https://personal.sron.nl/~pault/data/colourschemes.pdf)
+
+To use a specific one, assign its name to a metadata column.
+``` r
+# Most plots expect `color.by` to be a single categorical metadata field.
+color.by = list('Body Site' = "bright")
+color.by = list(
+  'Body Site' = list('colors' = "bright", 'values' = c("Stool", "Saliva")) )
+
+# Heatmap plots allow multiple metadata fields of any type.
+color.by = list('Body Site' = "okabe", 'Age' = "bamako")
+color.by = list(
+  'Body Site' = list('colors' = "okabe", 'values' = c("Stool", "Saliva")),
+  'Age'       = list('colors' = "bamako", 'range' = c(NA, 50)) )
+```
+
+### Discrete palettes
+
+```{r cat_palettes, echo=FALSE, results='asis'}
+cat(glue::glue_data(pals,
+'<table>
+<tr>{bright}{tableau}</tr>
+<tr>{vibrant}{classic}</tr>
+<tr>{okabe}{carto}</tr>
+<tr>{r4}{tol}</tr>
+<tr>{light}{tableau20}</tr>
+<tr>{muted}{kelly}</tr>
+<tr>{fishy}{alphabet}</tr>
+<tr>{sub("<td>", "<td colspan=3>", polychrome)}</tr>
+</table>'))
+```
+
+
+### Continuous palettes
+
+```{r num_palettes, echo=FALSE, results='asis'}
+cat(glue::glue_data(pals,
+'<table>
+<tr>{acton}{devon}{oslo}</tr>
+<tr>{bam}{grays}{purples}</tr>
+<tr>{bamako}{greens}{reds}</tr>
+<tr>{batlow}{hawaii}{roma}</tr>
+<tr>{berlin}{imola}{tofino}</tr>
+<tr>{bilbao}{lajolla}{tokyo}</tr>
+<tr>{broc}{lapaz}{turku}</tr>
+<tr>{buda}{lisbon}{vanimo}</tr>
+<tr>{cork}{nuuk}{vik}</tr>
+<tr>{davos}{oranges}<td></td><td></td></tr>
+</table>'))
+```
+
+
+### Reversing a palette
+
+Prefix a palette name with a dash (`-`) to reverse the color order.
+This is also helpful for assigning colors to a heatmap's main grid.
+``` r
+color.by = list('Age' = "-bamako")
+grid = "-imola"
+```
+
+
+
+
+
+
+# Patterns
+
+The patterned fills available in rbiom plots are made possible by the 
+[ggpattern](https://coolbutuseless.github.io/package/ggpattern/) R package.
+
+54 pattern names are defined by `gridpattern::names_magick`, however, the 
+20 below are a good collection for most purposes. You can allow rbiom to 
+choose a set of patterns, or you can explicitly define the mappings.
+
+
+``` r
+# One categorical metadata field may be specified.
+pattern.by = "Body Site"
+pattern.by = list('Body Site' = c("Stool", "Saliva"))
+pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
+
+# Assign the same metadata field to color.by for colored patterns.
+pattern.by = "Body Site", color.by = "Body Site"
+```
+
+
+```{r patterns, echo=FALSE}
+
+patterns <- rbiom:::get_n_patterns(20)
+
+ggplot2::ggplot(data.frame(pattern = patterns)) + 
+  ggpattern::geom_tile_pattern(
+    mapping      = ggplot2::aes(x = 1, y = 1, width = 1, height = 1, pattern_type = pattern), 
+    stat         = "identity", 
+    pattern      = "magick", 
+    pattern_fill = "black", 
+    fill         = "white", 
+    color        = "black", 
+    pattern_res  = 85 ) + 
+  ggplot2::facet_wrap(~pattern) +
+  ggpattern::scale_pattern_type_manual(
+    guide  = "none",
+    values = setNames(patterns, patterns) ) +
+  ggplot2::theme_void() +
+  ggplot2::theme(
+    panel.spacing    = ggplot2::unit(10, "pt"),
+    panel.background = ggplot2::element_rect(fill = "#222222", colour = NA),
+    strip.background = ggplot2::element_rect(fill = "#222222", colour = NA),
+    strip.text       = ggplot2::element_text(
+      size   = 11, 
+      color  = "white",
+      face   = "bold",
+      margin = ggplot2::margin(4,0,4,0, "pt") ))
+```
+
+
+
+# Shapes
+
+Shapes can be given as per base R - numbers 0 through 17 for various shapes,
+or the decimal value of an ascii character, e.g. 65:90 = A-Z; 97:122 = a-z to use 
+letters instead of shapes on the plot. Text strings may used as well.
+
+
+``` r
+# One categorical metadata field may be specified.
+shape.by = "Body Site"
+shape.by = list('Body Site' = c("Stool", "Saliva"))
+shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
+
+# Assign the same metadata field to color.by for colored shapes.
+shape.by = "Body Site", color.by = "Body Site"
+```
+
+
+```{r shapes, echo=FALSE, fig.asp = 0.25}
+ggplot2::ggplot(data.frame(shape = c(0:17, 65, 90, 97, 122))) + 
+  ggplot2::geom_point(
+    mapping = ggplot2::aes(x = 1, y = 1, shape = shape),
+    size    = 8,
+    color   = "white" ) + 
+  ggplot2::scale_shape_identity() +
+  ggplot2::facet_wrap(~shape, nrow = 2) +
+  ggplot2::theme_void() +
+  ggplot2::theme(
+    panel.spacing    = ggplot2::unit(10, "pt"),
+    panel.background = ggplot2::element_rect(fill = "#222222", colour = NA),
+    strip.background = ggplot2::element_rect(fill = "#222222", colour = NA),
+    strip.text       = ggplot2::element_text(
+      size   = 11, 
+      color  = "white",
+      face   = "bold",
+      margin = ggplot2::margin(4,0,4,0, "pt") ))
+```
+
+
+
+# Facets
+
+Faceting allows you to split your dataset into multiple sub-plots by one or 
+more categorical metadata fields. For example:
+
+```{r facets, fig.asp = 0.4, fig.align = 'center', out.width = "75%", fig.width = 6}
+biom <- sample_rarefy(hmp50)
+adiv_boxplot(biom, color.by="Body Site", facet.by="Sex")
+adiv_boxplot(
+  biom     = biom, 
+  color.by = "Sex", 
+  facet.by = list('Body Site' = c("Saliva", "Stool")) )
+```
+
+## Auto-generated facets
+
+Plotting functions often allow you to specify multiple ranks, taxa, metrics, 
+etc which are automatically assigned their own facet dimension. You can still
+add your own facets to these plots.
+
+```{r auto_facets1, fig.asp = 0.3, fig.align = 'center', out.width = "75%", fig.width = 5}
+bdiv_ord_plot(biom, layers = "p", bdiv = c("Bray-Curtis", "Euclidean"))
+```
+
+```{r auto_facets2, fig.asp = 0.55, fig.align = 'center', out.width = "75%", fig.width = 5}
+bdiv_ord_plot(biom, layers = "p", bdiv = c("bray", "euc"), facet.by = "Sex")
+```
+
+
+# Limits
+
+All the `*.by` parameters allow specifying a subset of samples to the plot. 
+`limit.by` does so without setting any other aesthetics. When multiple subsets 
+are defined, the intersection is used for the plot.
+
+``` r
+# Only show samples from males whose age is >= 20 and <= 40.
+limit.by = list('Sex' = "Male", 'Age' = c(20,40))
+
+# Limit to these two body sites and age <= 35.
+limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
+```

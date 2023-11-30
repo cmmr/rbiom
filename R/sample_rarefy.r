@@ -2,6 +2,8 @@
 #' Subset counts so that all samples have the same number of observations.
 #'
 #' @inherit documentation_default
+#' 
+#' @family rarefaction
 #'     
 #' @param depth   The number of observations to keep, per sample. If set to
 #'        \code{NULL}, a depth will be automatically selected. Samples that 
@@ -122,6 +124,8 @@ sample_rarefy <- function (biom, depth=NULL, seed=0) {
 #' Suggest a 'good' rarefaction depth.
 #'
 #' @inherit documentation_default
+#' 
+#' @family rarefaction
 #'     
 #' @return An integer.
 #' 

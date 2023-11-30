@@ -32,15 +32,12 @@ Get or set the sample names.
     head(sample_names(biom))
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
+Other samples: 
+\code{\link{n_samples}()},
 \code{\link{sample_metadata}()},
-\code{\link{taxa_ranks}()}
+\code{\link{sample_select}()},
+\code{\link{sample_sums}()},
+\code{\link{subset.rbiom}()},
+\code{\link{within.rbiom}()}
 }
-\concept{setters}
+\concept{samples}

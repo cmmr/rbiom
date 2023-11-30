@@ -351,7 +351,7 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
 #' @export
 tips <- function (x) {
   deprecate_warn("2.0.0", "tips()", "tree_tips()")
-  tree_tips(x = x)
+  tree_tips(tree = x)
 }
 
 

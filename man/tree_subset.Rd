@@ -28,3 +28,13 @@ Create a subtree by specifying tips to keep.
     subtree
 
 }
+\seealso{
+Other phylogeny: 
+\code{\link{has_tree}()},
+\code{\link{otu_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_data}()},
+\code{\link{tree_tips}()},
+\code{\link{write_tree}()}
+}
+\concept{phylogeny}

@@ -516,7 +516,9 @@ validate_meta_aes <- function (var, env = parent.frame(), null_ok = FALSE, ...) 
     result <- list()
     if (is_list(col_spec))           { result             <- col_spec
     } else if (is_palette(col_spec)) { result[['colors']] <- col_spec
-    } else if (col_type == "num")    { result[['range']]  <- col_spec
+    } else if (col_type == "num")    { 
+      if (is.character(col_spec))    { result[['colors']] <- col_spec
+      } else                         { result[['range']]  <- col_spec }
     } else                           { result[['values']] <- col_spec }
     
     

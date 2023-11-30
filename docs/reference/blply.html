@@ -14,7 +14,7 @@ otu_tree(biom) &amp;lt;- NULL to speed up creation of subseted rbiom objects."><
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9102</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9104</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,19 @@ otu_tree(biom) &amp;lt;- NULL to speed up creation of subseted rbiom objects."><
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Analysis Basics</h6>
+    <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
+    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
+    <a class="dropdown-item" href="../articles/plot_types.html">Plot Types</a>
+    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -102,10 +115,35 @@ Default: <code>FALSE</code></p></dd>
 
 <p>A list with the function outputs.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other metadata: 
+<code><a href="bdply.html">bdply</a>()</code>,
+<code><a href="metadata_names.html">metadata_names</a>()</code>,
+<code><a href="metadata_numeric.html">metadata_numeric</a>()</code>,
+<code><a href="n_metadata.html">n_metadata</a>()</code>,
+<code><a href="sample_metadata.html">sample_metadata</a>()</code>,
+<code><a href="sample_select.html">sample_select</a>()</code>,
+<code><a href="subset.rbiom.html">subset.rbiom</a>()</code>,
+<code><a href="within.rbiom.html">within.rbiom</a>()</code>,
+<code><a href="write_metadata.html">write_metadata</a>()</code></p>
+<p>Other biom: 
+<code><a href="as_percent.html">as_percent</a>()</code>,
+<code><a href="as_rbiom.html">as_rbiom</a>()</code>,
+<code><a href="bdply.html">bdply</a>()</code>,
+<code><a href="biom_build.html">biom_build</a>()</code>,
+<code><a href="biom_id.html">biom_id</a>()</code>,
+<code><a href="biom_info.html">biom_info</a>()</code>,
+<code><a href="biom_merge.html">biom_merge</a>()</code>,
+<code><a href="biom_repair.html">biom_repair</a>()</code>,
+<code><a href="read_biom.html">read_biom</a>()</code>,
+<code><a href="write_biom.html">write_biom</a>()</code>,
+<code><a href="write_xlsx.html">write_xlsx</a>()</code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/index.html">rbiom</a></span><span class="op">)</span> </span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">blply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"Sex"</span>, <span class="va">n_samples</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Female</span>

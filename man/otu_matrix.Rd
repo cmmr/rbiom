@@ -48,16 +48,10 @@ Get or set the abundance counts.
     otu_matrix(biom)[taxa,1:5]
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
+Other otus: 
+\code{\link{n_otus}()},
 \code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{otu_tree}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+\code{\link{write_counts}()}
 }
-\concept{setters}
+\concept{otus}
 \keyword{internal}

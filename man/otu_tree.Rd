@@ -13,8 +13,8 @@ otu_tree(biom) <- value
 \item{biom}{An \code{rbiom}-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{value}{A \code{phylo} class object with tip.labels matching
-\code{otu_names(x)}. If there are more tip.labels than
+\item{value}{A \code{phylo} class object, file name, or newick string with
+leaf names matching \code{otu_names(x)}. If there are more leafs than
 taxa names, then the tree will be subset.}
 }
 \value{
@@ -33,15 +33,12 @@ Get or set the phylogenetic tree.
 
 }
 \seealso{
-Other setters: 
-\code{\link{biom_id}()},
-\code{\link{metadata_names}()},
-\code{\link{otu_matrix}()},
-\code{\link{otu_names}()},
-\code{\link{otu_sequences}()},
-\code{\link{otu_taxonomy}()},
-\code{\link{sample_metadata}()},
-\code{\link{sample_names}()},
-\code{\link{taxa_ranks}()}
+Other phylogeny: 
+\code{\link{has_tree}()},
+\code{\link{read_tree}()},
+\code{\link{tree_data}()},
+\code{\link{tree_subset}()},
+\code{\link{tree_tips}()},
+\code{\link{write_tree}()}
 }
-\concept{setters}
+\concept{phylogeny}

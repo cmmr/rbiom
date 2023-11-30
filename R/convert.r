@@ -1,6 +1,8 @@
 
 #' Convert a phyloseq object to an rbiom object.
 #' 
+#' @family conversion
+#' 
 #' @param phy  A phyloseq object.
 #' 
 #' @return An rbiom object.
@@ -44,6 +46,8 @@ convert_from_phyloseq <- function (phy) {
 #' 
 #' @inherit documentation_default
 #' 
+#' @family conversion
+#' 
 #' @return A TreeSummarizedExperiment object.
 #' 
 #' @export
@@ -82,6 +86,8 @@ convert_to_TSE <- function (biom) {
 #' Requires the Bioconductor R package 'SummarizedExperiment' to be installed.
 #' 
 #' @inherit documentation_default
+#' 
+#' @family conversion
 #' 
 #' @return A SummarizedExperiment object.
 #' 

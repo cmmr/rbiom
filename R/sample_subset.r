@@ -31,7 +31,7 @@
 # #' 
 # #' \code{apply()} allows you to run any function on a per-taxon basis. For 
 # #' example, to filter genera by the root mean square of their relative abundances:
-# #' \code{rms <- function(x) sqrt(mean(x^2)); sample_subset(hmp50, apply(Genus, rms) >= 0.1)}.
+# #' \code{rms <- function (x) sqrt(mean(x^2)); sample_subset(hmp50, apply(Genus, rms) >= 0.1)}.
 # #' 
 # #' If you prefer to work on the raw values (e.g. read counts) instead of 
 # #' relative abundances, set \code{apply(..., raw = TRUE)}. For instance: 
