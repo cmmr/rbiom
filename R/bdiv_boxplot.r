@@ -12,7 +12,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     bdiv_boxplot(biom, x="==Body Site", bdiv="UniFrac", color.by="Body Site")
 #'     
 #'
@@ -23,11 +24,10 @@ bdiv_boxplot <- function (
   ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -143,7 +143,6 @@ bdiv_boxplot <- function (
   
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

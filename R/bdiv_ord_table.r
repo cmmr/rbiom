@@ -1,7 +1,7 @@
 #' Calculate PCoA and other ordinations, including taxa biplots and statistics.
 #' 
 #' The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
-#' \code{p.adj}) only only have an effect when \code{rank} is not \code{NULL}.
+#' \code{p.adj}) only only have an effect when \code{rank} is not `NULL`.
 #' 
 #' @inherit documentation_cmp
 #' @inherit documentation_dist_test
@@ -42,7 +42,7 @@ bdiv_ord_table <- function (
     test = "adonis2", seed = 0, permutations = 999, rank = -1, taxa = 5, 
     p.top = Inf, p.adj = 'fdr', unc = "singly", ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
   
@@ -60,7 +60,7 @@ bdiv_ord_table <- function (
   #________________________________________________________
   # Validate arguments only relevant for rbiom objects.
   #________________________________________________________
-  biom %<>% as_percent()
+  biom$counts %<>% rescale_cols()
   tree %<>% aa(display = "tree")
   validate_ord(max = Inf)
   validate_bdiv(max = Inf)
@@ -79,7 +79,7 @@ bdiv_ord_table <- function (
   # Biplot - determine taxonomic rank
   #________________________________________________________
   if (missing(rank) && is.character(taxa)) {
-    rank <- names(which.max(lapply(otu_taxonomy(biom), function (x) sum(x %in% taxa))))
+    rank <- names(which.max(lapply(biom$taxonomy, function (x) sum(x %in% taxa))))
     
   } else {
     validate_rank(max = Inf)
@@ -113,7 +113,7 @@ bdiv_ord_table <- function (
         
         sample_stats <- distmat_stats(
           dm           = dm, 
-          groups       = sample_metadata(b, stat.by), 
+          groups       = pull(b, stat.by), 
           test         = test, 
           seed         = seed,
           permutations = permutations )
@@ -182,7 +182,7 @@ bdiv_ord_table <- function (
   
   for (i in unique(c(split.by, stat.by, md)))
     if (!hasName(sample_coords, i))
-      sample_coords[[i]] <- sample_metadata(biom, i)[as.character(sample_coords[['.sample']])]
+      sample_coords[[i]] <- pull(biom, i)[as.character(sample_coords[['.sample']])]
   
   
   
@@ -213,7 +213,7 @@ bdiv_ord_table <- function (
           return (paste(
             sep = "\n",
             "dm     <- %s" %>% fmt_cmd(bdiv_distmat, biom, bdiv, weighted, tree),
-            "groups <- sample_metadata(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
+            "groups <- pull(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
             "set.seed(%i)" %>% sprintf(seed),
             sprintf(permutations, fmt = switch(
               EXPR = test,
@@ -240,7 +240,7 @@ bdiv_ord_table <- function (
           "iters   <- list(%s)"  %>% sprintf(as.args(iters)),
           "dm_list <- blply(%s)" %>% sprintf(as.args(dm_args, fun = blply)),
           "stats   <- plyr::ldply(dm_list, function (dm) {",
-          "  groups <- sample_metadata(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
+          "  groups <- pull(biom, %s)[attr(dm, 'Labels')]" %>% sprintf(double_quote(stat.by)),
           "  set.seed(%i)" %>% sprintf(seed),
           sprintf(permutations, fmt = switch(
             EXPR = test,

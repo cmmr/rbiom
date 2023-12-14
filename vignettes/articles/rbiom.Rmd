@@ -1,0 +1,253 @@
+---
+title: "rbiom"
+---
+
+```{r, include = FALSE}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+
+# Create
+
+The general purpose `as_rbiom()` function can convert most data types into an
+[rbiom object](../reference/rbiom_objects.html) - see 
+[importing](importing.html) for details. Here we'll import a dataset from a 
+BIOM file.
+
+```{r}
+library(rbiom)
+
+file <- system.file(package = "rbiom", "extdata", "hmp50.bz2")
+biom <- as_rbiom(file)
+
+biom
+```
+
+
+
+
+# Inspect
+
+The rbiom object has many helpful accessors.
+
+| Accessor                 | Content                                                  |
+|--------------------------|----------------------------------------------------------|
+| `$counts`                | Abundance of each OTU in each sample.                    |
+| `$metadata`              | Sample mappings to metadata (treatment, patient, etc).   |
+| `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).    |
+| `$otus`, `$n_otus`       | OTU names.                                               |
+| `$samples`, `$n_samples` | Sample names.                                            |
+| `$fields`, `$n_fields`   | Metadata field names.                                    |
+| `$ranks`, `$n_ranks`     | Taxonomic rank names.                                    |
+| `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`.   |
+| `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `NULL`. |
+| `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.              |
+
+```{r}
+biom$counts[1:4,1:8] %>% as.matrix()
+
+biom$fields
+
+# Use pull() to automatically setNames().
+pull(biom, 'Age') %>% head()
+```
+
+`pull()`, `sample_sums()`, `taxa_matrix()`, `taxa_means()`, `taxa_sums()`
+
+
+
+# Clone
+
+Rbiom objects are <u><b>passed by reference</b></u>. The common `<-` 
+assignment operator creates a second reference to the same object - it does not
+create a second object. To create a copy of an rbiom object, use the object's 
+`$clone()` method.
+
+<div class="container"><div class="row"><div class="col">
+```{r}
+a <- as_rbiom(file)
+b <- a$clone()  # Correct
+
+a$n_samples
+b$metadata %<>% head()
+a$n_samples
+```
+</div><div class="col">
+```{r}
+a <- as_rbiom(file)
+b <- a  # Wrong
+
+a$n_samples
+b$metadata %<>% head()
+a$n_samples
+```
+</div></div></div>
+
+
+
+# Modify
+
+There are seven components of an rbiom object which you can modify directly. 
+Assigning new values to these components will trigger validation checks and 
+inter-component OTU/sample synchronization. See 
+[Working with rbiom Objects](../reference/rbiom_objects.html) for additional
+details.
+
+| Component    | What can be assigned.                                  |
+|--------------|--------------------------------------------------------|
+| `$counts`    | matrix of abundances; OTUs (rows) by samples (columns) |
+| `$metadata`  | data.frame with `'.sample'` as the first column        |
+| `$taxonomy`  | data.frame with `'.otu'` as the first column           |
+| `$tree`      | phylo object with the phylogenetic tree for OTUs       |
+| `$sequences` | character vector of reference sequences for OTUs       |
+| `$id`        | string with a title for the dataset                    |
+| `$comment`   | string with additional information about the dataset   |
+
+
+
+
+## Rarefy Counts
+
+A common way to normalize microbiome count data is to rarefy it. This 
+process drops samples with too few observations, and randomly removes 
+observations from samples from the rest, so that all samples have the 
+same "rarefaction depth".
+
+```{r}
+sample_sums(biom) %>% head()
+
+biom <- rarefy(biom)
+
+sample_sums(biom) %>% head()
+```
+
+
+
+## Add Metadata
+
+Additional sample metadata columns can be added to `biom$metadata` (a tibble 
+data.frame). The first column, `'.sample'`, is used by rbiom to link sample 
+metadata to samples in the abundance table.
+
+```{r}
+biom$metadata$treatment <- sample(c("control", "test"), biom$n_samples, TRUE)
+biom$metadata
+```
+
+
+
+## Subset Samples
+
+Removing samples from the metadata will remove those samples from the entire 
+rbiom object. The base R `subset()` function works well for this, as do the 
+dplyr verbs `dplyr::filter()` and `dplyr::slice()`.
+
+```{r}
+biom <- subset(biom, `Body Site` == "Anterior nares")
+biom$metadata
+biom
+```
+
+
+
+
+
+# Compute
+
+Functions that end in `_table` or `_matrix` return calculation results for use 
+outside of rbiom. The `_table` suffix indicates the returned object will be a 
+tibble data.frame with one computed value per row. Alternatively, `_matrix` 
+will return a base R matrix.
+
+
+```{r}
+taxa_table(biom, rank = "Phylum")
+
+taxa_matrix(biom, rank = "Phylum")[1:4, 1:8]
+```
+
+Functions for taxa abundance (like the above `taxa_table()`) are prefixed by 
+`taxa_`. Similarly, `adiv_` is used for alpha diversity and `bdiv_` for beta 
+diversity.
+
+`adiv_matrix()`, `adiv_table()`, `bdiv_table()`, `bdiv_ord_table()`, 
+`taxa_table()`, `taxa_matrix()`
+
+
+
+
+# Visualize
+
+The plotting functions in rbiom make it easy to produce informative 
+visualizations about alpha diversity, beta diversity, and taxa abundance, and 
+explore associations between those metrics and sample metadata.
+
+See the [Plot Types](plots.html) article for an overview of all the different 
+plot options, and [Mapping Metadata to Aesthetics](aes.html) for guidance on 
+using colors, shapes, and patterns to represent metadata values.
+
+For example, to display an ordination colored by body site:
+
+```{r, fig.asp = 0.45}
+bdiv_ord_plot(biom = hmp50, color.by = "Body Site")
+```
+
+`adiv_boxplot()`, `adiv_corrplot()`, `bdiv_boxplot()`, `bdiv_heatmap()`, 
+`bdiv_ord_plot()`, `rare_barplot()`, `rare_corrplot()`, `rare_multiplot()`, 
+`taxa_barplot()`, `taxa_boxplot()`, `taxa_corrplot()`, `taxa_heatmap()`
+
+
+
+
+# Analyze
+
+Visualizations are an excellent way to observe differences between sample 
+groups. When `color.by` is set, boxplots, corrplots, and ord_plots will include 
+the following:
+
+* p-values and brief methodology on the plot itself.
+* `$stats` attribute with a detailed statistics table.
+* `$stats$code` attribute with the R code used to generate the table.
+
+The [Statistics](stats.html) article reviews this topic in greater detail.
+
+```{r, fig.asp = 0.45}
+p <- adiv_boxplot(hmp50, color.by = "Body Site", facet.by = "Sex")
+p
+p$stats
+
+p$stats$code
+```
+
+`adiv_stats()`, `bdiv_stats()`, `distmat_stats()`, `stats_table()`, `taxa_stats()`
+
+
+
+
+# Share
+
+Plots are essentially ggplot objects, and `ggplot2::ggsave()` can save them as 
+PNG, PDF, SVG, and many other image file types.
+
+To save your rbiom object to a BIOM file, use `write_biom()`. When sharing a
+dataset with someone who is unfamiliar with accessing BIOM files, 
+`write_xlsx()` is also an option.
+
+A few additional resources to know about:
+
+* [R Markdown](https://rmarkdown.rstudio.com/) - reproducible analyses/reports.
+* [flexdashboard](https://pkgs.rstudio.com/flexdashboard/) - interactive dashboards.
+* [atima](http://atima.research.bcm.edu) - rbiom in website form.
+
+`ggplot2::ggsave()`, `patchwork::wrap_plots()`, `write_biom()`, `write_xlsx()`
+
+
+
+
+

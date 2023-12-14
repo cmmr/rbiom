@@ -21,30 +21,30 @@
 #'                statistic. }
 #'          \item{\emph{.p.val} - }{ Probability calculated by \code{test}. }
 #'        }\cr
-#'         R commands for reproducing the results are in \code{$code} and 
-#'         object history in \code{$history}.
+#'         R commands for reproducing the results are in \code{$code}.
 #'         
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
-#'     biom <- sample_select(hmp50, 1:10)
-#'     dm   <- bdiv_distmat(biom, 'unifrac')
+#'     hmp10        <- hmp50$clone()
+#'     hmp10$counts <- hmp10$counts[,1:10]
 #'     
-#'     distmat_stats(dm, groups = sample_metadata(biom, 'Body Site'))
+#'     dm <- bdiv_distmat(hmp10, 'unifrac')
 #'     
-#'     distmat_stats(dm, groups = sample_metadata(biom, 'Age'))
+#'     distmat_stats(dm, groups = pull(hmp10, 'Body Site'))
+#'     
+#'     distmat_stats(dm, groups = pull(hmp10, 'Age'))
 #'     
 #'     # See the R code used to calculate these statistics:
-#'     stats <- distmat_stats(dm, groups = sample_metadata(biom, 'Age'))
+#'     stats <- distmat_stats(dm, groups = pull(hmp10, 'Age'))
 #'     stats$code
 #'
 
 distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations = 999) {
   
   
-  params  <- eval_envir(environment())
-  history <- append_history('stats ', params)
+  params <- eval_envir(environment())
   remove(list = intersect(env_names(params), ls()))
   
   

@@ -14,7 +14,7 @@ rare_barplot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
@@ -38,9 +38,9 @@ passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
 has its color set to \code{"black"}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot command,
-and object history are available as \code{$data}, \code{$code}, and
-\code{$history}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot
+command are available as \code{$data} and \code{$code},
+respectively.
 }
 \description{
 Visualize the number of observations per sample.
@@ -58,12 +58,11 @@ Visualize the number of observations per sample.
 }
 \seealso{
 Other rarefaction: 
-\code{\link{is_rarefied}()},
+\code{\link{pull.rbiom}()},
 \code{\link{rare_corrplot}()},
-\code{\link{rare_depth}()},
 \code{\link{rare_multiplot}()},
-\code{\link{rare_suggest}()},
-\code{\link{sample_rarefy}()},
+\code{\link{rarefy}()},
+\code{\link{rescale}},
 \code{\link{sample_sums}()}
 
 Other visualization: 

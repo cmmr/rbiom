@@ -1,3 +1,9 @@
 .nav-text.text-muted {
   color: white !important;
 }
+
+h2,h3 { margin-top: 30px; }
+
+.active>.nav-link {
+  color: white !important;
+}

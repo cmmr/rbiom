@@ -1,50 +1,7 @@
-#' Write data and summary information to a Microsoft Excel-compatible workbook.
-#' 
-#' @inherit otu_taxonomy params
-#' 
-#' @family biom
-#' @family writers
-#'
-#' @param biom   The \code{rbiom} object to save to the file.
-#' 
-#' @param file   Path to the output xlsx file.
-#' 
-#' @param depth   Depth to rarefy to. See [sample_rarefy()] function for details.
-#'        \code{depth = NULL} auto-selects a rarefaction level. 
-#'        \code{depth = 0} disables rarefaction. Only use \code{depth} with 
-#'        'OTU table' data and integer count values.
-#'                   
-#' @param seed   Random seed to use in rarefying. See [sample_rarefy()] function
-#'        for details.
-#' 
-#' @return The normalized filepath that was written to (invisibly).
-#' 
-#' @section Note:
-#' Any \code{data frame}, \code{matrix}, or \code{dist} attributes on 
-#' \code{biom} will be included as separate worksheets. An attribute named 
-#' 'Reads Per Step' is treated specially and merged with the usual 'Reads Per 
-#' Sample' tab.
-#' 
+
+#' @rdname write_biom
 #' @export
-#' @examples
-#'     library(rbiom) 
-#'     
-#'     if (FALSE) {
-#'       
-#'       biom <- sample_select(hmp50, 1:10) %>% sample_rarefy()
-#'       
-#'       attr(biom, "Weighted UniFrac")   <- bdiv_distmat(biom, 'unifrac')
-#'       attr(biom, "Unweighted Jaccard") <- bdiv_distmat(biom, 'jaccard', weighted=FALSE)
-#'       
-#'       outfile <- write_xlsx(biom, tempfile(fileext = ".xlsx"))
-#'     }
-
-
-write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
-  
-  validate_biom(clone = FALSE)
-  
-  stopifnot(is_scalar_character(file) && !is_na(file))
+write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = "asis") {
   
   
   #________________________________________________________
@@ -52,251 +9,175 @@ write_xlsx <- function (biom, file = NULL, depth=NULL, seed=0, unc = "asis") {
   #________________________________________________________
   unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
   
-  
-  
+  stopifnot(is_scalar_character(file) && !is_na(file))
   file <- normalizePath(file, winslash = "/", mustWork = FALSE)
   if (!dir.exists(dirname(file))) dir.create(dirname(file), recursive = TRUE)
   
   
   
+  #________________________________________________________
+  # We'll output worksheets for both full and rarefied.
+  #________________________________________________________
+  full <- as_rbiom(biom)
+  wb   <- openxlsx::createWorkbook(creator="rbiom", title=full$id)
+  
   
   #________________________________________________________
-  # Biom is an 'OTU table' and all counts are int
+  # Bypass some sheets for non-integer data.
   #________________________________________________________
-  
-  if (eq(tolower(biom$info$type), 'otu table') && !any(biom$counts$v %% 1 > 0)) {
+  if (all(full$counts$v %% 1 == 0)) {
     
-    #________________________________________________________
-    # Define the initial structure of our workbook
-    #________________________________________________________
+    rare <- full$clone()
     
-    wb <- openxlsx::createWorkbook(creator="rbiom", title=biom$info$id)
+    if (!isTRUE(depth == 0))
+      rarefy(biom = rare, depth = depth, seed = seed, clone = FALSE)
     
-    openxlsx::addWorksheet(wb, 'Reads Per Sample')
-    openxlsx::addWorksheet(wb, 'Mapped OTU Counts')
-    openxlsx::addWorksheet(wb, 'Rarefied OTU Counts')
-    openxlsx::addWorksheet(wb, 'Sample Metadata')
-    openxlsx::addWorksheet(wb, 'Alpha Diversity')
-    openxlsx::addWorksheet(wb, 'Centroid Taxonomy')
-    
-    
-    
-    #________________________________________________________
-    # Output counts, taxonomy, metadata, and sequencess 
-    # prior to rarefying
-    #________________________________________________________
-    
-    RawCounts <- data.frame(otu_matrix(biom),              check.names=FALSE)
-    Taxonomy  <- data.frame(otu_taxonomy(biom, unc = unc), check.names=FALSE)
-    Metadata  <- data.frame(sample_metadata(biom),         check.names=FALSE)
-    
-    # Set the full taxonomy string as the first column of RawCounts
-    TaxaStrings <- data.frame(Taxonomy=apply(biom$taxonomy, 1L, paste, collapse="; "))
-    RawCounts   <- cbind(TaxaStrings, RawCounts[rownames(TaxaStrings),,F])
-    
-    # Set the centroid sequence as the first column of Taxonomy
-    if (is(biom[['sequences']], "character"))
-      Taxonomy <- cbind(Sequence=biom[['sequences']], Taxonomy)
-    
-    openxlsx::writeData(wb, 'Mapped OTU Counts', RawCounts, rowNames=TRUE)
-    openxlsx::writeData(wb, 'Centroid Taxonomy', Taxonomy,  rowNames=TRUE)
-    openxlsx::writeData(wb, 'Sample Metadata',   Metadata,  rowNames=TRUE)
-    
-    
-    
-    #________________________________________________________
-    # Rarefy, then output counts again and adiv_table
-    #________________________________________________________
-    
-    # Allow the user to override rarefaction by setting depth = 0.
-    if (eq(depth, 0) || eq(depth, 0L) || isTRUE(is_rarefied(biom))) {
-      rare <- biom
-    } else {
-      rare <- sample_rarefy(biom = biom, depth = depth, seed = seed)
-    }
-    
-    RareCounts <- data.frame(otu_matrix(rare), check.names=FALSE)
-    AlphaDiv   <- adiv_table(biom = rare)
-    
-    # Set the full taxonomy string as the first column of RareCounts
-    TaxaStrings <- data.frame(Taxonomy=apply(rare$taxonomy, 1L, paste, collapse="; "))
-    RareCounts  <- cbind(TaxaStrings, RareCounts[rownames(TaxaStrings),,F])
-    
-    openxlsx::writeData(wb, 'Rarefied OTU Counts', RareCounts, rowNames=TRUE)
-    openxlsx::writeData(wb, 'Alpha Diversity',     AlphaDiv,   rowNames=FALSE)
-    
-    
-    
-    #________________________________________________________
-    # Track each sample's read counts before and after
-    #________________________________________________________
-    
-    if ('Reads Per Step' %in% names(attributes(biom))) {
-      rps <- attr(biom, 'Reads Per Step', exact = TRUE)
-    } else {
-      rps <- data.frame(Mapped=slam::col_sums(biom$counts))
-    }
-    
-    rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
-    rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
-    rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
-    openxlsx::writeData(wb, 'Reads Per Sample', rps, rowNames=TRUE)
-    
-    biom <- rare
-    
-    remove(list = intersect(ls(), "rare"))
-    
-    
-    
-    #________________________________________________________
-    # Create worksheets for any other attributes on biom
-    #________________________________________________________
-    
-    for (key in names(attributes(biom))) {
-      if (key %in% c("names", "class", "Reads Per Step"))   next
-      
-      val <- attr(biom, key, exact = TRUE)
-      
-      if (eq(class(val), "dist"))   val <- data.frame(as.matrix(val))
-      if (eq(class(val), "matrix")) val <- data.frame(val)
-      if (!eq(class(val), "data.frame")) next
-      
-      rn <- !eq(rownames(val), as.character(1:nrow(val)))
-      openxlsx::addWorksheet(wb, key)
-      openxlsx::writeData(wb, key, val, rowNames = rn)
-      remove("val", "rn")
-    }
-    
-    remove(list = intersect(ls(), "key"))
-    
-    
-    
-    #________________________________________________________
-    # Roll up abundances at each taxonomic level
-    #________________________________________________________
-    
-    for (rank in taxa_ranks(biom)) {
-      
-      df <- t(taxa_rollup(biom, rank, lineage = TRUE))
-      df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
-      
-      openxlsx::addWorksheet(wb, rank)
-      openxlsx::writeData(wb, rank, df, rowNames=TRUE)
-    }
-    
-    remove(list = intersect(ls(), c("df", "rank", "ranks")))
-    
-    
-    
-    #________________________________________________________
-    # Write everything to the specified output file
-    #________________________________________________________
-    
-    openxlsx::saveWorkbook(wb, file=file, overwrite=TRUE)
-    
-    
-    
-    
-  #________________________________________________________
-  # Biom isn't an 'OTU table' or not all counts are int
-  #________________________________________________________
-  
   } else {
-    
-    type <- sub(" table", "", biom$info$type, ignore.case=TRUE)
-    
-    if (!is_null(depth))
-      return(simpleError("Please use write_xlsx(depth=NULL) for non-OTU or non-Integer data."))
-    
-    
-    #________________________________________________________
-    # Define the initial structure of our workbook
-    #________________________________________________________
-    
-    wb <- openxlsx::createWorkbook(creator="rbiom", title=biom$info$id)
-    
-    ranks <- c(paste0(type, "s"), taxa_ranks(biom))
-    for (rank in ranks)
-      openxlsx::addWorksheet(wb, rank)
-    
-    openxlsx::addWorksheet(wb, 'Alpha Diversity')
-    openxlsx::addWorksheet(wb, paste(type, 'List'))
-    
-    
-    
-    #________________________________________________________
-    # Output totals, taxonomy/seqs, & adiv_table
-    #________________________________________________________
-    
-    AlphaDiv  <- data.frame(adiv_table(biom),              check.names=FALSE)
-    Taxonomy  <- data.frame(otu_taxonomy(biom, unc = unc), check.names=FALSE)
-    
-    # Set the centroid sequence as the first column of Taxonomy
-    if (is(biom[['sequences']], "character"))
-      Taxonomy <- cbind(Sequence=biom[['sequences']], Taxonomy)
-    
-    # Rename a few of the Alpha Div columns
-    names(AlphaDiv) <- sub("Depth", "Total",   names(AlphaDiv))
-    names(AlphaDiv) <- sub("OTUs", ranks[[1]], names(AlphaDiv))
-    
-    openxlsx::writeData(wb, 'Alpha Diversity',   AlphaDiv, rowNames=FALSE)
-    openxlsx::writeData(wb, paste(type, 'List'), Taxonomy, rowNames=TRUE)
-    
-    
-    
-    #________________________________________________________
-    # Create worksheets for any other attributes on biom
-    #________________________________________________________
-    
-    for (key in names(attributes(biom))) {
-      if (key %in% c("names", "class")) next
-      
-      val <- attr(biom, key, exact = TRUE)
-      
-      if (eq(class(val), "dist"))   val <- data.frame(as.matrix(val))
-      if (eq(class(val), "matrix")) val <- data.frame(val)
-      if (!eq(class(val), "data.frame")) next
-      
-      rn <- !eq(rownames(val), as.character(1:nrow(val)))
-      openxlsx::addWorksheet(wb, key)
-      openxlsx::writeData(wb, key, val, rowNames = rn)
-      remove("val", "rn")
-    }
-    
-    remove(list = intersect(ls(), "key"))
-    
-    
-    
-    #________________________________________________________
-    # Roll up abundances at each taxonomic level
-    #________________________________________________________
-      
-    for (i in seq_along(ranks)) {
-      
-      df <- t(taxa_rollup(biom, i - 1, lineage=TRUE))
-      df <- df[sort(rownames(df)), sort(colnames(df)), drop=FALSE]
-      
-      # Set the full taxonomy string as the first column
-      if (eq(i, 1L)) {
-        Description <- data.frame(Description=apply(biom$taxonomy, 1L, paste, collapse="; "))
-        df          <- cbind(Description, df[rownames(Description),,F])
-      }
-      
-      openxlsx::writeData(wb, ranks[[i]], df, rowNames=TRUE)
-    }
-    
-    remove(list = intersect(ls(), c("df", "i")))
-    
-    
-    
-    #________________________________________________________
-    # Write everything to the specified output file
-    #________________________________________________________
-    
-    openxlsx::saveWorkbook(wb, file=file, overwrite=TRUE)
-    
+    rare <- NULL
   }
   
+  
+  
+  #________________________________________________________
+  # Track "Reads Per Sample" counts before/after rarefying.
+  #________________________________________________________
+  if (!is.null(rare))
+    local ({
+      
+      if ('Reads Per Step' %in% names(attributes(full))) {
+        rps <- attr(full, 'Reads Per Step', exact = TRUE)
+      } else {
+        rps <- data.frame(Mapped=slam::col_sums(full$counts))
+      }
+      
+      rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
+      rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
+      rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
+      
+      df <- tibble::as_tibble(rps, rownames = '.sample')
+      
+      
+      openxlsx::addWorksheet(wb, 'Reads Per Sample')
+      openxlsx::writeData(wb, 'Reads Per Sample', df)
+  })
+  
+  
+  
+  #________________________________________________________
+  # "Mapped OTU Counts" and "Rarefied OTU Counts".
+  #________________________________________________________
+  if (!is.null(rare))
+    local ({
+      
+      tbl <- as.matrix(full$counts) %>% tibble::as_tibble(rownames = ".otu")
+      
+      if (ncol(full$taxonomy) > 1) {
+        lin <- taxa_map(full, rank = 0, unc = unc, lineage = TRUE)
+        tbl %<>% mutate(.lineage = unname(lin[tbl$.otu]), .after = ".otu")
+      }
+      openxlsx::addWorksheet(wb, 'Mapped OTU Counts')
+      openxlsx::writeData(wb, 'Mapped OTU Counts', tbl)
+      
+      
+      
+      tbl <- as.matrix(rare$counts) %>% tibble::as_tibble(rownames = ".otu")
+      
+      if (ncol(rare$taxonomy) > 1) {
+        lin <- taxa_map(rare, rank = 0, unc = unc, lineage = TRUE)
+        tbl %<>% mutate(.lineage = unname(lin[tbl$.otu]), .after = ".otu")
+      }
+      openxlsx::addWorksheet(wb, 'Rarefied OTU Counts')
+      openxlsx::writeData(wb, 'Rarefied OTU Counts', tbl)
+      
+    })
+  
+  
+  #________________________________________________________
+  # "Sample Metadata": .sample, <metadata fields>
+  #________________________________________________________
+  openxlsx::addWorksheet(wb, 'Sample Metadata')
+  openxlsx::writeData(wb, 'Sample Metadata', full$metadata)
+  
+  
+  
+  
+  #________________________________________________________
+  # "Alpha Diversity": .otu, Depth, OTUs, Shannon, ...
+  #________________________________________________________
+  openxlsx::addWorksheet(wb, 'Alpha Diversity')
+  if (!is.null(rare)) {
+    openxlsx::writeData(wb, 'Alpha Diversity', {
+      adiv_matrix(rare) %>% tibble::as_tibble(rownames = ".otu")
+    })
+  }
+  
+  
+  
+  #________________________________________________________
+  # "OTU Taxonomy": .otu, <ranks>, .sequence
+  #________________________________________________________
+  openxlsx::addWorksheet(wb, 'OTU Taxonomy')
+  openxlsx::writeData(wb, 'OTU Taxonomy', local({
+    
+    tbl <- biom$taxonomy %>%
+      relocate(.otu)
+    
+    if (!is.null(seqs <- full$sequences))
+      tbl %<>% mutate(.sequence = unname(seqs[tbl$.otu]))
+    
+    return (tbl)
+  }))
+  
+  
+  
+  #________________________________________________________
+  # Create worksheets for any other attributes on biom.
+  #________________________________________________________
+  
+  for (key in names(attributes(full))) {
+    if (key %in% c("class", "Reads Per Step")) next
+    
+    val <- attr(full, key, exact = TRUE)
+    
+    if (identical(class(val),  "dist"))   val <- data.frame(as.matrix(val))
+    if (identical(class(val),  "matrix")) val <- data.frame(val)
+    if (!identical(class(val), "data.frame")) next
+    
+    rn <- !identical(rownames(val), as.character(1:nrow(val)))
+    openxlsx::addWorksheet(wb, key)
+    openxlsx::writeData(wb, key, val, rowNames = rn)
+    remove("val", "rn")
+  }
+  
+  remove(list = intersect(ls(), "key"))
+  
+  
+  
+  #________________________________________________________
+  # Roll up abundances at each taxonomic level.
+  #________________________________________________________
+  if (is.null(rare))
+    rare <- full
+  
+  for (rank in rare$ranks[-1]) {
+    openxlsx::addWorksheet(wb, rank)
+    taxa_matrix(rare, rank, lineage = TRUE) %>%
+      tibble::as_tibble(rps, rownames = paste0('.', tolower(rank))) %>%
+      openxlsx::writeData(wb = wb, sheet = rank)
+  }
+  
+  remove(list = intersect(ls(), c("rank")))
+  
+  
+  
+  #________________________________________________________
+  # Write everything to the specified output file
+  #________________________________________________________
+  
+  openxlsx::saveWorkbook(wb, file=file, overwrite=TRUE)
+  
+  
+    
   
   return (invisible(file))
 }

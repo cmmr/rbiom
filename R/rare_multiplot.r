@@ -21,10 +21,9 @@ rare_multiplot <- function (
     test = "pw_means", model = "log", level = 0.95, p.adj = "fdr", 
     caption = TRUE, labels = FALSE, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -64,8 +63,6 @@ rare_multiplot <- function (
   })) %>% add_class('rbiom_code')
   
   
-  
-  attr(p, 'history') <- history
   
   set_cache_value(cache_file, p)
   return (p)

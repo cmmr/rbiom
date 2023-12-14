@@ -13,17 +13,17 @@
 #'                 
 #' @param color.by   Add annotation tracks for these metadata column(s). 
 #'        See "Annotation Tracks" section below for details.
-#'        Default: \code{NULL}
+#'        Default: `NULL`
 #'                 
 #' @param order.by   Which metadata column(s) to use for ordering the samples 
 #'        across the x and y axes. Overrides any \code{clust} argument.
 #'        See "Ordering and Limiting" section below for details.
-#'        Default: \code{NULL}
+#'        Default: `NULL`
 #'                 
 #' @param limit.by   Metadata definition(s) to use for sample subsetting prior
 #'        to calculations. 
 #'        See "Ordering and Limiting" section below for details.
-#'        Default: \code{NULL}
+#'        Default: `NULL`
 #'        
 #' @param ...   Additional arguments to pass on to ggplot2::theme().
 #'        For example, \code{labs.title = "Plot Title"}.
@@ -130,12 +130,14 @@
 #' 
 #' @export
 #' @examples
-#'   library(rbiom)
-#'   
-#'   biom <- hmp50 %>% sample_rarefy() %>% sample_select(1:10)
-#'   bdiv_heatmap(biom, color.by=c("Body Site", "Age"))
-#'   
-#'   bdiv_heatmap(biom, bdiv="uni", weighted=c(T,F), color.by="sex")
+#'     library(rbiom)
+#'     
+#'     # Keep and rarefy the 10 most deeply sequenced samples.
+#'     hmp10 <- rarefy(hmp50, n = 10)
+#'     
+#'     bdiv_heatmap(hmp10, color.by=c("Body Site", "Age"))
+#'     
+#'     bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), color.by="sex")
 #'     
 bdiv_heatmap <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL,
@@ -145,11 +147,10 @@ bdiv_heatmap <- function (
     clust = "complete", trees = TRUE, tree_height = NULL, track_height = NULL, 
     legend = "right", xlab.angle = "auto", ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -199,9 +200,7 @@ bdiv_heatmap <- function (
     
     p <- patchwork::wrap_plots(plots)
     
-    history <- sprintf("bdiv_heatmap(%s)", as.args(as.list(params), fun = bdiv_heatmap))
-    attr(p, 'history') <- history
-    attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
+    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
     
     attr(p, 'code') <- paste(collapse = "\n\n", local({
       
@@ -230,7 +229,7 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Sanity Check
   #________________________________________________________
-  if (n_samples(biom) < 1)
+  if (biom$n_samples < 1)
     stop("At least one sample is needed for a bdiv heatmap.")
   
   
@@ -264,7 +263,7 @@ bdiv_heatmap <- function (
     params$color.by[[md_col]] %<>% within({
       if (exists("values", inherits = FALSE))
         colors <- values
-      values <- sample_metadata(biom, md_col)
+      values <- pull(biom, md_col)
     })
   args[['tracks']] <- params$color.by
   
@@ -272,7 +271,6 @@ bdiv_heatmap <- function (
   
   fig <- do.call(plot_heatmap, args)
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

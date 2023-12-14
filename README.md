@@ -46,7 +46,7 @@ remotes::install_github("cmmr/rbiom")
 library(rbiom)
 
 infile <- system.file(package = "rbiom", "extdata", "hmp50.bz2")
-biom   <- read_biom(infile) %>% sample_rarefy()
+biom   <- rarefy(infile)
 ```
 
 #### Explore associations with metadata.
@@ -109,7 +109,7 @@ taxa_barplot(biom, rank = "Phylum")
 taxa_table(biom, 'Phylum')
 #> # A tibble: 637 × 8
 #>    .rank  .sample .taxa               .abundance   Age   BMI `Body Site`   Sex  
-#>    <fct>  <fct>   <fct>                    <dbl> <dbl> <dbl> <fct>         <fct>
+#>    <fct>  <chr>   <fct>                    <dbl> <dbl> <dbl> <fct>         <fct>
 #>  1 Phylum HMP01   Actinobacteria              13    22    20 Buccal mucosa Fema…
 #>  2 Phylum HMP01   Bacteroidetes              192    22    20 Buccal mucosa Fema…
 #>  3 Phylum HMP01   Cyanobacteria                0    22    20 Buccal mucosa Fema…

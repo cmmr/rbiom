@@ -8,9 +8,9 @@
 #' @param mtx   A numeric \code{matrix} with named rows and columns.
 #' 
 #' @param tracks   List of track definitions. See details below.
-#'        Default: \code{NULL}.
+#'        Default: `NULL`.
 #' 
-#' @param labs.title   Plot title. Default: \code{NULL}.
+#' @param labs.title   Plot title. Default: `NULL`.
 #' 
 #' 
 #' @section Track Definitions:

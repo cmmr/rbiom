@@ -27,7 +27,7 @@ bdiv_heatmap(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
@@ -44,7 +44,7 @@ Multiple values allowed.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{grid}{Color palette name, or a list with entries for \code{label},
 \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
@@ -129,9 +129,9 @@ Default: \code{"auto"}.}
 For example, \code{labs.title = "Plot Title"}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot command,
-and object history are available as \code{$data}, \code{$code}, and
-\code{$history}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot
+command are available as \code{$data} and \code{$code},
+respectively.
 }
 \description{
 Display beta diversities in an all vs all grid.
@@ -235,12 +235,14 @@ limit.by = list(
 }
 
 \examples{
-  library(rbiom)
-  
-  biom <- hmp50 \%>\% sample_rarefy() \%>\% sample_select(1:10)
-  bdiv_heatmap(biom, color.by=c("Body Site", "Age"))
-  
-  bdiv_heatmap(biom, bdiv="uni", weighted=c(T,F), color.by="sex")
+    library(rbiom)
+    
+    # Keep and rarefy the 10 most deeply sequenced samples.
+    hmp10 <- rarefy(hmp50, n = 10)
+    
+    bdiv_heatmap(hmp10, color.by=c("Body Site", "Age"))
+    
+    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), color.by="sex")
     
 }
 \seealso{
@@ -250,7 +252,6 @@ Other beta_diversity:
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other visualization: 

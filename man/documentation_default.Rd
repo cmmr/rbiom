@@ -4,12 +4,14 @@
 \alias{documentation_default}
 \title{documentation_default}
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
+
+\item{mtx}{A matrix-like object.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{md}{A character vector naming the metadata fields to include in the
 output data frame, or \code{'.all'} to include all metadata fields.
@@ -53,8 +55,8 @@ Multiple values allowed.}
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
@@ -126,7 +128,7 @@ Default: \code{0.05}}
 Default: \code{0.95}}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when
@@ -164,17 +166,21 @@ Default: \code{999}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{depths}{Rarefaction depths to show in the plot, or \code{NULL} to
-auto-select. Default: \code{NULL}.}
+auto-select. Default: \code{NULL}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
 auto-selected rarefaction depth or \code{FALSE} to not show a line.
-Default: \code{NULL}.}
+Default: \code{NULL}}
 
-\item{labels}{Show sample names under each bar. Default: \code{FALSE}.}
+\item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
+is modified in place as a side-effect. See \link{cloning} for use cases.
+Default: \code{TRUE}}
+
+\item{labels}{Show sample names under each bar. Default: \code{FALSE}}
 }
 \description{
 documentation_default

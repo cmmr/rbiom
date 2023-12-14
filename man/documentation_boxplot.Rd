@@ -36,8 +36,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-ggplot command, and object history are available as \code{$data},
-\code{$stats}, \code{$code}, and \code{$history}, respectively.
+and ggplot command are available as \code{$data}, \code{$stats}, and
+\code{$code}, respectively.
 }
 \description{
 documentation_boxplot

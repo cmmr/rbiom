@@ -1,28 +1,40 @@
 
 
-#' Taxa abundances per sample, at the specified taxonomic rank.
+#' Taxa abundances per sample.
+#' 
+#' \itemize{
+#'   \item{`taxa_matrix()` - }{ Accepts a single `rank` and returns a matrix. }
+#'   \item{`taxa_table()` - }{ Can accept more than one `rank` and returns a tibble data.frame.  }
+#' }
+#' 
 #' 
 #' @inherit documentation_default
 #' 
 #' @family taxa_abundance
 #' 
-#' @return A numeric matrix with taxa as rows, and samples as columns.
+#' @return 
+#' \itemize{
+#'   \item{`taxa_matrix()` - }{
+#'     A numeric matrix with taxa as rows, and samples as columns. }
+#'   \item{`taxa_table()` - }{
+#'     A tibble data frame with column names .sample, .taxa, .abundance, and any requested by `md`. }
+#' }
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
-#'     taxa_ranks(hmp50)
+#'     biom$ranks
 #'     
-#'     phyla <- taxa_matrix(hmp50, 'Phylum')
-#'     phyla[1:4,1:6]
-#'
+#'     taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
+#'     
+#'     taxa_table(hmp50, 'Phylum')
 
 taxa_matrix <- function (
     biom, rank = -1, taxa = NULL, lineage = FALSE, 
     sparse = FALSE, unc = "singly", other = FALSE ) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   params <- eval_envir(environment())
   
   
@@ -46,7 +58,7 @@ taxa_matrix <- function (
   #________________________________________________________
   # Fetch taxonomy map with ambiguous names corrected.
   #________________________________________________________
-  map <- otu_taxonomy(
+  map <- taxa_map(
     biom    = biom, 
     rank    = rank, 
     unc     = unc, 
@@ -61,7 +73,7 @@ taxa_matrix <- function (
     error = function (e) stop("Unable to group by taxonomic level: ", e),
     expr  = local({
       
-      counts <- biom[['counts']]
+      counts <- biom$counts
       mtx <- slam::rollup(counts[names(map),], 1L, map, sum)
       mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
       
@@ -127,4 +139,131 @@ taxa_matrix <- function (
   set_cache_value(cache_file, mtx)
   
   return (mtx)
+}
+
+
+
+
+
+#' @rdname taxa_matrix
+#' @export
+taxa_table <- function (
+    biom, rank = -1, taxa = NULL, lineage = FALSE, 
+    md = ".all", unc = "singly", other = FALSE ) {
+  
+  biom <- as_rbiom(biom)
+  
+  params <- eval_envir(environment())
+  
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file()
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
+  
+  
+  
+  #________________________________________________________
+  # Validate user's arguments.
+  #________________________________________________________
+  validate_rank(max = Inf)
+  validate_meta('md', max = Inf)
+  
+  
+  
+  #________________________________________________________
+  # Return multiple ranks in a single table.
+  #________________________________________________________
+  tbl <- NULL
+  
+  for (r in rank)
+    tbl %<>% dplyr::bind_rows(local({
+      
+      mtx <- taxa_matrix(
+        biom    = biom, 
+        rank    = r, 
+        taxa    = taxa, 
+        lineage = lineage, 
+        sparse  = FALSE, 
+        unc     = unc, 
+        other   = other )
+      
+      
+      #________________________________________________________
+      # Pivot Longer
+      #________________________________________________________
+      tibble(
+        '.rank'      = r,
+        '.sample'    = colnames(mtx)[col(mtx)],
+        '.taxa'      = rownames(mtx)[row(mtx)],
+        '.abundance' = as.numeric(mtx) )
+      
+    }))
+  
+  tbl[['.rank']]   %<>%  factor(., levels = rank)
+  tbl[['.sample']] %<>% {factor(., levels = intersect(biom$samples, .))}
+  tbl[['.taxa']]   %<>% {factor(., levels = unique(.))}
+  
+  
+  
+  #________________________________________________________
+  # Add Metadata
+  #________________________________________________________
+  if (length(md) > 0)
+    tbl %<>% left_join( 
+      by = '.sample',
+      y  = biom$metadata[,unique(c('.sample', md))] )
+  
+  
+  
+  attr(tbl, 'response') <- ".abundance"
+  
+  
+  set_cache_value(cache_file, tbl)
+  
+  return (tbl)
+}
+
+
+
+
+#' Get summary taxa abundances.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family taxa_abundance
+#' 
+#' @param rank  The taxonomic rank to return sums or means for. The default, 
+#'        \code{0}, returns per-OTU summaries.
+#'        
+#' @return A named, sorted numeric vector.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom) 
+#'     
+#'     taxa_sums(hmp50) %>% head(4)
+#'     
+#'     taxa_means(hmp50, 'Family') %>% head(5)
+#'
+
+taxa_sums <- function (biom, rank = 0) {
+  
+  taxa_matrix(biom, rank, sparse = TRUE) %>%
+    slam::row_sums() %>%
+    sort(decreasing = TRUE)
+}
+
+
+
+#' @rdname taxa_sums
+#' @export
+
+taxa_means <- function (biom, rank = 0) {
+  
+  taxa_matrix(biom, rank, sparse = TRUE) %>%
+    slam::row_means() %>%
+    sort(decreasing = TRUE)
 }

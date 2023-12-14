@@ -32,7 +32,7 @@ taxa_boxplot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. The
@@ -42,8 +42,8 @@ default, \code{NULL} puts taxa along the x-axis.}
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -95,7 +95,7 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
@@ -141,7 +141,7 @@ taxa simultaneously, without complaint about 'zero' count
 observations. Default: \code{"sqrt"}}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
@@ -152,8 +152,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-ggplot command, and object history are available as \code{$data},
-\code{$stats}, \code{$code}, and \code{$history}, respectively.
+and ggplot command are available as \code{$data}, \code{$stats}, and
+\code{$code}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
@@ -161,7 +161,8 @@ Visualize BIOM data with boxplots.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
+    
     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
     taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
     
@@ -173,8 +174,7 @@ Other taxa_abundance:
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
 \code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+\code{\link{taxa_sums}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},

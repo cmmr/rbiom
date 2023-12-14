@@ -81,9 +81,9 @@ Default: \code{1} (square).}
 \item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot command,
-and object history are available as \code{$data}, \code{$code}, and
-\code{$history}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot
+command are available as \code{$data} and \code{$code},
+respectively.
 }
 \description{
 documentation_heatmap

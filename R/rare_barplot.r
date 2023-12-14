@@ -7,18 +7,18 @@
 #' @family visualization
 #'        
 #' @param rline   Where to draw a horizontal line on the plot, intended to show
-#'        a particular rarefaction depth. Set to \code{TRUE} to show an 
-#'        auto-selected rarefaction depth, \code{FALSE} to not show a line, or
+#'        a particular rarefaction depth. Set to `TRUE` to show an 
+#'        auto-selected rarefaction depth, `FALSE` to not show a line, or
 #'        an integer for a custom position.
-#'        Default: \code{TRUE}.
+#'        Default: `TRUE`.
 #' 
 #' @param counts   Display the number of samples and reads remaining after
-#'        rarefying to \code{rline} reads per sample. Default: \code{TRUE}.
+#'        rarefying to \code{rline} reads per sample. Default: `TRUE`.
 #'        
-#' @param labels   Show sample names under each bar. Default: \code{TRUE}.
+#' @param labels   Show sample names under each bar. Default: `TRUE`.
 #'        
 #' @param trans   Y-axis transformation. Options are \code{"log10"} or 
-#'        \code{NULL}.  Default: \code{"log10"}.
+#'        `NULL`.  Default: \code{"log10"}.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 functions. 
 #'        Prefix a parameter name with \code{r.} to ensure it gets 
@@ -42,10 +42,9 @@
 rare_barplot <- function (
     biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -182,7 +181,6 @@ rare_barplot <- function (
   fig <- plot_build(params)
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

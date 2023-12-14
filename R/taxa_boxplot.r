@@ -10,13 +10,14 @@
 #' @family visualization
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
-#'        default, \code{NULL} puts taxa along the x-axis.
+#'        default, `NULL` puts taxa along the x-axis.
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
 #'     taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
 #'     
@@ -28,10 +29,9 @@ taxa_boxplot <- function (
     ci = 'ci', level = 0.95, outliers = NULL, xlab.angle = 'auto', y.trans = 'sqrt', 
     caption = TRUE, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -117,8 +117,8 @@ taxa_boxplot <- function (
   if (any(params$.ggdata[['.y']] > 1)) {
     
     biom <- params$biom
-    if (is_rarefied(biom)) { set_layer(params, 'labs', y = "Rarefied Counts")
-    } else                 { set_layer(params, 'labs', y = "Unrarefied Counts") }
+    if (is.null(biom$depth)) { set_layer(params, 'labs', y = "Unrarefied Counts")
+    } else                   { set_layer(params, 'labs', y = "Rarefied Counts") }
     
   } else {
     set_layer(params, 'labs', y = "Relative Abundance")
@@ -137,7 +137,6 @@ taxa_boxplot <- function (
   
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

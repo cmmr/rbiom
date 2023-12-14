@@ -27,7 +27,7 @@ adiv_boxplot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. The
@@ -57,7 +57,7 @@ of columns. Default: \code{FALSE}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
@@ -91,7 +91,7 @@ Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
@@ -102,8 +102,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-ggplot command, and object history are available as \code{$data},
-\code{$stats}, \code{$code}, and \code{$history}, respectively.
+and ggplot command are available as \code{$data}, \code{$stats}, and
+\code{$code}, respectively.
 }
 \description{
 Visualize alpha diversity with boxplots.
@@ -111,7 +111,7 @@ Visualize alpha diversity with boxplots.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
     
     adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
     
@@ -122,9 +122,6 @@ Visualize alpha diversity with boxplots.
     
     # Each plot object includes additional information.
     fig <- adiv_boxplot(biom, x="Body Site")
-    
-    ## Provenance History ---------------------
-    fig$history
     
     ## Computed Data Points -------------------
     fig$data

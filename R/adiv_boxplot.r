@@ -11,7 +11,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
 #'     
 #'     adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
 #'     
@@ -22,9 +22,6 @@
 #'     
 #'     # Each plot object includes additional information.
 #'     fig <- adiv_boxplot(biom, x="Body Site")
-#'     
-#'     ## Provenance History ---------------------
-#'     fig$history
 #'     
 #'     ## Computed Data Points -------------------
 #'     fig$data
@@ -43,10 +40,9 @@ adiv_boxplot <- function (
     outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -141,7 +137,6 @@ adiv_boxplot <- function (
   
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

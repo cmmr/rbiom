@@ -12,7 +12,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     taxa_corrplot(biom, "BMI", color.by="Body Site", taxa = 4) 
 #'     
 
@@ -22,10 +23,9 @@ taxa_corrplot <- function (
     test = "trends", model = "lm", level = 0.95, 
     p.top = Inf, p.adj = "fdr", caption = TRUE, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -57,8 +57,8 @@ taxa_corrplot <- function (
   #________________________________________________________
   with(params, {
     
-    if (is_rarefied(biom))
-      biom %<>% as_percent()
+    if (!is.null(biom$depth))
+      biom$counts %<>% rescale_cols()
     
     
     # Compute each rank separately: phylum, genus, etc
@@ -96,9 +96,9 @@ taxa_corrplot <- function (
   set_layer(params, 'labs', y = with(params, {
     
     ifelse(
-      test = is_rarefied(biom), 
-      yes  = paste(rank, "Relative Abundance"), 
-      no   = paste(rank, "Abundance [UNRAREFIED]"))
+      test = is.null(biom$depth), 
+      yes  = paste(rank, "Abundance [UNRAREFIED]"), 
+      no   = paste(rank, "Relative Abundance") )
     
   }))
   
@@ -116,7 +116,6 @@ taxa_corrplot <- function (
     plot_build()
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

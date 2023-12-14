@@ -14,7 +14,7 @@
 #' @examples
 #'     library(rbiom) 
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
 #'       
 #'     adiv_stats(biom, stat.by = "Body Site")
 #'       
@@ -31,10 +31,9 @@ adiv_stats <- function (
     split.by = NULL, level = 0.95, p.adj = "fdr") {
   
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment())
-  history <- append_history('stats ', params)
+  params <- eval_envir(environment())
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -62,6 +61,6 @@ adiv_stats <- function (
   
   stats <- do.call(stats_table, fun_params(stats_table, params))
   
-  attr(stats, 'history') <- history
+  
   return (stats)
 }

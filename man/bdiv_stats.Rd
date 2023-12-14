@@ -20,7 +20,7 @@ bdiv_stats(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{stat.by}{The categorical or numeric metadata field over which
@@ -40,7 +40,7 @@ Multiple values allowed.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{test}{Permutational test for accessing significance. Options are:
 \itemize{
@@ -63,12 +63,11 @@ Default: \code{999}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}, and
-the object history is in \code{$history}.
+The R code or generating these statistics is in \code{$code}.
 }
 \description{
 Test beta diversity vs categorical or numeric metadata.
@@ -76,7 +75,7 @@ Test beta diversity vs categorical or numeric metadata.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
     
     bdiv_stats(biom, stat.by = "Body Site", split.by = "Sex")
       
@@ -93,7 +92,6 @@ Other beta_diversity:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other stats_tables: 

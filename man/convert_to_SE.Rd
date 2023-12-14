@@ -2,37 +2,47 @@
 % Please edit documentation in R/convert.r
 \name{convert_to_SE}
 \alias{convert_to_SE}
-\title{Convert an rbiom object to a SummarizedExperiment object.}
+\alias{convert_to_TSE}
+\title{Convert an rbiom object to a Bioconductor object.}
 \usage{
 convert_to_SE(biom)
+
+convert_to_TSE(biom)
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 }
 \value{
-A SummarizedExperiment object.
+A SummarizedExperiment or TreeSummarizedExperiment object.
 }
 \description{
-Requires the Bioconductor R package 'SummarizedExperiment' to be installed.
+Requires the relevant Bioconductor R package to be installed:
+\itemize{
+\item{\code{convert_to_SE} - }{ \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} }
+\item{\code{convert_to_TSE} - }{ \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment} }
+}
+}
+\details{
+A SummarizedExperiment object includes counts, metadata, and taxonomy.
+
+TreeSummarizedExperiment additionally includes the tree and sequences.
 }
 \examples{
     
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
-    print(biom)
+    print(hmp50)
       
     # Requires 'SummarizedExperiment' Bioconductor R package
     if (nzchar(system.file(package = "SummarizedExperiment"))) {
-      se <- convert_to_SE(biom)
+      se <- convert_to_SE(hmp50)
       print(se)
     }
+      
+    # Requires 'TreeSummarizedExperiment' Bioconductor R package
+    if (nzchar(system.file(package = "TreeSummarizedExperiment"))) {
+      tse <- convert_to_TSE(hmp50)
+      print(tse)
+    }
 }
-\seealso{
-Other conversion: 
-\code{\link{as_rbiom}()},
-\code{\link{convert_from_phyloseq}()},
-\code{\link{convert_to_TSE}()}
-}
-\concept{conversion}

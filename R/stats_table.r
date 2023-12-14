@@ -18,7 +18,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
 #'     
 #'     df <- taxa_table(biom, rank = "Family")
 #'     stats_table(df, stat.by = "Body Site")
@@ -88,7 +88,7 @@ stats_table <- function (
   for (i in c(stat.by, split.by))
     if (!is.factor(df[[i]])) {
       if (!is.character(df[[i]]))
-        warning("Numeric column '", i, "' is being used for categorical grouping.")
+        cli_warn("Numeric column '{i}' is being used for categorical grouping.")
       df[[i]] %<>% as.factor()
     }
   remove(list = intersect("i", ls()))
@@ -118,9 +118,17 @@ stats_table <- function (
     stats %<>% plyr::arrange(.p.val)
     stats %<>% dplyr::relocate(.p.val, .after = last_col())
     stats[['.adj.p']] <- stats::p.adjust(stats[['.p.val']], p.adj)
+    attr(stats, 'code') <- glue(
+      "{attr(stats, 'code', exact = TRUE)}
+      stats %<>% plyr::arrange(.p.val)
+      stats %<>% dplyr::relocate(.p.val, .after = last_col())
+      stats[['.adj.p']] <- stats::p.adjust(stats[['.p.val']], '{p.adj}')" )
     
   } else if (hasName(stats, '.effect.size')) {
     stats %<>% plyr::arrange(plyr::desc(abs(.effect.size)))
+    attr(stats, 'code') <- glue(
+      "{attr(stats, 'code', exact = TRUE)}
+      stats %<>% plyr::arrange(plyr::desc(abs(.effect.size)))" )
   }
   
   

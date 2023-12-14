@@ -17,7 +17,7 @@ adiv_stats(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{stat.by}{The categorical metadata field defining the statistical
@@ -54,12 +54,11 @@ Default: \code{0.95}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}, and
-the object history is in \code{$history}.
+The R code or generating these statistics is in \code{$code}.
 }
 \description{
 Test alpha diversity differences for significance.
@@ -128,7 +127,7 @@ For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
 \examples{
     library(rbiom) 
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
       
     adiv_stats(biom, stat.by = "Body Site")
       

@@ -51,12 +51,11 @@ by prior to any calculations. Default: \code{NULL}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}, and
-the object history is in \code{$history}.
+The R code or generating these statistics is in \code{$code}.
 }
 \description{
 Run non-parametric statistics on a data.frame.
@@ -125,7 +124,7 @@ For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
     
     df <- taxa_table(biom, rank = "Family")
     stats_table(df, stat.by = "Body Site")

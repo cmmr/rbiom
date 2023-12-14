@@ -427,7 +427,7 @@ add_layer <- function (params, layer, fn = NULL) {
 sync_metadata <- function (params = parent.frame()) {
   
   
-  md <- sample_metadata(params$biom)
+  md <- params$biom$metadata
   
   
   by_params <- c(
@@ -565,7 +565,8 @@ sync_metadata <- function (params = parent.frame()) {
   
   
   # `params` and `biom` are both environments
-  sample_metadata(params$biom) <- md
+  params$biom <- params$biom$clone()
+  params$biom$metadata <- md
   
   
   return (invisible(NULL))

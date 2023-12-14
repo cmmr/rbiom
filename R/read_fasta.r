@@ -4,7 +4,7 @@
 #' @param file   A file/URL with fasta-formatted sequences. Can optionally be 
 #'        compressed with gzip, bzip2, xz, or lzma.
 #' 
-#' @param ids   Character vector of IDs to retrieve. The default, \code{NULL}, 
+#' @param ids   Character vector of IDs to retrieve. The default, `NULL`, 
 #'        will retrieve everything.
 #' 
 #' @return A named character vector in which names are the fasta headers and 

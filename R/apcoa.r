@@ -19,13 +19,14 @@
 #'     library(rbiom)
 #'     library(ggplot2)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     dm   <- bdiv_distmat(biom, 'unifrac')
 #'     reg_pcoa <- ape::pcoa(dm)[['vectors']]
-#'     adj_pcoa <- apcoa(dm, sample_metadata(biom)[,'Sex'])
+#'     adj_pcoa <- apcoa(dm, biom$metadata[,'Sex'])
 #'     
-#'     ids   <- sample_names(biom)
-#'     color <- sample_metadata(biom, 'Sex')
+#'     ids   <- biom$samples
+#'     color <- pull(biom, 'Sex')
 #'     ggplot(mapping=aes(x=reg_pcoa[ids, 1], y=reg_pcoa[ids, 2], color=color)) + geom_point()
 #'     ggplot(mapping=aes(x=adj_pcoa[ids, 1], y=adj_pcoa[ids, 2], color=color)) + geom_point()
 

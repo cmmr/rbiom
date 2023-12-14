@@ -15,8 +15,10 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- hmp50 %>% sample_rarefy() %>% sample_select(1:10)
-#'     taxa_heatmap(biom, rank="Phylum", color.by="Body Site")
+#'     # Keep and rarefy the 10 most deeply sequenced samples.
+#'     hmp10 <- rarefy(hmp50, n = 10)
+#'     
+#'     taxa_heatmap(hmp10, rank="Phylum", color.by="Body Site")
 #'     
 taxa_heatmap <- function (
     biom, rank = -1, taxa = 6,
@@ -28,10 +30,9 @@ taxa_heatmap <- function (
     tree_height = NULL, track_height = NULL, ratio=1, 
     legend = "right", xlab.angle = "auto", ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -62,8 +63,7 @@ taxa_heatmap <- function (
     p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
       add_class('rbiom_plot')
     
-    attr(p, 'history') <- history
-    attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
+    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
     
     attr(p, 'code') <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
@@ -110,7 +110,7 @@ taxa_heatmap <- function (
     
     sync_metadata()
     
-    if (n_samples(biom) < 1)
+    if (biom$n_samples < 1)
       stop("At least one sample is needed for a heatmap.")
   })
   
@@ -141,7 +141,7 @@ taxa_heatmap <- function (
     params$color.by[[md_col]] %<>% within({
       if (exists('values', inherits = FALSE))
         colors <- values
-      values <- sample_metadata(params$biom, md_col)
+      values <- pull(params$biom, md_col)
     })
   params[['tracks']] <- params$color.by
   
@@ -153,9 +153,6 @@ taxa_heatmap <- function (
   args <- intersect(formalArgs(plot_heatmap), env_names(params))
   args <- c(mget(args, envir = params), params$.dots)
   p    <- do.call(plot_heatmap, args)
-  
-  
-  attr(p, 'history') <- history
   
   
   set_cache_value(cache_file, p)

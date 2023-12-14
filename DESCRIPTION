@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9104
-Date: 2023-11-29
+Version: 2.0.0.9109
+Date: 2023-12-13
 Authors@R:
     person("Daniel P.", "Smith", 
     email = "dansmith01@gmail.com", 
@@ -23,6 +23,8 @@ LazyData: true
 Depends: R (>= 4.2.0)
 Additional_repositories: https://cmmr.github.io/rbiom
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Config/Needs/website: rmarkdown
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 LinkingTo: 
@@ -31,6 +33,7 @@ LinkingTo:
 Imports:
     ape,
     broom,
+    cli,
     dplyr,
     emmeans,
     ggbeeswarm,
@@ -48,6 +51,7 @@ Imports:
     optparse,
     patchwork,
     plyr,
+    R6,
     Rcpp,
     RcppParallel,
     rlang,
@@ -67,5 +71,3 @@ Suggests:
     rhdf5,
     testthat,
     vdiffr
-RoxygenNote: 7.2.3
-VignetteBuilder: knitr

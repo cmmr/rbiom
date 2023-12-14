@@ -33,11 +33,6 @@ New Hampshire format.
 }
 \seealso{
 Other phylogeny: 
-\code{\link{has_tree}()},
-\code{\link{otu_tree}()},
-\code{\link{tree_data}()},
-\code{\link{tree_subset}()},
-\code{\link{tree_tips}()},
-\code{\link{write_tree}()}
+\code{\link{tree_subset}()}
 }
 \concept{phylogeny}

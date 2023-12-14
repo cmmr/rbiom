@@ -31,7 +31,7 @@ bdiv_boxplot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name. Prefix the column name with
@@ -53,7 +53,7 @@ Multiple values allowed.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
 \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
@@ -78,7 +78,7 @@ of columns. Default: \code{FALSE}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
@@ -112,7 +112,7 @@ Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{...}{Parameters are matched to formal arguments of ggplot2
 functions. Prefixing parameter names with a layer name ensures that
@@ -123,8 +123,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-ggplot command, and object history are available as \code{$data},
-\code{$stats}, \code{$code}, and \code{$history}, respectively.
+and ggplot command are available as \code{$data}, \code{$stats}, and
+\code{$code}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
@@ -132,7 +132,8 @@ Visualize BIOM data with boxplots.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
+    
     bdiv_boxplot(biom, x="==Body Site", bdiv="UniFrac", color.by="Body Site")
     
 
@@ -144,7 +145,6 @@ Other beta_diversity:
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other visualization: 

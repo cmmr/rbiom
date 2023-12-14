@@ -28,7 +28,7 @@ bdiv_ord_table(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
@@ -68,7 +68,7 @@ statistics should be calculated. Required.}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{within, between}{Metadata field(s) for intra- or inter- sample
 comparisons. Default: \code{NULL}}
@@ -90,8 +90,8 @@ Default: \code{999}}
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -109,7 +109,7 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -158,7 +158,6 @@ Other beta_diversity:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other ordination: 

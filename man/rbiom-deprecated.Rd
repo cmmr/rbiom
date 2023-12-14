@@ -18,8 +18,6 @@
 \alias{ntaxa}
 \alias{phylogeny-deprecated}
 \alias{phylogeny}
-\alias{rarefy-deprecated}
-\alias{rarefy}
 \alias{read.biom-deprecated}
 \alias{read.biom}
 \alias{read.fasta-deprecated}
@@ -29,7 +27,7 @@
 \alias{sample.names-deprecated}
 \alias{sample.names}
 \alias{select-deprecated}
-\alias{select}
+\alias{select.rbiom}
 \alias{sequences-deprecated}
 \alias{sequences}
 \alias{subtree-deprecated}
@@ -76,6 +74,8 @@
 \alias{sample_subset}
 \alias{sample.sums-deprecated}
 \alias{sample.sums}
+\alias{stats.table-deprecated}
+\alias{stats.table}
 \alias{taxa.means-deprecated}
 \alias{taxa.means}
 \alias{taxa.sums-deprecated}
@@ -122,8 +122,6 @@ ntaxa(biom)
 
 phylogeny(biom)
 
-rarefy(biom, depth = NULL, seed = 0)
-
 read.biom(src, tree = "auto", prune = FALSE)
 
 read.fasta(file, ids = NULL)
@@ -132,7 +130,7 @@ read.tree(src)
 
 sample.names(biom)
 
-select(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
+\method{select}{rbiom}(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
 
 sequences(biom)
 
@@ -196,6 +194,8 @@ sample_subset(x, ...)
 
 sample.sums(biom, long = FALSE, md = FALSE)
 
+stats.table(...)
+
 taxa.means(biom, rank = NULL)
 
 taxa.sums(biom, rank = NULL)
@@ -242,37 +242,32 @@ Use \code{\link[=bdiv_table]{bdiv_table()}} or \code{\link[=bdiv_distmat]{bdiv_d
 
 \section{\code{counts}}{
 
-Use \code{\link[=otu_matrix]{otu_matrix()}} instead.
+Use \verb{$counts} instead.
 }
 
 \section{\code{info}}{
 
-Use \code{\link[=biom_info]{biom_info()}} instead.
+Use \code{biom$id}, \code{biom$comment}, etc instead.
 }
 
 \section{\code{metadata}}{
 
-Use \code{\link[=sample_metadata]{sample_metadata()}} instead.
+Use \code{biom$metadata} or \code{pull(biom, field)} instead.
 }
 
 \section{\code{nsamples}}{
 
-Use \code{\link[=n_samples]{n_samples()}} instead.
+Use \code{biom$n_samples} instead.
 }
 
 \section{\code{ntaxa}}{
 
-Use \code{\link[=n_otus]{n_otus()}} instead.
+Use \code{biom$n_otus} instead.
 }
 
 \section{\code{phylogeny}}{
 
-Use \code{\link[=otu_tree]{otu_tree()}} instead.
-}
-
-\section{\code{sample_rarefy}}{
-
-Use \code{\link[=otu_tree]{otu_tree()}} instead.
+Use \code{biom$tree} instead.
 }
 
 \section{\code{read.biom}}{
@@ -292,17 +287,17 @@ Use \code{\link[=read_tree]{read_tree()}} instead.
 
 \section{\code{sample.names}}{
 
-Use \code{\link[=sample_names]{sample_names()}} instead.
+Use \code{biom$samples} instead.
 }
 
 \section{\code{select}}{
 
-Use \code{\link[=subset]{subset()}} instead.
+Use \code{\link[=slice]{slice()}} instead.
 }
 
 \section{\code{sequences}}{
 
-Use \code{\link[=otu_sequences]{otu_sequences()}} instead.
+Use \code{biom$sequences} instead.
 }
 
 \section{\code{subtree}}{
@@ -312,12 +307,12 @@ Use \code{\link[=tree_subset]{tree_subset()}} instead.
 
 \section{\code{taxa.names}}{
 
-Use \code{\link[=otu_names]{otu_names()}} instead.
+Use \code{biom$otus} instead.
 }
 
 \section{\code{taxa.ranks}}{
 
-Use \code{\link[=taxa_ranks]{taxa_ranks()}} instead.
+Use \code{biom$ranks} instead.
 }
 
 \section{\code{taxa.rollup}}{
@@ -327,12 +322,12 @@ Use \code{\link[=taxa_table]{taxa_table()}} \code{\link[=taxa_matrix]{taxa_matri
 
 \section{\code{taxonomy}}{
 
-Use \code{\link[=otu_taxonomy]{otu_taxonomy()}} instead.
+Use \verb{$taxonomy} instead.
 }
 
 \section{\code{tips}}{
 
-Use \code{\link[=tree_tips]{tree_tips()}} instead.
+Use \code{tree$tip.label} instead.
 }
 
 \section{\code{unifrac}}{
@@ -362,12 +357,12 @@ Use \code{\link[=write_xlsx]{write_xlsx()}} instead.
 
 \section{\code{as.percent}}{
 
-Use \code{\link[=as_percent]{as_percent()}} instead.
+Use \code{biom$counts \%<>\% rescale_cols()} instead.
 }
 
 \section{\code{comments}}{
 
-Use \code{\link[=biom_comment]{biom_comment()}} instead.
+Use \code{biom$comment} instead.
 }
 
 \section{\code{depth}}{
@@ -382,37 +377,42 @@ Use \code{\link[=rare_barplot]{rare_barplot()}} instead.
 
 \section{\code{has.phylogeny}}{
 
-Use \code{\link[=has_tree]{has_tree()}} instead.
+Use \code{!is.null(biom$tree)} instead.
 }
 
 \section{\code{has.sequences}}{
 
-Use \code{\link[=has_sequences]{has_sequences()}} instead.
+Use \code{!is.null(biom$sequences)} instead.
 }
 
 \section{\code{id}}{
 
-Use \code{\link[=biom_id]{biom_id()}} instead.
+Use \code{biom$id} instead.
 }
 
 \section{\code{is.rarefied}}{
 
-Use \code{\link[=is_rarefied]{is_rarefied()}} instead.
+Use \code{!is.null(biom$depth)} instead.
 }
 
 \section{\code{repair}}{
 
-Use \code{\link[=biom_repair]{biom_repair()}} instead.
+Use \link{as_rbiom(as.list(biom))} instead.
 }
 
 \section{\code{sample_subset}}{
 
-Use \code{\link[=subset]{subset()}} instead.
+Use \code{biom$metadata \%<>\% base::subset()} instead.
 }
 
 \section{\code{sample.sums}}{
 
 Use \code{\link[=sample_sums]{sample_sums()}} or \code{\link[=adiv_table]{adiv_table()}} instead.
+}
+
+\section{\code{stats.table}}{
+
+Use \code{\link[=stats_table]{stats_table()}} instead.
 }
 
 \section{\code{taxa.means}}{
@@ -437,32 +437,31 @@ Use \code{\link[=taxa_sums]{taxa_sums()}} instead.
 
 \section{\code{comments-set}}{
 
-Use \code{\link[=biom_comment]{biom_comment()}} instead.
+Use \link{$comment} instead.
 }
 
 \section{\code{counts-set}}{
 
-Use \code{\link[=otu_matrix]{otu_matrix()}} instead.
+Use \link{$counts} instead.
 }
 
 \section{\code{id-set}}{
 
-Use \code{\link[=biom_id]{biom_id()}} instead.
+Use \link{$id} instead.
 }
 
 \section{\code{metadata-set}}{
 
-Use \code{\link[=sample_metadata]{sample_metadata()}} instead.
+Use \link{$metadata} instead.
 }
 
 \section{\code{phylogeny-set}}{
 
-Use \code{\link[=otu_tree]{otu_tree()}} instead.
+Use \link{$tree} instead.
 }
 
 \section{\code{sample.names-set}}{
 
-Use \code{\link[=sample_names]{sample_names()}} instead.
 }
 
 \section{\code{sequences-set}}{
@@ -472,17 +471,15 @@ Use \code{\link[=otu_sequences]{otu_sequences()}} instead.
 
 \section{\code{taxa.names-set}}{
 
-Use \code{\link[=otu_names]{otu_names()}} instead.
 }
 
 \section{\code{taxa.ranks-set}}{
 
-Use \code{\link[=taxa_ranks]{taxa_ranks()}} instead.
 }
 
 \section{\code{taxonomy-set}}{
 
-Use \code{\link[=otu_taxonomy]{otu_taxonomy()}} instead.
+Use \link{$taxonomy} instead.
 }
 
 \keyword{internal}

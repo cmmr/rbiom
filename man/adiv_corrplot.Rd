@@ -21,7 +21,7 @@ adiv_corrplot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A numeric metadata field to use for the x-axis. Required.}
@@ -55,13 +55,13 @@ additional details. Default: \code{"lm"}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{t.} or
@@ -72,8 +72,8 @@ scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-ggplot command, and object history are available as \code{$data},
-\code{$stats}, \code{$code}, and \code{$history}, respectively.
+and ggplot command are available as \code{$data}, \code{$stats}, and
+\code{$code}, respectively.
 }
 \description{
 Visualize alpha diversity with scatterplots and trendlines.
@@ -179,7 +179,7 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
     adiv_corrplot(biom, "age", color.by="body", adiv=c("sha", "otu"), facet.by="sex")
     
 }

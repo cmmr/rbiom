@@ -2,40 +2,83 @@
 % Please edit documentation in R/bdiv_distmat.r
 \name{bdiv_distmat}
 \alias{bdiv_distmat}
-\title{Make a distance matrix of samples vs samples.}
+\alias{bdiv_table}
+\title{Distance / dissimilarity between samples.}
 \usage{
 bdiv_distmat(biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL)
+
+bdiv_table(
+  biom,
+  bdiv = "Bray-Curtis",
+  weighted = TRUE,
+  tree = NULL,
+  md = NULL,
+  within = NULL,
+  between = NULL
+)
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
+\item{bdiv}{Beta diversity distance algorithm to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"}}
+\code{"Jaccard"}, and \code{"UniFrac"}. \code{bdiv_table()} can accept multiple
+values. Default: \code{"Bray-Curtis"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
+\code{bdiv_table()} can accept multiple values.
 Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
+
+\item{md}{Include metadata in the output data frame? Options are:
+\itemize{
+\item{\code{NULL} - }{ Don't include metadata. }
+\item{\code{TRUE} - }{ Include all metadata. }
+\item{\emph{character vector} - }{
+Include only the specified metadata columns.
+Prefix the column name(s) with \code{==} or \code{!=} to limit comparisons
+to within or between groups, respectively. }
+}
+Default: \code{NULL}}
+
+\item{within, between}{Metadata field(s) for intra- or inter- sample
+comparisons. Default: \code{NULL}}
 }
 \value{
-A \code{dist}-class distance matrix.
+\itemize{
+\item{\code{bdiv_distmat()} - }{ A dist-class distance matrix. }
+\item{\code{bdiv_table()} - }{
+A tibble data.frame with columns names .sample1, .sample2, .weighted,
+.bdiv, .distance, and any fields requested by \code{md}. }
+}
 }
 \description{
-Make a distance matrix of samples vs samples.
+Distance / dissimilarity between samples.
 }
 \examples{
     library(rbiom)
     
-    biom <- sample_select(hmp50, 1:10)
-    dm   <- bdiv_distmat(biom, 'unifrac')
-    as.matrix(dm)[1:4,1:4]
+    # Subset to four samples
+    biom <- hmp50$clone()
+    biom$counts <- biom$counts[,c("HMP18", "HMP19", "HMP20", "HMP21")]
+    
+    # Return in long format with metadata
+    bdiv_table(biom, 'unifrac', md = c("Body Site", "Sex"))
+    
+    # Only look at distances among the stool samples
+    bdiv_table(biom, 'unifrac', md = c("==Body Site", "Sex"))
+    
+    # Or between males and females
+    bdiv_table(biom, 'unifrac', md = c("Body Site", "!=Sex"))
+    
+    # Distance matrix for all samples
+    dm <- bdiv_distmat(biom, 'unifrac')
+    as.matrix(dm)
     plot(hclust(dm))
 
 }
@@ -46,7 +89,6 @@ Other beta_diversity:
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 }
 \concept{beta_diversity}

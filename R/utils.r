@@ -4,6 +4,15 @@
 
 
 #____________________________________________________________________
+# Stop with an error message if variable isn't an rbiom object.
+#____________________________________________________________________
+must_be_rbiom <- function (biom) {
+  if (!(is(biom, 'rbiom') && is(biom, 'R6')))
+    cli_abort(('x' = "`biom` must be an rbiom object, not {.type {biom}}."))
+}
+
+
+#____________________________________________________________________
 # Check if two objects are identical, ignoring attr(,'hash').
 #____________________________________________________________________
 eq <- function (x, y) {
@@ -48,44 +57,6 @@ layer_match <- function (x, choices, default) {
 
 
 
-#____________________________________________________________________
-# Append parent call to existing history.
-#____________________________________________________________________
-append_history <- function (dest = "biom", params = parent.frame()) {
-  
-  fun <- sys.function(-1)
-  src <- formalArgs(fun)[[1]]
-  cl  <- rlang::caller_call()
-  
-  
-  # Handle assignment pipe.
-  if (eq(format(params[[src]]), ".")) {
-    
-    assignment <- "%<>%"
-    cl <- cl[-2]
-    
-  } else {
-    
-    assignment <- "<-"
-  
-    # The root ancestor should be preserved as is.
-    if (is.null(attr(params[[src]], 'display', exact = TRUE)))
-      attr(params[[src]], 'display') <- capture.output(cl[[src]]) # e.g. "phyloseqObj"
-  }
-  
-  
-  history <- paste0(collapse = "\n", c(
-    attr(params[[src]], 'history', exact = TRUE),
-    sprintf(
-      fmt = paste(dest, assignment, "%s(%s)"), 
-      capture.output(cl[[1]]), # e.g. "sample_rarefy"
-      as.args(fun_params(fun, params), fun = fun) ))) %>%
-    add_class('rbiom_code')
-  
-  return (history)
-}
-
-
 
 #____________________________________________________________________
 # Convert to tibble and add 'rbiom_tbl' class.
@@ -105,14 +76,9 @@ eval_envir <- function (env, ...) {
   
   
   #____________________________________________________________________
-  # Evaluate and hash all arguments into a clean env.
+  # Evaluate all arguments into a clean env.
   #____________________________________________________________________
-  params <- lapply(as.list(env), function (x) {
-      x <- eval(x)
-      if (!is.null(x) && is.null(attr(x, 'hash', exact = TRUE)))
-        attr(x, 'hash') <- rlang::hash(x)
-      return (x)
-    }) %>%
+  params <- lapply(as.list(env), eval) %>%
     rlang::new_environment(parent = rlang::ns_env('rbiom'))
   
   
@@ -129,7 +95,7 @@ eval_envir <- function (env, ...) {
           'x', 'color.by', 'shape.by', 'facet.by', 
           'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
           'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
-          'within', 'between', 'tree', 'params', 'history' ))))
+          'within', 'between', 'tree', 'params' ))))
     
     if (nzchar(invalid)) {
       fn <- deparse(rlang::caller_call()[[1]])
@@ -564,6 +530,36 @@ qw <- function (...) {
 coan <- function (nm) {
   if (is.null(nm)) return ('')
   capture.output(as.name(nm))
+}
+
+
+#____________________________________________________________________
+# Convert vector to a string, limited by width.
+#____________________________________________________________________
+vw <- function (x, width = min(80, floor(getOption("width") * 0.75))) {
+  
+  if (length(x) == 0) return ("<none>")
+  if (length(x) == 1) return (x)
+  if (length(x) == 2) return (paste(x[[1]], "and", x[[2]]))
+  
+  x[length(x)] <- paste0("and ", x[length(x)])
+  x[-1]        <- paste0(", ",   x[-1])
+  
+  if (sum(nchar(x)) <= width)
+    return (paste(x, collapse = ''))
+  
+  n <- sum(cumsum(nchar(x)) < width - nchar(", ..."))
+  
+  if (n <= 3)
+    return (paste(c(head(x, max(1, n)), ", ..."), collapse = ''))
+  
+  n <- sum(cumsum(nchar(x)) < width - nchar(", ...") - nchar(tail(x, 1)))
+  if (n <= 6)
+    return (paste(c(head(x, n), ", ...", tail(x, 1)), collapse = ''))
+  
+  n <- sum(cumsum(nchar(x)) < width - nchar(", ...") - sum(nchar(tail(x, 2))))
+  return (paste(c(head(x, n), ", ...", tail(x, 2)), collapse = ''))
+  
 }
 
 

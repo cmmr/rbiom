@@ -42,24 +42,25 @@ as z-values). Evaluated from permuted values without observed
 statistic. }
 \item{\emph{.p.val} - }{ Probability calculated by \code{test}. }
 }\cr
-R commands for reproducing the results are in \code{$code} and
-object history in \code{$history}.
+R commands for reproducing the results are in \code{$code}.
 }
 \description{
 Run statistics on a distance matrix vs a categorical or numeric variable.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
-    biom <- sample_select(hmp50, 1:10)
-    dm   <- bdiv_distmat(biom, 'unifrac')
+    hmp10        <- hmp50$clone()
+    hmp10$counts <- hmp10$counts[,1:10]
     
-    distmat_stats(dm, groups = sample_metadata(biom, 'Body Site'))
+    dm <- bdiv_distmat(hmp10, 'unifrac')
     
-    distmat_stats(dm, groups = sample_metadata(biom, 'Age'))
+    distmat_stats(dm, groups = pull(hmp10, 'Body Site'))
+    
+    distmat_stats(dm, groups = pull(hmp10, 'Age'))
     
     # See the R code used to calculate these statistics:
-    stats <- distmat_stats(dm, groups = sample_metadata(biom, 'Age'))
+    stats <- distmat_stats(dm, groups = pull(hmp10, 'Age'))
     stats$code
 
 }
@@ -70,8 +71,7 @@ Other beta_diversity:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()}
+\code{\link{bdiv_stats}()}
 
 Other stats_tables: 
 \code{\link{adiv_stats}()},

@@ -30,15 +30,15 @@ taxa_heatmap(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -153,9 +153,9 @@ Default: \code{"auto"}.}
 \item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot command,
-and object history are available as \code{$data}, \code{$code}, and
-\code{$history}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot
+command are available as \code{$data} and \code{$code},
+respectively.
 }
 \description{
 Display taxa abundances as a heatmap.
@@ -163,8 +163,10 @@ Display taxa abundances as a heatmap.
 \examples{
     library(rbiom)
     
-    biom <- hmp50 \%>\% sample_rarefy() \%>\% sample_select(1:10)
-    taxa_heatmap(biom, rank="Phylum", color.by="Body Site")
+    # Keep and rarefy the 10 most deeply sequenced samples.
+    hmp10 <- rarefy(hmp50, n = 10)
+    
+    taxa_heatmap(hmp10, rank="Phylum", color.by="Body Site")
     
 }
 \seealso{
@@ -174,8 +176,7 @@ Other taxa_abundance:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_matrix}()},
 \code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+\code{\link{taxa_sums}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},

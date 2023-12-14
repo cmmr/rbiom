@@ -21,7 +21,7 @@ taxa_stats(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{stat.by}{The categorical metadata field defining the statistical
@@ -36,8 +36,8 @@ statistics will be returned. Default: \code{NULL}}
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -91,12 +91,11 @@ by prior to any calculations. Default: \code{NULL}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}, and
-the object history is in \code{$history}.
+The R code or generating these statistics is in \code{$code}.
 }
 \description{
 Test taxa abundances for significant differences.
@@ -165,7 +164,7 @@ For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
     
     taxa_stats(biom, stat.by = "Body Site", rank = "Family")
     
@@ -178,8 +177,7 @@ Other taxa_abundance:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+\code{\link{taxa_sums}()}
 
 Other stats_tables: 
 \code{\link{adiv_stats}()},

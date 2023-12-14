@@ -28,7 +28,7 @@ bdiv_ord_plot(
 )
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
@@ -68,7 +68,7 @@ Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{otu_tree(biom)}}
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{test}{Permutational test for accessing significance. Options are:
 \itemize{
@@ -87,8 +87,8 @@ Default: \code{999}}
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -106,7 +106,7 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}.}
+options. Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -120,7 +120,7 @@ Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
 
 \item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{...}{Parameters for layer geoms (e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}).
 Prefixing parameter names with a layer name ensures that a particular
@@ -131,9 +131,8 @@ the \code{pt.} prefix.}
 }
 \value{
 A \code{ggplot2} plot. \cr
-The computed sample coordinates, ggplot command, and object history
-are available as \code{$data}, \code{$code}, and \code{$history},
-respectively. \cr
+The computed sample coordinates and ggplot command
+are available as \code{$data} and \code{$code} respectively. \cr
 If \code{color.by} is given, then \code{$stats} and
 \code{$stats$code} are set. \cr
 If \code{rank} is given, then \code{$data$taxa_coords},
@@ -145,7 +144,8 @@ Ordinate samples and taxa on a 2D plane based on beta diversity distances.
 \examples{
     library(rbiom)
     
-    biom <- sample_rarefy(hmp50)
+    biom <- rarefy(hmp50)
+    
     bdiv_ord_plot(biom, layers="pemt", color.by="Body Site", rank="g")
     
 }
@@ -156,7 +156,6 @@ Other beta_diversity:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other ordination: 

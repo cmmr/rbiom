@@ -22,10 +22,9 @@ rare_corrplot <- function (
     test = "pw_means", model = "log", 
     p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -150,7 +149,6 @@ rare_corrplot <- function (
     plot_build()
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return (fig)

@@ -12,7 +12,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
 #'     
 #'     bdiv_stats(biom, stat.by = "Body Site", split.by = "Sex")
 #'       
@@ -28,11 +28,10 @@ bdiv_stats <- function (
     split.by = NULL, seed = 0, permutations = 999, p.adj = "fdr" ) {
   
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params  <- eval_envir(environment())
-  history <- append_history('stats', params)
+  params <- eval_envir(environment())
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -75,7 +74,7 @@ bdiv_stats <- function (
     iters  = list(weighted = weighted, bdiv = bdiv),
     prefix = TRUE,
     FUN    = function (b, weighted, bdiv) {
-      groups <- sample_metadata(b, stat.by)
+      groups <- pull(b, stat.by)
       dm     <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted, tree = tree)
       distmat_stats(dm = dm, groups = groups, test = test, seed = seed, permutations = permutations)
     })) %>%
@@ -108,7 +107,7 @@ bdiv_stats <- function (
       glue::glue(
         .sep = "\n",
         "dm <- bdiv_distmat(biom = biom, bdiv = '{bdiv}', weighted = {weighted})",
-        "grouping <- sample_metadata(biom, {as.args(list(stat.by))})[attr(dm, 'Labels')]",
+        "grouping <- pull(biom, {as.args(list(stat.by))})[attr(dm, 'Labels')]",
         "",
         "set.seed({seed})",
         "",
@@ -143,7 +142,7 @@ bdiv_stats <- function (
         "  FUN    = function (b, weighted, bdiv) {{",
         "",
         "    dm <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted)",
-        "    grouping <- sample_metadata(b, stat.by)[attr(dm, 'Labels')]",
+        "    grouping <- pull(b, stat.by)[attr(dm, 'Labels')]",
         "",
         "    set.seed({seed})",
         "",
@@ -169,7 +168,6 @@ bdiv_stats <- function (
   
   
   
-  attr(stats, 'history') <- history
   set_cache_value(cache_file, stats)
   
   return (stats)

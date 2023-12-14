@@ -5,12 +5,14 @@
 #' @name documentation_default
 #' @keywords internal
 #' 
-#' @param biom   An \code{rbiom}-class object, or data coercible with 
+#' @param biom   An rbiom-class object, or data coercible with 
 #'        [as_rbiom()].
+#' 
+#' @param mtx   A matrix-like object.
 #'        
 #' @param tree  A \code{phylo} object representing the phylogenetic
-#'        relationships of the taxa in \code{biom}. Only required when 
-#'        computing UniFrac distances. Default: \code{otu_tree(biom)}
+#'        relationships of the taxa in `biom`. Only required when 
+#'        computing UniFrac distances. Default: \code{biom$tree}
 #'     
 #' @param md  A character vector naming the metadata fields to include in the 
 #'        output data frame, or \code{'.all'} to include all metadata fields.
@@ -25,7 +27,7 @@
 #' @param bdiv  Beta diversity distance algorithm(s) to use. Options are:
 #'        \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"}, 
 #'        \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a 
-#'        phylogenetic tree must be present in \code{biom} or explicitly 
+#'        phylogenetic tree must be present in `biom` or explicitly 
 #'        provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 #'        Multiple/abbreviated values allowed.
 #' 
@@ -47,23 +49,23 @@
 #'     
 #' @param weighted  Take relative abundances into account. When 
 #'        \code{weighted=FALSE}, only presence/absence is considered.
-#'        Default: \code{TRUE} \cr\cr
+#'        Default: `TRUE` \cr\cr
 #'        Multiple values allowed.
 #'        
 #' @param rank   What rank(s) of taxa to display. E.g. \code{"Phylum"}, 
 #'        \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be 
 #'        given, where \code{1} is the highest rank, \code{2} is the second 
 #'        highest, \code{-1} is the lowest rank, \code{-2} is the second 
-#'        lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to 
-#'        see all options for a given \code{rbiom} object. Default: \code{-1}.
+#'        lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to 
+#'        see all options for a given rbiom object. Default: \code{-1}.
 #'        
 #' @param lineage  Include all ranks in the name of the taxa. For instance,
-#'        setting to \code{TRUE} will produce 
+#'        setting to `TRUE` will produce 
 #'        \code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}. 
 #'        Otherwise the taxa name will simply be \code{Coriobacteriales}. You 
 #'        want to set this to TRUE when \code{unc = "asis"} and you have taxa 
 #'        names (such as \emph{Incertae_Sedis}) that map to multiple higher 
-#'        level ranks. Default: \code{FALSE}
+#'        level ranks. Default: `FALSE`
 #'        
 #' @param unc  How to handle unclassified, uncultured, and similarly ambiguous
 #'        taxa names. Options are: 
@@ -77,15 +79,15 @@
 #'        Abbreviations are allowed.
 #'        
 #' @param other  Sum all non-itemized taxa into an "Other" taxa. When 
-#'        \code{FALSE}, only returns taxa matched by the \code{taxa} 
-#'        argument. Specifying \code{TRUE} adds "Other" to the returned set.
-#'        A string can also be given to imply \code{TRUE}, but with that
+#'        `FALSE`, only returns taxa matched by the \code{taxa} 
+#'        argument. Specifying `TRUE` adds "Other" to the returned set.
+#'        A string can also be given to imply `TRUE`, but with that
 #'        value as the name to use instead of "Other".
-#'        Default: \code{FALSE}
+#'        Default: `FALSE`
 #'        
 #' @param sparse  If true, returns a sparse matrix as described by 
 #'        [slam::simple_triplet_matrix()], otherwise returns a normal R
-#'        matrix object. Default: \code{FALSE}
+#'        matrix object. Default: `FALSE`
 #'        
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If \code{p.top} is >= 1, then the \code{p.top} most 
@@ -101,14 +103,14 @@
 #'        \itemize{
 #'          \item{\code{"sqrt"} - }{ square-root transformation }
 #'          \item{\code{"log1p"} - }{ log(y + 1) transformation }
-#'          \item{\code{NULL} - }{ no transformation }
+#'          \item{`NULL` - }{ no transformation }
 #'        }
 #'        These methods allow visualization of both high- and low-abundance
 #'        taxa simultaneously, without complaint about 'zero' count
 #'        observations. Default: \code{"sqrt"}
 #'        
 #' @param flip   Transpose the axes, so that taxa are present as rows instead
-#'        of columns. Default: \code{FALSE}
+#'        of columns. Default: `FALSE`
 #'
 #' @param stripe   Shade every other x position. Default: \emph{same as flip}
 #'
@@ -127,11 +129,11 @@
 #'        Default: \code{0.95}
 #'        
 #' @param caption   Add methodology caption beneath the plot.
-#'        Default: \code{TRUE}.
+#'        Default: `TRUE`
 #'        
-#' @param outliers   Show boxplot outliers? \code{TRUE} to always show. 
-#'        \code{FALSE} to always hide. \code{NULL} to only hide them when
-#'        overlaying a dot or strip chart.  Default: \code{NULL}
+#' @param outliers   Show boxplot outliers? `TRUE` to always show. 
+#'        `FALSE` to always hide. `NULL` to only hide them when
+#'        overlaying a dot or strip chart.  Default: `NULL`
 #' 
 #' @param xlab.angle   Angle of the labels at the bottom of the plot. 
 #'        Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}. 
@@ -141,7 +143,7 @@
 #'        \code{3L}. Default: \code{2L}
 #'        
 #' @param split.by   Name(s) of metadata columns that the data should be split
-#'        by prior to any calculations. Default: \code{NULL}
+#'        by prior to any calculations. Default: `NULL`
 #' 
 #' @param dm   A \code{dist}-class distance matrix, as returned from 
 #'        [bdiv_distmat()] or [stats::dist()]. Required.
@@ -156,7 +158,7 @@
 #' @param regr   To run a regression analysis, set \code{regr} to the numeric 
 #'        metadata field with the "x-axis" values. Leaving \code{regr=NULL} 
 #'        will generate boxplot-like statistics; when non-NULL, corrplot-like 
-#'        statistics will be returned. Default: \code{NULL}
+#'        statistics will be returned. Default: `NULL`
 #'        
 #' @param seed  Random seed for permutations. Default: \code{0}
 #'        
@@ -165,18 +167,46 @@
 #' 
 #' @param p.adj   Method to use for multiple comparisons adjustment of 
 #'        p-values. Run \code{p.adjust.methods} for a list of available 
-#'        options. Default: \code{"fdr"}.
+#'        options. Default: \code{"fdr"}
 #' 
-#' @param depths   Rarefaction depths to show in the plot, or \code{NULL} to 
-#'        auto-select. Default: \code{NULL}.
+#' @param depths   Rarefaction depths to show in the plot, or `NULL` to 
+#'        auto-select. Default: `NULL`
 #'        
 #' @param rline   Where to draw a horizontal line on the plot, intended to show
-#'        a particular rarefaction depth. Set to \code{TRUE} to show an 
-#'        auto-selected rarefaction depth or \code{FALSE} to not show a line.
-#'        Default: \code{NULL}.
+#'        a particular rarefaction depth. Set to `TRUE` to show an 
+#'        auto-selected rarefaction depth or `FALSE` to not show a line.
+#'        Default: `NULL`
+#'        
+#' @param clone   Create a copy of `biom` before modifying. If `FALSE`, `biom` 
+#'        is modified in place as a side-effect. See [cloning] for use cases. 
+#'        Default: `TRUE`
 #' 
-#' @param labels   Show sample names under each bar. Default: \code{FALSE}.
+#' @param labels   Show sample names under each bar. Default: `FALSE`
 #'   
+NULL
+
+
+
+# biom - rbiom object ====
+#' documentation_biom.rbiom
+#' 
+#' @name documentation_biom.rbiom
+#' @keywords internal
+#' 
+#' @param biom    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
+#' 
+NULL
+
+
+
+# return - biom ====
+#' documentation_return.biom
+#' 
+#' @name documentation_return.biom
+#' @keywords internal
+#' 
+#' @return An [rbiom object][rbiom_objects].
+#' 
 NULL
 
 
@@ -204,16 +234,16 @@ NULL
 #' 
 #' @param x   A categorical metadata column name. Prefix the column name with 
 #'        \code{==} or \code{!=} to limit comparisons to within or between
-#'        groups, respectively. The default, \code{NULL} groups all distances 
+#'        groups, respectively. The default, `NULL` groups all distances 
 #'        into a single column.
 #'        
 #' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
 #'        use for data partitioning. Prefix the column name with 
 #'        \code{==} or \code{!=} to limit comparisons to within or between
-#'        groups, respectively. Default: \code{NULL}
+#'        groups, respectively. Default: `NULL`
 #'        
 #' @param within,between   Metadata field(s) for intra- or inter- sample 
-#'        comparisons. Default: \code{NULL}
+#'        comparisons. Default: `NULL`
 #'          
 NULL
 
@@ -230,7 +260,7 @@ NULL
 #' 
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. The 
-#'        default, \code{NULL}, groups all samples into a single category. 
+#'        default, `NULL`, groups all samples into a single category. 
 #'        
 #' @param layers   \code{"bar"}, \code{"box" ("x")}, \code{"violin"}, 
 #'        \code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"}, 
@@ -241,7 +271,7 @@ NULL
 #'        Default: \code{"bld"}.
 #'        
 #' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
-#'        use for aesthetics and partitioning. Default: \code{NULL}
+#'        use for aesthetics and partitioning. Default: `NULL`
 #'     
 #' @param ci   How to calculate min/max of the \bold{crossbar}, 
 #'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
@@ -354,7 +384,7 @@ NULL
 #'        Default: \code{"t"}.
 #'        
 #' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
-#'        and partitioning. See below for details. Default: \code{NULL}
+#'        and partitioning. See below for details. Default: `NULL`
 #'        
 #' @param test   Which test statistic to display on the plot. Options are: 
 #'        \itemize{
@@ -450,13 +480,13 @@ NULL
 #'        \code{label = c(T, F)}. Other valid options are \code{"rows"},
 #'        \code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
 #'        and \code{"none"}.
-#'        Default: \code{TRUE}.
+#'        Default: `TRUE`.
 #'        
 #' @param label_size   The font size to use for the row and column labels. You 
 #'        can supply a numeric vector of length two to control row label sizes 
 #'        and column label sizes separately, for example 
 #'        \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
-#'        Default: \code{NULL}, which computes: 
+#'        Default: `NULL`, which computes: 
 #'        \code{pmax(8, pmin(20, 100 / dim(mtx)))}.
 #'        
 #' @param rescale   Rescale rows or columns to all have a common min/max.
@@ -469,7 +499,7 @@ NULL
 #'        \code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}. 
 #'        Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"}, 
 #'        \code{"left"}, \code{"top"}, and \code{"none"}.
-#'        Default: \code{TRUE}.
+#'        Default: `TRUE`.
 #'        
 #' @param clust   Clustering algorithm for reordering the rows and columns by 
 #'        similarity. You can supply a list or character vector of length two to 
@@ -477,7 +507,7 @@ NULL
 #'        \code{clust = c(rows = "complete", cols = NA)}, or simply 
 #'        \code{clust = c("complete", NA)}. Options are:
 #'        \itemize{
-#'          \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
+#'          \item{`FALSE` or \code{NA} - }{ Disable reordering. }
 #'          \item{An \code{hclust} class object}{ E.g. from [stats::hclust()]. }
 #'          \item{A method name - }{ \code{"ward.D"}, 
 #'            \code{"ward.D2"}, \code{"single"}, \code{"complete"}, 
@@ -503,7 +533,7 @@ NULL
 #'        tracks in multiples (or fractions) of the smaller dimension of the
 #'        grid cell size. Use a numeric vector of length two to assign
 #'        \code{c(top, left)} independently. 
-#'        Default: \code{NULL}, which computes:
+#'        Default: `NULL`, which computes:
 #'        \code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.
 #'        
 #' @param ratio   Height/width ratio for entire grid. 
@@ -768,9 +798,9 @@ NULL
 #' @name documentation_plot_return
 #' @keywords internal
 #' 
-#' @return A \code{ggplot2} plot. \cr The computed data points, ggplot command, 
-#'         and object history are available as \code{$data}, \code{$code}, and 
-#'         \code{$history}, respectively.
+#' @return A \code{ggplot2} plot. \cr The computed data points and ggplot 
+#'         command are available as \code{$data} and \code{$code}, 
+#'         respectively.
 #' 
 NULL
 
@@ -782,8 +812,8 @@ NULL
 #' @keywords internal
 #' 
 #' @return A \code{ggplot2} plot. \cr The computed data points, statistics, 
-#'         ggplot command, and object history are available as \code{$data}, 
-#'         \code{$stats}, \code{$code}, and \code{$history}, respectively.
+#'         and ggplot command are available as \code{$data}, \code{$stats}, and 
+#'         \code{$code}, respectively.
 #' 
 NULL
 
@@ -795,8 +825,7 @@ NULL
 #' @keywords internal
 #' 
 #' @return A tibble data frame with summary statistics. \cr
-#'         The R code or generating these statistics is in \code{$code}, and 
-#'         the object history is in \code{$history}.
+#'         The R code or generating these statistics is in \code{$code}.
 #' 
 NULL
 

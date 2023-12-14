@@ -14,7 +14,7 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
 #'     
 #'     taxa_stats(biom, stat.by = "Body Site", rank = "Family")
 #'     
@@ -27,10 +27,9 @@ taxa_stats <- function (
     lineage = FALSE, unc = "singly", other = FALSE,
     split.by = NULL, p.adj = "fdr" ) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment())
-  history <- append_history('stats', params)
+  params <- eval_envir(environment())
   remove(list = intersect(env_names(params), ls()))
   
   with(params, {
@@ -41,7 +40,7 @@ taxa_stats <- function (
   params$df <- do.call(taxa_table,  fun_params(taxa_table,  params))
   stats     <- do.call(stats_table, fun_params(stats_table, params))
   
-  attr(stats, 'history') <- history
+  
   return (stats)
 }
 

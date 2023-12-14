@@ -2,45 +2,45 @@
 % Please edit documentation in R/as_rbiom.r
 \name{as_rbiom}
 \alias{as_rbiom}
-\title{Convert BIOM data to an rbiom object.}
+\title{Convert a variety of data types to an rbiom object.}
 \usage{
-as_rbiom(biom)
+as_rbiom(biom, ...)
 }
 \arguments{
-\item{biom}{Object which can be coerced to an \code{rbiom}-class object.
+\item{biom}{Object which can be coerced to an rbiom-class object.
 For example:
 \itemize{
 \item{\emph{file} - }{ Filepath or URL to a biom file. }
 \item{\emph{matrix} - }{ An abundance matrix with OTUs in rows and samples in columns. }
 \item{\code{phyloseq}-class object - }{ From the phyloseq Bioconductor R package. }
+\item{\emph{list} - }{ With \code{counts} and optionally \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details). }
 }}
 }
 \value{
-An \code{rbiom}-class object.
+An \link[=rbiom_objects]{rbiom object}.
 }
 \description{
-Convert BIOM data to an rbiom object.
+Construct an rbiom object. The returned object is an R6 reference class.
+Use \code{b <- a$clone()} to create copies, not \code{b <- a}.
 }
-\seealso{
-\code{\link[=biom_build]{biom_build()}}, \code{\link[=read_biom]{read_biom()}}
+\examples{
+    library(rbiom)
+    
+    # create a simple matrix ------------------------
+    mtx <- matrix(
+      data     = floor(runif(24) * 1000), 
+      nrow     = 6, 
+      dimnames = list(paste0("OTU", 1:6), paste0("Sample", 1:4)) )
+    mtx
+    
+    # and some sample metadata ----------------------
+    df <- data.frame(
+      .sample   = paste0("Sample", 1:4),
+      treatment = c("A", "B", "A", "B"),
+      days      = c(12, 3, 7, 8) )
+    
+    # convert data set to rbiom ---------------------
+    biom <- as_rbiom(list(counts = mtx, metadata = df))
+    biom
 
-Other biom: 
-\code{\link{as_percent}()},
-\code{\link{bdply}()},
-\code{\link{biom_build}()},
-\code{\link{biom_id}()},
-\code{\link{biom_info}()},
-\code{\link{biom_merge}()},
-\code{\link{biom_repair}()},
-\code{\link{blply}()},
-\code{\link{read_biom}()},
-\code{\link{write_biom}()},
-\code{\link{write_xlsx}()}
-
-Other conversion: 
-\code{\link{convert_from_phyloseq}()},
-\code{\link{convert_to_SE}()},
-\code{\link{convert_to_TSE}()}
 }
-\concept{biom}
-\concept{conversion}

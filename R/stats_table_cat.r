@@ -73,6 +73,50 @@ stats_table_cat <- function (df, stat.by, resp, test, level, split.by) {
         tryCatch(error = function (e) data.frame()[1,])
       
     }) %>% as_tibble()
+    
+    
+    if (is.null(split.by)) {
+      
+      attr(result, 'code') <- glue::glue(
+        "stats <- stats::kruskal.test(
+            formula = {format(frm)}, 
+            data    = df ) %>%
+            
+          with(data.frame(
+            row.names = NULL, 
+            .n     = nrow(d), 
+            .stat  = statistic, 
+            .df    = parameter, 
+            .p.val = p.value )) %>%
+            
+          tryCatch(error = function (e) data.frame()[1,]) %>%
+          
+          as_tibble()"
+      )
+      
+    } else {
+      
+      attr(result, 'code') <- glue::glue(
+        "stats <- plyr::ddply(df, {as.args(list(split.by))}, function (d) {{
+          
+          stats::kruskal.test(
+              formula = {format(frm)}, 
+              data    = d ) %>%
+              
+            with(data.frame(
+              row.names = NULL, 
+              .n     = nrow(d), 
+              .stat  = statistic, 
+              .df    = parameter, 
+              .p.val = p.value )) %>%
+              
+            tryCatch(error = function (e) data.frame()[1,])
+          
+        }}) %>% as_tibble()"
+      )
+      
+    }
+    
   }
   
   

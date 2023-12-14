@@ -47,7 +47,7 @@ get_cache_file <- function (fn = NULL, params = NULL) {
   if (is.null(fn))     fn     <- capture.output(rlang::caller_call()[[1]])
   if (is.null(params)) params <- get('params', pos = parent.frame(), inherits = FALSE)
   
-  params  %<>% lapply(function (x) if.null(attr(x, 'hash', exact = TRUE), hash(x)))
+  params  %<>% lapply(function (x) { if (is(x, "rbiom")) x$hash else hash(x) })
   cache_key  <- hash(c(list(fn), params[order(names(params))]))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   cache_file <- normalizePath(cache_file, winslash = "/", mustWork = FALSE)

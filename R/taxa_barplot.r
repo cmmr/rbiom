@@ -8,12 +8,12 @@
 #' 
 #' @param colors,patterns   A character vector of colors or patterns to use in
 #'        the graph. A named character vector can be used to map taxon names to 
-#'        specific colors or patterns. Set to \code{TRUE} to auto-select colors
-#'        or patterns, or to \code{FALSE} to disable per-taxa colors
+#'        specific colors or patterns. Set to `TRUE` to auto-select colors
+#'        or patterns, or to `FALSE` to disable per-taxa colors
 #'        or patterns. Default: \code{colors=TRUE, patterns=FALSE}.
 #' 
 #' @param facet.by,limit.by   Metadata columns to 
-#'        use for data partitioning. Default: \code{NULL}
+#'        use for data partitioning. Default: `NULL`
 #' 
 #' @param label.by,order.by   What metadata column to use for labeling and/or
 #'        sorting the samples across the x-axis. Set \code{label.by='.sample'} 
@@ -35,7 +35,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     taxa_barplot(biom, rank="Phylum")
 #'     
 taxa_barplot <- function (
@@ -44,10 +45,9 @@ taxa_barplot <- function (
     dist = "euclidean", clust = "complete", other = TRUE, 
     unc = "singly", lineage = FALSE, xlab.angle = 90, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -78,8 +78,7 @@ taxa_barplot <- function (
     p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
       add_class('rbiom_plot')
     
-    attr(p, 'history') <- history
-    attr(p, 'data')    <- lapply(plots, attr, which = 'data', exact = TRUE)
+    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
     
     attr(p, 'code') <- paste(collapse = "\n\n", local({
       cmds <- sapply(seq_along(ranks), function (i) {
@@ -114,7 +113,7 @@ taxa_barplot <- function (
     
     sync_metadata()
     
-    if (n_samples(biom) < 1)
+    if (biom$n_samples < 1)
       stop("At least one sample is needed for a stacked bar plot.")
   })
   
@@ -149,7 +148,7 @@ taxa_barplot <- function (
           '.sample'    = colnames(mtx)[col(mtx)],
           '.taxa'      = rownames(mtx)[row(mtx)] %>% factor(rownames(mtx)),
           '.abundance' = as.numeric(mtx) ) %>%
-        left_join(sample_metadata(biom), by = '.sample') %>%
+        left_join(biom$metadata, by = '.sample') %>%
         add_class('rbiom_tbl')
       
       
@@ -164,8 +163,8 @@ taxa_barplot <- function (
         
         if (!is.null(order.by)) {
           
-          sns <- sample_names(biom)
-          md  <- sample_metadata(biom)[,order.by]
+          sns <- biom$samples
+          md  <- biom$metadata[,order.by]
           md[['.sort']] <- match(sns, lvls)
           
           lvls <- sns[base::rank(do.call(order, unname(as.list(md))))]
@@ -239,7 +238,7 @@ taxa_barplot <- function (
     with(params, {
       levels(.ggdata[['.sample']]) <- local({
         lvls <- levels(.ggdata[['.sample']])
-        labs <- sample_metadata(biom, label.by)
+        labs <- pull(biom, label.by)
         paste(sep="-", seq_along(lvls), labs[lvls])
       })
     })
@@ -277,14 +276,12 @@ taxa_barplot <- function (
   
   
   #________________________________________________________
-  # Control the values displayed on the y axis
+  # If rarefied, display relative abundance in %
   #________________________________________________________
-  
-  if (is_rarefied(params$biom)) {
+  depth <- unique(sample_sums(params$biom))
+  if (length(depth) == 1) {
     
-    with(params, {
-      .ggdata[[.ycol]] <- .ggdata[[.ycol]] / rare_depth(biom)
-    })
+    params$.ggdata[[params$.ycol]] <- params$.ggdata[[params$.ycol]] / depth
     
     set_layer(
       params = params, 
@@ -393,8 +390,6 @@ taxa_barplot <- function (
   p <- params %>%
     plot_facets() %>%
     plot_build()
-  
-  attr(p, 'history') <- history
   
   
   set_cache_value(cache_file, p)

@@ -1,7 +1,7 @@
 
 
 #________________________________________________________
-# Log ggplot command history, complete with arguments.
+# Log ggplot commands, complete with arguments.
 #________________________________________________________
 
 ENV <- environment(NULL)
@@ -67,5 +67,15 @@ ENV <- environment(NULL)
       plot = ggplot2::ggplot(iris, ggplot2::aes(Species, Sepal.Length)) +
         ggbeeswarm::geom_beeswarm(method="center"), 
       device = 'png', width = 7, height = 7, units = "in") )
+  
+  
+  
+  
+  #____________________________________________________________________
+  # Extract attributes *WITH* exact matching by default.
+  #____________________________________________________________________
+  assign('attr', pos = ENV, function (x, which, exact = TRUE) {
+    base::attr(x, which, exact)
+  })
   
 }

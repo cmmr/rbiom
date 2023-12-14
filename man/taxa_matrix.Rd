@@ -2,7 +2,8 @@
 % Please edit documentation in R/taxa_matrix.r
 \name{taxa_matrix}
 \alias{taxa_matrix}
-\title{Taxa abundances per sample, at the specified taxonomic rank.}
+\alias{taxa_table}
+\title{Taxa abundances per sample.}
 \usage{
 taxa_matrix(
   biom,
@@ -13,17 +14,27 @@ taxa_matrix(
   unc = "singly",
   other = FALSE
 )
+
+taxa_table(
+  biom,
+  rank = -1,
+  taxa = NULL,
+  lineage = FALSE,
+  md = ".all",
+  unc = "singly",
+  other = FALSE
+)
 }
 \arguments{
-\item{biom}{An \code{rbiom}-class object, or data coercible with
+\item{biom}{An rbiom-class object, or data coercible with
 \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
-lowest, and \code{0} is the OTU "rank". Run \code{taxa_ranks()} to
-see all options for a given \code{rbiom} object. Default: \code{-1}.}
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -60,21 +71,33 @@ argument. Specifying \code{TRUE} adds "Other" to the returned set.
 A string can also be given to imply \code{TRUE}, but with that
 value as the name to use instead of "Other".
 Default: \code{FALSE}}
+
+\item{md}{A character vector naming the metadata fields to include in the
+output data frame, or \code{'.all'} to include all metadata fields.
+Default: \code{'.all'}}
 }
 \value{
-A numeric matrix with taxa as rows, and samples as columns.
+\itemize{
+\item{\code{taxa_matrix()} - }{
+A numeric matrix with taxa as rows, and samples as columns. }
+\item{\code{taxa_table()} - }{
+A tibble data frame with column names .sample, .taxa, .abundance, and any requested by \code{md}. }
+}
 }
 \description{
-Taxa abundances per sample, at the specified taxonomic rank.
+\itemize{
+\item{\code{taxa_matrix()} - }{ Accepts a single \code{rank} and returns a matrix. }
+\item{\code{taxa_table()} - }{ Can accept more than one \code{rank} and returns a tibble data.frame.  }
+}
 }
 \examples{
     library(rbiom)
     
-    taxa_ranks(hmp50)
+    biom$ranks
     
-    phyla <- taxa_matrix(hmp50, 'Phylum')
-    phyla[1:4,1:6]
-
+    taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
+    
+    taxa_table(hmp50, 'Phylum')
 }
 \seealso{
 Other taxa_abundance: 
@@ -83,7 +106,6 @@ Other taxa_abundance:
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+\code{\link{taxa_sums}()}
 }
 \concept{taxa_abundance}

@@ -21,12 +21,13 @@
 
 distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   
+  # browser() ## below code intermittently crashes R session
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
   params     <- eval_envir(environment(), ...)
-  history    <- append_history('tbl ', params)
   cache_file <- get_cache_file()
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -105,7 +106,6 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   
   
   
-  attr(tbl, 'history') <- history
   set_cache_value(cache_file, tbl)
   
   return (tbl)

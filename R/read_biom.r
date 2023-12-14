@@ -1,6 +1,7 @@
 #' Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
 #' 
-#' @family biom
+#' @noRd
+#' @keywords internal
 #'
 #' @param src   Input data as either a file path, URL, or JSON string.
 #'        BIOM files can be formatted according to 
@@ -15,29 +16,29 @@
 #' @param tree   By default, the tree will be read from the BIOM file specified 
 #'        in \code{src}. Specifying \code{tree=TRUE} will do the same, but will 
 #'        generate an error message if a tree is not present. Setting 
-#'        \code{tree=FALSE} will return an \code{rbiom} object without any tree 
+#'        \code{tree=FALSE} will return an rbiom object without any tree 
 #'        data. You may also provide a file path, URL, or Newick string to load 
-#'        that tree data into the returned \code{rbiom} object. 
+#'        that tree data into the returned rbiom object. 
 #'        Default: \code{"auto"}
 #' 
-#' @return An \code{rbiom} class object containing the parsed data. This object
+#' @return An rbiom class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
 #'     \itemize{
 #'         \item{\code{$counts} - }{
 #'           A numeric [slam::simple_triplet_matrix()] (sparse matrix) of 
 #'           observation counts. Taxa (OTUs) as rows and samples as columns. 
-#'           Access or modify using [otu_matrix()]. }
+#'           Access or modify using `$counts`. }
 #'         \item{\code{$metadata} - }{
 #'           A [tibble::tibble()] (data frame) containing any embedded 
 #'           metadata. Sample IDs are in the \code{.sample} column. 
-#'           Access or modify using [sample_metadata()]. }
+#'           Access or modify using `$metadata`. }
 #'         \item{\code{$taxonomy} - }{
 #'           A [tibble::tibble()] (data frame) mapping OTU IDs to taxonomic 
 #'           clades. Columns are named .otu, Kingdom, Phylum, Class, Order, 
 #'           Family, Genus, Species, and Strain, or TaxLvl.1, TaxLvl.2, ... , 
 #'           TaxLvl.N when more than 8 levels of taxonomy are encoded in the 
-#'           biom file. Access or modify using [otu_taxonomy()]. }
-#'         \item{\code{$phylogeny} - }{
+#'           biom file. Access or modify using `$taxonomy`. }
+#'         \item{\code{$tree} - }{
 #'           An object of class \code{phylo} defining the phylogenetic 
 #'           relationships between the OTUs. Although the official 
 #'           specification for BIOM only includes phylogenetic trees in BIOM 
@@ -45,20 +46,13 @@
 #'           \code{phylogeny} entry with newick data, then it will be loaded
 #'           here as well. The \pkg{ape} package has additional functions for 
 #'           working with \code{phylo} objects. Access or modify using 
-#'           [otu_tree()]. }
+#'           `$tree`. }
 #'         \item{\code{$sequences} - }{
 #'           A named character vector, where the names are OTU IDs and the 
 #'           values are the nucleic acid sequences they represent. 
 #'           These values are not part of the official BIOM specification, but 
 #'           will be read and written when defined. Access or modify using 
-#'           [otu_sequences()]. }
-#'         \item{\code{$info} - }{
-#'           A list of other attributes defined in the BIOM file, such as 
-#'           \code{id}, \code{type}, \code{format}, \code{format_url},
-#'           \code{generated_by}, \code{date}, \code{matrix_type},
-#'           \code{matrix_element_type}, \code{comment}, and \code{shape}. 
-#'           Access using [biom_info()]. Access/set with [biom_id()] or 
-#'           [biom_comment()]. }
+#'           `$sequences`. }
 #'        }
 #'     \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
 #'     components of the BIOM file specification and therefore will be NULL
@@ -75,19 +69,19 @@
 #'     print(biom)
 #'
 #'     # Taxa Abundances
-#'     otu_matrix(biom)[,1:10] %>% as.matrix() %>% head()
+#'     biom$counts[1:4,1:10] %>% as.matrix()
 #'     
-#'     otu_taxonomy(biom) %>% head()
+#'     biom$taxonomy %>% head()
 #'
 #'     # Metadata
-#'     sample_metadata(biom) %>% head()
+#'     biom$metadata %>% head()
 #'     
 #'     table(biom$metadata$Sex, biom$metadata$`Body Site`)
 #'     
 #'     sprintf("Mean age: %.1f", mean(biom$metadata$Age))
 #'
 #'     # Phylogenetic tree
-#'     otu_tree(biom) %>%
+#'     biom$tree %>%
 #'       tree_subset(1:10) %>%
 #'       ape::plot.phylo()
 #'
@@ -227,7 +221,7 @@ read_biom <- function (src, tree='auto') {
   # Assemble everything as an rbiom class object.
   #________________________________________________________
   
-  biom <- biom_build(
+  biom <- rbiom$new(
     'counts'    = counts,
     'metadata'  = metadata,
     'taxonomy'  = taxonomy,
@@ -247,11 +241,6 @@ read_biom <- function (src, tree='auto') {
     if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
       cl[i] <- list(val)
   }
-  
-  attr(biom, 'display')     <- "biom"
-  attr(biom, 'history') <- paste0(collapse = "\n", c(
-    attr(biom, 'history', exact = TRUE),
-    sprintf("biom <- %s", deparse1(cl)) ))
   
   
   #________________________________________________________

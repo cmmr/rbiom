@@ -6,9 +6,9 @@
 #' @param filename  A file name or URL. Must be tab- or comma-separated 
 #'        content. Either all or no fields should be quoted.
 #' 
-#' @param matrix  Set to \code{TRUE} to convert data.frame to a matrix. Set to
+#' @param matrix  Set to `TRUE` to convert data.frame to a matrix. Set to
 #'        \code{"character"}, \code{"integer"}, etc to coerce to a matrix of
-#'        that type. The default, \code{FALSE}, does no conversion.
+#'        that type. The default, `FALSE`, does no conversion.
 #' 
 #' @param ...  Additional arguments for \code{read.table()}.
 #' 

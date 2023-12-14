@@ -19,7 +19,7 @@
 #'                 
 #' @param color.by,shape.by,facet.by,limit.by   Metadata columns to use for 
 #'        aesthetics and partitioning. See below for details. 
-#'        Default: \code{NULL}
+#'        Default: `NULL`
 #'        
 #' @param ...   Parameters for layer geoms (e.g. [ggplot2::geom_point()]). 
 #'        Prefixing parameter names with a layer name ensures that a particular 
@@ -30,9 +30,8 @@
 #'           
 #'        
 #' @return A \code{ggplot2} plot. \cr
-#'         The computed sample coordinates, ggplot command, and object history 
-#'         are available as \code{$data}, \code{$code}, and \code{$history}, 
-#'         respectively. \cr
+#'         The computed sample coordinates and ggplot command 
+#'         are available as \code{$data} and \code{$code} respectively. \cr
 #'         If \code{color.by} is given, then \code{$stats} and 
 #'         \code{$stats$code} are set. \cr
 #'         If \code{rank} is given, then \code{$data$taxa_coords}, 
@@ -43,7 +42,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom <- sample_rarefy(hmp50)
+#'     biom <- rarefy(hmp50)
+#'     
 #'     bdiv_ord_plot(biom, layers="pemt", color.by="Body Site", rank="g")
 #'     
 bdiv_ord_plot <- function (
@@ -52,11 +52,10 @@ bdiv_ord_plot <- function (
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {
   
-  validate_biom(clone = FALSE)
+  biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params  <- eval_envir(environment(), ...)
-  history <- append_history('fig ', params)
+  params <- eval_envir(environment(), ...)
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -87,7 +86,7 @@ bdiv_ord_plot <- function (
     
     sync_metadata()
     
-    if (n_samples(biom) < 4)
+    if (biom$n_samples < 4)
       stop("At least four samples are needed for an ordination.")
   })
   
@@ -269,7 +268,6 @@ bdiv_ord_plot <- function (
   
   
   
-  attr(fig, 'history') <- history
   set_cache_value(cache_file, fig)
   
   return(fig)
