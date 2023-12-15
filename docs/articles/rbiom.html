@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,7 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -108,7 +108,7 @@ Here we’ll import a dataset from a BIOM file.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-14)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-15)</span></span>
 <span><span class="co">#&gt;      50 Samples:  HMP01, HMP02, HMP03, ..., and HMP50</span></span>
 <span><span class="co">#&gt;     490 OTUs:     Unc01yki, Unc53100, LtbAci52, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
@@ -311,44 +311,46 @@ same “rarefaction depth”.</p>
 <code>'.sample'</code>, is used by rbiom to link sample metadata to
 samples in the abundance table.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">treatment</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"test"</span><span class="op">)</span>, <span class="va">biom</span><span class="op">$</span><span class="va">n_samples</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'A'</span>, <span class="st">'B'</span><span class="op">)</span>, <span class="va">biom</span><span class="op">$</span><span class="va">n_samples</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="../reference/mutate.html">mutate</a></span><span class="op">(</span>Obese <span class="op">=</span> <span class="va">BMI</span> <span class="op">&gt;=</span> <span class="fl">30</span>, Sex <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'Years Old'</span> <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
-<span><span class="co">#&gt;   .sample   Age   BMI `Body Site`   Sex    treatment</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01      22    20 Buccal mucosa Female control  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02      24    23 Buccal mucosa Male   test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03      28    26 Saliva        Male   test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04      25    23 Saliva        Male   test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05      27    24 Buccal mucosa Female test     </span></span>
+<span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre></div>
+<p><code><a href="../reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code></p>
 </div>
 <div class="section level3">
 <h3 id="subset-samples">Subset Samples<a class="anchor" aria-label="anchor" href="#subset-samples"></a>
 </h3>
 <p>Removing samples from the metadata will remove those samples from the
-entire rbiom object. The base R <code><a href="../reference/subset.html">subset()</a></code> function works
-well for this, as do the dplyr verbs <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code> and
-<code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">dplyr::slice()</a></code>.</p>
+entire rbiom object.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">biom</span>, <span class="va">`Body Site`</span> <span class="op">==</span> <span class="st">"Anterior nares"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">`Body Site`</span> <span class="op">==</span> <span class="st">"Anterior nares"</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 6</span></span></span>
-<span><span class="co">#&gt;   .sample   Age   BMI `Body Site`    Sex    treatment</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10      22    20 Anterior nares Female test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15      25    21 Anterior nares Female test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16      24    19 Anterior nares Female test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25      33    32 Anterior nares Male   control  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31      31    20 Anterior nares Male   test     </span></span>
+<span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`    group Obese</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares B     TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-14)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-15)</span></span>
 <span><span class="co">#&gt;      10 Samples:  HMP10, HMP15, HMP16, ..., and HMP48</span></span>
 <span><span class="co">#&gt;     126 OTUs:     CnbTube3, PpbAcne6, Unc02qsf, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
-<span><span class="co">#&gt;       6 Metadata: .sample, Age, BMI, ..., and treatment</span></span>
+<span><span class="co">#&gt;       6 Metadata: .sample, Years Old, BMI, ..., and Obese</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>
+<p><code><a href="../reference/subset.html">subset()</a></code>, <code><a href="../reference/slice.html">slice()</a></code></p>
 </div>
 </div>
 <div class="section level2">
@@ -362,13 +364,13 @@ tibble data.frame with one computed value per row. Alternatively,
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 80 × 9</span></span></span>
-<span><span class="co">#&gt;   .rank  .sample .taxa        .abundance   Age   BMI `Body Site` Sex   treatment</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Phylum HMP10   Actinobacte…        676    22    20 Anterior n… Fema… test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Phylum HMP10   Bacteroidet…          7    22    20 Anterior n… Fema… test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Phylum HMP10   Cyanobacter…          0    22    20 Anterior n… Fema… test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Phylum HMP10   Deinococcus…          0    22    20 Anterior n… Fema… test     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Phylum HMP10   Firmicutes          496    22    20 Anterior n… Fema… test     </span></span>
+<span><span class="co">#&gt;   .rank  .sample .taxa      .abundance `Years Old`   BMI `Body Site` group Obese</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Phylum HMP10   Actinobac…        676          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Phylum HMP10   Bacteroid…          7          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Phylum HMP10   Cyanobact…          0          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Phylum HMP10   Deinococc…          0          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Phylum HMP10   Firmicutes        496          22    20 Anterior n… B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 75 more rows</span></span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/taxa_matrix.html">taxa_matrix</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>

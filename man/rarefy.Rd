@@ -26,8 +26,8 @@ drop. If you need to create different random rarefactions of the same
 data, set the seed to a different number each time.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link{cloning} for use cases.
-Default: \code{TRUE}}
+is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+use cases. Default: \code{TRUE}}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -36,9 +36,6 @@ An \link[=rbiom_objects]{rbiom object}.
 Sub-sample OTU observations such that all samples have an equal number.
 If called on data with non-integer abundances, values will be re-scaled to
 integers between 1 and \code{depth} such that they sum to \code{depth}.
-\cr\cr
-Use \code{rarefy_i()} to optimize performance on large datasets. It will modify
-the rbiom object in place, avoiding overhead with with cloning it first.
 }
 \examples{
     library(rbiom)
@@ -55,11 +52,13 @@ Other rarefaction:
 \code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{rescale}},
+\code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
 
 Other transformations: 
-\code{\link{rescale}},
+\code{\link{mutate}()},
+\code{\link{rarefy_cols}()},
+\code{\link{slice}()},
 \code{\link{subset}()}
 }
 \concept{rarefaction}

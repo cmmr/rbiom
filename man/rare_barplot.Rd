@@ -46,7 +46,7 @@ respectively.
 Visualize the number of observations per sample.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     rare_barplot(hmp50)
     
@@ -61,8 +61,8 @@ Other rarefaction:
 \code{\link{pull.rbiom}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
-\code{\link{rescale}},
 \code{\link{sample_sums}()}
 
 Other visualization: 

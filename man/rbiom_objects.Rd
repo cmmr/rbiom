@@ -4,12 +4,18 @@
 \alias{rbiom_objects}
 \title{Working with rbiom Objects.}
 \description{
+\cr
 Rbiom objects make it easy to access and manipulate your BIOM data, ensuring
 all the disparate components remain in sync. These objects behave largely
 like lists, in that you can access and assign to them using the \code{$}
 operator. The sections below list all the fields which can be read and/or
 written, and the helper functions for common tasks like rarefying and
 subsetting. To create an rbiom object, see \code{\link[=as_rbiom]{as_rbiom()}}.
+\cr\cr
+Use \verb{$clone()} to create a copy of an rbiom object. This is necessary
+because rbiom objects are \strong{passed by reference}. The usual \verb{<-} assignment
+operator will simply create a second reference to the same object - it will
+not create a second object. See \link[=speed_ups]{Speed Ups} for more details.
 \cr\cr
 }
 \section{Readable Fields}{
@@ -42,7 +48,7 @@ validation checks and inter-component synchronization.\tabular{ll}{
    \verb{$counts} \tab matrix of abundances; OTUs (rows) by samples (columns) \cr
    \verb{$metadata} \tab data.frame with \code{'.sample'} as the first column \cr
    \verb{$taxonomy} \tab data.frame with \code{'.otu'} as the first column \cr
-   \verb{$tree} \tab phylo object with the phylogenetic tree for OTUs \cr
+   \verb{$tree} \tab phylo object with the phylogenetic tree for the OTUs \cr
    \verb{$sequences} \tab character vector of OTU reference sequences \cr
    \verb{$id}, \verb{$comment} \tab string with a title or comment for the dataset \cr
 }
@@ -52,43 +58,56 @@ validation checks and inter-component synchronization.\tabular{ll}{
 }
 
 \section{Transformations}{
-\tabular{ll}{
+
+
+All functions return an rbiom object.\tabular{ll}{
    \strong{Function} \tab \strong{Transformation} \cr
-   \verb{$clone()} \tab Safely duplicate an rbiom object. \cr
+   \code{\emph{<rbiom>}$clone()} \tab Safely duplicate an rbiom object. \cr
+   \code{\link[=subset]{\emph{<rbiom>}[]}} \tab Subset to a specific set of sample names. \cr
    \code{\link[=subset]{subset()}} \tab Subset samples according to metadata properties. \cr
-   \code{\link[=select]{select()}} \tab Keep just the specified sample names or indices. \cr
+   \code{\link[=slice]{slice()}} \tab Subset to a specific number of samples. \cr
+   \code{\link[=mutate]{mutate()}} \tab Create, modify, and delete metadata fields. \cr
    \code{\link[=rarefy]{rarefy()}} \tab Sub-sample OTU counts to an even sampling depth. \cr
 }
 
 
-All functions return an rbiom object.
-\cr\cr
-\subsection{Clone an Object}{
-
-Use \verb{$clone()} to create a copy of an rbiom object. This is necessary
-because rbiom objects are \strong{passed by reference}. The usual \verb{<-} assignment
-operator will simply create a second reference to the same object - it will
-not create a second object.
-\subsection{Usage}{
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{$clone(deep = FALSE)
-}\if{html}{\out{</div>}}
+\cr
 }
 
-\subsection{Arguments}{
+\examples{
+    library(rbiom)
+    
+    # Duplicate the HMP50 example dataset.
+    biom <- hmp50$clone()
+    
+    
+    # Display an overall summary of the rbiom object.
+    biom
+    
+    
+    # Demonstrate a few accessors.
+    biom$n_samples
+    biom$fields
+    biom$metadata
+    
+    
+    # Edit the metadata table.
+    biom$metadata$rand <- sample(1:50)
+    biom \%<>\% mutate(Obese = BMI >= 30, Sex = NULL)
+    biom \%<>\% rename('Years Old' = "Age")
+    biom$metadata
+    
+    
+    # Subset the rbiom object
+    biom \%<>\% subset(`Body Site` == "Saliva" & !Obese)
+    biom$metadata
+    
+    
+    # Rarefy to an even sampling depth
+    sample_sums(biom)
+    
+    biom \%<>\% rarefy()
+    sample_sums(biom)
 
-\itemize{
-\item{\code{deep}}{ Not used. }
 }
-}
-
-\subsection{Examples}{
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{biom <- hmp50$clone()
-}\if{html}{\out{</div>}}
-}
-
-}
-}
-
 \keyword{internal}

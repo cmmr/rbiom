@@ -1,5 +1,5 @@
 
-#' Convert an rbiom object to a Bioconductor object.
+#' Convert an rbiom object to a SummarizedExperiment object.
 #' 
 #' Requires the relevant Bioconductor R package to be installed:
 #' \itemize{

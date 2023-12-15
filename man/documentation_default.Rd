@@ -177,8 +177,8 @@ auto-selected rarefaction depth or \code{FALSE} to not show a line.
 Default: \code{NULL}}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link{cloning} for use cases.
-Default: \code{TRUE}}
+is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+use cases. Default: \code{TRUE}}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}}
 }

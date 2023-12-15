@@ -178,8 +178,8 @@
 #'        Default: `NULL`
 #'        
 #' @param clone   Create a copy of `biom` before modifying. If `FALSE`, `biom` 
-#'        is modified in place as a side-effect. See [cloning] for use cases. 
-#'        Default: `TRUE`
+#'        is modified in place as a side-effect. See [speed ups][speed_ups] for 
+#'        use cases. Default: `TRUE`
 #' 
 #' @param labels   Show sample names under each bar. Default: `FALSE`
 #'   

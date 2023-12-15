@@ -1,11 +1,17 @@
 #' Working with rbiom Objects.
 #' 
+#' \cr
 #' Rbiom objects make it easy to access and manipulate your BIOM data, ensuring 
 #' all the disparate components remain in sync. These objects behave largely 
 #' like lists, in that you can access and assign to them using the `$` 
 #' operator. The sections below list all the fields which can be read and/or 
 #' written, and the helper functions for common tasks like rarefying and 
 #' subsetting. To create an rbiom object, see [as_rbiom()].
+#' \cr\cr
+#' Use `$clone()` to create a copy of an rbiom object. This is necessary 
+#' because rbiom objects are **passed by reference**. The usual `<-` assignment 
+#' operator will simply create a second reference to the same object - it will 
+#' not create a second object. See [Speed Ups][speed_ups] for more details.
 #' \cr\cr
 #' 
 #' 
@@ -44,7 +50,7 @@
 #' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns) |
 #' | `$metadata`       | data.frame with `'.sample'` as the first column        |
 #' | `$taxonomy`       | data.frame with `'.otu'` as the first column           |
-#' | `$tree`           | phylo object with the phylogenetic tree for OTUs       |
+#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs   |
 #' | `$sequences`      | character vector of OTU reference sequences            |
 #' | `$id`, `$comment` | string with a title or comment for the dataset         |
 #' 
@@ -53,38 +59,54 @@
 #' 
 #' @section Transformations:
 #' 
-#' | **Function** | **Transformation**                               |
-#' | ------------ | ------------------------------------------------ |
-#' | `$clone()`   | Safely duplicate an rbiom object.                |
-#' | [subset()]   | Subset samples according to metadata properties. |
-#' | [select()]   | Keep just the specified sample names or indices. |
-#' | [rarefy()]   | Sub-sample OTU counts to an even sampling depth. |
-#' 
 #' All functions return an rbiom object.
-#' \cr\cr
+#' 
+#' | **Function**                            | **Transformation**                               |
+#' | --------------------------------------- | ------------------------------------------------ |
+#' | \code{\emph{<rbiom>}$clone()}           | Safely duplicate an rbiom object.                |
+#' | \code{\link[=subset]{\emph{<rbiom>}[]}} | Subset to a specific set of sample names.        |
+#' | [subset()]                              | Subset samples according to metadata properties. |
+#' | [slice()]                               | Subset to a specific number of samples.          |
+#' | [mutate()]                              | Create, modify, and delete metadata fields.      |
+#' | [rarefy()]                              | Sub-sample OTU counts to an even sampling depth. |
+#' 
+#' \cr
 #' 
 #' 
-#' ## Clone an Object
-#' 
-#' Use `$clone()` to create a copy of an rbiom object. This is necessary 
-#' because rbiom objects are **passed by reference**. The usual `<-` assignment 
-#' operator will simply create a second reference to the same object - it will 
-#' not create a second object.
-#' 
-#' ### Usage
-#' ~~~
-#' $clone(deep = FALSE)
-#' ~~~
-#' 
-#' ### Arguments
-#' \itemize{
-#'   \item{`deep`}{ Not used. }
-#' }
-#' 
-#' ### Examples
-#' ~~~
-#' biom <- hmp50$clone()
-#' ~~~
+#' @examples
+#'     library(rbiom)
+#'     
+#'     # Duplicate the HMP50 example dataset.
+#'     biom <- hmp50$clone()
+#'     
+#'     
+#'     # Display an overall summary of the rbiom object.
+#'     biom
+#'     
+#'     
+#'     # Demonstrate a few accessors.
+#'     biom$n_samples
+#'     biom$fields
+#'     biom$metadata
+#'     
+#'     
+#'     # Edit the metadata table.
+#'     biom$metadata$rand <- sample(1:50)
+#'     biom %<>% mutate(Obese = BMI >= 30, Sex = NULL)
+#'     biom %<>% rename('Years Old' = "Age")
+#'     biom$metadata
+#'     
+#'     
+#'     # Subset the rbiom object
+#'     biom %<>% subset(`Body Site` == "Saliva" & !Obese)
+#'     biom$metadata
+#'     
+#'     
+#'     # Rarefy to an even sampling depth
+#'     sample_sums(biom)
+#'     
+#'     biom %<>% rarefy()
+#'     sample_sums(biom)
 #' 
 NULL
 
@@ -328,8 +350,9 @@ rbiom <- R6::R6Class(
       
       if (missing(value)) return (private$.sequences)
       
-      if (!is_null(value) && !is_character(value))
-        cli_abort(c(x = "`value` must be NULL or a character vector, not {.type {value}}."))
+      
+      if (!is_null(value) && !(is_character(value) && !is.null(names(value))))
+        cli_abort(c(x = "`value` must be NULL or a named character vector, not {.type {value}}."))
       
       
       if (is_character(value)) {
@@ -395,6 +418,7 @@ rbiom <- R6::R6Class(
       
       if (missing(value)) return (private$.taxonomy)
       
+      
       #________________________________________________________
       # Convert data.frame/matrix to tibble.
       #________________________________________________________
@@ -452,6 +476,7 @@ rbiom <- R6::R6Class(
     metadata = function (value) {
       
       if (missing(value)) return (private$.metadata)
+      
       
       #________________________________________________________
       # Convert data.frame/matrix to tibble.

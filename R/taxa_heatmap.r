@@ -13,7 +13,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     # Keep and rarefy the 10 most deeply sequenced samples.
 #'     hmp10 <- rarefy(hmp50, n = 10)

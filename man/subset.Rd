@@ -3,44 +3,45 @@
 \name{subset}
 \alias{subset}
 \alias{subset.rbiom}
-\alias{slice.rbiom}
-\alias{mutate.rbiom}
-\title{Transform an rbiom object by its metadata.}
+\alias{[.rbiom}
+\title{Subset an rbiom object by sample names or metadata.}
 \usage{
 \method{subset}{rbiom}(biom, ..., clone = TRUE)
 
-\method{slice}{rbiom}(biom, ..., clone = TRUE)
-
-\method{mutate}{rbiom}(biom, ..., clone = TRUE)
+\method{[}{rbiom}(biom, i)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{...}{Passed on to \code{\link[base:subset]{base::subset()}}, \code{\link[dplyr:slice]{dplyr::slice()}}, or \code{\link[dplyr:mutate]{dplyr::mutate()}}.}
+\item{...}{Passed on to \code{\link[base:subset]{base::subset()}}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link{cloning} for use cases.
-Default: \code{TRUE}}
+is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+use cases. Default: \code{TRUE}}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
 }
 \description{
-Transform an rbiom object by its metadata.
+Subset an rbiom object by sample names or metadata.
 }
 \examples{
     library(rbiom)
     
-    subset(hmp50, `Body Site` \%in\% 'Saliva' & Age < 25)$metadata
+    # Subset to specific samples
+    biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
+    biom$metadata
     
-    slice(hmp50, 1:4)$metadata
-    
-    mutate(hmp50, Obsese = BMI >= 30)$metadata
+    # Subset according to metadata
+    biom <- subset(hmp50, `Body Site` \%in\% 'Saliva' & Age < 25)
+    biom$metadata
 
 }
 \seealso{
 Other transformations: 
+\code{\link{mutate}()},
+\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
-\code{\link{rescale}}
+\code{\link{slice}()}
 }
 \concept{transformations}

@@ -24,8 +24,8 @@ navbar:
       href: articles/importing.html
     - text: "Working with rbiom Objects"
       href: reference/rbiom_objects.html
-    - text: "Cloning"
-      href: reference/cloning.html
+    - text: "Speed Ups"
+      href: reference/speed_ups.html
     - text: "Diversity Metrics"
       href: articles/diversity.html
     - text: -------
@@ -46,41 +46,49 @@ reference:
   - starts_with("read_")
   - starts_with("write_")
   - starts_with("convert_")
-- title: Taxa Abundance
-  desc: Map OTUs to higher order taxonomic ranks, and compare those abundances to metadata.
-  contents:
-  - starts_with("taxa_")
-- title: Alpha Diversity
-  desc: Examine the diversity of OTUs present in each individual sample, and how that diversity correlates with metadata.
-  contents:
-  - starts_with("adiv_")
-  - sample_sums
-- title: Beta Diversity
-  desc: See how similiar samples are to each other, and what metadata/taxa influence clustering.
-  contents:
-  - starts_with("bdiv_")
-- title: Rarefaction
-  desc: Improve signal-to-noise in analyses by ensuring all samples have an equal number of observations.
-  contents:
-  - starts_with("rare_")
-  - rarefy
-- title: rbiom Object
+  
+- title: The rbiom Object
   desc: >
     The [rbiom object](rbiom_objects.html) itself includes many methods, 
     including `$counts`, `$metadata`, `$taxonomy`, $samples, $n_samples and more.
   contents:
   - rbiom_objects
   - as.list.rbiom
+  
+- title: Sample Metadata
+  contents:
   - pull.rbiom
-  - bdply
-  - blply
-  - biom_merge
-- title: Transformations
-  desc: Change the content of an rbiom object.
+  - mutate.rbiom
+  
+- title: Subsetting
   contents:
   - subset.rbiom
+  - slice.rbiom
   - rarefy
-- title: Direct Input
+  
+- title: Taxa Abundance
+  desc: Map OTUs to higher order taxonomic ranks, and compare those abundances to metadata.
+  contents:
+  - starts_with("taxa_")
+  
+- title: Alpha Diversity
+  desc: Examine the diversity of OTUs present in each individual sample, and how that diversity correlates with metadata.
+  contents:
+  - starts_with("adiv_")
+  - sample_sums
+  
+- title: Beta Diversity
+  desc: See how similiar samples are to each other, and what metadata/taxa influence clustering.
+  contents:
+  - starts_with("bdiv_")
+  
+- title: Rarefaction
+  desc: Improve signal-to-noise in analyses by ensuring all samples have an equal number of observations.
+  contents:
+  - starts_with("rare_")
+  - rarefy
+  
+- title: Low Level Functions
   desc: Most functions operate on rbiom objects. These let you use arbitrary data.frames, distance matrices, matrices, and phylo objects.
   contents:
   - starts_with("distmat_")
@@ -89,6 +97,12 @@ reference:
   - stats_table
   - tree_subset
   - plot_heatmap
+  
+- title: Advanced Operations
+  contents:
+  - bdply
+  - biom_merge
+  
 - title: HMP50 Dataset
   desc: A small dataset included with rbiom.
   contents:

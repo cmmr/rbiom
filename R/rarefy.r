@@ -4,9 +4,6 @@
 #' Sub-sample OTU observations such that all samples have an equal number.
 #' If called on data with non-integer abundances, values will be re-scaled to 
 #' integers between 1 and `depth` such that they sum to `depth`.
-#' \cr\cr
-#' Use `rarefy_i()` to optimize performance on large datasets. It will modify 
-#' the rbiom object in place, avoiding overhead with with cloning it first. 
 #'
 #' @inherit documentation_return.biom return
 #' @inherit documentation_default
@@ -55,7 +52,6 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #' observations. Rescaling rows or cols scales the matrix values so that row 
 #' sums or column sums equal 1.
 #'
-#' @name rescale
 #' @inherit documentation_default
 #' 
 #' @family rarefaction
@@ -100,11 +96,6 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #'     colSums(mtx)
 #'     colSums(rescale_cols(mtx))
 #'
-
-
-
-#' @rdname rescale
-#' @export
 rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
   
   #________________________________________________________
@@ -131,7 +122,7 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
     if (!(is.numeric(n) && length(n) == 1 && !is.na(n)))
       cli_abort(c('x' = "{.var n} must be a single number, not {.type {n}}."))
     
-    if ((n > -1 && n < 1) || (abs(n) >= 1 && n %% 1 == 0))
+    if (abs(n) >= 1 && n %% 1 != 0)
       cli_abort(c('x' = "{.var n} must between -1 and 1, or an integer, not {n}."))
   }
   
@@ -211,7 +202,7 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
 
 
 
-#' @rdname rescale
+#' @rdname rarefy_cols
 #' @export
 rescale_cols <- function (mtx) {
   
@@ -224,7 +215,7 @@ rescale_cols <- function (mtx) {
 
 
 
-#' @rdname rescale
+#' @rdname rarefy_cols
 #' @export
 rescale_rows <- function (mtx) {
   

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,7 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -97,7 +97,75 @@
           
           <code><a href="convert_to_SE.html">convert_to_SE()</a></code> <code><a href="convert_to_SE.html">convert_to_TSE()</a></code> 
         </dt>
-        <dd>Convert an rbiom object to a Bioconductor object.</dd>
+        <dd>Convert an rbiom object to a SummarizedExperiment object.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="the-rbiom-object">The rbiom Object<a class="anchor" aria-label="anchor" href="#the-rbiom-object"></a></h2>
+      
+      <p class="section-desc"></p><p>The <a href="rbiom_objects.html">rbiom object</a> itself includes many methods, including <code>$counts</code>, <code>$metadata</code>, <code>$taxonomy</code>, $samples, $n_samples and more.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="rbiom_objects.html">rbiom_objects</a></code> 
+        </dt>
+        <dd>Working with rbiom Objects.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="as.list.rbiom.html">as.list(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Convert an rbiom object to a base R list.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="sample-metadata">Sample Metadata<a class="anchor" aria-label="anchor" href="#sample-metadata"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="pull.rbiom.html">pull(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Map sample names to metadata field values.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mutate.html">mutate(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="mutate.html">rename(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Create, modify, and delete metadata fields.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="subsetting">Subsetting<a class="anchor" aria-label="anchor" href="#subsetting"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="subset.html">subset(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="subset.html">`[`(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Subset an rbiom object by sample names or metadata.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="slice.html">slice(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice.html">slice_head(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice.html">slice_tail(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice.html">slice_min(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice.html">slice_max(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice.html">slice_sample(<i>&lt;rbiom&gt;</i>)</a></code> 
+        </dt>
+        <dd>Subset to a specific number of samples.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rarefy.html">rarefy()</a></code> 
+        </dt>
+        <dd>Rarefy OTU counts.</dd>
       </dl></div><div class="section level2">
       <h2 id="taxa-abundance">Taxa Abundance<a class="anchor" aria-label="anchor" href="#taxa-abundance"></a></h2>
       
@@ -263,64 +331,7 @@
         </dt>
         <dd>Rarefy OTU counts.</dd>
       </dl></div><div class="section level2">
-      <h2 id="rbiom-object">rbiom Object<a class="anchor" aria-label="anchor" href="#rbiom-object"></a></h2>
-      
-      <p class="section-desc"></p><p>The <a href="rbiom_objects.html">rbiom object</a> itself includes many methods, including <code>$counts</code>, <code>$metadata</code>, <code>$taxonomy</code>, $samples, $n_samples and more.</p>
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="rbiom_objects.html">rbiom_objects</a></code> 
-        </dt>
-        <dd>Working with rbiom Objects.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="as.list.rbiom.html">as.list(<i>&lt;rbiom&gt;</i>)</a></code> 
-        </dt>
-        <dd>Convert an rbiom object to a base R list.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="pull.rbiom.html">pull(<i>&lt;rbiom&gt;</i>)</a></code> 
-        </dt>
-        <dd>Map sample names to metadata field values.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bdply.html">bdply()</a></code> <code><a href="bdply.html">blply()</a></code> 
-        </dt>
-        <dd>Apply a function to each subset of an rbiom object.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="biom_merge.html">biom_merge()</a></code> 
-        </dt>
-        <dd>Combine several rbiom objects into one.</dd>
-      </dl></div><div class="section level2">
-      <h2 id="transformations">Transformations<a class="anchor" aria-label="anchor" href="#transformations"></a></h2>
-      
-      <p class="section-desc"></p><p>Change the content of an rbiom object.</p>
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="subset.html">subset(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="subset.html">slice(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="subset.html">mutate(<i>&lt;rbiom&gt;</i>)</a></code> 
-        </dt>
-        <dd>Transform an rbiom object by its metadata.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="rarefy.html">rarefy()</a></code> 
-        </dt>
-        <dd>Rarefy OTU counts.</dd>
-      </dl></div><div class="section level2">
-      <h2 id="direct-input">Direct Input<a class="anchor" aria-label="anchor" href="#direct-input"></a></h2>
+      <h2 id="low-level-functions">Low Level Functions<a class="anchor" aria-label="anchor" href="#low-level-functions"></a></h2>
       
       <p class="section-desc"></p><p>Most functions operate on rbiom objects. These let you use arbitrary data.frames, distance matrices, matrices, and phylo objects.</p>
 
@@ -342,7 +353,7 @@
         <dd>Run statistics on a distance matrix vs a categorical or numeric variable.</dd>
       </dl><dl><dt>
           
-          <code><a href="rescale.html">rarefy_cols()</a></code> <code><a href="rescale.html">rescale_cols()</a></code> <code><a href="rescale.html">rescale_rows()</a></code> 
+          <code><a href="rarefy_cols.html">rarefy_cols()</a></code> <code><a href="rarefy_cols.html">rescale_cols()</a></code> <code><a href="rarefy_cols.html">rescale_rows()</a></code> 
         </dt>
         <dd>Transform a counts matrix.</dd>
       </dl><dl><dt>
@@ -360,6 +371,27 @@
           <code><a href="plot_heatmap.html">plot_heatmap()</a></code> 
         </dt>
         <dd>Create a heatmap with tracks and dendrograms from any matrix.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="advanced-operations">Advanced Operations<a class="anchor" aria-label="anchor" href="#advanced-operations"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="bdply.html">bdply()</a></code> <code><a href="bdply.html">blply()</a></code> 
+        </dt>
+        <dd>Apply a function to each subset of an rbiom object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biom_merge.html">biom_merge()</a></code> 
+        </dt>
+        <dd>Combine several rbiom objects into one.</dd>
       </dl></div><div class="section level2">
       <h2 id="hmp-dataset">HMP50 Dataset<a class="anchor" aria-label="anchor" href="#hmp-dataset"></a></h2>
       

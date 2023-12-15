@@ -24,7 +24,7 @@ write_counts(), write_metadata(), write_taxonomy() -  Tab-separated values.
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@ write_counts(), write_metadata(), write_taxonomy() -  Tab-separated values.
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -131,13 +131,13 @@ Default: <code>quote=FALSE, sep="\t"</code></p></dd>
 
 
 <dt>depth, n, seed</dt>
-<dd><p>Passed on to <code><a href="rescale.html">rarefy_cols()</a></code>. For <code>write_xlsx()</code> only,
+<dd><p>Passed on to <code><a href="rarefy_cols.html">rarefy_cols()</a></code>. For <code>write_xlsx()</code> only,
 <code>depth=0</code> disables rarefaction.
 Default: <code>depth='auto', n=NULL, seed=0</code></p></dd>
 
 
 <dt>seed</dt>
-<dd><p>Random seed to use in rarefying. See <code><a href="rescale.html">rarefy_cols()</a></code> function
+<dd><p>Random seed to use in rarefying. See <code><a href="rarefy_cols.html">rarefy_cols()</a></code> function
 for details. Default: <code>0</code></p></dd>
 
 
@@ -175,7 +175,7 @@ Per Sample' tab.</p>
 <span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>      <span class="va">hmp10</span>        <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span>      <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="rescale.html">rarefy_cols</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="rarefy_cols.html">rarefy_cols</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">"Weighted UniFrac"</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">"Unweighted Jaccard"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'jaccard'</span>, weighted<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span></span>

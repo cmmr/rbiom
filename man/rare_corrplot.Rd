@@ -194,8 +194,8 @@ Other rarefaction:
 \code{\link{pull.rbiom}()},
 \code{\link{rare_barplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
-\code{\link{rescale}},
 \code{\link{sample_sums}()}
 
 Other visualization: 

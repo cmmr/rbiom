@@ -184,7 +184,7 @@ phylogeny <- function (biom) {
 #' @name read.biom-deprecated
 #' @rdname rbiom-deprecated
 #' @section \code{read.biom}:
-#' Use [read_biom()] instead.
+#' Use [as_rbiom()] instead.
 #' @export
 read.biom <- function (src, tree = "auto", prune = FALSE) {
   
@@ -540,6 +540,14 @@ is.rarefied <- function (biom) {
   deprecate_warn("2.0.0", "is.rarefied()", "!is.null(biom$depth)")
   !is.null(as_rbiom(biom)$depth)
 }
+
+
+#' @name read_biom-deprecated
+#' @rdname rbiom-deprecated
+#' @section \code{read_biom}:
+#' Use [as_rbiom()] instead.
+#' @export
+read_biom <- read.biom
 
 
 #' @name repair-deprecated

@@ -16,7 +16,7 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'><!-- mathjax --><scri
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'><!-- mathjax --><scri
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -162,6 +162,8 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">is.rarefied</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">read_biom</span><span class="op">(</span><span class="va">src</span>, tree <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">repair</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sample_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -251,7 +253,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="read-biom"><code>read.biom</code><a class="anchor" aria-label="anchor" href="#read-biom"></a></h2>
     
 
-<p>Use <code>read_biom()</code> instead.</p>
+<p>Use <code><a href="as_rbiom.html">as_rbiom()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="read-fasta"><code>read.fasta</code><a class="anchor" aria-label="anchor" href="#read-fasta"></a></h2>
@@ -275,7 +277,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="select"><code>select</code><a class="anchor" aria-label="anchor" href="#select"></a></h2>
     
 
-<p>Use <code>slice()</code> instead.</p>
+<p>Use <code><a href="slice.html">slice()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="sequences"><code>sequences</code><a class="anchor" aria-label="anchor" href="#sequences"></a></h2>
@@ -396,6 +398,12 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     
 
 <p>Use <code>!is.null(biom$depth)</code> instead.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="read-biom-1"><code>read_biom</code><a class="anchor" aria-label="anchor" href="#read-biom-1"></a></h2>
+    
+
+<p>Use <code><a href="as_rbiom.html">as_rbiom()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="repair"><code>repair</code><a class="anchor" aria-label="anchor" href="#repair"></a></h2>

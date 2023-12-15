@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,7 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -279,7 +279,52 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co">## ggplot2 Command ------------------------</span></span></span>
 <span class="r-in"><span>    <span class="va">fig</span><span class="op">$</span><span class="va">code</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in print.rbiom_code(x):</span> object 'x' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ggplot</span><span style="color: #BBBB00;">(</span>data<span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_rect</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>xmin = <span style="color: #00BB00;">-</span><span style="color: #BB00BB;">Inf</span>, xmax = <span style="color: #BB00BB;">Inf</span>, ymin = <span style="color: #BB00BB;">4.52</span>, ymax = <span style="color: #BB00BB;">Inf)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     color   = <span style="color: #BB00BB;">NA</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = <span style="color: #BBBB00;">"white"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_bar</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .y<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     stat    = <span style="color: #BBBB00;">"summary"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha   = <span style="color: #BB00BB;">0.6</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fun     = <span style="color: #BBBB00;">"mean"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ggbeeswarm::<span style="color: #00BBBB;">geom_beeswarm</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .y<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     method  = <span style="color: #BBBB00;">"center"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cex     = <span style="color: #BB00BB;">0.5</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     corral  = <span style="color: #BBBB00;">"random"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha   = <span style="color: #BB00BB;">0.4</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     color   = <span style="color: #BBBB00;">"black"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = <span style="color: #BBBB00;">"black"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     size    = <span style="color: #BB00BB;">1.14</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     stroke  = <span style="color: #BB00BB;">0</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_linerange</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .y, ymin = .ymin, ymax = .ymax<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"vline"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_segment</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = .x, xend = .xend, y = .y, yend = .yend<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"stat_brackets"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_text</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = .x, y = .y, label = .label<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"stat_labels"</span><span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     parse   = <span style="color: #BB00BB;">TRUE</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     size    = <span style="color: #BB00BB;">3</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     vjust   = <span style="color: #BB00BB;">0</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     caption = <span style="color: #BBBB00;">"Mann-Whitney p-values, with Benjamini &amp; Hochberg FDR correction."</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     y       = <span style="color: #BBBB00;">"Shannon Diversity"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_discrete</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     breaks = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0</span>, <span style="color: #BB00BB;">1</span>, <span style="color: #BB00BB;">2</span>, <span style="color: #BB00BB;">3</span>, <span style="color: #BB00BB;">4)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     expand = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0.02</span>, <span style="color: #BB00BB;">0</span>, <span style="color: #BB00BB;">0.08</span>, <span style="color: #BB00BB;">0)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_bw</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     text               = <span style="color: #00BBBB;">element_text</span><span style="color: #BB00BB;">(</span>size = <span style="color: #BB00BB;">14)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     axis.text.x        = <span style="color: #00BBBB;">element_text</span><span style="color: #BB00BB;">(</span>hjust = <span style="color: #BB00BB;">0</span>, vjust = <span style="color: #BB00BB;">1</span>, angle = <span style="color: #00BB00;">-</span><span style="color: #BB00BB;">30)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     panel.grid.major.x = <span style="color: #00BBBB;">element_blank</span><span style="color: #BB00BB;">()</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.caption       = <span style="color: #00BBBB;">element_text</span><span style="color: #BB00BB;">(</span>face = <span style="color: #BBBB00;">"italic"</span>, size = <span style="color: #BB00BB;">9)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.margin        = <span style="color: #00BBBB;">unit</span><span style="color: #BB00BB;">(</span>x = <span style="color: #00BBBB;">c(</span><span style="color: #BB00BB;">0.1</span>, <span style="color: #BB00BB;">0.329</span>, <span style="color: #BB00BB;">0.1</span>, <span style="color: #BB00BB;">0.1</span><span style="color: #00BBBB;">)</span>, units = <span style="color: #BBBB00;">"inches"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

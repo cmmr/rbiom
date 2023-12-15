@@ -14,7 +14,7 @@ between BIOM files."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9109</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@ between BIOM files."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/cloning.html">Cloning</a>
+    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
@@ -82,9 +82,9 @@ between BIOM files.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
-<dd><p>Any number of rbiom objects (e.g. from <code>read_biom()</code>), lists of
+<dd><p>Any number of rbiom objects (e.g. from <code><a href="rbiom-deprecated.html">read_biom()</a></code>), lists of
 rbiom objects, or valid arguments to the <code>src</code> parameter of
-<code>read_biom()</code> (for instance file names).</p></dd>
+<code><a href="rbiom-deprecated.html">read_biom()</a></code> (for instance file names).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -108,7 +108,7 @@ rbiom objects, or valid arguments to the <code>src</code> parameter of
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">biom_merge</span><span class="op">(</span><span class="va">b1</span>, <span class="va">b2</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Merged BIOM (2023-12-14)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Merged BIOM (2023-12-15)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       8 Samples:  HMP01, HMP02, HMP03, ..., and HMP08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     168 OTUs:     Unc53100, Unc26984, Unc00c7g, ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1 Ranks:    .otu</span>
@@ -118,7 +118,7 @@ rbiom objects, or valid arguments to the <code>src</code> parameter of
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">tree</span>     <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="va">tree</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="va">metadata</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Merged BIOM (2023-12-14)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Merged BIOM (2023-12-15)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       8 Samples:  HMP01, HMP02, HMP03, ..., and HMP08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     168 OTUs:     Unc53100, Unc26984, Unc00c7g, ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1 Ranks:    .otu</span>

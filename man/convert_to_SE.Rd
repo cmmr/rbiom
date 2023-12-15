@@ -3,7 +3,7 @@
 \name{convert_to_SE}
 \alias{convert_to_SE}
 \alias{convert_to_TSE}
-\title{Convert an rbiom object to a Bioconductor object.}
+\title{Convert an rbiom object to a SummarizedExperiment object.}
 \usage{
 convert_to_SE(biom)
 

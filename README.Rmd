@@ -92,23 +92,6 @@ RcppParallel::setThreadOptions(numThreads = 4)
 ```
 
 
-## Caching
-
-Caching is enabled by default. rbiom will store a maximum of 200MB in the temporary directory given by `file.path(tempdir(), "rbiom", "cache")`. The following commands can be used to change the cache directory, storage limit (given in bytes), and key hashing function:
-``` r
-options(rbiom.cache_dir="/tmp/rbiom_cache")
-options(rbiom.cache_size=5 * 1024 ^ 2) # 5MB
-options(rbiom.cache_hash=rlang::hash)
-
-Sys.setenv(RBIOM_CACHE_DIR="/tmp/rbiom_cache")
-Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 2) # 1GB
-```
-
-Setting the cache directory to `"FALSE"` will disable caching.
-
-R options will override environment variables.
-
-
 
 ## Building from source
 

@@ -136,23 +136,27 @@ data.frame). The first column, `'.sample'`, is used by rbiom to link sample
 metadata to samples in the abundance table.
 
 ```{r}
-biom$metadata$treatment <- sample(c("control", "test"), biom$n_samples, TRUE)
+biom$metadata$group <- sample(c('A', 'B'), biom$n_samples, TRUE)
+biom %<>% mutate(Obese = BMI >= 30, Sex = NULL)
+biom %<>% rename('Years Old' = "Age")
 biom$metadata
 ```
 
+`mutate()`, `rename()`
 
 
 ## Subset Samples
 
 Removing samples from the metadata will remove those samples from the entire 
-rbiom object. The base R `subset()` function works well for this, as do the 
-dplyr verbs `dplyr::filter()` and `dplyr::slice()`.
+rbiom object.
 
 ```{r}
-biom <- subset(biom, `Body Site` == "Anterior nares")
+biom %<>% subset(`Body Site` == "Anterior nares")
 biom$metadata
 biom
 ```
+
+`subset()`, `slice()`
 
 
 

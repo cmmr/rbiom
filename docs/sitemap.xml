@@ -91,9 +91,6 @@
     <loc>https://cmmr.github.io/rbiom/reference/biom_merge.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/cloning.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/convert_to_SE.html</loc>
   </url>
   <url>
@@ -166,6 +163,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/mutate.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/plot_heatmap.html</loc>
   </url>
   <url>
@@ -173,6 +173,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/rarefy.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/rarefy_cols.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/rare_barplot.html</loc>
@@ -199,10 +202,13 @@
     <loc>https://cmmr.github.io/rbiom/reference/read_tree.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/rescale.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/sample_sums.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/sample_sums.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/slice.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/speed_ups.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc>

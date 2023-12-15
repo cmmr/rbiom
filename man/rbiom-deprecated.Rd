@@ -68,6 +68,8 @@
 \alias{id}
 \alias{is.rarefied-deprecated}
 \alias{is.rarefied}
+\alias{read_biom-deprecated}
+\alias{read_biom}
 \alias{repair-deprecated}
 \alias{repair}
 \alias{sample_subset-deprecated}
@@ -188,6 +190,8 @@ id(biom)
 
 is.rarefied(biom)
 
+read_biom(src, tree = "auto")
+
 repair(biom)
 
 sample_subset(x, ...)
@@ -272,7 +276,7 @@ Use \code{biom$tree} instead.
 
 \section{\code{read.biom}}{
 
-Use \code{\link[=read_biom]{read_biom()}} instead.
+Use \code{\link[=as_rbiom]{as_rbiom()}} instead.
 }
 
 \section{\code{read.fasta}}{
@@ -393,6 +397,11 @@ Use \code{biom$id} instead.
 \section{\code{is.rarefied}}{
 
 Use \code{!is.null(biom$depth)} instead.
+}
+
+\section{\code{read_biom}}{
+
+Use \code{\link[=as_rbiom]{as_rbiom()}} instead.
 }
 
 \section{\code{repair}}{

@@ -46,8 +46,8 @@ Other rarefaction:
 \code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
-\code{\link{rescale}},
 \code{\link{sample_sums}()}
 }
 \concept{rarefaction}
