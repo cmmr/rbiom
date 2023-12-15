@@ -125,7 +125,7 @@ Create a heatmap with tracks and dendrograms from any matrix.
 One or more colored tracks can be placed on the left and/or top of the
 heatmap grid to visualize associated metadata values.
 
-\preformatted{  ## Categorical ----------------------------
+\preformatted{## Categorical ----------------------------
 cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
 tracks   = list('Sex' = cat_vals)
 tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
@@ -165,7 +165,9 @@ The following entries in the track definitions are understood:
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 }
 
-All built-in color palettes are colorblind-friendly.
+All built-in color palettes are colorblind-friendly. See
+\href{https://cmmr.github.io/rbiom/articles/aes.html#discrete-palettes}{Mapping Metadata to Aesthetics}
+for images of the palettes.
 
 Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},

@@ -54,7 +54,7 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
-    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
     <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
   </div>
 </li>
@@ -318,11 +318,11 @@ samples in the abundance table.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre></div>
 <p><code><a href="../reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code></p>
 </div>
@@ -338,9 +338,9 @@ entire rbiom object.</p>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`    group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares B     TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares A     TRUE </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
 <span><span class="va">biom</span></span>

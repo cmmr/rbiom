@@ -36,7 +36,7 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
-    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
     <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
   </div>
 </li>
@@ -166,7 +166,7 @@ respectively.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>xmin = .xmin, xmax = .xmax, ymin = .ymin, ymax = .ymax, fill = .group<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color   = <span style="color: #BB00BB;">NA</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_hline</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     yintercept = <span style="color: #BB00BB;">1183</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     yintercept = <span style="color: #BB00BB;">0.999999999999999</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color      = <span style="color: #BBBB00;">"red"</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     linetype   = <span style="color: #BBBB00;">"dashed"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
@@ -175,8 +175,8 @@ respectively.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     y    = <span style="color: #BBBB00;">"Sequencing Depth (log10 scale)"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_discrete</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     breaks       = <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #BB00BB;">(0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">5)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     minor_breaks = <span style="color: #00BBBB;">as.vector</span><span style="color: #BB00BB;">(2</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">9</span> <span style="color: #00BB00;">%o%</span> <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #00BBBB;">(</span><span style="color: #BB00BB;">0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">4</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     breaks       = <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #BB00BB;">(0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">1)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     minor_breaks = <span style="color: #00BBBB;">as.vector</span><span style="color: #BB00BB;">(2</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">9</span> <span style="color: #00BB00;">%o%</span> <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #00BBBB;">(</span><span style="color: #BB00BB;">0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">0</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     labels       = scales::<span style="color: #00BBBB;">label_number</span><span style="color: #BB00BB;">(</span>scale_cut = scales::<span style="color: #00BBBB;">cut_si(</span><span style="color: #BBBB00;">""</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     expand       = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0</span>, <span style="color: #BB00BB;">0)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     trans        = <span style="color: #BBBB00;">"log10"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>

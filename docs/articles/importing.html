@@ -54,7 +54,7 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
-    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
     <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
   </div>
 </li>
@@ -118,12 +118,12 @@ R package.</li>
 <span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
 <span><span class="va">mtx</span></span>
 <span><span class="co">#&gt;      Sample1 Sample2 Sample3 Sample4</span></span>
-<span><span class="co">#&gt; OTU1     957     382     971     447</span></span>
-<span><span class="co">#&gt; OTU2     124     159     827     438</span></span>
-<span><span class="co">#&gt; OTU3     823      14     696     539</span></span>
-<span><span class="co">#&gt; OTU4      73     220     374     469</span></span>
-<span><span class="co">#&gt; OTU5     794     177     902     907</span></span>
-<span><span class="co">#&gt; OTU6     609     170     482     629</span></span>
+<span><span class="co">#&gt; OTU1     414      37     375     993</span></span>
+<span><span class="co">#&gt; OTU2     419     972     330     561</span></span>
+<span><span class="co">#&gt; OTU3     427     934     304     259</span></span>
+<span><span class="co">#&gt; OTU4     555     157     182     453</span></span>
+<span><span class="co">#&gt; OTU5     121     655     495     360</span></span>
+<span><span class="co">#&gt; OTU6     364     390     301     629</span></span>
 <span></span>
 <span><span class="co"># convert matrix to rbiom -----------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
@@ -209,7 +209,7 @@ sample.</p>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; An rbiom object (2023-12-15)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU3, OTU6, OTU2, and OTU4</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU5, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
@@ -219,7 +219,7 @@ sample.</p>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; An rbiom object (2023-12-15)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU3, OTU6, OTU2, and OTU4</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU5, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span></code></pre></div>
@@ -254,7 +254,7 @@ object directly, or a newick file/string.</p>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; An rbiom object (2023-12-15)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU3, OTU6, OTU2, and OTU4</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU5, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>
@@ -283,7 +283,7 @@ OTU.</p>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; An rbiom object (2023-12-15)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU3, OTU6, OTU2, and OTU4</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU5, and OTU4</span></span>
 <span><span class="co">#&gt;       3 Ranks:    .otu, Phylum, and Order</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>

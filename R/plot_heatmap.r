@@ -18,7 +18,7 @@
 #' One or more colored tracks can be placed on the left and/or top of the 
 #' heatmap grid to visualize associated metadata values.
 #'          
-#' \preformatted{  ## Categorical ----------------------------
+#' \preformatted{## Categorical ----------------------------
 #' cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
 #' tracks   = list('Sex' = cat_vals)
 #' tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
@@ -58,7 +58,9 @@
 #'   \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 #' }
 #' 
-#' All built-in color palettes are colorblind-friendly.
+#' All built-in color palettes are colorblind-friendly. See 
+#' [Mapping Metadata to Aesthetics](https://cmmr.github.io/rbiom/articles/aes.html#discrete-palettes) 
+#' for images of the palettes.
 #' 
 #' Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"}, 
 #' \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, 
@@ -203,8 +205,12 @@ plot_heatmap <- function (
   label_size_x <- tail(label_size, 1) %>% signif(digits = 3)
   label_size_y <- head(label_size, 1)
   
-  n_left <- sum(sapply(tracks, function (x) eq(x[['side']], 'left')))
-  n_top  <- length(tracks) - n_left
+  if (is.null(tracks)) {
+    n_left <- n_top <- 0
+  } else {
+    n_left <- sum(sapply(tracks, function (x) is.list(x) && eq(x[['side']], 'left')))
+    n_top  <- length(tracks) - n_left
+  }
   if (isTRUE(n_left > 0)) label_size_x <- .c(.rep(10, n_left), .rep(label_size_x, ncol(mtx)))
   if (isTRUE(n_top  > 0)) label_size_y <- .c(.rep(10, n_top),  .rep(label_size_y, nrow(mtx)))
   label_size_x <- unit(label_size_x, "points")

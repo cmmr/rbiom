@@ -36,7 +36,7 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
-    <a class="dropdown-item" href="../articles/aesthetics.html">Mapping Metadata to Aesthetics</a>
+    <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
     <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
   </div>
 </li>
@@ -218,7 +218,7 @@ respectively.</p>
 
 <p>One or more colored tracks can be placed on the left and/or top of the
 heatmap grid to visualize associated metadata values.</p>
-<div class="sourceCode"><pre><code>  ## Categorical ----------------------------
+<div class="sourceCode"><pre><code>## Categorical ----------------------------
 cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
 tracks   = list('Sex' = cat_vals)
 tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
@@ -254,7 +254,9 @@ plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
 <li><p><code>na.color</code> -  The color to use for <code>NA</code> values.</p></li>
 <li><p><code>bins</code> -  Bin a gradient into this many bins/steps.</p></li>
 <li><p><code>guide</code> -  A list of arguments for guide_colorbar() or guide_legend().</p></li>
-</ul><p>All built-in color palettes are colorblind-friendly.</p>
+</ul><p>All built-in color palettes are colorblind-friendly. See
+<a href="https://cmmr.github.io/rbiom/articles/aes.html#discrete-palettes">Mapping Metadata to Aesthetics</a>
+for images of the palettes.</p>
 <p>Categorical palette names: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>,
 <code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>,
 <code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, <code>"classic"</code>,
@@ -293,11 +295,11 @@ plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
 <span class="r-in"><span>    <span class="va">mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">5</span><span class="op">*</span><span class="fl">8</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">5</span>, dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sum(sapply(tracks, function(x) eq(x[["side"]], "left"))):</span> invalid 'type' (list) of argument</span>
+<span class="r-plt img"><img src="plot_heatmap-1.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    <span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">mtx</span>, grid<span class="op">=</span><span class="st">"oranges"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sum(sapply(tracks, function(x) eq(x[["side"]], "left"))):</span> invalid 'type' (list) of argument</span>
+<span class="r-plt img"><img src="plot_heatmap-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    <span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">mtx</span>, grid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>colors <span class="op">=</span> <span class="st">"oranges"</span>, label <span class="op">=</span> <span class="st">"Some %"</span>, bins <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sum(sapply(tracks, function(x) eq(x[["side"]], "left"))):</span> invalid 'type' (list) of argument</span>
+<span class="r-plt img"><img src="plot_heatmap-3.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">tracks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="st">'Number'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span><span class="op">)</span>,</span></span>
@@ -311,7 +313,7 @@ plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">plot_heatmap</span><span class="op">(</span><span class="va">mtx</span>, tracks<span class="op">=</span><span class="va">tracks</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in x[["side"]]:</span> subscript out of bounds</span>
+<span class="r-plt img"><img src="plot_heatmap-4.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

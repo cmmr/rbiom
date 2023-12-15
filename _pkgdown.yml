@@ -33,7 +33,7 @@ navbar:
     - text: "Plot Types"
       href: articles/plots.html
     - text: "Mapping Metadata to Aesthetics"
-      href: articles/aesthetics.html
+      href: articles/aes.html
     - text: "Data Partitioning"
       href: articles/partitioning.html
 
