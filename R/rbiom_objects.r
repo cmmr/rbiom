@@ -198,8 +198,7 @@ rbiom <- R6::R6Class(
     }
     
     
-    
-  ),
+  ), # /private
   
   
   public = list(
@@ -215,24 +214,12 @@ rbiom <- R6::R6Class(
       
       dots <- list(...)
       
-      private$.counts       <- slam::as.simple_triplet_matrix(counts)
-      private$.metadata     <- tibble::tibble(.sample = colnames(counts))
-      private$.taxonomy     <- tibble::tibble(.otu    = rownames(counts))
-      private$.date         <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
-      private$.generated_by <- paste("rbiom", packageVersion("rbiom"))
-      
       
       #________________________________________________________
-      # Cache the hash values.
+      # Use active bindings to load components.
       #________________________________________________________
-      private$.hashes[['.counts']]    <- hash(private$.counts)
-      private$.hashes[['.metadata']]  <- hash(private$.metadata)
-      private$.hashes[['.taxonomy']]  <- hash(private$.taxonomy)
+      self$counts <- counts
       
-      
-      #________________________________________________________
-      # Use active bindings to load optional components.
-      #________________________________________________________
       if (!is.null(metadata))      self$metadata  <- metadata
       if (!is.null(taxonomy))      self$taxonomy  <- taxonomy
       if (!is.null(tree))          self$tree      <- tree
@@ -244,10 +231,12 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Values found by read_biom(). Read-only hereafter.
       #________________________________________________________
+      private$.date <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
       if (!is.null(date <- dots[['date']]))
         if (is_scalar_character(date) && !is.na(date))
           private$.date <- date
       
+      private$.generated_by <- paste("rbiom", packageVersion("rbiom"))
       if (!is.null(generated_by <- dots[['generated_by']]))
         if (is_scalar_character(generated_by) && !is.na(generated_by))
           private$.generated_by <- generated_by
@@ -284,7 +273,7 @@ rbiom <- R6::R6Class(
       
     }
     
-  ),
+  ), # /public
   
   
   active = list(
@@ -568,9 +557,14 @@ rbiom <- R6::R6Class(
       # First time loading counts.
       #________________________________________________________
       if (is.null(private$.counts)) {
+        
         private$.counts   <- value
-        private$.metadata <- tibble::tibble(.sample = colnames(counts))
-        private$.taxonomy <- tibble::tibble(.otu    = rownames(counts))
+        private$.metadata <- tibble::tibble(.sample = colnames(value))
+        private$.taxonomy <- tibble::tibble(.otu    = rownames(value))
+        
+        private$.hashes[['.counts']]    <- hash(private$.counts)
+        private$.hashes[['.metadata']]  <- hash(private$.metadata)
+        private$.hashes[['.taxonomy']]  <- hash(private$.taxonomy)
       }
       
       
@@ -643,6 +637,6 @@ rbiom <- R6::R6Class(
     pkg_version  = function () { private$.pkg_version                      },
     depth        = function () { private$.depth                            }
     
-  )
+  ) # /active
 )
 
