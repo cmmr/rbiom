@@ -32,6 +32,7 @@ taxa_boxplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("taxa_boxplot(%s)", as.args(params, 2, taxa_boxplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -114,7 +115,7 @@ taxa_boxplot <- function (
   #________________________________________________________
   # y-axis title
   #________________________________________________________
-  if (any(params$.ggdata[['.y']] > 1)) {
+  if (any(params$.ggdata[[params$.ycol]] > 1)) {
     
     biom <- params$biom
     if (is.null(biom$depth)) { set_layer(params, 'labs', y = "Unrarefied Counts")
@@ -137,6 +138,7 @@ taxa_boxplot <- function (
   
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

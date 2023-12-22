@@ -28,6 +28,7 @@ bdiv_boxplot <- function (
   validate_tree(null_ok = TRUE)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("bdiv_boxplot(%s)", as.args(params, 2, bdiv_boxplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -143,6 +144,7 @@ bdiv_boxplot <- function (
   
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

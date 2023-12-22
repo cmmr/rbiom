@@ -46,7 +46,7 @@ respectively.
 Visualize the number of observations per sample.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     rare_barplot(hmp50)
     

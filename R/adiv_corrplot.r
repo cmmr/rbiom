@@ -28,6 +28,7 @@ adiv_corrplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("adiv_corrplot(%s)", as.args(params, 2, adiv_corrplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -117,6 +118,7 @@ adiv_corrplot <- function (
     plot_build()
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

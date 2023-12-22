@@ -34,6 +34,7 @@ adiv_matrix <- function (biom, rarefy=FALSE) {
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment())
+  cmd    <- sprintf("adiv_table(%s)", as.args(params, fun = adiv_table))
   
   
   #________________________________________________________
@@ -68,6 +69,7 @@ adiv_matrix <- function (biom, rarefy=FALSE) {
   
   
   
+  attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)
   
   return (mtx)
@@ -121,6 +123,7 @@ adiv_table <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment())
+  cmd    <- sprintf("adiv_table(%s)", as.args(params, fun = adiv_table))
   
   
   #________________________________________________________
@@ -222,6 +225,7 @@ adiv_table <- function (
   attr(tbl, 'response') <- ".diversity"
   
   
+  attr(tbl, 'cmd') <- cmd
   set_cache_value(cache_file, tbl)
   
   return (tbl)

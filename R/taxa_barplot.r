@@ -48,6 +48,7 @@ taxa_barplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("taxa_barplot(%s)", as.args(params, 2, taxa_barplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -392,7 +393,9 @@ taxa_barplot <- function (
     plot_build()
   
   
+  attr(p, 'cmd') <- cmd
   set_cache_value(cache_file, p)
+  
   return (p)
 }
 

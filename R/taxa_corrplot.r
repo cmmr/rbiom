@@ -26,6 +26,7 @@ taxa_corrplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("taxa_corrplot(%s)", as.args(params, 2, taxa_corrplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -116,6 +117,7 @@ taxa_corrplot <- function (
     plot_build()
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

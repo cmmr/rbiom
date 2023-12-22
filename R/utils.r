@@ -176,6 +176,7 @@ append.cmd <- function (x, fn, args, lhs = NULL, hist = NULL, display = lhs, fun
 #____________________________________________________________________
 as.args <- function (args = list(), indent = 0, fun = NULL) {
   
+  if (is.environment(args)) args <- as.list(args)
   stopifnot(is_list(args))
   stopifnot(is_scalar_integerish(indent) && !is_na(indent))
   

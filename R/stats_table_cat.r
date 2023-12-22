@@ -51,7 +51,60 @@ stats_table_cat <- function (df, stat.by, resp, test, level, split.by) {
       })
     }) %>% as_tibble()
     
-    attr(result, 'pairs')   <- pairs
+    attr(result, 'pairs') <- pairs
+    
+    
+    if (is.null(split.by) || length(split.by) == 0) {
+      
+      attr(result, 'code') <- glue::glue("
+        pairs <- combn(levels(data${coan(stat.by)}), m = 2, simplify = FALSE)
+        names(pairs) <- sapply(pairs, paste, collapse = ' - ')
+        
+        stats <- plyr::ldply(pairs, .id = {single_quote(stat.by)}, function (pair) {{
+          
+          pair <- data[data${coan(stat.by)} %in% pair,,drop=FALSE]
+          
+          wilcox.test({format(frm)}, data = pair, conf.int = TRUE, conf.level = {level}) %>%
+            with(data.frame(
+              row.names = NULL,
+              .n        = nrow(pair),
+              .stat     = statistic, 
+              .estimate = estimate, 
+              .lower    = conf.int[[1]], 
+              .upper    = conf.int[[2]], 
+              .p.val    = p.value )) %>%
+            suppressWarnings() %>%
+            tryCatch(error = function (e) data.frame()[1,])
+        }})"
+      )
+      
+    } else {
+      
+      attr(result, 'code') <- glue::glue("
+        pairs <- combn(levels(data${coan(stat.by)}), m = 2, simplify = FALSE)
+        names(pairs) <- sapply(pairs, paste, collapse = ' - ')
+        
+        stats <- plyr::ddply(data, single_quote(split.by), function (d) {{
+          plyr::ldply(pairs, .id = {single_quote(stat.by)}, function (pair) {{
+            
+            pair <- d[d${coan(stat.by)} %in% pair,,drop=FALSE]
+            
+            wilcox.test({format(frm)}, data = pair, conf.int = TRUE, conf.level = {level}) %>%
+              with(data.frame(
+                row.names = NULL,
+                .n        = nrow(pair),
+                .stat     = statistic, 
+                .estimate = estimate, 
+                .lower    = conf.int[[1]], 
+                .upper    = conf.int[[2]], 
+                .p.val    = p.value )) %>%
+              suppressWarnings() %>%
+              tryCatch(error = function (e) data.frame()[1,])
+          }})
+        }})"
+      )
+      
+    }
   }
   
   
@@ -75,33 +128,23 @@ stats_table_cat <- function (df, stat.by, resp, test, level, split.by) {
     }) %>% as_tibble()
     
     
-    if (is.null(split.by)) {
+    if (is.null(split.by) || length(split.by) == 0) {
       
-      attr(result, 'code') <- glue::glue(
-        "stats <- stats::kruskal.test(
-            formula = {format(frm)}, 
-            data    = df ) %>%
-            
+      attr(result, 'code') <- glue::glue("
+        stats <- stats::kruskal.test({format(frm)}, data = data) %>%
           with(data.frame(
-            row.names = NULL, 
-            .n     = nrow(d), 
-            .stat  = statistic, 
-            .df    = parameter, 
-            .p.val = p.value )) %>%
-            
-          tryCatch(error = function (e) data.frame()[1,]) %>%
-          
-          as_tibble()"
+           .n     = nrow(data), 
+           .stat  = statistic, 
+           .df    = parameter, 
+           .p.val = p.value ))"
       )
       
     } else {
       
-      attr(result, 'code') <- glue::glue(
-        "stats <- plyr::ddply(df, {as.args(list(split.by))}, function (d) {{
+      attr(result, 'code') <- glue::glue("
+        stats <- plyr::ddply(data, {as.args(list(split.by))}, function (d) {{
           
-          stats::kruskal.test(
-              formula = {format(frm)}, 
-              data    = d ) %>%
+          stats::kruskal.test({format(frm)}, data = d) %>%
               
             with(data.frame(
               row.names = NULL, 
@@ -112,7 +155,7 @@ stats_table_cat <- function (df, stat.by, resp, test, level, split.by) {
               
             tryCatch(error = function (e) data.frame()[1,])
           
-        }}) %>% as_tibble()"
+        }})"
       )
       
     }

@@ -48,6 +48,7 @@ corrplot_stats <- function (params) {
   tryCatch(
     error = function (e) { warning(e); return (params) }, 
     expr  = with(params, {
+      
       .plot_attrs[['stats']] <- stats_table(
         test     = test, 
         df       = .ggdata, 
@@ -57,7 +58,18 @@ corrplot_stats <- function (params) {
         model    = model, 
         split.by = facet.by, 
         level    = level, 
-        p.adj    = p.adj )}))
+        p.adj    = p.adj )
+      
+      
+      #________________________________________________________
+      # Add biom subsetting code before stats code.
+      #________________________________________________________
+      if (!is.null(attr(.plot_attrs[['stats']], 'code', exact = TRUE)))
+        if (exists(".subset_code", inherits = FALSE) && !is.null(.subset_code))
+          attr(.plot_attrs[['stats']], 'code') %<>% paste0(.subset_code, "\n\n", .) %>%
+        add_class("rbiom_code")
+      
+    }))
   
   
   

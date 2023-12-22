@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-<!-- Run `devtools::build_readme(); pkgdown::build_home()` after editing. -->
+<!-- Run `devtools::build_readme(); pkgdown::build_home()` after editing.  -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

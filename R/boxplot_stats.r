@@ -76,6 +76,14 @@ boxplot_stats <- function (params) {
     return (invisible(params))
   }
   
+  #________________________________________________________
+  # Add biom subsetting code before stats code.
+  #________________________________________________________
+  if (!is.null(attr(stats, 'code', exact = TRUE)))
+    if (!is.null(params$.subset_code))
+      attr(stats, 'code') %<>% paste0(params$.subset_code, "\n\n", .) %>%
+        add_class("rbiom_code")
+  
   params$.plot_attrs[['stats']] <- stats
   
   

@@ -33,14 +33,15 @@ init_boxplot_layers <- function (params = parent.frame()) {
   #________________________________________________________
   with(params, {
     
-    .ggdata <- rename_response(.ggdata, ".y")
-    .ggdata <- .ggdata[is.finite(.ggdata[['.y']]),]
+    .ycol   <- attr(.ggdata, 'response', exact = TRUE)
+    stopifnot(hasName(.ggdata, .ycol))
+    .ggdata <- .ggdata[is.finite(.ggdata[[.ycol]]),]
     
     # Avoid warning messages that come from this:
     # ggplot(data.frame(x="A", y=c(1, 1 - 1e-15))) 
     # + ggbeeswarm::geom_quasirandom(aes(x, y))
     #________________________________________________________
-    .ggdata[['.y']] %<>% round(12)
+    .ggdata[[.ycol]] %<>% round(12)
   })
   
   
@@ -71,7 +72,6 @@ init_boxplot_layers <- function (params = parent.frame()) {
   #________________________________________________________
   
   params$.xcol  <- params$x
-  params$.ycol  <- attr(params$.ggdata, "response", exact = TRUE)
   params$.xmode <- "factor"
   
   init_layers(
@@ -304,10 +304,13 @@ init_boxplot_layers <- function (params = parent.frame()) {
       attr(.ggdata, "vline") <- plyr::ddply(
         .data      = .ggdata, 
         .variables = ply_cols(intersect(colnames(.ggdata), c('.group', .group_by))), 
-        .fun       = function (v) { .vlineFun(v[['.y']]) })
+        .fun       = function (v) { .vlineFun(v[[.ycol]]) })
       
       remove('.vlineFun')
     })
+    
+    for (layer in intersect(c("crossbar", "errorbar", "linerange", "pointrange"), env_names(layers)))
+      set_layer(params, layer, 'mapping|y' = ".y")
     
     
     #________________________________________________________
@@ -381,8 +384,8 @@ init_boxplot_layers <- function (params = parent.frame()) {
     "linerange"  = c('x', 'y', 'group', 'color',                  'ymin', 'ymax'),
     "errorbar"   = c('x', 'y', 'group', 'color',                  'ymin', 'ymax') )
   
-  xcol <- params$.xcol
-  args <- c(list('x' = xcol), .qw(y, xmin, xmax, ymin, ymax, xend, yend, label))
+  
+  args <- c(list('x' = params$.xcol, 'y' = params$.ycol), .qw(xmin, xmax, ymin, ymax, xend, yend, label))
   if (hasName(params$.ggdata, '.group'))             args[['group']]        <- ".group"
   if (has_layer(params, 'color'))                    args[['color']]        <- names(params$color.by)
   if (has_layer(params, 'color'))                    args[['fill']]         <- names(params$color.by)

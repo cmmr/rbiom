@@ -187,7 +187,7 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 }
 
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     rare_multiplot(hmp50, color.by="Body Site")
     

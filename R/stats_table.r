@@ -107,29 +107,20 @@ stats_table <- function (
     stats <- do.call(stats_table_num, args)
   }
   
+  if (hasName(stats, '.p.val'))
+    stats[['.adj.p']] <- p.adjust(stats[['.p.val']], p.adj)
+  
+  
+  
+  #________________________________________________________
+  # Add in "data <- ..."
+  #________________________________________________________
+  if (!is.null(attr(df, 'cmd', exact = TRUE)))
+    attr(stats, 'code') %<>% sprintf("data  <- %s\n%s", attr(df, 'cmd'), .)
+  
+  
   attr(stats, 'stats_table_args') <- args[names(args) != 'df']
-  
-  
-  
-  #________________________________________________________
-  # Sort by '.p.val'; add '.adj.p'.
-  #________________________________________________________
-  if (hasName(stats, '.p.val')) {
-    stats %<>% plyr::arrange(.p.val)
-    stats %<>% dplyr::relocate(.p.val, .after = last_col())
-    stats[['.adj.p']] <- stats::p.adjust(stats[['.p.val']], p.adj)
-    attr(stats, 'code') <- glue(
-      "{attr(stats, 'code', exact = TRUE)}
-      stats %<>% plyr::arrange(.p.val)
-      stats %<>% dplyr::relocate(.p.val, .after = last_col())
-      stats[['.adj.p']] <- stats::p.adjust(stats[['.p.val']], '{p.adj}')" )
-    
-  } else if (hasName(stats, '.effect.size')) {
-    stats %<>% plyr::arrange(plyr::desc(abs(.effect.size)))
-    attr(stats, 'code') <- glue(
-      "{attr(stats, 'code', exact = TRUE)}
-      stats %<>% plyr::arrange(plyr::desc(abs(.effect.size)))" )
-  }
+  attr(stats, 'code') %<>% add_class("rbiom_code")
   
   
   #________________________________________________________

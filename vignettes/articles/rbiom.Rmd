@@ -36,18 +36,18 @@ biom
 
 The rbiom object has many helpful accessors.
 
-| Accessor                 | Content                                                  |
-|--------------------------|----------------------------------------------------------|
-| `$counts`                | Abundance of each OTU in each sample.                    |
-| `$metadata`              | Sample mappings to metadata (treatment, patient, etc).   |
-| `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).    |
-| `$otus`, `$n_otus`       | OTU names.                                               |
-| `$samples`, `$n_samples` | Sample names.                                            |
-| `$fields`, `$n_fields`   | Metadata field names.                                    |
-| `$ranks`, `$n_ranks`     | Taxonomic rank names.                                    |
-| `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`.   |
-| `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `NULL`. |
-| `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.              |
+| Accessor                 | Content                                                |
+|--------------------------|--------------------------------------------------------|
+| `$counts`                | Abundance of each OTU in each sample.                  |
+| `$metadata`              | Sample mappings to metadata (treatment, patient, etc). |
+| `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).  |
+| `$otus`, `$n_otus`       | OTU names.                                             |
+| `$samples`, `$n_samples` | Sample names.                                          |
+| `$fields`, `$n_fields`   | Metadata field names.                                  |
+| `$ranks`, `$n_ranks`     | Taxonomic rank names.                                  |
+| `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
+| `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `""`. |
+| `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
 
 ```{r}
 biom$counts[1:4,1:8] %>% as.matrix()
@@ -116,7 +116,7 @@ details.
 
 A common way to normalize microbiome count data is to rarefy it. This 
 process drops samples with too few observations, and randomly removes 
-observations from samples from the rest, so that all samples have the 
+observations from the remaining samples, so that all samples have the 
 same "rarefaction depth".
 
 ```{r}

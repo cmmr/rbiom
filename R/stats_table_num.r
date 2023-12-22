@@ -36,6 +36,19 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   })
   
   
+  #________________________________________________________
+  # convert
+  # from: .resp ~ .regr * .stat.by
+  # to:   .diversity ~ Age * `Body Site`
+  #________________________________________________________
+  formula_sub = with(model, {
+    replacements <- list(.regr = as.symbol(regr), .resp = as.symbol(resp))
+    if (!is.null(stat.by)) replacements %<>% c(list(.stat.by = as.symbol(stat.by)))
+    eval(do.call(substitute, list(args[['formula']], replacements)))
+  })
+  
+  
+  
   
   #________________________________________________________
   # Iterate over `split.by` categories.
@@ -53,12 +66,7 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
     #________________________________________________________
     # Apply the model to the provided data from `df`.
     #________________________________________________________
-    m <- run.cmd(
-      f     = model[[1]], 
-      args  = c(list(data = data), model[[2]]), 
-      # hist  = data, 
-      # lhs   = "model", 
-      envir = baseenv() )
+    m <- do.call(model[[1]], c(list(data = data), model[[2]]), envir = baseenv())
     
     
     #________________________________________________________
@@ -142,102 +150,109 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   
   
   
-  # #________________________________________________________
-  # # Attach stats R commands as attr(,'code') attributes.
-  # #________________________________________________________
-  # 
-  # stats <- local({
-  #   
-  #   model_fn      <- attr(model_function, 'fn', exact = TRUE)
-  #   model_arg_str <- as.args(model_args)
-  #   xcol_str      <- as.args(list(xcol))
-  #   color.by_str  <- as.args(list(color.by))
-  #   facet.by_str  <- as.args(list(facet.by))
-  #   specs_str     <- as.args(list(c(xcol, color.by)))
-  #   
-  #   emm_template <- ifelse(
-  #     test = is.null(facet.by), 
-  #     yes  = paste0(
-  #       sprintf("model <- %s(%s, data = data)\n", model_fn, model_arg_str),
-  #       sprintf("emm   <- emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
-  #       sprintf("stats <- {cmd}") ),
-  #     no   = paste0(
-  #       sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
-  #       sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
-  #       sprintf("  emm   <- emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
-  #       sprintf("  {cmd}\n}") ))
-  #   
-  #   if (hasName(stats, 'emmeans'))
-  #     attr(stats[['emmeans']],  'code') <- emm_template %>%
-  #     sub("{cmd}", "summary(object = emm, adjust = 'none')", ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   if (hasName(stats, 'emm_pairs'))
-  #     attr(stats[['emm_pairs']],  'code') <- emm_template %>%
-  #     sub("{cmd}", sprintf("pairs(x = emm, simple = %s, adjust = 'none')", color.by_str), ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   if (hasName(stats, 'emm_eff_size'))
-  #     attr(stats[['emm_eff_size']], 'code') <- emm_template %>%
-  #     sub("{cmd}", "eff_size(object = emm, sigma = sigma(model), edf = df.residual(model))", ., fixed = TRUE)
-  #   
-  #   
-  #   
-  #   emt_template <- ifelse(
-  #     test = is.null(facet.by), 
-  #     yes  = paste0(
-  #       sprintf("model <- %s(%s, data = data)\n", model_fn, model_arg_str),
-  #       sprintf("emt   <- emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", color.by_str, xcol_str, level),
-  #       sprintf("stats <- {cmd}") ),
-  #     no   = paste0(
-  #       sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
-  #       sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
-  #       sprintf("  emt   <- emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", color.by_str, xcol_str, level),
-  #       sprintf("  {cmd}\n}") ))
-  #   
-  #   if (hasName(stats, 'emtrends'))
-  #     attr(stats[['emtrends']],  'code') <- emt_template %>%
-  #     sub("{cmd}", "summary(object = emt, adjust = 'none')", ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   if (hasName(stats, 'emt_pairs'))
-  #     attr(stats[['emt_pairs']],  'code') <- emt_template %>%
-  #     sub("{cmd}", "pairs(x = emt, adjust = 'none')", ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   if (hasName(stats, 'emt_eff_size'))
-  #     attr(stats[['emt_eff_size']], 'code') <- emt_template %>%
-  #     sub("{cmd}", "eff_size(object = emt, sigma = sigma(model), edf = df.residual(model))", ., fixed = TRUE)
-  #   
-  #   
-  #   broom_template <- ifelse(
-  #     test = is.null(facet.by), 
-  #     yes  = paste0(
-  #       sprintf("model <- %s(%s, data = data)\n", model_fn, model_arg_str),
-  #       sprintf("stats <- {cmd}") ),
-  #     no   = paste0(
-  #       sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", facet.by_str),
-  #       sprintf("  model <- %s(%s, data = df)\n", model_fn, model_arg_str),
-  #       sprintf("  {cmd}\n}") ))
-  #   
-  #   if (hasName(stats, 'df'))
-  #     attr(stats[['df']],  'code') <- broom_template %>%
-  #     sub("{cmd}", "broom::augment(x = model, data = {data})", ., fixed = TRUE) %>%
-  #     sub("{data}", ifelse(is.null(facet.by), "data", "df"), ., fixed = TRUE)
-  #   
-  #   if (hasName(stats, 'terms'))
-  #     attr(stats[['terms']],  'code') <- broom_template %>%
-  #     sub("{cmd}", "broom::tidy(x = model)", ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   if (hasName(stats, 'fit'))
-  #     attr(stats[['fit']], 'code') <- broom_template %>%
-  #     sub("{cmd}", "broom::glance(x = model)", ., fixed = TRUE) %>%
-  #     paste0("\nstats[['adj.p']] <- p.adjust(stats[['p.value']], '", p.adj, "')")
-  #   
-  #   
-  #   return (stats)
-  # })
+  #________________________________________________________
+  # Attach stats R commands as attr(,'code') attributes.
+  #________________________________________________________
+  
+  attr(stats, 'code') <- local({
+    
+    model_args <- model[[2]]
+    model_args[['formula']] <- formula_sub
+    
+    model_fn      <- attr(model[[1]], 'fn', exact = TRUE)
+    model_arg_str <- as.args(model_args)
+    regr_str      <- as.args(list(regr))
+    stat.by_str   <- as.args(list(stat.by))
+    split.by_str  <- as.args(list(split.by))
+    specs_str     <- as.args(list(c(regr, stat.by)))
+    
+    
+    if (endsWith(test, "means")) {
+      
+      emm_template <- ifelse(
+        test = is.null(split.by),
+        yes  = paste0(
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
+          sprintf("stats <- {cmd}") ),
+        no   = paste0(
+          sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
+          sprintf("  {cmd}\n})") ))
+  
+      if (test == 'means')
+        emm_template %>%
+          sub("{cmd}", "summary(object = emm, adjust = 'none')", ., fixed = TRUE)
+  
+      else if (test == 'pw_means')
+        emm_template %>%
+          sub("{cmd}", sprintf("pairs(x = emm, simple = %s, adjust = 'none')", stat.by_str), ., fixed = TRUE)
+  
+      else if (test == 'es_means')
+        emm_template %>%
+          sub("{cmd}", "emmeans::eff_size(object = emm, sigma = sigma(model), edf = df.residual(model))", ., fixed = TRUE)
+    }
+
+    
+    else if (endsWith(test, "trends")) {
+      
+      emt_template <- ifelse(
+        test = is.null(split.by),
+        yes  = paste0(
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
+          sprintf("stats <- {cmd}") ),
+        no   = paste0(
+          sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
+          sprintf("  {cmd}\n})") ))
+  
+      
+      if (test == 'trends')
+        emt_template %>%
+          sub("{cmd}", "summary(object = emt, adjust = 'none')", ., fixed = TRUE)
+  
+      else if (test == 'pw_trends')
+        emt_template %>%
+          sub("{cmd}", "pairs(x = emt, adjust = 'none')", ., fixed = TRUE)
+  
+      else if (test == 'es_trends')
+        emt_template %>%
+          sub("{cmd}", "emmeans::eff_size(object = emt, sigma = sigma(model), edf = df.residual(model))", ., fixed = TRUE)
+    }
+    
+    
+    else {
+      
+      broom_template <- ifelse(
+        test = is.null(split.by),
+        yes  = paste0(
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("stats <- {cmd}") ),
+        no   = paste0(
+          sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  {cmd}\n}") ))
+  
+      if (test == 'predict')
+        broom_template %>%
+          sub("{cmd}", "broom::augment(x = model, data = {data})", ., fixed = TRUE) %>%
+          sub("{data}", ifelse(is.null(split.by), "data", "df"), ., fixed = TRUE)
+  
+      else if (test == 'terms')
+        broom_template %>%
+          sub("{cmd}", "broom::tidy(x = model)", ., fixed = TRUE)
+  
+      else if (test == 'fit')
+        broom_template %>%
+          sub("{cmd}", "broom::glance(x = model)", ., fixed = TRUE)
+      
+    }
+    
+    
+  })
   
   
   
@@ -259,15 +274,9 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       es_trends = "Estimated marginal means of linear trends - effect sizes.",
       test ),
     
-    'Model' = with(model, { # convert:  .resp ~ .regr * .stat.by  =>  .diversity ~ Age * `Body Site`
-      
-        replacements <- list(.regr = as.symbol(regr), .resp = as.symbol(resp))
-        if (!is.null(stat.by)) replacements %<>% c(list(.stat.by = as.symbol(stat.by)))
-        
+    'Model' = with(model, {
         fn   <- attr(fun, 'fn', exact = TRUE)
-        frm  <- eval(do.call(substitute, list(args[['formula']], replacements)))
-        args <- c(list(frm), args[names(args) != 'formula'])
-        
+        args <- c(list(formula_sub), args[names(args) != 'formula'])
         sprintf("%s(%s)", fn, as.args(args))
       }) )
   

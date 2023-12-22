@@ -56,6 +56,7 @@ bdiv_ord_plot <- function (
   validate_tree(null_ok = TRUE)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("bdiv_ord_plot(%s)", as.args(params, 2, bdiv_ord_plot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -268,6 +269,7 @@ bdiv_ord_plot <- function (
   
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return(fig)

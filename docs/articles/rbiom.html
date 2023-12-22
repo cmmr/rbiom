@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9110</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,7 @@ Here we’ll import a dataset from a BIOM file.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-15)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-22)</span></span>
 <span><span class="co">#&gt;      50 Samples:  HMP01, HMP02, HMP03, ..., and HMP50</span></span>
 <span><span class="co">#&gt;     490 OTUs:     Unc01yki, Unc53100, LtbAci52, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
@@ -290,7 +290,7 @@ for additional details.</p>
 </h3>
 <p>A common way to normalize microbiome count data is to rarefy it. This
 process drops samples with too few observations, and randomly removes
-observations from samples from the rest, so that all samples have the
+observations from the remaining samples, so that all samples have the
 same “rarefaction depth”.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -318,11 +318,11 @@ samples in the abundance table.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre></div>
 <p><code><a href="../reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code></p>
 </div>
@@ -340,11 +340,11 @@ entire rbiom object.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares A     TRUE </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares B     TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-15)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2023-12-22)</span></span>
 <span><span class="co">#&gt;      10 Samples:  HMP10, HMP15, HMP16, ..., and HMP48</span></span>
 <span><span class="co">#&gt;     126 OTUs:     CnbTube3, PpbAcne6, Unc02qsf, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
@@ -431,7 +431,7 @@ greater detail.</p>
 <p><img src="rbiom_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">stats</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Test:     kruskal.test(.y ~ `Body Site`).</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Test:     kruskal.test(.diversity ~ `Body Site`).</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
 <span><span class="co">#&gt;   Sex       .n .stat   .df    .p.val   .adj.p</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -439,25 +439,21 @@ greater detail.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Male      20  13.9     3 0.003<span style="text-decoration: underline;">02</span>   0.003<span style="text-decoration: underline;">02</span></span></span>
 <span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">stats</span><span class="op">$</span><span class="va">code</span></span>
-<span><span class="co">#&gt; stats &lt;- plyr::ddply(df, "Sex", function (d) {</span></span>
+<span><span class="co">#&gt; data  <span style="color: #00BB00;">&lt;-</span> <span style="color: #00BBBB;">adiv_table</span><span style="color: #BBBB00;">(</span>biom<span style="color: #BBBB00;">)</span></span></span>
+<span><span class="co">#&gt; stats <span style="color: #00BB00;">&lt;-</span> plyr::<span style="color: #00BBBB;">ddply</span><span style="color: #BBBB00;">(</span>data, <span style="color: #BBBB00;">"Sex"</span>, <span style="color: #BB0000;">function</span> <span style="color: #BB00BB;">(</span>d<span style="color: #BB00BB;">)</span> <span style="color: #BB00BB;">{</span></span></span>
 <span><span class="co">#&gt;   </span></span>
-<span><span class="co">#&gt;   stats::kruskal.test(</span></span>
-<span><span class="co">#&gt;       formula = .y ~ `Body Site`, </span></span>
-<span><span class="co">#&gt;       data    = d ) %&gt;%</span></span>
+<span><span class="co">#&gt;   stats::<span style="color: #00BBBB;">kruskal.test(</span>.diversity <span style="color: #00BB00;">~</span> `Body Site`, data = d<span style="color: #00BBBB;">)</span> <span style="color: #00BB00;">%&gt;%</span></span></span>
 <span><span class="co">#&gt;       </span></span>
-<span><span class="co">#&gt;     with(data.frame(</span></span>
-<span><span class="co">#&gt;       row.names = NULL, </span></span>
-<span><span class="co">#&gt;       .n     = nrow(d), </span></span>
+<span><span class="co">#&gt;     <span style="color: #00BBBB;">with(data.frame</span><span style="color: #BBBB00;">(</span></span></span>
+<span><span class="co">#&gt;       row.names = <span style="color: #BB00BB; font-weight: bold;">NULL</span>, </span></span>
+<span><span class="co">#&gt;       .n     = <span style="color: #00BBBB;">nrow</span><span style="color: #BB00BB;">(</span>d<span style="color: #BB00BB;">)</span>, </span></span>
 <span><span class="co">#&gt;       .stat  = statistic, </span></span>
 <span><span class="co">#&gt;       .df    = parameter, </span></span>
-<span><span class="co">#&gt;       .p.val = p.value )) %&gt;%</span></span>
+<span><span class="co">#&gt;       .p.val = p.value <span style="color: #BBBB00;">)</span><span style="color: #00BBBB;">)</span> <span style="color: #00BB00;">%&gt;%</span></span></span>
 <span><span class="co">#&gt;       </span></span>
-<span><span class="co">#&gt;     tryCatch(error = function (e) data.frame()[1,])</span></span>
+<span><span class="co">#&gt;     <span style="color: #00BBBB;">tryCatch(</span>error = <span style="color: #BB0000;">function</span> <span style="color: #BBBB00;">(</span>e<span style="color: #BBBB00;">)</span> <span style="color: #00BBBB;">data.frame</span><span style="color: #BBBB00;">()[</span><span style="color: #BB00BB;">1</span>,<span style="color: #BBBB00;">]</span><span style="color: #00BBBB;">)</span></span></span>
 <span><span class="co">#&gt;   </span></span>
-<span><span class="co">#&gt; }) %&gt;% as_tibble()</span></span>
-<span><span class="co">#&gt; stats %&lt;&gt;% plyr::arrange(.p.val)</span></span>
-<span><span class="co">#&gt; stats %&lt;&gt;% dplyr::relocate(.p.val, .after = last_col())</span></span>
-<span><span class="co">#&gt; stats[['.adj.p']] &lt;- stats::p.adjust(stats[['.p.val']], 'fdr')</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BB00BB;">}</span><span style="color: #BBBB00;">)</span></span></span></code></pre></div>
 <p><code><a href="../reference/adiv_stats.html">adiv_stats()</a></code>, <code><a href="../reference/bdiv_stats.html">bdiv_stats()</a></code>,
 <code><a href="../reference/distmat_stats.html">distmat_stats()</a></code>, <code><a href="../reference/stats_table.html">stats_table()</a></code>,
 <code><a href="../reference/taxa_stats.html">taxa_stats()</a></code></p>

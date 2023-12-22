@@ -10,7 +10,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     rare_multiplot(hmp50, color.by="Body Site")
 #'     
@@ -24,6 +24,7 @@ rare_multiplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("rare_multiplot(%s)", as.args(params, 2, rare_multiplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -64,7 +65,9 @@ rare_multiplot <- function (
   
   
   
+  attr(p, 'cmd') <- cmd
   set_cache_value(cache_file, p)
+  
   return (p)
 }
 

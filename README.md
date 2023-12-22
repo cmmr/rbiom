@@ -1,5 +1,5 @@
 
-<!-- Run `devtools::build_readme(); pkgdown::build_home()` after editing. -->
+<!-- Run `devtools::build_readme(); pkgdown::build_home()` after editing.  -->
 
 # rbiom
 
@@ -76,19 +76,20 @@ taxa_stats(biom, regr = "Age", stat.by = "Body Site", taxa = 0.01)
 #> # Test:     Estimated marginal means of linear trends.
 #> # Model:    stats::lm(.abundance ~ Age * `Body Site`)
 #> # A tibble: 80 × 10
-#>    .taxa   `Body Site` .trend   .se   .df .lower .upper .t.ratio  .p.val  .adj.p
-#>    <fct>   <fct>        <dbl> <dbl> <dbl>  <dbl>  <dbl>    <dbl>   <dbl>   <dbl>
-#>  1 Gemella Buccal muc…  15.5   2.45    39  10.6   20.4      6.34 1.76e-7 1.41e-5
-#>  2 Alisti… Stool       -14.1   2.49    39 -19.2   -9.10    -5.68 1.46e-6 5.86e-5
-#>  3 Haemop… Buccal muc…  38.2   7.97    39  22.1   54.3      4.79 2.40e-5 6.40e-4
-#>  4 Strept… Buccal muc… -53.3  12.8     39 -79.2  -27.3     -4.16 1.71e-4 3.43e-3
-#>  5 Shuttl… Mid vagina   16.7   4.27    39   8.11  25.4      3.92 3.43e-4 5.49e-3
-#>  6 Lactob… Mid vagina  -31.3   8.42    39 -48.4  -14.3     -3.72 6.19e-4 8.26e-3
-#>  7 Veillo… Saliva      -10.8   3.09    39 -17.0   -4.52    -3.49 1.23e-3 1.40e-2
-#>  8 Prevot… Saliva        5.23  1.69    39   1.82   8.65     3.10 3.58e-3 3.58e-2
-#>  9 Neisse… Saliva        9.70  3.42    39   2.78  16.6      2.83 7.23e-3 6.43e-2
-#> 10 Fusoba… Saliva        4.95  1.82    39   1.27   8.64     2.72 9.69e-3 7.75e-2
+#>    .taxa       `Body Site`    .trend   .se   .df .lower .upper  .t.ratio  .p.val
+#>    <fct>       <fct>           <dbl> <dbl> <dbl>  <dbl>  <dbl>     <dbl>   <dbl>
+#>  1 Lactobacil… Anterior n… -6.82e- 3  8.45    39  -17.1   17.1 -8.06e- 4 9.99e-1
+#>  2 Lactobacil… Buccal muc… -2.68e- 2 17.6     39  -35.7   35.6 -1.52e- 3 9.99e-1
+#>  3 Lactobacil… Mid vagina  -3.13e+ 1  8.42    39  -48.4  -14.3 -3.72e+ 0 6.19e-4
+#>  4 Lactobacil… Saliva      -2.33e- 2 11.3     39  -22.9   22.9 -2.06e- 3 9.98e-1
+#>  5 Lactobacil… Stool        4.75e-15 13.8     39  -27.9   27.9  3.44e-16 1   e+0
+#>  6 Streptococ… Anterior n…  1.50e+ 0  6.15    39  -10.9   13.9  2.45e- 1 8.08e-1
+#>  7 Streptococ… Buccal muc… -5.33e+ 1 12.8     39  -79.2  -27.3 -4.16e+ 0 1.71e-4
+#>  8 Streptococ… Mid vagina  -1.33e- 1  6.12    39  -12.5   12.2 -2.17e- 2 9.83e-1
+#>  9 Streptococ… Saliva      -4.56e+ 0  8.23    39  -21.2   12.1 -5.55e- 1 5.82e-1
+#> 10 Streptococ… Stool        3.37e- 2 10.0     39  -20.3   20.3  3.35e- 3 9.97e-1
 #> # ℹ 70 more rows
+#> # ℹ 1 more variable: .adj.p <dbl>
 ```
 
 #### Summarize counts by taxonomic rank.

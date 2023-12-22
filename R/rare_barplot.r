@@ -29,7 +29,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
 #'     rare_barplot(hmp50)
 #'     
@@ -45,6 +45,7 @@ rare_barplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("rare_barplot(%s)", as.args(params, 2, rare_barplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -181,6 +182,7 @@ rare_barplot <- function (
   fig <- plot_build(params)
   
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

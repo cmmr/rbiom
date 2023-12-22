@@ -43,6 +43,7 @@ adiv_boxplot <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("adiv_boxplot(%s)", as.args(params, 2, adiv_boxplot))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -80,10 +81,7 @@ adiv_boxplot <- function (
     
     # Compute each adiv metric separately: shannon, etc
     #________________________________________________________
-    .ggdata <- adiv_table(
-      biom = biom, 
-      adiv = adiv, 
-      md   = ".all" )
+    .ggdata <- adiv_table(biom, adiv = adiv)
     
     
     # Facet on multiple adiv metrics
@@ -136,7 +134,7 @@ adiv_boxplot <- function (
     plot_build()
   
   
-  
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

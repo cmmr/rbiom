@@ -33,6 +33,7 @@ taxa_heatmap <- function (
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("taxa_heatmap(%s)", as.args(params, 2, taxa_heatmap))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -155,7 +156,9 @@ taxa_heatmap <- function (
   p    <- do.call(plot_heatmap, args)
   
   
+  attr(p, 'cmd') <- cmd
   set_cache_value(cache_file, p)
+  
   return (p)
 }
 

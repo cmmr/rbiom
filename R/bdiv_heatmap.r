@@ -151,6 +151,7 @@ bdiv_heatmap <- function (
   validate_tree(null_ok = TRUE)
   
   params <- eval_envir(environment(), ...)
+  cmd    <- sprintf("bdiv_heatmap(%s)", as.args(params, 2, bdiv_heatmap))
   remove(list = intersect(env_names(params), ls()))
   
   
@@ -271,6 +272,7 @@ bdiv_heatmap <- function (
   
   fig <- do.call(plot_heatmap, args)
   
+  attr(fig, 'cmd') <- cmd
   set_cache_value(cache_file, fig)
   
   return (fig)

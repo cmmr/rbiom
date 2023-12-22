@@ -432,7 +432,8 @@ sync_metadata <- function (params = parent.frame()) {
   
   by_params <- c(
     "x", "color.by", "shape.by", "facet.by", 
-    "pattern.by", "label.by", "order.by", "stat.by", "limit.by" )
+    "pattern.by", "label.by", "order.by", "stat.by", "limit.by",
+    "within", "between" )
   
   
   
@@ -444,6 +445,9 @@ sync_metadata <- function (params = parent.frame()) {
   revsort   <- c() # For order.by, reverse if '-' prefix.
   group_by  <- c() # ggdata cols to use for ggplot group.
   
+  subset_vals <- list()
+  subset_lo   <- list()
+  subset_hi   <- list()
   
   
   #________________________________________________________
@@ -458,35 +462,79 @@ sync_metadata <- function (params = parent.frame()) {
       col_names %<>% c(col_name)
       revsort   %<>% c(attr(col_spec, 'revsort', exact = TRUE))
       
-      if (hasName(col_spec, 'range'))
-        md <- local({
-          vals <- md[[col_name]]
-          lo   <- min(col_spec[['range']])
-          hi   <- max(col_spec[['range']])
-          md[vals >= lo & vals <= hi,]
-        })
       
-      if (hasName(col_spec, 'values'))
-        md <- local({
-          values <- col_spec[['values']]
-          lvls   <- if.null(names(values), as.vector(values))
-          md[[col_name]] %<>% factor(levels = lvls)
-          md[!is.na(md[[col_name]]),]
-        })
+      if (hasName(col_spec, 'range')) {
+        
+        lo <- min(col_spec[['range']])
+        hi <- max(col_spec[['range']])
+        
+        subset_lo[[col_name]] <- max(c(lo, subset_lo[[col_name]]))
+        subset_hi[[col_name]] <- min(c(hi, subset_hi[[col_name]]))
+        if (subset_lo[[col_name]] > subset_hi[[col_name]]) cli_abort("All {col_name} values dropped.")
+      }
+      
+      
+      if (hasName(col_spec, 'values')) {
+        
+        values <- col_spec[['values']]
+        lvls   <- if.null(names(values), as.vector(values))
+        
+        if (is.null(subset_vals[[col_name]])) { subset_vals[[col_name]] <- lvls                 }
+        else                                  { subset_vals[[col_name]] %<>% intersect(lvls, .) }
+        if (length(subset_vals[[col_name]]) == 0) cli_abort("All {col_name} values dropped.")
+      }
       
     }
   }
   
   
+  #________________________________________________________
+  # Drop rows according to subset specs.
+  #________________________________________________________
   col_names %<>% unique()
-  
-  
-  
-  
-  #________________________________________________________
-  # Discard vestigal metadata columns and factor levels.
-  #________________________________________________________
   md <- md[,unique(c(".sample", col_names))]
+  
+  subset_cmds <- c()
+  factor_cmds <- c()
+  omit_cmds   <- c()
+  
+  for (i in col_names) {
+    
+    if (hasName(subset_vals, i) && !identical(levels(md[[i]]), subset_vals[[i]])) {
+      lvls <- subset_vals[[i]]
+      md[[i]] %<>% factor(levels = lvls)
+      lvls_str <- as.args(list(lvls))
+      factor_cmds %<>% c(glue("biom$metadata${coan(i)} %<>% factor(levels = {lvls_str})"))
+    }
+    
+    if (hasName(subset_lo, i) && min(c(Inf, md[[i]]), na.rm = TRUE) < subset_lo[[i]]) {
+      md <- md[md[[i]] >= subset_lo[[i]],]
+      subset_cmds %<>% c(glue("{coan(i)} >= {subset_lo[[i]]}"))
+    }
+    
+    if (hasName(subset_hi, i) && max(c(-Inf, md[[i]]), na.rm = TRUE) > subset_hi[[i]]) {
+      md <- md[md[[i]] <= subset_hi[[i]],]
+      subset_cmds %<>% c(glue("{coan(i)} <= {subset_hi[[i]]}"))
+    }
+    
+  }
+  
+  if (anyNA(md)) {
+    md        <- stats::na.omit(md)
+    omit_cmds <- glue("biom$metadata %<>% na.omit()")
+  }
+  
+  if (length(subset_cmds) > 0)
+    subset_cmds <- glue("biom %<>% subset({paste0(subset_cmds, collapse = ' & ')})")
+  
+  if (length(c(subset_cmds, factor_cmds, omit_cmds)) > 0)
+    params$.subset_code <- paste0(c(subset_cmds, factor_cmds, omit_cmds), collapse = "\n")
+  
+  
+  
+  #________________________________________________________
+  # Discard vestigial factor levels.
+  #________________________________________________________
   for (i in seq_len(ncol(md)))
     if (is.factor(md[[i]]))
       md[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
