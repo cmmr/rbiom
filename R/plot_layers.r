@@ -432,8 +432,7 @@ sync_metadata <- function (params = parent.frame()) {
   
   by_params <- c(
     "x", "color.by", "shape.by", "facet.by", 
-    "pattern.by", "label.by", "order.by", "stat.by", "limit.by",
-    "within", "between" )
+    "pattern.by", "label.by", "order.by", "stat.by", "limit.by" )
   
   
   
@@ -441,7 +440,7 @@ sync_metadata <- function (params = parent.frame()) {
   # Tracks which metadata columns are used.
   #________________________________________________________
   md_params <- intersect(by_params, env_names(params))
-  col_names <- c() # Metadata columns needed in ggdata.
+  col_names <- c(params[['within']], params[['between']]) # Metadata columns needed in ggdata.
   revsort   <- c() # For order.by, reverse if '-' prefix.
   group_by  <- c() # ggdata cols to use for ggplot group.
   
@@ -556,7 +555,7 @@ sync_metadata <- function (params = parent.frame()) {
     if (length(params[[param]]) == 0) {
       rlang::env_poke(params, nm = param, value = NULL)
       
-    } else if (!param %in% c("color.by", "shape.by", "pattern.by")) {
+    } else if (!param %in% c("color.by", "shape.by", "pattern.by", "within", "between")) {
       params[[param]] %<>% names()
     }
   }
