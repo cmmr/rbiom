@@ -3,14 +3,14 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   aes: aes.html
+  bdiv_cmp: bdiv_cmp.html
   diversity: diversity.html
   importing: importing.html
-  partitioning: partitioning.html
-  parts: parts.html
-  plot: plot.html
+  plots: plots.html
   rbiom: rbiom.html
-  stats: stats.html
-last_built: 2023-12-22T17:37Z
+  scales: scales.html
+  statistics: statistics.html
+last_built: 2024-01-18T01:13Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles

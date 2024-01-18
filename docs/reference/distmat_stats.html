@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -77,7 +78,7 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>dm</dt>
 <dd><p>A <code>dist</code>-class distance matrix, as returned from
-<code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> or <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>. Required.</p></dd>
+<code><a href="bdiv_table.html">bdiv_distmat()</a></code> or <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>. Required.</p></dd>
 
 
 <dt>groups</dt>
@@ -89,6 +90,7 @@ categorical or numeric. Required.</p></dd>
 <dt>test</dt>
 <dd><p>Permutational test for accessing significance. Options are:</p><ul><li><p><code>"adonis2"</code> -  Permutational MANOVA; <code><a href="https://rdrr.io/pkg/vegan/man/vegan-deprecated.html" class="external-link">vegan::adonis2()</a></code>.</p></li>
 <li><p><code>"mrpp"</code> -  Multiple response permutation procedure; <code><a href="https://rdrr.io/pkg/vegan/man/mrpp.html" class="external-link">vegan::mrpp()</a></code>.</p></li>
+<li><p><code>"none"</code> -  Don't run any statistics.</p></li>
 </ul><p>Default: <code>"adonis2"</code> <br><br>
 Abbreviations are allowed.</p></dd>
 
@@ -126,11 +128,12 @@ statistic.</p></li>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
-<code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
-<code><a href="bdiv_stats.html">bdiv_stats</a>()</code></p>
+<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
+<code><a href="bdiv_table.html">bdiv_table</a>()</code></p>
 <p>Other stats_tables: 
 <code><a href="adiv_stats.html">adiv_stats</a>()</code>,
 <code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
@@ -145,22 +148,22 @@ statistic.</p></li>
 <span class="r-in"><span>    <span class="va">hmp10</span>        <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">hmp10</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_distmat.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_table.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu">pull</span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Body Site'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Body Site'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      .n .stat    .z .p.val</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10  9.27  11.0  0.001</span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu">pull</span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      .n .stat    .z .p.val</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10  4.13  3.56  0.012</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># See the R code used to calculate these statistics:</span></span></span>
-<span class="r-in"><span>    <span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu">pull</span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu">distmat_stats</span><span class="op">(</span><span class="va">dm</span>, groups <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">hmp10</span>, <span class="st">'Age'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">stats</span><span class="op">$</span><span class="va">code</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> grouping <span style="color: #00BB00;">&lt;-</span> groups<span style="color: #BBBB00;">[</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>dm, <span style="color: #BBBB00;">'Labels'</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">set.seed</span><span style="color: #BBBB00;">(</span><span style="color: #BB00BB;">0</span><span style="color: #BBBB00;">)</span></span>

@@ -1,0 +1,311 @@
+---
+title: "Statistics"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+
+# Introduction
+
+Visualizations are one of the best ways to identify correlations in your 
+dataset. If you can see a trend with your eyes, then you're on the right track. 
+Rbiom's plotting functions are 
+
+```{r, echo=FALSE, results='asis'}
+cat(glue::glue('
+  <table class="table-borderless">
+  <tr>{adiv_boxplot}{bdiv_corrplot}{rare_barplot}{taxa_boxplot}</tr>
+  <tr>{adiv_corrplot}{bdiv_heatmap}{rare_corrplot}{taxa_corrplot}</tr>
+  <tr>{bdiv_boxplot}{bdiv_ord_plot}{taxa_barplot}{taxa_heatmap}</tr>
+  </table>',
+  .transformer = function (text, ...) {
+    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
+  }))
+```
+
+The `*_boxplot()`, `*_corrplot()`, and `bdiv_ord_plot()` functions will 
+automatically add p-values to your figures whenever possible. The ggplot object 
+they return has `$data`, `$code`, `$stats`, and `$stats$code` attributes you 
+can use to automate, reproduce, and customize your figures.
+
+To generate statistics without creating a plot, use one of the following:
+
+```{r, echo=FALSE, results='asis'}
+cat(glue::glue('
+  <table class="table-borderless">
+  <tr>{adiv_stats}{bdiv_stats}{distmat_stats}{stats_table}{taxa_stats}</tr>
+  </table>',
+  .transformer = function (text, ...) {
+    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
+  }))
+```
+
+
+
+\cr
+
+# Quick Start
+
+Your metadata field of interest and microbiome property will determine which 
+rbiom function to use.
+
+<table>
+<tr>
+<th rowspan=2 class="border-0 border-end border-bottom align-middle">Metadata<br>Property</th>
+<th colspan=3 class="border-0" align="center">Microbiome Property</th>
+</tr><tr>
+<th class="border-bottom">Alpha Diversity<br><span class="eg">Shannon, Simpson</span></th>
+<th class="border-bottom">Beta Diversity<br><span class="eg">UniFrac, Jaccard</span></th>
+<th class="border-bottom">Taxa Abundance<br><span class="eg">Phylum, Genus</span></th>
+</tr><tr>
+<th class="border-end">Categorical<br><span class="eg">Sex, Body Site</span></th>
+<td>`adiv_boxplot()`</td>
+<td>`bdiv_boxplot()`<br>`bdiv_ord_plot()`</td>
+<td>`taxa_boxplot()`</td>
+</tr><tr>
+<th class="border-end">Numeric<br><span class="eg">Age, BMI</span></th>
+<td>`adiv_corrplot()`</td>
+<td>`bdiv_corrplot()`</td>
+<td>`taxa_corrplot()`</td>
+</tr><tr>
+<th class="border-end"><i>Any</i></th>
+<td>`adiv_stats()`</td>
+<td>`bdiv_stats()`</td>
+<td>`taxa_stats()`</td>
+</tr>
+</table>
+
+For instance, to explore the effect of Body Site (a categorical metadata field) 
+on Shannon Diversity (an alpha diversity metric), we'd use `adiv_boxplot()` to 
+produce a plot with statistics, or `adiv_stats()` if we only want the stats.
+
+Although all the functions have important differences, the statistical methods 
+they employ can be grouped by the three plot types: ordination plot, box plot, 
+and correlation plot.
+
+
+\cr
+
+# Ordination Plots
+
+Statistics for ordination plots are the most straight-forward. Set a 
+categorical metadata field to the `color.by` parameter to test whether 
+inter-sample distances are correlated with that variable.
+
+```{r}
+p <- bdiv_ord_plot(
+  biom     = rarefy(hmp50), 
+  color.by = "Body Site", 
+  bdiv     = c("Jaccard", "Bray-Curtis"), 
+  ord      = c("PCoA", "UMAP") )
+p
+p$stats
+
+p$stats$code
+```
+
+The plot subtitles have the summary statistics. Additionally, `p$stats` 
+contains a tibble data.frame with the full statistics table, and `p$stats$code` 
+shows the R commands for reproducing the statistics outside of rbiom.
+
+Note that the ordination statistics are not dependent on the ordination, only 
+the distance metric. This is because the statistics are based on beta diversity 
+distances which are computed prior to ordination.
+
+By default, `bdiv_ord_plot()` applies the perMANOVA test. You can change this 
+to MRPP by specifying `test="mrpp"`. Details on the available tests are below.
+
+| Test      | Function           | Method                                                      |
+| --------- | ------------------ | ----------------------------------------------------------- |
+| `adonis2` | `vegan::adonis2()` | Permutational Multivariate Analysis of Variance (perMANOVA) |
+| `mrpp`    | `vegan::mrpp()`    | Multiple Response Permutation Procedure (MRPP)              |
+
+
+
+\cr
+
+# Box Plots
+
+Statistics on box plots will automatically toggle between pairwise and 
+group-wise statistics based on the values of `x` and `color.by`: `x` controls 
+pairwise and `color.by` controls group-wise. You can set `x` and `color.by` to 
+the same categorical metadata field to get colored pairwise statistics, or set 
+them to different categorical metadata fields to get multiple group-wise 
+statistics per plot.
+
+```{r}
+biom <- rarefy(hmp50) %>% 
+  subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
+
+p1 <- adiv_boxplot(biom, x = "Body Site")
+p2 <- adiv_boxplot(biom, color.by = "Body Site")
+p3 <- adiv_boxplot(biom, x = "Body Site", color.by = "Body Site")
+p4 <- adiv_boxplot(biom, x = "Sex", color.by = "Body Site")
+
+plots <- list(
+  p1 + ggplot2::labs(subtitle = 'x = "Body Site"'), 
+  p2 + ggplot2::labs(subtitle = 'color.by = "Body Site"'), 
+  p3 + ggplot2::labs(subtitle = 'x = color.by = "Body Site"'), 
+  p4 + ggplot2::labs(subtitle = 'x = "Sex", color.by = "Body Site"')) %>%
+  lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL))
+
+patchwork::wrap_plots(plots, guides = "collect")
+```
+
+Above, the two plots on the left are annotated with pairwise statistics while 
+the two on the right have group-wise statistics. As with other plots, you can 
+find the full statistics tables and reproducible R code in the plot attributes.
+
+```{r}
+p1$stats
+
+p2$stats
+
+p2$stats$code
+```
+
+Internally, rbiom uses the non-parametric functions listed below.
+
+| Test          | Function                | Method                                                   |
+| ------------- | ----------------------- | -------------------------------------------------------- |
+| pairwise      | `stats::wilcox.test()`  | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
+| group-wise    | `stats::kruskal.test()` | Kruskal-Wallis Rank Sum Test                             |
+
+
+
+
+\cr
+
+# Correlation Plots
+
+The `test` parameter for these plots allows you to control what statistical 
+question is being addressed.
+
+| Test        | Function              | Question                                       |
+| ----------- | --------------------- | ---------------------------------------------- |
+| `fit`       | `broom::glance.lm()`  | Does the model (e.g. y ~ x) fit the data well? |
+| `trends`    | `emmeans::emtrends()` | Is each trendline's slope non-zero?            |
+| `pw_trends` | `emmeans::emtrends()` | Do pairs of trendlines have different slopes?  |
+| `means`     | `emmeans::emmeans()`  | Is each trendline's mean non-zero?             |
+| `pw_means`  | `emmeans::emmeans()`  | Do pairs of trendlines have different means?   |
+
+
+These are parametric tests. To apply them to alpha diversity, beta diversity, 
+or taxa abundance non-parametric data, rbiom defaults to using the rank 
+transformation, e.g. `adiv_corrplot(biom, trans="rank", ...)`. Therefore, the 
+y-axis title for correlation plots will be something similar to 
+"rank(Shannon Diversity)" and the `$data` plot attribute will contain the rank- 
+transformed Shannon diversity values.
+
+
+Generally, more than one p-value will be generated per plot, for instance, one 
+p-value per trendline or one p-value per pair of trendlines. Showing all the 
+p-values on the plot can get crowded, so instead the plot displays "min(p)", 
+the most significant p-value after correcting for multiple corrections. The 
+caption under the plot provides a quick reminder of what is being tested for.
+
+```{r}
+biom <- rarefy(hmp50) %>% 
+  subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
+
+p <- taxa_corrplot(
+  biom = biom, taxa = "Bacteroides", layers = "tcs", 
+  x = "Age", color.by = "Body Site")
+
+p
+p$stats
+
+p$stats$code
+```
+
+
+Using the corresponding `_stats()` function will generate the same statistics.
+
+```{r}
+biom <- rarefy(hmp50) %>% 
+  subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
+
+taxa_stats(
+  biom = biom, taxa = "Bacteroides", 
+  regr = "Age", stat.by = "Body Site")
+```
+
+
+
+\cr
+
+# Background
+
+
+## Normality
+
+A normal distribution is visualized as a "bell curve", where values further 
+from the mean are observed less often. Microbial abundances do not follow this 
+pattern; it's common to observe high or low abundances more often than a 
+"medium" abundance.
+
+```{r}
+library(ggplot2)
+
+patchwork::wrap_plots(
+  widths = c(1, 1.5),
+
+  ggplot() + 
+    geom_histogram(aes(x=rnorm(1000)), bins = 10) + 
+    ggtitle("Normal Distribution"),
+    
+  ggplot(data = taxa_table(rarefy(hmp50), taxa = 4)) + 
+    geom_histogram(aes(x=.abundance), bins = 10) + 
+    facet_wrap(".taxa") + 
+    ggtitle("Genera Abundance Distributions")
+)
+```
+
+To compensate for this non-normality, rbiom uses the following non-parametric 
+tests for categorical variables that are based on ranking or permutations.
+
+| Test                    | Function                | Used For                   |
+| ----------------------- | ----------------------- | -------------------------- |
+| Wilcoxon Rank-Sum       | `stats::wilcox.test()`  | Pairwise boxplot           |
+| Kruskal-Wallis Rank Sum | `stats::kruskal.test()` | Groupwise boxplot          |
+| Permutational MANOVA    | `vegan::adonis2()`      | `bdiv_ord_plot()` clusters |
+
+For correlation/regression analysis, rbiom uses estimated marginal means 
+(`emmeans::emmeans()`) on rank-transformed values.
+
+Further reading:
+
+* [Applied Multivariate Statistics in R](https://uw.pressbooks.pub/appliedmultivariatestatistics/): 
+[PERMANOVA](https://uw.pressbooks.pub/appliedmultivariatestatistics/chapter/permanova/), 
+[Comparison of Techniques](https://uw.pressbooks.pub/appliedmultivariatestatistics/chapter/comparison-of-techniques/)
+* [R Applications — Part 1: Simple Linear Regression](https://medium.com/datasciencearth/r-applications-part-1-simple-linear-regression-ef5a0e19a05d), 
+particularly the section on [assumption control](https://medium.com/datasciencearth/r-applications-part-1-simple-linear-regression-ef5a0e19a05d#a6f6).
+
+\cr
+
+
+## Compositionality
+
+Compositional data arises when the counts don't represent the entire 
+population. In microbiome studies, the number of microbes that get sequenced 
+is far less than the number of microbes from where the sample was collected. 
+Articles by [Gloor et al](https://doi.org/10.3389/fmicb.2017.02224) and 
+[McMurdie and Holmes](https://doi.org/10.1371/journal.pcbi.1003531) 
+propose the use of their analysis tools (
+[ALDEx2](https://doi.org/doi:10.18129/B9.bioc.ALDEx2) and
+[metagenomeSeq](https://doi.org/doi:10.18129/B9.bioc.metagenomeSeq), 
+respectively) to apply the proper statistical methods for this situation. 
+Conversely, rbiom does not correct for compositionality. This is because 
+correcting for compositionality introduces extra noise into your dataset and 
+severely limits your selection of metrics and visualizations, typically 
+without any significant benefit to analysis.
+

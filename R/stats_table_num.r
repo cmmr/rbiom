@@ -23,14 +23,18 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   #________________________________________________________
   validate_model()
   
+  model_fun  <- model[['fun']]
+  model_fn   <- attr(model_fun, 'fn', exact = TRUE)
+  model_args <- model[['args']]
+  
   
   #________________________________________________________
   # Customize the model formula with actual column names.
   #________________________________________________________
   df %<>% rename_cols(setNames(c('.regr', '.resp', '.stat.by'), c(regr, resp, stat.by)))
-  model[[2]][['formula']] <- local({
+  model_args[['formula']] <- local({
     replacements <- list(x = as.symbol(".regr"), y = as.symbol(".resp"))
-    f <- eval(do.call(substitute, list(model[[2]][['formula']], replacements)))
+    f <- eval(do.call(substitute, list(model_args[['formula']], replacements)))
     if (!is.null(stat.by)) f <- as.formula(paste(format(f), "* .stat.by"))
     return (f)
   })
@@ -39,12 +43,13 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   #________________________________________________________
   # convert
   # from: .resp ~ .regr * .stat.by
-  # to:   .diversity ~ Age * `Body Site`
+  # to:   ".diversity ~ Age * `Body Site`"
   #________________________________________________________
-  formula_sub = with(model, {
+  model_str = local({
     replacements <- list(.regr = as.symbol(regr), .resp = as.symbol(resp))
     if (!is.null(stat.by)) replacements %<>% c(list(.stat.by = as.symbol(stat.by)))
-    eval(do.call(substitute, list(args[['formula']], replacements)))
+    formula <- eval(do.call(substitute, list(model_args[['formula']], replacements)))
+    as.args(c(list(formula), model_args[names(model_args) != 'formula']))
   })
   
   
@@ -66,7 +71,7 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
     #________________________________________________________
     # Apply the model to the provided data from `df`.
     #________________________________________________________
-    m <- do.call(model[[1]], c(list(data = data), model[[2]]), envir = baseenv())
+    m <- do.call(model_fun, c(list(data = data), model_args), envir = baseenv())
     
     
     #________________________________________________________
@@ -156,11 +161,6 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   
   attr(stats, 'code') <- local({
     
-    model_args <- model[[2]]
-    model_args[['formula']] <- formula_sub
-    
-    model_fn      <- attr(model[[1]], 'fn', exact = TRUE)
-    model_arg_str <- as.args(model_args)
     regr_str      <- as.args(list(regr))
     stat.by_str   <- as.args(list(stat.by))
     split.by_str  <- as.args(list(split.by))
@@ -172,12 +172,12 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       emm_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
           sprintf("emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
           sprintf("  emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
           sprintf("  {cmd}\n})") ))
   
@@ -200,12 +200,12 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       emt_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
           sprintf("emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
           sprintf("  emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
           sprintf("  {cmd}\n})") ))
   
@@ -229,11 +229,11 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       broom_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_arg_str),
+          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_arg_str),
+          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
           sprintf("  {cmd}\n}") ))
   
       if (test == 'predict')
@@ -256,29 +256,22 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
   
   
   
-  
-  
-  
   attr(stats, 'tbl_sum') <- c(
     
     'Test'  = switch(
       EXPR      = test,
-      fit       = "Model goodness-of-fit.",
-      terms     = "Significance of model terms. Pr(estimate != 0)",
+      fit       = "Does the below model fit the data well?",
+      terms     = "Are any terms significant? (estimate != 0)",
       predict   = "Observed versus model-predicted values.",
-      means     = "Estimated marginal means (aka least-squares means).",
-      trends    = "Estimated marginal means of linear trends.",
-      pw_means  = "Estimated marginal means - pairwise.",
-      pw_trends = "Estimated marginal means of linear trends - pairwise.",
-      es_means  = "Estimated marginal means - effect sizes.",
-      es_trends = "Estimated marginal means of linear trends - effect sizes.",
+      means     = "Is each trendline's mean non-zero?",
+      trends    = "Is each trendline's slope non-zero?",
+      pw_means  = "Do pairs of trendlines have different means?",
+      pw_trends = "Do pairs of trendlines have different slopes?",
+      es_means  = "Est. marginal means - effect sizes.",
+      es_trends = "Est. marginal means of linear trends - effect sizes.",
       test ),
     
-    'Model' = with(model, {
-        fn   <- attr(fun, 'fn', exact = TRUE)
-        args <- c(list(formula_sub), args[names(args) != 'formula'])
-        sprintf("%s(%s)", fn, as.args(args))
-      }) )
+    'Model' = sprintf("%s(%s)", model_fn, model_str) )
   
   
   if (test == "terms" && !is.null(stat.by))

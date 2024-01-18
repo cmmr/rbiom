@@ -4,14 +4,17 @@ title: "Mapping Metadata to Aesthetics"
 
 ```{r, include = FALSE}
 library(rbiom)
+
 pals <- sapply(simplify = FALSE, names(rbiom:::PALETTES), function (i) {
   sprintf("<td align='right' style='padding-left:20px; padding-right:0'>%s</td><td>%s</td>", i, 
     paste0(collapse = '', "<span style='color:#", rbiom:::PALETTES[[i]], "'>&#9608;</span>") )})
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
-)
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
 ```
 
 

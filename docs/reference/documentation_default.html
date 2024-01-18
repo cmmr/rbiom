@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -251,7 +252,7 @@ by prior to any calculations. Default: <code>NULL</code></p></dd>
 
 <dt>dm</dt>
 <dd><p>A <code>dist</code>-class distance matrix, as returned from
-<code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> or <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>. Required.</p></dd>
+<code><a href="bdiv_table.html">bdiv_distmat()</a></code> or <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code>. Required.</p></dd>
 
 
 <dt>groups</dt>
@@ -301,12 +302,19 @@ Default: <code>NULL</code></p></dd>
 
 <dt>clone</dt>
 <dd><p>Create a copy of <code>biom</code> before modifying. If <code>FALSE</code>, <code>biom</code>
-is modified in place as a side-effect. See <a href="speed_ups.html">speed ups</a> for
+is modified in place as a side-effect. See <a href="speed.html">speed ups</a> for
 use cases. Default: <code>TRUE</code></p></dd>
 
 
 <dt>labels</dt>
 <dd><p>Show sample names under each bar. Default: <code>FALSE</code></p></dd>
+
+
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
 
 </dl></div>
 

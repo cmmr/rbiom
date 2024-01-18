@@ -122,81 +122,58 @@ struct WeighEdges : public Worker
 struct PairwiseDist : public Worker
 {
   const RMatrix<double> sampleEdgeWt;
+  const RMatrix<int>    pairs;
   const RVector<int>    weighted;
-        RVector<double> results;
+        RVector<double> distances;
   
   PairwiseDist(
     const NumericMatrix sampleEdgeWt,
+    const IntegerMatrix pairs,
     const IntegerVector weighted,
-          NumericVector results
+          NumericVector distances
   ) :
     sampleEdgeWt(sampleEdgeWt),
+    pairs(pairs),
     weighted(weighted),
-    results(results)
+    distances(distances)
   {}
   
-  void operator()(std::size_t begin_in, std::size_t end_in) {
+  void operator()(std::size_t begin, std::size_t end) {
     
-    int begin = static_cast<int>(begin_in);
-    int end   = static_cast<int>(end_in);
-    
-    int nIters     = end - begin;
-    int nSamples   = sampleEdgeWt.nrow();
     int nTreeEdges = sampleEdgeWt.ncol();
     
-    
-    // Which two samples are we comparing first?
-    int i  = begin + 1;
-    int n  = nSamples;
-    double i_dbl = static_cast<double>(i);
-    double n_dbl = static_cast<double>(n);
-    int s1 = ceil(.5 * (-1.0 * pow(-8.0 * (i_dbl - 1.0) + 4.0 * pow(n_dbl, 2.0) - 4.0 * n_dbl - 7.0, .5) + 2.0 * n_dbl - 1.0) - 1.0) + 1;
-    int s2 = n - (s1 * (n - 1 - s1) + (s1 * (s1 + 1)) / 2) + i;
-    
-    // Convert from 1-based to 0-based indexing
-    i--;
-    s1--;
-    s2--;
-    
-    // This gets re-incremented on loop entry
-    s2--;
-    
-      
     double x = 0, y = 0, amt_diff = 0, amt_total = 0;
+    
     
     if (weighted[0] == 1) {
       
-      while (nIters-- > 0) { 
-        if (++s2 >= nSamples) { s1++; s2 = s1 + 1; }
+      for (std::size_t i = begin; i < end; i++) {
         
         amt_diff = 0;
         for (int edge = 0; edge < nTreeEdges; edge++) {
-          x = sampleEdgeWt(s1, edge);
-          y = sampleEdgeWt(s2, edge);
+          x = sampleEdgeWt(pairs(i,0), edge);
+          y = sampleEdgeWt(pairs(i,1), edge);
           amt_diff += (x >= y) ? (x - y) : (y - x);
         }
+        distances[i] = amt_diff;
         
-        results[i++] = amt_diff;
       }
       
     } else {
       
-      while (nIters-- > 0) {
-        if (++s2 >= nSamples) { s1++; s2 = s1 + 1; }
+      for (std::size_t i = begin; i < end; i++) {
         
         amt_diff = 0; amt_total = 0;
         for (int edge = 0; edge < nTreeEdges; edge++) {
-          x = sampleEdgeWt(s1, edge);
-          y = sampleEdgeWt(s2, edge);
+          x = sampleEdgeWt(pairs(i,0), edge);
+          y = sampleEdgeWt(pairs(i,1), edge);
           amt_diff  += (x && y) ? (0) : (x + y);
           amt_total += (x && y) ? (x) : (x + y);
         }
-        
-        results[i++] = amt_diff / amt_total;
+        distances[i] = amt_diff / amt_total;
       }
       
     }
-    
     
   }
 };
@@ -206,7 +183,7 @@ struct PairwiseDist : public Worker
 
 
 // [[Rcpp::export]]
-NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted) {
+NumericVector par_unifrac(List sparseMatrix, IntegerMatrix pairs, List tree, IntegerVector weighted) {
   
   //======================================================
   // Assumptions:
@@ -215,7 +192,7 @@ NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted) 
   //======================================================
   
   //======================================================
-  // Convert biom and tree to C++ objects
+  // Convert slam matrix and phylo tree to C++ objects.
   //======================================================
   
   IntegerVector mtxSample    = as<IntegerVector>(sparseMatrix["j"]);
@@ -264,29 +241,13 @@ NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted) 
   }
   
   
-  //======================================================
-  // R style dist object, initialized to zero
-  //======================================================
-  
-  int nIndices = (nSamples * nSamples - nSamples) / 2;
-  NumericVector results(nIndices);
-  results.attr("class")  = "dist";
-  results.attr("Size")   = nSamples;
-  results.attr("Upper")  = false;
-  results.attr("Diag")   = false;
-  results.attr("Labels") = sampleNames;
-  
-  
   
   //======================================================
   // Trace the path from each leaf to the root node
   //======================================================
   
   IntegerMatrix edge2leaves = IntegerMatrix(nTreeEdges, nOTUs);
-  TraverseTree traverseTree(
-      childAt, 
-      treeEdge, 
-      edge2leaves);
+  TraverseTree traverseTree(childAt, treeEdge, edge2leaves);
   parallelFor(1, nOTUs + 1, traverseTree, 10000);
   
   
@@ -310,13 +271,12 @@ NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted) 
   //======================================================
   // Compute Pairwise Distances
   //======================================================
-  PairwiseDist pairwiseDist(
-      sampleEdgeWt,
-      weighted,
-      results);
-  parallelFor(0, results.size(), pairwiseDist, 10000);
+  
+  NumericVector distances(pairs.nrow());
+  PairwiseDist pairwiseDist(sampleEdgeWt, pairs, weighted, distances);
+  parallelFor(0, distances.size(), pairwiseDist, 10000);
   
   
-  return results;
+  return distances;
 }
 

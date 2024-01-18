@@ -178,18 +178,15 @@ init_boxplot_layers <- function (params = parent.frame()) {
     
     # Show/hide/customize boxplot outliers.
     #________________________________________________________
-    with(params, {
-      
-      if (is.null(outliers))
-        outliers <- !any(hasName(layers, c('dot', 'strip')))
-      
-      if (isFALSE(outliers)) {
-        layers$box$outlier.shape <- NA
-      } else {
-        layers$box$outlier.size  <- params$pt.size
-        layers$box$outlier.alpha <- params$pt.alpha
-      }
-    })
+    if (is.null(params$outliers))
+      params$outliers <- !any(hasName(params$layers, c('dot', 'strip')))
+    
+    if (isFALSE(params$outliers)) {
+      params$layers$box$outlier.shape <- NA
+    } else {
+      params$layers$box$outlier.size  <- params$pt.size
+      params$layers$box$outlier.alpha <- params$pt.alpha
+    }
     
   }
   

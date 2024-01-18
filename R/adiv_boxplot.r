@@ -37,7 +37,7 @@ adiv_boxplot <- function (
     biom, x = NULL, adiv = "Shannon", layers = "bld",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = NULL, p.adj = "fdr", p.label = 0.05, ci = "ci", level = 0.95, 
-    outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
+    trans = "none", outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
   biom <- as_rbiom(biom)
@@ -81,7 +81,17 @@ adiv_boxplot <- function (
     
     # Compute each adiv metric separately: shannon, etc
     #________________________________________________________
-    .ggdata <- adiv_table(biom, adiv = adiv)
+    .ggdata <- adiv_table(biom, adiv = adiv, trans = trans)
+    
+    
+    # axis titles
+    #________________________________________________________
+    if (length(adiv) == 1)
+      .ylab <- switch (
+        EXPR    = adiv,
+        'OTUs'  = "Observed OTUs",
+        'Depth' = "Sequencing Depth",
+        paste(adiv, "Diversity") )
     
     
     # Facet on multiple adiv metrics
@@ -89,6 +99,7 @@ adiv_boxplot <- function (
     if (length(adiv) > 1) {
       facet.by %<>% c('.adiv')
       .free_y <- TRUE
+      .ylab <- aa("\u03B1 Dissimilarity", display = '"\\u03B1 Dissimilarity"')
     }
     
   })
@@ -99,28 +110,6 @@ adiv_boxplot <- function (
   # Initialize the layers environment.
   #________________________________________________________
   init_boxplot_layers(params)
-  
-  
-  
-  #________________________________________________________
-  # Default y-axis title
-  #________________________________________________________
-  set_layer(params, 'labs', y = with(params, {
-    
-    if (length(adiv) > 1) {
-      
-      "Diversity (\u03B1)" %>% 
-        aa(display = '"Diversity (\\u03B1)"')
-      
-    } else {
-      
-      switch (
-        EXPR    = adiv,
-        'OTUs'  = "Observed OTUs",
-        'Depth' = "Sequencing Depth",
-        paste(adiv, "Diversity") )
-      
-    }}))
   
   
   

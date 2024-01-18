@@ -15,16 +15,15 @@ rescale_rows(mtx)
 \arguments{
 \item{mtx}{A matrix-like object.}
 
-\item{depth}{The number of observations to keep, per column (sample). If
-set to \code{'auto'}, a depth will be automatically selected. Samples
-that have fewer than this number of observations will be dropped. If
-called on data with non-integer abundances, values will be re-scaled
-to integers between 1 and \code{depth} such that they sum to \code{depth}.
-Default: \code{'auto'}}
+\item{depth}{How many observations to keep per sample. When
+\verb{0 < depth < 1}, it is taken as the minimum percentage of the
+dataset's observations to keep. Ignored when \code{n} is specified.
+Default: \code{0.1}}
 
-\item{n}{The number of samples to retain, or if negative, the number of
-samples to drop. If \code{NULL}, the number kept/dropped is automatically
-selected. When not \code{NULL}, overrides any value given to \code{depth.}
+\item{n}{The number of samples to keep. When \verb{0 < n < 1}, it is taken as
+the percentage of samples to keep. If negative, that number or
+percentage of samples is dropped. If \code{0}, all samples are kept. If
+\code{NULL}, \code{depth} is used instead.
 Default: \code{NULL}}
 
 \item{seed}{An integer to use for seeding the random number generator. If
@@ -63,7 +62,6 @@ sums or column sums equal 1.
 }
 \seealso{
 Other rarefaction: 
-\code{\link{pull.rbiom}()},
 \code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},

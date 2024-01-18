@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,13 +59,14 @@
     <a class="dropdown-item" href="articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -139,21 +140,21 @@
 <p><img src="reference/figures/README-stats-1.png"><!-- --></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stats.html">taxa_stats</a></span><span class="op">(</span><span class="va">biom</span>, regr <span class="op">=</span> <span class="st">"Age"</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, taxa <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # Test:     Estimated marginal means of linear trends.</span></span>
+<span><span class="co">#&gt; # Test:     Is each trendline's slope non-zero?</span></span>
 <span><span class="co">#&gt; # Model:    stats::lm(.abundance ~ Age * `Body Site`)</span></span>
 <span><span class="co">#&gt; # A tibble: 80 × 10</span></span>
-<span><span class="co">#&gt;    .taxa       `Body Site`    .trend   .se   .df .lower .upper  .t.ratio  .p.val</span></span>
-<span><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Lactobacil… Anterior n… -6.82e- 3  8.45    39  -17.1   17.1 -8.06e- 4 9.99e-1</span></span>
-<span><span class="co">#&gt;  2 Lactobacil… Buccal muc… -2.68e- 2 17.6     39  -35.7   35.6 -1.52e- 3 9.99e-1</span></span>
-<span><span class="co">#&gt;  3 Lactobacil… Mid vagina  -3.13e+ 1  8.42    39  -48.4  -14.3 -3.72e+ 0 6.19e-4</span></span>
-<span><span class="co">#&gt;  4 Lactobacil… Saliva      -2.33e- 2 11.3     39  -22.9   22.9 -2.06e- 3 9.98e-1</span></span>
-<span><span class="co">#&gt;  5 Lactobacil… Stool        4.75e-15 13.8     39  -27.9   27.9  3.44e-16 1   e+0</span></span>
-<span><span class="co">#&gt;  6 Streptococ… Anterior n…  1.50e+ 0  6.15    39  -10.9   13.9  2.45e- 1 8.08e-1</span></span>
-<span><span class="co">#&gt;  7 Streptococ… Buccal muc… -5.33e+ 1 12.8     39  -79.2  -27.3 -4.16e+ 0 1.71e-4</span></span>
-<span><span class="co">#&gt;  8 Streptococ… Mid vagina  -1.33e- 1  6.12    39  -12.5   12.2 -2.17e- 2 9.83e-1</span></span>
-<span><span class="co">#&gt;  9 Streptococ… Saliva      -4.56e+ 0  8.23    39  -21.2   12.1 -5.55e- 1 5.82e-1</span></span>
-<span><span class="co">#&gt; 10 Streptococ… Stool        3.37e- 2 10.0     39  -20.3   20.3  3.35e- 3 9.97e-1</span></span>
+<span><span class="co">#&gt;    .taxa      `Body Site`    .trend   .se   .df  .lower .upper  .t.ratio  .p.val</span></span>
+<span><span class="co">#&gt;    &lt;fct&gt;      &lt;fct&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Lactobaci… Anterior n… -3.47e- 1  1.25    39  -2.88    2.19 -2.77e- 1 0.783  </span></span>
+<span><span class="co">#&gt;  2 Lactobaci… Buccal muc… -5.09e- 1  2.61    39  -5.79    4.78 -1.95e- 1 0.847  </span></span>
+<span><span class="co">#&gt;  3 Lactobaci… Mid vagina  -4.29e+ 0  1.25    39  -6.81   -1.76 -3.44e+ 0 0.00142</span></span>
+<span><span class="co">#&gt;  4 Lactobaci… Saliva      -4.42e- 1  1.68    39  -3.84    2.95 -2.63e- 1 0.794  </span></span>
+<span><span class="co">#&gt;  5 Lactobaci… Stool        8.33e-16  2.05    39  -4.14    4.14  4.07e-16 1      </span></span>
+<span><span class="co">#&gt;  6 Streptoco… Anterior n…  3.71e+ 0  2.05    39  -0.436   7.85  1.81e+ 0 0.0780 </span></span>
+<span><span class="co">#&gt;  7 Streptoco… Buccal muc… -3.01e+ 0  4.27    39 -11.6     5.63 -7.04e- 1 0.486  </span></span>
+<span><span class="co">#&gt;  8 Streptoco… Mid vagina  -1.60e+ 0  2.04    39  -5.72    2.53 -7.83e- 1 0.438  </span></span>
+<span><span class="co">#&gt;  9 Streptoco… Saliva      -3.38e+ 0  2.74    39  -8.92    2.17 -1.23e+ 0 0.225  </span></span>
+<span><span class="co">#&gt; 10 Streptoco… Stool        7.56e- 1  3.35    39  -6.01    7.52  2.26e- 1 0.822  </span></span>
 <span><span class="co">#&gt; # ℹ 70 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 1 more variable: .adj.p &lt;dbl&gt;</span></span></code></pre></div>
 </div>

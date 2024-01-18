@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,13 +49,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -118,19 +119,19 @@ R package.</li>
 <span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
 <span><span class="va">mtx</span></span>
 <span><span class="co">#&gt;      Sample1 Sample2 Sample3 Sample4</span></span>
-<span><span class="co">#&gt; OTU1     521     600     686     505</span></span>
-<span><span class="co">#&gt; OTU2     194      81     148     551</span></span>
-<span><span class="co">#&gt; OTU3     330     158     259     439</span></span>
-<span><span class="co">#&gt; OTU4     268     533      72     770</span></span>
-<span><span class="co">#&gt; OTU5     271     113      85     532</span></span>
-<span><span class="co">#&gt; OTU6     195     985     515      32</span></span>
+<span><span class="co">#&gt; OTU1     650     705     595     407</span></span>
+<span><span class="co">#&gt; OTU2     632     381      60     275</span></span>
+<span><span class="co">#&gt; OTU3     195     530     393      53</span></span>
+<span><span class="co">#&gt; OTU4     459       8     198     152</span></span>
+<span><span class="co">#&gt; OTU5     625     920     726     103</span></span>
+<span><span class="co">#&gt; OTU6     491     588     399     812</span></span>
 <span></span>
 <span><span class="co"># convert matrix to rbiom -----------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2023-12-22)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-01-18)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU1, OTU6, OTU4, OTU3, OTU5, and OTU2</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU6, OTU2, OTU3, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       1 Metadata: .sample</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
@@ -147,29 +148,12 @@ R package.</li>
 <span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">phy</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Imported PhyloSeq Data (2023-12-22)</span></span>
+<span><span class="co">#&gt; Imported PhyloSeq Data (2024-01-18)</span></span>
 <span><span class="co">#&gt;       6 Samples:  Sample1, Sample2, ..., and Sample6</span></span>
 <span><span class="co">#&gt;       5 OTUs:     GG_OTU_2, GG_OTU_3, GG_OTU_4, ...</span></span>
 <span><span class="co">#&gt;       8 Ranks:    .otu, Rank1, Rank2, ..., and Rank7</span></span>
 <span><span class="co">#&gt;       5 Metadata: .sample, BarcodeSequence, ...</span></span>
-<span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># @export</span></span>
-<span><span class="co"># @examples</span></span>
-<span><span class="co">#     library(rbiom)</span></span>
-<span><span class="co">#     </span></span>
-<span><span class="co">#     biom &lt;- hmp50$clone()</span></span>
-<span><span class="co">#     taxa &lt;- c('Unc53100', 'Unc00c7g', 'Unc25731')</span></span>
-<span><span class="co">#     </span></span>
-<span><span class="co">#     biom$counts[taxa,1:5]</span></span>
-<span><span class="co">#     </span></span>
-<span><span class="co">#     biom$counts %&lt;&gt;% rarefy(depth = 100)</span></span>
-<span><span class="co">#     biom$counts[taxa,1:5]</span></span>
-<span><span class="co">#     </span></span>
-<span><span class="co">#     biom$counts &lt;- biom$counts / 100</span></span>
-<span><span class="co">#     biom$counts[taxa,1:5]</span></span>
-<span><span class="co">#     </span></span></code></pre></div>
+<span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span></code></pre></div>
 <p>Now we have <code>biom</code>, an rbiom-class object that can be used
 with this package’s functions. If you loaded your data from a BIOM file
 or phyloseq object, it might already include metadata, ranks, and a
@@ -187,7 +171,7 @@ sample.</p>
 <li>
 <code>.sample</code> should be the first column.</li>
 <li>Other column names cannot start with a dot (<code>.</code>).</li>
-<li>Sample names need to match <code>sample_names(biom)</code>.</li>
+<li>Sample names need to match <code>biom$samples</code>.</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create example metadata -----------------------</span></span>
@@ -207,9 +191,9 @@ sample.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">md</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2023-12-22)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-01-18)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU1, OTU6, OTU4, OTU3, OTU5, and OTU2</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU6, OTU2, OTU3, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
@@ -217,9 +201,9 @@ sample.</p>
 <span><span class="co"># or in a single step ---------------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">mtx</span>, metadata <span class="op">=</span> <span class="va">md</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2023-12-22)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-01-18)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU1, OTU6, OTU4, OTU3, OTU5, and OTU2</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU6, OTU2, OTU3, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span></code></pre></div>
@@ -252,9 +236,9 @@ object directly, or a newick file/string.</p>
 <code class="sourceCode R"><span><span class="co"># define a random tree --------------------------</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">"(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2023-12-22)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-01-18)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU1, OTU6, OTU4, OTU3, OTU5, and OTU2</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU6, OTU2, OTU3, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>
@@ -281,9 +265,9 @@ OTU.</p>
 <span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span> <span class="op">&lt;-</span> <span class="va">map</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2023-12-22)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-01-18)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU1, OTU6, OTU4, OTU3, OTU5, and OTU2</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU1, OTU6, OTU2, OTU3, and OTU4</span></span>
 <span><span class="co">#&gt;       3 Ranks:    .otu, Phylum, and Order</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>

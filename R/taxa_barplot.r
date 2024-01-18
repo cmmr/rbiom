@@ -315,7 +315,7 @@ taxa_barplot <- function (
       layer  = 'yaxis', 
       'expand' = c(0, 0, 0.02, 0),
       'breaks' = with(params, base::pretty(.ggdata[[.ycol]])),
-      'labels' = si_units )
+      'labels' = label_number(scale_cut = cut_si("")) )
     
     set_layer(
       params = params, 

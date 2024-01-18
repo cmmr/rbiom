@@ -5,8 +5,8 @@
 \title{documentation_plot_stats_return}
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 documentation_plot_stats_return

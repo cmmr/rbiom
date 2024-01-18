@@ -61,6 +61,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
     } else if (o == "tSNE") {
       args <- c(fun_params(tsne::tsne, dots), list(X = dm, k = k))
       res  <- suppressMessages(do.call(tsne::tsne, args))
+      rownames(res) <- attr(dm, "Labels", exact = TRUE)
       
     } else if (o == "NMDS") {
       args <- c(fun_params(vegan::metaMDS, dots), list(comm = dm, k = k))
@@ -102,7 +103,6 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
         NMDS = "vegan::metaMDS(%s)",
         UMAP = "uwot::umap(%s)" )) %>%
       sprintf(as.args(params$.args))
-  
   
   
   

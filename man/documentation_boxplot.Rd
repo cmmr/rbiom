@@ -7,13 +7,11 @@
 \item{x}{A categorical metadata column name to use for the x-axis. The
 default, \code{NULL}, groups all samples into a single category.}
 
-\item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
-\code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
-\code{"linerange"}, and \code{"pointrange"}. Single letter
-abbreviations are also accepted. For instance, \code{c("box", "dot")}
-is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \code{vignette("boxplots")} for examples of each.
-Default: \code{"bld"}.}
+\item{layers}{One or more of
+\code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
+Single letter abbreviations are also accepted. For instance,
+\code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for aesthetics and partitioning. Default: \code{NULL}}
@@ -36,8 +34,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 documentation_boxplot

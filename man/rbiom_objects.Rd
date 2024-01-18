@@ -15,7 +15,7 @@ subsetting. To create an rbiom object, see \code{\link[=as_rbiom]{as_rbiom()}}.
 Use \verb{$clone()} to create a copy of an rbiom object. This is necessary
 because rbiom objects are \strong{passed by reference}. The usual \verb{<-} assignment
 operator will simply create a second reference to the same object - it will
-not create a second object. See \link[=speed_ups]{Speed Ups} for more details.
+not create a second object. See \link[=speed]{speed ups} for more details.
 \cr\cr
 }
 \section{Readable Fields}{

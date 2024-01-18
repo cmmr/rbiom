@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -81,9 +82,10 @@
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  test <span class="op">=</span> <span class="st">"trends"</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"rank"</span>,</span>
 <span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -118,11 +120,11 @@ Default: <code>6</code>.</p></dd>
 
 
 <dt>layers</dt>
-<dd><p><code>"trend"</code>, <code>"scatter"</code>. Single letter
-abbreviations are also accepted. For instance,
-<code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and
-<code>"ts"</code>. See <code>vignette("corrplots")</code> for examples of each.
-Default: <code>"t"</code>.</p></dd>
+<dd><p>One or more of
+<code>c("trend", "confidence", "scatter", "residual", "name")</code>. Single
+letter abbreviations are also accepted. For instance,
+<code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and <code>"ts"</code>.
+See plot types for examples of each. Default: <code>"t"</code></p></dd>
 
 
 <dt>color.by, facet.by, limit.by</dt>
@@ -146,9 +148,11 @@ Default: <code>"trends"</code></p></dd>
 additional details. Default: <code>"lm"</code></p></dd>
 
 
-<dt>level</dt>
-<dd><p>The confidence level for calculating a confidence interval.
-Default: <code>0.95</code></p></dd>
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
 
 
 <dt>p.top</dt>
@@ -165,6 +169,11 @@ Default: <code>Inf</code></p></dd>
 <dd><p>Method to use for multiple comparisons adjustment of
 p-values. Run <code>p.adjust.methods</code> for a list of available
 options. Default: <code>"fdr"</code></p></dd>
+
+
+<dt>level</dt>
+<dd><p>The confidence level for calculating a confidence interval.
+Default: <code>0.95</code></p></dd>
 
 
 <dt>caption</dt>
@@ -234,6 +243,10 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
+<p>By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+<code>model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>
@@ -290,6 +303,7 @@ and <code>"fishy"</code>.</p>
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,

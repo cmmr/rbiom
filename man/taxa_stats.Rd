@@ -13,6 +13,7 @@ taxa_stats(
   test = ifelse(is.null(regr), "means", "trends"),
   model = "lm",
   level = 0.95,
+  trans = ifelse(is.null(regr), "none", "rank"),
   lineage = FALSE,
   unc = "singly",
   other = FALSE,
@@ -46,10 +47,9 @@ character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
 \item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
-\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
-\code{"pw_means"}, or \code{"pw_trends"}.
+found in the "Statistical Tests" section below. One of \code{"predict"},
+\code{"terms"}, \code{"fit"}, \code{"means"}, \code{"trends"}, \code{"es_means"},
+\code{"es_trends"}, \code{"pw_means"}, or \code{"pw_trends"}.
 Default: \code{ifelse(is.null(regr), "means", "trends")}}
 
 \item{model}{What type of trend model to fit to the data. Options are:
@@ -60,9 +60,14 @@ additional details. Default: \code{"lm"}}
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
+
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
-\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
 Otherwise the taxa name will simply be \code{Coriobacteriales}. You
 want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
@@ -95,7 +100,7 @@ options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}.
+The R code or generating these statistics is in \verb{$code}.
 }
 \description{
 Test taxa abundances for significant differences.
@@ -159,6 +164,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \examples{

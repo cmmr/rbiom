@@ -20,8 +20,8 @@
 taxa_corrplot <- function (
     biom, x, rank = -1, taxa = 6, layers = "t",
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "trends", model = "lm", level = 0.95, 
-    p.top = Inf, p.adj = "fdr", caption = TRUE, ...) {
+    test = "trends", model = "lm", trans = "rank", 
+    p.top = Inf, p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -42,6 +42,7 @@ taxa_corrplot <- function (
   # Validate and restructure user's arguments.
   #________________________________________________________
   with(params, {
+    
     validate_rank(max = Inf)
     validate_meta_aes('x', col_type = "num")
     validate_meta_aes('color.by', null_ok = TRUE)
@@ -58,17 +59,24 @@ taxa_corrplot <- function (
   #________________________________________________________
   with(params, {
     
-    if (!is.null(biom$depth))
-      biom$counts %<>% rescale_cols()
-    
     
     # Compute each rank separately: phylum, genus, etc
     #________________________________________________________
     .ggdata <- taxa_table(
-      biom = biom,
-      rank = rank,
-      taxa = taxa,
-      md   = unique(c(x, names(color.by), facet.by)) )
+      biom  = biom, 
+      rank  = rank, 
+      taxa  = taxa, 
+      md    = unique(c(x, names(color.by), facet.by)), 
+      trans = trans )
+    
+    
+    # axis titles
+    #________________________________________________________
+    .ylab <- {
+      if      (eq(trans, 'percent')) { "Relative Abundance" }
+      else if (is.null(biom$depth))  { "Unrarefied Counts"  }
+      else                           { "Rarefied Counts"    }
+    }
     
     
     # Facet on multiple taxa/ranks
@@ -87,25 +95,6 @@ taxa_corrplot <- function (
   # Create and customize layer definitions.
   #________________________________________________________
   init_corrplot_layers(params)
-  
-  
-  
-  
-  #________________________________________________________
-  # y-axis title and scale
-  #________________________________________________________
-  set_layer(params, 'labs', y = with(params, {
-    
-    ifelse(
-      test = is.null(biom$depth), 
-      yes  = paste(rank, "Abundance [UNRAREFIED]"), 
-      no   = paste(rank, "Relative Abundance") )
-    
-  }))
-  
-  if (all(params$.ggdata[['.y']] <= 1))
-    set_layer(params, 'yaxis', labels = scales::percent)
-  
   
   
   #________________________________________________________

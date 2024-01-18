@@ -21,14 +21,13 @@
 #'     taxa_heatmap(hmp10, rank="Phylum", color.by="Body Site")
 #'     
 taxa_heatmap <- function (
-    biom, rank = -1, taxa = 6,
-    grid = list(label = "{rank} Abundance", colors = "bilbao"),
+    biom, rank = -1, taxa = 6, grid = "bilbao",
     color.by = NULL, order.by = NULL, limit.by = NULL, 
     other = FALSE, unc = "singly", lineage = FALSE, 
     label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
     clust = "complete", dist = "euclidean", 
-    tree_height = NULL, track_height = NULL, ratio=1, 
-    legend = "right", xlab.angle = "auto", ...) {
+    asp = 1, tree_height = 10, track_height = 10, 
+    legend = "right", title = TRUE, xlab.angle = "auto", ...) {
   
   biom <- as_rbiom(biom)
   
@@ -56,9 +55,13 @@ taxa_heatmap <- function (
     ranks <- params$rank
     
     plots <- sapply(ranks, simplify = FALSE, function (rank) {
-      params[['rank']]       <- rank
-      params[['labs.title']] <- rank
-      do.call(taxa_heatmap, fun_params(taxa_heatmap, params))
+      
+      args <- fun_params(taxa_heatmap, params)
+      args[['rank']] <- rank
+      if (isTRUE(params$title))
+        args[['title']] <- rank
+      
+      do.call(taxa_heatmap, args)
     })
     
     p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
@@ -88,9 +91,18 @@ taxa_heatmap <- function (
   #________________________________________________________
   with(params, {
     
-    if (!is_list(grid))                   grid       <- list(colors = grid)
-    if (!is_scalar_character(grid$label)) grid$label <- "{rank} Abundance"
-    grid$label %<>% sub("{rank}", rank, ., fixed = TRUE)
+    if (isTRUE(title))
+      title <- paste(rank, "Abundance")
+    
+    validate_var_choices('rescale', choices = c("none", "cols", "rows"))
+    
+    if (!is_list(grid)) grid <- list(colors = grid)
+    if (!is_scalar_character(grid$label)) {
+      grid$label <- if (rescale != "none") { "Rescaled Abundance"
+      } else if (is.null(biom$depth))      { "Unrarefied Reads"
+      } else if (biom$depth == 1)          { "Relative Abundance"
+      } else                               { "Rarefied Reads" }
+    }
     
     if (length(clust)    < 1) clust <- "complete"
     if (length(order.by) > 0) clust <- c(clust[[1]], NA)
@@ -110,6 +122,9 @@ taxa_heatmap <- function (
     validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
     
     sync_metadata()
+    
+    if (!(is.null(title) || (is_scalar_character(title) && !is.na(title))))
+      cli_abort("title must be TRUE, NULL, or a character string, not {.type {title}}: {title}.")
     
     if (biom$n_samples < 1)
       stop("At least one sample is needed for a heatmap.")

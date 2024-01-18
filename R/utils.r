@@ -95,11 +95,12 @@ eval_envir <- function (env, ...) {
           'x', 'color.by', 'shape.by', 'facet.by', 
           'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
           'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
-          'within', 'between', 'tree', 'params' ))))
+          'within', 'between', 'tree', 'params',
+          'xaxis.trans', 'yaxis.trans' ))))
     
     if (nzchar(invalid)) {
       fn <- deparse(rlang::caller_call()[[1]])
-      stop (sprintf("%s does not accept parameter(s): %s", fn, invalid))
+      cli_abort(c(x = "{fn} does not accept parameter(s): {invalid}"))
     }
     
   }
@@ -269,6 +270,9 @@ fun_toString <- function (x) {
           fn <- sprintf("%s::%s", pkg, fn)
         return (fn)
       }
+  
+  if (!is.null(srcref <- attr(x, 'srcref',  exact = TRUE)))
+    return (capture.output(srcref))
   
   chr <- paste0(capture.output(x), collapse = "")
   if (nchar(chr) < 50) return (chr)
@@ -483,15 +487,13 @@ finite_check <- function (df, col=".y", metric=NULL) {
 #____________________________________________________________________
 # Log scale labels
 #____________________________________________________________________
-si_units <- as.cmd(scales::label_number(scale_cut = scales::cut_si("")))
-
 loglabels <- function (values) {
   
   hi <- ceiling(log10(max(force(values))))
   list(
     'breaks'       = as.cmd(10 ** (0:hi),                    env = list(hi = hi)),
     'minor_breaks' = as.cmd(as.vector(2:9 %o% 10 ** (0:hi)), env = list(hi = hi - 1)),
-    'labels'       = si_units )
+    'labels'       = label_number(scale_cut = cut_si("")) )
 }
 
 # siunit <- function (x) {

@@ -20,8 +20,8 @@
 bdiv_boxplot <- function (
   biom, x = NULL, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, layers = "bld",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
-  within = NULL, between = NULL, flip = FALSE, stripe = NULL, p.adj = "fdr", p.label = 0.05, 
-  ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
+  within = NULL, between = NULL, trans = "none", flip = FALSE, stripe = NULL, p.adj = "fdr", 
+  p.label = 0.05, ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {
   
   
   biom <- as_rbiom(biom)
@@ -79,17 +79,25 @@ bdiv_boxplot <- function (
         tree     = tree, 
         md       = ".all",
         within   = within,
-        between  = between ) %>%
+        between  = between, 
+        trans    = trans ) %>%
       within({
         .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
         .bdiv <- factor(.bdiv, levels = unique(.bdiv))
         remove(".weighted") })
     
     
+    # axis titles
+    #________________________________________________________
+    .ylab <- paste(bdiv, "Distance")
+    
+    
     # Facet on multiple bdiv metrics
     #________________________________________________________
-    if (length(bdiv) > 1)
+    if (length(bdiv) > 1) {
       facet.by %<>% c(".bdiv")
+      .ylab <- aa("\u03B2 Dissimilarity", display = '"\\u03B2 Dissimilarity"')
+    }
   })
   
   
@@ -98,23 +106,6 @@ bdiv_boxplot <- function (
   # Initialize the layers environment.
   #________________________________________________________
   init_boxplot_layers(params)
-  
-  
-  #________________________________________________________
-  # y-axis title
-  #________________________________________________________
-  bdiv <- params$bdiv
-  
-  if (length(bdiv) > 1) {
-    ylab <- structure(
-      .Data   = "Dissimilarity (\u03B2)", 
-      display = '"Dissimilarity (\\u03B2)"' )
-    
-  } else {
-    ylab <- paste(bdiv, "Distance")
-  }
-  
-  set_layer(params, 'labs', y = ylab)
   
   
   #________________________________________________________

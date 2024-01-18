@@ -12,7 +12,7 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."><!-- mathjax -->
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,13 +33,14 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."><!-- mathjax -->
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -105,12 +106,12 @@ For example:</p><ul><li><p><em>file</em> -  Filepath or URL to a biom file.</p><
 <span class="r-in"><span>      dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">mtx</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Sample1 Sample2 Sample3 Sample4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU1     351     261     112     906</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU2     654     250     993      23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU3     427     665     762     691</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU4     378     549     699     384</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU5     632     484     246     148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU6     440     342     636     389</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU1     402     289      51     300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU2     195     678     530     636</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU3     403     735     695     479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU4      63     195     688     432</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU5     388     980      31     706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU6     975     741     225     948</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># and some sample metadata ----------------------</span></span></span>
 <span class="r-in"><span>    <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -121,9 +122,9 @@ For example:</p><ul><li><p><em>file</em> -  Filepath or URL to a biom file.</p><
 <span class="r-in"><span>    <span class="co"># convert data set to rbiom ---------------------</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">as_rbiom</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">mtx</span>, metadata <span class="op">=</span> <span class="va">df</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An rbiom object (2023-12-22)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An rbiom object (2024-01-18)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       6 OTUs:     OTU3, OTU4, OTU2, OTU6, OTU1, and OTU5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       6 OTUs:     OTU6, OTU3, OTU5, OTU2, OTU4, and OTU1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1 Ranks:    .otu</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       3 Metadata: .sample, treatment, and days</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         Tree:     &lt;absent&gt;</span>

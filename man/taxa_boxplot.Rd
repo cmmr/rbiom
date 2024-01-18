@@ -26,6 +26,7 @@ taxa_boxplot(
   level = 0.95,
   outliers = NULL,
   xlab.angle = "auto",
+  trans = "percent",
   y.trans = "sqrt",
   caption = TRUE,
   ...
@@ -51,13 +52,11 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
-\item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
-\code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
-\code{"linerange"}, and \code{"pointrange"}. Single letter
-abbreviations are also accepted. For instance, \code{c("box", "dot")}
-is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \code{vignette("boxplots")} for examples of each.
-Default: \code{"bld"}.}
+\item{layers}{One or more of
+\code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
+Single letter abbreviations are also accepted. For instance,
+\code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -128,6 +127,11 @@ overlaying a dot or strip chart.  Default: \code{NULL}}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
+
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
 a non-linear axis. Options are:
@@ -152,8 +156,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 Visualize BIOM data with boxplots.
@@ -164,7 +168,9 @@ Visualize BIOM data with boxplots.
     biom <- rarefy(hmp50)
     
     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
-    taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
+    taxa_boxplot(
+      biom = biom, taxa = 3, layers = "ps", 
+      color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")) )
     
 }
 \seealso{
@@ -180,6 +186,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

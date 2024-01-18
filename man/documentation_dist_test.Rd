@@ -11,6 +11,7 @@ statistics should be calculated. Required.}
 \itemize{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+\item{\code{"none"} - }{ Don't run any statistics. }
 }
 Default: \code{"adonis2"} \cr\cr
 Abbreviations are allowed.}

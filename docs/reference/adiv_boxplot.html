@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -86,6 +87,7 @@
 <span>  p.label <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ci <span class="op">=</span> <span class="st">"ci"</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  outliers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -114,13 +116,11 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 
 
 <dt>layers</dt>
-<dd><p><code>"bar"</code>, <code>"box" ("x")</code>, <code>"violin"</code>,
-<code>"dot"</code>, <code>"strip"</code>, <code>"crossbar"</code>, <code>"errorbar"</code>,
-<code>"linerange"</code>, and <code>"pointrange"</code>. Single letter
-abbreviations are also accepted. For instance, <code>c("box", "dot")</code>
-is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
-See <code>vignette("boxplots")</code> for examples of each.
-Default: <code>"bld"</code>.</p></dd>
+<dd><p>One or more of
+<code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
+Single letter abbreviations are also accepted. For instance,
+<code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
+See plot types for examples of each. Default: <code>"bld"</code></p></dd>
 
 
 <dt>color.by, pattern.by, shape.by, facet.by, limit.by</dt>
@@ -169,6 +169,13 @@ the median. Default: <code>"ci"</code></p></dd>
 Default: <code>0.95</code></p></dd>
 
 
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
+
+
 <dt>outliers</dt>
 <dd><p>Show boxplot outliers? <code>TRUE</code> to always show.
 <code>FALSE</code> to always hide. <code>NULL</code> to only hide them when
@@ -212,6 +219,7 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <p>Other visualization: 
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,

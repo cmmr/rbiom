@@ -43,26 +43,6 @@ phy
 
 biom <- as_rbiom(biom = phy)
 biom
-
-
-# @export
-# @examples
-#     library(rbiom)
-#     
-#     biom <- hmp50$clone()
-#     taxa <- c('Unc53100', 'Unc00c7g', 'Unc25731')
-#     
-#     biom$counts[taxa,1:5]
-#     
-#     biom$counts %<>% rarefy(depth = 100)
-#     biom$counts[taxa,1:5]
-#     
-#     biom$counts <- biom$counts / 100
-#     biom$counts[taxa,1:5]
-#     
-
-
-
 ```
 
 
@@ -79,7 +59,7 @@ A few quick rules:
 
 * `.sample` should be the first column.
 * Other column names cannot start with a dot (`.`).
-* Sample names need to match `sample_names(biom)`.
+* Sample names need to match `biom$samples`.
 
 
 ```{r}

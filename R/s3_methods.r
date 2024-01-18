@@ -105,7 +105,6 @@ as.list.rbiom <- function (biom) {
 #' @inherit documentation_biom.rbiom
 #' 
 #' @family samples
-#' @family rarefaction
 #' 
 #' @param field   The metadata field name specified as:
 #' \itemize{

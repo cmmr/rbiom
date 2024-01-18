@@ -27,7 +27,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
@@ -60,7 +60,7 @@ see all options for a given rbiom object. Default: \code{-1}.}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
-\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
 Otherwise the taxa name will simply be \code{Coriobacteriales}. You
 want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
@@ -177,10 +177,15 @@ auto-selected rarefaction depth or \code{FALSE} to not show a line.
 Default: \code{NULL}}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}}
+
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 }
 \description{
 documentation_default

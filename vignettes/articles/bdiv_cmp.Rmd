@@ -1,0 +1,25 @@
+---
+title: "Plot Types"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+```{r setup}
+biom <- rarefy(hmp50)
+
+bdiv_boxplot(
+  biom     = biom, 
+  x        = "==Sex", 
+  bdiv     = c("Bray-Curtis", "Euclidean"), 
+  facet.by = list("==Body Site" = c("Buccal mucosa", "Saliva")) )
+
+```

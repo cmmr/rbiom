@@ -77,14 +77,14 @@ as_rbiom.simple_triplet_matrix <- function (biom) { rbiom$new(counts = biom) }
 as_rbiom.phyloseq <- function (biom) {
   
   if (!nzchar(system.file(package = "phyloseq")))
-    stop("Bioconductor R package 'phyloseq' must be installed to use convert_from_phyloseq().")
+    cli_abort("Bioconductor R package 'phyloseq' must be installed to use as_rbiom.phyloseq().")
   
   rbiom$new(
-    counts    = phy %>% phyloseq::otu_table() %>% slam::as.simple_triplet_matrix(), 
-    metadata  = phy %>% phyloseq::sample_data(errorIfNULL = FALSE) %>% data.frame(), 
-    taxonomy  = phy %>% phyloseq::tax_table(errorIfNULL = FALSE) %>% data.frame(), 
-    sequences = phy %>% phyloseq::refseq(errorIfNULL = FALSE) %>% as.vector(), 
-    tree      = phy %>% phyloseq::phy_tree(errorIfNULL = FALSE), 
+    counts    = biom %>% phyloseq::otu_table() %>% slam::as.simple_triplet_matrix(), 
+    metadata  = biom %>% phyloseq::sample_data(errorIfNULL = FALSE) %>% data.frame(), 
+    taxonomy  = biom %>% phyloseq::tax_table(errorIfNULL = FALSE) %>% data.frame(), 
+    sequences = biom %>% phyloseq::refseq(errorIfNULL = FALSE) %>% as.vector(), 
+    tree      = biom %>% phyloseq::phy_tree(errorIfNULL = FALSE), 
     id        = "Imported PhyloSeq Data" )
 }
 

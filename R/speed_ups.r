@@ -3,7 +3,7 @@
 #' When working with very large datasets, you can make use of these tips and 
 #' tricks to speed up operations on rbiom objects.
 #' 
-#' @name speed_ups
+#' @name speed
 #' @keywords internal
 #' 
 #' 
@@ -98,5 +98,22 @@
 #' * Setting the cache directory to `"FALSE"` will disable caching.
 #' * R options will override environment variables.
 #' * The key hash algorithm can be set with `options(rbiom.cache_hash=rlang::hash)`.
+#' \cr
+#' 
+#' 
+#' 
+#' @section Summary Layers:
+#' 
+#' The figure-generating functions allow you to display every data point. 
+#' However, when you have thousands of data points, rendering every single one 
+#' can be slow. Instead, set the `layers` parameter to use other options.
+#' 
+#' 
+#' ```r
+#' adiv_boxplot(biom, layers = "bl")  # bar, linerange
+#' adiv_corrplot(biom, layers = "tc") # trend, confidence
+#' bdiv_ord_plot(biom, layers = "e")  # ellipse
+#' ```
+#' \cr
 #' 
 NULL

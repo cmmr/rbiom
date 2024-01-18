@@ -1,0 +1,244 @@
+---
+title: "Plot Types"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+
+Plotting functions in rbiom fall into five categories:
+
+| Category          | Functions                                             |
+| ----------------- | ----------------------------------------------------- |
+| Box Plots         | `adiv_boxplot()` `bdiv_boxplot()` `taxa_boxplot()`    |
+| Correlation Plots | `adiv_corrplot()` `bdiv_corrplot()` `taxa_corrplot()` |
+| Ordination Plots  | `bdiv_ord_plot()`                                     |
+| Heatmaps          | `bdiv_heatmap()` `taxa_heatmap()` `plot_heatmap()`    |
+| Stacked Bar Plots | `taxa_barplot()`                                      |
+
+
+# Box Plots
+
+Box plots are useful for visualizing a numeric outcome against one or more 
+categorical predictors. The rbiom package provides dedicated functions for 
+three numeric outcomes:
+
+1. Alpha Diversity (shannon, simpson, etc) - `adiv_boxplot()`.
+2. Beta Diversity (unifrac, bray-curtis, etc) - `bdiv_boxplot()`.
+3. Taxa Abundance (phylum, genus, etc) - `taxa_boxplot()`.
+
+You can then map categorical metadata variables to the x-axis, colors, 
+patterns, shapes, and facets.
+See [Mapping Metadata to Aesthetics](aes.html) for details.
+
+
+## Layers
+
+Despite being refered to as "box plots", rbiom's `*_boxplot()` functions 
+support a wide range of graphical elements beyond box-and-whisker.
+
+You can assign one or more of the following options to a box plot's `layers` 
+parameter.
+
+```{r, echo=FALSE}
+biom <- rarefy(hmp50)
+patchwork::wrap_plots(lapply(
+  c("bar", "box", "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange"), 
+  FUN = function (layer) {
+  adiv_boxplot(biom, layers = layer, color.by = "Sex", p.label = 0, y.limits = c(0, 4)) + 
+    ggplot2::labs(title = layer, y = NULL, caption = NULL) +
+    ggplot2::theme(legend.position = "none")
+  }))
+```
+
+Unambiguous abbreviations are also accepted. For instance, 
+`layers = c("box", "dot")` is equivalent to `layers = c("x", "d")` and 
+`layers = "xd"`. Note that the single letter abbreviation for "box" is "x" 
+("bar" is "b").
+
+
+## Examples
+
+```{r}
+biom <- rarefy(hmp50, depth = 1000)
+
+adiv <- adiv_boxplot(
+  biom = biom, layers = "bes", x = "Sex", color.by = "Sex")
+  
+bdiv <- bdiv_boxplot(
+  biom = biom, layers = "xd", x = "==Body Site", color.by = "Body Site", 
+  pt.alpha = 0.2, pt.stroke = 0 )
+
+taxa <- taxa_boxplot(
+  biom = biom, layers = "p", x = "Body Site", p.label = 0, taxa = 3, 
+  facet.ncol = 1, facet.strip.position = "right" )
+
+patchwork::wrap_plots(
+  lapply(list(adiv, bdiv, taxa), function (p) {
+    p + 
+      ggplot2::labs(x = NULL, caption = NULL) + 
+      ggplot2::theme(legend.position = "none") }))
+```
+
+
+## Statistics
+
+The categorical groups defined by `x`, `color.by`, etc are used to calculate 
+non-parametric statistics with the Mann-Whitney or Kruskal-Wallis algorithms. 
+See [Statistics](statistics.html) for details.
+
+
+
+
+# Correlation Plots
+
+Correlation plots are designed to visualize the relationship between a numeric 
+outcome and a numeric predictor, optionally with additional categorical 
+predictors. The rbiom package provides dedicated functions for 
+three numeric outcomes:
+
+1. Alpha Diversity (shannon, simpson, etc) - `adiv_corrplot()`.
+2. Beta Diversity (unifrac, bray-curtis, etc) - `bdiv_corrplot()`.
+3. Taxa Abundance (phylum, genus, etc) - `taxa_corrplot()`.
+
+You can then map categorical metadata variables to the x-axis, colors, and 
+facets. See [Mapping Metadata to Aesthetics](aes.html) for details.
+
+
+
+## Layers
+
+You can assign one or more of the following options to a correlation plot's 
+`layers` parameter.
+
+```{r, echo=FALSE}
+biom <- rarefy(hmp50)
+patchwork::wrap_plots(lapply(
+  c("trend", "confidence", "scatter", "residual", "name"), 
+  FUN = function (layer) {
+  adiv_corrplot(biom, x = "Age", layers = layer, color.by = "Sex", test = "none", y.limits = c(0, 50)) + 
+    ggplot2::labs(title = layer, y = NULL, caption = NULL) +
+    ggplot2::theme(legend.position = "none")
+  }))
+```
+
+Unambiguous abbreviations are also accepted. For instance, 
+`layers = c("trend", "scatter")` is equivalent to `layers = c("t", "s")` and 
+`layers = "ts"`.
+
+
+
+## Examples
+
+```{r}
+biom <- rarefy(hmp50, depth = 1000)
+
+adiv <- adiv_corrplot(biom, layers = "ts", x = "BMI")
+  
+bdiv <- bdiv_corrplot(
+  biom = biom, layers = "tc", x = "BMI", color.by = "==Body Site", 
+  limit.by = list("Body Site" = c("Buccal mucosa", "Stool")) )
+
+taxa <- taxa_corrplot(
+  biom = biom, layers = "tsr", x = "Age", taxa = 3, color.by = "Body Site", 
+  limit.by = list("Body Site" = c("Mid vagina", "Saliva", "Stool")),
+  facet.ncol = 1, facet.strip.position = "right" )
+
+patchwork::wrap_plots(
+  guides = "collect",
+  lapply(list(adiv, bdiv, taxa), function (p) {
+    p + ggplot2::labs(caption = NULL) }))
+```
+
+
+
+
+# Ordination Plots
+
+
+
+## Layers
+
+You can assign one or more of the following options to a ordination plot's 
+`layers` parameter.
+
+```{r, echo=FALSE}
+biom <- hmp50 %>% subset(`Body Site` %in% c("Saliva", "Buccal mucosa")) %>% rarefy()
+patchwork::wrap_plots(lapply(
+  c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow"), 
+  FUN = function (layer) {
+  bdiv_ord_plot(biom, layers = layer, color.by = "Body Site", test = "none") + 
+    ggplot2::ggtitle(layer) +
+    ggplot2::theme(legend.position = "none")
+  }))
+```
+
+Unambiguous abbreviations are also accepted. For instance, 
+`layers = c("point", "ellipse")` is equivalent to `layers = c("p", "e")` and 
+`layers = "pe"`.
+
+The layers `c("point", "spider", "ellipse", "name")` apply to samples.
+The layers `c("mean", "taxon", "arrow")` apply to the taxa.
+
+
+
+## Examples
+
+```{r}
+biom <- rarefy(hmp50)
+
+p1 <- bdiv_ord_plot(biom, layers = "pse", color.by = "Body Site") +
+        ggplot2::theme(legend.position = "none")
+
+p2 <- bdiv_ord_plot(biom, layers = "emt", color.by = "Body Site")
+
+patchwork::wrap_plots(p1, p2, guides = "collect")
+```
+
+
+
+
+# Heatmaps
+
+Visualizing a large grid of values is a job for heatmaps. The generic 
+`plot_heatmap()` function accepts any matrix, while the two common use cases 
+below operate on a biom object.
+
+1. Beta Diversity (unifrac, bray-curtis, etc) - `bdiv_heatmap()`.
+2. Taxa Abundance (phylum, genus, etc) - `taxa_heatmap()`.
+
+
+
+## Examples
+
+```{r}
+biom <- rarefy(hmp50)
+
+bdiv <- bdiv_heatmap(biom, color.by = c("Age", "Body Site"), asp = 0.4)
+taxa <- taxa_heatmap(biom, color.by = c("Age", "Body Site"), asp = 0.4)
+
+patchwork::wrap_plots(bdiv, taxa, ncol = 1, guides = "collect")
+```
+
+
+
+
+# Stacked Bar Plots
+
+Taxa stacked bar plots show the same information as a taxa heatmap. Both have 
+their own advantages.
+
+
+## Examples
+
+```{r}
+taxa_barplot(rarefy(hmp50), taxa = 10)
+```

@@ -61,9 +61,9 @@ plot_build <- function (params) {
   
   
   #______________________________________________________________
-  # Suppress x-axis labels when they're eq to facet labels
+  # Suppress x-axis labels when they're identical to facet labels
   #______________________________________________________________
-  if(params$.xcol %in% params$facet.by) {
+  if (params$.xcol %in% params$facet.by) {
     
     if (isTRUE(params$flip)) {
       set_layer(
@@ -88,12 +88,71 @@ plot_build <- function (params) {
   }
   
   
+  
   #______________________________________________________________
-  # Note any transformation in the y-axis label
+  # x-axis and y-axis transformations
   #______________________________________________________________
-  if (!is_null(layers[['labs']][['y']]))
-    if (!is_null(layers[['yaxis']][['trans']]))
-      layers[['labs']][['y']] %<>% paste0(" (", layers[['yaxis']][['trans']], " scale)")
+  
+  if (is_string(params$trans, c("rank", "log", "log1p", "sqrt")))
+    params$.ylab %<>% sprintf("%s(%s)", params$trans, .)
+  
+  if (eq(params$trans, 'percent'))
+    set_layer(params, 'yaxis', labels = scales::percent)
+  
+  
+  for (axis in c('x', 'y')) {
+    
+    layer <- sprintf("%saxis", axis)
+    label <- sprintf(".%slab", axis)
+    trans <- params$layers[[layer]][['trans']]
+    
+    if (is.null(trans)) next
+    
+    
+    # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
+    #______________________________________________________________
+    params[[label]] %<>% sprintf("%s (%s scale)", ., trans)
+    
+    
+    # Force sqrt scale to display zero tick mark.
+    # Handle sqrt- and log1p- transforming of Inf and -Inf
+    #______________________________________________________________
+    if (eq(trans, "log1p") && isTRUE(params$stripe)) {
+      
+      params$layers[[layer]][['trans']] <- trans_new(
+        name      = paste0(axis, "_log1p"), 
+        transform = function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, 
+        inverse   = as.cmd(base::expm1) )
+    
+    } else if (eq(trans, "sqrt")) {
+      
+      if (isTRUE(params$stripe)) {
+        
+        params$layers[[layer]][['trans']] <- trans_new(
+          name      = paste0(axis, "_sqrt"), 
+          transform = function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, 
+          inverse   = function (y) ifelse(y<0, 0, y^2) )
+        
+      } else {
+        
+        params$layers[[layer]][['trans']] <- trans_new(
+          name      = paste0(axis, "_sqrt"), 
+          transform = as.cmd(base::sqrt), 
+          inverse   = function (y) ifelse(y<0, 0, y^2) )
+      }  
+      
+    }
+  }
+  
+  
+  
+  #______________________________________________________________
+  # x-axis and y-axis labels
+  #______________________________________________________________
+  
+  if (hasName(params, '.xlab')) set_layer(params, 'labs', x = params$.xlab)
+  if (hasName(params, '.ylab')) set_layer(params, 'labs', y = params$.ylab)
+  
   
   
   
@@ -254,26 +313,6 @@ plot_build <- function (params) {
     if (layer == 'theme' && length(args) == 0)
       next
     
-    
-    # Force sqrt scale to display zero tick mark.
-    # Handle sqrt- and log1p- transforming of Inf and -Inf
-    #______________________________________________________________
-    if (layer == 'yaxis') {
-      
-      if (eq(args[['trans']], "sqrt")) {
-        if (isTRUE(params$stripe)) {
-          args[['trans']] <- as.cmd(scales::trans_new("sqrt0", function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, function(y) ifelse(y<0, 0, y^2)))
-        } else {
-          args[['trans']] <- as.cmd(scales::trans_new("sqrt0", base::sqrt, function(y) ifelse(y<0, 0, y^2)))
-        }
-        
-      } else if (eq(args[['trans']], "log1p")) {
-        if (isTRUE(params$stripe)) {
-          args[['trans']] <- as.cmd(scales::trans_new("log1p0", function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, base::expm1))
-        }
-      }
-      
-    }
     
     
     # Show ggplot() layer as "ggplot(data)", rest more verbosely

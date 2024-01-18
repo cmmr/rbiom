@@ -73,21 +73,21 @@ taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, p.top = 4, color.by =
 
 ``` r
 taxa_stats(biom, regr = "Age", stat.by = "Body Site", taxa = 0.01)
-#> # Test:     Estimated marginal means of linear trends.
+#> # Test:     Is each trendline's slope non-zero?
 #> # Model:    stats::lm(.abundance ~ Age * `Body Site`)
 #> # A tibble: 80 × 10
-#>    .taxa       `Body Site`    .trend   .se   .df .lower .upper  .t.ratio  .p.val
-#>    <fct>       <fct>           <dbl> <dbl> <dbl>  <dbl>  <dbl>     <dbl>   <dbl>
-#>  1 Lactobacil… Anterior n… -6.82e- 3  8.45    39  -17.1   17.1 -8.06e- 4 9.99e-1
-#>  2 Lactobacil… Buccal muc… -2.68e- 2 17.6     39  -35.7   35.6 -1.52e- 3 9.99e-1
-#>  3 Lactobacil… Mid vagina  -3.13e+ 1  8.42    39  -48.4  -14.3 -3.72e+ 0 6.19e-4
-#>  4 Lactobacil… Saliva      -2.33e- 2 11.3     39  -22.9   22.9 -2.06e- 3 9.98e-1
-#>  5 Lactobacil… Stool        4.75e-15 13.8     39  -27.9   27.9  3.44e-16 1   e+0
-#>  6 Streptococ… Anterior n…  1.50e+ 0  6.15    39  -10.9   13.9  2.45e- 1 8.08e-1
-#>  7 Streptococ… Buccal muc… -5.33e+ 1 12.8     39  -79.2  -27.3 -4.16e+ 0 1.71e-4
-#>  8 Streptococ… Mid vagina  -1.33e- 1  6.12    39  -12.5   12.2 -2.17e- 2 9.83e-1
-#>  9 Streptococ… Saliva      -4.56e+ 0  8.23    39  -21.2   12.1 -5.55e- 1 5.82e-1
-#> 10 Streptococ… Stool        3.37e- 2 10.0     39  -20.3   20.3  3.35e- 3 9.97e-1
+#>    .taxa      `Body Site`    .trend   .se   .df  .lower .upper  .t.ratio  .p.val
+#>    <fct>      <fct>           <dbl> <dbl> <dbl>   <dbl>  <dbl>     <dbl>   <dbl>
+#>  1 Lactobaci… Anterior n… -3.47e- 1  1.25    39  -2.88    2.19 -2.77e- 1 0.783  
+#>  2 Lactobaci… Buccal muc… -5.09e- 1  2.61    39  -5.79    4.78 -1.95e- 1 0.847  
+#>  3 Lactobaci… Mid vagina  -4.29e+ 0  1.25    39  -6.81   -1.76 -3.44e+ 0 0.00142
+#>  4 Lactobaci… Saliva      -4.42e- 1  1.68    39  -3.84    2.95 -2.63e- 1 0.794  
+#>  5 Lactobaci… Stool        8.33e-16  2.05    39  -4.14    4.14  4.07e-16 1      
+#>  6 Streptoco… Anterior n…  3.71e+ 0  2.05    39  -0.436   7.85  1.81e+ 0 0.0780 
+#>  7 Streptoco… Buccal muc… -3.01e+ 0  4.27    39 -11.6     5.63 -7.04e- 1 0.486  
+#>  8 Streptoco… Mid vagina  -1.60e+ 0  2.04    39  -5.72    2.53 -7.83e- 1 0.438  
+#>  9 Streptoco… Saliva      -3.38e+ 0  2.74    39  -8.92    2.17 -1.23e+ 0 0.225  
+#> 10 Streptoco… Stool        7.56e- 1  3.35    39  -6.01    7.52  2.26e- 1 0.822  
 #> # ℹ 70 more rows
 #> # ℹ 1 more variable: .adj.p <dbl>
 ```

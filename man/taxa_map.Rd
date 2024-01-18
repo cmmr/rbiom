@@ -28,7 +28,7 @@ Abbreviations are allowed.}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
-\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
 Otherwise the taxa name will simply be \code{Coriobacteriales}. You
 want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher

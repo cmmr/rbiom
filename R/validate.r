@@ -234,12 +234,13 @@ validate_model <- function (var = "model", env = parent.frame()) {
   #________________________________________________________
   # Predefined regression models
   #________________________________________________________
-  if (is_scalar_character(model))
+  if (is_scalar_character(model)) {
     model <- switch(
-      EXPR = match.arg(model, c('lm', 'log', 'gam')),
+      EXPR = match.arg(model, c('lm', 'gam')),
       lm   = list("stats::lm", list(formula = y ~ x)),
-      log  = list("stats::lm", list(formula = y ~ log(x))),
-      gam  = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML" )) )
+      gam  = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML")) )
+    environment(model[[2]][['formula']]) <- baseenv()
+  }
   
   
   
@@ -247,14 +248,14 @@ validate_model <- function (var = "model", env = parent.frame()) {
   # Sanity check model function.
   #________________________________________________________
   stopifnot(is_list(model))
-  stopifnot(eq(length(model), 2L))
-  fun  <- model[[1]]
-  args <- model[[2]]
+  stopifnot(length(model) == 2)
   
+  args <- model[[2]]
   stopifnot(is_list(args))
   stopifnot(is_formula(args[['formula']]))
   stopifnot(is_null(args[['data']]))
   
+  fun <- model[[1]]
   if (is.character(fun) && !is_na(fun))
     fun <- local({
       fn  <- fun
@@ -271,7 +272,8 @@ validate_model <- function (var = "model", env = parent.frame()) {
   stopifnot(is_scalar_character(fn) && !is_na(fn))
   
   
-  assign(var, list(fun = fun, args = args), pos = env)
+  model <- list(fun = fun, args = args)
+  assign(var, model, pos = env)
   
   return (invisible(NULL))
 }

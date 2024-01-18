@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -60,7 +61,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Calculate the alpha diversity of each sample.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/adiv_matrix.r" class="external-link"><code>R/adiv_matrix.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/adiv_table.r" class="external-link"><code>R/adiv_table.r</code></a></small>
       <div class="d-none name"><code>adiv_table.Rd</code></div>
     </div>
 
@@ -70,7 +71,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_table</span><span class="op">(</span><span class="va">biom</span>, rarefy <span class="op">=</span> <span class="cn">FALSE</span>, adiv <span class="op">=</span> <span class="st">"Shannon"</span>, md <span class="op">=</span> <span class="st">".all"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_table</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">"Shannon"</span>, md <span class="op">=</span> <span class="st">".all"</span>, trans <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -78,22 +79,6 @@
     <dl><dt>biom</dt>
 <dd><p>An rbiom-class object, or data coercible with
 <code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
-
-
-<dt>rarefy</dt>
-<dd><p>Control how/whether rarefactions are done prior to alpha
-diversity computations. Options are:</p><ul><li><p><code>FALSE</code> - 
-Use each sample's current set of observations without applying
-any rarefaction.</p></li>
-<li><p><code>TRUE</code> - 
-Automatically select and apply a single rarefaction.</p></li>
-<li><p><code>"multi"</code>, <code>"multi_log"</code>, <code>"multi_even"</code> - 
-Automatically select and apply multiple rarefactions.
-<code>"multi"</code> provides <code>"multi_log"</code> at the low end
-and <code>"multi_even"</code> at the high end.</p></li>
-<li><p><em>integer vector</em> - 
-Rarefy at the specified depth(s).</p></li>
-</ul><p>Default: <code>FALSE</code></p></dd>
 
 
 <dt>adiv</dt>
@@ -108,6 +93,13 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 <dd><p>A character vector naming the metadata fields to include in the
 output data frame, or <code>'.all'</code> to include all metadata fields.
 Default: <code>'.all'</code></p></dd>
+
+
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
 
 </dl></div>
     <div class="section level2">

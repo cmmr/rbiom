@@ -22,7 +22,7 @@
 adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "trends", model = "lm", 
+    test = "trends", model = "lm", trans = "rank", 
     p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
@@ -64,9 +64,22 @@ adiv_corrplot <- function (
     # Compute each adiv metric separately: shannon, etc
     #________________________________________________________
     .ggdata <- adiv_table(
-        biom = biom,
-        adiv = adiv,
-        md   = unique(c(x, names(color.by), facet.by)) )
+      biom  = biom,
+      adiv  = adiv,
+      md    = unique(c(x, names(color.by), facet.by)),
+      trans = trans )
+    
+    
+    # axis titles
+    #________________________________________________________
+    .xlab <- x
+    if (length(adiv) == 1)
+      .ylab <- switch(
+        EXPR    = adiv,
+        'OTUs'  = "Observed OTUs",
+        'Depth' = "Sequencing Depth",
+        paste(adiv, "Diversity") )
+    
     
     
     # Facet on multiple adiv metrics
@@ -74,6 +87,7 @@ adiv_corrplot <- function (
     if (length(adiv) > 1) {
       .free_y <- TRUE
       facet.by %<>% c('.adiv')
+      .ylab <- aa("\u03B1 Diversity", display = '"\\u03B1 Diversity"')
     }
     
   })
@@ -84,29 +98,6 @@ adiv_corrplot <- function (
   # Create and customize layer definitions.
   #________________________________________________________
   init_corrplot_layers(params)
-  
-  
-  #________________________________________________________
-  # y-axis title and scale
-  #________________________________________________________
-  set_layer(params, 'labs', y = with(params, {
-    
-    if (length(adiv) > 1) {
-      
-      "Diversity (\u03B1)" %>% 
-        aa(display = '"Diversity (\\u03B1)"')
-      
-    } else {
-      
-      switch (
-        EXPR    = adiv,
-        'OTUs'  = "Observed OTUs",
-        'Depth' = "Sequencing Depth",
-        paste(adiv, "Diversity") )
-    }
-    
-  }))
-  
   
   
   #________________________________________________________

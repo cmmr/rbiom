@@ -21,6 +21,7 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
     for (i in tolower(spec[nchar(spec) > 0]))
       layer_names <- c(layer_names, local({
         
+        if (i %in% choices)        return (i)
         if (i %in% names(choices)) return (choices[[i]])
         
         pm <- pmatch(i, choices)
@@ -580,8 +581,8 @@ sync_metadata <- function (params = parent.frame()) {
         n <- nlevels(md[[col_name]])
         
         
-        # Will need additional colors/shapes/patterns for bdiv.
-        if (hasName(params, 'bdiv') && n > 1)
+        # Will need additional colors/shapes/patterns for bdiv box/corr.
+        if (hasName(params, 'within') && n > 1)
           n <- as.integer(local({
             if (col_name %in% params$within)  return (n)
             if (col_name %in% params$between) return ((n * (n - 1) / 2))

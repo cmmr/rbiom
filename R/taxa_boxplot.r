@@ -19,15 +19,17 @@
 #'     biom <- rarefy(hmp50)
 #'     
 #'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
-#'     taxa_boxplot(biom, taxa = 3, layers = "ps", color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")))
+#'     taxa_boxplot(
+#'       biom = biom, taxa = 3, layers = "ps", 
+#'       color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")) )
 #'     
 
 taxa_boxplot <- function (
     biom, x = NULL, rank = -1, taxa = 6, layers = 'bld', unc = 'singly', other = FALSE,
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = NULL, p.top = Inf, p.adj = 'fdr', p.label = 0.05, 
-    ci = 'ci', level = 0.95, outliers = NULL, xlab.angle = 'auto', y.trans = 'sqrt', 
-    caption = TRUE, ...) {
+    ci = 'ci', level = 0.95, outliers = NULL, xlab.angle = 'auto', 
+    trans = 'percent', y.trans = 'sqrt', caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -84,7 +86,17 @@ taxa_boxplot <- function (
       taxa    = taxa, 
       md      = ".all", 
       unc     = unc, 
-      other   = other )
+      other   = other,
+      trans   = trans )
+    
+    
+    # axis titles
+    #________________________________________________________
+    .ylab <- {
+      if      (eq(trans, 'percent')) { "Relative Abundance" }
+      else if (is.null(biom$depth))  { "Unrarefied Counts"  }
+      else                           { "Rarefied Counts"    }
+    }
     
     
     # Set .taxa as `x` or `facet.by`.
@@ -94,6 +106,7 @@ taxa_boxplot <- function (
       if (is.null(x)) { x <- '.taxa'
       } else          { facet.by %<>% c('.taxa', .) }
     }
+    
     
     
     # Facet on multiple ranks
@@ -109,22 +122,6 @@ taxa_boxplot <- function (
   # Initialize the layers environment.
   #________________________________________________________
   init_boxplot_layers(params)
-  
-  
-  
-  #________________________________________________________
-  # y-axis title
-  #________________________________________________________
-  if (any(params$.ggdata[[params$.ycol]] > 1)) {
-    
-    biom <- params$biom
-    if (is.null(biom$depth)) { set_layer(params, 'labs', y = "Unrarefied Counts")
-    } else                   { set_layer(params, 'labs', y = "Rarefied Counts") }
-    
-  } else {
-    set_layer(params, 'labs', y = "Relative Abundance")
-    set_layer(params, 'yaxis', labels = scales::percent)
-  }
   
   
   

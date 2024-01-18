@@ -6,11 +6,11 @@
 \arguments{
 \item{x}{A numeric metadata field to use for the x-axis. Required.}
 
-\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
-abbreviations are also accepted. For instance,
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and
-\code{"ts"}. See \code{vignette("corrplots")} for examples of each.
-Default: \code{"t"}.}
+\item{layers}{One or more of
+\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+letter abbreviations are also accepted. For instance,
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -40,8 +40,8 @@ scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 documentation_corrplot

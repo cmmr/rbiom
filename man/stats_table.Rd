@@ -32,10 +32,9 @@ will generate boxplot-like statistics; when non-NULL, corrplot-like
 statistics will be returned. Default: \code{NULL}}
 
 \item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
-\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
-\code{"pw_means"}, or \code{"pw_trends"}.
+found in the "Statistical Tests" section below. One of \code{"predict"},
+\code{"terms"}, \code{"fit"}, \code{"means"}, \code{"trends"}, \code{"es_means"},
+\code{"es_trends"}, \code{"pw_means"}, or \code{"pw_trends"}.
 Default: \code{ifelse(is.null(regr), "means", "trends")}}
 
 \item{model}{What type of trend model to fit to the data. Options are:
@@ -55,7 +54,7 @@ options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}.
+The R code or generating these statistics is in \verb{$code}.
 }
 \description{
 Run non-parametric statistics on a data.frame.
@@ -119,6 +118,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \examples{

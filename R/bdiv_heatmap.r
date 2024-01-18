@@ -9,7 +9,7 @@
 #' @param grid   Color palette name, or a list with entries for \code{label}, 
 #'        \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or 
 #'        \code{guide}. See the Track Definitions section for details.
-#'        Default: \code{list(label = "Distance", colors = "-bilbao")}.
+#'        Default: `"devon"`
 #'                 
 #' @param color.by   Add annotation tracks for these metadata column(s). 
 #'        See "Annotation Tracks" section below for details.
@@ -26,7 +26,7 @@
 #'        Default: `NULL`
 #'        
 #' @param ...   Additional arguments to pass on to ggplot2::theme().
-#'        For example, \code{labs.title = "Plot Title"}.
+#'        For example, \code{labs.subtitle = "Plot subtitle"}.
 #'         
 #'         
 #' @section Annotation Tracks:
@@ -140,12 +140,11 @@
 #'     bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), color.by="sex")
 #'     
 bdiv_heatmap <- function (
-    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL,
-    grid = list(label = "Distance", colors = "-bilbao"),
+    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, grid = "devon",
     color.by = NULL, order.by = NULL, limit.by = NULL, 
-    label = TRUE, label_size = NULL, rescale = "none", ratio=1, 
-    clust = "complete", trees = TRUE, tree_height = NULL, track_height = NULL, 
-    legend = "right", xlab.angle = "auto", ...) {
+    label = TRUE, label_size = NULL, rescale = "none", clust = "complete", 
+    trees = TRUE, asp = 1, tree_height = 10, track_height = 10, 
+    legend = "right", title = TRUE, xlab.angle = "auto", ...) {
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
@@ -177,7 +176,7 @@ bdiv_heatmap <- function (
     validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
     validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
     
-    if (!is_list(grid)) grid <- list(label = "Distance", colors = grid)
+    if (!is_list(grid)) grid <- list(label = "Dissimilarity", colors = grid)
     if (length(order.by) > 0) clust <- FALSE
   })
   
@@ -192,10 +191,15 @@ bdiv_heatmap <- function (
     for (d in params$bdiv)
       for (w in params$weighted)
         plots[[length(plots) + 1]] <- local({
-          args                 <- fun_params(bdiv_heatmap, params)
-          args[['bdiv']]       <- d
-          args[['weighted']]   <- w
-          args[['labs.title']] <- paste(ifelse(w, "Weighted", "Unweighted"), d)
+          
+          args <- fun_params(bdiv_heatmap, params)
+          
+          args[['bdiv']]     <- d
+          args[['weighted']] <- w
+          
+          if (isTRUE(args[['title']]))
+            args[['title']] <- paste(ifelse(w, "Weighted", "Unweighted"), d)
+          
           do.call(bdiv_heatmap, args)
         })
     
@@ -234,6 +238,23 @@ bdiv_heatmap <- function (
     stop("At least one sample is needed for a bdiv heatmap.")
   
   
+  #________________________________________________________
+  # Replace title=TRUE with a default title string.
+  #________________________________________________________
+  with(params, {
+    
+    if (isTRUE(title))
+      title <- ifelse(
+        test = isTRUE(weighted), 
+        yes  = paste("Weighted",   bdiv, "Distance"), 
+        no   = paste("Unweighted", bdiv, "Distance") )
+    
+    if (!(is.null(title) || (is_scalar_character(title) && !is.na(title))))
+      cli_abort("title must be TRUE, NULL, or a character string, not {.type {title}}: {title}.")
+  })
+    
+  
+  
   
   #________________________________________________________
   # Matrix of samples x samples.
@@ -253,11 +274,6 @@ bdiv_heatmap <- function (
   args <- fun_params(plot_heatmap, params)
   args[['mtx']]  <- mtx
   args[['dist']] <- dm
-  
-  args[['labs.title']] %<>% if.null(ifelse(
-      test = isTRUE(params$weighted), 
-      yes  = paste("Weighted",   params$bdiv, "Distance"), 
-      no   = paste("Unweighted", params$bdiv, "Distance") ))
   
   
   for (md_col in names(params$color.by))

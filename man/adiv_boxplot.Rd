@@ -20,6 +20,7 @@ adiv_boxplot(
   p.label = 0.05,
   ci = "ci",
   level = 0.95,
+  trans = "none",
   outliers = NULL,
   xlab.angle = "auto",
   caption = TRUE,
@@ -39,13 +40,11 @@ default, \code{NULL}, groups all samples into a single category.}
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
-\item{layers}{\code{"bar"}, \code{"box" ("x")}, \code{"violin"},
-\code{"dot"}, \code{"strip"}, \code{"crossbar"}, \code{"errorbar"},
-\code{"linerange"}, and \code{"pointrange"}. Single letter
-abbreviations are also accepted. For instance, \code{c("box", "dot")}
-is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \code{vignette("boxplots")} for examples of each.
-Default: \code{"bld"}.}
+\item{layers}{One or more of
+\code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
+Single letter abbreviations are also accepted. For instance,
+\code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for aesthetics and partitioning. Default: \code{NULL}}
@@ -82,6 +81,11 @@ the median. Default: \code{"ci"}}
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
+
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when
 overlaying a dot or strip chart.  Default: \code{NULL}}
@@ -102,8 +106,8 @@ dotplot layer has its size set to \code{2}. The special prefix
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 Visualize alpha diversity with boxplots.
@@ -142,6 +146,7 @@ Other alpha_diversity:
 Other visualization: 
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

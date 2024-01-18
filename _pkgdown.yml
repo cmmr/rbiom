@@ -24,18 +24,20 @@ navbar:
       href: articles/importing.html
     - text: "Working with rbiom Objects"
       href: reference/rbiom_objects.html
-    - text: "Speed Ups"
-      href: reference/speed_ups.html
     - text: "Diversity Metrics"
       href: articles/diversity.html
+    - text: "Statistics"
+      href: articles/statistics.html
+    - text: "Speed Ups"
+      href: reference/speed.html
     - text: -------
     - text: "Plotting"
     - text: "Plot Types"
       href: articles/plots.html
     - text: "Mapping Metadata to Aesthetics"
       href: articles/aes.html
-    - text: "Data Partitioning"
-      href: articles/partitioning.html
+    - text: "Scales and Transformations"
+      href: articles/scales.html
 
 
 reference:

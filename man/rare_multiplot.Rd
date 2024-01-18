@@ -7,14 +7,14 @@
 rare_multiplot(
   biom,
   adiv = "OTUs",
-  depths = NULL,
   layers = "t",
   rline = TRUE,
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
   test = "pw_means",
-  model = "log",
+  model = list("stats::lm", list(formula = y ~ log(x))),
+  trans = "none",
   level = 0.95,
   p.adj = "fdr",
   caption = TRUE,
@@ -32,14 +32,11 @@ rare_multiplot(
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
-\item{depths}{Rarefaction depths to show in the plot, or \code{NULL} to
-auto-select. Default: \code{NULL}}
-
-\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
-abbreviations are also accepted. For instance,
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and
-\code{"ts"}. See \code{vignette("corrplots")} for examples of each.
-Default: \code{"t"}.}
+\item{layers}{One or more of
+\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+letter abbreviations are also accepted. For instance,
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
@@ -60,6 +57,11 @@ Default: \code{"pw_means"}}
 \code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
 (generalized additive). See the "Model Options" section below for
 additional details. Default: \code{"log"}}
+
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
@@ -82,8 +84,8 @@ scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 Combines rare_corrplot and rare_barplot into a single figure.
@@ -136,6 +138,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \section{Aesthetics and Partitions}{
@@ -194,7 +201,6 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 }
 \seealso{
 Other rarefaction: 
-\code{\link{pull.rbiom}()},
 \code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rarefy_cols}()},
@@ -205,6 +211,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

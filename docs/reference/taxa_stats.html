@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -79,6 +80,7 @@
 <span>  test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">regr</span><span class="op">)</span>, <span class="st">"means"</span>, <span class="st">"trends"</span><span class="op">)</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">regr</span><span class="op">)</span>, <span class="st">"none"</span>, <span class="st">"rank"</span><span class="op">)</span>,</span>
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -125,10 +127,9 @@ Default: <code>6</code>.</p></dd>
 
 <dt>test</dt>
 <dd><p>The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-<code>"predict"</code>, <code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>,
-<code>"trends"</code>, <code>"es_means"</code>, <code>"es_trends"</code>,
-<code>"pw_means"</code>, or <code>"pw_trends"</code>.
+found in the "Statistical Tests" section below. One of <code>"predict"</code>,
+<code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>, <code>"trends"</code>, <code>"es_means"</code>,
+<code>"es_trends"</code>, <code>"pw_means"</code>, or <code>"pw_trends"</code>.
 Default: <code>ifelse(is.null(regr), "means", "trends")</code></p></dd>
 
 
@@ -142,6 +143,13 @@ additional details. Default: <code>"lm"</code></p></dd>
 <dt>level</dt>
 <dd><p>The confidence level for calculating a confidence interval.
 Default: <code>0.95</code></p></dd>
+
+
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
 
 
 <dt>lineage</dt>
@@ -244,6 +252,10 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
+<p>By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+<code>model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -280,21 +292,21 @@ For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Veillonellaceae       49  32.0     4 0.000<span style="text-decoration: underline;">001</span>91   0.000<span style="text-decoration: underline;">002</span>86  </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, regr <span class="op">=</span> <span class="st">"Age"</span>, rank <span class="op">=</span> <span class="st">"Family"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     Estimated marginal means of linear trends.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     Is each trendline's slope non-zero?</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    stats::lm(.abundance ~ Age * `Body Site`)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 30 × 10</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .taxa       `Body Site`    .trend   .se   .df .lower .upper  .t.ratio  .p.val</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Lactobacil… Anterior n… -<span style="color: #BB0000;">6.82</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span>  8.45    39  -<span style="color: #BB0000;">17.1</span>   17.1 -<span style="color: #BB0000;">8.06</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span> 9.99<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Lactobacil… Buccal muc… -<span style="color: #BB0000;">2.68</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> 17.6     39  -<span style="color: #BB0000;">35.7</span>   35.6 -<span style="color: #BB0000;">1.52</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span> 9.99<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Lactobacil… Mid vagina  -<span style="color: #BB0000;">3.13</span><span style="color: #949494;">e</span>+ 1  8.42    39  -<span style="color: #BB0000;">48.4</span>  -<span style="color: #BB0000;">14.3</span> -<span style="color: #BB0000;">3.72</span><span style="color: #949494;">e</span>+ 0 6.19<span style="color: #949494;">e</span><span style="color: #BB0000;">-4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Lactobacil… Saliva      -<span style="color: #BB0000;">2.33</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> 11.3     39  -<span style="color: #BB0000;">22.9</span>   22.9 -<span style="color: #BB0000;">2.06</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span> 9.98<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Lactobacil… Stool        4.75<span style="color: #949494;">e</span><span style="color: #BB0000;">-15</span> 13.8     39  -<span style="color: #BB0000;">27.9</span>   27.9  3.44<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> 1   <span style="color: #949494;">e</span>+0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Streptococ… Anterior n…  1.57<span style="color: #949494;">e</span>+ 0  6.15    39  -<span style="color: #BB0000;">10.9</span>   14.0  2.55<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 8.00<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Streptococ… Buccal muc… -<span style="color: #BB0000;">5.33</span><span style="color: #949494;">e</span>+ 1 12.8     39  -<span style="color: #BB0000;">79.2</span>  -<span style="color: #BB0000;">27.3</span> -<span style="color: #BB0000;">4.16</span><span style="color: #949494;">e</span>+ 0 1.71<span style="color: #949494;">e</span><span style="color: #BB0000;">-4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Streptococ… Mid vagina  -<span style="color: #BB0000;">1.33</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>  6.12    39  -<span style="color: #BB0000;">12.5</span>   12.2 -<span style="color: #BB0000;">2.17</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> 9.83<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Streptococ… Saliva      -<span style="color: #BB0000;">4.56</span><span style="color: #949494;">e</span>+ 0  8.23    39  -<span style="color: #BB0000;">21.2</span>   12.1 -<span style="color: #BB0000;">5.55</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 5.82<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Streptococ… Stool        3.37<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> 10.0     39  -<span style="color: #BB0000;">20.3</span>   20.3  3.35<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span> 9.97<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Lactobacil… Anterior n… -<span style="color: #BB0000;">2.55</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.666    39 -<span style="color: #BB0000;">1.60</span>   1.09  -<span style="color: #BB0000;">3.83</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.704  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Lactobacil… Buccal muc… -<span style="color: #BB0000;">3.62</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 1.39     39 -<span style="color: #BB0000;">3.17</span>   2.44  -<span style="color: #BB0000;">2.61</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.796  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Lactobacil… Mid vagina  -<span style="color: #BB0000;">1.98</span><span style="color: #949494;">e</span>+ 0 0.663    39 -<span style="color: #BB0000;">3.32</span>  -<span style="color: #BB0000;">0.643</span> -<span style="color: #BB0000;">2.99</span><span style="color: #949494;">e</span>+ 0 0.004<span style="text-decoration: underline;">78</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Lactobacil… Saliva      -<span style="color: #BB0000;">3.14</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.891    39 -<span style="color: #BB0000;">2.12</span>   1.49  -<span style="color: #BB0000;">3.52</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.726  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Lactobacil… Stool       -<span style="color: #BB0000;">6.66</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> 1.09     39 -<span style="color: #BB0000;">2.20</span>   2.20  -<span style="color: #BB0000;">6.13</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> 1      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Streptococ… Anterior n…  1.45<span style="color: #949494;">e</span>+ 0 1.07     39 -<span style="color: #BB0000;">0.709</span>  3.62   1.36<span style="color: #949494;">e</span>+ 0 0.182  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Streptococ… Buccal muc… -<span style="color: #BB0000;">2.37</span><span style="color: #949494;">e</span>+ 0 2.23     39 -<span style="color: #BB0000;">6.88</span>   2.13  -<span style="color: #BB0000;">1.07</span><span style="color: #949494;">e</span>+ 0 0.293  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Streptococ… Mid vagina  -<span style="color: #BB0000;">1.05</span><span style="color: #949494;">e</span>+ 0 1.06     39 -<span style="color: #BB0000;">3.20</span>   1.10  -<span style="color: #BB0000;">9.87</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.330  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Streptococ… Saliva      -<span style="color: #BB0000;">1.02</span><span style="color: #949494;">e</span>+ 0 1.43     39 -<span style="color: #BB0000;">3.92</span>   1.87  -<span style="color: #BB0000;">7.15</span><span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.479  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Streptococ… Stool        5.12<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 1.75     39 -<span style="color: #BB0000;">3.02</span>   4.04   2.94<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> 0.771  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 20 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: .adj.p &lt;dbl&gt;</span></span>
 </code></pre></div>

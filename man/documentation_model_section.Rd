@@ -21,6 +21,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \keyword{internal}

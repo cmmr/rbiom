@@ -62,7 +62,15 @@ get_cache_file <- function (fn = NULL, params = NULL) {
 
 set_cache_value <- function (cache_file, result) {
   
-  if (is.null(cache_file) || is.null(NULL)) return (NULL)
+  
+  
+  # return (NULL)
+  
+  
+  
+  
+  
+  if (is.null(cache_file)) return (NULL)
   
   
   #________________________________________________________

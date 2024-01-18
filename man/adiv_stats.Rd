@@ -11,6 +11,7 @@ adiv_stats(
   adiv = "Shannon",
   test = ifelse(is.null(regr), "means", "trends"),
   model = "lm",
+  trans = ifelse(is.null(regr), "none", "rank"),
   split.by = NULL,
   level = 0.95,
   p.adj = "fdr"
@@ -35,16 +36,20 @@ Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
 \item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
-\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
-\code{"pw_means"}, or \code{"pw_trends"}.
+found in the "Statistical Tests" section below. One of \code{"predict"},
+\code{"terms"}, \code{"fit"}, \code{"means"}, \code{"trends"}, \code{"es_means"},
+\code{"es_trends"}, \code{"pw_means"}, or \code{"pw_trends"}.
 Default: \code{ifelse(is.null(regr), "means", "trends")}}
 
 \item{model}{What type of trend model to fit to the data. Options are:
 \code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
 (generalized additive). See the "Model Options" section below for
 additional details. Default: \code{"lm"}}
+
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{split.by}{Name(s) of metadata columns that the data should be split
 by prior to any calculations. Default: \code{NULL}}
@@ -58,7 +63,7 @@ options. Default: \code{"fdr"}}
 }
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}.
+The R code or generating these statistics is in \verb{$code}.
 }
 \description{
 Test alpha diversity differences for significance.
@@ -122,6 +127,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \examples{

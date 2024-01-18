@@ -17,9 +17,11 @@
 #'     
 
 rare_corrplot <- function (
-    biom, adiv = "Shannon", depths = NULL, layers = "t", rline = TRUE,
+    biom, adiv = "Shannon", layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "pw_means", model = "log", 
+    test = "pw_means", 
+    model = list("stats::lm", list(formula = y ~ log(x))), 
+    trans = "none", 
     p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
@@ -41,9 +43,8 @@ rare_corrplot <- function (
   # Sanity Checks
   #________________________________________________________
   with(params, {
-    stopifnot(is_null(depths) || is.numeric(depths))
     stopifnot(is_scalar_logical(rline) || is_scalar_integerish(rline))
-    stopifnot(!is.na(rline) && !anyNA(depths))
+    stopifnot(!is.na(rline))
   })
   
   
@@ -65,40 +66,51 @@ rare_corrplot <- function (
   # Default rarefaction depth.
   #________________________________________________________
   with(params, {
-    
-    if (isTRUE(rline)) {
-      .ss   <- as.vector(sample_sums(biom))
-      rline <- (sum(.ss) * .1) / length(.ss)
-      rline <- min(.ss[.ss >= rline])
-      remove(".ss")
-    }
-    
+    if (isTRUE(rline))  rline <- rare_suggest(biom$counts)
     if (isFALSE(rline)) rline <- NULL
   })
   
   
   #________________________________________________________
-  # Pull alpha diversity metrics for each depth.
+  # Select 10 depths and compute adiv metrics at each.
   #________________________________________________________
   with(params, {
     
-    if (is_null(depths))
-      depths <- "multi_even"
+    .ggdata <- local({
+      
+      upper <- fivenum(sample_sums(biom))[[4]]
+      rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
+      
+      plyr::ldply(rLvls, .id = ".depth", function (rLvl) {
+        adiv_table(
+          biom  = rarefy(biom, depth = rLvl),
+          adiv  = adiv,
+          md    = unique(c(names(color.by), facet.by)),
+          trans = trans )
+      }) %>% as_tibble()
+    })
     
-    .ggdata <- adiv_table(
-      biom   = biom,
-      rarefy = depths,
-      adiv   = adiv,
-      md     = unique(c(names(color.by), facet.by)) )
     
+    # axis titles
+    #________________________________________________________
     .xcol <- '.depth'
+    .xlab <- "Rarefaction Depth"
+    
+    .ycol <- '.diversity'
+    if (length(adiv) == 1)
+      .ylab <- switch (
+          EXPR    = adiv,
+          'OTUs'  = "Observed OTUs",
+          'Depth' = "Sequencing Depth",
+          paste(adiv, "Diversity") )
     
     
     # Facet on multiple adiv metrics
     #________________________________________________________
     if (length(adiv) > 1) {
       .free_y <- TRUE
-      facet.by  %<>% c('.adiv')
+      facet.by %<>% c('.adiv')
+      .ylab <- aa("\u03B1 Diversity", display = '"\\u03B1 Diversity"')
     }
     
   })
@@ -110,34 +122,10 @@ rare_corrplot <- function (
   #________________________________________________________
   init_corrplot_layers(params)
   
-  
-  #________________________________________________________
-  # x-axis title and scale
-  #________________________________________________________
-  set_layer(params, 'labs',  x = "Rarefaction Depth")
-  set_layer(params, 'xaxis', labels = si_units)
+  set_layer(params, 'xaxis', labels = label_number(scale_cut = cut_si("")))
   if (!is_null(params$rline))
     set_layer(params, 'vline', xintercept = params$rline, color = "red", linetype="dashed")
   
-  
-  #________________________________________________________
-  # y-axis title and scale
-  #________________________________________________________
-  set_layer(params, 'labs', y = with(params, {
-    
-    if (length(adiv) > 1) {
-      "Diversity (\u03B1)" %>% 
-        aa(display = '"Diversity (\\u03B1)"')
-      
-    } else {
-      switch (
-        EXPR    = adiv,
-        'OTUs'  = "Observed OTUs",
-        'Depth' = "Sequencing Depth",
-        paste(adiv, "Diversity") )
-    }
-    
-  }))
   
   
   

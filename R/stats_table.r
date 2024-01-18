@@ -2,6 +2,7 @@
 #' Run non-parametric statistics on a data.frame.
 #' 
 #' @inherit documentation_test.ifelse
+#' @inherit documentation_tranform.y.ifelse
 #' @inherit documentation_model.lm
 #' @inherit documentation_default
 #' @inherit documentation_stats_return return
@@ -68,7 +69,7 @@ stats_table <- function (
           "es_means", "es_trends", "pw_means", "pw_trends" ) })
   
   if (is.null(stat.by) && !test %in% c('predict', 'fit', 'terms', 'means', 'trends'))
-    stop ("Test '", test, "' requires a `stat.by` group.")
+    cli_abort ("Test '{test}' requires a `stat.by` group.")
   
   
   

@@ -16,16 +16,20 @@
 #'     
 #'     bdiv_stats(biom, stat.by = "Body Site", split.by = "Sex")
 #'       
-#'     bdiv_stats(biom, stat.by = "BMI", bdiv = c("bray", "unifrac"))
+#'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))
+#'     
+#'     bdiv_stats(biom, regr = "BMI", stat.by = "==Body Site")
 #'     
 #'     # The R code used to compute the stats is in $code.
 #'     tbl <- bdiv_stats(biom, stat.by = "Sex")
 #'     tbl$code
 
 bdiv_stats <- function (
-    biom, stat.by, bdiv="Bray-Curtis", weighted = TRUE, tree = NULL, 
-    test = "adonis2", within = NULL, between = NULL, 
-    split.by = NULL, seed = 0, permutations = 999, p.adj = "fdr" ) {
+    biom, stat.by = NULL, regr = NULL, bdiv = "Bray-Curtis", 
+    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
+    test = ifelse(is.null(regr), "means", "trends"), model = "lm", 
+    trans = ifelse(is.null(regr), "none", "rank"), 
+    split.by = NULL, level = 0.95, p.adj = "fdr" ) {
   
   
   biom <- as_rbiom(biom)
@@ -49,122 +53,28 @@ bdiv_stats <- function (
   with(params, {
     
     validate_bdiv(max = Inf)
-    validate_bool('weighted', max = Inf)
+    
     validate_meta('stat.by',  cmp = TRUE)
+    validate_meta('regr', null_ok = TRUE)
     validate_meta('split.by', cmp = TRUE, max = Inf, null_ok = TRUE)
     
     # Validates and appends to `within` and `between`.
     validate_meta_cmp(c('stat.by', 'split.by'))
     
-    test  <-   match.arg(tolower(test), c("adonis2", "mrpp"))
-    p.adj %<>% match.arg(p.adjust.methods)
-    
-    stopifnot(is_scalar_integerish(seed)         && !is_na(seed))
-    stopifnot(is_scalar_integerish(permutations) && !is_na(permutations))
-    
   })
   
   
-  #________________________________________________________
-  # Iteratively compute dm and permutational stats.
-  #________________________________________________________
-  stats <- with(params, bdply(
-    biom   = biom, 
-    vars   = split.by, 
-    iters  = list(weighted = weighted, bdiv = bdiv),
-    prefix = TRUE,
-    FUN    = function (b, weighted, bdiv) {
-      groups <- pull(b, stat.by)
-      dm     <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted, tree = tree)
-      distmat_stats(dm = dm, groups = groups, test = test, seed = seed, permutations = permutations)
-    })) %>%
-    transform(.adj.p = stats::p.adjust(.p.val, params$p.adj)) %>%
-    plyr::arrange(.p.val) %>%
-    as_rbiom_tbl()
   
   
-  #________________________________________________________
-  # Table header.
-  #________________________________________________________
-  attr(stats, 'tbl_sum') <- with(params, c(
-    'Test' = glue::glue(switch(
-      EXPR = test,
-      adonis2 = "vegan::adonis2(~ {coan(stat.by)}, permutations = {permutations})",
-      mrpp    = "vegan::mrpp(grouping = {coan(stat.by)}, permutations = {permutations})" ))))
+  params$md <- with(params, c(stat.by, regr, split.by))
+  params$df <- do.call(bdiv_table, fun_params(bdiv_table, params))
   
+  with(params, {
+    if (length(bdiv) > 1) { split.by %<>% c('.bdiv')
+    } else                { df %<>% rename_response(paste0('.', bdiv)) }
+  })
   
-  
-  #________________________________________________________
-  # Attach human-readable commands of varying complexity.
-  #________________________________________________________
-  attr(stats, 'code') <- with(params, {
-    
-    if (is.null(split.by) && length(weighted) == 1 && length(bdiv) == 1) {
-      
-      #________________________________________________________
-      # Simple version without any iterations.
-      #________________________________________________________
-      glue::glue(
-        .sep = "\n",
-        "dm <- bdiv_distmat(biom = biom, bdiv = '{bdiv}', weighted = {weighted})",
-        "grouping <- pull(biom, {as.args(list(stat.by))})[attr(dm, 'Labels')]",
-        "",
-        "set.seed({seed})",
-        "",
-        switch(
-          EXPR = test,
-          adonis2 = "vegan::adonis2(formula = dm ~ grouping, permutations = {permutations}) %>%",
-          mrpp    = "vegan::mrpp(dat = dm, grouping = grouping, permutations = {permutations}) %>%" ),
-        "  vegan::permustats() %>%", 
-        "  summary() %>%", 
-        "  with(data.frame(.stat = statistic, .z = z, .p.val = p)) %>%", 
-        "  tryCatch(", 
-        "    error   = function (e) data.frame(.stat=NA, .z=NA, .p.val=NA), ", 
-        "    warning = function (w) data.frame(.stat=NA, .z=NA, .p.val=NA) ) %>%", 
-        "  data.frame(row.names = NULL, .n = attr(dm, 'Size'), .) %>%",
-        "  data.frame({as.args(list(.weighted=weighted, .bdiv=bdiv))}, .) %>%",
-        "  transform(.adj.p = stats::p.adjust(.p.val, '{p.adj}')) %>%",
-        "  plyr::arrange(.p.val)" )
-      
-      
-    } else {
-      
-      #________________________________________________________
-      # With iterations.
-      #________________________________________________________
-      glue::glue(
-        .sep = "\n",
-        "bdply(",
-        "  biom   = biom, ",
-        "  vars   = {as.args(list(split.by))}, ",
-        "  iters  = list({as.args(list(weighted = weighted, bdiv = bdiv))}), ",
-        "  prefix = TRUE, ",
-        "  FUN    = function (b, weighted, bdiv) {{",
-        "",
-        "    dm <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted)",
-        "    grouping <- pull(b, stat.by)[attr(dm, 'Labels')]",
-        "",
-        "    set.seed({seed})",
-        "",
-        switch(
-          EXPR = test,
-          adonis2 = "    vegan::adonis2(formula = dm ~ grouping, permutations = {permutations}) %>%",
-          mrpp    = "    vegan::mrpp(dat = dm, grouping = grouping, permutations = {permutations}) %>%" ),
-        "      vegan::permustats() %>%", 
-        "      summary() %>%", 
-        "      with(data.frame(.stat = statistic, .z = z, .p.val = p)) %>%", 
-        "      tryCatch(", 
-        "        error   = function (e) data.frame(.stat=NA, .z=NA, .p.val=NA), ", 
-        "        warning = function (w) data.frame(.stat=NA, .z=NA, .p.val=NA) ) %>%", 
-        "      data.frame(row.names = NULL, .n = attr(dm, 'Size'), .)",
-        "",
-        "}}) %>%",
-        "  transform(.adj.p = stats::p.adjust(.p.val, '{p.adj}')) %>%",
-        "  plyr::arrange(.p.val)" )
-      
-    }
-    
-  }) %>% add_class('rbiom_code')
+  stats <- do.call(stats_table, fun_params(stats_table, params))
   
   
   

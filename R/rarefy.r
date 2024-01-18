@@ -57,16 +57,15 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #' @family rarefaction
 #' @family transformations
 #'     
-#' @param depth   The number of observations to keep, per column (sample). If 
-#'        set to `'auto'`, a depth will be automatically selected. Samples 
-#'        that have fewer than this number of observations will be dropped. If 
-#'        called on data with non-integer abundances, values will be re-scaled 
-#'        to integers between 1 and `depth` such that they sum to `depth`.
-#'        Default: `'auto'`
+#' @param depth   How many observations to keep per sample. When 
+#'        `0 < depth < 1`, it is taken as the minimum percentage of the 
+#'        dataset's observations to keep. Ignored when `n` is specified.
+#'        Default: `0.1`
 #'
-#' @param n   The number of samples to retain, or if negative, the number of
-#'        samples to drop. If `NULL`, the number kept/dropped is automatically
-#'        selected. When not `NULL`, overrides any value given to `depth.`
+#' @param n   The number of samples to keep. When `0 < n < 1`, it is taken as 
+#'        the percentage of samples to keep. If negative, that number or 
+#'        percentage of samples is dropped. If `0`, all samples are kept. If 
+#'        `NULL`, `depth` is used instead.
 #'        Default: `NULL`
 #'     
 #' @param seed   An integer to use for seeding the random number generator. If

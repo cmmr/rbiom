@@ -11,7 +11,7 @@
 #' Use `$clone()` to create a copy of an rbiom object. This is necessary 
 #' because rbiom objects are **passed by reference**. The usual `<-` assignment 
 #' operator will simply create a second reference to the same object - it will 
-#' not create a second object. See [Speed Ups][speed_ups] for more details.
+#' not create a second object. See [speed ups][speed] for more details.
 #' \cr\cr
 #' 
 #' 
@@ -611,7 +611,7 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Note the rarefaction depth, or NULL if unrarefied.
       #________________________________________________________
-      ss <- unique(col_sums(private$.counts))
+      ss <- unique(round(col_sums(private$.counts), 2))
       private$.depth <- if (length(ss) == 1) ss else NULL
       
       

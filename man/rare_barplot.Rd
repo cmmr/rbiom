@@ -39,7 +39,7 @@ has its color set to \code{"black"}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points and ggplot
-command are available as \code{$data} and \code{$code},
+command are available as \verb{$data} and \verb{$code},
 respectively.
 }
 \description{
@@ -58,7 +58,6 @@ Visualize the number of observations per sample.
 }
 \seealso{
 Other rarefaction: 
-\code{\link{pull.rbiom}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
 \code{\link{rarefy_cols}()},
@@ -69,6 +68,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

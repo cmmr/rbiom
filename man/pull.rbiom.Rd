@@ -41,14 +41,5 @@ Map sample names to metadata field values.
 
 Other samples: 
 \code{\link{sample_sums}()}
-
-Other rarefaction: 
-\code{\link{rare_barplot}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rarefy_cols}()},
-\code{\link{rarefy}()},
-\code{\link{sample_sums}()}
 }
-\concept{rarefaction}
 \concept{samples}

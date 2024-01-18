@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -92,6 +93,7 @@
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  outliers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"percent"</span>,</span>
 <span>  y.trans <span class="op">=</span> <span class="st">"sqrt"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -128,13 +130,11 @@ Default: <code>6</code>.</p></dd>
 
 
 <dt>layers</dt>
-<dd><p><code>"bar"</code>, <code>"box" ("x")</code>, <code>"violin"</code>,
-<code>"dot"</code>, <code>"strip"</code>, <code>"crossbar"</code>, <code>"errorbar"</code>,
-<code>"linerange"</code>, and <code>"pointrange"</code>. Single letter
-abbreviations are also accepted. For instance, <code>c("box", "dot")</code>
-is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
-See <code>vignette("boxplots")</code> for examples of each.
-Default: <code>"bld"</code>.</p></dd>
+<dd><p>One or more of
+<code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
+Single letter abbreviations are also accepted. For instance,
+<code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
+See plot types for examples of each. Default: <code>"bld"</code></p></dd>
 
 
 <dt>unc</dt>
@@ -224,6 +224,13 @@ Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>
 Default: <code>"auto"</code>.</p></dd>
 
 
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
+
+
 <dt>y.trans</dt>
 <dd><p>The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
@@ -270,6 +277,7 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
@@ -289,7 +297,9 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Genus"</span><span class="op">)</span>, flip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="taxa_boxplot-1.png" alt="" width="768" height="384"></span>
-<span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">3</span>, layers <span class="op">=</span> <span class="st">"ps"</span>, color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Body Site"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span></span></span>
+<span class="r-in"><span>      biom <span class="op">=</span> <span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">3</span>, layers <span class="op">=</span> <span class="st">"ps"</span>, </span></span>
+<span class="r-in"><span>      color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Body Site"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span></span>
 <span class="r-plt img"><img src="taxa_boxplot-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>

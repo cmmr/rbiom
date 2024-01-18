@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -109,10 +110,9 @@ statistics will be returned. Default: <code>NULL</code></p></dd>
 
 <dt>test</dt>
 <dd><p>The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-<code>"predict"</code>, <code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>,
-<code>"trends"</code>, <code>"es_means"</code>, <code>"es_trends"</code>,
-<code>"pw_means"</code>, or <code>"pw_trends"</code>.
+found in the "Statistical Tests" section below. One of <code>"predict"</code>,
+<code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>, <code>"trends"</code>, <code>"es_means"</code>,
+<code>"es_trends"</code>, <code>"pw_means"</code>, or <code>"pw_trends"</code>.
 Default: <code>ifelse(is.null(regr), "means", "trends")</code></p></dd>
 
 
@@ -199,6 +199,10 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
+<p>By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+<code>model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -232,7 +236,7 @@ For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female - Male    49   167    -<span style="color: #BB0000;">0.781</span>  -<span style="color: #BB0000;">1.44</span> -<span style="color: #BB0000;">0.183</span> 0.014<span style="text-decoration: underline;">9</span> 0.014<span style="text-decoration: underline;">9</span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">stats_table</span><span class="op">(</span><span class="va">df</span>, stat.by <span class="op">=</span> <span class="st">"Sex"</span>, regr <span class="op">=</span> <span class="st">"BMI"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     Estimated marginal means of linear trends.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     Is each trendline's slope non-zero?</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    stats::lm(.diversity ~ BMI * Sex)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sex    .trend    .se   .df  .lower .upper .t.ratio .p.val .adj.p</span>

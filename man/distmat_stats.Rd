@@ -18,6 +18,7 @@ categorical or numeric. Required.}
 \itemize{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+\item{\code{"none"} - }{ Don't run any statistics. }
 }
 Default: \code{"adonis2"} \cr\cr
 Abbreviations are allowed.}
@@ -67,11 +68,12 @@ Run statistics on a distance matrix vs a categorical or numeric variable.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()}
+\code{\link{bdiv_stats}()},
+\code{\link{bdiv_table}()}
 
 Other stats_tables: 
 \code{\link{adiv_stats}()},

@@ -259,33 +259,33 @@ inline double Jaccard_U(InputIterator1 begin1, InputIterator1 end1, InputIterato
 //======================================================
 struct BetaDivWorker : public Worker {
   
-  const RMatrix<double> mat;
-        RMatrix<double> rmat;
-  const int             method;
+  const RMatrix<double> counts;
+  const RMatrix<int>    pairs;
+  const int             algorithm;
+        RVector<double> distances;
   
-  BetaDivWorker(const NumericMatrix mat, NumericMatrix rmat, int method)
-    : mat(mat), rmat(rmat), method(method) {}
+  BetaDivWorker(const NumericMatrix counts, const IntegerMatrix pairs, int algorithm, NumericVector distances)
+    : counts(counts), pairs(pairs), algorithm(algorithm), distances(distances) {}
   
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; i++) {
-      for (std::size_t j = 0; j < i; j++) {
-        
-        // rows we will operate on
-        RMatrix<double>::Row row1 = mat.row(i);
-        RMatrix<double>::Row row2 = mat.row(j);
-        
-        // calculate distance and write to output matrix
-        switch (method) {
-          case BRAYCURTIS_W: { rmat(i,j) = BrayCurtis_W( row1.begin(), row1.end(), row2.begin() ); break; }
-          case BRAYCURTIS_U: { rmat(i,j) = BrayCurtis_U( row1.begin(), row1.end(), row2.begin() ); break; }
-          case EUCLIDEAN_W:  { rmat(i,j) = Euclidean_W(  row1.begin(), row1.end(), row2.begin() ); break; }
-          case EUCLIDEAN_U:  { rmat(i,j) = Euclidean_U(  row1.begin(), row1.end(), row2.begin() ); break; }
-          case MANHATTAN_W:  { rmat(i,j) = Manhattan_W(  row1.begin(), row1.end(), row2.begin() ); break; }
-          case MANHATTAN_U:  { rmat(i,j) = Manhattan_U(  row1.begin(), row1.end(), row2.begin() ); break; }
-          case JACCARD_W:    { rmat(i,j) = Jaccard_W(    row1.begin(), row1.end(), row2.begin() ); break; }
-          case JACCARD_U:    { rmat(i,j) = Jaccard_U(    row1.begin(), row1.end(), row2.begin() ); break; }
-        }
+      
+      // rows we will operate on
+      RMatrix<double>::Row row1 = counts.row(pairs(i,0));
+      RMatrix<double>::Row row2 = counts.row(pairs(i,1));
+      
+      // calculate distance and write to output matrix
+      switch (algorithm) {
+        case BRAYCURTIS_W: { distances[i] = BrayCurtis_W( row1.begin(), row1.end(), row2.begin() ); break; }
+        case BRAYCURTIS_U: { distances[i] = BrayCurtis_U( row1.begin(), row1.end(), row2.begin() ); break; }
+        case EUCLIDEAN_W:  { distances[i] = Euclidean_W(  row1.begin(), row1.end(), row2.begin() ); break; }
+        case EUCLIDEAN_U:  { distances[i] = Euclidean_U(  row1.begin(), row1.end(), row2.begin() ); break; }
+        case MANHATTAN_W:  { distances[i] = Manhattan_W(  row1.begin(), row1.end(), row2.begin() ); break; }
+        case MANHATTAN_U:  { distances[i] = Manhattan_U(  row1.begin(), row1.end(), row2.begin() ); break; }
+        case JACCARD_W:    { distances[i] = Jaccard_W(    row1.begin(), row1.end(), row2.begin() ); break; }
+        case JACCARD_U:    { distances[i] = Jaccard_U(    row1.begin(), row1.end(), row2.begin() ); break; }
       }
+      
     }
   }
 };
@@ -296,30 +296,30 @@ struct BetaDivWorker : public Worker {
 // Interface to R
 //======================================================
 // [[Rcpp::export]]
-NumericMatrix par_beta_div(NumericMatrix mat, const char* method, bool weighted) {
+NumericVector par_beta_div(NumericMatrix counts, IntegerMatrix pairs, const char* bdiv, bool weighted) {
   
   
-  // Map method and weighted to individual functions to call
-  int metric = 0;
-  if (( weighted) && (strcmp(method, "bray-curtis") == 0)) { metric = BRAYCURTIS_W; }
-  if ((!weighted) && (strcmp(method, "bray-curtis") == 0)) { metric = BRAYCURTIS_U; }
-  if (( weighted) && (strcmp(method, "euclidean")   == 0)) { metric = EUCLIDEAN_W;  }
-  if ((!weighted) && (strcmp(method, "euclidean")   == 0)) { metric = EUCLIDEAN_U;  }
-  if (( weighted) && (strcmp(method, "manhattan")   == 0)) { metric = MANHATTAN_W;  }
-  if ((!weighted) && (strcmp(method, "manhattan")   == 0)) { metric = MANHATTAN_U;  }
-  if (( weighted) && (strcmp(method, "jaccard")     == 0)) { metric = JACCARD_W;    }
-  if ((!weighted) && (strcmp(method, "jaccard")     == 0)) { metric = JACCARD_U;    }
+  // Map bdiv method and weighted to individual functions to call
+  int algorithm = 0;
+  if (( weighted) && (strcmp(bdiv, "bray-curtis") == 0)) { algorithm = BRAYCURTIS_W; }
+  if ((!weighted) && (strcmp(bdiv, "bray-curtis") == 0)) { algorithm = BRAYCURTIS_U; }
+  if (( weighted) && (strcmp(bdiv, "euclidean")   == 0)) { algorithm = EUCLIDEAN_W;  }
+  if ((!weighted) && (strcmp(bdiv, "euclidean")   == 0)) { algorithm = EUCLIDEAN_U;  }
+  if (( weighted) && (strcmp(bdiv, "manhattan")   == 0)) { algorithm = MANHATTAN_W;  }
+  if ((!weighted) && (strcmp(bdiv, "manhattan")   == 0)) { algorithm = MANHATTAN_U;  }
+  if (( weighted) && (strcmp(bdiv, "jaccard")     == 0)) { algorithm = JACCARD_W;    }
+  if ((!weighted) && (strcmp(bdiv, "jaccard")     == 0)) { algorithm = JACCARD_U;    }
   
   
-  // allocate the matrix we will return
-  NumericMatrix rmat(mat.nrow(), mat.nrow());
+  // allocate the vector we will return
+  NumericVector distances(pairs.nrow());
   
   // create the worker and call it with parallelFor
-  if (metric > 0) {
-    BetaDivWorker betaDivWorker(mat, rmat, metric);
-    parallelFor(0, mat.nrow(), betaDivWorker);
+  if (algorithm > 0) {
+    BetaDivWorker betaDivWorker(counts, pairs, algorithm, distances);
+    parallelFor(0, pairs.nrow(), betaDivWorker);
   }
   
-  return rmat;
+  return distances;
 }
 

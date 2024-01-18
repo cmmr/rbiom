@@ -3,7 +3,6 @@ title: "rbiom"
 ---
 
 ```{r, include = FALSE}
-
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -202,10 +201,10 @@ For example, to display an ordination colored by body site:
 bdiv_ord_plot(biom = hmp50, color.by = "Body Site")
 ```
 
-`adiv_boxplot()`, `adiv_corrplot()`, `bdiv_boxplot()`, `bdiv_heatmap()`, 
-`bdiv_ord_plot()`, `rare_barplot()`, `rare_corrplot()`, `rare_multiplot()`, 
-`taxa_barplot()`, `taxa_boxplot()`, `taxa_corrplot()`, `taxa_heatmap()`
-
+`adiv_boxplot()`, `adiv_corrplot()`, `bdiv_boxplot()`, `bdiv_corrplot()`, 
+`bdiv_heatmap()`, `bdiv_ord_plot()`, `rare_barplot()`, `rare_corrplot()`, 
+`rare_multiplot()`, `taxa_barplot()`, `taxa_boxplot()`, `taxa_corrplot()`, 
+`taxa_heatmap()`
 
 
 

@@ -15,9 +15,10 @@ taxa_corrplot(
   limit.by = NULL,
   test = "trends",
   model = "lm",
-  level = 0.95,
+  trans = "rank",
   p.top = Inf,
   p.adj = "fdr",
+  level = 0.95,
   caption = TRUE,
   ...
 )
@@ -41,11 +42,11 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
-\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
-abbreviations are also accepted. For instance,
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and
-\code{"ts"}. See \code{vignette("corrplots")} for examples of each.
-Default: \code{"t"}.}
+\item{layers}{One or more of
+\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+letter abbreviations are also accepted. For instance,
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -62,8 +63,10 @@ Default: \code{"trends"}}
 (generalized additive). See the "Model Options" section below for
 additional details. Default: \code{"lm"}}
 
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{p.top}{Only display taxa with the most significant differences in
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most
@@ -77,6 +80,9 @@ Default: \code{Inf}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
 
+\item{level}{The confidence level for calculating a confidence interval.
+Default: \code{0.95}}
+
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
 
@@ -89,8 +95,8 @@ scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 Visualize taxa abundance with scatterplots and trendlines.
@@ -143,6 +149,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \section{Aesthetics and Partitions}{
@@ -214,6 +225,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

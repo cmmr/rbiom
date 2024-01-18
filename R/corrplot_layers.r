@@ -28,9 +28,6 @@ init_corrplot_layers <- function (params = parent.frame()) {
   # Clean up the y-axis values.
   #________________________________________________________
   with(params, {
-    # .ggdata <- rename_response(.ggdata, ".y")
-    # .ggdata <- .ggdata[is.finite(.ggdata[['.y']]),]
-    
     .ggdata <- .ggdata[is.finite(.ggdata[[.xcol]]),]
     .ggdata <- .ggdata[is.finite(.ggdata[[.ycol]]),]
   })
@@ -169,6 +166,16 @@ init_corrplot_layers <- function (params = parent.frame()) {
   
   
   #________________________________________________________
+  # Display sample names at x,y coordinates.
+  #________________________________________________________
+  if (has_layer(params, 'name'))
+    set_layer(params, 'name', 'mapping|label' = ".sample")
+  
+  
+  
+  
+  
+  #________________________________________________________
   # Add layers will have a common `x` and `y` field name.
   #________________________________________________________
   set_layer(
@@ -176,12 +183,6 @@ init_corrplot_layers <- function (params = parent.frame()) {
     layer  = 'ggplot', 
     'mapping|x' = params$.xcol, 
     'mapping|y' = params$.ycol )
-  
-  
-  # x-axis title
-  #________________________________________________________
-  if (!startsWith(params$.xcol, "."))
-    set_layer(params, 'labs', x = params$.xcol)
   
   
   return (invisible(params))

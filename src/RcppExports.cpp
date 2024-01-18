@@ -11,28 +11,30 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // par_beta_div
-NumericMatrix par_beta_div(NumericMatrix mat, const char* method, bool weighted);
-RcppExport SEXP _rbiom_par_beta_div(SEXP matSEXP, SEXP methodSEXP, SEXP weightedSEXP) {
+NumericVector par_beta_div(NumericMatrix counts, IntegerMatrix pairs, const char* bdiv, bool weighted);
+RcppExport SEXP _rbiom_par_beta_div(SEXP countsSEXP, SEXP pairsSEXP, SEXP bdivSEXP, SEXP weightedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
-    Rcpp::traits::input_parameter< const char* >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type counts(countsSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type pairs(pairsSEXP);
+    Rcpp::traits::input_parameter< const char* >::type bdiv(bdivSEXP);
     Rcpp::traits::input_parameter< bool >::type weighted(weightedSEXP);
-    rcpp_result_gen = Rcpp::wrap(par_beta_div(mat, method, weighted));
+    rcpp_result_gen = Rcpp::wrap(par_beta_div(counts, pairs, bdiv, weighted));
     return rcpp_result_gen;
 END_RCPP
 }
 // par_unifrac
-NumericVector par_unifrac(List sparseMatrix, List tree, IntegerVector weighted);
-RcppExport SEXP _rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
+NumericVector par_unifrac(List sparseMatrix, IntegerMatrix pairs, List tree, IntegerVector weighted);
+RcppExport SEXP _rbiom_par_unifrac(SEXP sparseMatrixSEXP, SEXP pairsSEXP, SEXP treeSEXP, SEXP weightedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type sparseMatrix(sparseMatrixSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type pairs(pairsSEXP);
     Rcpp::traits::input_parameter< List >::type tree(treeSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type weighted(weightedSEXP);
-    rcpp_result_gen = Rcpp::wrap(par_unifrac(sparseMatrix, tree, weighted));
+    rcpp_result_gen = Rcpp::wrap(par_unifrac(sparseMatrix, pairs, tree, weighted));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,8 +75,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rbiom_par_beta_div", (DL_FUNC) &_rbiom_par_beta_div, 3},
-    {"_rbiom_par_unifrac", (DL_FUNC) &_rbiom_par_unifrac, 3},
+    {"_rbiom_par_beta_div", (DL_FUNC) &_rbiom_par_beta_div, 4},
+    {"_rbiom_par_unifrac", (DL_FUNC) &_rbiom_par_unifrac, 4},
     {"_rbiom_rcpp_alpha_div", (DL_FUNC) &_rbiom_rcpp_alpha_div, 1},
     {"_rbiom_rcpp_rarefy", (DL_FUNC) &_rbiom_rcpp_rarefy, 3},
     {"_rbiom_rcpp_read_tree", (DL_FUNC) &_rbiom_rcpp_read_tree, 1},

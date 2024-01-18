@@ -10,7 +10,7 @@
 #' @param tracks   List of track definitions. See details below.
 #'        Default: `NULL`.
 #' 
-#' @param labs.title   Plot title. Default: `NULL`.
+#' @param title   Plot title. Default: `NULL`.
 #' 
 #' 
 #' @section Track Definitions:
@@ -105,8 +105,8 @@ plot_heatmap <- function (
     mtx, grid = list(label = "Grid Value", colors = "imola"), tracks = NULL,
     label = TRUE, label_size = NULL, rescale = "none",
     trees = TRUE, clust = "complete", dist = "euclidean",
-    ratio = 1, tree_height = NULL, track_height = NULL, 
-    legend = "right", xlab.angle = "auto", labs.title = NULL, ... ) {
+    asp = 1, tree_height = 10, track_height = 10, 
+    legend = "right", title = NULL, xlab.angle = "auto", ... ) {
   
   
   #________________________________________________________
@@ -140,7 +140,7 @@ plot_heatmap <- function (
   stopifnot(is_null(label_size)   || (is_double(label_size)   && length(label_size)   <= 2) )
   stopifnot(is_null(tree_height)  || (is_double(tree_height)  && length(tree_height)  <= 2))
   stopifnot(is_null(track_height) || (is_double(track_height) && length(track_height) <= 2))
-  stopifnot(is_scalar_double(ratio) && !is_na(ratio))
+  stopifnot(is_scalar_double(asp) && !is_na(asp))
   stopifnot(is_string(rescale, c("none", "rows", "cols")))
   stopifnot(is_string(legend, c("right", "bottom")))
   stopifnot(is_string(as.character(xlab.angle), c("auto", "0", "30", "90")))
@@ -192,14 +192,28 @@ plot_heatmap <- function (
   
   
   
+  
+  
+  #________________________________________________________
+  # Combine heights + aspect ratio to get top/left heights
+  #________________________________________________________
+  stopifnot(is.numeric(tree_height) && is.numeric(track_height) && is.numeric(asp))
+  stopifnot(length(tree_height) > 0 && length(track_height) > 0 && length(asp) == 1)
+  
+  asp <- asp * ncol(mtx) / nrow(mtx)
+  
+  tree_height_top   <- tree_height[[1]]  / 100 * nrow(mtx)
+  track_height_top  <- track_height[[1]] / 100 * nrow(mtx)
+  tree_height_left  <- if (length(tree_height_top) == 1) tree_height_top  * asp else tree_height[[2]]  / 100 * ncol(mtx)
+  track_height_left <- if (length(track_height)    == 1) track_height_top * asp else track_height[[2]] / 100 * ncol(mtx)
+  remove("tree_height", "track_height")
+  
+  
+  
+  
   #________________________________________________________
   # Heuristics for setting sizes and heights of elements
   #________________________________________________________
-  if (is_null(tree_height))  tree_height  <- dim(mtx) * 0.15
-  if (is_null(track_height)) track_height <- tree_height / 3
-  
-  ratio <- ratio * ncol(mtx) / nrow(mtx)
-  
   if (is_null(label_size))         label_size <- pmax(5, pmin(14, 100 / dim(mtx)))
   if (!is_null(names(label_size))) label_size <- label_size[rev(order(names(label_size)))]
   label_size_x <- tail(label_size, 1) %>% signif(digits = 3)
@@ -216,19 +230,6 @@ plot_heatmap <- function (
   label_size_x <- unit(label_size_x, "points")
   label_size_y <- unit(label_size_y, "points")
   
-  
-  
-  
-  #________________________________________________________
-  # Use specified height(s) + ratio to compute top & left heights
-  #________________________________________________________
-  stopifnot(is.numeric(tree_height) && is.numeric(track_height) && is.numeric(ratio))
-  stopifnot(length(tree_height) > 0 && length(track_height) > 0 && length(ratio) == 1)
-  tree_height_top   <- head(tree_height,  1) * ifelse(ratio < 1, ratio, 1)
-  tree_height_left  <- tail(tree_height,  1) * ifelse(ratio > 1, ratio, 1)
-  track_height_top  <- head(track_height, 1) * ifelse(ratio < 1, ratio, 1)
-  track_height_left <- tail(track_height, 1) * ifelse(ratio > 1, ratio, 1)
-  remove("tree_height", "track_height")
   
   
   #________________________________________________________
@@ -412,10 +413,10 @@ plot_heatmap <- function (
   #________________________________________________________
   gglayers <- list()
   gglayers %<>% ggpush(ggplot(df))
-  gglayers %<>% ggpush(coord_fixed(ratio=ratio))
+  gglayers %<>% ggpush(coord_fixed(ratio=asp))
   
-  if (!is.null(labs.title))
-    gglayers %<>% ggpush(labs(title=labs.title))
+  if (!is.null(title))
+    gglayers %<>% ggpush(labs(title=title))
   
   
   #________________________________________________________

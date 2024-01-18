@@ -26,7 +26,7 @@ drop. If you need to create different random rarefactions of the same
 data, set the seed to a different number each time.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
 }
 \value{
@@ -48,7 +48,6 @@ integers between 1 and \code{depth} such that they sum to \code{depth}.
 }
 \seealso{
 Other rarefaction: 
-\code{\link{pull.rbiom}()},
 \code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},

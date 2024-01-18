@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -75,7 +76,7 @@
 <dd><p>Color palette name, or a list with entries for <code>label</code>,
 <code>colors</code>, <code>range</code>, <code>bins</code>, <code>na.color</code>, and/or
 <code>guide</code>. See the Track Definitions section for details.
-Default: <code>list(label = "Grid Value", colors = "imola")</code>.</p></dd>
+Default: <code>list(label = "Grid Value", colors = "imola")</code></p></dd>
 
 
 <dt>label</dt>
@@ -86,7 +87,7 @@ labels separately, for example
 <code>label = c(T, F)</code>. Other valid options are <code>"rows"</code>,
 <code>"cols"</code>, <code>"both"</code>, <code>"bottom"</code>, <code>"right"</code>,
 and <code>"none"</code>.
-Default: <code>TRUE</code>.</p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>label_size</dt>
@@ -95,13 +96,13 @@ can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 <code>c(rows = 20, cols = 8)</code>, or simply <code>c(20, 8)</code>.
 Default: <code>NULL</code>, which computes:
-<code>pmax(8, pmin(20, 100 / dim(mtx)))</code>.</p></dd>
+<code>pmax(8, pmin(20, 100 / dim(mtx)))</code></p></dd>
 
 
 <dt>rescale</dt>
 <dd><p>Rescale rows or columns to all have a common min/max.
 Options: <code>"none"</code>, <code>"rows"</code>, or <code>"cols"</code>.
-Default: <code>"none"</code>.</p></dd>
+Default: <code>"none"</code></p></dd>
 
 
 <dt>trees</dt>
@@ -111,7 +112,7 @@ and column tree separately, for example
 <code>trees = c(rows = T, cols = F)</code>, or simply <code>trees = c(T, F)</code>.
 Other valid options are <code>"rows"</code>, <code>"cols"</code>, <code>"both"</code>,
 <code>"left"</code>, <code>"top"</code>, and <code>"none"</code>.
-Default: <code>TRUE</code>.</p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>clust</dt>
@@ -125,7 +126,7 @@ control the row and column clustering separately, for example
 <code>"ward.D2"</code>, <code>"single"</code>, <code>"complete"</code>,
 <code>"average"</code>, <code>"mcquitty"</code>, <code>"median"</code>, or
 <code>"centroid"</code>.</p></li>
-</ul><p>Default: <code>"complete"</code>.</p></dd>
+</ul><p>Default: <code>"complete"</code></p></dd>
 
 
 <dt>dist</dt>
@@ -133,30 +134,33 @@ control the row and column clustering separately, for example
 by similarity. You can supply a list or character vector of length
 two to control the row and column clustering separately, for example
 <code>dist = c(rows = "euclidean", cols = "maximum")</code>, or simply
-<code>dist = c("euclidean", "maximum")</code>. Options are:</p><ul><li><p>A <code>dist</code> class object E.g. from <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code> or <code><a href="bdiv_distmat.html">bdiv_distmat()</a></code>.</p></li>
+<code>dist = c("euclidean", "maximum")</code>. Options are:</p><ul><li><p>A <code>dist</code> class object E.g. from <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">stats::dist()</a></code> or <code><a href="bdiv_table.html">bdiv_distmat()</a></code>.</p></li>
 <li><p>A method name -  <code>"euclidean"</code>,
 <code>"maximum"</code>, <code>"manhattan"</code>, <code>"canberra"</code>,
 <code>"binary"</code>, or <code>"minkowski"</code>.</p></li>
-</ul><p>Default: <code>"euclidean"</code>.</p></dd>
+</ul><p>Default: <code>"euclidean"</code></p></dd>
 
 
 <dt>tree_height, track_height</dt>
 <dd><p>The height of the dendrogram or annotation
-tracks in multiples (or fractions) of the smaller dimension of the
-grid cell size. Use a numeric vector of length two to assign
-<code>c(top, left)</code> independently.
-Default: <code>NULL</code>, which computes:
-<code>tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4</code>.</p></dd>
+tracks as a percentage of the overall grid size. Use a numeric vector
+of length two to assign <code>c(top, left)</code> independently.
+Default: <code>10</code> (10% of the grid's height)</p></dd>
 
 
-<dt>ratio</dt>
-<dd><p>Height/width ratio for entire grid.
-Default: <code>1</code> (square).</p></dd>
+<dt>asp</dt>
+<dd><p>Aspect ratio (height/width) for entire grid.
+Default: <code>1</code> (square)</p></dd>
 
 
 <dt>legend</dt>
 <dd><p>Where to place the legend. Options are: <code>"right"</code> or
-<code>"bottom"</code>. Default: <code>"right"</code>.</p></dd>
+<code>"bottom"</code>. Default: <code>"right"</code></p></dd>
+
+
+<dt>title</dt>
+<dd><p>Plot title. Set to <code>TRUE</code> for a default title, <code>NULL</code> for
+no title, or any character string. Default: <code>TRUE</code></p></dd>
 
 
 <dt>...</dt>

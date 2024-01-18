@@ -28,7 +28,7 @@
 \item{...}{Passed on to \code{\link[dplyr:slice]{dplyr::slice()}}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
-is modified in place as a side-effect. See \link[=speed_ups]{speed ups} for
+is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
 }
 \value{

@@ -5,10 +5,9 @@
 \title{documentation_test.ifelse}
 \arguments{
 \item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
-\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
-\code{"pw_means"}, or \code{"pw_trends"}.
+found in the "Statistical Tests" section below. One of \code{"predict"},
+\code{"terms"}, \code{"fit"}, \code{"means"}, \code{"trends"}, \code{"es_means"},
+\code{"es_trends"}, \code{"pw_means"}, or \code{"pw_trends"}.
 Default: \code{ifelse(is.null(regr), "means", "trends")}}
 }
 \description{

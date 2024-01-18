@@ -24,7 +24,7 @@ Create a subtree by specifying tips to keep.
     tree <- read_tree(infile)
     tree
     
-    subtree <- tree_subset(tree, tips = head(tree_tips(tree)))
+    subtree <- tree_subset(tree, tips = head(tree$tip.label))
     subtree
 
 }

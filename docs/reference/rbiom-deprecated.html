@@ -16,7 +16,7 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'><!-- mathjax --><scri
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,13 +37,14 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'><!-- mathjax --><scri
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -104,7 +105,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span><span class="fu">sample.names</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for rbiom</span></span>
-<span><span class="fu">select</span><span class="op">(</span><span class="va">biom</span>, samples <span class="op">=</span> <span class="cn">NULL</span>, nTop <span class="op">=</span> <span class="cn">NULL</span>, nRandom <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">biom</span>, samples <span class="op">=</span> <span class="cn">NULL</span>, nTop <span class="op">=</span> <span class="cn">NULL</span>, nRandom <span class="op">=</span> <span class="cn">NULL</span>, seed <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sequences</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
@@ -211,7 +212,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="beta-div"><code>beta.div</code><a class="anchor" aria-label="anchor" href="#beta-div"></a></h2>
     
 
-<p>Use <code><a href="bdiv_distmat.html">bdiv_table()</a></code> or <code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> instead.</p>
+<p>Use <code><a href="bdiv_table.html">bdiv_table()</a></code> or <code><a href="bdiv_table.html">bdiv_distmat()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="counts"><code>counts</code><a class="anchor" aria-label="anchor" href="#counts"></a></h2>
@@ -325,7 +326,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
     <h2 id="unifrac"><code>unifrac</code><a class="anchor" aria-label="anchor" href="#unifrac"></a></h2>
     
 
-<p>Use <code><a href="bdiv_distmat.html">bdiv_distmat()</a></code> or <code><a href="bdiv_distmat.html">bdiv_table()</a></code> instead.</p>
+<p>Use <code><a href="bdiv_table.html">bdiv_distmat()</a></code> or <code><a href="bdiv_table.html">bdiv_table()</a></code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="write-biom"><code>write.biom</code><a class="anchor" aria-label="anchor" href="#write-biom"></a></h2>

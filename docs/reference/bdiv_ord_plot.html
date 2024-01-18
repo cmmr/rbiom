@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,14 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -127,14 +128,12 @@ Multiple values allowed.</p></dd>
 
 
 <dt>layers</dt>
-<dd><p>What graphical elements to use for drawing. Options are:
-<b>point</b>, <b>spider</b>, <b>ellipse</b>, and <b>name</b> for
-samples, and <b>mean</b>, <b>taxon</b>, and <b>arrow</b> for taxa.
+<dd><p>One or more of
+<code>c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")</code>.
+The first four are sample-centric; the last three are taxa-centric.
 Single letter abbreviations are also accepted. For instance,
-<code>c("point", "ellipse")</code> is equivalent to <code>c("p", "e")</code> and
-<code>"pe"</code>.
-See the <code>vignette("ordination")</code> vignette for examples of each.
-Default: <code>"pe"</code></p></dd>
+<code>c("point", "ellipse")</code> is equivalent to <code>c("p", "e")</code> and <code>"pe"</code>.
+See plot types for examples of each. Default: <code>"pe"</code></p></dd>
 
 
 <dt>color.by, shape.by, facet.by, limit.by</dt>
@@ -152,6 +151,7 @@ computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 <dt>test</dt>
 <dd><p>Permutational test for accessing significance. Options are:</p><ul><li><p><code>"adonis2"</code> -  Permutational MANOVA; <code><a href="https://rdrr.io/pkg/vegan/man/vegan-deprecated.html" class="external-link">vegan::adonis2()</a></code>.</p></li>
 <li><p><code>"mrpp"</code> -  Multiple response permutation procedure; <code><a href="https://rdrr.io/pkg/vegan/man/mrpp.html" class="external-link">vegan::mrpp()</a></code>.</p></li>
+<li><p><code>"none"</code> -  Don't run any statistics.</p></li>
 </ul><p>Default: <code>"adonis2"</code> <br><br>
 Abbreviations are allowed.</p></dd>
 
@@ -244,10 +244,11 @@ are available as <code>$data</code> and <code>$code</code> respectively. <br></p
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
-<code><a href="bdiv_distmat.html">bdiv_distmat</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
 <code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
+<code><a href="bdiv_table.html">bdiv_table</a>()</code>,
 <code><a href="distmat_stats.html">distmat_stats</a>()</code></p>
 <p>Other ordination: 
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
@@ -256,6 +257,7 @@ are available as <code>$data</code> and <code>$code</code> respectively. <br></p
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
 <code><a href="rare_barplot.html">rare_barplot</a>()</code>,

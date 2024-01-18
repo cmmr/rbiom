@@ -19,8 +19,8 @@ bdiv_ord_table(
   test = "adonis2",
   seed = 0,
   permutations = 999,
-  rank = -1,
-  taxa = 5,
+  rank = NULL,
+  taxa = 6,
   p.top = Inf,
   p.adj = "fdr",
   unc = "singly",
@@ -35,7 +35,7 @@ bdiv_ord_table(
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
@@ -77,6 +77,7 @@ comparisons. Default: \code{NULL}}
 \itemize{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+\item{\code{"none"} - }{ Don't run any statistics. }
 }
 Default: \code{"adonis2"} \cr\cr
 Abbreviations are allowed.}
@@ -86,12 +87,13 @@ Abbreviations are allowed.}
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
 
-\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\item{rank}{What rank(s) of taxa to compute biplot coordinates and
+statistics for, or \code{NULL} to disable. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
 given, where \code{1} is the highest rank, \code{2} is the second
 highest, \code{-1} is the lowest rank, \code{-2} is the second
 lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
-see all options for a given rbiom object. Default: \code{-1}.}
+see all options for a given rbiom object. Default: \code{NULL}.}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -154,10 +156,11 @@ The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_stats}()},
+\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other ordination: 

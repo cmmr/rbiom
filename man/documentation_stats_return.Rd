@@ -5,7 +5,7 @@
 \title{documentation_stats_return}
 \value{
 A tibble data frame with summary statistics. \cr
-The R code or generating these statistics is in \code{$code}.
+The R code or generating these statistics is in \verb{$code}.
 }
 \description{
 documentation_stats_return

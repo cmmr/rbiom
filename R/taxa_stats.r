@@ -24,6 +24,7 @@ taxa_stats <- function (
     biom, stat.by = NULL, regr = NULL, rank = -1, taxa = 6, 
     test = ifelse(is.null(regr), "means", "trends"), 
     model = "lm", level = 0.95, 
+    trans = ifelse(is.null(regr), "none", "rank"), 
     lineage = FALSE, unc = "singly", other = FALSE,
     split.by = NULL, p.adj = "fdr" ) {
   

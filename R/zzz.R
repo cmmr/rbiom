@@ -52,6 +52,7 @@ ENV <- environment(NULL)
   lapply(FUN = cmd_wrap, pkg="generics",   {c('tidy', 'glance', 'augment')})
   lapply(FUN = cmd_wrap, pkg="emmeans",    {c('emmeans', 'emtrends', 'eff_size')})
   lapply(FUN = cmd_wrap, pkg="graphics",   {c('pairs')})
+  lapply(FUN = cmd_wrap, pkg="scales",     {c('trans_new', 'label_number', 'cut_si')})
   lapply(FUN = cmd_wrap, pkg="stats",      {c('sigma', 'df.residual')})
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})

@@ -9,19 +9,20 @@ bdiv_heatmap(
   bdiv = "Bray-Curtis",
   weighted = TRUE,
   tree = NULL,
-  grid = list(label = "Distance", colors = "-bilbao"),
+  grid = "devon",
   color.by = NULL,
   order.by = NULL,
   limit.by = NULL,
   label = TRUE,
   label_size = NULL,
   rescale = "none",
-  ratio = 1,
   clust = "complete",
   trees = TRUE,
-  tree_height = NULL,
-  track_height = NULL,
+  asp = 1,
+  tree_height = 10,
+  track_height = 10,
   legend = "right",
+  title = TRUE,
   xlab.angle = "auto",
   ...
 )
@@ -34,7 +35,7 @@ bdiv_heatmap(
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{weighted}{Take relative abundances into account. When
@@ -49,7 +50,7 @@ computing UniFrac distances. Default: \code{biom$tree}}
 \item{grid}{Color palette name, or a list with entries for \code{label},
 \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
 \code{guide}. See the Track Definitions section for details.
-Default: \code{list(label = "Distance", colors = "-bilbao")}.}
+Default: \code{"devon"}}
 
 \item{color.by}{Add annotation tracks for these metadata column(s).
 See "Annotation Tracks" section below for details.
@@ -72,21 +73,18 @@ labels separately, for example
 \code{label = c(T, F)}. Other valid options are \code{"rows"},
 \code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
 and \code{"none"}.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
 
 \item{label_size}{The font size to use for the row and column labels. You
 can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
 Default: \code{NULL}, which computes:
-\code{pmax(8, pmin(20, 100 / dim(mtx)))}.}
+\code{pmax(8, pmin(20, 100 / dim(mtx)))}}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
-Default: \code{"none"}.}
-
-\item{ratio}{Height/width ratio for entire grid.
-Default: \code{1} (square).}
+Default: \code{"none"}}
 
 \item{clust}{Clustering algorithm for reordering the rows and columns by
 similarity. You can supply a list or character vector of length two to
@@ -101,7 +99,7 @@ control the row and column clustering separately, for example
 \code{"average"}, \code{"mcquitty"}, \code{"median"}, or
 \code{"centroid"}. }
 }
-Default: \code{"complete"}.}
+Default: \code{"complete"}}
 
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
 supply a list or logical vector of length two to control the row tree
@@ -109,28 +107,32 @@ and column tree separately, for example
 \code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}.
 Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"},
 \code{"left"}, \code{"top"}, and \code{"none"}.
-Default: \code{TRUE}.}
+Default: \code{TRUE}}
+
+\item{asp}{Aspect ratio (height/width) for entire grid.
+Default: \code{1} (square)}
 
 \item{tree_height, track_height}{The height of the dendrogram or annotation
-tracks in multiples (or fractions) of the smaller dimension of the
-grid cell size. Use a numeric vector of length two to assign
-\code{c(top, left)} independently.
-Default: \code{NULL}, which computes:
-\code{tree_height = sqrt(min(dim(mtx))), track_height = tree_height / 4}.}
+tracks as a percentage of the overall grid size. Use a numeric vector
+of length two to assign \code{c(top, left)} independently.
+Default: \code{10} (10\% of the grid's height)}
 
 \item{legend}{Where to place the legend. Options are: \code{"right"} or
-\code{"bottom"}. Default: \code{"right"}.}
+\code{"bottom"}. Default: \code{"right"}}
+
+\item{title}{Plot title. Set to \code{TRUE} for a default title, \code{NULL} for
+no title, or any character string. Default: \code{TRUE}}
 
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
-For example, \code{labs.title = "Plot Title"}.}
+For example, \code{labs.subtitle = "Plot subtitle"}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points and ggplot
-command are available as \code{$data} and \code{$code},
+command are available as \verb{$data} and \verb{$code},
 respectively.
 }
 \description{
@@ -248,16 +250,18 @@ limit.by = list(
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
+\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
 \code{\link{rare_barplot}()},

@@ -20,7 +20,7 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9111</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,13 +41,14 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../reference/speed_ups.html">Speed Ups</a>
     <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
+    <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/partitioning.html">Data Partitioning</a>
+    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -70,7 +71,7 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Taxa abundances per sample.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_matrix.r" class="external-link"><code>R/taxa_matrix.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_table.r" class="external-link"><code>R/taxa_table.r</code></a></small>
       <div class="d-none name"><code>taxa_matrix.Rd</code></div>
     </div>
 
@@ -89,7 +90,8 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sparse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
-<span>  other <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">taxa_table</span><span class="op">(</span></span>
@@ -99,7 +101,8 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
 <span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  md <span class="op">=</span> <span class="st">".all"</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
-<span>  other <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -162,6 +165,13 @@ value as the name to use instead of "Other".
 Default: <code>FALSE</code></p></dd>
 
 
+<dt>trans</dt>
+<dd><p>Transformation to apply. Options are:
+<code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: <code>"none"</code></p></dd>
+
+
 <dt>md</dt>
 <dd><p>A character vector naming the metadata fields to include in the
 output data frame, or <code>'.all'</code> to include all metadata fields.
@@ -193,34 +203,29 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">ranks</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".otu"    "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          HMP01      HMP02      HMP03      HMP04       HMP05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Actinobacteria      0.01084337 0.04376368 0.09312639 0.06332454 0.007616146</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bacteroidetes       0.16626506 0.16119621 0.23133777 0.11503958 0.036557502</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cyanobacteria       0.00000000 0.00000000 0.00000000 0.00000000 0.000000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Deinococcus Thermus 0.00000000 0.00000000 0.00000000 0.00000000 0.000000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          HMP06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Actinobacteria      0.01710843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bacteroidetes       0.21204819</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cyanobacteria       0.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Deinococcus Thermus 0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     HMP01 HMP02 HMP03 HMP04 HMP05 HMP06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Actinobacteria         18    60   126   120    30    71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bacteroidetes         276   221   313   218   144   880</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cyanobacteria           0     0     0     0     0     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Deinococcus Thermus     0     0     0     0     0     0</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 650 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .rank  .sample .taxa               .abundance   Age   BMI `Body Site`   Sex  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Phylum HMP01   Actinobacteria         0.010<span style="text-decoration: underline;">8</span>     22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Phylum HMP01   Bacteroidetes          0.166      22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Phylum HMP01   Cyanobacteria          0          22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Phylum HMP01   Deinococcus Thermus    0          22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Phylum HMP01   Firmicutes             0.728      22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Phylum HMP01   Fusobacteria           0.024<span style="text-decoration: underline;">7</span>     22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Phylum HMP01   Gracilibacteria        0.008<span style="text-decoration: underline;">43</span>    22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Phylum HMP01   Proteobacteria         0.062<span style="text-decoration: underline;">0</span>     22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Phylum HMP01   Saccharibacteria       0          22    20 Buccal mucosa Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Phylum HMP01   Spirochaetae           0          22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Phylum HMP01   Actinobacteria              18    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Phylum HMP01   Bacteroidetes              276    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Phylum HMP01   Cyanobacteria                0    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Phylum HMP01   Deinococcus Thermus          0    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Phylum HMP01   Firmicutes                <span style="text-decoration: underline;">1</span>208    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Phylum HMP01   Fusobacteria                41    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Phylum HMP01   Gracilibacteria             14    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Phylum HMP01   Proteobacteria             103    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Phylum HMP01   Saccharibacteria             0    22    20 Buccal mucosa Fema…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Phylum HMP01   Spirochaetae                 0    22    20 Buccal mucosa Fema…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 640 more rows</span></span>
 </code></pre></div>
     </div>

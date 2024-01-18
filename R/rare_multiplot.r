@@ -16,9 +16,11 @@
 #'     
 
 rare_multiplot <- function (
-    biom, adiv = "OTUs", depths = NULL, layers = "t", rline = TRUE,
+    biom, adiv = "OTUs", layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "pw_means", model = "log", level = 0.95, p.adj = "fdr", 
+    test = "pw_means", 
+    model = list("stats::lm", list(formula = y ~ log(x))),
+    trans = "none", level = 0.95, p.adj = "fdr", 
     caption = TRUE, labels = FALSE, ...) {
   
   biom <- as_rbiom(biom)
@@ -55,8 +57,8 @@ rare_multiplot <- function (
     cmds <- sapply(seq_along(plots), function (i) {
       sub(
         x           = attr(plots[[i]], 'code'), 
-        pattern     = "ggplot(data = data", 
-        replacement = sprintf("p%i <- ggplot(data = data[[%s]]", i, single_quote(names(plots)[[i]])),
+        pattern     = "ggplot(data", 
+        replacement = sprintf("p%i <- ggplot(data[[%s]]", i, single_quote(names(plots)[[i]])),
         fixed       = TRUE )
     })
     c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))

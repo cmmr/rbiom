@@ -28,6 +28,7 @@
 adiv_stats <- function (
     biom, stat.by = NULL, regr = NULL, adiv = "Shannon",
     test = ifelse(is.null(regr), "means", "trends"), model = "lm", 
+    trans = ifelse(is.null(regr), "none", "rank"), 
     split.by = NULL, level = 0.95, p.adj = "fdr") {
   
   

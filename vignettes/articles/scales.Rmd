@@ -1,0 +1,18 @@
+---
+title: "Plot Scales and Transformations"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+
+
+

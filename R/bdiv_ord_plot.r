@@ -8,15 +8,13 @@
 #' @family visualization
 #' 
 #' 
-#' @param layers   What graphical elements to use for drawing. Options are:
-#'        \bold{point}, \bold{spider}, \bold{ellipse}, and \bold{name} for
-#'        samples, and \bold{mean}, \bold{taxon}, and \bold{arrow} for taxa.
-#'        Single letter abbreviations are also accepted. For instance,
-#'        \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and 
-#'        \code{"pe"}.
-#'        See the \code{vignette("ordination")} vignette for examples of each.
-#'        Default: \code{"pe"}
-#'                 
+#' @param layers   One or more of 
+#'        `c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")`. 
+#'        The first four are sample-centric; the last three are taxa-centric. 
+#'        Single letter abbreviations are also accepted. For instance, 
+#'        `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`. 
+#'        See [plot types][plots] for examples of each. Default: `"pe"`
+#'        
 #' @param color.by,shape.by,facet.by,limit.by   Metadata columns to use for 
 #'        aesthetics and partitioning. See below for details. 
 #'        Default: `NULL`
@@ -106,11 +104,15 @@ bdiv_ord_plot <- function (
       md           = ".all",
       split.by     = facet.by,
       stat.by      = names(color.by),
+      tree         = tree,
+      test         = test,
+      seed         = seed,
       permutations = permutations,
       rank         = rank,
       taxa         = taxa,
       p.adj        = p.adj,
-      p.top        = p.top )
+      p.top        = p.top,
+      unc          = unc )
     
     .ggdata %<>% rename_cols('.sample' = ".label")
     
@@ -169,6 +171,7 @@ bdiv_ord_plot <- function (
     if (length(layerArgs) == 0) next
     
     names(layerArgs) <- paste0("mapping|", names(layerArgs))
+    if (layer == "name") layerArgs[['mapping|label']] <- ".sample"
     set_layer(params, layer, layerArgs)
   }
   remove(list = c("specs", "args", "layer") %>% intersect(ls()))
@@ -558,16 +561,17 @@ ordination_spider <- function (params) {
   ggdata <- params$.ggdata
   
   attr(ggdata, 'spider') <- plyr::ddply(
-    .data      = ggdata,
+    .data      = as.data.frame(ggdata),
     .variables = ply_cols(c(params$facet.by, names(params$color.by))), 
     .fun       = function (df) {
+      
       data.frame(
         check.names = FALSE,
         df,
-        '.xend' = df[['.x']] %>% mean(),
-        '.yend' = df[['.y']] %>% mean()
+        '.xend' = mean(df[['.x']]),
+        '.yend' = mean(df[['.y']])
       )
-    }) %>% drop_cols(".id")
+    }) %>% drop_cols(".id") %>% as_tibble()
   
   params$.ggdata <- ggdata
   

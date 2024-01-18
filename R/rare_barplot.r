@@ -132,7 +132,7 @@ rare_barplot <- function (
   if (params$trans == "log10") {
     set_layer(params, 'yaxis', c(loglabels(params$.ss), trans="log10"))
   } else {
-    set_layer(params, 'yaxis', labels = si_units)
+    set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
   }
   
   if (isTRUE(labels)) {

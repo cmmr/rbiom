@@ -103,7 +103,7 @@ read_tree <- function (src) {
 #'     tree <- read_tree(infile)
 #'     tree
 #'     
-#'     subtree <- tree_subset(tree, tips = head(tree_tips(tree)))
+#'     subtree <- tree_subset(tree, tips = head(tree$tip.label))
 #'     subtree
 #'
 tree_subset <- function (tree, tips) {

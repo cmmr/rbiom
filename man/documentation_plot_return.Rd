@@ -5,7 +5,7 @@
 \title{documentation_plot_return}
 \value{
 A \code{ggplot2} plot. \cr The computed data points and ggplot
-command are available as \code{$data} and \code{$code},
+command are available as \verb{$data} and \verb{$code},
 respectively.
 }
 \description{

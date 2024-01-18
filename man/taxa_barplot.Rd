@@ -80,7 +80,7 @@ Abbreviations are allowed.}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
-\code{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
 Otherwise the taxa name will simply be \code{Coriobacteriales}. You
 want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
@@ -96,7 +96,7 @@ and only to, that layer.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points and ggplot
-command are available as \code{$data} and \code{$code},
+command are available as \verb{$data} and \verb{$code},
 respectively.
 }
 \description{
@@ -123,6 +123,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

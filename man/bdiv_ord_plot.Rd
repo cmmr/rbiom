@@ -35,7 +35,7 @@ bdiv_ord_plot(
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \code{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
+provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
@@ -53,14 +53,12 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
 
-\item{layers}{What graphical elements to use for drawing. Options are:
-\bold{point}, \bold{spider}, \bold{ellipse}, and \bold{name} for
-samples, and \bold{mean}, \bold{taxon}, and \bold{arrow} for taxa.
+\item{layers}{One or more of
+\code{c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")}.
+The first four are sample-centric; the last three are taxa-centric.
 Single letter abbreviations are also accepted. For instance,
-\code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and
-\code{"pe"}.
-See the \code{vignette("ordination")} vignette for examples of each.
-Default: \code{"pe"}}
+\code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and \code{"pe"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"pe"}}
 
 \item{color.by, shape.by, facet.by, limit.by}{Metadata columns to use for
 aesthetics and partitioning. See below for details.
@@ -74,6 +72,7 @@ computing UniFrac distances. Default: \code{biom$tree}}
 \itemize{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+\item{\code{"none"} - }{ Don't run any statistics. }
 }
 Default: \code{"adonis2"} \cr\cr
 Abbreviations are allowed.}
@@ -152,10 +151,11 @@ Ordinate samples and taxa on a 2D plane based on beta diversity distances.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_distmat}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_table}()},
 \code{\link{bdiv_stats}()},
+\code{\link{bdiv_table}()},
 \code{\link{distmat_stats}()}
 
 Other ordination: 
@@ -166,6 +166,7 @@ Other visualization:
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{plot_heatmap}()},
 \code{\link{rare_barplot}()},

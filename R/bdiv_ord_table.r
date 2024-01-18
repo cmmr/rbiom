@@ -5,6 +5,7 @@
 #' 
 #' @inherit documentation_cmp
 #' @inherit documentation_dist_test
+#' @inherit documentation_rank.NULL
 #' @inherit documentation_default
 #' 
 #' @family beta_diversity
@@ -39,7 +40,7 @@
 bdiv_ord_table <- function (
     biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, md = NULL, k = 2, 
     split.by = NULL, stat.by = NULL, tree = NULL, within = NULL, between = NULL,
-    test = "adonis2", seed = 0, permutations = 999, rank = -1, taxa = 5, 
+    test = "adonis2", seed = 0, permutations = 999, rank = NULL, taxa = 6, 
     p.top = Inf, p.adj = 'fdr', unc = "singly", ...) {
   
   biom <- as_rbiom(biom)
@@ -58,8 +59,9 @@ bdiv_ord_table <- function (
   
   
   #________________________________________________________
-  # Validate arguments only relevant for rbiom objects.
+  # Validate and restructure user's arguments.
   #________________________________________________________
+  biom <- biom$clone()
   biom$counts %<>% rescale_cols()
   tree %<>% aa(display = "tree")
   validate_ord(max = Inf)
@@ -82,7 +84,7 @@ bdiv_ord_table <- function (
     rank <- names(which.max(lapply(biom$taxonomy, function (x) sum(x %in% taxa))))
     
   } else {
-    validate_rank(max = Inf)
+    validate_rank(max = Inf, null_ok = TRUE)
   }
   
   
@@ -94,14 +96,13 @@ bdiv_ord_table <- function (
     prefix = TRUE,
     FUN    = function (b, weighted, bdiv) {
       
-      
       dm <- bdiv_distmat(biom = b, bdiv = bdiv, weighted = weighted, tree = tree)
       
       
       #________________________________________________________
       # Sample Ordination(s). x/y/z coordinates.
       #________________________________________________________
-      args          <- c(list(dm = dm, ord = ord, k = k), params$.dots)
+      args          <- c(list(dm = dm, ord = ord, k = k, seed = seed), params$.dots)
       sample_coords <- do.call(distmat_ord_table, args)
       attr(dm, 'sample_coords') <- sample_coords
       
@@ -220,8 +221,7 @@ bdiv_ord_table <- function (
               adonis2 = "ptest  <- vegan::adonis2(formula = dm ~ groups, permutations = %i)",
               mrpp    = "ptest  <- vegan::mrpp(dat = dm, grouping = groups, permutations = %i)" )),
             "pstats <- summary(vegan::permustats(ptest))",
-            "stats <- with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p, .adj.p=p), 3))",
-            "print(stats)" ))
+            "stats  <- with(pstats, data.frame(statistic, z, p))" ))
         
         
         # Complex case: stats assembled from multiple iterations.
@@ -247,10 +247,8 @@ bdiv_ord_table <- function (
             adonis2 = "  ptest  <- vegan::adonis2(formula = dm ~ groups, permutations = %i)",
             mrpp    = "  ptest  <- vegan::mrpp(dat = dm, grouping = groups, permutations = %i)" )),
           "  pstats <- summary(vegan::permustats(ptest))",
-          "  with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
-          "})",
-          sprintf("stats[['.adj.p']] <- signif(p.adjust(stats[['.p.val']], %s), 3))", double_quote(p.adj)),
-          "print(stats)" ))
+          "  with(pstats, data.frame(statistic, z, p))",
+          "})" ))
         
       }) %>%
         add_class('rbiom_code')
@@ -284,10 +282,8 @@ bdiv_ord_table <- function (
               adonis2 = "  ptest  <- vegan::adonis2(formula = dm ~ abundances, permutations = %i)",
               mrpp    = "  ptest  <- vegan::mrpp(dat = dm, grouping = abundances, permutations = %i)" )),
             "  pstats <- summary(vegan::permustats(ptest))",
-            "  with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
-            "})",
-            sprintf("taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], %s), 3)", double_quote(p.adj)),
-            "print(taxa_stats)" ))
+            "  with(pstats, data.frame(statistic, z, p))",
+            "})" ))
         
         
         # Complex case: stats assembled from multiple iterations.
@@ -317,15 +313,14 @@ bdiv_ord_table <- function (
             adonis2 = "      ptest  <- vegan::adonis2(formula = dm ~ abundances, permutations = %i)",
             mrpp    = "      ptest  <- vegan::mrpp(dat = dm, grouping = abundances, permutations = %i)" )),
           "      pstats <- summary(vegan::permustats(ptest))",
-          "      with(pstats, signif(data.frame(.stat=statistic, .z=z, .p.val=p), 3))",
+          "      with(pstats, data.frame(statistic, z, p))",
           "    })",
           "  })",
           "})",
-          sprintf("taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], %s), 3)", double_quote(p.adj)),
-          if (p.top < 1)          { sprintf("taxa_stats <- subset(taxa_stats, .adj.p <= %f)", p.top)
-          } else if (p.top < Inf) { sprintf("taxa_stats <- subset(taxa_stats, rank(.p.val) <= %i)", p.top)
-          } else                  { NULL },
-          "print(taxa_stats)" ))
+          sprintf("taxa_stats[['adj.p']] <- p.adjust(taxa_stats[['p']], '%s')", p.adj),
+          if (p.top < 1)          { sprintf("taxa_stats <- subset(taxa_stats, adj.p <= %f)", p.top)
+          } else if (p.top < Inf) { sprintf("taxa_stats <- subset(taxa_stats, rank(p) <= %i)", p.top)
+          } else                  { NULL } ))
         
       }) %>%
         add_class('rbiom_code')
@@ -348,6 +343,8 @@ bdiv_ord_table <- function (
 
 
 biplot_taxa_stats <- function (dm, taxa_mtx, test, seed, permutations, p.adj, p.top) {
+  
+  if (test == "none") return (NULL)
   
   taxa_stats <- plyr::adply(
     .data        = t(taxa_mtx)[attr(dm, 'Labels'),], 

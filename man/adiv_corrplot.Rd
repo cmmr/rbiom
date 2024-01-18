@@ -14,6 +14,7 @@ adiv_corrplot(
   limit.by = NULL,
   test = "trends",
   model = "lm",
+  trans = "rank",
   p.adj = "fdr",
   level = 0.95,
   caption = TRUE,
@@ -32,11 +33,11 @@ adiv_corrplot(
 Default: \code{"Shannon"} \cr\cr
 Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 
-\item{layers}{\code{"trend"}, \code{"scatter"}. Single letter
-abbreviations are also accepted. For instance,
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and
-\code{"ts"}. See \code{vignette("corrplots")} for examples of each.
-Default: \code{"t"}.}
+\item{layers}{One or more of
+\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+letter abbreviations are also accepted. For instance,
+\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
+See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -52,6 +53,11 @@ Default: \code{"trends"}}
 \code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
 (generalized additive). See the "Model Options" section below for
 additional details. Default: \code{"lm"}}
+
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
@@ -72,8 +78,8 @@ scatterplot points have their size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \code{$data}, \code{$stats}, and
-\code{$code}, respectively.
+and ggplot command are available as \verb{$data}, \verb{$stats}, and
+\verb{$code}, respectively.
 }
 \description{
 Visualize alpha diversity with scatterplots and trendlines.
@@ -126,6 +132,11 @@ element is a character vector of length 1 naming a function, and the
 second element is a list of arguments to pass to that function. One
 of the function's arguments must be named 'formula'.
 For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
+
+By default, the same arguments are used for both plotting and calculating
+statistics. Arguments just for statistics can be set as a third list
+element:
+\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
 }
 
 \section{Aesthetics and Partitions}{
@@ -192,6 +203,7 @@ Other alpha_diversity:
 Other visualization: 
 \code{\link{adiv_boxplot}()},
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},

@@ -54,7 +54,8 @@ alpha.div <- function (biom, rarefy = FALSE) {
   res <- NULL
   for (i in rarefy) {
     
-    df <- adiv_matrix(biom = biom, rarefy = i) %>%
+    df <- rarefy(biom, depth = i) %>%
+      adiv_matrix() %>%
       as_tibble(x, rownames = 'Sample') %>%
       as.data.frame()
     

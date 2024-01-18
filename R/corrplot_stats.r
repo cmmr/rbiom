@@ -14,7 +14,7 @@ corrplot_stats <- function (params) {
   #________________________________________________________
   with(params, {
     validate_bool('caption')
-    validate_var_range('level',   range = c(0, 1))
+    validate_var_range('level',   range   = c(0, 1))
     validate_var_choices('p.adj', choices = p.adjust.methods)
     validate_var_choices('test',  choices = c(
       'none', 'fit', 'terms', 'means', 'trends', 'pw_means', 'pw_trends' ))
@@ -50,15 +50,15 @@ corrplot_stats <- function (params) {
     expr  = with(params, {
       
       .plot_attrs[['stats']] <- stats_table(
-        test     = test, 
-        df       = .ggdata, 
-        stat.by  = names(color.by), 
-        resp     = .ycol, 
-        regr     = .xcol, 
-        model    = model, 
-        split.by = facet.by, 
-        level    = level, 
-        p.adj    = p.adj )
+        test        = test, 
+        df          = .ggdata, 
+        stat.by     = names(color.by), 
+        resp        = .ycol, 
+        regr        = .xcol, 
+        model       = model, 
+        split.by    = facet.by, 
+        level       = level, 
+        p.adj       = p.adj )
       
       
       #________________________________________________________
