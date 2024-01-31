@@ -154,21 +154,18 @@ rbiom <- R6::R6Class(
       sids <- private$.metadata[['.sample']] %>%
         intersect(colnames(private$.counts))
       
-      if (!identical(sids, colnames(private$.counts))) {
-        private$.counts              <- private$.counts[,sids]
-        private$.hashes[['.counts']] <- hash(private$.counts)
-      }
+      private$.counts              <- private$.counts[,sids]
+      private$.hashes[['.counts']] <- hash(private$.counts)
       
-      if (!identical(sids, private$.metadata[['.sample']])) {
+      if (!identical(sids, private$.metadata[['.sample']]))
         private$.metadata <- private$.metadata[match(sids, private$.metadata[['.sample']]),]
-        
-        # Drop missing factor levels
-        for (i in which(sapply(private$.metadata, is.factor)))
-          if (!all(levels(private$.metadata[[i]]) %in% private$.metadata[[i]]))
-            private$.metadata[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
-        
-        private$.hashes[['.metadata']] <- hash(private$.metadata)
-      }
+      
+      # Drop missing factor levels
+      for (i in which(sapply(private$.metadata, is.factor)))
+        if (!all(levels(private$.metadata[[i]]) %in% private$.metadata[[i]]))
+          private$.metadata[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
+      
+      private$.hashes[['.metadata']] <- hash(private$.metadata)
       
       
       #________________________________________________________
