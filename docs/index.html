@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,43 +131,20 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"otu"</span>, <span class="st">"shan"</span><span class="op">)</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bdiv-2.png"><!-- --></p>
-</div>
-<div class="section level4">
-<h4 id="compute-statistics-for-correlation-models">Compute statistics for correlation models.<a class="anchor" aria-label="anchor" href="#compute-statistics-for-correlation-models"></a>
-</h4>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Age"</span>, layers <span class="op">=</span> <span class="st">"stc"</span>, taxa <span class="op">=</span> <span class="fl">.01</span>, p.top <span class="op">=</span> <span class="fl">4</span>, color.by <span class="op">=</span> <span class="st">"bod"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-stats-1.png"><!-- --></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stats.html">taxa_stats</a></span><span class="op">(</span><span class="va">biom</span>, regr <span class="op">=</span> <span class="st">"Age"</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, taxa <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # Test:     Is each trendline's slope non-zero?</span></span>
-<span><span class="co">#&gt; # Model:    stats::lm(.abundance ~ Age * `Body Site`)</span></span>
-<span><span class="co">#&gt; # A tibble: 80 × 10</span></span>
-<span><span class="co">#&gt;    .taxa      `Body Site`    .trend   .se   .df  .lower .upper  .t.ratio  .p.val</span></span>
-<span><span class="co">#&gt;    &lt;fct&gt;      &lt;fct&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Lactobaci… Anterior n… -3.47e- 1  1.25    39  -2.88    2.19 -2.77e- 1 0.783  </span></span>
-<span><span class="co">#&gt;  2 Lactobaci… Buccal muc… -5.09e- 1  2.61    39  -5.79    4.78 -1.95e- 1 0.847  </span></span>
-<span><span class="co">#&gt;  3 Lactobaci… Mid vagina  -4.29e+ 0  1.25    39  -6.81   -1.76 -3.44e+ 0 0.00142</span></span>
-<span><span class="co">#&gt;  4 Lactobaci… Saliva      -4.42e- 1  1.68    39  -3.84    2.95 -2.63e- 1 0.794  </span></span>
-<span><span class="co">#&gt;  5 Lactobaci… Stool        8.33e-16  2.05    39  -4.14    4.14  4.07e-16 1      </span></span>
-<span><span class="co">#&gt;  6 Streptoco… Anterior n…  3.71e+ 0  2.05    39  -0.436   7.85  1.81e+ 0 0.0780 </span></span>
-<span><span class="co">#&gt;  7 Streptoco… Buccal muc… -3.01e+ 0  4.27    39 -11.6     5.63 -7.04e- 1 0.486  </span></span>
-<span><span class="co">#&gt;  8 Streptoco… Mid vagina  -1.60e+ 0  2.04    39  -5.72    2.53 -7.83e- 1 0.438  </span></span>
-<span><span class="co">#&gt;  9 Streptoco… Saliva      -3.38e+ 0  2.74    39  -8.92    2.17 -1.23e+ 0 0.225  </span></span>
-<span><span class="co">#&gt; 10 Streptoco… Stool        7.56e- 1  3.35    39  -6.01    7.52  2.26e- 1 0.822  </span></span>
-<span><span class="co">#&gt; # ℹ 70 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: .adj.p &lt;dbl&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Age"</span>, layers <span class="op">=</span> <span class="st">"stc"</span>, taxa <span class="op">=</span> <span class="fl">.01</span>, color.by <span class="op">=</span> <span class="st">"bod"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-bdiv-3.png"><!-- --></p>
 </div>
 <div class="section level4">
 <h4 id="summarize-counts-by-taxonomic-rank">Summarize counts by taxonomic rank.<a class="anchor" aria-label="anchor" href="#summarize-counts-by-taxonomic-rank"></a>
 </h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">30</span>, color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"age"</span><span class="op">)</span>, limit.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sex <span class="op">=</span> <span class="st">"Male"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-taxa-1.png"><!-- --></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_barplot.html">taxa_barplot</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-taxa-2.png"><!-- --></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Phylum'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 637 × 8</span></span>
 <span><span class="co">#&gt;    .rank  .sample .taxa               .abundance   Age   BMI `Body Site`   Sex  </span></span>
@@ -189,7 +166,7 @@
 <h2 id="parallel-processing">Parallel Processing<a class="anchor" aria-label="anchor" href="#parallel-processing"></a>
 </h2>
 <p>Computation of beta diversity metrics (UniFrac, Bray-Curtis, etc) will use all available CPU cores by default. To limit the number of cores used, you can set the numThreads option:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html" class="external-link">setThreadOptions</a></span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

@@ -55,6 +55,8 @@ print.rbiom_code <- function (x) {
   
 }
 
+
+#' @export
 `$.rbiom_plot` <- `$.rbiom_tbl`
 
 
@@ -140,6 +142,33 @@ pull.rbiom <- function (biom, field = -1, name = ".sample", ...) {
 
 
 
+#' Get a glimpse of your metadata.
+#' 
+#' @inherit documentation_default
+#' 
+#' @family metadata
+#' 
+#' @param width   Width of output. See [pillar::glimpse()] documentation. 
+#'        Default: `NULL`
+#' 
+#' @param ...   Unused, for extensibility.
+#' 
+#' @return The original `biom`, invisibly.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     glimpse(hmp50)
+#'     
+glimpse.rbiom <- function (biom, width = NULL, ...) {
+  eval.parent(pillar::glimpse(x = biom$metadata, width = width, ...))
+  return (invisible(biom))
+}
+
+
+
+
 #' Create, modify, and delete metadata fields.
 #' 
 #' mutate() creates new fields in `$metadata` that are functions of existing 
@@ -205,14 +234,14 @@ rename.rbiom <- function (biom, ..., clone = TRUE) {
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     # Subset to specific samples
 #'     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
 #'     biom$metadata
 #'     
-#'     # Subset according to metadata
-#'     biom <- subset(hmp50, `Body Site` %in% 'Saliva' & Age < 25)
+#'     # Subset according to metadata (using base::subset)
+#'     biom <- subset(hmp50, `Body Site` %in% c('Saliva') & Age < 25)
 #'     biom$metadata
 #' 
 

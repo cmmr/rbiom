@@ -1,7 +1,5 @@
 #' Combines rare_corrplot and rare_barplot into a single figure.
 #' 
-#' @inherit documentation_test.pw_means
-#' @inherit documentation_model.log
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
 #' 
@@ -17,10 +15,8 @@
 
 rare_multiplot <- function (
     biom, adiv = "OTUs", layers = "t", rline = TRUE,
-    color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "pw_means", 
-    model = list("stats::lm", list(formula = y ~ log(x))),
-    trans = "none", level = 0.95, p.adj = "fdr", 
+    color.by = NULL, facet.by = NULL, limit.by = NULL,
+    formula = y ~ log(x), engine = "lm", level = 0.95, 
     caption = TRUE, labels = FALSE, ...) {
   
   biom <- as_rbiom(biom)

@@ -113,6 +113,7 @@ Display taxa abundances as a stacked bar graph.
 \seealso{
 Other taxa_abundance: 
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},

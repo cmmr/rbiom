@@ -2,22 +2,19 @@
 % Please edit documentation in R/bdiv_stats.r
 \name{bdiv_stats}
 \alias{bdiv_stats}
-\title{Test beta diversity vs categorical or numeric metadata.}
+\title{Test beta diversity vs categorical metadata.}
 \usage{
 bdiv_stats(
   biom,
-  stat.by = NULL,
-  regr = NULL,
+  stat.by,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
-  tree = NULL,
+  split.by = NULL,
   within = NULL,
   between = NULL,
-  test = ifelse(is.null(regr), "means", "trends"),
-  model = "lm",
-  trans = ifelse(is.null(regr), "none", "rank"),
-  split.by = NULL,
-  level = 0.95,
+  tree = NULL,
+  trans = "none",
+  test = "means",
   p.adj = "fdr"
 )
 }
@@ -27,11 +24,6 @@ bdiv_stats(
 
 \item{stat.by}{The categorical or numeric metadata field over which
 statistics should be calculated. Required.}
-
-\item{regr}{To run a regression analysis, set \code{regr} to the numeric
-metadata field with the "x-axis" values. Leaving \code{regr=NULL}
-will generate boxplot-like statistics; when non-NULL, corrplot-like
-statistics will be returned. Default: \code{NULL}}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
@@ -45,12 +37,20 @@ Multiple/abbreviated values allowed.}
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
 
+\item{split.by}{Name(s) of metadata columns that the data should be split
+by prior to any calculations. Default: \code{NULL}}
+
+\item{within, between}{Metadata field(s) for intra- or inter- sample
+comparisons. Default: \code{NULL}}
+
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{within, between}{Metadata field(s) for intra- or inter- sample
-comparisons. Default: \code{NULL}}
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{test}{Permutational test for accessing significance. Options are:
 \itemize{
@@ -61,17 +61,6 @@ comparisons. Default: \code{NULL}}
 Default: \code{"adonis2"} \cr\cr
 Abbreviations are allowed.}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
-
-\item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to any calculations. Default: \code{NULL}}
-
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
-
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
@@ -81,7 +70,7 @@ A tibble data frame with summary statistics. \cr
 The R code or generating these statistics is in \verb{$code}.
 }
 \description{
-Test beta diversity vs categorical or numeric metadata.
+Test beta diversity vs categorical metadata.
 }
 \examples{
     library(rbiom)
@@ -92,8 +81,6 @@ Test beta diversity vs categorical or numeric metadata.
       
     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))
     
-    bdiv_stats(biom, regr = "BMI", stat.by = "==Body Site")
-    
     # The R code used to compute the stats is in $code.
     tbl <- bdiv_stats(biom, stat.by = "Sex")
     tbl$code
@@ -101,6 +88,7 @@ Test beta diversity vs categorical or numeric metadata.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
@@ -111,7 +99,6 @@ Other beta_diversity:
 Other stats_tables: 
 \code{\link{adiv_stats}()},
 \code{\link{distmat_stats}()},
-\code{\link{stats_table}()},
 \code{\link{taxa_stats}()}
 }
 \concept{beta_diversity}

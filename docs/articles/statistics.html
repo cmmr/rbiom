@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -162,9 +162,6 @@ following:</p>
 </td>
 <td>
 <code><a href="../reference/distmat_stats.html">distmat_stats()</a></code>
-</td>
-<td>
-<code><a href="../reference/stats_table.html">stats_table()</a></code>
 </td>
 <td>
 <code><a href="../reference/taxa_stats.html">taxa_stats()</a></code>
@@ -401,108 +398,6 @@ reproducible R code in the plot attributes.</p>
 </table>
 </div>
 <div class="section level2">
-<h2 id="correlation-plots">Correlation Plots<a class="anchor" aria-label="anchor" href="#correlation-plots"></a>
-</h2>
-<p>The <code>test</code> parameter for these plots allows you to control
-what statistical question is being addressed.</p>
-<table class="table">
-<colgroup>
-<col width="14%">
-<col width="26%">
-<col width="58%">
-</colgroup>
-<thead><tr class="header">
-<th>Test</th>
-<th>Function</th>
-<th>Question</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>fit</code></td>
-<td><code><a href="https://broom.tidymodels.org/reference/glance.lm.html" class="external-link">broom::glance.lm()</a></code></td>
-<td>Does the model (e.g. y ~ x) fit the data well?</td>
-</tr>
-<tr class="even">
-<td><code>trends</code></td>
-<td><code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code></td>
-<td>Is each trendline’s slope non-zero?</td>
-</tr>
-<tr class="odd">
-<td><code>pw_trends</code></td>
-<td><code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code></td>
-<td>Do pairs of trendlines have different slopes?</td>
-</tr>
-<tr class="even">
-<td><code>means</code></td>
-<td><code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code></td>
-<td>Is each trendline’s mean non-zero?</td>
-</tr>
-<tr class="odd">
-<td><code>pw_means</code></td>
-<td><code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code></td>
-<td>Do pairs of trendlines have different means?</td>
-</tr>
-</tbody>
-</table>
-<p>These are parametric tests. To apply them to alpha diversity, beta
-diversity, or taxa abundance non-parametric data, rbiom defaults to
-using the rank transformation,
-e.g. <code>adiv_corrplot(biom, trans="rank", ...)</code>. Therefore, the
-y-axis title for correlation plots will be something similar to
-“rank(Shannon Diversity)” and the <code>$data</code> plot attribute will
-contain the rank- transformed Shannon diversity values.</p>
-<p>Generally, more than one p-value will be generated per plot, for
-instance, one p-value per trendline or one p-value per pair of
-trendlines. Showing all the p-values on the plot can get crowded, so
-instead the plot displays “min(p)”, the most significant p-value after
-correcting for multiple corrections. The caption under the plot provides
-a quick reminder of what is being tested for.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span>, <span class="st">'Stool'</span>, <span class="st">'Buccal mucosa'</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
-<span>  biom <span class="op">=</span> <span class="va">biom</span>, taxa <span class="op">=</span> <span class="st">"Bacteroides"</span>, layers <span class="op">=</span> <span class="st">"tcs"</span>, </span>
-<span>  x <span class="op">=</span> <span class="st">"Age"</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p</span></span></code></pre></div>
-<p><img src="statistics_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">stats</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Test:     Is each trendline's slope non-zero?</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    stats::lm(.abundance ~ Age * `Body Site`)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
-<span><span class="co">#&gt;   .taxa     `Body Site`  .trend   .se   .df .lower .upper .t.ratio .p.val .adj.p</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Bacteroi… Buccal muc… -<span style="color: #BB0000;">0.418</span>  0.389    23 -<span style="color: #BB0000;">1.22</span>   0.386   -<span style="color: #BB0000;">1.08</span>   0.293  0.440</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Bacteroi… Saliva      -<span style="color: #BB0000;">0.372</span>  0.250    23 -<span style="color: #BB0000;">0.888</span>  0.144   -<span style="color: #BB0000;">1.49</span>   0.150  0.440</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Bacteroi… Stool       -<span style="color: #BB0000;">0.086</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.305    23 -<span style="color: #BB0000;">0.716</span>  0.543   -<span style="color: #BB0000;">0.284</span>  0.779  0.779</span></span>
-<span></span>
-<span><span class="va">p</span><span class="op">$</span><span class="va">stats</span><span class="op">$</span><span class="va">code</span></span>
-<span><span class="co">#&gt; stats <span style="color: #00BB00;">&lt;-</span> plyr::<span style="color: #00BBBB;">ddply</span><span style="color: #BBBB00;">(</span>data, <span style="color: #BBBB00;">".taxa"</span>, <span style="color: #BB0000;">function</span> <span style="color: #BB00BB;">(</span>df<span style="color: #BB00BB;">)</span> <span style="color: #BB00BB;">{</span></span></span>
-<span><span class="co">#&gt;   model <span style="color: #00BB00;">&lt;-</span> stats::<span style="color: #00BBBB;">lm(</span>data = df, .abundance <span style="color: #00BB00;">~</span> Age <span style="color: #00BB00;">*</span> `Body Site`<span style="color: #00BBBB;">)</span></span></span>
-<span><span class="co">#&gt;   emt   <span style="color: #00BB00;">&lt;-</span> emmeans::<span style="color: #00BBBB;">emtrends(</span>object = model, specs = <span style="color: #BBBB00;">"Body Site"</span>, var = <span style="color: #BBBB00;">"Age"</span>, level = <span style="color: #BB00BB;">0.95</span>, infer = <span style="color: #BB00BB;">TRUE</span><span style="color: #00BBBB;">)</span></span></span>
-<span><span class="co">#&gt;   <span style="color: #00BBBB;">summary(</span>object = emt, adjust = <span style="color: #BBBB00;">'none'</span><span style="color: #00BBBB;">)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BB00BB;">}</span><span style="color: #BBBB00;">)</span></span></span></code></pre></div>
-<p>Using the corresponding <code>_stats()</code> function will generate
-the same statistics.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span>, <span class="st">'Stool'</span>, <span class="st">'Buccal mucosa'</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/taxa_stats.html">taxa_stats</a></span><span class="op">(</span></span>
-<span>  biom <span class="op">=</span> <span class="va">biom</span>, taxa <span class="op">=</span> <span class="st">"Bacteroides"</span>, </span>
-<span>  regr <span class="op">=</span> <span class="st">"Age"</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Test:     Is each trendline's slope non-zero?</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    stats::lm(.abundance ~ Age * `Body Site`)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
-<span><span class="co">#&gt;   .taxa     `Body Site`  .trend   .se   .df .lower .upper .t.ratio .p.val .adj.p</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Bacteroi… Buccal muc… -<span style="color: #BB0000;">0.418</span>  0.389    23 -<span style="color: #BB0000;">1.22</span>   0.386   -<span style="color: #BB0000;">1.08</span>   0.293  0.440</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Bacteroi… Saliva      -<span style="color: #BB0000;">0.372</span>  0.250    23 -<span style="color: #BB0000;">0.888</span>  0.144   -<span style="color: #BB0000;">1.49</span>   0.150  0.440</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Bacteroi… Stool       -<span style="color: #BB0000;">0.086</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.305    23 -<span style="color: #BB0000;">0.716</span>  0.543   -<span style="color: #BB0000;">0.284</span>  0.779  0.779</span></span></code></pre></div>
-</div>
-<div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
 <div class="section level3">
@@ -512,7 +407,7 @@ the same statistics.</p>
 further from the mean are observed less often. Microbial abundances do
 not follow this pattern; it’s common to observe high or low abundances
 more often than a “medium” abundance.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
@@ -527,7 +422,7 @@ more often than a “medium” abundance.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="st">".taxa"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Genera Abundance Distributions"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="statistics_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
+<p><img src="statistics_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
 <p>To compensate for this non-normality, rbiom uses the following
 non-parametric tests for categorical variables that are based on ranking
 or permutations.</p>

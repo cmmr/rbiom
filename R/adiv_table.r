@@ -9,9 +9,9 @@
 #'     
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
-#'     biom <- slice_head(hmp50)
+#'     biom <- slice_head(hmp50, n = 5)
 #'     
 #'     adiv_matrix(biom)
 
@@ -123,7 +123,7 @@ adiv_table <- function (
       '.depth'     = mtx[,'Depth'][row(mtx)],
       '.adiv'      = colnames(mtx)[col(mtx)] %>% factor(levels = adiv),
       '.diversity' = as.numeric(mtx) ) %>%
-    filter(!is.na(.adiv))
+    dplyr::filter(!is.na(.adiv))
   
   
   

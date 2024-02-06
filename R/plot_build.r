@@ -48,8 +48,8 @@ plot_build <- function (params) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 'trend', 
-    'residual', 'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
+    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 
+    'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
     'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
     'arrow', 'taxon', 'brackets', 'stats_text', 'stack', 'hline', 'vline', 
     'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 
@@ -112,6 +112,14 @@ plot_build <- function (params) {
     # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
     #______________________________________________________________
     params[[label]] %<>% sprintf("%s (%s scale)", ., trans)
+    
+    
+    
+    # Change 10000 to 10k for log scales.
+    #______________________________________________________________
+    if (trans %in% c("log", "log10", "log1p"))
+      set_layer(params, layer, labels = label_number(scale_cut = cut_si("")))
+    
     
     
     # Force sqrt scale to display zero tick mark.

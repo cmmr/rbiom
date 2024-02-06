@@ -20,7 +20,7 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -192,6 +192,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
     <div class="dont-index"><p>Other taxa_abundance: 
 <code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
+<code><a href="taxa_clusters.html">taxa_clusters</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
 <code><a href="taxa_stats.html">taxa_stats</a>()</code>,
@@ -203,7 +204,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">ranks</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".otu"    "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'biom' not found</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_matrix</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Phylum'</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     HMP01 HMP02 HMP03 HMP04 HMP05 HMP06</span>

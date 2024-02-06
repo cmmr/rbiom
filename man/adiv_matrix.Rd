@@ -24,9 +24,9 @@ A numeric matrix with samples as rows and columns named
 Create a matrix of samples x alpha diversity metrics.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
-    biom <- slice_head(hmp50)
+    biom <- slice_head(hmp50, n = 5)
     
     adiv_matrix(biom)
 }

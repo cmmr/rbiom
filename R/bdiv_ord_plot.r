@@ -159,6 +159,7 @@ bdiv_ord_plot <- function (
     "taxon"      = c('x', 'y', 'size',  'label'),
     "mean"       = c('x', 'y', 'size') )
   
+  
   args <- .qw(x, y, xend, yend, label, size)
   if (has_layer(params, 'color')) args[['color']] <- names(params$color.by)
   if (has_layer(params, 'color')) args[['fill']]  <- names(params$color.by)

@@ -1,4 +1,8 @@
 
+# Excellent reference for emmeans ~num*cat, ~cat*cat, etc
+# https://stats.oarc.ucla.edu/r/seminars/interactions-r/
+
+
 #' Run estimated marginal means (least-squares means).
 #' 
 #' All arguments should be pre-validated by [stats_table()].
@@ -10,48 +14,17 @@
 stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.by) {
   
   
-  #________________________________________________________
-  # Sanity checks specific to corrplot-like stats.
-  #________________________________________________________
-  stopifnot(hasName(df, regr) && is.numeric(df[[regr]]))
-  stopifnot(!eq(regr, resp))
-  stopifnot(!(stat.by %in% split.by))
-  
   
   #________________________________________________________
-  # Sanity check model function.
+  # Clean up field names for gam (remove spaces, etc).
   #________________________________________________________
-  validate_model()
+  df    <- cleanup_colnames(df, update = environment())
+  clean <- attr(df, 'map_clean', exact = TRUE)
   
-  model_fun  <- model[['fun']]
-  model_fn   <- attr(model_fun, 'fn', exact = TRUE)
-  model_args <- model[['args']]
-  
-  
-  #________________________________________________________
-  # Customize the model formula with actual column names.
-  #________________________________________________________
-  df %<>% rename_cols(setNames(c('.regr', '.resp', '.stat.by'), c(regr, resp, stat.by)))
-  model_args[['formula']] <- local({
-    replacements <- list(x = as.symbol(".regr"), y = as.symbol(".resp"))
-    f <- eval(do.call(substitute, list(model_args[['formula']], replacements)))
-    if (!is.null(stat.by)) f <- as.formula(paste(format(f), "* .stat.by"))
-    return (f)
-  })
-  
-  
-  #________________________________________________________
-  # convert
-  # from: .resp ~ .regr * .stat.by
-  # to:   ".diversity ~ Age * `Body Site`"
-  #________________________________________________________
-  model_str = local({
-    replacements <- list(.regr = as.symbol(regr), .resp = as.symbol(resp))
-    if (!is.null(stat.by)) replacements %<>% c(list(.stat.by = as.symbol(stat.by)))
-    formula <- eval(do.call(substitute, list(model_args[['formula']], replacements)))
-    as.args(c(list(formula), model_args[names(model_args) != 'formula']))
-  })
-  
+  if (!is.null(stat.by))  stat.by  <- unname(clean[stat.by])
+  if (!is.null(regr))     regr     <- unname(clean[regr])
+  if (!is.null(resp))     resp     <- unname(clean[resp])
+  if (!is.null(split.by)) split.by <- unname(clean[split.by])
   
   
   
@@ -64,25 +37,25 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
     # Some facets might only have one level of `stat.by`.
     #________________________________________________________
     if (!is.null(stat.by))
-      if (length(unique(data[['.stat.by']])) < 2)
+      if (length(unique(data[[stat.by]])) < 2)
         return (data.frame()[1,])
     
     
     #________________________________________________________
     # Apply the model to the provided data from `df`.
     #________________________________________________________
-    m <- do.call(model_fun, c(list(data = data), model_args), envir = baseenv())
-    
+    sm <- stats_model(data = data, stat.by = stat.by, regr = regr, resp = resp, model = model)
+    m  <- sm$model
     
     #________________________________________________________
     # These values can be called from multiple places below.
     #________________________________________________________
     if (is.null(stat.by)) {
-      emm <- function () emmeans(object = m,  specs = '.regr',             level = level, infer = TRUE, .lhs = "emm")
-      emt <- function () emtrends(object = m, specs = NULL, var = '.regr', level = level, infer = TRUE)
+      emm <- function () emmeans(object = m,  specs = regr,             level = level, infer = TRUE, .lhs = "emm")
+      emt <- function () emtrends(object = m, specs = NULL, var = regr, level = level, infer = TRUE)
     } else {
-      emm <- function () emmeans(object = m,  specs = c('.regr', '.stat.by'),    level = level, infer = TRUE, .lhs = "emm")
-      emt <- function () emtrends(object = m, specs = '.stat.by', var = '.regr', level = level, infer = TRUE)
+      emm <- function () emmeans(object = m,  specs = c(regr, stat.by),    level = level, infer = TRUE, .lhs = "emm")
+      emt <- function () emtrends(object = m, specs = stat.by, var = regr, level = level, infer = TRUE)
     }
     
     result <- tryCatch(
@@ -95,9 +68,9 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
         fit       = m     %>% glance(),
         means     = emm() %>% summary(adjust = 'none'),
         trends    = emt() %>% summary(adjust = 'none'),
-        pw_means  = emm() %>% pairs(adjust = 'none', simple = '.stat.by'),
+        pw_means  = emm() %>% pairs(adjust = 'none', simple = stat.by),
         pw_trends = emt() %>% pairs(adjust = 'none'),
-        es_means  = emm() %>% eff_size(sigma = sigma(m), edf = df.residual(m), simple = '.stat.by'),
+        es_means  = emm() %>% eff_size(sigma = sigma(m), edf = df.residual(m), simple = stat.by),
         es_trends = emt() %>% eff_size(sigma = sigma(m), edf = df.residual(m)),
         data.frame()[1,] )))
     
@@ -106,13 +79,7 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
     # Drop `regr` column from stats tables.
     #________________________________________________________
     if (!test %in% c("predict", "terms", "fit"))
-      result <- result[,colnames(result) != '.regr',drop=FALSE]
-    
-    if (test == "terms") {
-      result[['term']] %<>% sub("^.stat.by", "", .)
-      result[['term']] %<>% sub("^.regr:.stat.by", ".regr:", .)
-      result[['term']] %<>% sub("^.regr", regr, .)
-    }
+      result <- result[,colnames(result) != regr,drop=FALSE]
     
     return (result)
     
@@ -143,14 +110,36 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       'df.residual'   = ".df.res",
       'nobs'          = ".n",
       '.regr.trend'   = ".trend",
-      'contrast'      = stat.by,
-      '.resp'         = resp, 
-      '.regr'         = regr, 
-      '.stat.by'      = stat.by )) %>%
+      'contrast'      = stat.by )) %>%
     as_tibble() %>%
     add_class('rbiom_tbl')
   
   
+  
+  
+  #________________________________________________________
+  # Confidence interval data for ggplot2::geom_ribbon().
+  #________________________________________________________
+  if (isTRUE(ribbon) || is_scalar_integerish(ribbon))
+    attr(stats, 'ribbon') <- local({
+      
+      model_args[['formula']] <- model_xy
+      
+      # Values of `regr` to estimate confidence as ymin - ymax
+      if (isTRUE(ribbon)) ribbon <- 100
+      at <- range(df[[regr]], na.rm = TRUE)
+      at <- seq(from = at[[1]], to = at[[2]], length.out = ribbon)
+      at <- setNames(list(at), regr)
+      
+      plyr::ddply(df, ply_cols(c(stat.by, split.by)), function (data) {
+        do.call(model_fun, c(list(data = data), model_args), envir = baseenv()) %>%
+          emmeans::emmeans(specs = regr, level = level, infer = TRUE, at = at) %>%
+          summary()
+      })
+    }) %>% 
+    as_tibble() %>%
+    dplyr::select(any_of(c(regr, "emmean", "lower.CL", "upper.CL", stat.by, split.by))) %>%
+    dplyr::rename(!!resp := emmean, .ymin = lower.CL, .ymax = upper.CL)
   
   
   
@@ -172,12 +161,12 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       emm_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
+          sprintf("model <- %s(data = data, %s)\n", model, model_str),
           sprintf("emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
+          sprintf("  model <- %s(data = df, %s)\n", model, model_str),
           sprintf("  emm   <- emmeans::emmeans(object = model, specs = %s, level = %s, infer = TRUE)\n", specs_str, level),
           sprintf("  {cmd}\n})") ))
   
@@ -200,12 +189,12 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       emt_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
+          sprintf("model <- %s(data = data, %s)\n", model, model_str),
           sprintf("emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
+          sprintf("  model <- %s(data = df, %s)\n", model, model_str),
           sprintf("  emt   <- emmeans::emtrends(object = model, specs = %s, var = %s, level = %s, infer = TRUE)\n", stat.by_str, regr_str, level),
           sprintf("  {cmd}\n})") ))
   
@@ -229,11 +218,11 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       broom_template <- ifelse(
         test = is.null(split.by),
         yes  = paste0(
-          sprintf("model <- %s(data = data, %s)\n", model_fn, model_str),
+          sprintf("model <- %s(data = data, %s)\n", model, model_str),
           sprintf("stats <- {cmd}") ),
         no   = paste0(
           sprintf("stats <- plyr::ddply(data, %s, function (df) {\n", split.by_str),
-          sprintf("  model <- %s(data = df, %s)\n", model_fn, model_str),
+          sprintf("  model <- %s(data = df, %s)\n", model, model_str),
           sprintf("  {cmd}\n}") ))
   
       if (test == 'predict')
@@ -271,12 +260,12 @@ stats_table_num <- function (df, stat.by, regr, resp, test, level, model, split.
       es_trends = "Est. marginal means of linear trends - effect sizes.",
       test ),
     
-    'Model' = sprintf("%s(%s)", model_fn, model_str) )
+    'Model' = sprintf("%s(%s)", model, model_str) )
   
   
   if (test == "terms" && !is.null(stat.by))
     attr(stats, 'tbl_sum') %<>% c(
-      'Ref. Group' = paste(coan(stat.by), "=", levels(df[['.stat.by']])[[1]]) )
+      'Ref. Group' = paste(coan(stat.by), "=", levels(df[[stat.by]])[[1]]) )
   
   
   return (stats)

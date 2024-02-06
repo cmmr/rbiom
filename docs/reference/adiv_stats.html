@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,14 +73,11 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_stats</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  stat.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  regr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">stat.by</span>,</span>
 <span>  adiv <span class="op">=</span> <span class="st">"Shannon"</span>,</span>
-<span>  test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">regr</span><span class="op">)</span>, <span class="st">"means"</span>, <span class="st">"trends"</span><span class="op">)</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  trans <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">regr</span><span class="op">)</span>, <span class="st">"none"</span>, <span class="st">"rank"</span><span class="op">)</span>,</span>
 <span>  split.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  test <span class="op">=</span> <span class="st">"means"</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -97,13 +94,6 @@
 groups. Required.</p></dd>
 
 
-<dt>regr</dt>
-<dd><p>To run a regression analysis, set <code>regr</code> to the numeric
-metadata field with the "x-axis" values. Leaving <code>regr=NULL</code>
-will generate boxplot-like statistics; when non-NULL, corrplot-like
-statistics will be returned. Default: <code>NULL</code></p></dd>
-
-
 <dt>adiv</dt>
 <dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
 <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
@@ -112,19 +102,9 @@ Default: <code>"Shannon"</code> <br><br>
 Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 
 
-<dt>test</dt>
-<dd><p>The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of <code>"predict"</code>,
-<code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>, <code>"trends"</code>, <code>"es_means"</code>,
-<code>"es_trends"</code>, <code>"pw_means"</code>, or <code>"pw_trends"</code>.
-Default: <code>ifelse(is.null(regr), "means", "trends")</code></p></dd>
-
-
-<dt>model</dt>
-<dd><p>What type of trend model to fit to the data. Options are:
-<code>"lm"</code> (linear), <code>"log"</code> (logarithmic), or <code>"gam"</code>
-(generalized additive). See the "Model Options" section below for
-additional details. Default: <code>"lm"</code></p></dd>
+<dt>split.by</dt>
+<dd><p>Name(s) of metadata columns that the data should be split
+by prior to any calculations. Default: <code>NULL</code></p></dd>
 
 
 <dt>trans</dt>
@@ -132,16 +112,6 @@ additional details. Default: <code>"lm"</code></p></dd>
 <code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: <code>"none"</code></p></dd>
-
-
-<dt>split.by</dt>
-<dd><p>Name(s) of metadata columns that the data should be split
-by prior to any calculations. Default: <code>NULL</code></p></dd>
-
-
-<dt>level</dt>
-<dd><p>The confidence level for calculating a confidence interval.
-Default: <code>0.95</code></p></dd>
 
 
 <dt>p.adj</dt>
@@ -160,62 +130,6 @@ options. Default: <code>"fdr"</code></p></dd>
 <p>The R code or generating these statistics is in <code>$code</code>.</p>
     </div>
     <div class="section level2">
-    <h2 id="statistical-tests">Statistical Tests<a class="anchor" aria-label="anchor" href="#statistical-tests"></a></h2>
-    
-
-
-<p><b>When <code>regr</code> is NULL:</b></p><ul><li><p><code>"means"</code> - 
-Considers all groups at once using the Kruskal-Wallis
-non-parametric test: <code><a href="https://rdrr.io/r/stats/kruskal.test.html" class="external-link">stats::kruskal.test()</a></code>.</p></li>
-<li><p><code>"pw_means"</code> - 
-Pairwise comparison of <code>stat.by</code> groups using the Wilcox rank sum
-(aka Mann-Whitney) non-parametric test: <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">stats::wilcox.test()</a></code>.</p></li>
-</ul><p><b>When <code>regr</code> is not NULL:</b></p><ul><li><p><code>"predict"</code> - 
-Augments original data with fitted information. See
-<code><a href="https://broom.tidymodels.org/reference/augment.lm.html" class="external-link">broom::augment.lm()</a></code>.</p></li>
-<li><p><code>"terms"</code> -  Summary information about the model's
-terms, including p-value, r-squared, AIC, BIC, and confidence
-interval at <code>level</code>. See <code><a href="https://broom.tidymodels.org/reference/tidy.lm.html" class="external-link">broom::tidy.lm()</a></code>.</p></li>
-<li><p><code>"fit"</code> -  Goodness of fit measures, p-values, and
-more for the overall model. See <code><a href="https://broom.tidymodels.org/reference/glance.lm.html" class="external-link">broom::glance.lm()</a></code>.</p></li>
-<li><p><code>"means"</code> -  The estimated marginal mean (EMM) for
-each <code>stat.by</code> group, along with confidence intervals (CI),
-standard errors (SE), t-ratios, and p-values testing for mean = zero.
-See <code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code> and <code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
-<li><p><code>"trends"</code> -  The trendline slope for each
-<code>stat.by</code> group, along with CI and SE and p-value testing for
-slope = zero. See <code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code> and
-<code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
-<li><p><code>"pw_means"</code> -  Pairwise means. All <code>stat.by</code> groups are
-compared to each other and the difference in means is estimated
-along with SE, t-ratios, and p-values testing if the two means
-are the same. See <code><a href="https://rdrr.io/pkg/emmeans/man/contrast.html" class="external-link">emmeans::pairs.emmGrid()</a></code>.</p></li>
-<li><p><code>"pw_trends"</code> -  Pairwise trends. As above, but
-comparing trendline slopes instead of means.</p></li>
-<li><p><code>"es_means"</code> -  Effect sizes for pairwise differences
-of means, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
-<li><p><code>"es_trends"</code> -  Effect sizes for pairwise differences
-of slopes, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
-</ul></div>
-    <div class="section level2">
-    <h2 id="model-options">Model Options<a class="anchor" aria-label="anchor" href="#model-options"></a></h2>
-    
-
-
-<p>The predefined options are:</p><ul><li><p><code>"lm"</code> -   Linear model: <code>stats::lm(formula = y ~ x)</code>.)</p></li>
-<li><p><code>"log"</code> -  Logarithmic model: <code>stats::lm(formula = y ~ log(x))</code>.</p></li>
-<li><p><code>"gam"</code> -  Generalized additive model: <code>mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")</code>.</p></li>
-</ul><p>You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
-<p>By default, the same arguments are used for both plotting and calculating
-statistics. Arguments just for statistics can be set as a third list
-element:
-<code>model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))</code>.</p>
-    </div>
-    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other alpha_diversity: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
@@ -224,7 +138,6 @@ element:
 <p>Other stats_tables: 
 <code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
 <code><a href="distmat_stats.html">distmat_stats</a>()</code>,
-<code><a href="stats_table.html">stats_table</a>()</code>,
 <code><a href="taxa_stats.html">taxa_stats</a>()</code></p></div>
     </div>
 
@@ -247,18 +160,6 @@ element:
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sex              .n .stat .estimate .lower .upper .p.val .adj.p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female - Male    49   167    -<span style="color: #BB0000;">0.781</span>  -<span style="color: #BB0000;">1.44</span> -<span style="color: #BB0000;">0.183</span> 0.014<span style="text-decoration: underline;">9</span> 0.014<span style="text-decoration: underline;">9</span></span>
-<span class="r-in"><span>      </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, regr <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     Is each trendline's slope non-zero?</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    stats::lm(.Shannon ~ Age * `Body Site`)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   `Body Site`    .trend   .se   .df .lower .upper .t.ratio .p.val .adj.p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Anterior nares 0.080<span style="text-decoration: underline;">5</span> 0.379    39 -<span style="color: #BB0000;">0.686</span>  0.847    0.212  0.833  0.833</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Buccal mucosa  0.780  0.790    39 -<span style="color: #BB0000;">0.818</span>  2.38     0.987  0.330  0.824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Mid vagina     0.600  0.377    39 -<span style="color: #BB0000;">0.163</span>  1.36     1.59   0.120  0.600</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Saliva         0.238  0.507    39 -<span style="color: #BB0000;">0.788</span>  1.26     0.470  0.641  0.833</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Stool          0.229  0.619    39 -<span style="color: #BB0000;">1.02</span>   1.48     0.370  0.714  0.833</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, split.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     kruskal.test(.Shannon ~ `Body Site`).</span></span>

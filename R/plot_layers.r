@@ -6,7 +6,6 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
   stopifnot(env_has(params, c('.ggdata', '.xcol', '.ycol', '.xmode')))
   
   
-  
   layer_names <- do_init
   
   
@@ -41,9 +40,11 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
     #________________________________________________________
     # Ignore shapes/etc without applicable layers.
     #________________________________________________________
-    if (!any(c('dot', 'strip', 'pointrange', 'scatter') %in% layer_names)) params$shape.by   <- NULL
-    if (!any(c('box', 'bar', 'violin')                  %in% layer_names)) params$pattern.by <- NULL
-    if (!any(c('taxon', 'arrow', 'mean')                %in% layer_names)) params$rank       <- NULL
+    if (!any(c('dot', 'strip', 'pointrange', 'scatter', 'point') %in% layer_names)) 
+       params$shape.by <- NULL
+    
+    if (!any(c('box', 'bar', 'violin')   %in% layer_names)) params$pattern.by <- NULL
+    if (!any(c('taxon', 'arrow', 'mean') %in% layer_names)) params$rank <- NULL
     
     
     if (length(layer_names) == 0)
@@ -237,6 +238,7 @@ add_layer <- function (params, layer, fn = NULL) {
   }
   
   
+  
   attr(result, 'function') <- switch(
     EXPR = layer,
     'ggplot'       = ggplot,
@@ -266,7 +268,6 @@ add_layer <- function (params, layer, fn = NULL) {
     'pointrange'   = geom_pointrange,
     'point'        = geom_point,
     'rect'         = geom_rect,
-    'residual'     = geom_segment,
     'scatter'      = geom_point,
     'shape'        = scale_shape_manual,
     'smooth'       = stat_smooth,
@@ -282,7 +283,6 @@ add_layer <- function (params, layer, fn = NULL) {
     'theme_bw'     = theme_bw,
     'tiplab'       = geom_tiplab,
     'topo'         = geom_hdr_lines,
-    'trend'        = stat_smooth,
     'violin'       = if (patterned) geom_violin_pattern else geom_violin,
     'vline'        = geom_vline,
     'xaxis'        = if (xmode == "factor") scale_x_discrete else scale_x_continuous,
@@ -299,7 +299,6 @@ add_layer <- function (params, layer, fn = NULL) {
     'linerange'    = "vline",
     'mean'         = "taxa_coords",
     'pointrange'   = "vline",
-    'residual'     = "residual",
     'spider'       = "spider",
     'stats_text'   = "stat_labels",
     'stats_ggtext' = "stat_labels",
@@ -315,7 +314,6 @@ add_layer <- function (params, layer, fn = NULL) {
     'linerange'    = ~ attr(., "vline"),
     'mean'         = ~ attr(., "taxa_coords"),
     'pointrange'   = ~ attr(., "vline"),
-    'residual'     = ~ attr(., "residual"),
     'spider'       = ~ attr(., "spider"),
     'stats_text'   = ~ attr(., "stat_labels"),
     'stats_ggtext' = ~ attr(., "stat_labels"),
@@ -351,11 +349,10 @@ add_layer <- function (params, layer, fn = NULL) {
     'pattern'      = "^pattern\\.",
     'pointrange'   = "^(pt|p|pointrange)\\.",
     'point'        = "^(pt|p|point)\\.",
-    'residual'     = "^r(|esidual)\\.",
     'shape'        = "^shape\\.",
     'scatter'      = "^(pt|s|scatter)\\.",
     'size'         = "^size\\.",
-    'smooth'       = "^s(|mooth)\\.",
+    'smooth'       = "^(t|c|trend|confidence)\\.",
     'spider'       = "^s(|pider)\\.",
     'stack'        = "^s(|tack)\\.",
     'stats_text'   = "^stats\\.",
@@ -366,7 +363,6 @@ add_layer <- function (params, layer, fn = NULL) {
     'theme_bw'     = "^theme_bw\\.",
     'tiplab'       = "^tip(|lab)\\.",
     'topo'         = "^topo\\.",
-    'trend'        = "^(t|trend|c|confidence)\\.",
     'vline'        = "^[rv](|line)\\.",
     'violin'       = "^v(|iolin)\\.",
     'xaxis'        = "^x(|axis)\\.",

@@ -61,6 +61,7 @@ reference:
   contents:
   - pull.rbiom
   - mutate.rbiom
+  - glimpse.rbiom
   
 - title: Subsetting
   contents:
@@ -96,7 +97,6 @@ reference:
   - starts_with("distmat_")
   - starts_with("rescale_")
   - rarefy_cols
-  - stats_table
   - tree_subset
   - plot_heatmap
   

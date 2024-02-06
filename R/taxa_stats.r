@@ -2,8 +2,6 @@
 
 #' Test taxa abundances for significant differences.
 #' 
-#' @inherit documentation_test.ifelse
-#' @inherit documentation_model.lm
 #' @inherit documentation_default
 #' @inherit documentation_stats_return return
 #' 
@@ -17,29 +15,42 @@
 #'     biom <- rarefy(hmp50)
 #'     
 #'     taxa_stats(biom, stat.by = "Body Site", rank = "Family")
-#'     
-#'     taxa_stats(biom, stat.by = "Body Site", regr = "Age", rank = "Family")
 
 taxa_stats <- function (
-    biom, stat.by = NULL, regr = NULL, rank = -1, taxa = 6, 
-    test = ifelse(is.null(regr), "means", "trends"), 
-    model = "lm", level = 0.95, 
-    trans = ifelse(is.null(regr), "none", "rank"), 
+    biom, stat.by, rank = -1, taxa = 6, split.by = NULL,
     lineage = FALSE, unc = "singly", other = FALSE,
-    split.by = NULL, p.adj = "fdr" ) {
+    trans = "none", test = "means", p.adj = "fdr" ) {
   
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment())
   remove(list = intersect(env_names(params), ls()))
   
+  
+  #________________________________________________________
+  # Validate user's arguments.
+  #________________________________________________________
   with(params, {
-    md       <- setdiff(unique(c(stat.by, regr, split.by)), ".taxa")
-    split.by <- setdiff(c(split.by, ".taxa"), c(regr, stat.by))
+    validate_rank(max = Inf)
+    validate_meta('stat.by')
+    validate_meta('split.by', null_ok = TRUE, max = Inf)
+  })
+  
+  
+  with(params, {
+    md       <- setdiff(unique(c(stat.by, split.by)), ".taxa")
+    split.by <- setdiff(c(split.by, ".taxa"), stat.by)
   })
   
   params$df <- do.call(taxa_table,  fun_params(taxa_table,  params))
-  stats     <- do.call(stats_table, fun_params(stats_table, params))
+  
+  
+  with(params, {
+    if (length(rank) > 1) { split.by %<>% c('.rank')
+    } else                { df %<>% rename_response(paste0('.', rank)) }
+  })
+  
+  stats <- do.call(stats_table, fun_params(stats_table, params))
   
   
   return (stats)

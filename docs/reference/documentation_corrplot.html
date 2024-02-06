@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
 
 <dt>layers</dt>
 <dd><p>One or more of
-<code>c("trend", "confidence", "scatter", "residual", "name")</code>. Single
+<code>c("trend", "confidence", "scatter", "name")</code>. Single
 letter abbreviations are also accepted. For instance,
 <code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and <code>"ts"</code>.
 See plot types for examples of each. Default: <code>"t"</code></p></dd>
@@ -89,19 +89,13 @@ See plot types for examples of each. Default: <code>"t"</code></p></dd>
 and partitioning. See below for details. Default: <code>NULL</code></p></dd>
 
 
-<dt>test</dt>
-<dd><p>Which test statistic to display on the plot. Options are:</p><ul><li><p><code>"fit"</code> -  How well does the model fit the data?</p></li>
-<li><p><code>"terms"</code> -  How strongly does 'x' influence 'y'?</p></li>
-<li><p><code>"means"</code> -  Is the average 'y' value non-zero?</p></li>
-<li><p><code>"trends"</code> -  Does any trendline have a non-zero slope?</p></li>
-<li><p><code>"pw_means"</code> -  Are the means of any trendlines different?</p></li>
-<li><p><code>"pw_trends"</code> -  Are the slopes of any trendlines different?</p></li>
-<li><p><code>"none"</code> -  Do not compute or show statistics.</p></li>
-</ul><p>Default: <code>"trends"</code> <br><br>
-Note: <code>"pw_means"</code> and <code>"pw_trends"</code> can only be calculated
-when using a <code>color.by</code> metadata column with more than one level. <br><br>
-Statistical tests are run separately on each facet. P-values are
-adjusted for multiple comparisons by considering all facets together.</p></dd>
+<dt>formula</dt>
+<dd><p>Relationship between variables. Default: <code>y ~ x</code></p></dd>
+
+
+<dt>engine</dt>
+<dd><p>What type of trend model to fit to the data. Options are:
+<code>"lm"</code> (linear), <code>"local"</code> (uses loess or gam). Default: <code>"lm"</code></p></dd>
 
 
 <dt>...</dt>
@@ -117,9 +111,8 @@ scatterplot points have their size set to <code>2</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. <br> The computed data points, statistics,
-and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
-<code>$code</code>, respectively.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points and ggplot command
+are available as <code>$data</code> and <code>$code</code>, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>

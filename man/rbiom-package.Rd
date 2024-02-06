@@ -2,8 +2,8 @@
 % Please edit documentation in R/rbiom-package.R
 \docType{package}
 \name{rbiom-package}
+\alias{rbiom}
 \alias{rbiom-package}
-\alias{_PACKAGE}
 \title{rbiom: Read/Write, Transform, and Summarize BIOM Data}
 \description{
 A toolkit for working with Biological Observation Matrix (BIOM) files.

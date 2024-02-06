@@ -76,8 +76,6 @@
 \alias{sample_subset}
 \alias{sample.sums-deprecated}
 \alias{sample.sums}
-\alias{stats.table-deprecated}
-\alias{stats.table}
 \alias{taxa.means-deprecated}
 \alias{taxa.means}
 \alias{taxa.sums-deprecated}
@@ -197,8 +195,6 @@ repair(biom)
 sample_subset(x, ...)
 
 sample.sums(biom, long = FALSE, md = FALSE)
-
-stats.table(...)
 
 taxa.means(biom, rank = NULL)
 
@@ -417,11 +413,6 @@ Use \code{biom$metadata \%<>\% base::subset()} instead.
 \section{\code{sample.sums}}{
 
 Use \code{\link[=sample_sums]{sample_sums()}} or \code{\link[=adiv_table]{adiv_table()}} instead.
-}
-
-\section{\code{stats.table}}{
-
-Use \code{\link[=stats_table]{stats_table()}} instead.
 }
 
 \section{\code{taxa.means}}{

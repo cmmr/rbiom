@@ -30,7 +30,7 @@ TreeSummarizedExperiment additionally includes the tree and sequences.
 }
 \examples{
     
-    library(rbiom)
+    library(rbiom) 
     
     print(hmp50)
       

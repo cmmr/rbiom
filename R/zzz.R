@@ -14,7 +14,7 @@ ENV <- environment(NULL)
     'element_blank', 'element_rect', 'element_text', 
     'facet_grid', 'facet_wrap', 'expansion', 'labs', 'margin', 
     'geom_bar', 'geom_col', 'geom_boxplot', 'geom_violin',  
-    'geom_hline', 'geom_vline', 'geom_segment',
+    'geom_line', 'geom_hline', 'geom_vline', 'geom_segment', 'geom_ribbon',
     'geom_crossbar', 'geom_errorbar', 'geom_linerange', 'geom_point', 
     'geom_pointrange', 'geom_raster', 'geom_rect', 'geom_tile', 
     'geom_smooth', 'geom_text', 'geom_label', 
@@ -32,6 +32,7 @@ ENV <- environment(NULL)
   lapply(FUN = cmd_wrap, pkg="ggpattern", {c(
     'geom_bar_pattern', 'geom_boxplot_pattern', 
     'geom_col_pattern', 'geom_crossbar_pattern', 
+    'geom_ribbon_pattern', 
     'scale_pattern_color_manual', 'scale_pattern_fill_manual', 
     'scale_pattern_type_manual', 'geom_violin_pattern' )})
 

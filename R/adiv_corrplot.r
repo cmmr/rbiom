@@ -4,8 +4,6 @@
 
 #' Visualize alpha diversity with scatterplots and trendlines.
 #' 
-#' @inherit documentation_test.trends
-#' @inherit documentation_model.lm
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
 #' 
@@ -22,8 +20,8 @@
 adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "trends", model = "lm", trans = "rank", 
-    p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
+    formula = y ~ x, engine = "lm", level = 0.95, 
+    trans = "none", caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -105,7 +103,6 @@ adiv_corrplot <- function (
   #________________________________________________________
   fig <- params %>% 
     plot_facets() %>% 
-    corrplot_stats() %>%
     plot_build()
   
   

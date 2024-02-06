@@ -18,7 +18,7 @@
 #' @export
 #' @examples
 #'     
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     print(hmp50)
 #'       
@@ -42,7 +42,7 @@ convert_to_SE <- function (biom) {
     stop("Bioconductor R package 'SummarizedExperiment' must be installed to use convert_to_SE().")
   
   SummarizedExperiment::SummarizedExperiment(
-    assays  = list('OTU table' = biom$counts),
+    assays  = list('OTU table' = as.matrix(biom$counts)),
     rowData = biom$taxonomy %>% tibble::column_to_rownames(".otu") %>% as.matrix(),
     colData = biom$metadata %>% tibble::column_to_rownames(".sample") )
 }
@@ -60,10 +60,10 @@ convert_to_TSE <- function (biom) {
     stop("Bioconductor R package 'TreeSummarizedExperiment' must be installed to use convert_to_TSE().")
   
   TreeSummarizedExperiment::TreeSummarizedExperiment(
-    assays       = list('OTU table' = biom$counts),
+    assays       = list('OTU table' = as.matrix(biom$counts)),
     rowData      = biom$taxonomy %>% tibble::column_to_rownames(".otu") %>% as.matrix(),
     colData      = biom$metadata %>% tibble::column_to_rownames(".sample"),
-    rowTree      = biom$tree,
+    rowTree      = biom$tree, 
     referenceSeq = Biostrings::DNAStringSet(biom$sequences) )
 }
 

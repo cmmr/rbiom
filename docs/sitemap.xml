@@ -7,30 +7,6 @@
     <loc>https://cmmr.github.io/rbiom/articles/aes.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/aes.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/bdiv_cmp.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/diversity.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/importing.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/plots.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/rbiom.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/scales.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/articles/articles/statistics.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/articles/bdiv_cmp.html</loc>
   </url>
   <url>
@@ -94,6 +70,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_boxplot.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/bdiv_clusters.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_corrplot.html</loc>
   </url>
   <url>
@@ -136,6 +115,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/documentation_boxplot_aes_section.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_clusters.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_cmp.html</loc>
   </url>
   <url>
@@ -151,19 +133,7 @@
     <loc>https://cmmr.github.io/rbiom/reference/documentation_heatmap.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/documentation_model.lm.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/documentation_model.log.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/documentation_model_section.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_plot_return.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/documentation_plot_stats_return.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_rank.NULL.html</loc>
@@ -187,7 +157,7 @@
     <loc>https://cmmr.github.io/rbiom/reference/documentation_test.trends.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/documentation_tranform.y.ifelse.html</loc>
+    <loc>https://cmmr.github.io/rbiom/reference/glimpse.rbiom.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/hmp50.html</loc>
@@ -244,9 +214,6 @@
     <loc>https://cmmr.github.io/rbiom/reference/speed.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/subset.html</loc>
   </url>
   <url>
@@ -254,6 +221,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_clusters.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_corrplot.html</loc>

@@ -226,54 +226,15 @@ validate_bool <- function (var, env = parent.frame(), evar = var, max = 1, null_
 
 
 
-validate_model <- function (var = "model", env = parent.frame()) {
+validate_formula <- function (var = "formula", env = parent.frame(), evar = var) {
   
-  model <- get(var, pos = env, inherits = FALSE)
-  
-  
-  #________________________________________________________
-  # Predefined regression models
-  #________________________________________________________
-  if (is_scalar_character(model)) {
-    model <- switch(
-      EXPR = match.arg(model, c('lm', 'gam')),
-      lm   = list("stats::lm", list(formula = y ~ x)),
-      gam  = list("mgcv::gam", list(formula = y ~ s(x, bs = "cs"), method = "REML")) )
-    environment(model[[2]][['formula']]) <- baseenv()
-  }
-  
-  
+  f <- get(var, pos = env, inherits = FALSE)
   
   #________________________________________________________
-  # Sanity check model function.
+  # Sanity check user-specified regression formula.
   #________________________________________________________
-  stopifnot(is_list(model))
-  stopifnot(length(model) == 2)
-  
-  args <- model[[2]]
-  stopifnot(is_list(args))
-  stopifnot(is_formula(args[['formula']]))
-  stopifnot(is_null(args[['data']]))
-  
-  fun <- model[[1]]
-  if (is.character(fun) && !is_na(fun))
-    fun <- local({
-      fn  <- fun
-      fun <- strsplit(fun, '::', fixed = TRUE)[[1]]
-      fun <- if (length(fun) == 1) get(fun) else getFromNamespace(fun[[2]], fun[[1]])
-      stopifnot(is_function(fun))
-      stopifnot(all(c('formula', 'data') %in% formalArgs(fun)))
-      attr(fun, 'fn') <- fn
-      return (fun)
-    })
-  stopifnot(is.function(fun))
-  
-  fn <- attr(fun, 'fn', exact = TRUE)
-  stopifnot(is_scalar_character(fn) && !is_na(fn))
-  
-  
-  model <- list(fun = fun, args = args)
-  assign(var, model, pos = env)
+  if (!is_formula(f) || !identical(all.vars(f), c("y", "x")))
+    cli_abort("`{evar}` must be a formula of the form y ~ x.")
   
   return (invisible(NULL))
 }

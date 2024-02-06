@@ -176,6 +176,7 @@ Visualize BIOM data with boxplots.
 \seealso{
 Other taxa_abundance: 
 \code{\link{taxa_barplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},

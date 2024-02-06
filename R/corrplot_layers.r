@@ -10,7 +10,9 @@ init_corrplot_layers <- function (params = parent.frame()) {
   #________________________________________________________
   with(params, {
     stopifnot(is_tibble(.ggdata))
-    validate_model()
+    validate_formula()
+    validate_var_range('level', range = c(0.5, 1))
+    validate_var_choices('engine', choices = c("lm", "local"))
   })
   
   
@@ -43,17 +45,27 @@ init_corrplot_layers <- function (params = parent.frame()) {
     no_init = c("trend", "confidence"),
     choices = c(
       't' = "trend",   'c' = "confidence", 
-      's' = "scatter", 'r' = "residual",   'n' = "name") )
+      's' = "scatter", 'n' = "name" ))
   
   
   
+  #________________________________________________________
   # Merge trend and confidence into a single layer.
+  #________________________________________________________
   if (any(c('trend', 'confidence') %in% layer_names)) {
-    add_layer(params, 'trend')
-    if (!'trend'      %in% layer_names) set_layer(params, 'trend', color = NA)
-    if (!'confidence' %in% layer_names) set_layer(params, 'trend', se = FALSE)
+    
+    add_layer(params, 'smooth')
+    set_layer(params, 'smooth', formula = params$formula)
+    
+    if (!'trend'      %in% layer_names) set_layer(params, 'smooth', color = NA)
+    if (!'confidence' %in% layer_names) set_layer(params, 'smooth', se = FALSE)
+    
+    if (params$engine == "lm")
+      set_layer(params, 'smooth', method = params$engine)
+    
+    if ('confidence' %in% layer_names && params$level != 0.95)
+      set_layer(params, 'smooth', level = params$level)
   }
-  
   
   
   
@@ -73,15 +85,16 @@ init_corrplot_layers <- function (params = parent.frame()) {
     if (has_layer(params, 'scatter'))
       set_layer(params, 'scatter', 'mapping|color' = color.by)
     
-    if (has_layer(params, 'residual'))
-      set_layer(params, 'residual', 'mapping|color' = color.by)
     
-    if (has_layer(params, 'trend')) {
-      set_layer(params, 'trend', 'mapping|color' = color.by)
+    if (has_layer(params, 'smooth')) {
+      
+      if ('trend' %in% layer_names)
+        set_layer(params, 'smooth', 'mapping|color' = color.by)
       
       if ('confidence' %in% layer_names) {
-        set_layer(params, 'trend', 'mapping|fill' = color.by)
         
+        set_layer(params, 'smooth', 'mapping|fill' = color.by)
+      
         if (!is_null(params$layers[['color']][['values']]))
           set_layer(
             params = params, 
@@ -89,79 +102,8 @@ init_corrplot_layers <- function (params = parent.frame()) {
             'values' = params$layers[['color']][['values']] )
       }
     }
+    
   }
-  
-  
-  
-  #________________________________________________________
-  # Define the curve and confidence interval.
-  #________________________________________________________
-  if (has_layer(params, 'trend')) {
-    
-    model <- params$model
-    
-    
-    #________________________________________________________
-    # The method for geom_smooth.
-    #________________________________________________________
-    method <- with(params$model, structure(
-      .Data   = function (data, ...) do.call(fun, c(args, list(data = data))),
-      display = sprintf(
-        fmt = "function (data, ...) %s(%s, data = data)",
-        attr(fun, 'fn'), as.args(args, fun = fun) )))
-    
-    set_layer(
-      params = params, 
-      layer  = 'trend', 
-      'method'  = method, 
-      'formula' = params$model[['args']][['formula']] )
-    
-    if (!isTRUE(params$level == 0.95)) # 0.95 is default
-      set_layer(params, 'trend', level = params$level)
-    
-    
-    
-    #________________________________________________________
-    # Fade out the points when a curve is fitted.
-    #________________________________________________________
-    if (has_layer(params, 'scatter'))
-      set_layer(params, 'scatter', size = 0.2, alpha = 0.5)
-    
-    
-    remove("method")
-  }
-  
-  
-  
-  
-  
-  #________________________________________________________
-  # Connect points to trendline with vertical lines.
-  #________________________________________________________
-  if (has_layer(params, 'residual')) {
-    
-    with(params, {
-      attr(.ggdata, 'residual') <- stats_table(
-          test     = "predict", 
-          df       = .ggdata, 
-          stat.by  = names(color.by), 
-          resp     = .ycol, 
-          regr     = .xcol, 
-          model    = model, 
-          split.by = facet.by ) %>%
-        keep_cols('.sample', .xcol, .ycol, '.fitted', names(color.by), facet.by)
-    })
-    
-    set_layer(
-      params = params, 
-      layer  = 'residual',
-      'mapping|x'    = params$.xcol,
-      'mapping|xend' = params$.xcol,
-      'mapping|y'    = params$.ycol,
-      'mapping|yend' = '.fitted' )
-  }
-  
-  
   
   
   
@@ -176,7 +118,7 @@ init_corrplot_layers <- function (params = parent.frame()) {
   
   
   #________________________________________________________
-  # Add layers will have a common `x` and `y` field name.
+  # All layers will have a common `x` and `y` field name.
   #________________________________________________________
   set_layer(
     params = params, 

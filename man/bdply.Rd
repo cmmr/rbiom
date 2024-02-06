@@ -72,6 +72,9 @@ Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::d
 
 }
 \seealso{
+Other metadata: 
+\code{\link{glimpse.rbiom}()}
+
 Other biom: 
 \code{\link{biom_merge}()}
 }

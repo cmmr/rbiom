@@ -228,7 +228,7 @@ p$stats
 p$stats$code
 ```
 
-`adiv_stats()`, `bdiv_stats()`, `distmat_stats()`, `stats_table()`, `taxa_stats()`
+`adiv_stats()`, `bdiv_stats()`, `distmat_stats()`, `taxa_stats()`
 
 
 

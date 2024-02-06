@@ -43,6 +43,7 @@ as_rbiom <- function(biom, ...) {
 
 
 
+#' @export
 as_rbiom.rbiom <- function (biom) {
   
   #________________________________________________________
@@ -50,10 +51,10 @@ as_rbiom.rbiom <- function (biom) {
   #________________________________________________________
   if (!identical(pv1 <- biom$pkg_version, pv2 <- packageVersion("rbiom"))) {
     
-    if (getOption("rbiom.inform", default = TRUE))
-      cli_inform(.frequency = "regularly", .frequency_id = "up_convert", c(
-        '!' = "Up converting rbiom object from version {pv1} to {pv2}.",
-        'i' = "It is recommended to save rbiom objects to BIOM files, not RDS files." ))
+    # if (getOption("rbiom.inform", default = TRUE))
+    #   cli_inform(.frequency = "regularly", .frequency_id = "up_convert", c(
+    #     '!' = "Up converting rbiom object from version {pv1} to {pv2}.",
+    #     'i' = "It is recommended to save rbiom objects to BIOM files, not RDS files." ))
     
     biom <- do.call(rbiom$new, as.list(biom))
   }
@@ -67,13 +68,20 @@ as_rbiom.rbiom <- function (biom) {
 #________________________________________________________
 # Create an rbiom object from just count data.
 #________________________________________________________
-as_rbiom.matrix                <- function (biom) { rbiom$new(counts = biom) }
+
+#' @export
+as_rbiom.matrix <- function (biom) { rbiom$new(counts = biom) }
+
+
+#' @export
 as_rbiom.simple_triplet_matrix <- function (biom) { rbiom$new(counts = biom) }
 
 
 #________________________________________________________
 # Allow passing phyloseq objects to rbiom functions.
 #________________________________________________________
+
+#' @export
 as_rbiom.phyloseq <- function (biom) {
   
   if (!nzchar(system.file(package = "phyloseq")))
@@ -90,6 +98,7 @@ as_rbiom.phyloseq <- function (biom) {
 
 
 
+#' @export
 as_rbiom.default <- function (biom) {
   
   

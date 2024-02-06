@@ -83,6 +83,15 @@ eval_envir <- function (env, ...) {
   
   
   #____________________________________________________________________
+  # Move some parameters into dots.
+  #____________________________________________________________________
+  if (hasName(params, 'y.trans')) {
+    dots[['y.trans']] <- params[['y.trans']]
+    rlang::env_unbind(params, 'y.trans')
+  }
+  
+  
+  #____________________________________________________________________
   # Check if obviously wrong parameters are going into dots.
   #____________________________________________________________________
   if (length(dots) > 0) {
@@ -95,8 +104,7 @@ eval_envir <- function (env, ...) {
           'x', 'color.by', 'shape.by', 'facet.by', 
           'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
           'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
-          'within', 'between', 'tree', 'params',
-          'xaxis.trans', 'yaxis.trans' ))))
+          'within', 'between', 'tree', 'params' ))))
     
     if (nzchar(invalid)) {
       fn <- deparse(rlang::caller_call()[[1]])
@@ -581,27 +589,6 @@ add_class <- function (obj, cls) {
   if (!is.null(obj))
     class(obj) <- c(cls, setdiff(class(obj), cls))
   return (obj)
-}
-
-
-#____________________________________________________________________
-# Test if ALL arguments are NULL
-#____________________________________________________________________
-all.null <- function (...) {
-  for (i in list(...))
-    if (!is_null(i))
-      return (FALSE)
-  return (TRUE)
-}
-
-#____________________________________________________________________
-# Test if ANY arguments are NULL
-#____________________________________________________________________
-any.null <- function (...) {
-  for (i in list(...))
-    if (is_null(i))
-      return (TRUE)
-  return (FALSE)
 }
 
 

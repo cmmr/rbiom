@@ -9,7 +9,7 @@ rare_barplot(
   rline = TRUE,
   counts = TRUE,
   labels = TRUE,
-  trans = "log10",
+  y.trans = "log10",
   ...
 )
 }
@@ -28,14 +28,26 @@ rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 
 \item{labels}{Show sample names under each bar. Default: \code{TRUE}.}
 
-\item{trans}{Y-axis transformation. Options are \code{"log10"} or
-\code{NULL}.  Default: \code{"log10"}.}
+\item{y.trans}{The transformation to apply to the y-axis. Visualizing
+differences of both high- and low-abundance taxa is best done with
+a non-linear axis. Options are:
+\itemize{
+\item{\code{"sqrt"} - }{ square-root transformation }
+\item{\code{"log1p"} - }{ log(y + 1) transformation }
+\item{\code{NULL} - }{ no transformation }
+}
+These methods allow visualization of both high- and low-abundance
+taxa simultaneously, without complaint about 'zero' count
+observations. Default: \code{"sqrt"}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with \code{r.} to ensure it gets
 passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
 \code{r.color = "black"} ensures only the horizontal rarefaction line
 has its color set to \code{"black"}.}
+
+\item{trans}{Y-axis transformation. Options are \code{"log10"} or
+\code{NULL}.  Default: \code{"log10"}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points and ggplot
@@ -60,8 +72,8 @@ Visualize the number of observations per sample.
 Other rarefaction: 
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
+\code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
 
 Other visualization: 

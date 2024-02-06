@@ -56,8 +56,8 @@ Subset to a specific number of samples.
 \seealso{
 Other transformations: 
 \code{\link{mutate}()},
-\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
+\code{\link{rarefy_cols}()},
 \code{\link{subset}()}
 }
 \concept{transformations}

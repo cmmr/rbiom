@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,7 +109,7 @@ Here we’ll import a dataset from a BIOM file.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2024-01-18)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2024-02-06)</span></span>
 <span><span class="co">#&gt;      50 Samples:  HMP01, HMP02, HMP03, ..., and HMP50</span></span>
 <span><span class="co">#&gt;     490 OTUs:     Unc01yki, Unc53100, LtbAci52, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
@@ -319,11 +319,11 @@ samples in the abundance table.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre></div>
 <p><code><a href="../reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code></p>
 </div>
@@ -339,13 +339,13 @@ entire rbiom object.</p>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`    group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares A     TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares B     TRUE </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2024-01-18)</span></span>
+<span><span class="co">#&gt; Human Microbiome Project - 50 Sample Demo (2024-02-06)</span></span>
 <span><span class="co">#&gt;      10 Samples:  HMP10, HMP15, HMP16, ..., and HMP48</span></span>
 <span><span class="co">#&gt;     126 OTUs:     CnbTube3, PpbAcne6, Unc02qsf, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span></span>
@@ -457,8 +457,7 @@ greater detail.</p>
 <span><span class="co">#&gt;   </span></span>
 <span><span class="co">#&gt; <span style="color: #BB00BB;">}</span><span style="color: #BBBB00;">)</span></span></span></code></pre></div>
 <p><code><a href="../reference/adiv_stats.html">adiv_stats()</a></code>, <code><a href="../reference/bdiv_stats.html">bdiv_stats()</a></code>,
-<code><a href="../reference/distmat_stats.html">distmat_stats()</a></code>, <code><a href="../reference/stats_table.html">stats_table()</a></code>,
-<code><a href="../reference/taxa_stats.html">taxa_stats()</a></code></p>
+<code><a href="../reference/distmat_stats.html">distmat_stats()</a></code>, <code><a href="../reference/taxa_stats.html">taxa_stats()</a></code></p>
 </div>
 <div class="section level2">
 <h2 id="share">Share<a class="anchor" aria-label="anchor" href="#share"></a>

@@ -63,34 +63,11 @@ adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), color.by = "Body Site")
 
 ![](man/figures/README-bdiv-2.png)<!-- -->
 
-#### Compute statistics for correlation models.
-
 ``` r
-taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, p.top = 4, color.by = "bod")
+taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, color.by = "bod")
 ```
 
-![](man/figures/README-stats-1.png)<!-- -->
-
-``` r
-taxa_stats(biom, regr = "Age", stat.by = "Body Site", taxa = 0.01)
-#> # Test:     Is each trendline's slope non-zero?
-#> # Model:    stats::lm(.abundance ~ Age * `Body Site`)
-#> # A tibble: 80 × 10
-#>    .taxa      `Body Site`    .trend   .se   .df  .lower .upper  .t.ratio  .p.val
-#>    <fct>      <fct>           <dbl> <dbl> <dbl>   <dbl>  <dbl>     <dbl>   <dbl>
-#>  1 Lactobaci… Anterior n… -3.47e- 1  1.25    39  -2.88    2.19 -2.77e- 1 0.783  
-#>  2 Lactobaci… Buccal muc… -5.09e- 1  2.61    39  -5.79    4.78 -1.95e- 1 0.847  
-#>  3 Lactobaci… Mid vagina  -4.29e+ 0  1.25    39  -6.81   -1.76 -3.44e+ 0 0.00142
-#>  4 Lactobaci… Saliva      -4.42e- 1  1.68    39  -3.84    2.95 -2.63e- 1 0.794  
-#>  5 Lactobaci… Stool        8.33e-16  2.05    39  -4.14    4.14  4.07e-16 1      
-#>  6 Streptoco… Anterior n…  3.71e+ 0  2.05    39  -0.436   7.85  1.81e+ 0 0.0780 
-#>  7 Streptoco… Buccal muc… -3.01e+ 0  4.27    39 -11.6     5.63 -7.04e- 1 0.486  
-#>  8 Streptoco… Mid vagina  -1.60e+ 0  2.04    39  -5.72    2.53 -7.83e- 1 0.438  
-#>  9 Streptoco… Saliva      -3.38e+ 0  2.74    39  -8.92    2.17 -1.23e+ 0 0.225  
-#> 10 Streptoco… Stool        7.56e- 1  3.35    39  -6.01    7.52  2.26e- 1 0.822  
-#> # ℹ 70 more rows
-#> # ℹ 1 more variable: .adj.p <dbl>
-```
+![](man/figures/README-bdiv-3.png)<!-- -->
 
 #### Summarize counts by taxonomic rank.
 

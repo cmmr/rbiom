@@ -163,7 +163,7 @@ respectively.
 Display taxa abundances as a heatmap.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     # Keep and rarefy the 10 most deeply sequenced samples.
     hmp10 <- rarefy(hmp50, n = 10)
@@ -175,6 +175,7 @@ Display taxa abundances as a heatmap.
 Other taxa_abundance: 
 \code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_matrix}()},
 \code{\link{taxa_stats}()},

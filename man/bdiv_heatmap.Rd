@@ -250,6 +250,7 @@ limit.by = list(
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},

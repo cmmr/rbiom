@@ -40,7 +40,7 @@
 #'     
 
 rare_barplot <- function (
-    biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
+    biom, rline = TRUE, counts = TRUE, labels = TRUE, y.trans = "log10", ...) {
   
   biom <- as_rbiom(biom)
   
@@ -109,7 +109,9 @@ rare_barplot <- function (
     .ggdata %<>% subset(.ymin > 0 & .ymax > 0) %>% as_rbiom_tbl()
     
     .xcol  <- ".sample"
+    .xlab  <- "Sample"
     .ycol  <- ".ymax"
+    .ylab  <- "Sequencing Depth"
     .xmode <- "factor"
   })
   
@@ -125,15 +127,14 @@ rare_barplot <- function (
   # Add default layer parameters.
   #________________________________________________________
   set_layer(params, 'rect',  mapping = .qw(xmin, xmax, ymin, ymax), color=NA)
-  set_layer(params, 'labs',  x = "Sample", y = "Sequencing Depth")
   set_layer(params, 'yaxis', expand = c(0,0))
   set_layer(params, 'theme', panel.grid.major.x = element_blank())
   
-  if (params$trans == "log10") {
-    set_layer(params, 'yaxis', c(loglabels(params$.ss), trans="log10"))
-  } else {
-    set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
-  }
+  # if (params$trans == "log10") {
+  #   set_layer(params, 'yaxis', c(loglabels(params$.ss), trans="log10"))
+  # } else {
+  #   set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
+  # }
   
   if (isTRUE(labels)) {
     set_layer(params, 'point', mapping     = list(x = ".x"), y = 1, alpha = 0)

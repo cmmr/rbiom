@@ -7,7 +7,7 @@
 \item{x}{A numeric metadata field to use for the x-axis. Required.}
 
 \item{layers}{One or more of
-\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+\code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
 See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
@@ -15,21 +15,10 @@ See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
 
-\item{test}{Which test statistic to display on the plot. Options are:
-\itemize{
-\item{\code{"fit"} - }{ How well does the model fit the data? }
-\item{\code{"terms"} - }{ How strongly does 'x' influence 'y'? }
-\item{\code{"means"} - }{ Is the average 'y' value non-zero? }
-\item{\code{"trends"} - }{ Does any trendline have a non-zero slope? }
-\item{\code{"pw_means"} - }{ Are the means of any trendlines different? }
-\item{\code{"pw_trends"} - }{ Are the slopes of any trendlines different? }
-\item{\code{"none"} - }{ Do not compute or show statistics. }
-}
-Default: \code{"trends"} \cr\cr
-Note: \code{"pw_means"} and \code{"pw_trends"} can only be calculated
-when using a \code{color.by} metadata column with more than one level. \cr\cr
-Statistical tests are run separately on each facet. P-values are
-adjusted for multiple comparisons by considering all facets together.}
+\item{formula}{Relationship between variables. Default: \code{y ~ x}}
+
+\item{engine}{What type of trend model to fit to the data. Options are:
+\code{"lm"} (linear), \code{"local"} (uses loess or gam). Default: \code{"lm"}}
 
 \item{...}{Additional parameters to pass along to ggplot2
 functions. Prefix a parameter name with either \code{t.} or
@@ -39,9 +28,8 @@ respectively. For instance, \code{s.size = 2} ensures only the
 scatterplot points have their size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \verb{$data}, \verb{$stats}, and
-\verb{$code}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot command
+are available as \verb{$data} and \verb{$code}, respectively.
 }
 \description{
 documentation_corrplot

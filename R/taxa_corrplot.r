@@ -1,7 +1,5 @@
 #' Visualize taxa abundance with scatterplots and trendlines.
 #' 
-#' @inherit documentation_test.trends
-#' @inherit documentation_model.lm
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
 #' 
@@ -10,7 +8,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
@@ -20,8 +18,8 @@
 taxa_corrplot <- function (
     biom, x, rank = -1, taxa = 6, layers = "t",
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "trends", model = "lm", trans = "rank", 
-    p.top = Inf, p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
+    formula = y ~ x, engine = "lm", level = 0.95, 
+    trans = "none", caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -102,7 +100,6 @@ taxa_corrplot <- function (
   #________________________________________________________
   fig <- params %>% 
     plot_facets() %>% 
-    corrplot_stats() %>%
     plot_build()
   
   

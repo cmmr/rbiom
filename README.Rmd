@@ -65,13 +65,7 @@ biom   <- rarefy(infile)
 ```{r bdiv}
 bdiv_ord_plot(biom, color.by = "Body Site", facet.by = "Sex")
 adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), color.by = "Body Site")
-```
-
-
-#### Compute statistics for correlation models.
-```{r stats}
-taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, p.top = 4, color.by = "bod")
-taxa_stats(biom, regr = "Age", stat.by = "Body Site", taxa = 0.01)
+taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, color.by = "bod")
 ```
 
 
@@ -102,4 +96,5 @@ rbiom requires the following system libraries which can be installed through you
 * csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev gdal_dev`
 * brew (OSX): `udunits`
 
+     
    

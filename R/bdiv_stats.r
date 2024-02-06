@@ -1,4 +1,4 @@
-#' Test beta diversity vs categorical or numeric metadata.
+#' Test beta diversity vs categorical metadata.
 #' 
 #' @inherit documentation_cmp
 #' @inherit documentation_dist_test
@@ -18,18 +18,14 @@
 #'       
 #'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))
 #'     
-#'     bdiv_stats(biom, regr = "BMI", stat.by = "==Body Site")
-#'     
 #'     # The R code used to compute the stats is in $code.
 #'     tbl <- bdiv_stats(biom, stat.by = "Sex")
 #'     tbl$code
 
 bdiv_stats <- function (
-    biom, stat.by = NULL, regr = NULL, bdiv = "Bray-Curtis", 
-    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
-    test = ifelse(is.null(regr), "means", "trends"), model = "lm", 
-    trans = ifelse(is.null(regr), "none", "rank"), 
-    split.by = NULL, level = 0.95, p.adj = "fdr" ) {
+    biom, stat.by, bdiv = "Bray-Curtis", weighted = TRUE, 
+    split.by = NULL, within = NULL, between = NULL, tree = NULL, 
+    trans = "none", test = "means", p.adj = "fdr" ) {
   
   
   biom <- as_rbiom(biom)
@@ -48,14 +44,13 @@ bdiv_stats <- function (
   
   
   #________________________________________________________
-  # Sanity checks.
+  # Validate user's arguments.
   #________________________________________________________
   with(params, {
     
     validate_bdiv(max = Inf)
     
     validate_meta('stat.by',  cmp = TRUE)
-    validate_meta('regr', null_ok = TRUE)
     validate_meta('split.by', cmp = TRUE, max = Inf, null_ok = TRUE)
     
     # Validates and appends to `within` and `between`.
@@ -66,7 +61,7 @@ bdiv_stats <- function (
   
   
   
-  params$md <- with(params, c(stat.by, regr, split.by))
+  params$md <- with(params, c(stat.by, split.by))
   params$df <- do.call(bdiv_table, fun_params(bdiv_table, params))
   
   with(params, {

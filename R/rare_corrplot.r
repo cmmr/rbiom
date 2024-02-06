@@ -1,13 +1,16 @@
 
 #' Visualize rarefaction curves with scatterplots and trendlines.
 #' 
-#' @inherit documentation_test.pw_means
-#' @inherit documentation_model.log
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
 #' 
 #' @family rarefaction
 #' @family visualization
+#' 
+#' 
+#' @param formula   Relationship between variables. In `rare_corrplot()`, `x` is 
+#'        the sequencing depth and `y` is alpha diversity.
+#'        Default: `y ~ log(x)`
 #' 
 #' @export
 #' @examples
@@ -19,10 +22,8 @@
 rare_corrplot <- function (
     biom, adiv = "Shannon", layers = "t", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    test = "pw_means", 
-    model = list("stats::lm", list(formula = y ~ log(x))), 
-    trans = "none", 
-    p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
+    formula = y ~ log(x), engine = "lm", level = 0.95, 
+    trans = "none", caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -122,9 +123,13 @@ rare_corrplot <- function (
   #________________________________________________________
   init_corrplot_layers(params)
   
-  set_layer(params, 'xaxis', labels = label_number(scale_cut = cut_si("")))
   if (!is_null(params$rline))
-    set_layer(params, 'vline', xintercept = params$rline, color = "red", linetype="dashed")
+    set_layer(
+      params     = params, 
+      layer      = 'vline', 
+      xintercept = params$rline, 
+      color      = "red", 
+      linetype   = "dashed" )
   
   
   
@@ -134,7 +139,6 @@ rare_corrplot <- function (
   #________________________________________________________
   fig <- params %>% 
     plot_facets() %>% 
-    corrplot_stats() %>%
     plot_build()
   
   

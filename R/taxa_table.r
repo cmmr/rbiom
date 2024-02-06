@@ -168,7 +168,7 @@ taxa_table <- function (
   # Validate user's arguments.
   #________________________________________________________
   validate_rank(max = Inf)
-  validate_meta('md', max = Inf)
+  validate_meta('md', max = Inf, null_ok = TRUE)
   
   
   

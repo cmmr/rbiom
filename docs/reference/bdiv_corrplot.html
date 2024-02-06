@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,18 +76,17 @@
 <span>  <span class="va">x</span>,</span>
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  layers <span class="op">=</span> <span class="st">"t"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  test <span class="op">=</span> <span class="st">"trends"</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  trans <span class="op">=</span> <span class="st">"rank"</span>,</span>
-<span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span>,</span>
+<span>  engine <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -120,15 +119,9 @@ Default: <code>TRUE</code> <br><br>
 Multiple values allowed.</p></dd>
 
 
-<dt>tree</dt>
-<dd><p>A <code>phylo</code> object representing the phylogenetic
-relationships of the taxa in <code>biom</code>. Only required when
-computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
-
-
 <dt>layers</dt>
 <dd><p>One or more of
-<code>c("trend", "confidence", "scatter", "residual", "name")</code>. Single
+<code>c("trend", "confidence", "scatter", "name")</code>. Single
 letter abbreviations are also accepted. For instance,
 <code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and <code>"ts"</code>.
 See plot types for examples of each. Default: <code>"t"</code></p></dd>
@@ -139,20 +132,24 @@ See plot types for examples of each. Default: <code>"t"</code></p></dd>
 and partitioning. See below for details. Default: <code>NULL</code></p></dd>
 
 
-<dt>test</dt>
-<dd><p>The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-<code>"predict"</code>, <code>"terms"</code>, <code>"fit"</code>, <code>"means"</code>,
-<code>"trends"</code>, <code>"es_means"</code>, <code>"es_trends"</code>,
-<code>"pw_means"</code>, or <code>"pw_trends"</code>.
-Default: <code>"trends"</code></p></dd>
+<dt>tree</dt>
+<dd><p>A <code>phylo</code> object representing the phylogenetic
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 
 
-<dt>model</dt>
+<dt>formula</dt>
+<dd><p>Relationship between variables. Default: <code>y ~ x</code></p></dd>
+
+
+<dt>engine</dt>
 <dd><p>What type of trend model to fit to the data. Options are:
-<code>"lm"</code> (linear), <code>"log"</code> (logarithmic), or <code>"gam"</code>
-(generalized additive). See the "Model Options" section below for
-additional details. Default: <code>"lm"</code></p></dd>
+<code>"lm"</code> (linear), <code>"local"</code> (uses loess or gam). Default: <code>"lm"</code></p></dd>
+
+
+<dt>level</dt>
+<dd><p>The confidence level for calculating a confidence interval.
+Default: <code>0.95</code></p></dd>
 
 
 <dt>trans</dt>
@@ -160,17 +157,6 @@ additional details. Default: <code>"lm"</code></p></dd>
 <code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: <code>"none"</code></p></dd>
-
-
-<dt>p.adj</dt>
-<dd><p>Method to use for multiple comparisons adjustment of
-p-values. Run <code>p.adjust.methods</code> for a list of available
-options. Default: <code>"fdr"</code></p></dd>
-
-
-<dt>level</dt>
-<dd><p>The confidence level for calculating a confidence interval.
-Default: <code>0.95</code></p></dd>
 
 
 <dt>caption</dt>
@@ -191,59 +177,8 @@ scatterplot points have their size set to <code>2</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>ggplot2</code> plot. <br> The computed data points, statistics,
-and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
-<code>$code</code>, respectively.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="statistical-tests">Statistical Tests<a class="anchor" aria-label="anchor" href="#statistical-tests"></a></h2>
-    
-
-
-<ul><li><p><code>"predict"</code> - 
-Augments original data with fitted information. See
-<code><a href="https://broom.tidymodels.org/reference/augment.lm.html" class="external-link">broom::augment.lm()</a></code>.</p></li>
-<li><p><code>"terms"</code> -  Summary information about the model's
-terms, including p-value, r-squared, AIC, BIC, and confidence
-interval at <code>level</code>. See <code><a href="https://broom.tidymodels.org/reference/tidy.lm.html" class="external-link">broom::tidy.lm()</a></code>.</p></li>
-<li><p><code>"fit"</code> -  Goodness of fit measures, p-values, and
-more for the overall model. See <code><a href="https://broom.tidymodels.org/reference/glance.lm.html" class="external-link">broom::glance.lm()</a></code>.</p></li>
-<li><p><code>"means"</code> -  The estimated marginal mean (EMM) for
-each <code>stat.by</code> group, along with confidence intervals (CI),
-standard errors (SE), t-ratios, and p-values testing for mean = zero.
-See <code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code> and <code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
-<li><p><code>"trends"</code> -  The trendline slope for each
-<code>stat.by</code> group, along with CI and SE and p-value testing for
-slope = zero. See <code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code> and
-<code><a href="https://rdrr.io/pkg/emmeans/man/summary.emmGrid.html" class="external-link">emmeans::summary.emmGrid()</a></code>.</p></li>
-<li><p><code>"pw_means"</code> -  Pairwise means. All <code>stat.by</code> groups are
-compared to each other and the difference in means is estimated
-along with SE, t-ratios, and p-values testing if the two means
-are the same. See <code><a href="https://rdrr.io/pkg/emmeans/man/contrast.html" class="external-link">emmeans::pairs.emmGrid()</a></code>.</p></li>
-<li><p><code>"pw_trends"</code> -  Pairwise trends. As above, but
-comparing trendline slopes instead of means.</p></li>
-<li><p><code>"es_means"</code> -  Effect sizes for pairwise differences
-of means, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
-<li><p><code>"es_trends"</code> -  Effect sizes for pairwise differences
-of slopes, including SE and CI. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</p></li>
-</ul></div>
-    <div class="section level2">
-    <h2 id="model-options">Model Options<a class="anchor" aria-label="anchor" href="#model-options"></a></h2>
-    
-
-
-<p>The predefined options are:</p><ul><li><p><code>"lm"</code> -   Linear model: <code>stats::lm(formula = y ~ x)</code>.)</p></li>
-<li><p><code>"log"</code> -  Logarithmic model: <code>stats::lm(formula = y ~ log(x))</code>.</p></li>
-<li><p><code>"gam"</code> -  Generalized additive model: <code>mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")</code>.</p></li>
-</ul><p>You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, <code>model = list("stats::lm", list(formula = y ~ x))</code>.</p>
-<p>By default, the same arguments are used for both plotting and calculating
-statistics. Arguments just for statistics can be set as a third list
-element:
-<code>model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))</code>.</p>
+<p>A <code>ggplot2</code> plot. <br> The computed data points and ggplot command
+are available as <code>$data</code> and <code>$code</code>, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics-and-partitions">Aesthetics and Partitions<a class="anchor" aria-label="anchor" href="#aesthetics-and-partitions"></a></h2>
@@ -291,6 +226,7 @@ and <code>"fishy"</code>.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
+<code><a href="bdiv_clusters.html">bdiv_clusters</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9114</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 <span>  rline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  counts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  trans <span class="op">=</span> <span class="st">"log10"</span>,</span>
+<span>  y.trans <span class="op">=</span> <span class="st">"log10"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -105,9 +105,15 @@ rarefying to <code>rline</code> reads per sample. Default: <code>TRUE</code>.</p
 <dd><p>Show sample names under each bar. Default: <code>TRUE</code>.</p></dd>
 
 
-<dt>trans</dt>
-<dd><p>Y-axis transformation. Options are <code>"log10"</code> or
-<code>NULL</code>.  Default: <code>"log10"</code>.</p></dd>
+<dt>y.trans</dt>
+<dd><p>The transformation to apply to the y-axis. Visualizing
+differences of both high- and low-abundance taxa is best done with
+a non-linear axis. Options are:</p><ul><li><p><code>"sqrt"</code> -  square-root transformation</p></li>
+<li><p><code>"log1p"</code> -  log(y + 1) transformation</p></li>
+<li><p><code>NULL</code> -  no transformation</p></li>
+</ul><p>These methods allow visualization of both high- and low-abundance
+taxa simultaneously, without complaint about 'zero' count
+observations. Default: <code>"sqrt"</code></p></dd>
 
 
 <dt>...</dt>
@@ -116,6 +122,11 @@ Prefix a parameter name with <code>r.</code> to ensure it gets
 passed to (and only to) <a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a>. For instance,
 <code>r.color = "black"</code> ensures only the horizontal rarefaction line
 has its color set to <code>"black"</code>.</p></dd>
+
+
+<dt>trans</dt>
+<dd><p>Y-axis transformation. Options are <code>"log10"</code> or
+<code>NULL</code>.  Default: <code>"log10"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -131,8 +142,8 @@ respectively.</p>
     <div class="dont-index"><p>Other rarefaction: 
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="rarefy_cols.html">rarefy_cols</a>()</code>,
 <code><a href="rarefy.html">rarefy</a>()</code>,
+<code><a href="rarefy_cols.html">rarefy_cols</a>()</code>,
 <code><a href="sample_sums.html">sample_sums</a>()</code></p>
 <p>Other visualization: 
 <code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
@@ -173,14 +184,12 @@ respectively.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     fill = <span style="color: #BBBB00;">"Reads"</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x    = <span style="color: #BBBB00;">"Sample"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     y    = <span style="color: #BBBB00;">"Sequencing Depth"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     y    = <span style="color: #BBBB00;">"Sequencing Depth (log10 scale)"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_discrete</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     breaks       = <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #BB00BB;">(0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">5)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     minor_breaks = <span style="color: #00BBBB;">as.vector</span><span style="color: #BB00BB;">(2</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">9</span> <span style="color: #00BB00;">%o%</span> <span style="color: #BB00BB;">10</span><span style="color: #00BB00;">^</span><span style="color: #00BBBB;">(</span><span style="color: #BB00BB;">0</span><span style="color: #00BB00;">:</span><span style="color: #BB00BB;">4</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     labels       = scales::<span style="color: #00BBBB;">label_number</span><span style="color: #BB00BB;">(</span>scale_cut = scales::<span style="color: #00BBBB;">cut_si(</span><span style="color: #BBBB00;">""</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     expand       = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0</span>, <span style="color: #BB00BB;">0)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     trans        = <span style="color: #BBBB00;">"log10"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     labels = scales::<span style="color: #00BBBB;">label_number</span><span style="color: #BB00BB;">(</span>scale_cut = scales::<span style="color: #00BBBB;">cut_si(</span><span style="color: #BBBB00;">""</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     expand = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0</span>, <span style="color: #BB00BB;">0)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     trans  = <span style="color: #BBBB00;">"log10"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_bw</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme</span><span style="color: #BBBB00;">(</span>panel.grid.major.x = <span style="color: #00BBBB;">element_blank</span><span style="color: #BB00BB;">()</span><span style="color: #BBBB00;">)</span></span>
 <span class="r-in"><span>    </span></span>

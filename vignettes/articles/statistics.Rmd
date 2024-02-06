@@ -42,7 +42,7 @@ To generate statistics without creating a plot, use one of the following:
 ```{r, echo=FALSE, results='asis'}
 cat(glue::glue('
   <table class="table-borderless">
-  <tr>{adiv_stats}{bdiv_stats}{distmat_stats}{stats_table}{taxa_stats}</tr>
+  <tr>{adiv_stats}{bdiv_stats}{distmat_stats}{taxa_stats}</tr>
   </table>',
   .transformer = function (text, ...) {
     sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
@@ -180,64 +180,6 @@ Internally, rbiom uses the non-parametric functions listed below.
 | pairwise      | `stats::wilcox.test()`  | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
 | group-wise    | `stats::kruskal.test()` | Kruskal-Wallis Rank Sum Test                             |
 
-
-
-
-\cr
-
-# Correlation Plots
-
-The `test` parameter for these plots allows you to control what statistical 
-question is being addressed.
-
-| Test        | Function              | Question                                       |
-| ----------- | --------------------- | ---------------------------------------------- |
-| `fit`       | `broom::glance.lm()`  | Does the model (e.g. y ~ x) fit the data well? |
-| `trends`    | `emmeans::emtrends()` | Is each trendline's slope non-zero?            |
-| `pw_trends` | `emmeans::emtrends()` | Do pairs of trendlines have different slopes?  |
-| `means`     | `emmeans::emmeans()`  | Is each trendline's mean non-zero?             |
-| `pw_means`  | `emmeans::emmeans()`  | Do pairs of trendlines have different means?   |
-
-
-These are parametric tests. To apply them to alpha diversity, beta diversity, 
-or taxa abundance non-parametric data, rbiom defaults to using the rank 
-transformation, e.g. `adiv_corrplot(biom, trans="rank", ...)`. Therefore, the 
-y-axis title for correlation plots will be something similar to 
-"rank(Shannon Diversity)" and the `$data` plot attribute will contain the rank- 
-transformed Shannon diversity values.
-
-
-Generally, more than one p-value will be generated per plot, for instance, one 
-p-value per trendline or one p-value per pair of trendlines. Showing all the 
-p-values on the plot can get crowded, so instead the plot displays "min(p)", 
-the most significant p-value after correcting for multiple corrections. The 
-caption under the plot provides a quick reminder of what is being tested for.
-
-```{r}
-biom <- rarefy(hmp50) %>% 
-  subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
-
-p <- taxa_corrplot(
-  biom = biom, taxa = "Bacteroides", layers = "tcs", 
-  x = "Age", color.by = "Body Site")
-
-p
-p$stats
-
-p$stats$code
-```
-
-
-Using the corresponding `_stats()` function will generate the same statistics.
-
-```{r}
-biom <- rarefy(hmp50) %>% 
-  subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
-
-taxa_stats(
-  biom = biom, taxa = "Bacteroides", 
-  regr = "Age", stat.by = "Body Site")
-```
 
 
 

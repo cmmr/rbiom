@@ -68,6 +68,7 @@ Run statistics on a distance matrix vs a categorical or numeric variable.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
@@ -78,7 +79,6 @@ Other beta_diversity:
 Other stats_tables: 
 \code{\link{adiv_stats}()},
 \code{\link{bdiv_stats}()},
-\code{\link{stats_table}()},
 \code{\link{taxa_stats}()}
 }
 \concept{beta_diversity}

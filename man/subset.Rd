@@ -26,22 +26,22 @@ An \link[=rbiom_objects]{rbiom object}.
 Subset an rbiom object by sample names or metadata.
 }
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     # Subset to specific samples
     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
     biom$metadata
     
-    # Subset according to metadata
-    biom <- subset(hmp50, `Body Site` \%in\% 'Saliva' & Age < 25)
+    # Subset according to metadata (using base::subset)
+    biom <- subset(hmp50, `Body Site` \%in\% c('Saliva') & Age < 25)
     biom$metadata
 
 }
 \seealso{
 Other transformations: 
 \code{\link{mutate}()},
-\code{\link{rarefy_cols}()},
 \code{\link{rarefy}()},
+\code{\link{rarefy_cols}()},
 \code{\link{slice}()}
 }
 \concept{transformations}

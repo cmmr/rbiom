@@ -1,21 +1,24 @@
 
+# Excellent reference for emmeans ~num*cat, ~cat*cat, etc:
+# https://stats.oarc.ucla.edu/r/seminars/interactions-r/
+
+
 #' Run non-parametric statistics on a data.frame.
 #' 
-#' @inherit documentation_test.ifelse
-#' @inherit documentation_tranform.y.ifelse
-#' @inherit documentation_model.lm
+#' @noRd
+#' @keywords internal
+#' 
 #' @inherit documentation_default
 #' @inherit documentation_stats_return return
 #' 
 #' @family stats_tables
 #' 
 #' @param df   A data.frame with columns named by \code{stat.by}, \code{resp}, 
-#'        \code{regr}, and \code{split.by}. Required.
+#'        and \code{split.by}. Required.
 #' 
 #' @param resp   The response (independent) numeric variable, such as taxa 
 #'        abundance or alpha diversity.  Default: \code{attr(df, 'response')}
 #' 
-#' @export
 #' @examples
 #'     library(rbiom)
 #'     
@@ -26,13 +29,10 @@
 #'     
 #'     df <- adiv_table(biom)
 #'     stats_table(df, stat.by = "Sex", test = "pw_means")
-#'     
-#'     stats_table(df, stat.by = "Sex", regr = "BMI")
 #' 
 
 stats_table <- function (
-    df, stat.by, resp = attr(df, 'response'), regr = NULL, 
-    test = ifelse(is.null(regr), "means", "trends"), model = "lm", 
+    df, stat.by, resp = attr(df, 'response'), test = "means", 
     level = 0.95, split.by = NULL, p.adj = 'fdr' ) {
   
   
@@ -56,13 +56,12 @@ stats_table <- function (
   choices <- colnames(df)
   validate_var_choices('stat.by',  choices, null_ok = TRUE)
   validate_var_choices('resp',     choices)
-  validate_var_choices('regr',     choices, null_ok = TRUE)
   validate_var_choices('split.by', choices, null_ok = TRUE, max = Inf)
   remove("choices")
   
   test <- match.arg(
     arg     = trimws(tolower(test)),
-    choices = if (is.null(regr)) {
+    choices = if (is.null(NULL)) {  # is.null(regr)
         c("means", "pw_means")
       } else {
         c("predict", "terms", "fit", "means", "trends", 
@@ -99,7 +98,7 @@ stats_table <- function (
   #________________________________________________________
   # Calculate boxplot-like or corrplot-like stats.
   #________________________________________________________
-  if (is.null(regr)) {
+  if (is.null(NULL)) { # is.null(regr)
     args  <- fun_params(stats_table_cat, as.list(environment()))
     stats <- do.call(stats_table_cat, args)
     

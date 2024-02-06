@@ -75,7 +75,7 @@ All functions return an rbiom object.\tabular{ll}{
 }
 
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     # Duplicate the HMP50 example dataset.
     biom <- hmp50$clone()

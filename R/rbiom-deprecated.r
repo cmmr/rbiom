@@ -601,15 +601,15 @@ sample.sums <- function (biom, long = FALSE, md = FALSE) {
 }
 
 
-#' @name stats.table-deprecated
-#' @rdname rbiom-deprecated
-#' @section \code{stats.table}:
-#' Use [stats_table()] instead.
-#' @export
-stats.table <- function (...) {
-  deprecate_warn("2.0.0", "stats.table()", "stats_table()")
-  stats_table(...)
-}
+# #' @name stats.table-deprecated
+# #' @rdname rbiom-deprecated
+# #' @section \code{stats.table}:
+# #' Use [stats_table()] instead.
+# #' @export
+# stats.table <- function (...) {
+#   deprecate_warn("2.0.0", "stats.table()", "stats_table()")
+#   stats_table(...)
+# }
 
 
 #' @name taxa.means-deprecated

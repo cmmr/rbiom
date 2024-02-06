@@ -2,8 +2,6 @@
 
 #' Test alpha diversity differences for significance.
 #' 
-#' @inherit documentation_test.ifelse
-#' @inherit documentation_model.lm
 #' @inherit documentation_default
 #' @inherit documentation_stats_return return
 #' 
@@ -19,17 +17,13 @@
 #'     adiv_stats(biom, stat.by = "Body Site")
 #'       
 #'     adiv_stats(biom, stat.by = "Sex", test = "pw_means")
-#'       
-#'     adiv_stats(biom, stat.by = "Body Site", regr = "Age")
 #'     
 #'     adiv_stats(biom, stat.by = "Body Site", split.by = "Sex")
 #'       
 
 adiv_stats <- function (
-    biom, stat.by = NULL, regr = NULL, adiv = "Shannon",
-    test = ifelse(is.null(regr), "means", "trends"), model = "lm", 
-    trans = ifelse(is.null(regr), "none", "rank"), 
-    split.by = NULL, level = 0.95, p.adj = "fdr") {
+    biom, stat.by, adiv = "Shannon", split.by = NULL,
+    trans = "none", test = "means", p.adj = "fdr" ) {
   
   
   biom <- as_rbiom(biom)
@@ -42,17 +36,13 @@ adiv_stats <- function (
   # Validate user's arguments.
   #________________________________________________________
   with(params, {
-    
     validate_adiv(max = Inf)
-    
-    validate_meta('stat.by',  null_ok = TRUE)
-    validate_meta('regr',     null_ok = TRUE)
+    validate_meta('stat.by')
     validate_meta('split.by', null_ok = TRUE, max = Inf)
-    
   })
   
   
-  params$md <- with(params, c(stat.by, regr, split.by))
+  params$md <- with(params, c(stat.by, split.by))
   params$df <- do.call(adiv_table, fun_params(adiv_table, params))
   
   with(params, {

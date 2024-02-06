@@ -94,7 +94,7 @@ bdiv_boxplot <- function (
     
     # Facet on multiple bdiv metrics
     #________________________________________________________
-    if (length(bdiv) > 1) {
+    if (length(bdiv) > 1 || length(weighted) > 1) {
       facet.by %<>% c(".bdiv")
       .ylab <- aa("\u03B2 Dissimilarity", display = '"\\u03B2 Dissimilarity"')
     }

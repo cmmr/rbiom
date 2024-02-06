@@ -79,7 +79,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     set.seed(123)
 #'     mtx <- matrix(runif(5*8), nrow = 5, dimnames = list(LETTERS[1:5], letters[1:8]))
@@ -274,6 +274,8 @@ plot_heatmap <- function (
     hc <- clust_rows
     if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
     if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
+    
+    hc  <- rev(hc) # Move interesting taxa to top rows of plot.
     mtx <- mtx[hc[['order']],]
     
     if (isTRUE(trees_rows)) {

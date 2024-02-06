@@ -1,8 +1,6 @@
 
 #' Visualize beta diversity with scatterplots and trendlines.
 #' 
-#' @inherit documentation_test.trends
-#' @inherit documentation_model.lm
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
 #' 
@@ -17,11 +15,11 @@
 #'     bdiv_corrplot(biom, "Age", color.by="==Body Site", facet.by="==Sex")
 #'     
 bdiv_corrplot <- function (
-    biom, x, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, layers = "t", 
+    biom, x, bdiv = "Bray-Curtis", weighted = TRUE, layers = "t", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
-    within = NULL, between = NULL, 
-    test = "trends", model = "lm", trans = "rank", 
-    p.adj = "fdr", level = 0.95, caption = TRUE, ...) {
+    within = NULL, between = NULL, tree = NULL, 
+    formula = y ~ x, engine = "lm", level = 0.95, 
+    trans = "none", caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   
@@ -106,7 +104,6 @@ bdiv_corrplot <- function (
   #________________________________________________________
   fig <- params %>% 
     plot_facets() %>% 
-    corrplot_stats() %>%
     plot_build()
   
   

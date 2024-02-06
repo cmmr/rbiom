@@ -234,6 +234,25 @@ NULL
 
 
 
+# clusters ====
+#' documentation_clusters
+#' 
+#' @name documentation_clusters
+#' @keywords internal
+#'        
+#' @param k   Number of clusters. Default: `5L`
+#'        
+#' @param rank   Which taxa rank to use. E.g. `"Phylum"`, 
+#'        `"Genus"`, `".otu"`, etc. An integer can also be 
+#'        given, where `1` is the highest rank, `2` is the second 
+#'        highest, `-1` is the lowest rank, `-2` is the second 
+#'        lowest, and `0` is the OTU "rank". Run `biom$ranks` to 
+#'        see all options for a given rbiom object. Default: `.otu`.
+#' 
+NULL
+
+
+
 # taxa - 4 ====
 #' documentation_taxa.4
 #' 
@@ -309,6 +328,11 @@ NULL
 #'        instance, `dot.size = 2` or `d.size = 2` ensures only the 
 #'        dotplot layer has its size set to `2`. The special prefix
 #'        `pt.` will control both the dot and strip layers.
+#'        
+#' 
+#' @return A `ggplot2` plot. \cr The computed data points, statistics, 
+#'         and ggplot command are available as `$data`, `$stats`, and 
+#'         `$code`, respectively.
 #' 
 NULL
 
@@ -393,35 +417,22 @@ NULL
 #' @name documentation_corrplot
 #' @keywords internal
 #' 
-#' @inherit documentation_plot_stats_return return
-#' 
 #' 
 #' @param x   A numeric metadata field to use for the x-axis. Required.
 #'           
 #' @param layers   One or more of 
-#'        `c("trend", "confidence", "scatter", "residual", "name")`. Single 
+#'        `c("trend", "confidence", "scatter", "name")`. Single 
 #'        letter abbreviations are also accepted. For instance, 
 #'        `c("trend", "scatter")` is equivalent to `c("t", "s")` and `"ts"`. 
 #'        See [plot types][plots] for examples of each. Default: `"t"`
 #'        
 #' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
 #'        and partitioning. See below for details. Default: `NULL`
-#'        
-#' @param test   Which test statistic to display on the plot. Options are: 
-#'        \itemize{
-#'          \item{`"fit"` - }{ How well does the model fit the data? }
-#'          \item{`"terms"` - }{ How strongly does 'x' influence 'y'? }
-#'          \item{`"means"` - }{ Is the average 'y' value non-zero? }
-#'          \item{`"trends"` - }{ Does any trendline have a non-zero slope? }
-#'          \item{`"pw_means"` - }{ Are the means of any trendlines different? }
-#'          \item{`"pw_trends"` - }{ Are the slopes of any trendlines different? }
-#'          \item{`"none"` - }{ Do not compute or show statistics. }
-#'        }
-#'        Default: `"trends"` \cr\cr
-#'        Note: `"pw_means"` and `"pw_trends"` can only be calculated
-#'        when using a `color.by` metadata column with more than one level. \cr\cr
-#'        Statistical tests are run separately on each facet. P-values are 
-#'        adjusted for multiple comparisons by considering all facets together.
+#' 
+#' @param formula   Relationship between variables. Default: `y ~ x`
+#' 
+#' @param engine   What type of trend model to fit to the data. Options are: 
+#'        `"lm"` (linear), `"local"` (uses loess or gam). Default: `"lm"`
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2
 #'        functions. Prefix a parameter name with either `t.` or 
@@ -429,6 +440,10 @@ NULL
 #'        \link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
 #'        respectively. For instance, `s.size = 2` ensures only the 
 #'        scatterplot points have their size set to `2`.
+#'        
+#' 
+#' @return A `ggplot2` plot. \cr The computed data points and ggplot command 
+#'         are available as `$data` and `$code`, respectively.
 #' 
 #' 
 #' @section Aesthetics and Partitions:
@@ -588,21 +603,6 @@ NULL
 #'        Default: `"adonis2"` \cr\cr
 #'        Abbreviations are allowed.
 #'        
-NULL
-
-
-
-
-# transform.y - ifelse ====
-#' documentation_tranform.y.ifelse
-#' 
-#' @name documentation_tranform.y.ifelse
-#' @keywords internal
-#' 
-#' @param transform.y   How to transform y-axis values. Useful for correcting 
-#'        for non-normally distributions before applying regression statistics. 
-#'        Options are `"none"` or `"rank"`. 
-#'        Default: `ifelse(is.null(regr), "rank", "none")`
 NULL
 
 
@@ -767,71 +767,6 @@ NULL
 
 
 
-# model - lm ====
-#' documentation_model.lm
-#' 
-#' @name documentation_model.lm
-#' @keywords internal
-#' 
-#' @inherit documentation_model_section sections
-#' 
-#' @param model   What type of trend model to fit to the data. Options are: 
-#'        `"lm"` (linear), `"log"` (logarithmic), or `"gam"` 
-#'        (generalized additive). See the "Model Options" section below for
-#'        additional details. Default: `"lm"`
-#' 
-NULL
-
-
-
-# model - log ====
-#' documentation_model.log
-#' 
-#' @name documentation_model.log
-#' @keywords internal
-#' 
-#' @inherit documentation_model_section sections
-#' 
-#' @param model   What type of trend model to fit to the data. Options are: 
-#'        `"lm"` (linear), `"log"` (logarithmic), or `"gam"` 
-#'        (generalized additive). See the "Model Options" section below for
-#'        additional details. Default: `"log"`
-#' 
-NULL
-
-
-
-# model - section ====
-#' documentation_model_section
-#' 
-#' @name documentation_model_section
-#' @keywords internal
-#' 
-#' 
-#' @section Model Options:
-#' 
-#' The predefined options are: 
-#' \itemize{
-#'   \item{`"lm"` - }{  Linear model: `stats::lm(formula = y ~ x)`.) }
-#'   \item{`"log"` - }{ Logarithmic model: `stats::lm(formula = y ~ log(x))`. }
-#'   \item{`"gam"` - }{ Generalized additive model: `mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")`. }
-#' }
-#' 
-#' You can alternatively provide a list of length two where the first 
-#' element is a character vector of length 1 naming a function, and the 
-#' second element is a list of arguments to pass to that function. One 
-#' of the function's arguments must be named 'formula'. 
-#' For example, `model = list("stats::lm", list(formula = y ~ x))`.
-#' 
-#' By default, the same arguments are used for both plotting and calculating 
-#' statistics. Arguments just for statistics can be set as a third list 
-#' element: 
-#' `model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))`.
-#' 
-NULL
-
-
-
 
 # plot - return ====
 #' documentation_plot_return
@@ -842,19 +777,6 @@ NULL
 #' @return A `ggplot2` plot. \cr The computed data points and ggplot 
 #'         command are available as `$data` and `$code`, 
 #'         respectively.
-#' 
-NULL
-
-
-# plot w/ stats - return ====
-#' documentation_plot_stats_return
-#' 
-#' @name documentation_plot_stats_return
-#' @keywords internal
-#' 
-#' @return A `ggplot2` plot. \cr The computed data points, statistics, 
-#'         and ggplot command are available as `$data`, `$stats`, and 
-#'         `$code`, respectively.
 #' 
 NULL
 

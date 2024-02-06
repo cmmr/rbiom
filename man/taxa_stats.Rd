@@ -6,18 +6,15 @@
 \usage{
 taxa_stats(
   biom,
-  stat.by = NULL,
-  regr = NULL,
+  stat.by,
   rank = -1,
   taxa = 6,
-  test = ifelse(is.null(regr), "means", "trends"),
-  model = "lm",
-  level = 0.95,
-  trans = ifelse(is.null(regr), "none", "rank"),
+  split.by = NULL,
   lineage = FALSE,
   unc = "singly",
   other = FALSE,
-  split.by = NULL,
+  trans = "none",
+  test = "means",
   p.adj = "fdr"
 )
 }
@@ -27,11 +24,6 @@ taxa_stats(
 
 \item{stat.by}{The categorical metadata field defining the statistical
 groups. Required.}
-
-\item{regr}{To run a regression analysis, set \code{regr} to the numeric
-metadata field with the "x-axis" values. Leaving \code{regr=NULL}
-will generate boxplot-like statistics; when non-NULL, corrplot-like
-statistics will be returned. Default: \code{NULL}}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
@@ -46,24 +38,8 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
-\item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of \code{"predict"},
-\code{"terms"}, \code{"fit"}, \code{"means"}, \code{"trends"}, \code{"es_means"},
-\code{"es_trends"}, \code{"pw_means"}, or \code{"pw_trends"}.
-Default: \code{ifelse(is.null(regr), "means", "trends")}}
-
-\item{model}{What type of trend model to fit to the data. Options are:
-\code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
-(generalized additive). See the "Model Options" section below for
-additional details. Default: \code{"lm"}}
-
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
-
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{split.by}{Name(s) of metadata columns that the data should be split
+by prior to any calculations. Default: \code{NULL}}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
@@ -91,8 +67,10 @@ A string can also be given to imply \code{TRUE}, but with that
 value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
-\item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to any calculations. Default: \code{NULL}}
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
@@ -105,85 +83,18 @@ The R code or generating these statistics is in \verb{$code}.
 \description{
 Test taxa abundances for significant differences.
 }
-\section{Statistical Tests}{
-
-
-\bold{When \code{regr} is NULL:}
-\itemize{
-\item{\code{"means"} - }{
-Considers all groups at once using the Kruskal-Wallis
-non-parametric test: \code{\link[stats:kruskal.test]{stats::kruskal.test()}}. }
-\item{\code{"pw_means"} - }{
-Pairwise comparison of \code{stat.by} groups using the Wilcox rank sum
-(aka Mann-Whitney) non-parametric test: \code{\link[stats:wilcox.test]{stats::wilcox.test()}}. }
-}
-
-\bold{When \code{regr} is not NULL:}
-\itemize{
-\item{\code{"predict"} - }{
-Augments original data with fitted information. See
-\code{\link[broom:augment.lm]{broom::augment.lm()}}. }
-\item{\code{"terms"} - }{ Summary information about the model's
-terms, including p-value, r-squared, AIC, BIC, and confidence
-interval at \code{level}. See \code{\link[broom:tidy.lm]{broom::tidy.lm()}}. }
-\item{\code{"fit"} - }{ Goodness of fit measures, p-values, and
-more for the overall model. See \code{\link[broom:glance.lm]{broom::glance.lm()}}. }
-\item{\code{"means"} - }{ The estimated marginal mean (EMM) for
-each \code{stat.by} group, along with confidence intervals (CI),
-standard errors (SE), t-ratios, and p-values testing for mean = zero.
-See \code{\link[emmeans:emmeans]{emmeans::emmeans()}} and \code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
-\item{\code{"trends"} - }{ The trendline slope for each
-\code{stat.by} group, along with CI and SE and p-value testing for
-slope = zero. See \code{\link[emmeans:emtrends]{emmeans::emtrends()}} and
-\code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
-\item{\code{"pw_means"} - }{ Pairwise means. All \code{stat.by} groups are
-compared to each other and the difference in means is estimated
-along with SE, t-ratios, and p-values testing if the two means
-are the same. See \code{\link[emmeans:contrast]{emmeans::pairs.emmGrid()}}. }
-\item{\code{"pw_trends"} - }{ Pairwise trends. As above, but
-comparing trendline slopes instead of means. }
-\item{\code{"es_means"} - }{ Effect sizes for pairwise differences
-of means, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
-\item{\code{"es_trends"} - }{ Effect sizes for pairwise differences
-of slopes, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
-}
-}
-
-\section{Model Options}{
-
-
-The predefined options are:
-\itemize{
-\item{\code{"lm"} - }{  Linear model: \code{stats::lm(formula = y ~ x)}.) }
-\item{\code{"log"} - }{ Logarithmic model: \code{stats::lm(formula = y ~ log(x))}. }
-\item{\code{"gam"} - }{ Generalized additive model: \code{mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")}. }
-}
-
-You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
-
-By default, the same arguments are used for both plotting and calculating
-statistics. Arguments just for statistics can be set as a third list
-element:
-\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
-}
-
 \examples{
     library(rbiom)
     
     biom <- rarefy(hmp50)
     
     taxa_stats(biom, stat.by = "Body Site", rank = "Family")
-    
-    taxa_stats(biom, stat.by = "Body Site", regr = "Age", rank = "Family")
 }
 \seealso{
 Other taxa_abundance: 
 \code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
@@ -192,8 +103,7 @@ Other taxa_abundance:
 Other stats_tables: 
 \code{\link{adiv_stats}()},
 \code{\link{bdiv_stats}()},
-\code{\link{distmat_stats}()},
-\code{\link{stats_table}()}
+\code{\link{distmat_stats}()}
 }
 \concept{stats_tables}
 \concept{taxa_abundance}

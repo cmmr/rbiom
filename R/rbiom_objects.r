@@ -74,7 +74,7 @@
 #' 
 #' 
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     # Duplicate the HMP50 example dataset.
 #'     biom <- hmp50$clone()
@@ -146,12 +146,16 @@ rbiom <- R6::R6Class(
     # OTUs are ordered by overall abundance.
     # Sample order is taken from metadata.
     #________________________________________________________
-    sync = function () {
+    sync = function (sids = NULL) {
       
       #________________________________________________________
       # Sync sample names between counts and metadata.
       #________________________________________________________
-      sids <- private$.metadata[['.sample']] %>%
+      if (is.null(sids))
+        sids <- private$.metadata[['.sample']]
+      
+      sids <- sids %>%
+        intersect(private$.metadata[['.sample']]) %>%
         intersect(colnames(private$.counts))
       
       private$.counts              <- private$.counts[,sids]
@@ -612,7 +616,7 @@ rbiom <- R6::R6Class(
       private$.depth <- if (length(ss) == 1) ss else NULL
       
       
-      private$sync()
+      private$sync(sids = sids)
       
       return (self)
     },

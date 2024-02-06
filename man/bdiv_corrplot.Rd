@@ -9,18 +9,17 @@ bdiv_corrplot(
   x,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
-  tree = NULL,
   layers = "t",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
   within = NULL,
   between = NULL,
-  test = "trends",
-  model = "lm",
-  trans = "rank",
-  p.adj = "fdr",
+  tree = NULL,
+  formula = y ~ x,
+  engine = "lm",
   level = 0.95,
+  trans = "none",
   caption = TRUE,
   ...
 )
@@ -43,12 +42,8 @@ Multiple/abbreviated values allowed.}
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
 
-\item{tree}{A \code{phylo} object representing the phylogenetic
-relationships of the taxa in \code{biom}. Only required when
-computing UniFrac distances. Default: \code{biom$tree}}
-
 \item{layers}{One or more of
-\code{c("trend", "confidence", "scatter", "residual", "name")}. Single
+\code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
 See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
@@ -56,29 +51,22 @@ See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
 
-\item{test}{The statistic of interest. An overview of options can be
-found in the "Statistical Tests" section below. One of
-\code{"predict"}, \code{"terms"}, \code{"fit"}, \code{"means"},
-\code{"trends"}, \code{"es_means"}, \code{"es_trends"},
-\code{"pw_means"}, or \code{"pw_trends"}.
-Default: \code{"trends"}}
+\item{tree}{A \code{phylo} object representing the phylogenetic
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{model}{What type of trend model to fit to the data. Options are:
-\code{"lm"} (linear), \code{"log"} (logarithmic), or \code{"gam"}
-(generalized additive). See the "Model Options" section below for
-additional details. Default: \code{"lm"}}
+\item{formula}{Relationship between variables. Default: \code{y ~ x}}
+
+\item{engine}{What type of trend model to fit to the data. Options are:
+\code{"lm"} (linear), \code{"local"} (uses loess or gam). Default: \code{"lm"}}
+
+\item{level}{The confidence level for calculating a confidence interval.
+Default: \code{0.95}}
 
 \item{trans}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
-
-\item{p.adj}{Method to use for multiple comparisons adjustment of
-p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
-
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
@@ -91,68 +79,12 @@ respectively. For instance, \code{s.size = 2} ensures only the
 scatterplot points have their size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, statistics,
-and ggplot command are available as \verb{$data}, \verb{$stats}, and
-\verb{$code}, respectively.
+A \code{ggplot2} plot. \cr The computed data points and ggplot command
+are available as \verb{$data} and \verb{$code}, respectively.
 }
 \description{
 Visualize beta diversity with scatterplots and trendlines.
 }
-\section{Statistical Tests}{
-
-
-\itemize{
-\item{\code{"predict"} - }{
-Augments original data with fitted information. See
-\code{\link[broom:augment.lm]{broom::augment.lm()}}. }
-\item{\code{"terms"} - }{ Summary information about the model's
-terms, including p-value, r-squared, AIC, BIC, and confidence
-interval at \code{level}. See \code{\link[broom:tidy.lm]{broom::tidy.lm()}}. }
-\item{\code{"fit"} - }{ Goodness of fit measures, p-values, and
-more for the overall model. See \code{\link[broom:glance.lm]{broom::glance.lm()}}. }
-\item{\code{"means"} - }{ The estimated marginal mean (EMM) for
-each \code{stat.by} group, along with confidence intervals (CI),
-standard errors (SE), t-ratios, and p-values testing for mean = zero.
-See \code{\link[emmeans:emmeans]{emmeans::emmeans()}} and \code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
-\item{\code{"trends"} - }{ The trendline slope for each
-\code{stat.by} group, along with CI and SE and p-value testing for
-slope = zero. See \code{\link[emmeans:emtrends]{emmeans::emtrends()}} and
-\code{\link[emmeans:summary.emmGrid]{emmeans::summary.emmGrid()}}. }
-\item{\code{"pw_means"} - }{ Pairwise means. All \code{stat.by} groups are
-compared to each other and the difference in means is estimated
-along with SE, t-ratios, and p-values testing if the two means
-are the same. See \code{\link[emmeans:contrast]{emmeans::pairs.emmGrid()}}. }
-\item{\code{"pw_trends"} - }{ Pairwise trends. As above, but
-comparing trendline slopes instead of means. }
-\item{\code{"es_means"} - }{ Effect sizes for pairwise differences
-of means, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
-\item{\code{"es_trends"} - }{ Effect sizes for pairwise differences
-of slopes, including SE and CI. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. }
-}
-}
-
-\section{Model Options}{
-
-
-The predefined options are:
-\itemize{
-\item{\code{"lm"} - }{  Linear model: \code{stats::lm(formula = y ~ x)}.) }
-\item{\code{"log"} - }{ Logarithmic model: \code{stats::lm(formula = y ~ log(x))}. }
-\item{\code{"gam"} - }{ Generalized additive model: \code{mgcv::gam(formula = y ~ s(x, bs = "cs"), method = "REML")}. }
-}
-
-You can alternatively provide a list of length two where the first
-element is a character vector of length 1 naming a function, and the
-second element is a list of arguments to pass to that function. One
-of the function's arguments must be named 'formula'.
-For example, \code{model = list("stats::lm", list(formula = y ~ x))}.
-
-By default, the same arguments are used for both plotting and calculating
-statistics. Arguments just for statistics can be set as a third list
-element:
-\code{model = list("stats::lm", list(formula = y ~ x), list(formula = rank(y) ~ x))}.
-}
-
 \section{Aesthetics and Partitions}{
 
 
@@ -211,6 +143,7 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},

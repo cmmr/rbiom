@@ -183,7 +183,7 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 }
 
 \examples{
-    library(rbiom)
+    library(rbiom) 
     
     set.seed(123)
     mtx <- matrix(runif(5*8), nrow = 5, dimnames = list(LETTERS[1:5], letters[1:8]))
