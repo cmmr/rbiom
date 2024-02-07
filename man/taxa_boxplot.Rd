@@ -9,7 +9,7 @@ taxa_boxplot(
   x = NULL,
   rank = -1,
   taxa = 6,
-  layers = "bld",
+  layers = "x",
   unc = "singly",
   other = FALSE,
   color.by = NULL,
@@ -56,7 +56,7 @@ Default: \code{6}.}
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"x"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -167,7 +167,8 @@ Visualize BIOM data with boxplots.
     
     biom <- rarefy(hmp50)
     
-    taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
+    taxa_boxplot(biom, color.by = "Body Site", stripe = TRUE)
+    taxa_boxplot(biom, layers = "bed", rank = c("Phylum", "Genus"), flip = TRUE)
     taxa_boxplot(
       biom = biom, taxa = 3, layers = "ps", 
       color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")) )
@@ -175,11 +176,10 @@ Visualize BIOM data with boxplots.
 }
 \seealso{
 Other taxa_abundance: 
-\code{\link{taxa_barplot}()},
-\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
+\code{\link{taxa_stacked}()},
 \code{\link{taxa_stats}()},
 \code{\link{taxa_sums}()}
 
@@ -191,12 +191,12 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{taxa_abundance}
 \concept{visualization}

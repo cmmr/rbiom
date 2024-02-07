@@ -70,9 +70,6 @@
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_boxplot.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/bdiv_clusters.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/bdiv_corrplot.html</loc>
   </url>
   <url>
@@ -181,13 +178,13 @@
     <loc>https://cmmr.github.io/rbiom/reference/rarefy_cols.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/rare_barplot.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/rare_corrplot.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/rare_multiplot.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/rare_stacked.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/rbiom-deprecated.html</loc>
@@ -217,13 +214,7 @@
     <loc>https://cmmr.github.io/rbiom/reference/subset.html</loc>
   </url>
   <url>
-    <loc>https://cmmr.github.io/rbiom/reference/taxa_barplot.html</loc>
-  </url>
-  <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_boxplot.html</loc>
-  </url>
-  <url>
-    <loc>https://cmmr.github.io/rbiom/reference/taxa_clusters.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_corrplot.html</loc>
@@ -236,6 +227,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_matrix.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/taxa_stacked.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/taxa_stats.html</loc>

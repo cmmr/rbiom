@@ -78,7 +78,7 @@ taxa_heatmap(biom, taxa = 30, color.by = c("body", "age"), limit.by = c(sex = "M
 ![](man/figures/README-taxa-1.png)<!-- -->
 
 ``` r
-taxa_barplot(biom, rank = "Phylum")
+taxa_stacked(biom, rank = "Phylum")
 ```
 
 ![](man/figures/README-taxa-2.png)<!-- -->

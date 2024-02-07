@@ -308,7 +308,7 @@ NULL
 #'        `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`. 
 #'        Single letter abbreviations are also accepted. For instance, 
 #'        `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`.
-#'        See [plot types][plots] for examples of each. Default: `"bld"`
+#'        See [plot types][plots] for examples of each. Default: `"x"`
 #'        
 #' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
 #'        use for aesthetics and partitioning. Default: `NULL`
@@ -424,7 +424,7 @@ NULL
 #'        `c("trend", "confidence", "scatter", "name")`. Single 
 #'        letter abbreviations are also accepted. For instance, 
 #'        `c("trend", "scatter")` is equivalent to `c("t", "s")` and `"ts"`. 
-#'        See [plot types][plots] for examples of each. Default: `"t"`
+#'        See [plot types][plots] for examples of each. Default: `"tc"`
 #'        
 #' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
 #'        and partitioning. See below for details. Default: `NULL`

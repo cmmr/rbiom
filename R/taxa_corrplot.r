@@ -16,7 +16,7 @@
 #'     
 
 taxa_corrplot <- function (
-    biom, x, rank = -1, taxa = 6, layers = "t",
+    biom, x, rank = -1, taxa = 6, layers = "tc",
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     formula = y ~ x, engine = "lm", level = 0.95, 
     trans = "none", caption = TRUE, ...) {

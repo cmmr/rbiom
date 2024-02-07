@@ -10,7 +10,7 @@
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}

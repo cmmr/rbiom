@@ -8,7 +8,7 @@ adiv_boxplot(
   biom,
   x = NULL,
   adiv = "Shannon",
-  layers = "bld",
+  layers = "x",
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
@@ -44,7 +44,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"x"}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for aesthetics and partitioning. Default: \code{NULL}}
@@ -117,11 +117,11 @@ Visualize alpha diversity with boxplots.
     
     biom <- rarefy(hmp50)
     
-    adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
-    
-    adiv_boxplot(biom, x="body", adiv=".all", layers="p", color.by="sex", flip=TRUE)
-    
     adiv_boxplot(biom, x="Body Site", color.by="Body Site")
+    
+    adiv_boxplot(biom, x="Sex", color.by="Body Site", adiv=c("otu", "shan"), layers = "bld")
+    
+    adiv_boxplot(biom, x="body", color.by="sex", adiv=".all", flip=TRUE, layers="p")
     
     
     # Each plot object includes additional information.
@@ -150,13 +150,13 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{alpha_diversity}
 \concept{visualization}

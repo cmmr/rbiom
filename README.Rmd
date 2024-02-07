@@ -72,7 +72,7 @@ taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, color.by = "bod")
 #### Summarize counts by taxonomic rank.
 ```{r taxa}
 taxa_heatmap(biom, taxa = 30, color.by = c("body", "age"), limit.by = c(sex = "Male"))
-taxa_barplot(biom, rank = "Phylum")
+taxa_stacked(biom, rank = "Phylum")
 taxa_table(biom, 'Phylum')
 ```
 
@@ -98,3 +98,4 @@ rbiom requires the following system libraries which can be installed through you
 
      
    
+ 

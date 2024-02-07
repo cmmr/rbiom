@@ -372,7 +372,7 @@ Use \code{\link[=sample_sums]{sample_sums()}} instead.
 
 \section{\code{depths_barplot}}{
 
-Use \code{\link[=rare_barplot]{rare_barplot()}} instead.
+Use \code{\link[=rare_stacked]{rare_stacked()}} instead.
 }
 
 \section{\code{has.phylogeny}}{

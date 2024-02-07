@@ -18,7 +18,7 @@
 #'     
 #'
 bdiv_boxplot <- function (
-  biom, x = NULL, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, layers = "bld",
+  biom, x = NULL, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, layers = "x",
   color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
   within = NULL, between = NULL, trans = "none", flip = FALSE, stripe = NULL, p.adj = "fdr", 
   p.label = 0.05, ci = "ci", level = 0.95, outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {

@@ -202,8 +202,8 @@ bdiv_ord_plot(biom = hmp50, color.by = "Body Site")
 ```
 
 `adiv_boxplot()`, `adiv_corrplot()`, `bdiv_boxplot()`, `bdiv_corrplot()`, 
-`bdiv_heatmap()`, `bdiv_ord_plot()`, `rare_barplot()`, `rare_corrplot()`, 
-`rare_multiplot()`, `taxa_barplot()`, `taxa_boxplot()`, `taxa_corrplot()`, 
+`bdiv_heatmap()`, `bdiv_ord_plot()`, `rare_stacked()`, `rare_corrplot()`, 
+`rare_multiplot()`, `taxa_stacked()`, `taxa_boxplot()`, `taxa_corrplot()`, 
 `taxa_heatmap()`
 
 

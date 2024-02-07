@@ -9,7 +9,7 @@ taxa_corrplot(
   x,
   rank = -1,
   taxa = 6,
-  layers = "t",
+  layers = "tc",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
@@ -44,7 +44,7 @@ Default: \code{6}.}
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -137,11 +137,10 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 }
 \seealso{
 Other taxa_abundance: 
-\code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
+\code{\link{taxa_stacked}()},
 \code{\link{taxa_stats}()},
 \code{\link{taxa_sums}()}
 
@@ -153,12 +152,12 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{taxa_abundance}
 \concept{visualization}

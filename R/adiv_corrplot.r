@@ -15,10 +15,17 @@
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
-#'     adiv_corrplot(biom, "age", color.by="body", adiv=c("sha", "otu"), facet.by="sex")
+#'     adiv_corrplot(biom, "age", color.by = list(Body = c("a", "sa")))
+#'     adiv_corrplot(
+#'       biom     = biom, 
+#'       x        = "Age", 
+#'       adiv     = c("OTUs", "Shannon", "Simpson"), 
+#'       color.by = "Body Site", 
+#'       facet.by = "Sex", 
+#'       layers   = "trend" )
 #'     
 adiv_corrplot <- function (
-    biom, x, adiv = "Shannon", layers = "t", 
+    biom, x, adiv = "Shannon", layers = "tc", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     formula = y ~ x, engine = "lm", level = 0.95, 
     trans = "none", caption = TRUE, ...) {

@@ -62,9 +62,9 @@ sums or column sums equal 1.
 }
 \seealso{
 Other rarefaction: 
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{rarefy}()},
 \code{\link{sample_sums}()}
 

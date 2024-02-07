@@ -151,7 +151,6 @@ Ordinate samples and taxa on a 2D plane based on beta diversity distances.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_table}()},
@@ -170,13 +169,13 @@ Other visualization:
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{beta_diversity}
 \concept{ordination}

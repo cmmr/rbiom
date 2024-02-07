@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  taxa <span class="op">=</span> <span class="fl">6</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"bld"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"x"</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -134,7 +134,7 @@ Default: <code>6</code>.</p></dd>
 <code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
 Single letter abbreviations are also accepted. For instance,
 <code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
-See plot types for examples of each. Default: <code>"bld"</code></p></dd>
+See plot types for examples of each. Default: <code>"x"</code></p></dd>
 
 
 <dt>unc</dt>
@@ -267,11 +267,10 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other taxa_abundance: 
-<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
-<code><a href="taxa_clusters.html">taxa_clusters</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
 <code><a href="taxa_matrix.html">taxa_matrix</a>()</code>,
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code>,
 <code><a href="taxa_stats.html">taxa_stats</a>()</code>,
 <code><a href="taxa_sums.html">taxa_sums</a>()</code></p>
 <p>Other visualization: 
@@ -282,12 +281,12 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
-<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
+<code><a href="rare_stacked.html">rare_stacked</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
     </div>
 
     <div class="section level2">
@@ -296,12 +295,14 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Genus"</span><span class="op">)</span>, flip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span>, stripe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="taxa_boxplot-1.png" alt="" width="768" height="384"></span>
+<span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"bed"</span>, rank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Genus"</span><span class="op">)</span>, flip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="taxa_boxplot-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span></span></span>
 <span class="r-in"><span>      biom <span class="op">=</span> <span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">3</span>, layers <span class="op">=</span> <span class="st">"ps"</span>, </span></span>
 <span class="r-in"><span>      color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Body Site"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span></span>
-<span class="r-plt img"><img src="taxa_boxplot-2.png" alt="" width="768" height="384"></span>
+<span class="r-plt img"><img src="taxa_boxplot-3.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

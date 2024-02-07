@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,7 @@
 <span>  <span class="va">biom</span>,</span>
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  adiv <span class="op">=</span> <span class="st">"Shannon"</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"bld"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"x"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pattern.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -120,7 +120,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 <code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
 Single letter abbreviations are also accepted. For instance,
 <code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
-See plot types for examples of each. Default: <code>"bld"</code></p></dd>
+See plot types for examples of each. Default: <code>"x"</code></p></dd>
 
 
 <dt>color.by, pattern.by, shape.by, facet.by, limit.by</dt>
@@ -223,13 +223,13 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
-<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
+<code><a href="rare_stacked.html">rare_stacked</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
     </div>
 
     <div class="section level2">
@@ -238,13 +238,13 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"Sex"</span>, adiv<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"otu"</span>, <span class="st">"shan"</span><span class="op">)</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"Body Site"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_boxplot-1.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"body"</span>, adiv<span class="op">=</span><span class="st">".all"</span>, layers<span class="op">=</span><span class="st">"p"</span>, color.by<span class="op">=</span><span class="st">"sex"</span>, flip<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"Sex"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span>, adiv<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"otu"</span>, <span class="st">"shan"</span><span class="op">)</span>, layers <span class="op">=</span> <span class="st">"bld"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_boxplot-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"Body Site"</span>, color.by<span class="op">=</span><span class="st">"Body Site"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">adiv_boxplot</span><span class="op">(</span><span class="va">biom</span>, x<span class="op">=</span><span class="st">"body"</span>, color.by<span class="op">=</span><span class="st">"sex"</span>, adiv<span class="op">=</span><span class="st">".all"</span>, flip<span class="op">=</span><span class="cn">TRUE</span>, layers<span class="op">=</span><span class="st">"p"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_boxplot-3.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    </span></span>
@@ -292,24 +292,11 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>xmin = <span style="color: #00BB00;">-</span><span style="color: #BB00BB;">Inf</span>, xmax = <span style="color: #BB00BB;">Inf</span>, ymin = <span style="color: #BB00BB;">4.52</span>, ymax = <span style="color: #BB00BB;">Inf)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color   = <span style="color: #BB00BB;">NA</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = <span style="color: #BBBB00;">"white"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_bar</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_boxplot</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .diversity<span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     stat    = <span style="color: #BBBB00;">"summary"</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     alpha   = <span style="color: #BB00BB;">0.6</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fun     = <span style="color: #BBBB00;">"mean"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ggbeeswarm::<span style="color: #00BBBB;">geom_beeswarm</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .diversity<span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     method  = <span style="color: #BBBB00;">"center"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     cex     = <span style="color: #BB00BB;">0.5</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     corral  = <span style="color: #BBBB00;">"random"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha   = <span style="color: #BB00BB;">0.4</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     color   = <span style="color: #BBBB00;">"black"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fill    = <span style="color: #BBBB00;">"black"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     size    = <span style="color: #BB00BB;">1.14</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     stroke  = <span style="color: #BB00BB;">0</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_linerange</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Body Site`, y = .y, ymin = .ymin, ymax = .ymax<span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"vline"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     width   = <span style="color: #BB00BB;">0.7</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_segment</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = .x, xend = .xend, y = .y, yend = .yend<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"stat_brackets"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>

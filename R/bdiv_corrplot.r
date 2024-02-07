@@ -12,10 +12,11 @@
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
-#'     bdiv_corrplot(biom, "Age", color.by="==Body Site", facet.by="==Sex")
+#'     bdiv_corrplot(biom, "Age", color.by = "==Body Site", facet.by = "==Sex")
+#'     bdiv_corrplot(biom, "Age", color.by = list('==Body Site' = c("a", "b")), layers = "tcs")
 #'     
 bdiv_corrplot <- function (
-    biom, x, bdiv = "Bray-Curtis", weighted = TRUE, layers = "t", 
+    biom, x, bdiv = "Bray-Curtis", weighted = TRUE, layers = "tc", 
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     within = NULL, between = NULL, tree = NULL, 
     formula = y ~ x, engine = "lm", level = 0.95, 

@@ -23,9 +23,9 @@ Rbiom's plotting functions are
 ```{r, echo=FALSE, results='asis'}
 cat(glue::glue('
   <table class="table-borderless">
-  <tr>{adiv_boxplot}{bdiv_corrplot}{rare_barplot}{taxa_boxplot}</tr>
+  <tr>{adiv_boxplot}{bdiv_corrplot}{rare_stacked}{taxa_boxplot}</tr>
   <tr>{adiv_corrplot}{bdiv_heatmap}{rare_corrplot}{taxa_corrplot}</tr>
-  <tr>{bdiv_boxplot}{bdiv_ord_plot}{taxa_barplot}{taxa_heatmap}</tr>
+  <tr>{bdiv_boxplot}{bdiv_ord_plot}{taxa_stacked}{taxa_heatmap}</tr>
   </table>',
   .transformer = function (text, ...) {
     sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)

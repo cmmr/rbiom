@@ -7,7 +7,7 @@
 rare_corrplot(
   biom,
   adiv = "Shannon",
-  layers = "t",
+  layers = "tc",
   rline = TRUE,
   color.by = NULL,
   facet.by = NULL,
@@ -34,7 +34,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
@@ -127,13 +127,13 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 \examples{
     library(rbiom)
     
-    rare_corrplot(hmp50, color.by="Body Site", adiv=c("shan", "otus"), facet.by="Sex")
+    rare_corrplot(hmp50, color.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
     
 }
 \seealso{
 Other rarefaction: 
-\code{\link{rare_barplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
@@ -146,12 +146,12 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{rarefaction}
 \concept{visualization}

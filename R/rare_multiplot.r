@@ -1,4 +1,4 @@
-#' Combines rare_corrplot and rare_barplot into a single figure.
+#' Combines rare_corrplot and rare_stacked into a single figure.
 #' 
 #' @inherit documentation_corrplot
 #' @inherit documentation_default
@@ -38,8 +38,8 @@ rare_multiplot <- function (
   # Build the two subplots, then arrange them together.
   #________________________________________________________
   corrplot <- do.call(rare_corrplot, fun_params(rare_corrplot, params))
-  barplot  <- do.call(rare_barplot,  fun_params(rare_barplot,  params))
-  plots    <- list(corrplot = corrplot, barplot = barplot)
+  stacked  <- do.call(rare_stacked,  fun_params(rare_stacked,  params))
+  plots    <- list(corrplot = corrplot, stacked = stacked)
   
   
   p <- patchwork::wrap_plots(plots, ncol = 1) %>% 

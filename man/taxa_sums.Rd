@@ -32,12 +32,11 @@ Get summary taxa abundances.
 }
 \seealso{
 Other taxa_abundance: 
-\code{\link{taxa_barplot}()},
 \code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_matrix}()},
+\code{\link{taxa_stacked}()},
 \code{\link{taxa_stats}()}
 }
 \concept{taxa_abundance}

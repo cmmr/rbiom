@@ -489,11 +489,11 @@ depth <- function (biom) {
 #' @name depths_barplot-deprecated
 #' @rdname rbiom-deprecated
 #' @section \code{depths_barplot}:
-#' Use [rare_barplot()] instead.
+#' Use [rare_stacked()] instead.
 #' @export
 depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, trans = "log10", ...) {
-  deprecate_warn("2.0.0", "depths_barplot()", "rare_barplot()")
-  rare_barplot(biom = biom, rline = rline, counts = counts, labels = labels, trans = trans, ...)
+  deprecate_warn("2.0.0", "depths_barplot()", "rare_stacked()")
+  rare_stacked(biom = biom, rline = rline, counts = counts, labels = labels, trans = trans, ...)
 }
 
 

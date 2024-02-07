@@ -18,14 +18,15 @@
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     taxa_boxplot(biom, rank = c("Phylum", "Genus"), flip = TRUE)
+#'     taxa_boxplot(biom, color.by = "Body Site", stripe = TRUE)
+#'     taxa_boxplot(biom, layers = "bed", rank = c("Phylum", "Genus"), flip = TRUE)
 #'     taxa_boxplot(
 #'       biom = biom, taxa = 3, layers = "ps", 
 #'       color.by = list("Body Site" = c('Saliva' = "blue", 'Stool' = "red")) )
 #'     
 
 taxa_boxplot <- function (
-    biom, x = NULL, rank = -1, taxa = 6, layers = 'bld', unc = 'singly', other = FALSE,
+    biom, x = NULL, rank = -1, taxa = 6, layers = 'x', unc = 'singly', other = FALSE,
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = NULL, p.top = Inf, p.adj = 'fdr', p.label = 0.05, 
     ci = 'ci', level = 0.95, outliers = NULL, xlab.angle = 'auto', 

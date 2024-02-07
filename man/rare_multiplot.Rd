@@ -2,7 +2,7 @@
 % Please edit documentation in R/rare_multiplot.r
 \name{rare_multiplot}
 \alias{rare_multiplot}
-\title{Combines rare_corrplot and rare_barplot into a single figure.}
+\title{Combines rare_corrplot and rare_stacked into a single figure.}
 \usage{
 rare_multiplot(
   biom,
@@ -34,7 +34,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
@@ -69,7 +69,7 @@ A \code{ggplot2} plot. \cr The computed data points and ggplot command
 are available as \verb{$data} and \verb{$code}, respectively.
 }
 \description{
-Combines rare_corrplot and rare_barplot into a single figure.
+Combines rare_corrplot and rare_stacked into a single figure.
 }
 \section{Aesthetics and Partitions}{
 
@@ -127,8 +127,8 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
 }
 \seealso{
 Other rarefaction: 
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
@@ -141,12 +141,12 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{rarefaction}
 \concept{visualization}

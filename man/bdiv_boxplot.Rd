@@ -10,7 +10,7 @@ bdiv_boxplot(
   bdiv = "Bray-Curtis",
   weighted = TRUE,
   tree = NULL,
-  layers = "bld",
+  layers = "x",
   color.by = NULL,
   pattern.by = NULL,
   shape.by = NULL,
@@ -60,7 +60,7 @@ computing UniFrac distances. Default: \code{biom$tree}}
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"x"}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for data partitioning. Prefix the column name with
@@ -144,7 +144,6 @@ Visualize BIOM data with boxplots.
 }
 \seealso{
 Other beta_diversity: 
-\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
@@ -160,13 +159,13 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{beta_diversity}
 \concept{visualization}

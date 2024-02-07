@@ -16,11 +16,11 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     rare_corrplot(hmp50, color.by="Body Site", adiv=c("shan", "otus"), facet.by="Sex")
+#'     rare_corrplot(hmp50, color.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
 #'     
 
 rare_corrplot <- function (
-    biom, adiv = "Shannon", layers = "t", rline = TRUE,
+    biom, adiv = "Shannon", layers = "tc", rline = TRUE,
     color.by = NULL, facet.by = NULL, limit.by = NULL, 
     formula = y ~ log(x), engine = "lm", level = 0.95, 
     trans = "none", caption = TRUE, ...) {

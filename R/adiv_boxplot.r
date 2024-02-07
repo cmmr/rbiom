@@ -13,11 +13,11 @@
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     adiv_boxplot(biom, x="Sex", adiv=c("otu", "shan"), color.by="Body Site")
-#'     
-#'     adiv_boxplot(biom, x="body", adiv=".all", layers="p", color.by="sex", flip=TRUE)
-#'     
 #'     adiv_boxplot(biom, x="Body Site", color.by="Body Site")
+#'     
+#'     adiv_boxplot(biom, x="Sex", color.by="Body Site", adiv=c("otu", "shan"), layers = "bld")
+#'     
+#'     adiv_boxplot(biom, x="body", color.by="sex", adiv=".all", flip=TRUE, layers="p")
 #'     
 #'     
 #'     # Each plot object includes additional information.
@@ -34,7 +34,7 @@
 #'     
 
 adiv_boxplot <- function (
-    biom, x = NULL, adiv = "Shannon", layers = "bld",
+    biom, x = NULL, adiv = "Shannon", layers = "x",
     color.by = NULL, pattern.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
     flip = FALSE, stripe = NULL, p.adj = "fdr", p.label = 0.05, ci = "ci", level = 0.95, 
     trans = "none", outliers = NULL, xlab.angle = 'auto', caption = TRUE, ...) {

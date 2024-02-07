@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"bld"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"x"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pattern.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -140,7 +140,7 @@ computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 <code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
 Single letter abbreviations are also accepted. For instance,
 <code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
-See plot types for examples of each. Default: <code>"bld"</code></p></dd>
+See plot types for examples of each. Default: <code>"x"</code></p></dd>
 
 
 <dt>color.by, pattern.by, shape.by, facet.by, limit.by</dt>
@@ -240,7 +240,6 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
-<code><a href="bdiv_clusters.html">bdiv_clusters</a>()</code>,
 <code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
@@ -255,13 +254,13 @@ and ggplot command are available as <code>$data</code>, <code>$stats</code>, and
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
-<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
+<code><a href="rare_stacked.html">rare_stacked</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
     </div>
 
     <div class="section level2">

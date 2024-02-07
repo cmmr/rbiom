@@ -22,7 +22,7 @@ Plotting functions in rbiom fall into five categories:
 | Correlation Plots | `adiv_corrplot()` `bdiv_corrplot()` `taxa_corrplot()` |
 | Ordination Plots  | `bdiv_ord_plot()`                                     |
 | Heatmaps          | `bdiv_heatmap()` `taxa_heatmap()` `plot_heatmap()`    |
-| Stacked Bar Plots | `taxa_barplot()`                                      |
+| Stacked Bar Plots | `taxa_stacked()`                                      |
 
 
 # Box Plots
@@ -240,5 +240,5 @@ their own advantages.
 ## Examples
 
 ```{r}
-taxa_barplot(rarefy(hmp50), taxa = 10)
+taxa_stacked(rarefy(hmp50), taxa = 10)
 ```

@@ -29,9 +29,9 @@ Other samples:
 \code{\link{pull.rbiom}()}
 
 Other rarefaction: 
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()}
 }

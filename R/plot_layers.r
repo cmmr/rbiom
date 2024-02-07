@@ -473,7 +473,17 @@ sync_metadata <- function (params = parent.frame()) {
       if (hasName(col_spec, 'values')) {
         
         values <- col_spec[['values']]
-        lvls   <- if.null(names(values), as.vector(values))
+        
+        lvls <- names(values) # color.by = list('Sex' = c(Male = "green", Female = "teal"))
+        if (is.null(lvls)) {  # color.by = list('Sex' = c("Male", "Female"))
+          lvls <- as.vector(values)
+          params[[md_param]][[i]][['values']] <- NULL
+        }
+        validate_var_choices( # color.by = list('Sex' = c("m", "f"))
+          var     = 'lvls', 
+          choices = levels(params$biom$metadata[[col_name]]), 
+          evar    = paste0(md_param, ": ", col_name), 
+          max     = Inf )
         
         if (is.null(subset_vals[[col_name]])) { subset_vals[[col_name]] <- lvls                 }
         else                                  { subset_vals[[col_name]] %<>% intersect(lvls, .) }

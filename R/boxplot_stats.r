@@ -138,14 +138,16 @@ boxplot_stats <- function (params) {
       lapply(switch,
         max    = {function (v) { max(v)                    }},
         mean   = {function (v) { mean(v)                   }},
-        box    = {function (v) { boxplot.stats(v)$stats[5] }},
         violin = {function (v) { max(density(v)[['x']])    }},
+        box    = switch(as.character(isFALSE(params$outliers)), 
+          'TRUE'  = {function (v) { boxplot.stats(v)$stats[5]                        }},
+          'FALSE' = {function (v) { max(v)                                           }} ),
         vline  = switch(params$ci, 
-          range = {function (v) { max(v)                                                }},
-          mad   = {function (v) { median(v) + mad(v, median(v))                         }},
-          sd    = {function (v) { mean(v) + sd(v)                                       }},
-          se    = {function (v) { mean(v) + sqrt(var(v)/length(v))                      }},
-          ci    = {function (v) { t.test(v, conf.level = params$level)$conf.int[2] }} ))
+          'range' = {function (v) { max(v)                                           }},
+          'mad'   = {function (v) { median(v) + mad(v, median(v))                    }},
+          'sd'    = {function (v) { mean(v) + sd(v)                                  }},
+          'se'    = {function (v) { mean(v) + sqrt(var(v)/length(v))                 }},
+          'ci'    = {function (v) { t.test(v, conf.level = params$level)$conf.int[2] }} ))
     
     function (df) {
       

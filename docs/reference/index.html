@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -185,19 +185,9 @@
 
       <dl><dt>
           
-          <code><a href="taxa_barplot.html">taxa_barplot()</a></code> 
-        </dt>
-        <dd>Display taxa abundances as a stacked bar graph.</dd>
-      </dl><dl><dt>
-          
           <code><a href="taxa_boxplot.html">taxa_boxplot()</a></code> 
         </dt>
         <dd>Visualize BIOM data with boxplots.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="taxa_clusters.html">taxa_clusters()</a></code> 
-        </dt>
-        <dd>Define sample kmeans clusters from taxa abundances.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code> 
@@ -218,6 +208,11 @@
           <code><a href="taxa_matrix.html">taxa_matrix()</a></code> <code><a href="taxa_matrix.html">taxa_table()</a></code> 
         </dt>
         <dd>Taxa abundances per sample.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="taxa_stacked.html">taxa_stacked()</a></code> 
+        </dt>
+        <dd>Display taxa abundances as a stacked bar graph.</dd>
       </dl><dl><dt>
           
           <code><a href="taxa_stats.html">taxa_stats()</a></code> 
@@ -287,11 +282,6 @@
         <dd>Visualize BIOM data with boxplots.</dd>
       </dl><dl><dt>
           
-          <code><a href="bdiv_clusters.html">bdiv_clusters()</a></code> 
-        </dt>
-        <dd>Define sample PAM clusters from beta diversity.</dd>
-      </dl><dl><dt>
-          
           <code><a href="bdiv_corrplot.html">bdiv_corrplot()</a></code> 
         </dt>
         <dd>Visualize beta diversity with scatterplots and trendlines.</dd>
@@ -333,11 +323,6 @@
 
       <dl><dt>
           
-          <code><a href="rare_barplot.html">rare_barplot()</a></code> 
-        </dt>
-        <dd>Visualize the number of observations per sample.</dd>
-      </dl><dl><dt>
-          
           <code><a href="rare_corrplot.html">rare_corrplot()</a></code> 
         </dt>
         <dd>Visualize rarefaction curves with scatterplots and trendlines.</dd>
@@ -345,7 +330,12 @@
           
           <code><a href="rare_multiplot.html">rare_multiplot()</a></code> 
         </dt>
-        <dd>Combines rare_corrplot and rare_barplot into a single figure.</dd>
+        <dd>Combines rare_corrplot and rare_stacked into a single figure.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rare_stacked.html">rare_stacked()</a></code> 
+        </dt>
+        <dd>Visualize the number of observations per sample.</dd>
       </dl><dl><dt>
           
           <code><a href="rarefy.html">rarefy()</a></code> 

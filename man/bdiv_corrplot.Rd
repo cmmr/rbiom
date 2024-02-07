@@ -9,7 +9,7 @@ bdiv_corrplot(
   x,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
-  layers = "t",
+  layers = "tc",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
@@ -46,7 +46,7 @@ Multiple values allowed.}
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -137,13 +137,13 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
     library(rbiom)
     
     biom <- rarefy(hmp50)
-    bdiv_corrplot(biom, "Age", color.by="==Body Site", facet.by="==Sex")
+    bdiv_corrplot(biom, "Age", color.by = "==Body Site", facet.by = "==Sex")
+    bdiv_corrplot(biom, "Age", color.by = list('==Body Site' = c("a", "b")), layers = "tcs")
     
 }
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},
@@ -158,13 +158,13 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{beta_diversity}
 \concept{visualization}

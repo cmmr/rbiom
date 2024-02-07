@@ -8,7 +8,7 @@ adiv_corrplot(
   biom,
   x,
   adiv = "Shannon",
-  layers = "t",
+  layers = "tc",
   color.by = NULL,
   facet.by = NULL,
   limit.by = NULL,
@@ -36,7 +36,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.}
 \code{c("trend", "confidence", "scatter", "name")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"t"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
 
 \item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: \code{NULL}}
@@ -123,7 +123,14 @@ The available numeric palette names are: \code{"reds"}, \code{"oranges"},
     library(rbiom)
     
     biom <- rarefy(hmp50)
-    adiv_corrplot(biom, "age", color.by="body", adiv=c("sha", "otu"), facet.by="sex")
+    adiv_corrplot(biom, "age", color.by = list(Body = c("a", "sa")))
+    adiv_corrplot(
+      biom     = biom, 
+      x        = "Age", 
+      adiv     = c("OTUs", "Shannon", "Simpson"), 
+      color.by = "Body Site", 
+      facet.by = "Sex", 
+      layers   = "trend" )
     
 }
 \seealso{
@@ -139,13 +146,13 @@ Other visualization:
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{plot_heatmap}()},
-\code{\link{rare_barplot}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{taxa_barplot}()},
+\code{\link{rare_stacked}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()}
 }
 \concept{alpha_diversity}
 \concept{visualization}

@@ -104,7 +104,7 @@ get_n_colors <- function (n, palette = NULL) {
   if (is.logical(palette)) palette <- NULL
   
   if (is_null(palette)) {
-    if (n <= 8)         { palette <- "okabe"
+    if (n <= 10)        { palette <- "classic"
     } else if (n <= 12) { palette <- "tol"
     } else if (n <= 20) { palette <- "tableau20"
     } else              { palette <- "alphabet" }

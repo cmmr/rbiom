@@ -11,7 +11,7 @@ default, \code{NULL}, groups all samples into a single category.}
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"bld"}}
+See \link[=plots]{plot types} for examples of each. Default: \code{"x"}}
 
 \item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
 use for aesthetics and partitioning. Default: \code{NULL}}

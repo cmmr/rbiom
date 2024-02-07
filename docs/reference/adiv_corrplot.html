@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,7 @@
 <span>  <span class="va">biom</span>,</span>
 <span>  <span class="va">x</span>,</span>
 <span>  adiv <span class="op">=</span> <span class="st">"Shannon"</span>,</span>
-<span>  layers <span class="op">=</span> <span class="st">"t"</span>,</span>
+<span>  layers <span class="op">=</span> <span class="st">"tc"</span>,</span>
 <span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -112,7 +112,7 @@ Multiple values allowed. Non-ambiguous abbreviations are allowed.</p></dd>
 <code>c("trend", "confidence", "scatter", "name")</code>. Single
 letter abbreviations are also accepted. For instance,
 <code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and <code>"ts"</code>.
-See plot types for examples of each. Default: <code>"t"</code></p></dd>
+See plot types for examples of each. Default: <code>"tc"</code></p></dd>
 
 
 <dt>color.by, facet.by, limit.by</dt>
@@ -217,13 +217,13 @@ and <code>"fishy"</code>.</p>
 <code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
 <code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
 <code><a href="plot_heatmap.html">plot_heatmap</a>()</code>,
-<code><a href="rare_barplot.html">rare_barplot</a>()</code>,
 <code><a href="rare_corrplot.html">rare_corrplot</a>()</code>,
 <code><a href="rare_multiplot.html">rare_multiplot</a>()</code>,
-<code><a href="taxa_barplot.html">taxa_barplot</a>()</code>,
+<code><a href="rare_stacked.html">rare_stacked</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
-<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code></p></div>
+<code><a href="taxa_heatmap.html">taxa_heatmap</a>()</code>,
+<code><a href="taxa_stacked.html">taxa_stacked</a>()</code></p></div>
     </div>
 
     <div class="section level2">
@@ -231,8 +231,16 @@ and <code>"fishy"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu">adiv_corrplot</span><span class="op">(</span><span class="va">biom</span>, <span class="st">"age"</span>, color.by<span class="op">=</span><span class="st">"body"</span>, adiv<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sha"</span>, <span class="st">"otu"</span><span class="op">)</span>, facet.by<span class="op">=</span><span class="st">"sex"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">adiv_corrplot</span><span class="op">(</span><span class="va">biom</span>, <span class="st">"age"</span>, color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"sa"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="adiv_corrplot-1.png" alt="" width="768" height="384"></span>
+<span class="r-in"><span>    <span class="fu">adiv_corrplot</span><span class="op">(</span></span></span>
+<span class="r-in"><span>      biom     <span class="op">=</span> <span class="va">biom</span>, </span></span>
+<span class="r-in"><span>      x        <span class="op">=</span> <span class="st">"Age"</span>, </span></span>
+<span class="r-in"><span>      adiv     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OTUs"</span>, <span class="st">"Shannon"</span>, <span class="st">"Simpson"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>      color.by <span class="op">=</span> <span class="st">"Body Site"</span>, </span></span>
+<span class="r-in"><span>      facet.by <span class="op">=</span> <span class="st">"Sex"</span>, </span></span>
+<span class="r-in"><span>      layers   <span class="op">=</span> <span class="st">"trend"</span> <span class="op">)</span></span></span>
+<span class="r-plt img"><img src="adiv_corrplot-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

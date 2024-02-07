@@ -2,13 +2,15 @@
 
 #' Define sample kmeans clusters from taxa abundances.
 #' 
+#' @noRd
+#' @keywords internal
+#' 
 #' @inherit documentation_clusters
 #' @inherit documentation_default
 #' 
 #' @family taxa_abundance
 #' @family clustering
 #' 
-#' @export
 #' @examples
 #'     library(rbiom)
 #'     
@@ -27,13 +29,15 @@ taxa_clusters <- function (biom, rank = ".otu", k = 5, ...) {
 
 #' Define sample PAM clusters from beta diversity.
 #' 
+#' @noRd
+#' @keywords internal
+#' 
 #' @inherit documentation_clusters
 #' @inherit documentation_default
 #' 
 #' @family beta_diversity
 #' @family clustering
 #' 
-#' @export
 #' @examples
 #'     library(rbiom)
 #'     
