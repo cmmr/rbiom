@@ -39,7 +39,7 @@
 #'     taxa_map(hmp50, unc = "grouped") %>% filter(.otu %in% otus) %>% select(Class:Genus)
 #'
 
-taxa_map <- function (biom, rank = NULL, unc = "asis", lineage = FALSE) {
+taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
   
   biom <- as_rbiom(biom)
   
@@ -74,12 +74,12 @@ taxa_map <- function (biom, rank = NULL, unc = "asis", lineage = FALSE) {
   #________________________________________________________
   # Transform the taxa names.
   #________________________________________________________
-  if (unc != "asis")
+  if (unc != "asis" && ncol(tbl) > 1)
     tbl <- tryCatch(
       expr = local({
         
-        mtx <- tbl %>% 
-          as.matrix()
+        mtx  <- as.matrix(tbl)
+        otus <- mtx[,'.otu']
         
       
         # Discard technical prefixes/suffixes.
@@ -137,9 +137,16 @@ taxa_map <- function (biom, rank = NULL, unc = "asis", lineage = FALSE) {
           mtx <- mtx[complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE]),,drop=FALSE]
         
         
+        
         tbl <- as_tibble(mtx) %>%
           relocate(.otu) %>%
           mutate(across(everything(), as.factor))
+        
+        
+        # Always keep .otu column unmodified.
+        #________________________________________________________
+        tbl[['.otu']] <- as.character(otus)
+        
         
         return (tbl)
       }), 
