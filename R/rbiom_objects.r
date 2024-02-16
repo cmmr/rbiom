@@ -131,11 +131,11 @@ rbiom <- R6::R6Class(
     
     .pkg_version  = packageVersion("rbiom"),
     .hashes       = list(
-      .counts       = hash(NULL),
-      .metadata     = hash(NULL),
-      .taxonomy     = hash(NULL),
-      .tree         = hash(NULL),
-      .sequences    = hash(NULL) ),
+      .counts       = rlang::hash(NULL),
+      .metadata     = rlang::hash(NULL),
+      .taxonomy     = rlang::hash(NULL),
+      .tree         = rlang::hash(NULL),
+      .sequences    = rlang::hash(NULL) ),
     
     
     
@@ -159,7 +159,7 @@ rbiom <- R6::R6Class(
         intersect(colnames(private$.counts))
       
       private$.counts              <- private$.counts[,sids]
-      private$.hashes[['.counts']] <- hash(private$.counts)
+      private$.hashes[['.counts']] <- rlang::hash(private$.counts)
       
       if (!identical(sids, private$.metadata[['.sample']]))
         private$.metadata <- private$.metadata[match(sids, private$.metadata[['.sample']]),]
@@ -169,7 +169,7 @@ rbiom <- R6::R6Class(
         if (!all(levels(private$.metadata[[i]]) %in% private$.metadata[[i]]))
           private$.metadata[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
       
-      private$.hashes[['.metadata']] <- hash(private$.metadata)
+      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
       
       
       #________________________________________________________
@@ -180,18 +180,18 @@ rbiom <- R6::R6Class(
       
       if (!identical(otus, rownames(private$.counts))) {
         private$.counts              <- private$.counts[otus,]
-        private$.hashes[['.counts']] <- hash(private$.counts)
+        private$.hashes[['.counts']] <- rlang::hash(private$.counts)
       }
       
       if (!identical(otus, private$.taxonomy[['.otu']])) {
         private$.taxonomy <- private$.taxonomy[match(otus, private$.taxonomy[['.otu']]),]
-        private$.hashes[['.taxonomy']] <- hash(private$.taxonomy)
+        private$.hashes[['.taxonomy']] <- rlang::hash(private$.taxonomy)
       }
       
       if (!is.null(private$.sequences))
         if (!identical(names(private$.sequences), otus)) {
           private$.sequences              <- private$.sequences[otus]
-          private$.hashes[['.sequences']] <- hash(private$.sequences)
+          private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
         }
       
       
@@ -357,7 +357,7 @@ rbiom <- R6::R6Class(
       
       
       private$.sequences              <- value
-      private$.hashes[['.sequences']] <- hash(private$.sequences)
+      private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
       
       return (self)
     },
@@ -394,7 +394,7 @@ rbiom <- R6::R6Class(
       }
       
       private$.tree              <- value
-      private$.hashes[['.tree']] <- hash(private$.tree)
+      private$.hashes[['.tree']] <- rlang::hash(private$.tree)
       
       return (self)
     },
@@ -453,7 +453,7 @@ rbiom <- R6::R6Class(
       
       
       private$.taxonomy              <- value
-      private$.hashes[['.taxonomy']] <- hash(private$.taxonomy)
+      private$.hashes[['.taxonomy']] <- rlang::hash(private$.taxonomy)
       
       return (self)
     },
@@ -514,7 +514,7 @@ rbiom <- R6::R6Class(
       
       
       private$.metadata              <- value
-      private$.hashes[['.metadata']] <- hash(private$.metadata)
+      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
       
       private$sync()
       
@@ -563,9 +563,9 @@ rbiom <- R6::R6Class(
         private$.metadata <- tibble::tibble(.sample = colnames(value))
         private$.taxonomy <- tibble::tibble(.otu    = rownames(value))
         
-        private$.hashes[['.counts']]    <- hash(private$.counts)
-        private$.hashes[['.metadata']]  <- hash(private$.metadata)
-        private$.hashes[['.taxonomy']]  <- hash(private$.taxonomy)
+        private$.hashes[['.counts']]    <- rlang::hash(private$.counts)
+        private$.hashes[['.metadata']]  <- rlang::hash(private$.metadata)
+        private$.hashes[['.taxonomy']]  <- rlang::hash(private$.taxonomy)
       }
       
       
@@ -606,7 +606,7 @@ rbiom <- R6::R6Class(
           'x' = "Can't subset to zero samples/OTUs." ))
       
       private$.counts              <- value[otus, sids]
-      private$.hashes[['.counts']] <- hash(private$.counts)
+      private$.hashes[['.counts']] <- rlang::hash(private$.counts)
       
       
       #________________________________________________________
