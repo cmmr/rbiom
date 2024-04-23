@@ -165,6 +165,8 @@ performance::check_model(
 
 However, microbiome data is usually non-normally distributed.
 
+```{r, fig.asp = 1.5}
+
 performance::check_model(
   check = c("pp_check", "linearity"),
   x     = mgcv::gam(
