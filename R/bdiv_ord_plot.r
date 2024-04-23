@@ -61,7 +61,7 @@ bdiv_ord_plot <- function (
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('bdiv_ord_plot', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
@@ -78,9 +78,9 @@ bdiv_ord_plot <- function (
     validate_ord(max = Inf)
     validate_bool('weighted', max = Inf)
     
-    validate_meta_aes('color.by', null_ok = TRUE)
-    validate_meta_aes('shape.by', null_ok = TRUE, col_type = "cat")
-    validate_meta_aes('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
+    validate_meta_aes('color.by', null_ok = TRUE, aes = "color")
+    validate_meta_aes('shape.by', null_ok = TRUE, aes = "shape", col_type = "cat")
+    validate_meta_aes('facet.by', null_ok = TRUE, max = Inf,     col_type = "cat")
     validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
     
     sync_metadata()
@@ -139,7 +139,7 @@ bdiv_ord_plot <- function (
   # Initialize the `layers` object.
   #________________________________________________________
   init_layers(
-    params  = params,
+    params  = params, 
     choices = c( 'p' = "point", 'n' = "name",    's' = "spider", 
                  'n' = "name",  'd' = "density", 't' = "taxon",
                  'a' = "arrow", 'e' = "ellipse", 'm' = "mean" ) )

@@ -1,7 +1,7 @@
 
 #' @rdname write_biom
 #' @export
-write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = "asis") {
+write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = 'singly') {
   
   
   #________________________________________________________

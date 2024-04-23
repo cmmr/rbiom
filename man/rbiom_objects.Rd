@@ -33,6 +33,7 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
    \verb{$tree}, \verb{$sequences} \tab Phylogenetic tree / sequences for the OTUs, or \code{NULL}. \cr
    \verb{$id}, \verb{$comment} \tab Arbitrary strings for describing the dataset, or \code{NULL}. \cr
    \verb{$depth} \tab Rarefaction depth, or \code{NULL} if unrarefied. \cr
+   \verb{$date} \tab Date from BIOM file. \cr
 }
 
 
@@ -46,11 +47,14 @@ Assigning new values to these components will trigger
 validation checks and inter-component synchronization.\tabular{ll}{
    \strong{Component} \tab \strong{What can be assigned.} \cr
    \verb{$counts} \tab matrix of abundances; OTUs (rows) by samples (columns) \cr
-   \verb{$metadata} \tab data.frame with \code{'.sample'} as the first column \cr
+   \verb{$metadata} \tab data.frame with \code{'.sample'} column, or a file name \cr
    \verb{$taxonomy} \tab data.frame with \code{'.otu'} as the first column \cr
+   \verb{$otus} \tab character vector with new names for the OTUs \cr
+   \verb{$samples} \tab character vector with new names for the samples \cr
    \verb{$tree} \tab phylo object with the phylogenetic tree for the OTUs \cr
    \verb{$sequences} \tab character vector of OTU reference sequences \cr
    \verb{$id}, \verb{$comment} \tab string with a title or comment for the dataset \cr
+   \verb{$date} \tab date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string \cr
 }
 
 
@@ -75,7 +79,7 @@ All functions return an rbiom object.\tabular{ll}{
 }
 
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     # Duplicate the HMP50 example dataset.
     biom <- hmp50$clone()

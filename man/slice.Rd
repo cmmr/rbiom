@@ -58,6 +58,7 @@ Other transformations:
 \code{\link{mutate}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
-\code{\link{subset}()}
+\code{\link{subset}()},
+\code{\link{with}()}
 }
 \concept{transformations}

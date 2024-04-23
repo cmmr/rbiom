@@ -99,7 +99,7 @@ bdply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
       stop("Can't apply metadata partitions to non-rbiom object.")
     
     data <- biom$metadata
-    validate_meta('vars', col_type = 'cat', max = Inf, null_ok = TRUE)
+    validate_biom_field('vars', col_type = 'cat', max = Inf, null_ok = TRUE)
     
     result <- plyr::ddply(data, ply_cols(vars), function (df) {
       
@@ -167,7 +167,7 @@ blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
     
     
     data <- biom$metadata
-    validate_meta('vars', col_type = 'cat', max = Inf, null_ok = TRUE)
+    validate_biom_field('vars', col_type = 'cat', max = Inf, null_ok = TRUE)
     
     result <- plyr::dlply(data, ply_cols(vars), function (df) {
       

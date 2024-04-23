@@ -1,135 +1,342 @@
 
-# Excellent reference for emmeans ~num*cat, ~cat*cat, etc:
-# https://stats.oarc.ucla.edu/r/seminars/interactions-r/
-
-
 #' Run non-parametric statistics on a data.frame.
 #' 
-#' @noRd
-#' @keywords internal
+#' A simple interface to lower-level statistics functions, including 
+#' [stats::wilcox.test()], [stats::kruskal.test()], [emmeans::emmeans()], 
+#' and [emmeans::emtrends()].
 #' 
 #' @inherit documentation_default
-#' @inherit documentation_stats_return return
 #' 
 #' @family stats_tables
 #' 
-#' @param df   A data.frame with columns named by \code{stat.by}, \code{resp}, 
-#'        and \code{split.by}. Required.
+#' @return A tibble data.frame with fields from the table below. This tibble 
+#' object provides the `$code` operator to print the R code used to generate 
+#' the statistics.
 #' 
-#' @param resp   The response (independent) numeric variable, such as taxa 
-#'        abundance or alpha diversity.  Default: \code{attr(df, 'response')}
+#' | **Field**    | **Description**                                      |
+#' | ------------ | ---------------------------------------------------- |
+#' | .mean        | Estimated marginal mean. See [emmeans::emmeans()].   |
+#' | .mean.diff   | Difference in means.                                 |
+#' | .slope       | Trendline slope. See [emmeans::emtrends()].          |
+#' | .slope.diff  | Difference in slopes.                                |
+#' | .h1          | Alternate hypothesis.                                |
+#' | .p.val       | Probability that null hypothesis is correct.         |
+#' | .adj.p       | `.p.val` after adjusting for multiple comparisons.   |
+#' | .effect.size | Effect size. See [emmeans::eff_size()].              |
+#' | .lower       | Confidence interval lower bound.                     |
+#' | .upper       | Confidence interval upper bound.                     |
+#' | .se          | Standard error.                                      |
+#' | .n           | Number of samples.                                   |
+#' | .df          | Degrees of freedom.                                  |
+#' | .stat        | Wilcoxon or Kruskal-Wallis rank sum statistic.       |
+#' | .t.ratio     | `.mean` / `.se`                                      |
+#' | .r.sqr       | Percent of variation explained by the model.         |
+#' | .adj.r       | `.r.sqr`, taking degrees of freedom into account.    |
+#' | .aic         | Akaike Information Criterion (predictive models).    |
+#' | .bic         | Bayesian Information Criterion (descriptive models). |
+#' | .loglik      | Log-likelihood goodness-of-fit score.                |
+#' | .fit.p       | P-value for observing this fit by chance.            |
 #' 
+#' 
+#' @export
 #' @examples
 #'     library(rbiom)
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
 #'     df <- taxa_table(biom, rank = "Family")
-#'     stats_table(df, stat.by = "Body Site")
+#'     stats_table(df, stat.by = "Body Site")[,1:6]
 #'     
 #'     df <- adiv_table(biom)
-#'     stats_table(df, stat.by = "Sex", test = "pw_means")
-#' 
+#'     stats_table(df, stat.by = "Sex", split.by = "Body Site")[,1:7]
 
 stats_table <- function (
-    df, stat.by, resp = attr(df, 'response'), test = "means", 
-    level = 0.95, split.by = NULL, p.adj = 'fdr' ) {
+    df, regr = NULL, resp = attr(df, 'response'), 
+    stat.by = NULL, split.by = NULL, 
+    test = "emmeans", fit = "lm", at = NULL, 
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment())
-  cache_file <- get_cache_file()
+  params     <- list2env(slurp_env())
+  cache_file <- get_cache_file('stats_table', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
   
-  #________________________________________________________
-  # Sanity checks.
-  #________________________________________________________
-  validate_var_range('level', c(0,1))
-  validate_var_choices('p.adj', choices = p.adjust.methods)
-  
-  stopifnot(is.data.frame(df) && nrow(df) > 0)
-  choices <- colnames(df)
-  validate_var_choices('stat.by',  choices, null_ok = TRUE)
-  validate_var_choices('resp',     choices)
-  validate_var_choices('split.by', choices, null_ok = TRUE, max = Inf)
-  remove("choices")
-  
-  test <- match.arg(
-    arg     = trimws(tolower(test)),
-    choices = if (is.null(NULL)) {  # is.null(regr)
-        c("means", "pw_means")
-      } else {
-        c("predict", "terms", "fit", "means", "trends", 
-          "es_means", "es_trends", "pw_means", "pw_trends" ) })
-  
-  if (is.null(stat.by) && !test %in% c('predict', 'fit', 'terms', 'means', 'trends'))
-    cli_abort ("Test '{test}' requires a `stat.by` group.")
-  
-  
-  
-  #________________________________________________________
-  # Response (`resp`) variable must be numeric.
-  #________________________________________________________
-  if (!is.numeric(df[[resp]]))
-    stop("Column '", resp, "' must be numeric, not ", head(class(df[[resp]])), ".")
-  
-  df <- df[is.finite(df[[resp]]),,drop=FALSE] # Drop NA, Inf, NaN, etc
-  
-  
-  
-  #________________________________________________________
-  # Coerce `stat.by` and `split.by` variables to factors.
-  #________________________________________________________
-  for (i in c(stat.by, split.by))
-    if (!is.factor(df[[i]])) {
-      if (!is.character(df[[i]]))
-        cli_warn("Numeric column '{i}' is being used for categorical grouping.")
-      df[[i]] %<>% as.factor()
-    }
-  remove(list = intersect("i", ls()))
-  
-  
-  
-  #________________________________________________________
-  # Calculate boxplot-like or corrplot-like stats.
-  #________________________________________________________
-  if (is.null(NULL)) { # is.null(regr)
-    args  <- fun_params(stats_table_cat, as.list(environment()))
-    stats <- do.call(stats_table_cat, args)
+  with(params, {
     
-  } else {
-    args  <- fun_params(stats_table_num, as.list(environment()))
-    stats <- do.call(stats_table_num, args)
-  }
-  
-  if (hasName(stats, '.p.val'))
-    stats[['.adj.p']] <- p.adjust(stats[['.p.val']], p.adj)
+    #________________________________________________________
+    # Validate and restructure user's arguments.
+    #________________________________________________________
+    if (!inherits(df, 'data.frame'))
+      cli_abort("`df` must be a data.frame, not {.type {df}}.")
+    
+    validate_df_field('regr',     col_type = "num", null_ok = TRUE)
+    validate_df_field('resp',     col_type = "num")
+    validate_df_field('stat.by',  col_type = "cat", null_ok = TRUE)
+    validate_df_field('split.by', col_type = "cat", null_ok = TRUE, max = Inf)
+    
+    validate_var_choices('test',  c("wilcox", "kruskal", "emmeans", "emtrends"))
+    validate_var_choices('alt',   c("!=", ">", "<"))
+    validate_var_choices('fit',   c("lm", "log", "gam"))
+    validate_var_choices('p.adj', p.adjust.methods)
+    
+    validate_var_range('at',    null_ok = TRUE)
+    validate_var_range('level', n = 1, range = c(0.5, 1))
+    validate_var_range('mu',    n = 1)
+    
+    
+    #________________________________________________________
+    # Warn about invalid combinations of parameters.
+    #________________________________________________________
+    if (anyDuplicated(c(regr, resp, stat.by, split.by)))
+      cli_abort("`regr`, `resp`, `stat.by`, `split.by` must all be unique.")
+    
+    if (is.null(regr) && !is.null(at))
+      cli_warn('`at` is ignored when `regr` = NULL.')
+    
+    if (test %in% c('wilcox', 'kruskal')) {
+      if (!eq(fit, "lm")) cli_warn('`fit` is ignored when `test` = "{test}".')
+      if (!is.null(regr)) cli_warn('`regr` is ignored when `test` = "{test}".')
+    }
+    
+    if (!is.null(stat.by)) {
+      if (!eq(level, 0.95)) cli_warn('`level` is ignored when using `stat.by`.')
+      if (!eq(alt, "!="))   cli_warn('`alt` must be "!=" when using `stat.by`.')
+      if (!eq(mu, 0))       cli_warn('`mu` must be 0 when using `stat.by`.')
+    }
+    
+  })
   
   
   
   #________________________________________________________
-  # Add in "data <- ..."
+  # Dispatch to relevant stats_* function.
   #________________________________________________________
-  if (!is.null(attr(df, 'cmd', exact = TRUE)))
-    attr(stats, 'code') %<>% sprintf("data  <- %s\n%s", attr(df, 'cmd'), .)
+  stats <- switch(
+    EXPR = params$test,
+    'wilcox'   = do.call(stats_wilcox,   fun_params(stats_wilcox,   params)), 
+    'kruskal'  = do.call(stats_kruskal,  fun_params(stats_kruskal,  params)), 
+    'emmeans'  = do.call(stats_emmeans,  fun_params(stats_emmeans,  params)), 
+    'emtrends' = do.call(stats_emtrends, fun_params(stats_emtrends, params)) )
   
   
-  attr(stats, 'stats_table_args') <- args[names(args) != 'df']
-  attr(stats, 'code') %<>% add_class("rbiom_code")
-  
-  
-  #________________________________________________________
-  # Enable accessing attributes with `$`.
-  #________________________________________________________
-  stats %<>% as_rbiom_tbl()
-  
-  
+  attr(stats, 'cmd') <- current_cmd('stats_table')
   set_cache_value(cache_file, stats)
   
   return (stats)
 }
+
+
+
+
+
+#' Test alpha diversity for associations with metadata.
+#' 
+#' A convenience wrapper for [adiv_table()] + [stats_table()].
+#' 
+#' @inherit documentation_default
+#' @inherit stats_table return
+#' 
+#' @family alpha_diversity
+#' @family stats_tables
+#' 
+#' @export
+#' @examples
+#'     library(rbiom) 
+#'     
+#'     biom <- rarefy(hmp50)
+#'       
+#'     adiv_stats(biom, stat.by = "Sex")[,1:6]
+#'       
+#'     adiv_stats(biom, stat.by = "Sex", split.by = "Body Site")[,1:6]
+#'     
+#'     adiv_stats(biom, stat.by = "Body Site", test = "kruskal")
+
+adiv_stats <- function (
+    biom, regr = NULL, stat.by = NULL, adiv = "Shannon", 
+    split.by = NULL, trans = "none", 
+    test = "emmeans", fit = "lm", at = NULL, 
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+  
+  
+  #________________________________________________________
+  # Compute alpha diversity values
+  #________________________________________________________
+  df <- adiv_table(
+    biom  = biom, 
+    adiv  = adiv, 
+    md    = c(regr, stat.by, split.by), 
+    trans = trans )
+  
+  if (nlevels(df$.adiv) > 1)
+    split.by %<>% c('.adiv')
+  
+  
+  #________________________________________________________
+  # Run statistics
+  #________________________________________________________
+  stats <- stats_table(
+    df       = df, 
+    regr     = regr, 
+    stat.by  = stat.by, 
+    split.by = split.by, 
+    test     = test, 
+    fit      = fit, 
+    at       = at, 
+    level    = level, 
+    alt      = alt, 
+    mu       = mu, 
+    p.adj    = p.adj )
+  
+  
+  attr(stats, 'cmd') <- current_cmd('adiv_stats')
+  return (stats)
+  
+}
+
+
+
+#' Test beta diversity for associations with metadata.
+#' 
+#' A convenience wrapper for [bdiv_table()] + [stats_table()].
+#' 
+#' @inherit documentation_default
+#' @inherit stats_table return
+#' 
+#' @family beta_diversity
+#' @family stats_tables
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     biom <- rarefy(hmp50)
+#'       
+#'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))[,1:7]
+#'     
+#'     bdiv_stats(biom, stat.by = "Body Site", split.by = "==Sex")[,1:6]
+
+bdiv_stats <- function (
+    biom, regr = NULL, stat.by = NULL, bdiv = "Bray-Curtis", 
+    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
+    split.by = NULL, trans = "none", 
+    test = "emmeans", fit = "lm", at = NULL, 
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+  
+  
+  #________________________________________________________
+  # Compute beta diversity values
+  #________________________________________________________
+  df <- bdiv_table(
+    biom     = biom, 
+    bdiv     = bdiv, 
+    weighted = weighted, 
+    tree     = tree, 
+    md       = c(regr, stat.by, split.by, within, between), 
+    within   = within, 
+    between  = between, 
+    delta    = regr, 
+    trans    = trans )
+  
+  if (nlevels(df$.bdiv) > 1)
+    split.by %<>% c('.bdiv')
+  
+  
+  #________________________________________________________
+  # Run statistics
+  #________________________________________________________
+  stats <- stats_table(
+    df       = df, 
+    regr     = regr, 
+    stat.by  = stat.by, 
+    split.by = split.by, 
+    test     = test, 
+    fit      = fit, 
+    at       = at, 
+    level    = level, 
+    alt      = alt, 
+    mu       = mu, 
+    p.adj    = p.adj )
+  
+  
+  attr(stats, 'cmd') <- current_cmd('bdiv_stats')
+  return (stats)
+  
+}
+
+
+
+
+
+#' Test taxa abundances for associations with metadata.
+#' 
+#' A convenience wrapper for [taxa_table()] + [stats_table()].
+#' 
+#' @inherit documentation_default
+#' @inherit stats_table return
+#' 
+#' @family taxa_abundance
+#' @family stats_tables
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     biom <- rarefy(hmp50)
+#'     
+#'     taxa_stats(biom, stat.by = "Body Site", rank = "Family")[,1:6]
+
+taxa_stats <- function (
+    biom, regr = NULL, stat.by = NULL, rank = -1, taxa = 6, 
+    lineage = FALSE, unc = "singly", other = FALSE,
+    split.by = NULL, trans = "none", 
+    test = "emmeans", fit = "lm", at = NULL, 
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+  
+  
+  #________________________________________________________
+  # Compute beta diversity values
+  #________________________________________________________
+  df <- taxa_table(
+    biom    = biom, 
+    rank    = rank, 
+    taxa    = taxa, 
+    lineage = lineage, 
+    md      = setdiff(c(regr, stat.by, split.by), ".taxa"), 
+    unc     = unc, 
+    other   = other, 
+    trans   = trans )
+  
+  if (nlevels(df$.rank) > 1) split.by %<>% c('.rank')
+  if (!eq(stat.by, ".taxa")) split.by %<>% c('.taxa')
+  
+  
+  #________________________________________________________
+  # Run statistics
+  #________________________________________________________
+  stats <- stats_table(
+    df       = df, 
+    regr     = regr, 
+    stat.by  = stat.by, 
+    split.by = split.by, 
+    test     = test, 
+    fit      = fit, 
+    at       = at, 
+    level    = level, 
+    alt      = alt, 
+    mu       = mu, 
+    p.adj    = p.adj )
+  
+  
+  attr(stats, 'cmd') <- current_cmd('taxa_stats')
+  return (stats)
+  
+}
+
+
+

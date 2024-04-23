@@ -72,7 +72,8 @@ Other transformations:
 \code{\link{mutate}()},
 \code{\link{rarefy}()},
 \code{\link{slice}()},
-\code{\link{subset}()}
+\code{\link{subset}()},
+\code{\link{with}()}
 }
 \concept{rarefaction}
 \concept{transformations}

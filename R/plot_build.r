@@ -6,8 +6,8 @@
 plot_build <- function (params) {
   
   
-  ggdata <- params$.ggdata
   layers <- params$layers
+  ggdata <- params$.ggdata
   
   stopifnot(has_layer(params, 'ggplot'))
   stopifnot(is(ggdata, 'data.frame'))
@@ -28,10 +28,18 @@ plot_build <- function (params) {
   }
   
   
+  
+  
   #________________________________________________________
   # Add in coord_flip when flip=TRUE
   #________________________________________________________
   if (isTRUE(params$flip)) add_layer(params, 'flip')
+  
+  
+  #________________________________________________________
+  # Theme arguments
+  #________________________________________________________
+  set_layer(params, 'theme', text=element_text('size' = 14))
   
   
   #______________________________________________________________
@@ -41,50 +49,6 @@ plot_build <- function (params) {
     set_layer(params, 'theme', panel.grid.major.y = element_blank())
   } else {
     set_layer(params, 'theme', panel.grid.major.x = element_blank())
-  }
-  
-  
-  #______________________________________________________________
-  # Standardize the list order: ggplot() first, theme() last, etc
-  #______________________________________________________________
-  layer_order <- c(
-    'ggplot', 'stats_bg', 'stripe', 'violin', 'point', 'smooth', 
-    'scatter', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
-    'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
-    'arrow', 'taxon', 'brackets', 'stats_text', 'stack', 'hline', 'vline', 
-    'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 
-    'scale_size', 'facet', # 'free_y', 
-    'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
-  layer_order <- c(
-    intersect(layer_order, env_names(layers)),
-    setdiff(env_names(layers), layer_order) )
-  
-  
-  #______________________________________________________________
-  # Suppress x-axis labels when they're identical to facet labels
-  #______________________________________________________________
-  if (params$.xcol %in% params$facet.by) {
-    
-    if (isTRUE(params$flip)) {
-      set_layer(
-        params     = params, 
-        layer      = 'theme', 
-        .overwrite = TRUE,
-        'axis.text.x'        = element_blank(),
-        'axis.ticks.x'       = element_blank(),
-        'axis.title.x'       = element_blank(),
-        'panel.grid.major.x' = element_blank() )
-      
-    } else {
-      set_layer(
-        params     = params, 
-        layer      = 'theme', 
-        .overwrite = TRUE,
-        'axis.text.y'        = element_blank(),
-        'axis.ticks.y'       = element_blank(),
-        'axis.title.y'       = element_blank(),
-        'panel.grid.major.y' = element_blank() )
-    }
   }
   
   
@@ -102,8 +66,9 @@ plot_build <- function (params) {
   
   for (axis in c('x', 'y')) {
     
+    var   <- sprintf(".%scol", axis)
     layer <- sprintf("%saxis", axis)
-    label <- sprintf(".%slab", axis)
+    label <- params$layers[['labs']][[axis]] %||% params[[var]] %||% ''
     trans <- params$layers[[layer]][['trans']]
     
     if (is.null(trans)) next
@@ -111,7 +76,8 @@ plot_build <- function (params) {
     
     # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
     #______________________________________________________________
-    params[[label]] %<>% sprintf("%s (%s scale)", ., trans)
+    if (!has_layer(params, 'labs')) add_layer(params, 'labs')
+    params$layers[['labs']][[axis]] <- sprintf("%s (%s scale)", label, trans)
     
     
     
@@ -154,59 +120,65 @@ plot_build <- function (params) {
   
   
   
-  #______________________________________________________________
-  # x-axis and y-axis labels
-  #______________________________________________________________
+  #________________________________________________________
+  # aes() defaults
+  #________________________________________________________
+  specs <- list(
+    "trend"      = c('color'),
+    "name"       = c('color'),
+    "residual"   = c('color'),
+    "linerange"  = c('color'),
+    "errorbar"   = c('color'),
+    "confidence" = c('color', 'fill'),
+    "violin"     = c('color', 'fill'),
+    "bar"        = c('color', 'fill'),
+    "crossbar"   = c('color', 'fill'),
+    "box"        = c('color', 'fill'),
+    "pointrange" = c('color', 'fill', 'shape'),
+    "point"      = c('color',         'shape'),
+    "dot"        = c('color',         'shape'),
+    "strip"      = c('color',         'shape') )
   
-  if (hasName(params, '.xlab')) set_layer(params, 'labs', x = params$.xlab)
-  if (hasName(params, '.ylab')) set_layer(params, 'labs', y = params$.ylab)
   
+  args <- list()
   
+  colors <- if (!is.null(params$colors))   list(values   = params$colors)   else NULL
+  shapes <- if (!is.null(params$shapes))   list(values   = params$shapes)   else NULL
+  fills  <- if (!is.null(params$patterns)) list(patterns = params$patterns) else colors
   
+  if (!is.null(colors)) args[['color']] <- params$stat.by
+  if (!is.null(shapes)) args[['shape']] <- params$stat.by
+  if (!is.null(fills))  args[['fill']]  <- params$stat.by
   
-  #______________________________________________________________
-  # See if there's a better group column than '.group'
-  #______________________________________________________________
-  gcol <- '.group'
-  if (hasName(ggdata, '.group')) {
+  for (layer in intersect(names(layers), names(specs))) {
     
-    gvals <- ggdata[['.group']] %>% as.character() %>% factor() %>% as.numeric()
-    gvals[is.na(gvals)] <- 0
+    layerArgs <- args[intersect(specs[[layer]], names(args))]
+    layerArgs <- args[setdiff(names(layerArgs), names(layers[[layer]]))]
+    
+    if (length(layerArgs) == 0) next
     
     
-    prefer <- lapply(env_names(params), function (i) {
-      if (grepl("^(x|.+\\.by)$", i)) params[[i]] else NULL
-    }) %>% unlist() %>% unname()
-    mcols  <- grep("^\\.", colnames(ggdata), invert = TRUE, value = TRUE)
-    mcols  <- mcols[order(!mcols %in% prefer)]
+    #________________________________________________________
+    # Initialize colors/shapes/pattern scales.
+    #________________________________________________________
+    if (hasName(layerArgs, 'color')) set_layer(params, 'color', colors)
+    if (hasName(layerArgs, 'shape')) set_layer(params, 'shape', shapes)
+    if (hasName(layerArgs, 'fill'))  set_layer(params, 'fill',  fills)
     
-    for (i in mcols) {
-      if (!is.factor(ggdata[[i]])) next
-      
-      vals <- ggdata[[i]] %>% as.character() %>% factor() %>% as.numeric()
-      vals[is.na(vals)] <- 0
-      
-      if (all(vals == gvals)) {
-        gcol <- i
-        break
-      }
-    }
     
-    remove("gvals", "prefer", "mcols")
+    names(layerArgs) <- paste0("mapping|", names(layerArgs))
+    set_layer(params, layer, layerArgs)
   }
   
   
-  #______________________________________________________________
-  # Track which columns in `data` the plot command uses
-  #______________________________________________________________
-  mapped_cols <- params$facet.by
+  
   
   
   #______________________________________________________________
-  # Clean up args; remove vestigial columns from ggdata
+  # Clean up args
   #______________________________________________________________
   
-  for (layer in layer_order) {
+  for (layer in names(layers)) {
     
     args <- layers[[layer]]
     fun  <- attr(args, 'function', exact = TRUE)
@@ -219,71 +191,21 @@ plot_build <- function (params) {
     
     # Create the aes object for `mapping`=
     #______________________________________________________________
-    if (hasName(args, 'mapping')) {
+    if (hasName(args, 'mapping') && !is(args[['mapping']], "uneval")) {
+    
+      aes_args <- args[['mapping']]
+      aes_args <- aes_args[!sapply(aes_args, is.null)]
+      aes_args <- lapply(aes_args, as.vector)
       
-      if (is(args[['mapping']], "uneval")) {
-        
-        # mapping is already an aes() object.
-        mapped_cols <- unique(c(mapped_cols, colnames(ggdata)))
-        
-      } else {
+      for (arg in names(aes_args))
+        if (is_string(aes_args[[arg]], data_cols)) 
+          aes_args[[arg]] <- as.name(aes_args[[arg]])
       
-        aes_args <- args[['mapping']]
-        aes_args <- aes_args[!sapply(aes_args, is.null)]
-        
-        # Put group last, so we can see if it's optional when it comes up
-        aes_cols <- c()
-        if ('group' %in% names(aes_args))
-          aes_args <- aes_args[c(setdiff(names(aes_args), 'group'), 'group')]
-        
-        
-        for (arg in names(aes_args)) {
-          
-          val <- as.vector(aes_args[[arg]])
-          
-          # if (eq(val, ".all"))   val <- NA
-          if (eq(val, ".group")) val <- gcol
-          
-          
-          if (is.character(val) && length(val) == 1) {
-            
-            if (val %in% data_cols) {
-              
-              if (arg == "group" && val %in% aes_cols) {
-                
-                # Avoid this: color = Sex, group = Sex
-                val <- NULL
-                
-              } else {
-              
-                aes_cols <- unique(c(aes_cols, val))
-                
-                if (is_null(src))
-                  mapped_cols <- unique(c(mapped_cols, val))
-                
-                # Add backticks to column names
-                val <- as.name(val)
-                #val <- sym(val)
-                #val <- enquo(val)
-              }
-            
-            }
-            
-          }
-          
-          aes_args[[arg]] <- val
-        }
-        
-        
-        if (isTRUE(length(aes_args) > 0)) {
-          args[['mapping']] <- do.call(aes, aes_args)
-          
-        } else {
-          args <- args[names(args) != 'mapping']
-        }
-        
-        remove("aes_args", "aes_cols")
-      }
+      args[['mapping']] <- NULL
+      if (isTRUE(length(aes_args) > 0))
+        args[['mapping']] <- do.call(aes, aes_args)
+      
+      remove("aes_args")
     }
     
     
@@ -296,18 +218,33 @@ plot_build <- function (params) {
     
     
     layers[[layer]] <- list(fun = fun, args = args)
+    
+    remove("args", "fun", "src", "defaults")
   }
   
-  # Drop columns while keeping attributes
-  ggdata <- within(ggdata, rm(list = setdiff(names(ggdata), mapped_cols)))
-  remove("mapped_cols")
+  
+  #______________________________________________________________
+  # Standardize the list order: ggplot() first, theme() last, etc
+  #______________________________________________________________
+  layer_order <- c(
+    'ggplot', 'ggtree', 'confidence', 'stats_bg', 'stripe', 'violin', 
+    'residual', 'point', 'trend', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
+    'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
+    'arrow', 'taxon', 'brackets', 'stats_vline', 'stats_label', 'stats_text', 'stack', 'hline', 'vline', 
+    'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale', 
+    'scale_size', 'facet', # 'free_y', 
+    'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
+  layer_order <- c(
+    intersect(layer_order, env_names(layers)),
+    setdiff(env_names(layers), layer_order) )
+  
   
   
   #______________________________________________________________
   # Assemble the ggplot object (p)
   #______________________________________________________________
   p    <- NULL
-  cmds <- c("library(ggplot2)")
+  cmds <- NULL
   
   for (layer in layer_order) {
     

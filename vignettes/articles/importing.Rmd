@@ -18,7 +18,7 @@ The fastest way to make an rbiom object is with `as_rbiom()`, which accepts:
 * A filepath or URL to a BIOM file.
 * An abundance matrix with OTUs in rows and samples in columns.
 * A `phyloseq`-class object, from the phyloseq Bioconductor R package.
-* A list with `counts` and optionally `metadata`, `taxonomy`, `tree`, etc (see [as_rbiom()]).
+* A list with `counts` and optionally `metadata`, `taxonomy`, `tree`, etc (see `as_rbiom()`).
 
 
 ```{r}

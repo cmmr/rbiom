@@ -1,5 +1,5 @@
 pandoc: 3.1.1
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   aes: aes.html
@@ -8,9 +8,10 @@ articles:
   importing: importing.html
   plots: plots.html
   rbiom: rbiom.html
+  regression: regression.html
   scales: scales.html
   statistics: statistics.html
-last_built: 2024-02-07T01:05Z
+last_built: 2024-04-23T15:35Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles

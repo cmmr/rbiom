@@ -97,11 +97,13 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #'
 rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
   
+  params <- eval_envir(environment())
+  
+  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment())
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('rarefy_cols', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   

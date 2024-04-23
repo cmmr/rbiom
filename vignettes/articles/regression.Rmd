@@ -1,0 +1,600 @@
+---
+title: "Regression"
+---
+
+```{r, include = FALSE}
+library(rbiom)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  R.options = list(
+    pillar.print_min = 5,
+    pillar.print_max = 5 ))
+```
+
+# Introduction
+
+Regression functions are provided for examining the association between two continuous variables. 
+
+Examples of continuous variables are alpha diversity metrics, taxa abundances, and sample metadata such as age or BMI. These all have a numeric range in which a data point can take on any value in that range.
+
+
+
+# Children Heights
+
+To start with a simple example, consider the `children` dataset from the R package `npregfast`. It contains the age and height measurements of 2500 children aged 5 through 19 years, split by sex (1292 females and 1208 males).
+
+```{r}
+head(npregfast::children)
+```
+
+
+## Height vs Age
+
+The most straight forward plot is putting 'age' on the x-axis, 'height' on the y-axis, and drawing a straight line that minimizes the distances between the observed data points and the linear trendline.
+
+With this plot, we're testing the hypothesis "as you get older, your height changes".
+
+```{r, fig.asp = 0.4}
+stats_corrplot(
+  df       = npregfast::children,  # dataset
+  x        = 'age',                # x-axis variable
+  y        = 'height',             # y-axis variable
+  layers   = 'tp',                 # show trendline and points
+  test     = 'emtrends',           # run stats on the slope
+  pt.size  = 0.2,                  # make points smaller
+  pt.alpha = 0.2 )                 # and semi-transparent
+```
+
+As you'd expect, the trendline's slope is positive (p-value = 0). Therefore it's safe to say that height changes with age.
+
+
+## Grouped by Sex
+
+Is the rate of growth influenced by sex? We can add `stat.by = "sex"` to draw separate lines for each sex.
+
+```{r, fig.asp = 0.4}
+stats_corrplot(
+  df       = npregfast::children,  # dataset
+  x        = 'age',                # x-axis variable
+  y        = 'height',             # y-axis variable
+  stat.by  = 'sex',                # statistical groups
+  layers   = 'tp',                 # show trendline and points
+  test     = 'emtrends',           # run stats on the slopes
+  pt.size  = 0.2,                  # make points smaller
+  pt.alpha = 0.2 )                 # and semi-transparent
+```
+
+If you look at the captions of the last two plots, you'll notice that the p-value test automatically switches. When `stat.by = NULL`, `test = "emtrends"` will test if the slope is zero. When `stat.by` is not `NULL`, `test = "emtrends"` will test if the trendline slopes are equal.
+
+Here, a p-value of 3.9e-51 indicates that males and females do have different growth rates.
+
+
+## Smoothed Fit
+
+Linear trendlines probably aren't the best way to model growth rates. Setting `fit = "gam"` will use a generalized additive model which fits several sub-ranges of age with independent splines.
+
+```{r, fig.asp = 0.4}
+stats_corrplot(
+  df       = npregfast::children,  # dataset
+  x        = 'age',                # x-axis variable
+  y        = 'height',             # y-axis variable
+  stat.by  = 'sex',                # statistical groups
+  fit      = 'gam',                # smoothed trendline
+  layers   = 'tp',                 # show trendline and points
+  test     = 'emtrends',           # run stats on the slopes
+  pt.size  = 0.2,                  # make points smaller
+  pt.alpha = 0.2 )                 # and semi-transparent
+```
+
+This gives us a much better idea of the moving average over time.
+
+We still have `test = "emtrends"`, so the p-value is reported where the differences is slope is most significant - in this case, at age = 5.83 years.
+
+
+## Difference in Means
+
+Let's set `test = "emmeans"` instead, and show the 95% confidence interval instead of all the data points.
+
+```{r, fig.asp = 0.4}
+stats_corrplot(
+  df       = npregfast::children,  # dataset
+  x        = 'age',                # x-axis variable
+  y        = 'height',             # y-axis variable
+  stat.by  = 'sex',                # statistical groups
+  fit      = 'gam',                # smoothed trendline
+  layers   = 'tc',                 # show trendline with conf. int.
+  test     = 'emmeans' )           # run stats on the means
+```
+
+Differences in height are most significant at age = 16.8 (p-value = 8.9e-40). 
+
+
+## Stats Table
+
+The complete statistical output is attached to the returned plot as `$stats`. Though not covered in this article, you can also access `$code` and `$stats$code` to see the ggplot2 plotting command and statistics R code, respectively.
+
+```{r, fig.asp = 0.4}
+p <- stats_corrplot(
+  df       = npregfast::children,  # dataset
+  x        = 'age',                # x-axis variable
+  y        = 'height',             # y-axis variable
+  stat.by  = 'sex',                # statistical groups
+  fit      = 'gam',                # smoothed trendline
+  layers   = 'tc',                 # show trendline with conf. int.
+  test     = 'emmeans' )           # run stats on the means
+
+p$stats
+```
+This is the same table you can generate with the [stats_table()] function, and that reference page has an explanation of each field.
+
+
+
+
+
+
+# Babies Dataset
+
+Now that we have the concepts down, let's switch to the `babies` dataset included with rbiom. It has microbiome data from 2,684 stool samples from 12 infants. The original Nature article by Eric J. de Muinck and Pal Trosvik for this data set is available online for free at [Individuality and Convergence of the Infant Gut Microbiota During the First Year of Life](https://www.nature.com/articles/s41467-018-04641-7).
+
+```{r}
+babies
+
+
+glimpse(babies)
+```
+
+We'll use the `age`, `sex`, `delivery`, and `subject` metadata fields in the following examples. `age` is a continuous variable while the rest are categorical.
+
+
+# Normality
+
+Many common statistical tools rely on the assumption that your data is normally distributed.
+
+In the children dataset, this assumption is accurate.
+
+```{r, fig.asp = 1.5}
+performance::check_model(
+  check = c("pp_check", "linearity"),
+  x     = mgcv::gam(
+    data    = npregfast::children,
+    formula = height ~ s(age, bs = 'cs'), 
+    method  = 'REML' ) )
+```
+
+However, microbiome data is usually non-normally distributed.
+
+performance::check_model(
+  check = c("pp_check", "linearity"),
+  x     = mgcv::gam(
+    data    = adiv_table(babies) %>% rename(age = 'Age (days)'),
+    formula = .diversity ~ s(age, bs = 'cs'), 
+    method  = 'REML' ) )
+
+
+```
+
+
+
+
+
+
+
+
+
+
+# Draft Text
+
+
+
+
+You can use the formula `height ~ age` as a way of saying "as you get older, your height changes". You can get fancier using a formula like `height ~ log(age)` which says that larger values of age have less of an effect on height, or `height ~ log(age) * sex` which also accounts for different growth trends of males and females. If you're of the opinion that height and age are linked, but not linearly or logarithmically, you can write `height ~ s(age)` to partition age into sub-ranges and fit splines to each independently.
+
+That's as complex as it gets for rbiom! And again, rbiom insulates you from needing to write any formulas yourself. All you need to do is point the functions to the relevant variables.
+
+
+```{r, fig.keep = 'all', echo = FALSE }
+
+local({
+  
+  op <- par(no.readonly = TRUE)
+  on.exit(par(op))
+  
+  par(
+    mfrow     = c(2, 3),
+    cex.main  = 1.5, 
+    font.main = 1, 
+    mar       = c(0.5, 0.5, 3, 0.5) )
+  
+  all    <- npregfast::children
+  male   <- subset(all, sex == "male")
+  female <- subset(all, sex == "female")
+  
+  p <- function () with(all, plot(age, height, cex = 0.1, axes = FALSE, ann = FALSE, frame.plot = TRUE))
+  x <- seq(from = min(all$age), to = max(all$age), length.out = 100)
+  
+  with (all, {
+    
+    p(); title(main="height ~ age", line = 1)
+    fit <- lm(height ~ age)
+    matlines(x=x, y=predict(fit, newdata = list(age=x)), lwd = 4, col = 3)
+    
+    p(); title(main="height ~ log(age)", line = 1)
+    fit <- lm(height ~ log(age))
+    matlines(x=x, y=predict(fit, newdata = list(age=x)), lwd = 4, col = 3)
+    
+    p(); title(main="height ~ s(age)", line = 1)
+    fit <- mgcv::gam(height ~ s(age, bs = 'cs'), method = 'REML')
+    matlines(x=x, y=predict(fit, newdata = list(age=x)), lwd = 4, col = 3)
+  })
+  
+  p(); title(main="height ~ age * sex", line = 1)
+  m_fit <- with(male,   lm(height ~ age))
+  f_fit <- with(female, lm(height ~ age))
+  matlines(x=x, y=predict(m_fit, newdata = list(age=x)), lwd = 4, col = 4)
+  matlines(x=x, y=predict(f_fit, newdata = list(age=x)), lwd = 4, col = 2)
+  
+  p(); title(main="height ~ log(age) * sex", line = 1)
+  m_fit <- with(male,   lm(height ~ log(age)))
+  f_fit <- with(female, lm(height ~ log(age)))
+  matlines(x=x, y=predict(m_fit, newdata = list(age=x)), lwd = 4, col = 4)
+  matlines(x=x, y=predict(f_fit, newdata = list(age=x)), lwd = 4, col = 2)
+  
+  p(); title(main="height ~ s(age) * sex", line = 1)
+  m_fit <- with(male,   mgcv::gam(height ~ s(age, bs = 'cs'), method = 'REML'))
+  f_fit <- with(female, mgcv::gam(height ~ s(age, bs = 'cs'), method = 'REML'))
+  matlines(x=x, y=predict(m_fit, newdata = list(age=x)), lwd = 4, col = 4)
+  matlines(x=x, y=predict(f_fit, newdata = list(age=x)), lwd = 4, col = 2)
+  
+})
+
+```
+
+
+
+## Models and Trendlines
+
+Before we go further, let's define a couple terms.
+
+* **Model Family** - A generalized equation, e.g. `y = mx + b`.
+* **Fitted Model** - An equation for a specific line, e.g. `y = 1.2x + 10`.
+* **Coefficients** - In the above fitted model, `1.2` and `10`.
+
+For more on this topic, see the online book [R for Data Science](https://r4ds.had.co.nz/model-basics.html) by Hadley Wickham and Garrett Grolemund.
+
+You can tell rbiom which model family to use with the `fit` parameter:
+* `fit = "lm"` - Fit a linear `y ~ x` model.
+* `fit = "log"` - Fit a logarithmic `y ~ log(x)` model.
+* `fit = "gam"` - Fit a generalized additive `y ~ s(x)` model.
+
+One important thing to know about rbiom is that **model fitting is done AFTER splitting the dataset**. For example, if your formula is `height ~ age * sex`, then the data will be split into two datasets - one of just males and one of just females. Each new dataset and the formula of `height ~ age` is passed on to the underlying statistical f
+
+
+
+## Optimal Model/Trendline
+
+So, how do you decide whether to use a linear, logarithmic, or smoothed trendline?
+
+Looking at the different fits with your eye is an excellent place to start. There are also some metrics and charts to help you to really evaluate the goodness of fit.
+
+Below (and in the figures above) data is sourced from the R package dataset `npregfast::children`, which has the age and height measurements of 2500 children aged 5 to 19 years, split by sex (1292 females and 1208 males). 
+
+To start, we can use [broom::glance()] or rbiom's `stats_table()` to calculate R<sup>2</sup>, AIC, and other goodness of fit metrics.
+
+```{r}
+children <- as_tibble(npregfast::children)
+glimpse(children)
+
+
+# Using broom::glance() directly:
+models <- with(children, list(
+  'height ~ age'      = stats::lm(height ~ age),
+  'height ~ log(age)' = stats::lm(height ~ log(age)),
+  'height ~ s(age)'   = mgcv::gam(height ~ s(age, bs = 'cs'), method = 'REML') ))
+
+plyr::ldply(models, broom::glance) %>% 
+  as_tibble() %>% 
+  select(model = .id, r.squared, adj.r.squared, logLik:BIC, p.value)
+
+
+# Or equivalently with stats_table()
+stats_table(children, resp = "height", regr = "age", fit = "lm") %>% 
+  select(.r.sqr:.fit.p)
+```
+
+
+Here's how to interpret this output:
+
+* `.r.sqr` - Coefficient of Determination (<i>R</i><sup>2</sup>); range: 0-1, lower is better. Percent of variation explained by the model.
+* `.adj.r` - <i>R</i><sup>2</sup>, taking degrees of freedom into account.
+* `.aic` - Akaike Information Criterion; lower is better. Preferred when using model for prediction.
+* `.bic` - Bayesian Information Criterion; lower is better. Preferred when using model for interpretation.
+* `.loglik` - Log-Likelihood (negative values); higher values (closer to zero) are better.
+* `.fit.p` - P-value for observing this fit by chance; range: 0-1, lower is better.
+
+Based on these metrics, the smoothed trendline is optimal.
+
+
+We can also visualize the fit with the `performance` R package. Below, compare the graphs for the linear vs smoothed trendline.
+
+```{r, fig.asp = 0.4}
+with(children, stats::lm(height ~ age)) %>% 
+  performance::check_model(check = c("pp_check", "linearity"))
+```
+
+
+```{r, fig.asp = 0.4}
+with(children, mgcv::gam(height ~ s(age, bs = 'cs'), method = 'REML')) %>% 
+  performance::check_model(check = c("pp_check", "linearity"))
+```
+
+Omitting the `checks = ` argument will generate even more plots, and adding in the `* sex` interaction term will produce even more plots, but I'll leave that as an exercise for the reader. Just an FYI - the gam formula with an interaction will look like `height ~ s(age, by=sex, bs='cs') + sex`. Aren't you glad that rbiom doesn't need you to know formulas?
+
+From these checks we can conclude that our model fits the `children` dataset very well and can give credence to any conclusions reached by interpretations of that model.
+
+
+
+
+
+## stats_table()
+
+We'll use [stats_table()] in this article.
+
+[stats_table()] is called by [adiv_stats()], [bdiv_stats()], and [taxa_stats()], which in turn are called by the `*_corrplot()` plotting functions. Therefore, once you understand how to use [stats_table()], you'll understand all the other regression functions too!
+
+Here are the first few arguments for [stats_table()], explained in more detail than on the reference page.
+
+
+* `df` - A data.frame with all your data. Typically, this will be the data.frame returned by [adiv_stats()], [bdiv_stats()], or [taxa_stats()], but a custom-made one is fine too. It doesn't even have to be microbiome data. A nice thing about the `_stats()` functions is they set e.g. `attr(df, 'response') <- ".abundance"` so you don't need to worry about setting `stats_table(resp = )`.
+* `regr` - The independent variable. Such as `"age"` in the `babies` dataset.
+* `resp` - The dependent variable. Will be `".abundance"`, `".diversity"`, or `".distance"` if calculated by the `_stats()` functions, or `"height"` from the earlier section.
+
+As this article goes on, we'll go over how and when to use additional [stats_table()] arguments.
+
+
+
+## Linear Trends
+
+Let's explore Firmicutes abundance in the `babies` dataset.
+
+```{r}
+df <- taxa_table(babies, rank = "Phylum", taxa = "Firmicutes") %>%
+  select(
+    .sample, .taxa, .abundance, 
+    age      = `Age (days)`, 
+    sex      = Sex, 
+    delivery = `Delivery mode`, 
+    subject  = `Subject ID` )
+
+df
+```
+
+
+The simplest way to find the abundance is to take the average across all samples.
+
+```{r}
+mean(df$.abundance)
+
+stats_table(df)$.mean
+```
+
+
+
+Regression comes into play when we suspect that abundance changes over time.
+
+```{r}
+with(df, plot(age, .abundance))
+stats_table(df, regr = "age", fit = "lm", test = "emtrends") %>% 
+  select(.slope, .h1, .p.val)
+```
+
+Above, we're modeling `.abundance ~ age` and using [emmeans::emtrends()] behind the scenes see if the resulting trendline is non-horizontal.
+
+Recall from your statistic classes that you are testing a null hypothesis H<sub>0</sub> against an alternate hypothesis H<sub>1</sub>. In this case our null hypothesis is that the trendline is flat (slope = 0), indicating no relationship between age and Firmicutes abundance. The p-value is the probability that the null hypothesis is correct (a p-value of 0.6 is interpreted as a 60% chance that there's no relationship between age and abundance). When the p-value is below a certain value (usually 0.05) we accept the alternative hypothesis instead - in this case that there IS a relationship between age and Firmicutes abundance.
+
+In the output we see that `.slope` is -0.127 and our alternative hypothesis (`.h1`) of `.slope != 0` is acceptable since `.p.val` is less than 0.05. Therefore, the mean abundance of Firmicutes decreases over time in babies.
+
+The un-`select()`ed output contains columns for confidence intervals, goodness of fit measures, and intermediary statistic values that we'll get to later.
+
+
+
+## Data Normality
+
+In statistics, it is crucial to know if your data is normally distributed.
+
+The `performance` R package has excellent utilities for assessing normality and similar characteristics.
+
+```{r, fig.asp = 1.5}
+with(df, stats::lm(.abundance ~ age * sex)) %>%
+  performance::check_model()
+```
+
+The "Normality of Residuals" plots clearly show we're dealing with non-normal data. To handle this, we need to use non-parametric methods or manually apply a rank transformation.
+
+```{r, fig.asp = 1.5}
+df$rt_abundance <- rank(df$.abundance)
+with(df, stats::lm(rt_abundance ~ age * sex)) %>% 
+  performance::check_model()
+```
+
+
+
+## Trends and Engines
+
+Now's a good time to explain two more `stats_table()` parameters: `fit` and `test`.
+
+`fit` is the shape of the trendline you want to fit (see intro section). Options are:
+* `'lm'` - Linear (straight line), using `stats::lm(y ~ x)`.
+* `'log'` - Logarithmic, using `stats::lm(y ~ log(x))`.
+* `'gam'` - Generalized additive model, using `mgcv::gam(y ~ s(x, bs = 'cs'), method = 'REML')`.
+
+`test` is the top-most operator the model. Options are:
+* `'emmeans'` - To compute means.
+* `'emtrends'` - To compute trendline slopes.
+
+
+
+## Marginal Means
+
+The default test for `stats_table()` is `'emmeans'`, which computes estimated marginal means (EMMs), also known as least-squares means, using the [emmeans::emmeans] package.
+
+Generally speaking, EMMs are means extracted from a statistical model. This allows EMMs to take into account more complex associations and produce confidence intervals in addition to estimates of the mean. For a more information on EMMs, these resources are recommended:
+
+* [Marginalia: A Guide to Figuring Out What the Heck Marginal Effects Are](https://www.andrewheiss.com/blog/2022/05/20/marginalia/#marginal-effects-at-the-mean-the-default-in-emmeans)
+* [Decomposing, Probing, and Plotting Interactions in R](https://stats.oarc.ucla.edu/r/seminars/interactions-r)
+
+
+
+
+## Model Selection
+
+As per our discussion of age vs height, a straight (linear) trendline might not be the best fit for a dataset.
+
+To evaluate different models, change the `fit` parameter and look at the resultant goodness of fit values.
+
+```{r}
+stats_table(df, regr = "age", test = "emtrends", fit = "lm") %>% 
+  select(.r.sqr:.fit.p)
+
+
+stats_table(df, regr = "age", test = "emtrends", fit = "log") %>% 
+  select(.r.sqr:.fit.p)
+
+
+stats_table(df, regr = "age", test = "emtrends", fit = "gam") %>% 
+  select(.aic:.loglik)
+```
+
+These values are calculated by the [broom::glance()] function.
+
+* `.r.sqr` - Coefficient of Determination (<i>R</i><sup>2</sup>); range: 0-1, lower is better. Percent of variation explained by the model.
+* `.adj.r` - <i>R</i><sup>2</sup>, taking degrees of freedom into account.
+* `.aic` - Akaike Information Criterion; lower is better. Preferred when using model for prediction.
+* `.bic` - Bayesian Information Criterion; lower is better. Preferred when using model for interpretation.
+* `.loglik` - Log-Likelihood (negative values); higher values (closer to zero) are better.
+* `.fit.p` - P-value for observing this fit by chance; range: 0-1, lower is better.
+
+Based on these metrics, the `fit = "lm"` model is optimal.
+
+
+
+
+
+## Means at Specific Timepoints
+
+The previous section showed us that Firmicutes abundance decreases with age (slope = -0.127). We can use `stats_table(at = ...)` to find the estimated marginal mean of `.abundance` at any value of age.
+
+```{r}
+stats_table(df, regr = "age", at = c(30, 90, 150, 210)) %>% 
+  select(age, .mean)
+```
+
+
+
+## Pairwise Contrasts
+
+Let's check if the abundance of Firmicutes is different for babies born vaginally vs via Cesarean.
+
+```{r}
+stats_table(df, regr = "age", stat.by = "delivery", at = c(30, 90, 150, 210)) %>% 
+  select(age, delivery, .mean.diff, .h1, .effect.size, .p.val, .adj.p)
+```
+
+Here we see why the `at` parameter is so important; at day 30, the difference is very significant, while at day 150, the difference is negligible.
+
+A few new columns are introduced here. `.mean.diff` is the differences in mean abundance. The negative values indicate there is more Firmicutes in the babies delivered vaginally. See how the pair is listed as `Cesarean - Vaginal`? You can think "Cesarean abundance" **minus** "Vaginal abundance". In this table, the `.h1` column tells us the alternate hypothesis is that the `.mean.diff` is not equal to zero.
+
+The `.adj.p` column is the `.p.val` corrected for multiple comparisons. Since we looked at four timepoints, the chances of encountering a randomly significant difference is higher than if we looked at just one timepoint. The default `stats_table(p.adj = 'fdr')` uses the Benjamini & Hochberg (1995) correction algorithm.
+
+
+The `.effect.size` column gives us an idea of the practical significance of `.mean.diff`. Calculated as `.mean.diff / standard_deviation`, a rough interpretation is 0.2 = small effect, 0.5 = moderate effect, and 0.8 = large effect.
+
+Considering this, we can say that babies born vaginally had significantly more Firmicutes in their stool than babies born via Cesarean. However, this difference is fairly small.
+
+
+
+## Pairwise Trends
+
+The above differences were actually the result of calculating separate models for each level of delivery. These underlying trendlines can be interesting in their own right as well. The slopes might be different, or they might be the same but with different y-intercepts. We can find out like this:
+
+```{r}
+stats_table(df, regr = "age", stat.by = "delivery", test = "emtrends") %>% 
+  select(delivery, .slope.diff, .h1, .p.val)
+```
+
+This shows us that the linear trendline slopes are significantly different. The new column `.slope.diff` is the difference in slopes for the two delivery group trendlines.
+
+But what if we want to know the slope of those two trendlines by themselves? We can find those by changing `stats_table(stat.by = ...)` to `stats_table(split.by = ...)`.
+
+```{r}
+stats_table(df, regr = "age", split.by = "delivery", test = "emtrends") %>% 
+  select(delivery, .slope, .h1, .adj.p)
+```
+
+This reveals that when babies are born via Cesarean, their Firmicutes abundance does NOT change as they get older. But babies born vaginally DO see a decrease over time in Firmicutes abundance. Interesting!
+
+We can check the y-intercepts of the trendlines by checking the mean abundances at age = 0.
+
+```{r}
+stats_table(df, regr = "age", split.by = "delivery", at = 0) %>% 
+  select(age, delivery, .mean, .lower, .upper)
+```
+
+Here we see that the means (and their 95% confidence interval, `.lower` - `.upper`) are quite different. Therefore, at birth, babies born vaginally have more Firmcutes in their stool than babies born via Cesarean.
+
+
+
+
+
+* `stat.by` - An optional categorical variable defining the statistical groups. If set, this triggers a pairwise comparison of all `stat.by` groups. 
+* `split.by` - Optional field(s) to pre-partition the dataset by.
+* `test` - The options are `'fits'`, `'means'`, or `'slopes'`. `'fits'` will return goodness-of-fit metrics. `'means'` calculates the estimated marginal mean of `resp` at `at`. `'means'` estimates the trendline slope at `at`. More detail on these later.
+* `fit` - For regression, the choices are `'lm'`, `'log'`, or `'gam'`. These fit straight trend-lines, log-curved trend-lines, and multi-spline trend-lines to the data, respectively.
+* `level` - The confidence level for calculating a confidence interval. 
+* `alt` - Alternative hypothesis direction. Options are `'!='` (two-sided; not equal to `mu`), `'<'` (less than `mu`), or `'>'` (greater than `mu`).
+* `mu` - Reference value to test against.
+* `at` - Calculate means or slopes at this `regr` value, or `NULL` to use the median of `regr`'s values.
+* `p.adj` - Method to use for multiple comparisons adjustment of p-values. Run `p.adjust.methods` for a list of available options.
+
+
+
+
+
+Rbiom has three pre-defined regression models:
+
+```{r, echo=FALSE, fig.asp = 0.45}
+library(ggplot2)
+set.seed(4)
+d <- data.frame(x = 1:100, y = sample(1:100, prob = 100:1))
+p <- function (title, method, formula) 
+  ggplot(d, aes(x=x,y=y)) + 
+  ggtitle(title) + 
+  geom_point(alpha = 0.4, size = 0.2) + 
+  stat_smooth(color = "black", method = method, formula = formula) + 
+  theme_void() + theme(
+    panel.border    = element_rect(fill = NA, color = "black"),
+    plot.title      = element_text(face = "bold", size = 18, hjust = 0.5, margin = margin(0,0,5,0)),
+    plot.margin     = unit(c(0,4,0,4), "points") )
+patchwork::wrap_plots(
+  nrow = 1,
+  p("lm",  "lm",  y ~ x), 
+  p("log", "lm",  y ~ log(x)), 
+  p("gam", "gam", y ~ s(x, bs = "cs")) )
+```
+
+
+
+  p("lm",  y ~ x,               "stats::lm(y ~ x)"),
+  p("log", y ~ log(x),         "stats::lm(y ~ log(x))"),
+  p("gam", y ~ s(x, bs = "cs"), "mgcv::gam(y ~ s(x, bs = 'cs'),\nmethod = 'REML')")
+
+Visualizations are one of the best ways to identify correlations in your 
+dataset. If you can see a trend with your eyes, then you're on the right track. 
+Rbiom's plotting functions are 
+
+The `*_boxplot()`, `*_corrplot()`, and `bdiv_ord_plot()` functions will 
+automatically add p-values to your figures whenever possible. The ggplot object 
+they return has `$data`, `$code`, `$stats`, and `$stats$code` attributes you 
+can use to automate, reproduce, and customize your figures.
+

@@ -7,18 +7,17 @@
 adiv_table(biom, adiv = "Shannon", md = ".all", trans = "none")
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
-\item{md}{A character vector naming the metadata fields to include in the
-output data frame, or \code{'.all'} to include all metadata fields.
-Default: \code{'.all'}}
+\item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
+to include all metadata fields. Default: \code{'.all'}}
 
 \item{trans}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for

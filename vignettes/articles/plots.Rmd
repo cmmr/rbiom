@@ -122,7 +122,7 @@ You can assign one or more of the following options to a correlation plot's
 ```{r, echo=FALSE}
 biom <- rarefy(hmp50)
 patchwork::wrap_plots(lapply(
-  c("trend", "confidence", "scatter", "residual", "name"), 
+  c("trend", "confidence", "point", "residual", "name"), 
   FUN = function (layer) {
   adiv_corrplot(biom, x = "Age", layers = layer, color.by = "Sex", test = "none", y.limits = c(0, 50)) + 
     ggplot2::labs(title = layer, y = NULL, caption = NULL) +
@@ -131,8 +131,8 @@ patchwork::wrap_plots(lapply(
 ```
 
 Unambiguous abbreviations are also accepted. For instance, 
-`layers = c("trend", "scatter")` is equivalent to `layers = c("t", "s")` and 
-`layers = "ts"`.
+`layers = c("trend", "point")` is equivalent to `layers = c("t", "p")` and 
+`layers = "tp"`.
 
 
 

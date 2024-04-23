@@ -28,8 +28,8 @@ bdiv_ord_plot(
 )
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
@@ -46,7 +46,7 @@ Multiple/abbreviated values allowed.}
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
 Default: \code{"UMAP"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
@@ -172,6 +172,8 @@ Other visualization:
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
 \code{\link{rare_stacked}()},
+\code{\link{stats_boxplot}()},
+\code{\link{stats_corrplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

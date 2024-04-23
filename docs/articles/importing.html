@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9123</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,10 +107,10 @@
 R package.</li>
 <li>A list with <code>counts</code> and optionally
 <code>metadata</code>, <code>taxonomy</code>, <code>tree</code>, etc
-(see [as_rbiom()]).</li>
+(see <code><a href="../reference/as_rbiom.html">as_rbiom()</a></code>).</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom">rbiom</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># create a simple matrix ------------------------</span></span>
 <span><span class="va">mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
@@ -119,19 +119,19 @@ R package.</li>
 <span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
 <span><span class="va">mtx</span></span>
 <span><span class="co">#&gt;      Sample1 Sample2 Sample3 Sample4</span></span>
-<span><span class="co">#&gt; OTU1     517     139     625     796</span></span>
-<span><span class="co">#&gt; OTU2     347     753     704     969</span></span>
-<span><span class="co">#&gt; OTU3     525     749     521     346</span></span>
-<span><span class="co">#&gt; OTU4      19     786     293     614</span></span>
-<span><span class="co">#&gt; OTU5      82     311     883      12</span></span>
-<span><span class="co">#&gt; OTU6      30     564     903     315</span></span>
+<span><span class="co">#&gt; OTU1      33     456     657     403</span></span>
+<span><span class="co">#&gt; OTU2     779     479      45     802</span></span>
+<span><span class="co">#&gt; OTU3     575      85     995     381</span></span>
+<span><span class="co">#&gt; OTU4      25     295     841       8</span></span>
+<span><span class="co">#&gt; OTU5     848     738     524     613</span></span>
+<span><span class="co">#&gt; OTU6     387     393     651     452</span></span>
 <span></span>
 <span><span class="co"># convert matrix to rbiom -----------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2024-02-07)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-03-26)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU4, and OTU5</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU2, OTU3, OTU6, OTU1, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       1 Metadata: .sample</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
@@ -148,7 +148,7 @@ R package.</li>
 <span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">phy</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; Imported PhyloSeq Data (2024-02-07)</span></span>
+<span><span class="co">#&gt; Imported PhyloSeq Data (2024-03-26)</span></span>
 <span><span class="co">#&gt;       6 Samples:  Sample1, Sample2, ..., and Sample6</span></span>
 <span><span class="co">#&gt;       5 OTUs:     GG_OTU_2, GG_OTU_3, GG_OTU_4, ...</span></span>
 <span><span class="co">#&gt;       8 Ranks:    .otu, Rank1, Rank2, ..., and Rank7</span></span>
@@ -191,9 +191,9 @@ sample.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">md</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2024-02-07)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-03-26)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU4, and OTU5</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU2, OTU3, OTU6, OTU1, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
@@ -201,9 +201,9 @@ sample.</p>
 <span><span class="co"># or in a single step ---------------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">mtx</span>, metadata <span class="op">=</span> <span class="va">md</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2024-02-07)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-03-26)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU4, and OTU5</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU2, OTU3, OTU6, OTU1, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span></code></pre></div>
@@ -236,9 +236,9 @@ object directly, or a newick file/string.</p>
 <code class="sourceCode R"><span><span class="co"># define a random tree --------------------------</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">"(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2024-02-07)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-03-26)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU4, and OTU5</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU2, OTU3, OTU6, OTU1, and OTU4</span></span>
 <span><span class="co">#&gt;       1 Ranks:    .otu</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>
@@ -265,9 +265,9 @@ OTU.</p>
 <span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span> <span class="op">&lt;-</span> <span class="va">map</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; An rbiom object (2024-02-07)</span></span>
+<span><span class="co">#&gt; An rbiom object (2024-03-26)</span></span>
 <span><span class="co">#&gt;       4 Samples:  Sample1, Sample2, Sample3, and Sample4</span></span>
-<span><span class="co">#&gt;       6 OTUs:     OTU2, OTU3, OTU1, OTU6, OTU4, and OTU5</span></span>
+<span><span class="co">#&gt;       6 OTUs:     OTU5, OTU2, OTU3, OTU6, OTU1, and OTU4</span></span>
 <span><span class="co">#&gt;       3 Ranks:    .otu, Phylum, and Order</span></span>
 <span><span class="co">#&gt;       4 Metadata: .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:     &lt;present&gt;</span></span></code></pre></div>
@@ -280,7 +280,7 @@ OTU.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Daniel P. Smith.</p>
+<p>Developed by Daniel P. Smith, Alkek Center for Metagenomics and Microbiome Research.</p>
 </div>
 
 <div class="pkgdown-footer-right">

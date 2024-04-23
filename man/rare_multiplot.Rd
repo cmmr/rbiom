@@ -6,123 +6,133 @@
 \usage{
 rare_multiplot(
   biom,
-  adiv = "OTUs",
-  layers = "t",
+  adiv = "Shannon",
+  layers = "tc",
   rline = TRUE,
-  color.by = NULL,
+  stat.by = NULL,
   facet.by = NULL,
-  limit.by = NULL,
-  formula = y ~ log(x),
-  engine = "lm",
+  colors = TRUE,
+  shapes = FALSE,
+  test = "none",
+  fit = "log",
+  at = NULL,
   level = 0.95,
+  p.adj = "fdr",
+  trans = "none",
+  alt = "!=",
+  mu = 0,
   caption = TRUE,
-  labels = FALSE,
   ...
 )
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{layers}{One or more of
-\code{c("trend", "confidence", "scatter", "name")}. Single
+\code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
-\code{c("trend", "scatter")} is equivalent to \code{c("t", "s")} and \code{"ts"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"tc"}}
+\code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.
+Default: \code{"tc"}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
 auto-selected rarefaction depth or \code{FALSE} to not show a line.
 Default: \code{NULL}}
 
-\item{color.by, facet.by, limit.by}{Metadata columns to use for aesthetics
-and partitioning. See below for details. Default: \code{NULL}}
+\item{stat.by}{Dataset field with the statistical groups. Must be
+categorical. Default: \code{NULL}}
 
-\item{formula}{Relationship between variables. Default: \code{y ~ x}}
+\item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
+Default: \code{NULL}}
 
-\item{engine}{What type of trend model to fit to the data. Options are:
-\code{"lm"} (linear), \code{"local"} (uses loess or gam). Default: \code{"lm"}}
+\item{colors}{How to color the \code{stat.by} groups. Options are:
+\itemize{
+\item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
+\item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
+\item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
+\item{character vector - }{ Custom colors to use. E.g. \code{c("red", "#00FF00")} }
+\item{named character vector - }{ Explicit mapping. E.g. \code{c(Male = "blue", Female = "red")} }
+}
+See "Aesthetics" section below for additional information.
+Default: \code{TRUE}}
+
+\item{shapes}{Shapes for each \code{stat.by} group.
+Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, shape
+names (typically integers 0 - 17), or a named vector mapping
+\code{stat.by} groups to specific shape names.
+See "Aesthetics" section below for additional information.
+Default: \code{FALSE}}
+
+\item{test}{Method for computing p-values: \code{'none'}, \code{'emmeans'}, or
+\code{'emtrends'}. Default: \code{'emmeans'}}
+
+\item{fit}{How to fit the trendline.
+Options are \code{'lm'}, \code{'log'}, and \code{'gam'}.
+Default: \code{'log'}}
+
+\item{at}{Position(s) along the x-axis where the means or slopes should be
+evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
+and selects the position where the p-value is most significant.}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
+\item{p.adj}{Method to use for multiple comparisons adjustment of
+p-values. Run \code{p.adjust.methods} for a list of available
+options. Default: \code{"fdr"}}
+
+\item{trans}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normally distributions before applying regression
+statistics. Default: \code{"none"}}
+
+\item{alt}{Alternative hypothesis direction. Options are \code{'!='}
+(two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
+(greater than \code{mu}). Default: \code{'!='}}
+
+\item{mu}{Reference value to test against. Default: \code{0}}
+
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
 
-\item{labels}{Show sample names under each bar. Default: \code{FALSE}}
-
-\item{...}{Additional parameters to pass along to ggplot2
-functions. Prefix a parameter name with either \code{t.} or
-\code{s.}/\code{pt.} to ensure it gets passed to (and only to)
-\link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point},
-respectively. For instance, \code{s.size = 2} ensures only the
-scatterplot points have their size set to \code{2}.}
+\item{...}{Additional parameters to pass along to ggplot2 functions.
+Prefix a parameter name with a layer name to pass it to only that
+layer. For instance, \code{p.size = 2} ensures only the points have their
+size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points and ggplot command
-are available as \verb{$data} and \verb{$code}, respectively.
+A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,
+stats table, and stats table commands are available as \verb{$data},
+\verb{$code}, \verb{$stats}, and \verb{$stats$code}, respectively.
 }
 \description{
 Combines rare_corrplot and rare_stacked into a single figure.
 }
-\section{Aesthetics and Partitions}{
+\section{Aesthetics}{
 
 
-Metadata can be used to flexibly subset, partition, and apply aesthetics
-when creating a plot. Common use cases are provided below. More thorough
-documentation is available at \url{https://cmmr.github.io/rbiom}.
+All built-in color palettes are colorblind-friendly. The available
+categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
+\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
 
-\preformatted{  ## Colors ----------------------------
-  color.by = "Body Site"
-  color.by = list('Body Site' = "bright")
-  color.by = list('Body Site' = c("Stool", "Saliva"))
-  color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
-  color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-  
-  ## Facets ----------------------------
-  facet.by = "Body Site"
-  facet.by = c("Body Site", "Sex")
-  facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
-  
-  ## Limits ----------------------------
-  limit.by = list('Sex' = "Male", 'Age' = c(20,40))
-  limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
-}
-
-\itemize{
-\item{\code{color.by} - }{Any metadata column. (Max 1)}
-\item{\code{facet.by} - }{Only categorical metadata column(s).}
-\item{\code{limit.by} - }{Any metadata column(s).}
-}
-
-All built-in color palettes are colorblind-friendly.
-
-The available categorical palette names are: \code{"okabe"}, \code{"carto"},
-\code{"r4"}, \code{"polychrome"}, \code{"tol"}, \code{"bright"},
-\code{"light"}, \code{"muted"}, \code{"vibrant"}, \code{"tableau"},
-\code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"},
-and \code{"fishy"}.
-
-The available numeric palette names are: \code{"reds"}, \code{"oranges"},
-\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"},
-\code{"bamako"}, \code{"batlow"}, \code{"bilbao"}, \code{"buda"},
-\code{"davos"}, \code{"devon"}, \code{"grayC"}, \code{"hawaii"},
-\code{"imola"}, \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"},
-\code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"},
-\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"},
-\code{"roma"}, \code{"tofino"}, \code{"vanimo"}, \code{"vik"}
+Shapes can be given as per base R - numbers 0 through 17 for various shapes,
+or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
+letters instead of shapes on the plot. Character strings may used as well.
 }
 
 \examples{
     library(rbiom) 
     
-    rare_multiplot(hmp50, color.by="Body Site")
+    rare_multiplot(hmp50, stat.by = "Body Site")
     
 }
 \seealso{
@@ -143,6 +153,8 @@ Other visualization:
 \code{\link{plot_heatmap}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_stacked}()},
+\code{\link{stats_boxplot}()},
+\code{\link{stats_corrplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

@@ -60,6 +60,7 @@ reference:
 - title: Sample Metadata
   contents:
   - pull.rbiom
+  - with.rbiom
   - mutate.rbiom
   - glimpse.rbiom
   
@@ -96,6 +97,7 @@ reference:
   contents:
   - starts_with("distmat_")
   - starts_with("rescale_")
+  - starts_with("stats_")
   - rarefy_cols
   - tree_subset
   - plot_heatmap
@@ -105,7 +107,8 @@ reference:
   - bdply
   - biom_merge
   
-- title: HMP50 Dataset
-  desc: A small dataset included with rbiom.
+- title: Datasets
+  desc: Example datasets included with rbiom.
   contents:
   - hmp50
+  - babies

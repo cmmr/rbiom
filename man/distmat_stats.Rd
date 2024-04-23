@@ -78,6 +78,7 @@ Other beta_diversity:
 Other stats_tables: 
 \code{\link{adiv_stats}()},
 \code{\link{bdiv_stats}()},
+\code{\link{stats_table}()},
 \code{\link{taxa_stats}()}
 }
 \concept{beta_diversity}

@@ -1,13 +1,13 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9120
-Date: 2024-02-15
-Authors@R:
-    person("Daniel P.", "Smith", 
-    email = "dansmith01@gmail.com", 
-    role  = c("aut", "cre", "cph"),
-    comment = c(ORCID = "0000-0002-2479-2044"))
+Version: 2.0.0.9125
+Date: 2024-04-11
+Authors@R: c(
+    person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-2479-2044")),
+    person("Alkek Center for Metagenomics and Microbiome Research", role = c("cph", "fnd"))
+  )
 Maintainer: Daniel P. Smith <dansmith01@gmail.com>
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
@@ -15,7 +15,7 @@ Description:
     diversity, beta diversity (including 'UniFrac'), summarizing counts by 
     taxonomic level, subsetting, visualizations, and statistical analysis. 
     All CPU intensive operations are written in C.
-URL: https://cmmr.github.io/rbiom, https://github.com/cmmr/rbiom
+URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
 License: AGPL-3.0-or-later
 Encoding: UTF-8
@@ -36,12 +36,14 @@ Imports:
     cli,
     dplyr,
     emmeans,
+    fillpattern,
     ggbeeswarm,
     ggnewscale,
     ggplot2,
     ggrepel,
     ggtext,
     glue,
+    graphics,
     jsonlite,
     labeling,
     lifecycle,
@@ -56,6 +58,7 @@ Imports:
     RcppParallel,
     rlang,
     R.utils,
+    scales,
     slam,
     tibble,
     tsne,
@@ -63,8 +66,9 @@ Imports:
     vegan
 Suggests:
     ggdensity,
-    ggpattern,
     ggtree,
+    npregfast,
+    performance,
     phyloseq,
     prettycode,
     ragg,

@@ -36,6 +36,9 @@ export(`read_tree`)
 export(`rescale_cols`)
 export(`rescale_rows`)
 export(`sample_sums`)
+export(`stats_boxplot`)
+export(`stats_corrplot`)
+export(`stats_table`)
 export(`taxa_boxplot`)
 export(`taxa_corrplot`)
 export(`taxa_heatmap`)
@@ -120,18 +123,18 @@ importMethodsFrom("emmeans")
 import("RcppParallel")
 
 importFrom("ape", "print.phylo")
-importFrom("cli", "cli_abort", "cli_warn", "cli_inform", "cli_vec")
+importFrom("cli", "cli_text", "cli_abort", "cli_warn", "cli_inform", "cli_vec", "qty")
 importFrom("glue", "glue", "glue_data", "glue_collapse", "backtick", "single_quote", "double_quote")
-importFrom("graphics", "hist")
+importFrom("graphics", "boxplot", "hist")
 importFrom("grDevices", "boxplot.stats")
-importFrom("ggplot2", "aes")
+importFrom("ggplot2", "aes", "ggplot", "ggplot_add", "ggproto")
 importFrom("lifecycle", "deprecate_warn", "deprecated")
 importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "is", "as")
 importFrom("Rcpp", "sourceCpp")
 
 importFrom("rlang",
-           "%||%", "hash", "enquo", "quo_name", "has_name", 
+           "%||%", "hash", "enquo", "quo_name", "has_name", "expr", 
            "get_env", "env_names", "env_has", "env_clone", 
            "as_label", ".data", "as_name", "quo", "sym", "data_sym", "quo_squash",
            "caller_call", "caller_env", "caller_fn", 
@@ -148,10 +151,10 @@ importFrom("rlang",
 importFrom("slam", "is.simple_triplet_matrix", "as.simple_triplet_matrix", "row_sums", "col_sums")
 
 importFrom("stats", "as.dist", "aggregate", "fivenum", "model.frame", 
-           "model.matrix", "na.omit", "setNames", "terms")
+           "model.matrix", "na.omit", "setNames", "terms", "weighted.mean")
            # zzz.R also loads `df.residual` and `sigma`
 
-importFrom("plyr", "empty", "daply", "ddply", "ldply")
+importFrom("plyr", ".", "empty", "adply", "alply", "daply", "ddply", "dlply", "ldply", "llply")
 importFrom("pillar", "tbl_sum", "glimpse")
 
 importFrom("dplyr", 
@@ -184,23 +187,31 @@ S3method(slice_tail,   rbiom)
 S3method(slice_min,    rbiom)
 S3method(slice_max,    rbiom)
 S3method(slice_sample, rbiom)
-S3method(tbl_sum,  rbiom_tbl)
-S3method("$",      rbiom_tbl)
-S3method("$",      rbiom_plot)
-S3method(print,    rbiom_code)
+S3method(with,         rbiom)
+S3method(within,       rbiom)
+S3method(tbl_sum,      rbiom_tbl)
+S3method("$",          rbiom_tbl)
+S3method("$",          rbiom_plot)
+S3method(print,        rbiom_code)
 
 # Deprecated S3 functions
 S3method(select, rbiom)
 
 # Re-exports
+export(".")
 export("%>%")
 export("%<>%")
 export("as_tibble")
+export("boxplot")
 export("ddply")
 export("glimpse")
+export("glue")
 export("left_join")
+export("ldply")
+export("llply")
 export("mutate")
 export("pull")
+export("relocate")
 export("rename")
 export("select")
 export("slice")

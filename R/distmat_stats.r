@@ -51,7 +51,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('distmat_stats', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   

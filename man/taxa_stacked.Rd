@@ -24,8 +24,8 @@ taxa_stacked(
 )
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
@@ -115,9 +115,9 @@ Other taxa_abundance:
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
-\code{\link{taxa_matrix}()},
 \code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()}
+\code{\link{taxa_sums}()},
+\code{\link{taxa_table}()}
 
 Other visualization: 
 \code{\link{adiv_boxplot}()},
@@ -130,6 +130,8 @@ Other visualization:
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
 \code{\link{rare_stacked}()},
+\code{\link{stats_boxplot}()},
+\code{\link{stats_corrplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()}

@@ -59,7 +59,7 @@ PALETTES <- list(
 #________________________________________________________
 is_palette <- function (palette) {
   
-  if (!is_scalar_character(palette)) return (FALSE)
+  if (!is_scalar_character(palette) || is.na(palette)) return (FALSE)
   
   palette <- tolower(palette)
   if (eq(substr(palette, 1, 1), "-"))
@@ -147,13 +147,7 @@ get_n_patterns <- function (n, values = NULL) {
   if (is.logical(values)) values <- NULL
   
   if (is_null(values))
-    values <- c(
-      "bricks", "hexagons", "horizontalsaw", "hs_fdiagonal", 
-      "fishscales", "verticalsaw", "checkerboard", "octagons", 
-      "right45", "hs_cross", "hs_bdiagonal", "hs_diagcross", 
-      "hs_horizontal", "hs_vertical", "left45", "leftshingle", 
-      "rightshingle", "verticalbricks", "verticalleftshingle", 
-      "verticalrightshingle" )
+    values <- seq_len(n)
   
   return (rep_len(values, n))
 }
@@ -203,7 +197,7 @@ get_n_patterns <- function (n, values = NULL) {
 # color_palette(pal = "okabe") or color_palette(n = 8)
 # c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
 #
-# color_palette(pal = "r4", assign = c("Male", "Female"))
+# color_palette(pal = "r4", keys = c("Male", "Female"))
 # c(Male = "#DF536B", Female = "#61D04F")
 # 
 # color_palette(n = 3)

@@ -54,14 +54,19 @@ plot_facets <- function (params) {
     #________________________________________________________
     # Examine the variance in min/max per facet.
     #________________________________________________________
-    
-    stopifnot(is_scalar_character(xmode <- params$.xmode))
-    stopifnot(is_scalar_character(xcol  <- params$.xcol))
-    stopifnot(is_scalar_character(ycol  <- params$.ycol))
+    xmode <- params$.xmode
+    xcol  <- params$.xcol
+    ycol  <- params$.ycol
+    stopifnot(is_scalar_character(xmode))
+    stopifnot(is_scalar_character(xcol) || is.null(xcol))
+    stopifnot(is_scalar_character(ycol))
     
     df <- if (xmode == "numeric") {
       
       plyr::ddply(ggdata, ply_cols(facet.by), function (d) {
+        
+        if (is.null(xcol)) d[[xcol <- '.x']] <- 0
+        
         data.frame(
           x_min = min(c(d[[xcol]], 0), na.rm = TRUE),
           x_max = max(c(d[[xcol]], 0), na.rm = TRUE),
@@ -73,6 +78,8 @@ plot_facets <- function (params) {
     } else {
       
       plyr::ddply(ggdata, ply_cols(facet.by), function (d) {
+        
+        if (is.null(xcol)) d[[xcol <- '.x']] <- 0
         
         data.frame(
           x_min = 0,

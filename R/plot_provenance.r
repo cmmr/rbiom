@@ -10,7 +10,7 @@ cmd_wrap <- function (pkg, fn) {
   if (nzchar(system.file(package = pkg))) {
   
     fun    <- getFromNamespace(x = fn, ns = pkg)
-    pkgfn  <- ifelse(pkg %in% c('ggplot2', 'grid'), fn, paste0(pkg, '::', fn))
+    pkgfn  <- ifelse(pkg %in% c('ggplot2', 'ggtree', 'grid'), fn, paste0(pkg, '::', fn))
     
     newfun <- function (..., .indent = 0, .display = NULL, .lhs = NULL) {
       
@@ -36,7 +36,7 @@ cmd_wrap <- function (pkg, fn) {
       
       return (res)
     }
-    newfun %<>% aa(fn = fn, pkgfn = pkgfn)
+    newfun %<>% aa(fn = fn, pkgfn = pkgfn, formalArgs = formalArgs(fun))
     assign(x = fn, value = newfun, pos = ENV)
     
     

@@ -8,10 +8,10 @@ get_cache_dir <- function () {
   cache <- getOption("rbiom.cache_dir", default = "")
   if (eq(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
   if (eq(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
-  if (!is_scalar_character(cache) || eq(cache, "FALSE"))   return (NULL)
+  if (!is_scalar_character(cache) || eq(cache, "FALSE")) return (NULL)
   if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (NULL)
   
-  return (cache)
+  return (normalizePath(cache, winslash = '/'))
 }
 
 
@@ -36,16 +36,13 @@ get_hash_fun <- function () {
 #________________________________________________________
 # Hash a function call to a cache file.
 #________________________________________________________
-get_cache_file <- function (fn = NULL, params = NULL) {
+get_cache_file <- function (fn, params) {
   
   cache_dir <- get_cache_dir()
   if (is.null(cache_dir)) return (NULL)
   
   hash <- getOption("rbiom.cache_hash", default = "")
   if (!is.function(hash)) hash <- rlang::hash
-  
-  if (is.null(fn))     fn     <- capture.output(rlang::caller_call()[[1]])
-  if (is.null(params)) params <- get('params', pos = parent.frame(), inherits = FALSE)
   
   params  %<>% lapply(function (x) { if (is(x, "rbiom")) x$hash else hash(x) })
   cache_key  <- hash(c(list(fn), params[order(names(params))]))
@@ -54,6 +51,7 @@ get_cache_file <- function (fn = NULL, params = NULL) {
   
   attr(cache_file, 'exists') <- Sys.setFileTime(cache_file, Sys.time())
   
+  # cat(sprintf("%s => %s [%s]\n", fn, cache_key, attr(cache_file, 'exists')))
   
   return (cache_file)
 }
@@ -61,14 +59,6 @@ get_cache_file <- function (fn = NULL, params = NULL) {
 
 
 set_cache_value <- function (cache_file, result) {
-  
-  
-  
-  return (NULL)
-  
-  
-  
-  
   
   if (is.null(cache_file)) return (NULL)
   

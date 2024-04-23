@@ -3,13 +3,13 @@
 \docType{data}
 \name{hmp50}
 \alias{hmp50}
-\title{Human Microbiome Project - 50 sample demo dataset.}
+\title{Human Microbiome Project - demo dataset (n = 50)}
 \format{
 An rbiom object with 50 samples.
 Includes metadata, taxonomy, phylogeny, and sequences.
 \itemize{
 \item{Sex - }{Male or Female}
-\item{Body Site - }{Buccal mucosa, Saliva, Anterior nares, Stool, or Mid vagina}
+\item{Body Site - }{Anterior nares, Buccal mucosa, Mid vagina, Saliva, or Stool}
 \item{Age - }{21 - 40}
 \item{BMI - }{19 - 32}
 }
@@ -21,6 +21,6 @@ Includes metadata, taxonomy, phylogeny, and sequences.
 hmp50
 }
 \description{
-Human Microbiome Project - 50 sample demo dataset.
+Human Microbiome Project - demo dataset (n = 50)
 }
 \keyword{datasets}

@@ -7,8 +7,8 @@
 rarefy(biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{depth}{How many observations to keep per sample. When
 \verb{0 < depth < 1}, it is taken as the minimum percentage of the
@@ -58,7 +58,8 @@ Other transformations:
 \code{\link{mutate}()},
 \code{\link{rarefy_cols}()},
 \code{\link{slice}()},
-\code{\link{subset}()}
+\code{\link{subset}()},
+\code{\link{with}()}
 }
 \concept{rarefaction}
 \concept{transformations}

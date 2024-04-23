@@ -8,8 +8,15 @@ ENV <- environment(NULL)
 
 .onLoad <- function(libname, pkgname) {
   
+  
+  # Empty the cache (mainly for during development)
+  if (!is.null(x <- get_cache_dir()))
+    unlink(x = dir(x, full.names = TRUE))
+  
+  
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(
     'ggplot', # `aes` is intentionally omitted here
+    'annotation_custom', 
     'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'facet_grid', 'facet_wrap', 'expansion', 'labs', 'margin', 
@@ -20,7 +27,7 @@ ENV <- environment(NULL)
     'geom_smooth', 'geom_text', 'geom_label', 
     'guide_colorbar', 'guide_legend', 'guides', 
     'position_dodge', 'position_jitter', 'position_jitterdodge',
-    'scale_color_manual', 'scale_color_continuous',
+    'scale_color_manual', 'scale_color_continuous', 'scale_color_gradientn',
     'scale_fill_manual', 'scale_fill_gradient', 'scale_fill_gradientn', 
     'scale_fill_steps', 'scale_fill_stepsn', 
     'scale_shape_manual', 'scale_size',
@@ -28,33 +35,25 @@ ENV <- environment(NULL)
     'scale_y_continuous', 'scale_y_discrete', 'scale_y_log10', 
     'stat_ellipse', 'stat_smooth', 
     'theme', 'theme_bw', 'theme_void' )})
-  
-  lapply(FUN = cmd_wrap, pkg="ggpattern", {c(
-    'geom_bar_pattern', 'geom_boxplot_pattern', 
-    'geom_col_pattern', 'geom_crossbar_pattern', 
-    'geom_ribbon_pattern', 
-    'scale_pattern_color_manual', 'scale_pattern_fill_manual', 
-    'scale_pattern_type_manual', 'geom_violin_pattern' )})
 
   lapply(FUN = cmd_wrap, pkg="ggtree", {c(
     'ggtree', 'geom_tiplab', 'geom_cladelab', 
     'gheatmap', 'hexpand', 'vexpand' )})
   
   
-  lapply(FUN = cmd_wrap, pkg="ggrepel",    {c('geom_text_repel', 'geom_label_repel' )})
-  lapply(FUN = cmd_wrap, pkg="ggdensity",  {c('geom_hdr', 'geom_hdr_lines' )})
-  lapply(FUN = cmd_wrap, pkg="ggbeeswarm", {c('geom_beeswarm', 'geom_quasirandom')})
-  lapply(FUN = cmd_wrap, pkg="ggh4x",      {c('facetted_pos_scales')})
-  lapply(FUN = cmd_wrap, pkg="ggnewscale", {c('new_scale_fill')})
-  lapply(FUN = cmd_wrap, pkg="ggrepel",    {c('geom_label_repel')})
-  lapply(FUN = cmd_wrap, pkg="ggtext",     {c('element_markdown', 'geom_textbox')})
-  lapply(FUN = cmd_wrap, pkg="grid",       {c('arrow', 'unit')})
-  lapply(FUN = cmd_wrap, pkg="scales",     {c('alpha')})
-  lapply(FUN = cmd_wrap, pkg="generics",   {c('tidy', 'glance', 'augment')})
-  lapply(FUN = cmd_wrap, pkg="emmeans",    {c('emmeans', 'emtrends', 'eff_size')})
-  lapply(FUN = cmd_wrap, pkg="graphics",   {c('pairs')})
-  lapply(FUN = cmd_wrap, pkg="scales",     {c('trans_new', 'label_number', 'cut_si')})
-  lapply(FUN = cmd_wrap, pkg="stats",      {c('sigma', 'df.residual')})
+  lapply(FUN = cmd_wrap, pkg="fillpattern", {c('fill_pattern', 'scale_fill_pattern')})
+  lapply(FUN = cmd_wrap, pkg="ggrepel",     {c('geom_text_repel', 'geom_label_repel')})
+  lapply(FUN = cmd_wrap, pkg="ggdensity",   {c('geom_hdr', 'geom_hdr_lines')})
+  lapply(FUN = cmd_wrap, pkg="ggbeeswarm",  {c('geom_beeswarm', 'geom_quasirandom')})
+  lapply(FUN = cmd_wrap, pkg="ggh4x",       {c('facetted_pos_scales')})
+  lapply(FUN = cmd_wrap, pkg="ggnewscale",  {c('new_scale_fill')})
+  lapply(FUN = cmd_wrap, pkg="ggrepel",     {c('geom_label_repel')})
+  lapply(FUN = cmd_wrap, pkg="ggtext",      {c('element_markdown', 'geom_textbox')})
+  lapply(FUN = cmd_wrap, pkg="grid",        {c('arrow', 'unit')})
+  lapply(FUN = cmd_wrap, pkg="scales",      {c('alpha')})
+  lapply(FUN = cmd_wrap, pkg="generics",    {c('tidy', 'glance', 'augment')})
+  lapply(FUN = cmd_wrap, pkg="graphics",    {c('pairs')})
+  lapply(FUN = cmd_wrap, pkg="scales",      {c('trans_new', 'label_number', 'cut_si')})
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
   

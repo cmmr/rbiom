@@ -42,6 +42,7 @@ Other transformations:
 \code{\link{mutate}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
-\code{\link{slice}()}
+\code{\link{slice}()},
+\code{\link{with}()}
 }
 \concept{transformations}

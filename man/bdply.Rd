@@ -10,8 +10,8 @@ bdply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
 blply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{vars}{A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted

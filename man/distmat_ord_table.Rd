@@ -18,7 +18,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, ...)
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
 Default: \code{"UMAP"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}

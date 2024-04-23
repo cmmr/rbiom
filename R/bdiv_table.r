@@ -4,27 +4,6 @@
 #' @inherit documentation_default
 #' 
 #' @family beta_diversity
-#'     
-#' @param md  Include metadata in the output data frame? Options are: 
-#'        \itemize{
-#'          \item{`NULL` - }{ Don't include metadata. }
-#'          \item{`".all"` - }{ Include all metadata. }
-#'          \item{\emph{character vector} - }{
-#'            Include only the specified metadata columns.
-#'            Prefix the column name(s) with `==` or `!=` to limit comparisons 
-#'            to within or between groups, respectively. }
-#'        }
-#'        Default: `NULL`
-#' 
-#' @param weighted  Take relative abundances into account. When 
-#'        `weighted=FALSE`, only presence/absence is considered.
-#'        `bdiv_table()` can accept multiple values.
-#'        Default: `TRUE`
-#' 
-#' @param bdiv  Beta diversity distance algorithm to use. Options are:
-#'        `"Bray-Curtis"`, `"Manhattan"`, `"Euclidean"`, 
-#'        `"Jaccard"`, and `"UniFrac"`. `bdiv_table()` can accept multiple 
-#'        values. Default: `"Bray-Curtis"`
 #' 
 #' @return
 #' \itemize{
@@ -66,9 +45,26 @@
 
 bdiv_table <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
-    md = NULL, within = NULL, between = NULL, trans = "none" ) {
+    md = ".all", within = NULL, between = NULL, delta = '.all', 
+    trans = "none" ) {
   
-  biom <- as_rbiom(biom)
+  biom   <- as_rbiom(biom)
+  params <- eval_envir(environment())
+  cmd    <- sprintf("bdiv_table(%s)", as.args(params, fun = bdiv_table))
+  
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file('bdiv_table', params)
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
+  
+  
+  #________________________________________________________
+  # Strips '==' and '!='; appends to within and between.
+  #________________________________________________________
+  validate_var_cmp(c('md', 'delta'))
   
   
   #________________________________________________________
@@ -76,8 +72,12 @@ bdiv_table <- function (
   #________________________________________________________
   validate_bdiv(max = Inf)
   validate_bool('weighted', max = Inf)
-  validate_meta('md', null_ok = TRUE, max = Inf, cmp = TRUE)
-  validate_meta_cmp('md') # Validates and appends to `within` and `between`.
+  
+  validate_biom_field('md',      null_ok = TRUE, max = Inf)
+  validate_biom_field('delta',   null_ok = TRUE, max = Inf)
+  validate_biom_field('within',  null_ok = TRUE, max = Inf, col_type = "cat")
+  validate_biom_field('between', null_ok = TRUE, max = Inf, col_type = "cat")
+  
   
   
   
@@ -132,7 +132,7 @@ bdiv_table <- function (
     
     # Compute abs(v1 - v2)
     #________________________________________________________
-    if (is.numeric(map)) {
+    if (is.numeric(map) && col %in% delta) {
       tbl[[col]] <- abs(v1 - v2)
     }
     
@@ -172,13 +172,29 @@ bdiv_table <- function (
   }
   
   
-  lvls <- biom$metadata[['.sample']]
-  tbl[['.sample1']] %<>% {factor(., levels = intersect(lvls, .))}
-  tbl[['.sample2']] %<>% {factor(., levels = intersect(lvls, .))}
+  
+  #________________________________________________________
+  # Descriptive label for y-axis.
+  #________________________________________________________
+  if (length(bdiv) == 1 && length(weighted) == 1) {
+    
+    resp_label <- paste(
+      ifelse(weighted, "Weighted", "Unweighted"), bdiv, "Distance" )
+    
+  } else {
+    
+    resp_label <- "\u03B2 Dissimilarity" %>% 
+      aa(display = '"\\u03B2 Dissimilarity"')
+  }
   
   
+  
+  tbl %<>% as_rbiom_tbl()
+  attr(tbl, 'cmd')      <- cmd
   attr(tbl, 'response') <- ".distance"
+  attr(tbl, 'resp_label') <- resp_label
   
+  set_cache_value(cache_file, tbl)
   
   return (tbl)
 }
@@ -199,15 +215,28 @@ bdiv_matrix <- function (
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
+  params <- eval_envir(environment())
+  cmd    <- sprintf("bdiv_matrix(%s)", as.args(params, fun = bdiv_matrix))
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment())
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('bdiv_matrix', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   remove("params")
+  
+  
+  #________________________________________________________
+  # Ensure `within` and `between` are non-overlapping.
+  #________________________________________________________
+  validate_biom_field('within',  null_ok = TRUE, max = Inf, col_type = "cat")
+  validate_biom_field('between', null_ok = TRUE, max = Inf, col_type = "cat")
+  
+  if (length(x <- intersect(within, between)) > 0)
+    cli_abort("Metadata field name{?s} {.val {x}} cannot be set as both a within (==) and between (!=) grouping.")
+  
   
   
   #________________________________________________________
@@ -215,8 +244,6 @@ bdiv_matrix <- function (
   #________________________________________________________
   validate_bdiv()
   validate_bool("weighted")
-  validate_meta('within',  null_ok = TRUE, max = Inf)
-  validate_meta('between', null_ok = TRUE, max = Inf)
   validate_var_choices('trans', c("none", "rank", "log", "log1p", "sqrt"))
   
   if (!is.null(tree)) {
@@ -310,7 +337,9 @@ bdiv_matrix <- function (
   #________________________________________________________
   # Return the matrix
   #________________________________________________________
+  attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)
+  
   return (mtx)
 }
 

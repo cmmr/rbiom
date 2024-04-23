@@ -10,8 +10,8 @@ taxa_sums(biom, rank = 0)
 taxa_means(biom, rank = 0)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{rank}{The taxonomic rank to return sums or means for. The default,
 \code{0}, returns per-OTU summaries.}
@@ -35,8 +35,8 @@ Other taxa_abundance:
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
-\code{\link{taxa_matrix}()},
 \code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()}
+\code{\link{taxa_stats}()},
+\code{\link{taxa_table}()}
 }
 \concept{taxa_abundance}

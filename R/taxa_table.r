@@ -1,5 +1,104 @@
 
 
+#' @rdname taxa_matrix
+#' @export
+taxa_table <- function (
+    biom, rank = -1, taxa = 6, lineage = FALSE, 
+    md = ".all", unc = "singly", other = FALSE, trans = "none" ) {
+  
+  biom   <- as_rbiom(biom)
+  params <- eval_envir(environment())
+  cmd    <- sprintf("taxa_table(%s)", as.args(params, fun = taxa_table))
+  
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file('taxa_table', params)
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
+  
+  
+  
+  #________________________________________________________
+  # Validate user's arguments.
+  #________________________________________________________
+  validate_rank(max = Inf)
+  validate_biom_field('md', max = Inf, null_ok = TRUE)
+  
+  
+  
+  #________________________________________________________
+  # Return multiple ranks in a single table.
+  #________________________________________________________
+  tbl <- NULL
+  
+  for (r in rank)
+    tbl %<>% dplyr::bind_rows(local({
+      
+      mtx <- taxa_matrix(
+        biom    = biom, 
+        rank    = r, 
+        taxa    = taxa, 
+        lineage = lineage, 
+        sparse  = FALSE, 
+        unc     = unc, 
+        other   = other,
+        trans   = trans )
+      
+      
+      #________________________________________________________
+      # Pivot Longer
+      #________________________________________________________
+      tibble(
+        '.rank'      = r,
+        '.sample'    = colnames(mtx)[col(mtx)],
+        '.taxa'      = rownames(mtx)[row(mtx)],
+        '.abundance' = as.numeric(mtx) )
+      
+    }))
+  
+  tbl[['.rank']]   %<>%  factor(., levels = rank)
+  tbl[['.sample']] %<>% {factor(., levels = intersect(biom$samples, .))}
+  tbl[['.taxa']]   %<>% {factor(., levels = unique(.))}
+  
+  
+  
+  #________________________________________________________
+  # Add Metadata
+  #________________________________________________________
+  if (length(md) > 0)
+    tbl %<>% left_join( 
+      by = '.sample',
+      y  = biom$metadata[,unique(c('.sample', md))] )
+  
+  
+  
+  #________________________________________________________
+  # Descriptive label for y-axis.
+  #________________________________________________________
+  resp_label <- {
+    if      (eq(trans, 'percent')) { "Relative Abundance" }
+    else if (is.null(biom$depth))  { "Unrarefied Counts"  }
+    else                           { "Rarefied Counts"    }
+  }
+  
+  
+  
+  tbl %<>% as_rbiom_tbl()
+  attr(tbl, 'cmd')      <- cmd
+  attr(tbl, 'response') <- ".abundance"
+  attr(tbl, 'resp_label') <- resp_label
+  
+  set_cache_value(cache_file, tbl)
+  
+  
+  return (tbl)
+}
+
+
+
+
 #' Taxa abundances per sample.
 #' 
 #' \itemize{
@@ -34,14 +133,15 @@ taxa_matrix <- function (
     biom, rank = -1, taxa = NULL, lineage = FALSE, 
     sparse = FALSE, unc = "singly", other = FALSE, trans = "none" ) {
   
-  biom <- as_rbiom(biom)
+  biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
+  cmd    <- sprintf("taxa_matrix(%s)", as.args(params, fun = taxa_matrix))
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('taxa_matrix', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
@@ -144,85 +244,12 @@ taxa_matrix <- function (
     mtx <- as.matrix(mtx)
   
   
-  
+  attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)
   
   return (mtx)
 }
 
-
-
-
-
-#' @rdname taxa_matrix
-#' @export
-taxa_table <- function (
-    biom, rank = -1, taxa = NULL, lineage = FALSE, 
-    md = ".all", unc = "singly", other = FALSE, trans = "none" ) {
-  
-  biom <- as_rbiom(biom)
-  
-  
-  
-  #________________________________________________________
-  # Validate user's arguments.
-  #________________________________________________________
-  validate_rank(max = Inf)
-  validate_meta('md', max = Inf, null_ok = TRUE)
-  
-  
-  
-  #________________________________________________________
-  # Return multiple ranks in a single table.
-  #________________________________________________________
-  tbl <- NULL
-  
-  for (r in rank)
-    tbl %<>% dplyr::bind_rows(local({
-      
-      mtx <- taxa_matrix(
-        biom    = biom, 
-        rank    = r, 
-        taxa    = taxa, 
-        lineage = lineage, 
-        sparse  = FALSE, 
-        unc     = unc, 
-        other   = other,
-        trans   = trans )
-      
-      
-      #________________________________________________________
-      # Pivot Longer
-      #________________________________________________________
-      tibble(
-        '.rank'      = r,
-        '.sample'    = colnames(mtx)[col(mtx)],
-        '.taxa'      = rownames(mtx)[row(mtx)],
-        '.abundance' = as.numeric(mtx) )
-      
-    }))
-  
-  tbl[['.rank']]   %<>%  factor(., levels = rank)
-  tbl[['.sample']] %<>% {factor(., levels = intersect(biom$samples, .))}
-  tbl[['.taxa']]   %<>% {factor(., levels = unique(.))}
-  
-  
-  
-  #________________________________________________________
-  # Add Metadata
-  #________________________________________________________
-  if (length(md) > 0)
-    tbl %<>% left_join( 
-      by = '.sample',
-      y  = biom$metadata[,unique(c('.sample', md))] )
-  
-  
-  
-  attr(tbl, 'response') <- ".abundance"
-  
-  
-  return (tbl)
-}
 
 
 
@@ -264,4 +291,83 @@ taxa_means <- function (biom, rank = 0) {
   taxa_matrix(biom, rank, sparse = TRUE) %>%
     slam::row_means() %>%
     sort(decreasing = TRUE)
+}
+
+
+
+
+#' Apply `p.top` constraint to data about to be plotted.
+#' 
+#' Used by boxplot_stats() and corrplot_stats().
+#' 
+#' @noRd
+#' @keywords internal
+#' 
+
+apply_p.top <- function (params) {
+  
+  p.top  <- params$p.top
+  ggdata <- params$.ggdata
+  stats  <- params$.plot_attrs[['stats']]
+  vline  <- attr(ggdata, 'vline', exact = TRUE)
+  
+  stopifnot(all(c('.taxa', '.rank')  %in% names(ggdata)))
+  stopifnot('.taxa' %in% names(stats))
+  
+  if (!hasName(stats, '.adj.p'))
+    stop ("No p-values to apply `p.top` constraint on.")
+  
+  
+  
+  #________________________________________________________
+  # Locate the top taxa for each rank.
+  #________________________________________________________
+  if (!hasName(stats, '.rank'))
+    stats[['.rank']] <- factor(as.character(ggdata[['.rank']][[1]]))
+  
+  keep_taxa <- plyr::dlply(stats, ply_cols('.rank'), function (x) {
+    taxa_min_p <- split(x[['.adj.p']], x[['.taxa']]) %>%
+      sapply(base::min, 1, na.rm = TRUE) %>%
+      sort()
+    if (p.top >= 1) { return (head(names(taxa_min_p), p.top))
+    } else          { return (names(which(taxa_min_p <= p.top))) }
+  })
+  
+  
+  
+  #________________________________________________________
+  # Drop rows for taxa that didn't make the cut-off.
+  #________________________________________________________
+  for (obj_name in c('ggdata', 'stats', 'vline')) {
+    
+    df <- get(obj_name, inherits = FALSE)
+    if (!is.data.frame(df)) next
+    
+    
+    attrs <- attributes(df)
+    
+    if (!hasName(df, '.rank'))
+      df[['.rank']] <- factor(names(keep_taxa)[[1]])
+    
+    df %<>% plyr::ddply(ply_cols('.rank'), function (x) {
+      rank <- as.character(x[['.rank']][[1]])
+      x[x[['.taxa']] %in% keep_taxa[[rank]],,drop=FALSE]
+    }) %>% as_rbiom_tbl()
+    
+    df[['.taxa']] %<>% {factor(., unique(unname(unlist(keep_taxa))))}
+    
+    for (i in names(attrs))
+      if (is.null(attr(df, i, exact = TRUE)))
+        attr(df, i) <- attrs[[i]]
+    
+    
+    assign(obj_name, df)
+  }
+  
+  
+  params$.plot_attrs[['stats']] <- stats
+  attr(ggdata, 'vline')         <- vline
+  params$.ggdata                <- ggdata
+  
+  return (invisible(params))
 }

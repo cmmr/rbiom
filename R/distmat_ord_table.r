@@ -23,12 +23,13 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   
   # browser() ## below code intermittently crashes R session
   
+  params <- eval_envir(environment(), ...)
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment(), ...)
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('distmat_ord_table', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   

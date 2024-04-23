@@ -28,8 +28,8 @@ bdiv_ord_table(
 )
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
@@ -46,22 +46,21 @@ Multiple/abbreviated values allowed.}
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
 Default: \code{"UMAP"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
 
-\item{md}{A character vector naming the metadata fields to include in the
-output data frame, or \code{'.all'} to include all metadata fields.
-Default: \code{'.all'}}
+\item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
+to include all metadata fields. Default: \code{'.all'}}
 
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}
 
-\item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to any calculations. Default: \code{NULL}}
+\item{split.by}{Dataset field(s) that the data should be split by prior to
+any calculations. Must be categorical. Default: \code{NULL}}
 
 \item{stat.by}{The categorical or numeric metadata field over which
 statistics should be calculated. Required.}
@@ -70,8 +69,10 @@ statistics should be calculated. Required.}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{within, between}{Metadata field(s) for intra- or inter- sample
-comparisons. Default: \code{NULL}}
+\item{within, between}{Dataset field(s) for intra- or inter- sample
+comparisons. Alternatively, dataset field names given elsewhere can
+be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
+\code{between}, respectively. Default: \code{NULL}}
 
 \item{test}{Permutational test for accessing significance. Options are:
 \itemize{
@@ -141,6 +142,21 @@ If \code{rank} is given, then \code{$taxa_coords},
 The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
 \code{p.adj}) only only have an effect when \code{rank} is not \code{NULL}.
 }
+\section{Metadata Comparisons}{
+
+
+Prefix metadata fields with \code{==} or \code{!=} to limit comparisons to within or
+between groups, respectively. For example, \code{stat.by = '==Sex'} will
+run calculations only for intra-group comparisons, returning "Male" and
+"Female", but NOT "Female vs Male". Similarly, setting
+\code{stat.by = '!=Body Site'} will only show the inter-group comparisons, such
+as "Saliva vs Stool", "Anterior nares vs Buccal mucosa", and so on.
+
+The same effect can be achieved by using the \code{within} and \code{between}
+parameters. \code{stat.by = '==Sex'} is equivalent to
+\verb{stat.by = 'Sex', within = 'Sex'}.
+}
+
 \examples{
     library(rbiom)
     

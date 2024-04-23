@@ -7,6 +7,30 @@
     <loc>https://cmmr.github.io/rbiom/articles/aes.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/aes.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/bdiv_cmp.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/diversity.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/importing.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/plots.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/rbiom.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/scales.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/articles/articles/statistics.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/articles/bdiv_cmp.html</loc>
   </url>
   <url>
@@ -136,6 +160,9 @@
     <loc>https://cmmr.github.io/rbiom/reference/documentation_rank.NULL.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_regression.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_return.biom.html</loc>
   </url>
   <url>
@@ -146,6 +173,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_test.ifelse.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/documentation_test.pmeans.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/documentation_test.pw_means.html</loc>
@@ -211,6 +241,15 @@
     <loc>https://cmmr.github.io/rbiom/reference/speed.html</loc>
   </url>
   <url>
+    <loc>https://cmmr.github.io/rbiom/reference/stats_regr.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/stats_rsum.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc>
+  </url>
+  <url>
     <loc>https://cmmr.github.io/rbiom/reference/subset.html</loc>
   </url>
   <url>
@@ -239,6 +278,9 @@
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/tree_subset.html</loc>
+  </url>
+  <url>
+    <loc>https://cmmr.github.io/rbiom/reference/with.html</loc>
   </url>
   <url>
     <loc>https://cmmr.github.io/rbiom/reference/write_biom.html</loc>

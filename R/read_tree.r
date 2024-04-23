@@ -109,12 +109,13 @@ read_tree <- function (src) {
 tree_subset <- function (tree, tips) {
   
   validate_tree()
+  params <- eval_envir(environment())
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment())
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('tree_subset', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   

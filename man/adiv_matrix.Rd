@@ -7,8 +7,8 @@
 adiv_matrix(biom, trans = "none")
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{trans}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for

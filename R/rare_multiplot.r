@@ -1,6 +1,6 @@
 #' Combines rare_corrplot and rare_stacked into a single figure.
 #' 
-#' @inherit documentation_corrplot
+#' @inherit rare_corrplot
 #' @inherit documentation_default
 #' 
 #' @family rarefaction
@@ -10,26 +10,25 @@
 #' @examples
 #'     library(rbiom) 
 #'     
-#'     rare_multiplot(hmp50, color.by="Body Site")
+#'     rare_multiplot(hmp50, stat.by = "Body Site")
 #'     
 
 rare_multiplot <- function (
-    biom, adiv = "OTUs", layers = "t", rline = TRUE,
-    color.by = NULL, facet.by = NULL, limit.by = NULL,
-    formula = y ~ log(x), engine = "lm", level = 0.95, 
-    caption = TRUE, labels = FALSE, ...) {
+    biom, adiv = "Shannon", layers = "tc", rline = TRUE,
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
+    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
   
   biom <- as_rbiom(biom)
   
   params <- eval_envir(environment(), ...)
-  cmd    <- sprintf("rare_multiplot(%s)", as.args(params, 2, rare_multiplot))
   remove(list = intersect(env_names(params), ls()))
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('rare_multiplot', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
@@ -63,7 +62,7 @@ rare_multiplot <- function (
   
   
   
-  attr(p, 'cmd') <- cmd
+  attr(p, 'cmd') <-  current_cmd('rare_multiplot')
   set_cache_value(cache_file, p)
   
   return (p)

@@ -1,9 +1,8 @@
 #________________________________________________________
 # Converts user's `layers` spec to `layers` environment.
 #________________________________________________________
-init_layers <- function (params = parent.frame(), choices = NULL, var = "layers", no_init = NULL, do_init = NULL) {
-  
-  stopifnot(env_has(params, c('.ggdata', '.xcol', '.ycol', '.xmode')))
+init_layers <- function (
+    params = parent.frame(), choices = NULL, var = "layers", do_init = NULL ) {
   
   
   layer_names <- do_init
@@ -13,8 +12,12 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
     
     stopifnot(is_scalar_character(var) && env_has(params, var))
     spec <- get(var, pos = params, inherits = FALSE)
+    
     if (!is_character(spec) || anyNA(spec))
-      stop("Invalid '", var, "' value.")
+      cli_abort("`{var}` must be character, not {.type {spec}}.")
+    
+    if (anyNA(spec))
+      cli_abort("`{var}` cannot have any NA values.")
     
     
     for (i in tolower(spec[nchar(spec) > 0]))
@@ -40,34 +43,93 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
     #________________________________________________________
     # Ignore shapes/etc without applicable layers.
     #________________________________________________________
-    if (!any(c('dot', 'strip', 'pointrange', 'scatter', 'point') %in% layer_names)) 
-       params$shape.by <- NULL
-    
-    if (!any(c('box', 'bar', 'violin')   %in% layer_names)) params$pattern.by <- NULL
     if (!any(c('taxon', 'arrow', 'mean') %in% layer_names)) params$rank <- NULL
     
-    
     if (length(layer_names) == 0)
-      stop("Invalid 'layers' argument.")
+      cli_abort("Invalid `{var}` argument: {.val {spec}}.")
     
     
-    #________________________________________________________
-    # Add in aesthetic layers as needed.
-    #________________________________________________________
-    if (!is_null(params$color.by))   layer_names %<>% c('color')
-    if (!is_null(params$shape.by))   layer_names %<>% c('shape')
-    if (!is_null(params$pattern.by)) layer_names %<>% c('pattern')
-    if (!is_null(params$facet.by))   layer_names %<>% c('facet')
+    if (!is_null(params$facet.by)) layer_names %<>% c('facet')
     
   }
   
   
   
-  init_layer_names <- layer_names %>%
-    c('ggplot', ., 'xaxis', 'yaxis', 'labs', 'theme', 'theme_bw') %>%
-    setdiff(., no_init) %>% 
-    unique()
+  #________________________________________________________
+  # Ignore shapes/patterns without applicable layers.
+  #________________________________________________________
+  if (!any(c('dot', 'strip', 'pointrange', 'point') %in% layer_names)) params$shapes   <- NULL
+  if (!any(c('box', 'bar', 'violin')                %in% layer_names)) params$patterns <- NULL
   
+  
+  #________________________________________________________
+  # Resolve `colors`, `patterns`, and `shapes`.
+  #________________________________________________________
+  if (is.null(params$stat.by)) {
+    
+    params$colors   <- NULL
+    params$shapes   <- NULL
+    params$patterns <- NULL
+    
+  } else {
+    
+    if (is_palette(params$colors))
+      params$colors <- color_palette(params$colors)
+    
+    
+    stat_lvls  <- levels(params$.ggdata[[params$stat.by]])
+    stat_nlvls <- length(stat_lvls)
+    
+    for (i in c('colors', 'shapes', 'patterns')) {
+      
+      x <- params[[i]]
+      
+      if (is.null(x)) next
+      if (isFALSE(x)) { params[[i]] <- NULL; next }
+      
+      
+      if (isTRUE(x))
+        x <- switch(
+          EXPR = i, 
+          'colors'   = get_n_colors(n = stat_nlvls), 
+          'shapes'   = get_n_shapes(n = stat_nlvls), 
+          'patterns' = get_n_patterns(n = stat_nlvls) )
+      
+      
+      # Re-order named aesthetic values to match levels() order.
+      if (!is.null(names(x))) {
+        
+        xn <- names(x)
+        validate_var_choices('xn', evar = i, choices = stat_lvls, max = Inf)
+        names(x) <- xn
+        remove("xn")
+        
+        if (length(missing <- setdiff(stat_lvls, names(x))) > 0)
+          cli_abort("Missing `{i}` for {stat.by} {qty(missing)} level{?s} {.val {missing}}.")
+        
+        if (length(dups <- unique(names(x)[duplicated(names(x))])) > 0)
+          cli_abort("Duplicated {qty(dups)} name{?s} in `{i}`: {.val {dups}}.")
+        
+        x <- as.vector(x[stat_lvls])
+      }
+      
+      
+      params[[i]] <- rep_len(x, stat_nlvls)
+    }
+    
+    remove("stat_lvls", "stat_nlvls", "i", "x")
+  }
+  
+  
+  
+  
+  if (any(startsWith(names(params$.dots), 'labs.')))
+    layer_names %<>% c('labs')
+  
+  
+  init_layer_names <- layer_names %>%
+    c('ggplot', ., 'xaxis', 'yaxis', 'theme', 'theme_bw') %>%
+    unique()
   
   
   #________________________________________________________
@@ -80,6 +142,8 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
     add_layer(params, layer_name)
   
   
+  
+  
   return (invisible(layer_names))
 }
 
@@ -90,7 +154,7 @@ init_layers <- function (params = parent.frame(), choices = NULL, var = "layers"
 # Finds parent's `layers` variable for a particular layer
 #________________________________________________________
 has_layer <- function (params, layer) {
-  hasName(params$layers, layer)
+  sapply(layer, hasName, x = params$layers)
 }
 
 
@@ -101,7 +165,7 @@ has_layer <- function (params, layer) {
 del_layer <- function (params, layer) {
   
   if (hasName(params$layers, layer))
-    remove(list = layer, pos = layers)
+    remove(list = layer, pos = params$layers)
   
   return (invisible(NULL))
 }
@@ -168,7 +232,7 @@ set_layer <- function (params, layer, ..., .fn = NULL, .overwrite = FALSE) {
         }
       
     } else {
-      stop("Key vector is too long. Key '", key, "' split on '|'.")
+      cli_abort("Key vector is too long. Key {.val {key}} split on '|'.")
     }
     
   }
@@ -192,11 +256,11 @@ add_layer <- function (params, layer, fn = NULL) {
   stopifnot(is_bare_environment(params))
   
   if (hasName(layers, layer))
-    stop("Cannot add layer '", layer, "' twice.")
+    cli_abort("Cannot add layer {.val {layer}} twice.")
   
   
   xmode     <- params$.xmode
-  patterned <- !is_null(params$pattern.by)
+  patterned <- !is_null(params$patterns)
   facetDims <- length(params$facet.by)
   
   
@@ -224,18 +288,7 @@ add_layer <- function (params, layer, fn = NULL) {
   
   
   
-  #________________________________________________________
-  # color.by, pattern.by, and shape.by arguments.
-  #________________________________________________________
-  
   result <- list()
-  
-  if (layer %in% c('shape', 'pattern'))
-    result <- as.list(params[[paste0(layer, ".by")]][[1]])
-  
-  if (layer %in% c('color', 'fill')) {
-    result <- as.list(params[["color.by"]][[1]])
-  }
   
   
   
@@ -244,18 +297,19 @@ add_layer <- function (params, layer, fn = NULL) {
     'ggplot'       = ggplot,
     'ggtree'       = ggtree,
     'arrow'        = geom_segment,
-    'bar'          = if (patterned) geom_bar_pattern else geom_bar,
-    'box'          = if (patterned) geom_boxplot_pattern else geom_boxplot,
+    'bar'          = geom_bar,
+    'box'          = geom_boxplot,
     'brackets'     = geom_segment,
     'cladelab'     = geom_cladelab,
-    'color'        = if (patterned) scale_pattern_color_manual else scale_color_manual,
-    'crossbar'     = if (patterned) geom_crossbar_pattern else geom_crossbar,
+    'color'        = scale_color_manual,
+    'confidence'   = geom_ribbon,
+    'crossbar'     = geom_crossbar,
     'density'      = geom_hdr,
     'dot'          = geom_beeswarm,
     'errorbar'     = geom_errorbar,
     'ellipse'      = stat_ellipse,
     'facet'        = if (facetDims == 2) facet_grid else facet_wrap,
-    'fill'         = if (patterned) scale_pattern_fill_manual else scale_fill_manual,
+    'fill'         = if (patterned) scale_fill_pattern else scale_fill_manual,
     'flip'         = coord_flip,
     # 'free_y'     = facetted_pos_scales,
     'hline'        = geom_hline,
@@ -264,26 +318,29 @@ add_layer <- function (params, layer, fn = NULL) {
     'linerange'    = geom_linerange,
     'mean'         = geom_point,
     'name'         = geom_text,
-    'pattern'      = scale_pattern_type_manual,
     'pointrange'   = geom_pointrange,
     'point'        = geom_point,
     'rect'         = geom_rect,
-    'scatter'      = geom_point,
+    'residual'     = geom_segment,
     'shape'        = scale_shape_manual,
     'smooth'       = stat_smooth,
     'spider'       = geom_segment,
-    'stack'        = if (patterned) geom_col_pattern else geom_col,
+    'stack'        = geom_col,
     'stats_bg'     = geom_rect,
-    'stats_text'   = geom_text,
     'stats_ggtext' = geom_textbox,
+    'stats_label'  = geom_label,
+    'stats_text'   = geom_text,
+    'stats_vline'  = geom_vline,
     'strip'        = geom_quasirandom,
     'stripe'       = geom_rect,
+    'table'        = annotation_custom,
     'taxon'        = geom_label_repel,
     'theme'        = theme,
     'theme_bw'     = theme_bw,
     'tiplab'       = geom_tiplab,
     'topo'         = geom_hdr_lines,
-    'violin'       = if (patterned) geom_violin_pattern else geom_violin,
+    'trend'        = geom_line,
+    'violin'       = geom_violin,
     'vline'        = geom_vline,
     'xaxis'        = if (xmode == "factor") scale_x_discrete else scale_x_continuous,
     'yaxis'        = scale_y_continuous,
@@ -294,30 +351,40 @@ add_layer <- function (params, layer, fn = NULL) {
     EXPR = layer,
     'arrow'        = "taxa_coords",
     'brackets'     = "stat_brackets",
+    'confidence'   = "fit",
     'crossbar'     = "vline",
     'errorbar'     = "vline",
     'linerange'    = "vline",
     'mean'         = "taxa_coords",
     'pointrange'   = "vline",
+    'residual'     = "residual",
     'spider'       = "spider",
-    'stats_text'   = "stat_labels",
     'stats_ggtext' = "stat_labels",
-    'taxon'        = "taxa_coords" )
+    'stats_label'  = "stat_labels",
+    'stats_text'   = "stat_labels",
+    'stats_vline'  = "stat_vline",
+    'taxon'        = "taxa_coords",
+    'trend'        = "fit" )
   
   
   result[['data']] <- switch(
     EXPR = layer,
     'arrow'        = ~ attr(., "taxa_coords"),
     'brackets'     = ~ attr(., "stat_brackets"),
+    'confidence'   = ~ attr(., "fit"),
     'crossbar'     = ~ attr(., "vline"),
     'errorbar'     = ~ attr(., "vline"),
     'linerange'    = ~ attr(., "vline"),
     'mean'         = ~ attr(., "taxa_coords"),
     'pointrange'   = ~ attr(., "vline"),
+    'residual'     = ~ attr(., "residual"),
     'spider'       = ~ attr(., "spider"),
-    'stats_text'   = ~ attr(., "stat_labels"),
     'stats_ggtext' = ~ attr(., "stat_labels"),
-    'taxon'        = ~ attr(., "taxa_coords") )
+    'stats_label'  = ~ attr(., "stat_labels"),
+    'stats_text'   = ~ attr(., "stat_labels"),
+    'stats_vline'  = ~ attr(., "stat_vline"),
+    'taxon'        = ~ attr(., "taxa_coords"),
+    'trend'        = ~ attr(., "fit") )
   
   
   regex <- switch(
@@ -330,13 +397,14 @@ add_layer <- function (params, layer, fn = NULL) {
     'brackets'     = "^h(|line)\\.",
     'cladelab'     = "^c(|lade|ladelab)\\.",
     'color'        = "^color\\.",
+    'confidence'   = "^c(|onfidence)\\.",
     'crossbar'     = "^c(|rossbar)\\.",
     'density'      = "^d(|ensity)\\.",
     'dot'          = "^(pt|d|dot)\\.",
     'errorbar'     = "^e(|rrorbar)\\.",
     'ellipse'      = "^e(|llipse)\\.",
     'facet'        = "^f(|acet)\\.",
-    'fill'         = "^fill\\.",
+    'fill'         = "^(fill|pattern|patterns)\\.",
     'flip'         = "^flip\\.",
     'heat'         = "^h(|eat|eatmap)\\.",
     'hexpand'      = "^h(|expand)\\.",
@@ -346,22 +414,22 @@ add_layer <- function (params, layer, fn = NULL) {
     'linerange'    = "^l(|inerange)\\.",
     'mean'         = "^m(|ean)\\.",
     'name'         = "^n(|ame)\\.",
-    'pattern'      = "^pattern\\.",
     'pointrange'   = "^(pt|p|pointrange)\\.",
     'point'        = "^(pt|p|point)\\.",
+    'residual'     = "^r(|esidual)\\.",
     'shape'        = "^shape\\.",
-    'scatter'      = "^(pt|s|scatter)\\.",
     'size'         = "^size\\.",
-    'smooth'       = "^(t|c|trend|confidence)\\.",
     'spider'       = "^s(|pider)\\.",
     'stack'        = "^s(|tack)\\.",
-    'stats_text'   = "^stats\\.",
     'stats_ggtext' = "^stats\\.",
+    'stats_label'  = "^stats\\.",
+    'stats_text'   = "^stats\\.",
     'strip'        = "^(pt|s|strip)\\.",
     'taxon'        = "^taxon\\.",
     'theme'        = "^theme\\.",
     'theme_bw'     = "^theme_bw\\.",
     'tiplab'       = "^tip(|lab)\\.",
+    'trend'        = "^t(|rend)\\.",
     'topo'         = "^topo\\.",
     'vline'        = "^[rv](|line)\\.",
     'violin'       = "^v(|iolin)\\.",
@@ -375,9 +443,13 @@ add_layer <- function (params, layer, fn = NULL) {
   # Unprefixed dot arguments, e.g. 'scales'="free_x"
   #________________________________________________________
   layer_fun <- attr(result, 'function', exact = TRUE)
-  for (i in intersect(names(layer_params), formalArgs(layer_fun)))
+  f_args    <- intersect(
+    x = names(layer_params), 
+    y = attr(layer_fun, 'formalArgs') %||% formalArgs(layer_fun) )
+  for (i in f_args)
     if (!isFALSE(attr(layer_params[[i]], 'display')))
       result[i] <- layer_params[[i]]
+  
   
   # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
   #________________________________________________________
@@ -416,215 +488,206 @@ add_layer <- function (params, layer, fn = NULL) {
 
 
 
-#________________________________________________________
-#' Subset `biom` by `*.by` args. Assign colors, etc.
-#' 
-#' @noRd
-#' @keywords internal
-sync_metadata <- function (params = parent.frame()) {
-  
-  
-  md <- params$biom$metadata
-  
-  
-  by_params <- c(
-    "x", "color.by", "shape.by", "facet.by", 
-    "pattern.by", "label.by", "order.by", "stat.by", "limit.by" )
-  
-  
-  
-  #________________________________________________________
-  # Tracks which metadata columns are used.
-  #________________________________________________________
-  md_params <- intersect(by_params, env_names(params))
-  col_names <- c(params[['within']], params[['between']]) # Metadata columns needed in ggdata.
-  revsort   <- c() # For order.by, reverse if '-' prefix.
-  group_by  <- c() # ggdata cols to use for ggplot group.
-  
-  subset_vals <- list()
-  subset_lo   <- list()
-  subset_hi   <- list()
-  
-  
-  #________________________________________________________
-  # Apply subseting defined by 'range' or 'values'.
-  #________________________________________________________
-  for (md_param in md_params) {
-    for (i in seq_along(params[[md_param]])) {
-      
-      col_spec <- params[[md_param]][[i]]
-      col_name <- names(params[[md_param]])[[i]]
-      
-      col_names %<>% c(col_name)
-      revsort   %<>% c(attr(col_spec, 'revsort', exact = TRUE))
-      
-      
-      if (hasName(col_spec, 'range')) {
-        
-        lo <- min(col_spec[['range']])
-        hi <- max(col_spec[['range']])
-        
-        subset_lo[[col_name]] <- max(c(lo, subset_lo[[col_name]]))
-        subset_hi[[col_name]] <- min(c(hi, subset_hi[[col_name]]))
-        if (subset_lo[[col_name]] > subset_hi[[col_name]]) cli_abort("All {col_name} values dropped.")
-      }
-      
-      
-      if (hasName(col_spec, 'values')) {
-        
-        values <- col_spec[['values']]
-        
-        lvls <- names(values) # color.by = list('Sex' = c(Male = "green", Female = "teal"))
-        if (is.null(lvls)) {  # color.by = list('Sex' = c("Male", "Female"))
-          lvls <- as.vector(values)
-          params[[md_param]][[i]][['values']] <- NULL
-        }
-        validate_var_choices( # color.by = list('Sex' = c("m", "f"))
-          var     = 'lvls', 
-          choices = levels(params$biom$metadata[[col_name]]), 
-          evar    = paste0(md_param, ": ", col_name), 
-          max     = Inf )
-        
-        if (is.null(subset_vals[[col_name]])) { subset_vals[[col_name]] <- lvls                 }
-        else                                  { subset_vals[[col_name]] %<>% intersect(lvls, .) }
-        if (length(subset_vals[[col_name]]) == 0) cli_abort("All {col_name} values dropped.")
-      }
-      
-    }
-  }
-  
-  
-  #________________________________________________________
-  # Drop rows according to subset specs.
-  #________________________________________________________
-  col_names %<>% unique()
-  md <- md[,unique(c(".sample", col_names))]
-  
-  subset_cmds <- c()
-  factor_cmds <- c()
-  omit_cmds   <- c()
-  
-  for (i in col_names) {
-    
-    if (hasName(subset_vals, i) && !identical(levels(md[[i]]), subset_vals[[i]])) {
-      lvls <- subset_vals[[i]]
-      md[[i]] %<>% factor(levels = lvls)
-      lvls_str <- as.args(list(lvls))
-      factor_cmds %<>% c(glue("biom$metadata${coan(i)} %<>% factor(levels = {lvls_str})"))
-    }
-    
-    if (hasName(subset_lo, i) && min(c(Inf, md[[i]]), na.rm = TRUE) < subset_lo[[i]]) {
-      md <- md[md[[i]] >= subset_lo[[i]],]
-      subset_cmds %<>% c(glue("{coan(i)} >= {subset_lo[[i]]}"))
-    }
-    
-    if (hasName(subset_hi, i) && max(c(-Inf, md[[i]]), na.rm = TRUE) > subset_hi[[i]]) {
-      md <- md[md[[i]] <= subset_hi[[i]],]
-      subset_cmds %<>% c(glue("{coan(i)} <= {subset_hi[[i]]}"))
-    }
-    
-  }
-  
-  if (anyNA(md)) {
-    md        <- stats::na.omit(md)
-    omit_cmds <- glue("biom$metadata %<>% na.omit()")
-  }
-  
-  if (length(subset_cmds) > 0)
-    subset_cmds <- glue("biom %<>% subset({paste0(subset_cmds, collapse = ' & ')})")
-  
-  if (length(c(subset_cmds, factor_cmds, omit_cmds)) > 0)
-    params$.subset_code <- paste0(c(subset_cmds, factor_cmds, omit_cmds), collapse = "\n")
-  
-  
-  
-  #________________________________________________________
-  # Discard vestigial factor levels.
-  #________________________________________________________
-  for (i in seq_len(ncol(md)))
-    if (is.factor(md[[i]]))
-      md[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
-  
-  
-  #________________________________________________________
-  # Re-order the samples according to metadata.
-  #________________________________________________________
-  for (i in rev(names(params$order.by)))
-    md <- md[order(md[[i]], decreasing = i %in% revsort),,drop=FALSE]
-  
-  
-  
-  #________________________________________________________
-  # Simplify all *.by params except color/shape/pattern.
-  #________________________________________________________
-  for (param in md_params) {
-    
-    if (length(params[[param]]) == 0) {
-      rlang::env_poke(params, nm = param, value = NULL)
-      
-    } else if (!param %in% c("color.by", "shape.by", "pattern.by", "within", "between")) {
-      params[[param]] %<>% names()
-    }
-  }
-  
-  
-  
-  #________________________________________________________
-  # Explicitly map color/shape/pattern to values.
-  #________________________________________________________
-  for (param in c("color.by", "shape.by", "pattern.by")) {
-    
-    for (i in seq_along(params[[param]])) {
-      
-      col_spec <- params[[param]][[i]]
-      col_name <- attr(col_spec, 'col_name', exact = TRUE)
-      col_type <- attr(col_spec, 'col_type', exact = TRUE)
-      values   <- col_spec[['values']]
-      
-      
-      if (eq(col_type, "cat")) {
-        
-        n <- nlevels(md[[col_name]])
-        
-        
-        # Will need additional colors/shapes/patterns for bdiv box/corr.
-        if (hasName(params, 'within') && n > 1)
-          n <- as.integer(local({
-            if (col_name %in% params$within)  return (n)
-            if (col_name %in% params$between) return ((n * (n - 1) / 2))
-            return ((n * (n - 1) / 2) + n)
-          }))
-        
-        
-        if (is_null(values))
-          values <- switch(
-            EXPR = param,
-            'color.by'   = get_n_colors(n, col_spec[['colors']]),
-            'shape.by'   = get_n_shapes(n),
-            'pattern.by' = get_n_patterns(n) )
-        
-        
-      } else if (eq(col_type, "num")) {
-        if (hasName(col_spec, 'colors')) values <- col_spec[['colors']]
-        if (is_palette(values))          values %<>% get_palette()
-      }
-      
-      col_spec[['colors']] <- NULL
-      col_spec[['values']] <- values
-      params[[param]][[i]] <- col_spec
-    }
-  }
-  
-  
-  
-  
-  # `params` and `biom` are both environments
-  params$biom <- params$biom$clone()
-  params$biom$metadata <- md
-  
-  
-  return (invisible(NULL))
-}
+# #________________________________________________________
+# #' Subset `biom` by `*.by` args. Assign colors, etc.
+# #' 
+# #' @noRd
+# #' @keywords internal
+# sync_metadata <- function (md, params = parent.frame()) {
+#   
+#   
+#   by_params <- c(
+#     "x", "y", "color.by", "shape.by", "facet.by", 
+#     "pattern.by", "label.by", "order.by", "stat.by", "limit.by" )
+#   
+#   
+#   
+#   #________________________________________________________
+#   # Tracks which metadata columns are used.
+#   #________________________________________________________
+#   md_params <- intersect(by_params, env_names(params))
+#   col_names <- c(params[['within']], params[['between']]) # Metadata columns needed in ggdata.
+#   revsort   <- c() # For order.by, reverse if '-' prefix.
+#   group_by  <- c() # ggdata cols to use for ggplot group.
+#   
+#   subset_vals <- list()
+#   subset_lo   <- list()
+#   subset_hi   <- list()
+#   
+#   
+#   #________________________________________________________
+#   # Apply subseting defined by 'range' or 'values'.
+#   #________________________________________________________
+#   for (md_param in md_params) {
+#     for (i in seq_along(params[[md_param]])) {
+#       
+#       col_spec <- params[[md_param]][[i]]
+#       col_name <- names(params[[md_param]])[[i]]
+#       
+#       col_names %<>% c(col_name)
+#       revsort   %<>% c(attr(col_spec, 'revsort', exact = TRUE))
+#       
+#       
+#       if (hasName(col_spec, 'range')) {
+#         
+#         lo <- min(col_spec[['range']])
+#         hi <- max(col_spec[['range']])
+#         
+#         subset_lo[[col_name]] <- max(c(lo, subset_lo[[col_name]]))
+#         subset_hi[[col_name]] <- min(c(hi, subset_hi[[col_name]]))
+#         if (subset_lo[[col_name]] > subset_hi[[col_name]]) cli_abort("All {col_name} values dropped.")
+#       }
+#       
+#       
+#       if (hasName(col_spec, 'values')) {
+#         
+#         values <- col_spec[['values']]
+#         
+#         lvls <- names(values) # color.by = list('Sex' = c(Male = "green", Female = "teal"))
+#         if (is.null(lvls)) {  # color.by = list('Sex' = c("Male", "Female"))
+#           lvls <- as.vector(values)
+#           params[[md_param]][[i]][['values']] <- NULL
+#         }
+#         validate_var_choices( # color.by = list('Sex' = c("m", "f"))
+#           var     = 'lvls', 
+#           choices = levels(md[[col_name]]), 
+#           evar    = paste0(md_param, ": ", col_name), 
+#           max     = Inf )
+#         
+#         if (is.null(subset_vals[[col_name]])) { subset_vals[[col_name]] <- lvls                 }
+#         else                                  { subset_vals[[col_name]] %<>% intersect(lvls, .) }
+#         if (length(subset_vals[[col_name]]) == 0) cli_abort("All {col_name} values dropped.")
+#       }
+#       
+#     }
+#   }
+#   
+#   
+#   #________________________________________________________
+#   # Drop rows according to subset specs.
+#   #________________________________________________________
+#   col_names %<>% unique()
+#   md <- md[,intersect(colnames(md), unique(c(".sample", col_names)))]
+#   
+#   subset_cmds <- c()
+#   factor_cmds <- c()
+#   omit_cmds   <- c()
+#   
+#   for (i in col_names) {
+#     
+#     if (hasName(subset_vals, i) && !identical(levels(md[[i]]), subset_vals[[i]])) {
+#       lvls <- subset_vals[[i]]
+#       md[[i]] %<>% factor(levels = lvls)
+#       lvls_str <- as.args(list(lvls))
+#       factor_cmds %<>% c(glue("biom$metadata${coan(i)} %<>% factor(levels = {lvls_str})"))
+#     }
+#     
+#     if (hasName(subset_lo, i) && min(c(Inf, md[[i]]), na.rm = TRUE) < subset_lo[[i]]) {
+#       md <- md[md[[i]] >= subset_lo[[i]],]
+#       subset_cmds %<>% c(glue("{coan(i)} >= {subset_lo[[i]]}"))
+#     }
+#     
+#     if (hasName(subset_hi, i) && max(c(-Inf, md[[i]]), na.rm = TRUE) > subset_hi[[i]]) {
+#       md <- md[md[[i]] <= subset_hi[[i]],]
+#       subset_cmds %<>% c(glue("{coan(i)} <= {subset_hi[[i]]}"))
+#     }
+#     
+#   }
+#   
+#   if (anyNA(md)) {
+#     md        <- stats::na.omit(md)
+#     omit_cmds <- glue("biom$metadata %<>% na.omit()")
+#   }
+#   
+#   if (length(subset_cmds) > 0)
+#     subset_cmds <- glue("biom %<>% subset({paste0(subset_cmds, collapse = ' & ')})")
+#   
+#   if (length(c(subset_cmds, factor_cmds, omit_cmds)) > 0)
+#     params$.subset_code <- paste0(c(subset_cmds, factor_cmds, omit_cmds), collapse = "\n")
+#   
+#   
+#   
+#   #________________________________________________________
+#   # Discard vestigial factor levels.
+#   #________________________________________________________
+#   for (i in seq_len(ncol(md)))
+#     if (is.factor(md[[i]]))
+#       md[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
+#   
+#   
+#   #________________________________________________________
+#   # Re-order the samples according to metadata.
+#   #________________________________________________________
+#   for (i in rev(names(params$order.by)))
+#     md <- md[order(md[[i]], decreasing = i %in% revsort),,drop=FALSE]
+#   
+#   
+#   
+#   #________________________________________________________
+#   # Simplify all *.by params except color/shape/pattern.
+#   #________________________________________________________
+#   for (param in md_params) {
+#     
+#     if (length(params[[param]]) == 0) {
+#       rlang::env_poke(params, nm = param, value = NULL)
+#       
+#     } else if (!param %in% c("color.by", "shape.by", "pattern.by", "within", "between")) {
+#       params[[param]] %<>% names()
+#     }
+#   }
+#   
+#   
+#   
+#   #________________________________________________________
+#   # Explicitly map color/shape/pattern to values.
+#   #________________________________________________________
+#   for (param in c("color.by", "shape.by", "pattern.by")) {
+#     
+#     for (i in seq_along(params[[param]])) {
+#       
+#       col_spec <- params[[param]][[i]]
+#       col_name <- attr(col_spec, 'col_name', exact = TRUE)
+#       col_type <- attr(col_spec, 'col_type', exact = TRUE)
+#       values   <- col_spec[['values']]
+#       
+#       
+#       if (eq(col_type, "cat")) {
+#         
+#         n <- nlevels(md[[col_name]])
+#         
+#         
+#         # Will need additional colors/shapes/patterns for bdiv box/corr.
+#         if (hasName(params, 'within') && n > 1)
+#           n <- as.integer(local({
+#             if (col_name %in% params$within)  return (n)
+#             if (col_name %in% params$between) return ((n * (n - 1) / 2))
+#             return ((n * (n - 1) / 2) + n)
+#           }))
+#         
+#         
+#         if (is_null(values))
+#           values <- switch(
+#             EXPR = param,
+#             'color.by'   = get_n_colors(n, col_spec[['colors']]),
+#             'shape.by'   = get_n_shapes(n),
+#             'pattern.by' = get_n_patterns(n) )
+#         
+#         
+#       } else if (eq(col_type, "num")) {
+#         if (hasName(col_spec, 'colors')) values <- col_spec[['colors']]
+#         if (is_palette(values))          values %<>% get_palette()
+#       }
+#       
+#       col_spec[['colors']] <- NULL
+#       col_spec[['values']] <- values
+#       params[[param]][[i]] <- col_spec
+#     }
+#   }
+#   
+#   
+#   
+#   return (md)
+# }
 
 
 

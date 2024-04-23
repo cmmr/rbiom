@@ -41,15 +41,15 @@
 
 taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
   
-  biom <- as_rbiom(biom)
+  biom   <- as_rbiom(biom)
+  params <- eval_envir(environment())
   
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment())
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('taxa_map', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   

@@ -22,11 +22,11 @@ write_fasta(biom, file = NULL)
 
 write_tree(biom, file = NULL)
 
-write_xlsx(biom, file, depth = "auto", n = NULL, seed = 0, unc = "asis")
+write_xlsx(biom, file, depth = "auto", n = NULL, seed = 0, unc = "singly")
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{file}{Path to the output file. File names ending in \code{.gz} or
 \code{.bz2} will be compressed accordingly. \code{write_fasta()} and

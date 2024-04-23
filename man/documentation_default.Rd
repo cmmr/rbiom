@@ -4,8 +4,8 @@
 \alias{documentation_default}
 \title{documentation_default}
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{mtx}{A matrix-like object.}
 
@@ -13,15 +13,14 @@
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{md}{A character vector naming the metadata fields to include in the
-output data frame, or \code{'.all'} to include all metadata fields.
-Default: \code{'.all'}}
+\item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
+to include all metadata fields. Default: \code{'.all'}}
 
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Default: \code{"Shannon"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
@@ -44,12 +43,16 @@ Default: \code{6}.}
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
 Default: \code{"UMAP"} \cr\cr
-Multiple values allowed. Non-ambiguous abbreviations are allowed.}
+Multiple/abbreviated values allowed.}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
 Default: \code{TRUE} \cr\cr
 Multiple values allowed.}
+
+\item{delta}{For numeric metadata, report the absolute difference in values
+for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
+Default: \code{TRUE}}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
@@ -113,6 +116,15 @@ of columns. Default: \code{FALSE}}
 
 \item{stripe}{Shade every other x position. Default: \emph{same as flip}}
 
+\item{ci}{How to calculate min/max of the \bold{crossbar},
+\bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
+Options are: \code{"ci"} (confidence interval), \code{"range"},
+\code{"sd"} (standard deviation), \code{"se"} (standard error), and
+\code{"mad"} (median absolute deviation).
+The center mark of \bold{crossbar} and \bold{pointrange} represents
+the mean, except for \code{"mad"} in which case it represents the median.
+Default: \code{"ci"}}
+
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
 \itemize{
@@ -141,8 +153,8 @@ Default: \code{"auto"}.}
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}
 
-\item{split.by}{Name(s) of metadata columns that the data should be split
-by prior to any calculations. Default: \code{NULL}}
+\item{split.by}{Dataset field(s) that the data should be split by prior to
+any calculations. Must be categorical. Default: \code{NULL}}
 
 \item{dm}{A \code{dist}-class distance matrix, as returned from
 \code{\link[=bdiv_distmat]{bdiv_distmat()}} or \code{\link[stats:dist]{stats::dist()}}. Required.}
@@ -151,13 +163,67 @@ by prior to any calculations. Default: \code{NULL}}
 correspond to \code{attr(dm, 'Labels')}. Values can be either
 categorical or numeric. Required.}
 
-\item{stat.by}{The categorical metadata field defining the statistical
-groups. Required.}
+\item{df}{The dataset (data.frame or tibble object). "Dataset fields"
+mentioned below should match column names in \code{df}. Required.}
 
-\item{regr}{To run a regression analysis, set \code{regr} to the numeric
-metadata field with the "x-axis" values. Leaving \code{regr=NULL}
-will generate boxplot-like statistics; when non-NULL, corrplot-like
-statistics will be returned. Default: \code{NULL}}
+\item{regr}{Dataset field with the x-axis (independent; predictive)
+values. Must be numeric. Default: \code{NULL}}
+
+\item{resp}{Dataset field with the y-axis (dependent; response) values,
+such as taxa abundance or alpha diversity.
+Default: \code{attr(df, 'response')}}
+
+\item{stat.by}{Dataset field with the statistical groups. Must be
+categorical. Default: \code{NULL}}
+
+\item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
+Default: \code{NULL}}
+
+\item{colors}{How to color the \code{stat.by} groups. Options are:
+\itemize{
+\item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
+\item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
+\item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
+\item{character vector - }{ Custom colors to use. E.g. \code{c("red", "#00FF00")} }
+\item{named character vector - }{ Explicit mapping. E.g. \code{c(Male = "blue", Female = "red")} }
+}
+See "Aesthetics" section below for additional information.
+Default: \code{TRUE}}
+
+\item{shapes}{Shapes for each \code{stat.by} group.
+Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, shape
+names (typically integers 0 - 17), or a named vector mapping
+\code{stat.by} groups to specific shape names.
+See "Aesthetics" section below for additional information.
+Default: \code{FALSE}}
+
+\item{patterns}{Patterns for each \code{stat.by} group.
+Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, pattern
+names (\code{"brick"}, \code{"chevron"}, \code{"fish"}, \code{"grid"}, etc), or a named
+vector mapping \code{stat.by} groups to specific pattern names.
+See "Aesthetics" section below for additional information.
+Default: \code{FALSE}}
+
+\item{test}{Method for computing p-values: \code{'wilcox'}, \code{'kruskal'},
+\code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}
+
+\item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
+Default: \code{'lm'}}
+
+\item{at}{Position(s) along the x-axis where the means or slopes should be
+evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
+and selects the position where the p-value is most significant.}
+
+\item{alt}{Alternative hypothesis direction. Options are \code{'!='}
+(two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
+(greater than \code{mu}). Default: \code{'!='}}
+
+\item{mu}{Reference value to test against. Default: \code{0}}
+
+\item{within, between}{Dataset field(s) for intra- or inter- sample
+comparisons. Alternatively, dataset field names given elsewhere can
+be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
+\code{between}, respectively. Default: \code{NULL}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 

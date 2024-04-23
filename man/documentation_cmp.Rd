@@ -3,21 +3,22 @@
 \name{documentation_cmp}
 \alias{documentation_cmp}
 \title{documentation_cmp}
-\arguments{
-\item{x}{A categorical metadata column name. Prefix the column name with
-\code{==} or \code{!=} to limit comparisons to within or between
-groups, respectively. The default, \code{NULL} groups all distances
-into a single column.}
-
-\item{color.by, pattern.by, shape.by, facet.by, limit.by}{Metadata columns to
-use for data partitioning. Prefix the column name with
-\code{==} or \code{!=} to limit comparisons to within or between
-groups, respectively. Default: \code{NULL}}
-
-\item{within, between}{Metadata field(s) for intra- or inter- sample
-comparisons. Default: \code{NULL}}
-}
 \description{
 documentation_cmp
 }
+\section{Metadata Comparisons}{
+
+
+Prefix metadata fields with \code{==} or \code{!=} to limit comparisons to within or
+between groups, respectively. For example, \code{stat.by = '==Sex'} will
+run calculations only for intra-group comparisons, returning "Male" and
+"Female", but NOT "Female vs Male". Similarly, setting
+\code{stat.by = '!=Body Site'} will only show the inter-group comparisons, such
+as "Saliva vs Stool", "Anterior nares vs Buccal mucosa", and so on.
+
+The same effect can be achieved by using the \code{within} and \code{between}
+parameters. \code{stat.by = '==Sex'} is equivalent to
+\verb{stat.by = 'Sex', within = 'Sex'}.
+}
+
 \keyword{internal}

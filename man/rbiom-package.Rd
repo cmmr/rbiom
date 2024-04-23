@@ -30,14 +30,19 @@ For instance:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://cmmr.github.io/rbiom}
+  \item \url{https://cmmr.github.io/rbiom/}
   \item \url{https://github.com/cmmr/rbiom}
   \item Report bugs at \url{https://github.com/cmmr/rbiom/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Daniel P. Smith \email{dansmith01@gmail.com} (\href{https://orcid.org/0000-0002-2479-2044}{ORCID}) [copyright holder]
+\strong{Maintainer}: Daniel P. Smith \email{dansmith01@gmail.com} (\href{https://orcid.org/0000-0002-2479-2044}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Alkek Center for Metagenomics and Microbiome Research [copyright holder, funder]
+}
 
 }
 \keyword{internal}

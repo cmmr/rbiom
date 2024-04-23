@@ -46,12 +46,13 @@ bdiv_ord_table <- function (
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
+  params <- eval_envir(environment(), ...)
+  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- eval_envir(environment(), ...)
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('bdiv_ord_table', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
@@ -68,12 +69,12 @@ bdiv_ord_table <- function (
   validate_bdiv(max = Inf)
   validate_bool("weighted", max = Inf)
   
-  validate_meta('md',       null_ok = TRUE, cmp = TRUE, max = Inf)
-  validate_meta('stat.by',  null_ok = TRUE, cmp = TRUE)
-  validate_meta('split.by', null_ok = TRUE, cmp = TRUE, col_type = "cat")
-  
   # Validates and appends to `within` and `between`.
   validate_meta_cmp(c('md', 'stat.by', 'split.by'))
+  
+  validate_biom_field('md',       null_ok = TRUE, max = Inf)
+  validate_biom_field('stat.by',  null_ok = TRUE)
+  validate_biom_field('split.by', null_ok = TRUE, col_type = "cat")
   
   
   

@@ -36,6 +36,7 @@
 #' | `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`.   |
 #' | `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `NULL`. |
 #' | `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.              |
+#' | `$date`                  | Date from BIOM file.                                     |
 #' 
 #' \cr
 #' 
@@ -45,14 +46,17 @@
 #' Assigning new values to these components will trigger 
 #' validation checks and inter-component synchronization.
 #' 
-#' | **Component**     | **What can be assigned.**                              |
-#' | ----------------- | ------------------------------------------------------ |
-#' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns) |
-#' | `$metadata`       | data.frame with `'.sample'` as the first column        |
-#' | `$taxonomy`       | data.frame with `'.otu'` as the first column           |
-#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs   |
-#' | `$sequences`      | character vector of OTU reference sequences            |
-#' | `$id`, `$comment` | string with a title or comment for the dataset         |
+#' | **Component**     | **What can be assigned.**                               |
+#' | ----------------- | ------------------------------------------------------- |
+#' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns)  |
+#' | `$metadata`       | data.frame with `'.sample'` column, or a file name      |
+#' | `$taxonomy`       | data.frame with `'.otu'` as the first column            |
+#' | `$otus`           | character vector with new names for the OTUs            |
+#' | `$samples`        | character vector with new names for the samples         |
+#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs    |
+#' | `$sequences`      | character vector of OTU reference sequences             |
+#' | `$id`, `$comment` | string with a title or comment for the dataset          |
+#' | `$date`           | date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string      |
 #' 
 #' \cr
 #' 
@@ -74,7 +78,7 @@
 #' 
 #' 
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
 #'     # Duplicate the HMP50 example dataset.
 #'     biom <- hmp50$clone()
@@ -230,13 +234,16 @@ rbiom <- R6::R6Class(
       
       
       #________________________________________________________
-      # Values found by read_biom(). Read-only hereafter.
+      # Date found by read_biom(), or current date/time.
       #________________________________________________________
       private$.date <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
       if (!is.null(date <- dots[['date']]))
         if (is_scalar_character(date) && !is.na(date))
           private$.date <- date
       
+      #________________________________________________________
+      # Value found by read_biom(). Read-only hereafter.
+      #________________________________________________________
       private$.generated_by <- paste("rbiom", packageVersion("rbiom"))
       if (!is.null(generated_by <- dots[['generated_by']]))
         if (is_scalar_character(generated_by) && !is.na(generated_by))
@@ -260,8 +267,9 @@ rbiom <- R6::R6Class(
       cat(sprintf(" (%s)\n", substr(private$.date, 1, 10)))
       
       if (nzchar(private$.comment)) {
-        width <- min(80, floor(getOption("width") * 0.75))
-        cat(strwrap(private$.comment, width), "\n")
+        width         <- min(80, floor(getOption("width") * 0.75))
+        manual_breaks <- strsplit(babies$comment, "\n")[[1]]
+        cat(paste(collapse = "\n", strwrap(manual_breaks, width)), "\n")
         cat("-----------\n")
       }
       
@@ -287,8 +295,8 @@ rbiom <- R6::R6Class(
       
       if (missing(value)) return (private$.id)
       
-      if (is.null(value)) value <- ""
-      stopifnot(is_scalar_character(value))
+      if (is.null(value) || is.na(value)) value <- ""
+      if (!is_scalar_character(value)) cli_abort("Invalid `id`: {.val {value}}")
       private$.id <- value
       
       return (self)
@@ -347,6 +355,7 @@ rbiom <- R6::R6Class(
       
       if (is_character(value)) {
         
+        rownames(private$.counts) %<>% trimws()
         otus <- rownames(private$.counts)
         
         if (length(missing <- setdiff(otus, names(value))) != 0)
@@ -388,7 +397,7 @@ rbiom <- R6::R6Class(
         validate_tree("value")
         
         otus <- private$.counts$dimnames[[1]]
-        tips <- value$tip.label
+        tips <- value$tip.label <- trimws(value$tip.label)
         if (length(missing <- setdiff(otus, tips)) > 0)
           cli_abort(('x' = sprintf("OTUs missing from tree: {missing}")))
       }
@@ -439,8 +448,17 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Convert all cols (except .otu) to factor.
       #________________________________________________________
-      value %<>% mutate(across(everything() & !.otu, as.factor))
-      value[['.otu']] %<>% as.character()
+      for (i in seq_len(ncol(value))[-1]) {
+        
+        if (!is.factor(value[[i]])) value[[i]] %<>% as.factor()
+        
+        lvls <- levels(value[[i]])
+        if (length(i <- which(lvls != trimws(lvls))) > 0) {
+          cli_warn("Whitespace trimmed from {.field {i}} column value{?s} {.val {lvls[i]}}.")
+          levels(value[[i]]) %<>% trimws()
+        }
+      }
+      value[['.otu']] %<>% as.character() %>% trimws()
       
       
       #________________________________________________________
@@ -469,9 +487,59 @@ rbiom <- R6::R6Class(
       
       
       #________________________________________________________
-      # Convert data.frame/matrix to tibble.
+      # User wants to erase all the metadata.
       #________________________________________________________
       if (is.null(value)) value <- tibble(.sample = colnames(private$.counts))
+      
+      #________________________________________________________
+      # They're handing us a filename.
+      #________________________________________________________
+      if (is.character(value) && length(value) == 1)
+        value <- local({
+        
+          fp <- normalizePath(value, mustWork = FALSE, winslash = "/")
+          if (!file.exists(fp)) cli_abort("File doesn't exist: {fp}")
+          
+          
+          if (grepl("\\.(xls|xlsx)$", tolower(fp))) {
+            
+            value <- openxlsx::read.xlsx(fp, sheet = 1)
+            
+          } else {
+            
+            #________________________________________________________
+            # Auto-detect the field separator.
+            #________________________________________________________
+            ch  <- c(strsplit(readLines(con = fp, n = 1), '')[[1]], "\t")
+            sep <- ch[[head(which(ch %in% c("\t", ",", ";")), 1)]]
+            
+            value <- read.delim(
+              file        = value, 
+              sep         = sep, 
+              check.names = FALSE,
+              strip.white = TRUE )
+          }
+          
+          
+          #________________________________________________________
+          # Auto-detect the column with sample names.
+          #________________________________________________________
+          if (!any(colnames(value) == ".sample"))
+            for (i in seq_len(ncol(value)))
+              if (!anyDuplicated(vals <- value[[i]]))
+                if (any(as.character(vals) %in% self$samples)) {
+                  rownames(value) <- as.character(vals)
+                  value <- value[,-i,drop=FALSE]
+                  break
+                }
+          
+          return (value)
+        })
+      
+      
+      #________________________________________________________
+      # Convert data.frame/matrix to tibble.
+      #________________________________________________________
       value <- tibble::as_tibble(value, rownames = NA, .name_repair = trimws)
       
       
@@ -498,8 +566,30 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Convert all character cols (except .sample) to factor.
       #________________________________________________________
-      value %<>% mutate(across(where(is.character) & !.sample, as.factor))
-      value[['.sample']] %<>% as.character()
+      for (i in colnames(value)[-1]) {
+        
+        if (is.character(value[[i]])) value[[i]] %<>% as.factor()
+        
+        if (is.factor(value[[i]])) {
+          lvls <- levels(value[[i]])
+          if (length(i <- which(lvls != trimws(lvls))) > 0) {
+            cli_warn("Whitespace trimmed from {.field {i}} column value{?s} {.val {lvls[i]}}.")
+            levels(value[[i]]) %<>% trimws()
+          }
+        }
+      }
+      
+      value[['.sample']] %<>% as.character() %>% trimws()
+      
+      
+      
+      #________________________________________________________
+      # Enforce unnamed vectors.
+      #________________________________________________________
+      for (i in colnames(value))
+        if (!is.null(names(value[[i]])))
+          value[[i]] %<>% unname()
+      
       
       
       #________________________________________________________
@@ -550,8 +640,18 @@ rbiom <- R6::R6Class(
       otus <- rownames(value)
       if (!is.character(sids)) cli_abort("Column names must be sample names, not {.type {sids}}.")
       if (!is.character(otus)) cli_abort("Row names must be OTU names, not {.type {otus}}.")
+      
+      sids <- trimws(sids)
+      otus <- trimws(otus)
+      if (length(i <- which(sids != colnames(value))) > 0)
+        cli_warn("Trimming whitespace from sample name{?s}: {.val {colnames(value)[i]}}.")
+      if (length(i <- which(otus != rownames(value))) > 0)
+        cli_warn("Trimming whitespace from OTU name{?s}: {.val {rownames(value)[i]}}.")
+      
       if (length(dups <- sids[duplicated(sids)]) > 0) cli_abort("Duplicated sample name{?s}: {dups}.")
       if (length(dups <- otus[duplicated(otus)]) > 0) cli_abort("Duplicated OTU name{?s}: {dups}.")
+      colnames(value) <- sids
+      rownames(value) <- otus
       
       
       #________________________________________________________
@@ -622,21 +722,105 @@ rbiom <- R6::R6Class(
     },
     
     
+    
+    #________________________________________________________
+    # Get or set the date/time.
+    #________________________________________________________
+    date = function (value) {
+      
+      if (missing(value)) return (private$.date)
+      
+      if (length(value) != 1) cli_abort("Length must be 1.")
+      
+      fmt <- "%Y-%m-%dT%H:%M:%SZ"
+      
+      posix <- try(silent = TRUE, {
+        if (is.character(value)) { strptime(value, fmt, tz = "UTC") 
+        } else                   { as.POSIXlt(value, tz = "UTC")    } })
+      
+      if (!inherits(posix, 'POSIXt') || is.na(posix))
+        cli_abort(c(
+          x = "Can't parse date given as: {value}.",
+          i = "Expected POSIXt object or string in {.code {fmt}} format."))
+      
+      
+      private$.date <- strftime(posix, fmt, tz="UTC")
+      
+      return (self)
+    },
+    
+    
+    
+    #________________________________________________________
+    # Get or set sample names.
+    #________________________________________________________
+    samples = function (value) {
+      
+      if (missing(value)) return (private$.counts$dimnames[[2]])
+      
+      stopifnot(is.character(value))
+      stopifnot(!anyDuplicated(value))
+      stopifnot(!anyNA(value))
+      stopifnot(is.null(names(value)))
+      stopifnot(length(value) == self$n_samples)
+      
+      prev <- private$.counts$dimnames[[2]]
+      map  <- function (x) value[match(x, prev)]
+      
+      private$.counts$dimnames[[2]]  %<>% map()
+      private$.metadata[['.sample']] %<>% map()
+      
+      private$.hashes[['.counts']]   <- rlang::hash(private$.counts)
+      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
+      
+      return (self)
+    },
+    
+    
+    
+    #________________________________________________________
+    # Get or set OTU names.
+    #________________________________________________________
+    otus = function (value) {
+      
+      if (missing(value)) return (private$.counts$dimnames[[1]])
+      
+      stopifnot(is.character(value))
+      stopifnot(!anyDuplicated(value))
+      stopifnot(!anyNA(value))
+      stopifnot(is.null(names(value)))
+      stopifnot(length(value) == self$n_otus)
+      
+      prev <- private$.counts$dimnames[[1]]
+      map  <- function (x) value[match(x, prev)]
+      
+      private$.counts$dimnames[[1]] %<>% map()
+      private$.taxonomy[['.otu']]   %<>% map()
+      if (!is.null(private$.sequences)) names(private$.sequences) %<>% map()
+      if (!is.null(private$.tree))      private$.tree$tip.label   %<>% map()
+      
+      private$.hashes[['.counts']]    <- rlang::hash(private$.counts)
+      private$.hashes[['.taxonomy']]  <- rlang::hash(private$.taxonomy)
+      private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
+      private$.hashes[['.tree']]      <- rlang::hash(private$.tree)
+      
+      return (self)
+    },
+    
+    
+    
     #________________________________________________________
     # Read-only accessors.
     #________________________________________________________
-    otus         = function () { private$.counts$dimnames[[1]]             },
-    samples      = function () { private$.counts$dimnames[[2]]             },
-    fields       = function () { attr(private$.metadata, 'names')          },
-    ranks        = function () { attr(private$.taxonomy, 'names')          },
-    n_otus       = function () { private$.counts$nrow                      },
-    n_samples    = function () { private$.counts$ncol                      },
-    n_fields     = function () { length(attr(private$.metadata, 'names'))  },
-    n_ranks      = function () { length(attr(private$.taxonomy, 'names'))  },
-    date         = function () { private$.date                             },
-    generated_by = function () { private$.generated_by                     },
-    pkg_version  = function () { private$.pkg_version                      },
-    depth        = function () { private$.depth                            }
+    fields       = function () { attr(private$.metadata, 'names')         },
+    ranks        = function () { attr(private$.taxonomy, 'names')         },
+    n_otus       = function () { private$.counts$nrow                     },
+    n_samples    = function () { private$.counts$ncol                     },
+    n_fields     = function () { length(attr(private$.metadata, 'names')) },
+    n_ranks      = function () { length(attr(private$.taxonomy, 'names')) },
+    generated_by = function () { private$.generated_by                    },
+    pkg_version  = function () { private$.pkg_version                     },
+    depth        = function () { private$.depth                           }
     
   ) # /active
 )

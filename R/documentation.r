@@ -5,8 +5,8 @@
 #' @name documentation_default
 #' @keywords internal
 #' 
-#' @param biom   An rbiom-class object, or data coercible with 
-#'        [as_rbiom()].
+#' @param biom   An [rbiom object][rbiom_objects], such as from [as_rbiom()]. 
+#'        Any value accepted by [as_rbiom()] can also be given here.
 #' 
 #' @param mtx   A matrix-like object.
 #'        
@@ -14,15 +14,14 @@
 #'        relationships of the taxa in `biom`. Only required when 
 #'        computing UniFrac distances. Default: `biom$tree`
 #'     
-#' @param md  A character vector naming the metadata fields to include in the 
-#'        output data frame, or `'.all'` to include all metadata fields.
-#'        Default: `'.all'`
+#' @param md  Dataset field(s) to include in the output data frame, or `'.all'` 
+#'        to include all metadata fields. Default: `'.all'`
 #' 
 #' @param adiv   Alpha diversity metric(s) to use. Options are: `"OTUs"`, 
 #'        `"Shannon"`, `"Chao1"`, `"Simpson"`, and/or 
 #'        `"InvSimpson"`. Set `adiv=".all"` to use all metrics.
 #'        Default: `"Shannon"` \cr\cr
-#'        Multiple values allowed. Non-ambiguous abbreviations are allowed.
+#'        Multiple/abbreviated values allowed.
 #' 
 #' @param bdiv  Beta diversity distance algorithm(s) to use. Options are:
 #'        `"Bray-Curtis"`, `"Manhattan"`, `"Euclidean"`, 
@@ -45,12 +44,16 @@
 #'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
 #'        }
 #'        Default: `"UMAP"` \cr\cr
-#'        Multiple values allowed. Non-ambiguous abbreviations are allowed.
+#'        Multiple/abbreviated values allowed.
 #'     
 #' @param weighted  Take relative abundances into account. When 
 #'        `weighted=FALSE`, only presence/absence is considered.
 #'        Default: `TRUE` \cr\cr
 #'        Multiple values allowed.
+#' 
+#' @param delta  For numeric metadata, report the absolute difference in values 
+#'        for the two samples, for instance `2` instead of `"10 vs 12"`. 
+#'        Default: `TRUE`
 #'        
 #' @param rank   What rank(s) of taxa to display. E.g. `"Phylum"`, 
 #'        `"Genus"`, `".otu"`, etc. An integer vector can also be 
@@ -113,6 +116,15 @@
 #'        of columns. Default: `FALSE`
 #'
 #' @param stripe   Shade every other x position. Default: \emph{same as flip}
+#'     
+#' @param ci   How to calculate min/max of the \bold{crossbar}, 
+#'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
+#'        Options are: `"ci"` (confidence interval), `"range"`, 
+#'        `"sd"` (standard deviation), `"se"` (standard error), and 
+#'        `"mad"` (median absolute deviation). 
+#'        The center mark of \bold{crossbar} and \bold{pointrange} represents
+#'        the mean, except for `"mad"` in which case it represents the median. 
+#'        Default: `"ci"`
 #'
 #' @param p.label   Minimum adjusted p-value to display on the plot with a 
 #'        bracket.
@@ -142,8 +154,8 @@
 #' @param k   Number of ordination dimensions to return. Either `2L` or 
 #'        `3L`. Default: `2L`
 #'        
-#' @param split.by   Name(s) of metadata columns that the data should be split
-#'        by prior to any calculations. Default: `NULL`
+#' @param split.by   Dataset field(s) that the data should be split by prior to 
+#'        any calculations. Must be categorical. Default: `NULL`
 #' 
 #' @param dm   A `dist`-class distance matrix, as returned from 
 #'        [bdiv_distmat()] or [stats::dist()]. Required.
@@ -152,13 +164,67 @@
 #'        correspond to `attr(dm, 'Labels')`. Values can be either 
 #'        categorical or numeric. Required.
 #' 
-#' @param stat.by   The categorical metadata field defining the statistical 
-#'        groups. Required.
+#' @param df   The dataset (data.frame or tibble object). "Dataset fields" 
+#'        mentioned below should match column names in `df`. Required.
+#'        
+#' @param regr   Dataset field with the x-axis (independent; predictive) 
+#'        values. Must be numeric. Default: `NULL`
 #' 
-#' @param regr   To run a regression analysis, set `regr` to the numeric 
-#'        metadata field with the "x-axis" values. Leaving `regr=NULL` 
-#'        will generate boxplot-like statistics; when non-NULL, corrplot-like 
-#'        statistics will be returned. Default: `NULL`
+#' @param resp   Dataset field with the y-axis (dependent; response) values, 
+#'        such as taxa abundance or alpha diversity. 
+#'        Default: `attr(df, 'response')`
+#'        
+#' @param stat.by   Dataset field with the statistical groups. Must be 
+#'        categorical. Default: `NULL`
+#'        
+#' @param facet.by   Dataset field(s) to use for faceting. Must be categorical. 
+#'        Default: `NULL`
+#'        
+#' @param colors   How to color the `stat.by` groups. Options are:
+#'        \itemize{
+#'            \item{`TRUE` - }{ Automatically select colorblind-friendly colors. }
+#'            \item{`FALSE` or `NULL` - }{ Don't use colors. }
+#'            \item{a palette name - }{ Auto-select colors from this set. E.g. `"okabe"` }
+#'            \item{character vector - }{ Custom colors to use. E.g. `c("red", "#00FF00")` }
+#'            \item{named character vector - }{ Explicit mapping. E.g. `c(Male = "blue", Female = "red")` }
+#'        }
+#'        See "Aesthetics" section below for additional information.
+#'        Default: `TRUE`
+#'        
+#' @param shapes   Shapes for each `stat.by` group. 
+#'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, shape 
+#'        names (typically integers 0 - 17), or a named vector mapping 
+#'        `stat.by` groups to specific shape names.
+#'        See "Aesthetics" section below for additional information.
+#'        Default: `FALSE`
+#'        
+#' @param patterns   Patterns for each `stat.by` group. 
+#'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, pattern 
+#'        names (`"brick"`, `"chevron"`, `"fish"`, `"grid"`, etc), or a named 
+#'        vector mapping `stat.by` groups to specific pattern names.
+#'        See "Aesthetics" section below for additional information.
+#'        Default: `FALSE`
+#' 
+#' @param test   Method for computing p-values: `'wilcox'`, `'kruskal'`, 
+#'        `'emmeans'`, or `'emtrends'`. Default: `'emmeans'`
+#' 
+#' @param fit   How to fit the trendline. `'lm'`, `'log'`, or `'gam'`. 
+#'        Default: `'lm'`
+#'        
+#' @param at   Position(s) along the x-axis where the means or slopes should be 
+#'        evaluated. Default: `NULL`, which samples 100 evenly spaced positions 
+#'        and selects the position where the p-value is most significant.
+#'        
+#' @param alt   Alternative hypothesis direction. Options are `'!='` 
+#'        (two-sided; not equal to `mu`), `'<'` (less than `mu`), or `'>'` 
+#'        (greater than `mu`). Default: `'!='`
+#'        
+#' @param mu   Reference value to test against. Default: `0`
+#'        
+#' @param within,between   Dataset field(s) for intra- or inter- sample 
+#'        comparisons. Alternatively, dataset field names given elsewhere can 
+#'        be prefixed with `'=='` or `'!='` to assign them to `within` or 
+#'        `between`, respectively. Default: `NULL`
 #'        
 #' @param seed  Random seed for permutations. Default: `0`
 #'        
@@ -268,230 +334,26 @@ NULL
 NULL
 
 
+
 # cmp ====
 #' documentation_cmp
 #' 
 #' @name documentation_cmp
 #' @keywords internal
 #' 
-#' @param x   A categorical metadata column name. Prefix the column name with 
-#'        `==` or `!=` to limit comparisons to within or between
-#'        groups, respectively. The default, `NULL` groups all distances 
-#'        into a single column.
-#'        
-#' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
-#'        use for data partitioning. Prefix the column name with 
-#'        `==` or `!=` to limit comparisons to within or between
-#'        groups, respectively. Default: `NULL`
-#'        
-#' @param within,between   Metadata field(s) for intra- or inter- sample 
-#'        comparisons. Default: `NULL`
+#' @section Metadata Comparisons:
+#' 
+#' Prefix metadata fields with `==` or `!=` to limit comparisons to within or 
+#' between groups, respectively. For example, `stat.by = '==Sex'` will 
+#' run calculations only for intra-group comparisons, returning "Male" and
+#' "Female", but NOT "Female vs Male". Similarly, setting 
+#' `stat.by = '!=Body Site'` will only show the inter-group comparisons, such 
+#' as "Saliva vs Stool", "Anterior nares vs Buccal mucosa", and so on.
+#' 
+#' The same effect can be achieved by using the `within` and `between` 
+#' parameters. `stat.by = '==Sex'` is equivalent to 
+#' `stat.by = 'Sex', within = 'Sex'`.
 #'          
-NULL
-
-
-
-
-# boxplot ====
-#' documentation_boxplot
-#' 
-#' @name documentation_boxplot
-#' @keywords internal
-#' 
-#' @inherit documentation_plot_stats_return return
-#' 
-#' 
-#' @param x   A categorical metadata column name to use for the x-axis. The 
-#'        default, `NULL`, groups all samples into a single category. 
-#'        
-#' @param layers   One or more of 
-#'        `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`. 
-#'        Single letter abbreviations are also accepted. For instance, 
-#'        `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`.
-#'        See [plot types][plots] for examples of each. Default: `"x"`
-#'        
-#' @param color.by,pattern.by,shape.by,facet.by,limit.by   Metadata columns to 
-#'        use for aesthetics and partitioning. Default: `NULL`
-#'     
-#' @param ci   How to calculate min/max of the \bold{crossbar}, 
-#'        \bold{errorbar}, \bold{linerange}, and \bold{pointrange} layers.
-#'        Options are: `"ci"` (confidence interval), `"range"`, 
-#'        `"sd"` (standard deviation), `"se"` (standard error), and 
-#'        `"mad"` (median absolute deviation). 
-#'        The center mark of \bold{crossbar} and \bold{pointrange} represents
-#'        the mean, except for code{"mad"} in which case it represents
-#'        the median. Default: `"ci"`
-#'        
-#' @param ...   Parameters are matched to formal arguments of ggplot2
-#'        functions. Prefixing parameter names with a layer name ensures that
-#'        a particular parameter is passed to, and only to, that layer. For
-#'        instance, `dot.size = 2` or `d.size = 2` ensures only the 
-#'        dotplot layer has its size set to `2`. The special prefix
-#'        `pt.` will control both the dot and strip layers.
-#'        
-#' 
-#' @return A `ggplot2` plot. \cr The computed data points, statistics, 
-#'         and ggplot command are available as `$data`, `$stats`, and 
-#'         `$code`, respectively.
-#' 
-NULL
-
-
-
-
-# boxplot aes - section ====
-#' documentation_boxplot_aes_section
-#' 
-#' @name documentation_boxplot_aes_section
-#' @keywords internal
-#' 
-#' @section Aesthetics and Partitions:
-#' 
-#' Metadata can be used to flexibly subset, partition, and apply aesthetics 
-#' when creating a plot. Common use cases are provided below. More thorough 
-#' documentation is available at \url{https://cmmr.github.io/rbiom}.
-#' 
-#' 
-#' \preformatted{  ## Colors ----------------------------
-#'   color.by = "Body Site"
-#'   color.by = list('Body Site' = "bright")
-#'   color.by = list('Body Site' = c("Stool", "Saliva"))
-#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
-#'   color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-#'   
-#'   ## Patterns --------------------------
-#'   pattern.by = "Body Site"
-#'   pattern.by = list('Body Site' = c("Stool", "Saliva"))
-#'   pattern.by = list('Body Site' = c('Stool' = "left45", 'Saliva' = "hs_cross"))
-#'   
-#'   ## Shapes ----------------------------
-#'   shape.by = "Body Site"
-#'   shape.by = list('Body Site' = c("Stool", "Saliva"))
-#'   shape.by = list('Body Site' = c('Stool' = 7, 'Saliva' = 8))
-#'   
-#'   ## Facets ----------------------------
-#'   facet.by = "Body Site"
-#'   facet.by = c("Body Site", "Sex")
-#'   facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
-#'   
-#'   ## Limits ----------------------------
-#'   limit.by = list('Sex' = "Male", 'Age' = c(20,40))
-#'   limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
-#' }
-#' 
-#' \itemize{
-#'   \item{`color.by` - }{A categorical metadata column. (Max 1)}
-#'   \item{`pattern.by` - }{A categorical metadata column. (Max 1)}
-#'   \item{`shape.by` - }{A categorical metadata column. (Max 1)}
-#'   \item{`facet.by` - }{Categorical metadata column(s).}
-#'   \item{`limit.by` - }{Any metadata column(s).}
-#' }
-#' 
-#' All built-in color palettes are colorblind-friendly. The available 
-#' categorical palette names are: `"okabe"`, `"carto"`, `"r4"`, 
-#' `"polychrome"`, `"tol"`, `"bright"`, `"light"`, 
-#' `"muted"`, `"vibrant"`, `"tableau"`, `"classic"`, 
-#' `"alphabet"`, `"tableau20"`, `"kelly"`, and `"fishy"`.
-#' 
-#' Patterns are sourced from the magick R package. Pattern names are: 
-#' `"bricks"`, `"hexagons"`, `"horizontalsaw"`, 
-#' `"hs_fdiagonal"`, `"fishscales"`, `"verticalsaw"`, 
-#' `"checkerboard"`, `"octagons"`, `"right45"`, 
-#' `"hs_cross"`, `"hs_bdiagonal"`, `"hs_diagcross"`, 
-#' `"hs_horizontal"`, `"hs_vertical"`, `"left45"`, 
-#' `"leftshingle"`, `"rightshingle"`, `"verticalbricks"`, 
-#' `"verticalleftshingle"`, and `"verticalrightshingle"`.
-#' 
-#' Shapes can be given as per base R - numbers 0 through 17 for various shapes,
-#' or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use 
-#' letters instead of shapes on the plot. Character strings may used as well.
-#' 
-#' 
-NULL
-
-
-
-# corrplot ====
-#' documentation_corrplot
-#' 
-#' @name documentation_corrplot
-#' @keywords internal
-#' 
-#' 
-#' @param x   A numeric metadata field to use for the x-axis. Required.
-#'           
-#' @param layers   One or more of 
-#'        `c("trend", "confidence", "scatter", "name")`. Single 
-#'        letter abbreviations are also accepted. For instance, 
-#'        `c("trend", "scatter")` is equivalent to `c("t", "s")` and `"ts"`. 
-#'        See [plot types][plots] for examples of each. Default: `"tc"`
-#'        
-#' @param color.by,facet.by,limit.by   Metadata columns to use for aesthetics 
-#'        and partitioning. See below for details. Default: `NULL`
-#' 
-#' @param formula   Relationship between variables. Default: `y ~ x`
-#' 
-#' @param engine   What type of trend model to fit to the data. Options are: 
-#'        `"lm"` (linear), `"local"` (uses loess or gam). Default: `"lm"`
-#'        
-#' @param ...   Additional parameters to pass along to ggplot2
-#'        functions. Prefix a parameter name with either `t.` or 
-#'        `s.`/`pt.` to ensure it gets passed to (and only to) 
-#'        \link[ggplot2]{geom_smooth} or \link[ggplot2]{geom_point}, 
-#'        respectively. For instance, `s.size = 2` ensures only the 
-#'        scatterplot points have their size set to `2`.
-#'        
-#' 
-#' @return A `ggplot2` plot. \cr The computed data points and ggplot command 
-#'         are available as `$data` and `$code`, respectively.
-#' 
-#' 
-#' @section Aesthetics and Partitions:
-#' 
-#' Metadata can be used to flexibly subset, partition, and apply aesthetics 
-#' when creating a plot. Common use cases are provided below. More thorough 
-#' documentation is available at \url{https://cmmr.github.io/rbiom}.
-#' 
-#' \preformatted{  ## Colors ----------------------------
-#'   color.by = "Body Site"
-#'   color.by = list('Body Site' = "bright")
-#'   color.by = list('Body Site' = c("Stool", "Saliva"))
-#'   color.by = list('Body Site' = list('values' = c("Stool", "Saliva"), 'colors' = "bright"))
-#'   color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
-#'   
-#'   ## Facets ----------------------------
-#'   facet.by = "Body Site"
-#'   facet.by = c("Body Site", "Sex")
-#'   facet.by = list('Body Site' = c("Stool", "Saliva"), "Sex")
-#'   
-#'   ## Limits ----------------------------
-#'   limit.by = list('Sex' = "Male", 'Age' = c(20,40))
-#'   limit.by = list('Body Site' = c("Saliva", "Anterior nares"), 'Age' = c(NA,35))
-#' }
-#' 
-#' \itemize{
-#'   \item{`color.by` - }{Any metadata column. (Max 1)}
-#'   \item{`facet.by` - }{Only categorical metadata column(s).}
-#'   \item{`limit.by` - }{Any metadata column(s).}
-#' }
-#' 
-#' All built-in color palettes are colorblind-friendly.
-#' 
-#' The available categorical palette names are: `"okabe"`, `"carto"`, 
-#' `"r4"`, `"polychrome"`, `"tol"`, `"bright"`, 
-#' `"light"`, `"muted"`, `"vibrant"`, `"tableau"`, 
-#' `"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, 
-#' and `"fishy"`.
-#' 
-#' The available numeric palette names are: `"reds"`, `"oranges"`, 
-#' `"greens"`, `"purples"`, `"grays"`, `"acton"`, 
-#' `"bamako"`, `"batlow"`, `"bilbao"`, `"buda"`, 
-#' `"davos"`, `"devon"`, `"grayC"`, `"hawaii"`, 
-#' `"imola"`, `"lajolla"`, `"lapaz"`, `"nuuk"`, 
-#' `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`, 
-#' `"berlin"`, `"broc"`, `"cork"`, `"lisbon"`, 
-#' `"roma"`, `"tofino"`, `"vanimo"`, `"vik"`
-#' 
 NULL
 
 
@@ -607,166 +469,6 @@ NULL
 
 
 
-# test - ifelse ====
-#' documentation_test.ifelse
-#' 
-#' @name documentation_test.ifelse
-#' @keywords internal
-#' 
-#' 
-#' @param test   The statistic of interest. An overview of options can be 
-#'        found in the "Statistical Tests" section below. One of `"predict"`, 
-#'        `"terms"`, `"fit"`, `"means"`, `"trends"`, `"es_means"`, 
-#'        `"es_trends"`, `"pw_means"`, or `"pw_trends"`. 
-#'        Default: `ifelse(is.null(regr), "means", "trends")`
-#' 
-#' 
-#' @section Statistical Tests:
-#' 
-#' \bold{When `regr` is NULL:}
-#' \itemize{
-#'   \item{`"means"` - }{ 
-#'     Considers all groups at once using the Kruskal-Wallis
-#'     non-parametric test: [stats::kruskal.test()]. }
-#'   \item{`"pw_means"` - }{
-#'     Pairwise comparison of `stat.by` groups using the Wilcox rank sum 
-#'     (aka Mann-Whitney) non-parametric test: [stats::wilcox.test()]. }
-#' }
-#' 
-#' \bold{When `regr` is not NULL:}
-#' \itemize{
-#'   \item{`"predict"` - }{
-#'     Augments original data with fitted information. See 
-#'     [broom::augment.lm()]. }
-#'   \item{`"terms"` - }{ Summary information about the model's 
-#'     terms, including p-value, r-squared, AIC, BIC, and confidence 
-#'     interval at `level`. See [broom::tidy.lm()]. }
-#'   \item{`"fit"` - }{ Goodness of fit measures, p-values, and 
-#'     more for the overall model. See [broom::glance.lm()]. }
-#'   \item{`"means"` - }{ The estimated marginal mean (EMM) for 
-#'     each `stat.by` group, along with confidence intervals (CI), 
-#'     standard errors (SE), t-ratios, and p-values testing for mean = zero. 
-#'     See [emmeans::emmeans()] and [emmeans::summary.emmGrid()]. }
-#'   \item{`"trends"` - }{ The trendline slope for each 
-#'     `stat.by` group, along with CI and SE and p-value testing for
-#'     slope = zero. See [emmeans::emtrends()] and 
-#'     [emmeans::summary.emmGrid()]. }
-#'   \item{`"pw_means"` - }{ Pairwise means. All `stat.by` groups are 
-#'     compared to each other and the difference in means is estimated 
-#'     along with SE, t-ratios, and p-values testing if the two means 
-#'     are the same. See [emmeans::pairs.emmGrid()]. }
-#'   \item{`"pw_trends"` - }{ Pairwise trends. As above, but
-#'     comparing trendline slopes instead of means. }
-#'   \item{`"es_means"` - }{ Effect sizes for pairwise differences 
-#'     of means, including SE and CI. See [emmeans::eff_size()]. }
-#'   \item{`"es_trends"` - }{ Effect sizes for pairwise differences 
-#'     of slopes, including SE and CI. See [emmeans::eff_size()]. }
-#' }
-#'        
-NULL
-
-
-
-# test - pw_means ====
-#' documentation_test.pw_means
-#' 
-#' @name documentation_test.pw_means
-#' @keywords internal
-#' 
-#' 
-#' @param test   The statistic of interest. An overview of options can be 
-#'        found in the "Statistical Tests" section below. One of
-#'        `"predict"`, `"terms"`, `"fit"`, `"means"`, 
-#'        `"trends"`, `"es_means"`, `"es_trends"`, 
-#'        `"pw_means"`, or `"pw_trends"`. 
-#'        Default: `"pw_means"`
-#' 
-#' 
-#' @section Statistical Tests:
-#' 
-#' \itemize{
-#'   \item{`"predict"` - }{
-#'     Augments original data with fitted information. See 
-#'     [broom::augment.lm()]. }
-#'   \item{`"terms"` - }{ Summary information about the model's 
-#'     terms, including p-value, r-squared, AIC, BIC, and confidence 
-#'     interval at `level`. See [broom::tidy.lm()]. }
-#'   \item{`"fit"` - }{ Goodness of fit measures, p-values, and 
-#'     more for the overall model. See [broom::glance.lm()]. }
-#'   \item{`"means"` - }{ The estimated marginal mean (EMM) for 
-#'     each `stat.by` group, along with confidence intervals (CI), 
-#'     standard errors (SE), t-ratios, and p-values testing for mean = zero. 
-#'     See [emmeans::emmeans()] and [emmeans::summary.emmGrid()]. }
-#'   \item{`"trends"` - }{ The trendline slope for each 
-#'     `stat.by` group, along with CI and SE and p-value testing for
-#'     slope = zero. See [emmeans::emtrends()] and 
-#'     [emmeans::summary.emmGrid()]. }
-#'   \item{`"pw_means"` - }{ Pairwise means. All `stat.by` groups are 
-#'     compared to each other and the difference in means is estimated 
-#'     along with SE, t-ratios, and p-values testing if the two means 
-#'     are the same. See [emmeans::pairs.emmGrid()]. }
-#'   \item{`"pw_trends"` - }{ Pairwise trends. As above, but
-#'     comparing trendline slopes instead of means. }
-#'   \item{`"es_means"` - }{ Effect sizes for pairwise differences 
-#'     of means, including SE and CI. See [emmeans::eff_size()]. }
-#'   \item{`"es_trends"` - }{ Effect sizes for pairwise differences 
-#'     of slopes, including SE and CI. See [emmeans::eff_size()]. }
-#' }
-#' 
-NULL
-
-
-
-# test - trends ====
-#' documentation_test.trends
-#' 
-#' @name documentation_test.trends
-#' @keywords internal
-#' 
-#' 
-#' @param test   The statistic of interest. An overview of options can be 
-#'        found in the "Statistical Tests" section below. One of
-#'        `"predict"`, `"terms"`, `"fit"`, `"means"`, 
-#'        `"trends"`, `"es_means"`, `"es_trends"`, 
-#'        `"pw_means"`, or `"pw_trends"`. 
-#'        Default: `"trends"`
-#' 
-#' 
-#' @section Statistical Tests:
-#' 
-#' \itemize{
-#'   \item{`"predict"` - }{
-#'     Augments original data with fitted information. See 
-#'     [broom::augment.lm()]. }
-#'   \item{`"terms"` - }{ Summary information about the model's 
-#'     terms, including p-value, r-squared, AIC, BIC, and confidence 
-#'     interval at `level`. See [broom::tidy.lm()]. }
-#'   \item{`"fit"` - }{ Goodness of fit measures, p-values, and 
-#'     more for the overall model. See [broom::glance.lm()]. }
-#'   \item{`"means"` - }{ The estimated marginal mean (EMM) for 
-#'     each `stat.by` group, along with confidence intervals (CI), 
-#'     standard errors (SE), t-ratios, and p-values testing for mean = zero. 
-#'     See [emmeans::emmeans()] and [emmeans::summary.emmGrid()]. }
-#'   \item{`"trends"` - }{ The trendline slope for each 
-#'     `stat.by` group, along with CI and SE and p-value testing for
-#'     slope = zero. See [emmeans::emtrends()] and 
-#'     [emmeans::summary.emmGrid()]. }
-#'   \item{`"pw_means"` - }{ Pairwise means. All `stat.by` groups are 
-#'     compared to each other and the difference in means is estimated 
-#'     along with SE, t-ratios, and p-values testing if the two means 
-#'     are the same. See [emmeans::pairs.emmGrid()]. }
-#'   \item{`"pw_trends"` - }{ Pairwise trends. As above, but
-#'     comparing trendline slopes instead of means. }
-#'   \item{`"es_means"` - }{ Effect sizes for pairwise differences 
-#'     of means, including SE and CI. See [emmeans::eff_size()]. }
-#'   \item{`"es_trends"` - }{ Effect sizes for pairwise differences 
-#'     of slopes, including SE and CI. See [emmeans::eff_size()]. }
-#' }
-#' 
-NULL
-
-
-
 
 # plot - return ====
 #' documentation_plot_return
@@ -777,18 +479,6 @@ NULL
 #' @return A `ggplot2` plot. \cr The computed data points and ggplot 
 #'         command are available as `$data` and `$code`, 
 #'         respectively.
-#' 
-NULL
-
-
-# stats - return ====
-#' documentation_stats_return
-#' 
-#' @name documentation_stats_return
-#' @keywords internal
-#' 
-#' @return A tibble data frame with summary statistics. \cr
-#'         The R code or generating these statistics is in `$code`.
 #' 
 NULL
 

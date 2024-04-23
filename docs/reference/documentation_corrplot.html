@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9118</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9125</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,24 +78,15 @@
 
 <dt>layers</dt>
 <dd><p>One or more of
-<code>c("trend", "confidence", "scatter", "name")</code>. Single
+<code>c("trend", "confidence", "point", "name")</code>. Single
 letter abbreviations are also accepted. For instance,
-<code>c("trend", "scatter")</code> is equivalent to <code>c("t", "s")</code> and <code>"ts"</code>.
+<code>c("trend", "point")</code> is equivalent to <code>c("t", "p")</code> and <code>"tp"</code>.
 See plot types for examples of each. Default: <code>"tc"</code></p></dd>
 
 
 <dt>color.by, facet.by, limit.by</dt>
 <dd><p>Metadata columns to use for aesthetics
 and partitioning. See below for details. Default: <code>NULL</code></p></dd>
-
-
-<dt>formula</dt>
-<dd><p>Relationship between variables. Default: <code>y ~ x</code></p></dd>
-
-
-<dt>engine</dt>
-<dd><p>What type of trend model to fit to the data. Options are:
-<code>"lm"</code> (linear), <code>"local"</code> (uses loess or gam). Default: <code>"lm"</code></p></dd>
 
 
 <dt>...</dt>
@@ -162,7 +153,7 @@ and <code>"fishy"</code>.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Daniel P. Smith.</p>
+  <p></p><p>Developed by Daniel P. Smith, Alkek Center for Metagenomics and Microbiome Research.</p>
 </div>
 
 <div class="pkgdown-footer-right">

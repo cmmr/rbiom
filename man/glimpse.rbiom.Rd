@@ -7,8 +7,8 @@
 \method{glimpse}{rbiom}(biom, width = NULL, ...)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{width}{Width of output. See \code{\link[pillar:glimpse]{pillar::glimpse()}} documentation.
 Default: \code{NULL}}

@@ -39,7 +39,7 @@ taxa_heatmap <- function (
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file()
+  cache_file <- get_cache_file('taxa_heatmap', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
@@ -117,7 +117,7 @@ taxa_heatmap <- function (
     
     validate_taxa()
     
-    validate_meta_aes('color.by', null_ok = TRUE, max = Inf)
+    validate_meta_aes('color.by', null_ok = TRUE, max = Inf, aes = "color")
     validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
     validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
     

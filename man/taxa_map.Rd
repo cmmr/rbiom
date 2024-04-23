@@ -4,11 +4,11 @@
 \alias{taxa_map}
 \title{Map OTUs names to taxa names at a given rank.}
 \usage{
-taxa_map(biom, rank = NULL, unc = "asis", lineage = FALSE)
+taxa_map(biom, rank = NULL, unc = "singly", lineage = FALSE)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{rank}{When \code{NULL}, the entire biom$taxonomy data.frame is returned,
 transformed as per \code{unc}. Alternatively, a single taxonomic rank

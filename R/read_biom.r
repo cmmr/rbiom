@@ -228,6 +228,7 @@ read_biom <- function (src, tree='auto') {
     'tree'      = phylogeny,
     'sequences' = sequences,
     'id'        = info$id,
+    'date'      = info$date,
     'comment'   = info$comment )
   
   
@@ -279,8 +280,8 @@ biom_file_format <- function (file) {
   
   format <- local({
     first4 <- readChar(con, nchars = min(4L, file.size(file)))
-    if (startsWith(first4, '{'))      return ("json")
-    if (eq(first4, "\x89HDF")) return ("hdf5")
+    if (startsWith(first4, '{')) return ("json")
+    if (eq(first4, "\x89HDF"))   return ("hdf5")
     return ("tsv")
   })
   

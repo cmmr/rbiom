@@ -217,6 +217,8 @@ Other visualization:
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
 \code{\link{rare_stacked}()},
+\code{\link{stats_boxplot}()},
+\code{\link{stats_corrplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

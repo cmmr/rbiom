@@ -1,5 +1,113 @@
 
-# Helper functions called by the plot_*.r scripts.
+
+
+#____________________________________________________________________
+# Ensure something's a factor with minimal levels.
+#____________________________________________________________________
+refactor <- function (values) {
+  values <- as.factor(values)
+  factor(values, intersect(levels(values), unique(values)))
+}
+
+
+#____________________________________________________________________
+# Assign var = value only when var doesn't already exist.
+#____________________________________________________________________
+default <- function (var, value, env = parent.frame()) {
+  if (!hasName(env, var)) assign(var, value, env)
+  return (invisible(NULL))
+}
+
+
+#____________________________________________________________________
+# A string representation of the function call.
+#____________________________________________________________________
+current_cmd <- function (fn, indent = 0) {
+  
+  fun  <- get(fn)
+  env  <- rlang::caller_env(2)
+  args <- rlang::caller_call() %>% 
+    rlang::call_match(fun) %>% 
+    rlang::call_args() %>% 
+    lapply(eval, envir = env)
+  
+  glue("{fn}({as.args(args, indent, fun)})")
+}
+
+
+#____________________________________________________________________
+# Collect and evaluate all the arguments.
+#____________________________________________________________________
+slurp_env <- function (..., .dots = FALSE) {
+  
+  env <- rlang::caller_env()
+  
+  if (isTRUE(.dots)) { env$.dots <- lapply(list(...), eval, envir = env)
+  } else             { rlang::env_bind(env, ...) }
+  
+  rlang::env_unbind(env, '...')
+  params <- lapply(as.list(env, all.names = TRUE), eval, envir = env)
+  
+  rlang::env_unbind(env, names(env))
+  
+  return (params)
+}
+
+
+
+#____________________________________________________________________
+# Create an environment of evaluated variables from caller's env.
+#____________________________________________________________________
+eval_envir <- function (env, ...) {
+  
+  dots <- list(...)
+  
+  
+  #____________________________________________________________________
+  # Evaluate all arguments into a clean env.
+  #____________________________________________________________________
+  params <- lapply(as.list(env), eval) %>%
+    rlang::new_environment(parent = rlang::ns_env('rbiom'))
+  
+  
+  #____________________________________________________________________
+  # Move some parameters into dots.
+  #____________________________________________________________________
+  if (hasName(params, 'y.trans')) {
+    dots[['y.trans']] <- params[['y.trans']]
+    rlang::env_unbind(params, 'y.trans')
+  }
+  
+  
+  #____________________________________________________________________
+  # Check if obviously wrong parameters are going into dots.
+  #____________________________________________________________________
+  if (length(dots) > 0) {
+    
+    invalid <- paste(collapse = ", ", c(
+      names(dots)[startsWith(names(dots), '.')],
+      intersect(
+        x = names(dots),
+        y = c(
+          'x', 'y', 'color.by', 'shape.by', 'facet.by', 
+          'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
+          'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
+          'within', 'between', 'tree', 'params',
+          'regr', 'resp' ))))
+    
+    if (nzchar(invalid)) {
+      fn <- deparse(rlang::caller_call()[[1]])
+      cli_abort(c(x = "{fn} does not accept parameter(s): {invalid}"))
+    }
+    
+  }
+  
+  
+  params$.dots <- lapply(dots, eval)
+  
+  
+  return (params)
+}
 
 
 
@@ -68,59 +176,6 @@ as_rbiom_tbl <- function (df) {
 
 
 #____________________________________________________________________
-# Create an environment of evaluated variables in caller's env.
-#____________________________________________________________________
-eval_envir <- function (env, ...) {
-  
-  dots <- list(...)
-  
-  
-  #____________________________________________________________________
-  # Evaluate all arguments into a clean env.
-  #____________________________________________________________________
-  params <- lapply(as.list(env), eval) %>%
-    rlang::new_environment(parent = rlang::ns_env('rbiom'))
-  
-  
-  #____________________________________________________________________
-  # Move some parameters into dots.
-  #____________________________________________________________________
-  if (hasName(params, 'y.trans')) {
-    dots[['y.trans']] <- params[['y.trans']]
-    rlang::env_unbind(params, 'y.trans')
-  }
-  
-  
-  #____________________________________________________________________
-  # Check if obviously wrong parameters are going into dots.
-  #____________________________________________________________________
-  if (length(dots) > 0) {
-    
-    invalid <- paste(collapse = ", ", c(
-      names(dots)[startsWith(names(dots), '.')],
-      intersect(
-        x = names(dots),
-        y = c(
-          'x', 'color.by', 'shape.by', 'facet.by', 
-          'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
-          'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
-          'within', 'between', 'tree', 'params' ))))
-    
-    if (nzchar(invalid)) {
-      fn <- deparse(rlang::caller_call()[[1]])
-      cli_abort(c(x = "{fn} does not accept parameter(s): {invalid}"))
-    }
-    
-  }
-  params$.dots <- lapply(dots, eval)
-  
-  
-  return (params)
-}
-
-
-
-#____________________________________________________________________
 # Explicitly define the code to be displayed in cmd
 #____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
@@ -183,7 +238,7 @@ append.cmd <- function (x, fn, args, lhs = NULL, hist = NULL, display = lhs, fun
 # When indent > 0, produces a multi-line string.
 # When fun is a function, puts the arguments in the expected order.
 #____________________________________________________________________
-as.args <- function (args = list(), indent = 0, fun = NULL) {
+as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
   
   if (is.environment(args)) args <- as.list(args)
   stopifnot(is_list(args))
@@ -206,6 +261,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
     
     f_args <- names(f_args)
     args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
+    if (!'...' %in% f_args) args <- args[intersect(f_args, names(args))]
     if (isTRUE(indent == 0))
       for (i in seq_along(args))
         if (eq(names(args)[[i]], f_args[[i]])) names(args)[i] <- "" else break
@@ -215,7 +271,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
   fmt <- "%s = %s"
   if (isTRUE(indent > 0 && length(args) > 1 && !is_null(names(args))))
     fmt <- paste(collapse="", rep(" ", indent)) %>%
-    paste0("\n", ., "%-", max(nchar(names(args))), "s = %s")
+      paste0("\n", ., "%-", max(nchar(coan(names(args)))), "s = %s")
   
   # Convert arguments to `eval`-able string representations
   strs <- c()
@@ -249,8 +305,7 @@ as.args <- function (args = list(), indent = 0, fun = NULL) {
       val <- paste0("c(", paste(collapse=", ", val), ")")
     
     if (nzchar(key)) {
-      key <- capture.output(as.name(key))
-      val <- sprintf(fmt = fmt, key, val)
+      val <- sprintf(fmt = fmt, coan(key), val)
     }
     
     strs <- c(strs, val)
@@ -299,8 +354,7 @@ aes_toString <- function (x) {
   sort <- c(
     "x", "xend", "xmin", "xmax", 
     "y", "yend", "ymin", "ymax", 
-    "colour", "fill", "shape", "group", 
-    "pattern_type", "pattern_fill", "label" )
+    "colour", "fill", "shape", "group", "label" )
   keys <- c(intersect(sort, keys), setdiff(keys, sort))
   
   results <- c()
@@ -418,11 +472,13 @@ ply_cols <- function (cols) {
   
   if (is(cols, 'quoted')) return (cols)
   
-  vars <- NULL
-  for (col in cols)
-    vars <- c(plyr::as.quoted(as.name(col)), vars)
+  structure(lapply(cols, as.name), class = "quoted")
   
-  return (vars)
+  # vars <- NULL
+  # for (col in cols)
+  #   vars <- c(plyr::as.quoted(as.name(col)), vars)
+  # 
+  # return (vars)
 }
 
 
@@ -540,7 +596,7 @@ qw <- function (...) {
 #____________________________________________________________________
 coan <- function (nm) {
   if (is.null(nm)) return ('')
-  capture.output(as.name(nm))
+  sapply(nm, USE.NAMES = FALSE, function (nm) capture.output(as.name(nm)))
 }
 
 

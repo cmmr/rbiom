@@ -14,8 +14,8 @@ rare_stacked(
 )
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
@@ -86,6 +86,8 @@ Other visualization:
 \code{\link{plot_heatmap}()},
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
+\code{\link{stats_boxplot}()},
+\code{\link{stats_corrplot}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

@@ -10,8 +10,8 @@ convert_to_SE(biom)
 convert_to_TSE(biom)
 }
 \arguments{
-\item{biom}{An rbiom-class object, or data coercible with
-\code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
+Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 }
 \value{
 A SummarizedExperiment or TreeSummarizedExperiment object.

@@ -30,6 +30,8 @@ print.rbiom_code <- function (x) {
 }
 
 
+
+
 #' Also search attributes.
 #' 
 #' @noRd
@@ -37,7 +39,7 @@ print.rbiom_code <- function (x) {
 #' @export
 `$.rbiom_tbl` <- function(obj, nm) {
   
-  if (!nm %in% c('code', 'stats', 'taxa_coords', 'taxa_stats')) {
+  if (!nm %in% c('cmd', 'code', 'stats', 'taxa_coords', 'taxa_stats')) {
     NextMethod()
     
   } else if (hasName(obj, nm)) {
@@ -46,6 +48,9 @@ print.rbiom_code <- function (x) {
   } else {
     
     val <- attr(obj, nm, exact = TRUE)
+    
+    if (!is.null(val) && nm %in% c('cmd', 'code'))
+      return (add_class(val, 'rbiom_code'))
     
     if (is.null(val) && hasName(obj, 'data'))
       val <- attr(obj[['data']], nm, exact = TRUE)
@@ -69,7 +74,6 @@ print.rbiom_code <- function (x) {
 tbl_sum.rbiom_tbl <- function (x) {
   c(attr(x, 'tbl_sum'), NextMethod())
 }
-
 
 
 
@@ -134,8 +138,8 @@ as.list.rbiom <- function (biom) {
 #'     pull(hmp50, 'bod') %>% head(4)
 #'     
 pull.rbiom <- function (biom, field = -1, name = ".sample", ...) {
-  if (!is_integerish(field)) validate_meta("field")
-  if (!is_integerish(name))  validate_meta("name", null_ok = TRUE)
+  if (!is_integerish(field)) validate_biom_field("field")
+  if (!is_integerish(name))  validate_biom_field("name", null_ok = TRUE)
   dplyr::pull(.data = biom$metadata, var = field, name = name, ...)
 }
 
@@ -213,6 +217,50 @@ mutate.rbiom <- function (biom, ..., clone = TRUE) {
 rename.rbiom <- function (biom, ..., clone = TRUE) {
   if (isTRUE(clone)) biom <- biom$clone()
   biom$metadata <- eval.parent(dplyr::rename(.data = biom$metadata, ...))
+  if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
+}
+
+
+
+
+
+#' Evaluate expressions on metadata.
+#' 
+#' `with()` will return the result of your expression. `within()` will return 
+#' an rbiom object.
+#' 
+#' @inherit documentation_biom.rbiom
+#' 
+#' @name with
+#' @family transformations
+#' 
+#' @param ...   Passed on to [base::with()] or [base::within()].
+#' 
+#' @return See description.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom) 
+#'     
+#'     with(hmp50, table(`Body Site`, Sex))
+#'     
+#'     biom <- within(hmp50, {
+#'       age_bin = cut(Age, 5)
+#'       bmi_bin = cut(BMI, 5)
+#'     })
+#'     biom$metadata
+#' 
+with.rbiom <- function (biom, ...) {
+  eval.parent(base::with(data = biom$metadata, ...))
+}
+
+
+
+#' @rdname with
+#' @export
+within.rbiom <- function (biom, ..., clone = TRUE) {
+  if (isTRUE(clone)) biom <- biom$clone()
+  biom$metadata <- eval.parent(base::within(data = biom$metadata, ...))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
