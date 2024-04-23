@@ -154,7 +154,7 @@ Many common statistical tools rely on the assumption that your data is normally 
 
 In the children dataset, this assumption is accurate.
 
-```{r, fig.asp = 1.5}
+```{r, fig.asp = 0.4}
 performance::check_model(
   check = c("pp_check", "linearity"),
   x     = mgcv::gam(
@@ -165,7 +165,7 @@ performance::check_model(
 
 However, microbiome data is usually non-normally distributed.
 
-```{r, fig.asp = 1.5}
+```{r, fig.asp = 0.4}
 
 performance::check_model(
   check = c("pp_check", "linearity"),
