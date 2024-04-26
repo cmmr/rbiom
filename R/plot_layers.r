@@ -73,6 +73,7 @@ init_layers <- function (
     # Use `color.by` instead of `stat.by`
     by <- sub("s$", ".by", i)
     by <- if (hasName(params, by)) params[[by]] else params$stat.by
+    if (is.null(by)) { params[[i]] <- NULL; next }
     by <- params$.ggdata[[by]]
     if (is.null(by)) { params[[i]] <- NULL; next }
     

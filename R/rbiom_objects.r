@@ -263,22 +263,47 @@ rbiom <- R6::R6Class(
       ranks  <- colnames(private$.taxonomy)
       fields <- colnames(private$.metadata)
       
-      cat(ifelse(nzchar(private$.id), private$.id, "An rbiom object"))
-      cat(sprintf(" (%s)\n", substr(private$.date, 1, 10)))
+      width <- min(80L, as.integer(getOption("width") * 0.75))
+      rlang::local_options(cli.width = width)
+      
+      
+      cat("\n")
+      title <- ifelse(nzchar(private$.id), private$.id, "An rbiom object")
+      div   <- cli::cli_div(theme = list(
+        rule = list("color" = "grey50", "line-type" = "double"),
+        span = list("color" = "white") ))
+      cli::cli_rule(paste0("{.span ", title, "}"), .envir = stop())
+      cli::cli_end(div)
+      cat("\n")
+      
       
       if (nzchar(private$.comment)) {
-        width         <- min(80, floor(getOption("width") * 0.75))
-        manual_breaks <- strsplit(babies$comment, "\n")[[1]]
-        cat(paste(collapse = "\n", strwrap(manual_breaks, width)), "\n")
-        cat("-----------\n")
+        cli::cli_text(private$.comment, .envir = stop())
+        cat("\n")
       }
       
-      width <- min(80, floor(getOption("width") * 0.75)) - 20
-      cat(sprintf("%7.0f Samples:  %s\n", length(sids),   vw(sids,   width)))
-      cat(sprintf("%7.0f OTUs:     %s\n", length(otus),   vw(otus,   width)))
-      cat(sprintf("%7.0f Ranks:    %s\n", length(ranks),  vw(ranks,  width)))
-      cat(sprintf("%7.0f Metadata: %s\n", length(fields), vw(fields, width)))
-      cat(sprintf("        Tree:     <%s>\n", ifelse(is.null(private$.tree), "absent", "present")))
+      
+      cat(sprintf("%7.0f Samples: %s\n", length(sids),   vw(sids,   width - 20)))
+      cat(sprintf("%7.0f OTUs:    %s\n", length(otus),   vw(otus,   width - 20)))
+      cat(sprintf("%7.0f Ranks:   %s\n", length(ranks),  vw(ranks,  width - 20)))
+      cat(sprintf("%7.0f Fields:  %s\n", length(fields), vw(fields, width - 20)))
+      cat("        Tree:    ")
+      cli::cli_text("{.emph {ifelse(is.null(private$.tree), '<absent>', '<present>')}}")
+      cat("\n")
+      
+      
+      if (is.null(depth <- private$.depth))
+        depth <- range(col_sums(private$.counts)) %>%
+          {scales::label_number(scale_cut=scales::cut_si(''))}() %>% 
+          sub(' ', '', .) %>% 
+          paste(collapse = " - ")
+      
+      div <- cli::cli_div(theme = list(rule = list("color" = "grey50")))
+      cli::cli_rule(
+        left   = paste(depth, 'reads/sample'), 
+        right  = substr(private$.date, 1, 10) )
+      cli::cli_end(div)
+      cat("\n")
       
     }
     

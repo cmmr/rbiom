@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9125</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -274,11 +274,13 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-in"><span>    <span class="va">p</span><span class="op">$</span><span class="va">code</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ggplot</span><span style="color: #BBBB00;">(</span>data, <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Age (days)`, y = .diversity<span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_ribbon</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping   = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>ymin = .ymin, ymax = .ymax<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping   = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>ymin = .ymin, ymax = .ymax, color = `Delivery mode`, fill = `Delivery mode`<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data      = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     alpha     = <span style="color: #BB00BB;">0.25</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     linewidth = <span style="color: #BB00BB;">0.2</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_line</span><span style="color: #BBBB00;">(</span>data = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_line</span><span style="color: #BBBB00;">(</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>color = `Delivery mode`<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_vline</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>xintercept = `Age (days)`<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data     = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"stat_vline"</span><span style="color: #BB00BB;">)</span>, </span>
@@ -292,6 +294,8 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     caption = <span style="color: #BBBB00;">"Low p-value indicates trendline means are different.\nBenjamini &amp; Hochberg FDR correction in use."</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     y       = <span style="color: #BBBB00;">"Shannon Diversity"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_color_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_fill_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_continuous</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span>expand = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0.15</span>, <span style="color: #BB00BB;">0</span>, <span style="color: #BB00BB;">0.15</span>, <span style="color: #BB00BB;">0)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_bw</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>

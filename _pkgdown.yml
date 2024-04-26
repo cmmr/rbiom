@@ -111,4 +111,5 @@ reference:
   desc: Example datasets included with rbiom.
   contents:
   - hmp50
+  - gems
   - babies

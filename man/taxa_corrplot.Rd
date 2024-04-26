@@ -10,7 +10,9 @@ taxa_corrplot(
   rank = -1,
   layers = "tc",
   taxa = 6,
+  lineage = FALSE,
   unc = "singly",
+  other = FALSE,
   stat.by = NULL,
   facet.by = NULL,
   colors = TRUE,
@@ -53,6 +55,14 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
+\item{lineage}{Include all ranks in the name of the taxa. For instance,
+setting to \code{TRUE} will produce
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+Otherwise the taxa name will simply be \code{Coriobacteriales}. You
+want to set this to TRUE when \code{unc = "asis"} and you have taxa
+names (such as \emph{Incertae_Sedis}) that map to multiple higher
+level ranks. Default: \code{FALSE}}
+
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
 \itemize{
@@ -63,6 +73,13 @@ taxa names. Options are:
 }
 Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
+
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{taxa}
+argument. Specifying \code{TRUE} adds "Other" to the returned set.
+A string can also be given to imply \code{TRUE}, but with that
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 
 \item{stat.by}{Dataset field with the statistical groups. Must be
 categorical. Default: \code{NULL}}
