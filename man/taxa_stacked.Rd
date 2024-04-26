@@ -13,7 +13,6 @@ taxa_stacked(
   label.by = NULL,
   order.by = NULL,
   facet.by = NULL,
-  limit.by = NULL,
   dist = "euclidean",
   clust = "complete",
   other = TRUE,
@@ -43,8 +42,8 @@ Default: \code{6}.}
 \item{colors, patterns}{A character vector of colors or patterns to use in
 the graph. A named character vector can be used to map taxon names to
 specific colors or patterns. Set to \code{TRUE} to auto-select colors
-or patterns, or to \code{FALSE} to disable per-taxa colors
-or patterns. Default: \code{colors=TRUE, patterns=FALSE}.}
+or patterns, or to \code{FALSE} to disable per-taxa colors or patterns.
+Default: \code{colors=TRUE, patterns=FALSE}.}
 
 \item{label.by, order.by}{What metadata column to use for labeling and/or
 sorting the samples across the x-axis. Set \code{label.by='.sample'}
@@ -52,8 +51,8 @@ to display sample names. When \code{order.by=NULL}, samples are
 arranged based on \code{dist} and \code{clust}, below.
 Default: \code{label.by=NULL, order.by=NULL}.}
 
-\item{facet.by, limit.by}{Metadata columns to
-use for data partitioning. Default: \code{NULL}}
+\item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
+Default: \code{NULL}}
 
 \item{dist, clust}{Distance (\code{\link[stats:dist]{stats::dist()}}) and clustering
 (\code{\link[stats:hclust]{stats::hclust()}}) methods to use for automatically arranging
@@ -108,6 +107,8 @@ Display taxa abundances as a stacked bar graph.
     biom <- rarefy(hmp50)
     
     taxa_stacked(biom, rank="Phylum")
+    
+    taxa_stacked(biom, rank = "genus", facet.by = "body site")
     
 }
 \seealso{

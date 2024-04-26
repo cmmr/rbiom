@@ -62,7 +62,7 @@
 
 stats_corrplot <- function (
     df, x, y = attr(df, 'response'), layers = "tc", 
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
     alt = "!=", mu = 0, caption = TRUE, ... ) {
   
@@ -145,7 +145,7 @@ stats_corrplot <- function (
 
 adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "tc", 
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
     trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
   
@@ -204,7 +204,7 @@ adiv_corrplot <- function (
 bdiv_corrplot <- function (
     biom, x, bdiv = "Bray-Curtis", layers = "tc", 
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
     trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
   
@@ -290,7 +290,7 @@ bdiv_corrplot <- function (
 
 rare_corrplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
     trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
   
@@ -378,13 +378,14 @@ rare_corrplot <- function (
 
 taxa_corrplot <- function (
     biom, x, rank = -1, layers = "tc", 
-    taxa = 6, unc = 'singly', 
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
+    taxa = 6, lineage = FALSE, unc = 'singly', other = FALSE, 
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
     trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
   
+  params <- list2env(slurp_env(...))
   
-  p <- with(slurp_env(...), {
+  p <- with(params, {
     
     #________________________________________________________
     # Compute taxa abundance.
@@ -393,12 +394,13 @@ taxa_corrplot <- function (
       biom    = biom, 
       rank    = rank, 
       taxa    = taxa, 
-      md      = c(x, stat.by, facet.by), 
+      lineage = lineage, 
+      md      = c(x, stat.by, facet.by),
       unc     = unc, 
       other   = other,
       trans   = trans )
     
-    remove("biom", "rank", "taxa", "unc", "other", "trans")
+    remove("biom", "rank", "taxa", "lineage", "unc", "other", "trans")
     
     
     #________________________________________________________
@@ -415,6 +417,7 @@ taxa_corrplot <- function (
     do.call(stats_corrplot, as.list(environment()))
     
   })
+  
   
   attr(p, 'cmd') <- current_cmd('taxa_corrplot')
   return (p)

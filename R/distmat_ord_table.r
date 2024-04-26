@@ -23,12 +23,12 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   
   # browser() ## below code intermittently crashes R session
   
-  params <- eval_envir(environment(), ...)
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env(..., .dots = TRUE)
   cache_file <- get_cache_file('distmat_ord_table', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -38,12 +38,17 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  validate_ord(max = Inf)
-  stopifnot(is_integerish(k) && k >= 2 && k <= 3)
-  stopifnot(is(dm, 'dist'))
-  
-  if (is.null(attr(dm, 'display', exact = TRUE)))
-    attr(dm, 'display') <- "dm"
+  params <- list2env(params)
+  with(params, {
+    
+    validate_ord(max = Inf)
+    validate_var_range('k', range = c(2, 3), n = 1, int = TRUE)
+    stopifnot(is(dm, 'dist'))
+    
+    if (is.null(attr(dm, 'display', exact = TRUE)))
+      attr(dm, 'display') <- "dm"
+    
+  })
   
   
   
@@ -51,9 +56,12 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   #________________________________________________________
   # Call 3rd party function with proper arguments.
   #________________________________________________________
+  dm   <- params$dm
+  k    <- params$k
+  ords <- setNames(params$ord, params$ord)
   dots <- params$.dots
   
-  tbl <- plyr::ldply(setNames(ord, ord), .id = ".ord", function (o) {
+  tbl <- plyr::ldply(ords, .id = ".ord", function (o) {
     
     if (o == "PCoA") {
       args <- c(fun_params(ape::pcoa, dots), list(D = dm))
@@ -95,17 +103,18 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   #________________________________________________________
   # Table header.
   #________________________________________________________
-  if (length(ord) == 1)
+  if (length(ords) == 1)
     attr(tbl, 'tbl_sum') <- c(
-      'Test' = switch(
-        EXPR = ord,
+      'Ordination' = switch(
+        EXPR = unname(ords),
         PCoA = "ape::pcoa(%s)",
         tSNE = "tsne::tsne(%s)",
         NMDS = "vegan::metaMDS(%s)",
-        UMAP = "uwot::umap(%s)" )) %>%
-      sprintf(as.args(params$.args))
+        UMAP = "uwot::umap(%s)" ) %>%
+      sprintf(as.args(params$.args)) )
   
   
+  attr(tbl, 'cmd') <- current_cmd('distmat_ord_table')
   
   set_cache_value(cache_file, tbl)
   

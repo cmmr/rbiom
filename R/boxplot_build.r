@@ -175,14 +175,11 @@ boxplot_build <- function (params) {
   #________________________________________________________
   if (has_layer(params, 'box')) {
     
-    if (!patterned)
-      set_layer(params, 'box', color="black", width=0.7)
-    
     if (has_layer(params, 'violin')) {
       set_layer(params, 'box', fill="white", width=0.1)
       
-    } else if (!patterned) {
-      set_layer(params, 'box', alpha=0.6)
+    } else {
+      set_layer(params, 'box', width=0.7, alpha=0.6)
     }
     
     if (dodged)

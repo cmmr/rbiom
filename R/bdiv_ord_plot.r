@@ -42,25 +42,23 @@
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     bdiv_ord_plot(biom, layers="pemt", color.by="Body Site", rank="g")
+#'     bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
 #'     
 bdiv_ord_plot <- function (
     biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, layers = "petm", 
-    color.by = NULL, shape.by = NULL, facet.by = NULL, limit.by = NULL, 
+    stat.by = NULL, color.by = stat.by, shape.by = stat.by, facet.by = NULL, 
+    colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params <- eval_envir(environment(), ...)
-  cmd    <- sprintf("bdiv_ord_plot(%s)", as.args(params, 2, bdiv_ord_plot))
-  remove(list = intersect(env_names(params), ls()))
-  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env(..., .dots = TRUE)
   cache_file <- get_cache_file('bdiv_ord_plot', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -69,24 +67,19 @@ bdiv_ord_plot <- function (
   #________________________________________________________
   # Validate and restructure user's arguments.
   #________________________________________________________
+  params <- list2env(params)
   with(params, {
     
-    validate_bdiv(max = Inf)
-    validate_rank(max = Inf)
-    
-    validate_unc()
-    validate_ord(max = Inf)
-    validate_bool('weighted', max = Inf)
-    
-    validate_meta_aes('color.by', null_ok = TRUE, aes = "color")
-    validate_meta_aes('shape.by', null_ok = TRUE, aes = "shape", col_type = "cat")
-    validate_meta_aes('facet.by', null_ok = TRUE, max = Inf,     col_type = "cat")
-    validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
-    
-    sync_metadata()
-    
     if (biom$n_samples < 4)
-      stop("At least four samples are needed for an ordination.")
+      cli_abort("At least four samples are needed for an ordination.")
+    
+    validate_rank(max = Inf, null_ok = TRUE)
+    
+    validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
+    validate_biom_field('color.by', null_ok = TRUE)
+    validate_biom_field('shape.by', null_ok = TRUE, col_type = "cat")
+    validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat")
+    
   })
   
   
@@ -101,9 +94,9 @@ bdiv_ord_plot <- function (
       bdiv         = bdiv,
       ord          = ord,
       weighted     = weighted,
-      md           = ".all",
+      md           = c(color.by, shape.by),
       split.by     = facet.by,
-      stat.by      = names(color.by),
+      stat.by      = stat.by,
       tree         = tree,
       test         = test,
       seed         = seed,
@@ -142,81 +135,32 @@ bdiv_ord_plot <- function (
     params  = params, 
     choices = c( 'p' = "point", 'n' = "name",    's' = "spider", 
                  'n' = "name",  'd' = "density", 't' = "taxon",
-                 'a' = "arrow", 'e' = "ellipse", 'm' = "mean" ) )
+                 'a' = "arrow", 'e' = "ellipse", 'm' = "mean" ))
   
   
   
   #________________________________________________________
-  # aes() parameters
+  # Ignore shapes/etc without applicable layers.
   #________________________________________________________
-  specs <- list(
-    "arrow"      = c('x', 'y', 'xend',  'yend'),
-    "spider"     = c('x', 'y', 'xend',  'yend',  'color'),
-    "ellipse"    = c('x', 'y',                   'color'),
-    "point"      = c('x', 'y', 'shape', 'fill',  'color'),
-    "name"       = c('x', 'y',          'label', 'color'),
-    "stats_text" = c(                   'label'),
-    "taxon"      = c('x', 'y', 'size',  'label'),
-    "mean"       = c('x', 'y', 'size') )
-  
-  
-  args <- .qw(x, y, xend, yend, label, size)
-  if (has_layer(params, 'color')) args[['color']] <- names(params$color.by)
-  if (has_layer(params, 'color')) args[['fill']]  <- names(params$color.by)
-  if (has_layer(params, 'shape')) args[['shape']] <- names(params$shape.by)
-  
-  for (layer in intersect(env_names(params$layers), names(specs))) {
-    layerArgs <- args[intersect(specs[[layer]], names(args))]
-    layerArgs <- args[setdiff(names(layerArgs), names(params$layers[[layer]]))]
-    
-    if (length(layerArgs) == 0) next
-    
-    names(layerArgs) <- paste0("mapping|", names(layerArgs))
-    if (layer == "name") layerArgs[['mapping|label']] <- ".sample"
-    set_layer(params, layer, layerArgs)
+  if (is.null(params$rank) || !any(has_layer(params, c('taxon', 'arrow', 'mean')))) {
+    params$rank <- NULL
+    del_layer(params, c('taxon', 'arrow', 'mean'))
   }
-  remove(list = c("specs", "args", "layer") %>% intersect(ls()))
-  
   
   
   
   #________________________________________________________
-  # Non-aes parameters
+  # aes() parameters - now handled by plot_build
   #________________________________________________________
-  if (has_layer(params, 'labs'))   set_layer(params, 'labs',   x = NULL, y = NULL)
-  if (has_layer(params, 'spider')) set_layer(params, 'spider', alpha = 0.4, size = 0.75)
-  if (has_layer(params, 'mean'))   set_layer(params, 'mean',   alpha = 0.5, color = "darkgray")
-  
-  if (has_layer(params, 'arrow'))
-    set_layer(
-      params = params, 
-      layer  = 'arrow', 
-      'alpha' = 0.4,
-      'color' = "darkgray", 
-      'size'  = 0.75, 
-      'arrow' = arrow(ends="first", length=unit(.5,"cm")))
-  
-  if (has_layer(params, 'taxon'))
-    set_layer(
-      params = params, 
-      layer  = 'taxon', 
-      'show.legend'        = FALSE,
-      'fill'               = alpha(c("white"), 0.8),
-      'box.padding'        = 1,
-      'segment.curvature'  = -0.1, 
-      'segment.linetype'   = 8, 
-      'max.overlaps'       = 100,
-      'seed'               = 0)
-  
-  set_layer(
-    params = params, 
-    layer  = 'theme', 
-    'axis.text'        = element_blank(),
-    'axis.ticks'       = element_blank(),
-    'panel.border'     = element_rect(color = "black", fill = FALSE, size = 1),
-    'panel.grid.major' = element_blank(),
-    'panel.grid.minor' = element_blank(),
-    'panel.background' = element_rect(fill = "white"))
+  # specs <- list(
+  #   "arrow"      = c('x', 'y', 'xend',  'yend'),
+  #   "spider"     = c('x', 'y', 'xend',  'yend',  'color'),
+  #   "ellipse"    = c('x', 'y',                   'color'),
+  #   "point"      = c('x', 'y', 'shape', 'fill',  'color'),
+  #   "name"       = c('x', 'y',          'label', 'color'),
+  #   "stats_text" = c(                   'label'),
+  #   "taxon"      = c('x', 'y', 'size',  'label'),
+  #   "mean"       = c('x', 'y', 'size') )
   
   
   
@@ -260,6 +204,90 @@ bdiv_ord_plot <- function (
   }
   
   
+  if (eq(params$stat.by, params$color.by))
+    if (has_layer(params, 'ellipse'))
+      set_layer(
+        params = params, 
+        layer  = 'ellipse', 
+        'mapping|color' = params$stat.by )
+  
+  
+  
+  #________________________________________________________
+  # Default aes and non-aes parameters
+  #________________________________________________________
+  set_layer(
+    params = params, 
+    layer  = 'ggplot', 
+    'mapping|x' = '.x', 
+    'mapping|y' = '.y' )
+  
+  set_layer(
+    params = params, 
+    layer = 'labs', 
+    'x' = NULL, 
+    'y' = NULL )
+  
+  if (has_layer(params, 'name'))
+    set_layer(
+      params = params, 
+      layer  = 'name', 
+      'mapping|label' = ".label" )
+  
+  if (has_layer(params, 'mean'))
+    set_layer(
+      params = params, 
+      layer  = 'mean', 
+      'alpha'        = 0.5, 
+      'color'        = "darkgray",
+      'mapping|size' = ".size" )
+  
+  if (has_layer(params, 'spider'))
+    set_layer(
+      params = params, 
+      layer  = 'spider', 
+      'alpha'        = 0.4, 
+      'size'         = 0.75,
+      'mapping|xend' = ".xend",
+      'mapping|yend' = ".yend" )
+  
+  if (has_layer(params, 'arrow'))
+    set_layer(
+      params = params, 
+      layer  = 'arrow', 
+      'alpha'        = 0.4,
+      'color'        = "darkgray", 
+      'size'         = 0.75, 
+      'arrow'        = arrow(ends="first", length=unit(.5,"cm")),
+      'mapping|xend' = ".xend",
+      'mapping|yend' = ".yend" )
+  
+  if (has_layer(params, 'taxon'))
+    set_layer(
+      params = params, 
+      layer  = 'taxon', 
+      'show.legend'        = FALSE,
+      'fill'               = alpha(c("white"), 0.8),
+      'box.padding'        = 1,
+      'segment.curvature'  = -0.1, 
+      'segment.linetype'   = 8, 
+      'max.overlaps'       = 100,
+      'seed'               = 0,
+      'mapping|size'       = ".size",
+      'mapping|label'      = ".label" )
+  
+  
+  set_layer(
+    params = params, 
+    layer  = 'theme', 
+    'axis.text'        = element_blank(),
+    'axis.ticks'       = element_blank(),
+    'panel.border'     = element_rect(color = "black", fill = FALSE, size = 1),
+    'panel.grid.major' = element_blank(),
+    'panel.grid.minor' = element_blank(),
+    'panel.background' = element_rect(fill = "white"))
+  
+  
   #________________________________________________________
   # Create the plot and add each layer with its arguments.
   # Also attach the human-readable ggplot command.
@@ -272,8 +300,7 @@ bdiv_ord_plot <- function (
   
   
   
-  
-  attr(fig, 'cmd') <- cmd
+  attr(fig, 'cmd') <- current_cmd('bdiv_ord_plot')
   set_cache_value(cache_file, fig)
   
   return(fig)
@@ -563,7 +590,7 @@ ordination_spider <- function (params) {
   
   attr(ggdata, 'spider') <- plyr::ddply(
     .data      = as.data.frame(ggdata),
-    .variables = ply_cols(c(params$facet.by, names(params$color.by))), 
+    .variables = ply_cols(c(params$facet.by, params$stat.by)), 
     .fun       = function (df) {
       
       data.frame(

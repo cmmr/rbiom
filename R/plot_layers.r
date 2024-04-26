@@ -7,6 +7,9 @@ init_layers <- function (
   
   layer_names <- do_init
   
+  if (!is_null(params$facet.by))
+    layer_names %<>% c('facet')
+  
   
   if (!is.null(choices)) {
     
@@ -38,18 +41,8 @@ init_layers <- function (
     layer_names <- layer_names[!is.na(layer_names)]
     
     
-    
-    
-    #________________________________________________________
-    # Ignore shapes/etc without applicable layers.
-    #________________________________________________________
-    if (!any(c('taxon', 'arrow', 'mean') %in% layer_names)) params$rank <- NULL
-    
     if (length(layer_names) == 0)
       cli_abort("Invalid `{var}` argument: {.val {spec}}.")
-    
-    
-    if (!is_null(params$facet.by)) layer_names %<>% c('facet')
     
   }
   
@@ -59,72 +52,75 @@ init_layers <- function (
   # Ignore shapes/patterns without applicable layers.
   #________________________________________________________
   if (!any(c('dot', 'strip', 'pointrange', 'point') %in% layer_names)) params$shapes   <- NULL
-  if (!any(c('box', 'bar', 'violin')                %in% layer_names)) params$patterns <- NULL
+  if (!any(c('box', 'bar', 'violin', 'stack')       %in% layer_names)) params$patterns <- NULL
   
   
   #________________________________________________________
   # Resolve `colors`, `patterns`, and `shapes`.
   #________________________________________________________
-  if (is.null(params$stat.by)) {
+  
+  if (is_palette(params$colors))
+    params$colors <- color_palette(params$colors)
+  
+  for (i in c('colors', 'shapes', 'patterns')) {
     
-    params$colors   <- NULL
-    params$shapes   <- NULL
-    params$patterns <- NULL
+    x <- params[[i]]
     
-  } else {
-    
-    if (is_palette(params$colors))
-      params$colors <- color_palette(params$colors)
+    if (is.null(x)) next
+    if (isFALSE(x)) { params[[i]] <- NULL; next }
     
     
-    stat_lvls  <- levels(params$.ggdata[[params$stat.by]])
+    # Use `color.by` instead of `stat.by`
+    by <- sub("s$", ".by", i)
+    by <- if (hasName(params, by)) params[[by]] else params$stat.by
+    by <- params$.ggdata[[by]]
+    if (is.null(by)) { params[[i]] <- NULL; next }
+    
+    # Gradient colors finish up here.
+    if (!is.factor(by)) next
+    
+    
+    stat_lvls  <- levels(by)
     stat_nlvls <- length(stat_lvls)
     
-    for (i in c('colors', 'shapes', 'patterns')) {
+    
+    if (isTRUE(x))
+      x <- switch(
+        EXPR = i, 
+        'colors'   = get_n_colors(n = stat_nlvls), 
+        'shapes'   = get_n_shapes(n = stat_nlvls), 
+        'patterns' = get_n_patterns(n = stat_nlvls) )
+    
+    
+    # Re-order named aesthetic values to match levels() order.
+    if (!is.null(names(x))) {
       
-      x <- params[[i]]
+      xn <- names(x)
+      validate_var_choices('xn', evar = i, choices = stat_lvls, max = Inf)
+      names(x) <- xn
+      remove("xn")
       
-      if (is.null(x)) next
-      if (isFALSE(x)) { params[[i]] <- NULL; next }
+      if (length(missing <- setdiff(stat_lvls, names(x))) > 0)
+        cli_abort("Missing `{i}` for {stat.by} {qty(missing)} level{?s} {.val {missing}}.")
       
+      if (length(dups <- unique(names(x)[duplicated(names(x))])) > 0)
+        cli_abort("Duplicated {qty(dups)} name{?s} in `{i}`: {.val {dups}}.")
       
-      if (isTRUE(x))
-        x <- switch(
-          EXPR = i, 
-          'colors'   = get_n_colors(n = stat_nlvls), 
-          'shapes'   = get_n_shapes(n = stat_nlvls), 
-          'patterns' = get_n_patterns(n = stat_nlvls) )
-      
-      
-      # Re-order named aesthetic values to match levels() order.
-      if (!is.null(names(x))) {
-        
-        xn <- names(x)
-        validate_var_choices('xn', evar = i, choices = stat_lvls, max = Inf)
-        names(x) <- xn
-        remove("xn")
-        
-        if (length(missing <- setdiff(stat_lvls, names(x))) > 0)
-          cli_abort("Missing `{i}` for {stat.by} {qty(missing)} level{?s} {.val {missing}}.")
-        
-        if (length(dups <- unique(names(x)[duplicated(names(x))])) > 0)
-          cli_abort("Duplicated {qty(dups)} name{?s} in `{i}`: {.val {dups}}.")
-        
-        x <- as.vector(x[stat_lvls])
-      }
-      
-      
-      params[[i]] <- rep_len(x, stat_nlvls)
+      x <- as.vector(x[stat_lvls])
     }
     
-    remove("stat_lvls", "stat_nlvls", "i", "x")
+    
+    params[[i]] <- rep_len(x, stat_nlvls)
   }
   
+  remove(list = c("i", "x", "by", "stat_lvls", "stat_nlvls") %>% intersect(ls()))
   
   
   
-  if (any(startsWith(names(params$.dots), 'labs.')))
-    layer_names %<>% c('labs')
+  
+  if (!is.null(names(params$.dots)))
+    if (any(startsWith(names(params$.dots), 'labs.')))
+      layer_names %<>% c('labs')
   
   
   init_layer_names <- layer_names %>%
@@ -164,8 +160,9 @@ has_layer <- function (params, layer) {
 #________________________________________________________
 del_layer <- function (params, layer) {
   
-  if (hasName(params$layers, layer))
-    remove(list = layer, pos = params$layers)
+  for (i in layer)
+    if (hasName(params$layers, i))
+      remove(list = i, pos = params$layers)
   
   return (invisible(NULL))
 }

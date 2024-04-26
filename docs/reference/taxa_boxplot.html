@@ -84,7 +84,7 @@
 <span>  stat.by <span class="op">=</span> <span class="va">x</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  shapes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shapes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  patterns <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  flip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  stripe <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -188,7 +188,7 @@ Default: <code>NULL</code></p></dd>
 
 
 <dt>colors</dt>
-<dd><p>How to color the <code>stat.by</code> groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
+<dd><p>How to color the groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
 <li><p><code>FALSE</code> or <code>NULL</code> -  Don't use colors.</p></li>
 <li><p>a palette name -  Auto-select colors from this set. E.g. <code>"okabe"</code></p></li>
 <li><p>character vector -  Custom colors to use. E.g. <code>c("red", "#00FF00")</code></p></li>
@@ -198,19 +198,19 @@ Default: <code>TRUE</code></p></dd>
 
 
 <dt>shapes</dt>
-<dd><p>Shapes for each <code>stat.by</code> group.
+<dd><p>Shapes for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, shape
 names (typically integers 0 - 17), or a named vector mapping
-<code>stat.by</code> groups to specific shape names.
+groups to specific shape names.
 See "Aesthetics" section below for additional information.
-Default: <code>FALSE</code></p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>patterns</dt>
-<dd><p>Patterns for each <code>stat.by</code> group.
+<dd><p>Patterns for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, pattern
 names (<code>"brick"</code>, <code>"chevron"</code>, <code>"fish"</code>, <code>"grid"</code>, etc), or a named
-vector mapping <code>stat.by</code> groups to specific pattern names.
+vector mapping groups to specific pattern names.
 See "Aesthetics" section below for additional information.
 Default: <code>FALSE</code></p></dd>
 
@@ -354,10 +354,7 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object '.taxa' not found</span>
 <span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"bed"</span>, rank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Genus"</span><span class="op">)</span>, flip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in fun(...):</span> Problem while computing aesthetics.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Error occurred in the 1st layer.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object '.taxa' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in params[[by]]:</span> wrong arguments for subsetting an environment</span>
 <span class="r-in"><span>    <span class="fu">taxa_boxplot</span><span class="op">(</span></span></span>
 <span class="r-in"><span>      biom    <span class="op">=</span> <span class="fu"><a href="subset.html">subset</a></span><span class="op">(</span><span class="va">biom</span>, <span class="va">`Body Site`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Saliva'</span>, <span class="st">'Stool'</span><span class="op">)</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>      taxa    <span class="op">=</span> <span class="fl">3</span>, </span></span>

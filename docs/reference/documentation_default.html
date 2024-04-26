@@ -298,13 +298,23 @@ Default: <code>attr(df, 'response')</code></p></dd>
 categorical. Default: <code>NULL</code></p></dd>
 
 
+<dt>color.by</dt>
+<dd><p>Dataset field with the group to color by. Must be
+categorical. Default: <code>stat.by</code></p></dd>
+
+
+<dt>shape.by</dt>
+<dd><p>Dataset field with the group for shapes. Must be
+categorical. Default: <code>stat.by</code></p></dd>
+
+
 <dt>facet.by</dt>
 <dd><p>Dataset field(s) to use for faceting. Must be categorical.
 Default: <code>NULL</code></p></dd>
 
 
 <dt>colors</dt>
-<dd><p>How to color the <code>stat.by</code> groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
+<dd><p>How to color the groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
 <li><p><code>FALSE</code> or <code>NULL</code> -  Don't use colors.</p></li>
 <li><p>a palette name -  Auto-select colors from this set. E.g. <code>"okabe"</code></p></li>
 <li><p>character vector -  Custom colors to use. E.g. <code>c("red", "#00FF00")</code></p></li>
@@ -314,19 +324,19 @@ Default: <code>TRUE</code></p></dd>
 
 
 <dt>shapes</dt>
-<dd><p>Shapes for each <code>stat.by</code> group.
+<dd><p>Shapes for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, shape
 names (typically integers 0 - 17), or a named vector mapping
-<code>stat.by</code> groups to specific shape names.
+groups to specific shape names.
 See "Aesthetics" section below for additional information.
-Default: <code>FALSE</code></p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>patterns</dt>
-<dd><p>Patterns for each <code>stat.by</code> group.
+<dd><p>Patterns for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, pattern
 names (<code>"brick"</code>, <code>"chevron"</code>, <code>"fish"</code>, <code>"grid"</code>, etc), or a named
-vector mapping <code>stat.by</code> groups to specific pattern names.
+vector mapping groups to specific pattern names.
 See "Aesthetics" section below for additional information.
 Default: <code>FALSE</code></p></dd>
 

@@ -16,7 +16,7 @@ ENV <- environment(NULL)
   
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(
     'ggplot', # `aes` is intentionally omitted here
-    'annotation_custom', 
+    'annotate', 'annotation_custom', 
     'coord_fixed', 'coord_flip', 'continuous_scale',
     'element_blank', 'element_rect', 'element_text', 
     'facet_grid', 'facet_wrap', 'expansion', 'labs', 'margin', 

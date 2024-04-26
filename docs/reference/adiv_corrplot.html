@@ -79,7 +79,7 @@
 <span>  stat.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  shapes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shapes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  test <span class="op">=</span> <span class="st">"emmeans"</span>,</span>
 <span>  fit <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  at <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -132,7 +132,7 @@ Default: <code>NULL</code></p></dd>
 
 
 <dt>colors</dt>
-<dd><p>How to color the <code>stat.by</code> groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
+<dd><p>How to color the groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
 <li><p><code>FALSE</code> or <code>NULL</code> -  Don't use colors.</p></li>
 <li><p>a palette name -  Auto-select colors from this set. E.g. <code>"okabe"</code></p></li>
 <li><p>character vector -  Custom colors to use. E.g. <code>c("red", "#00FF00")</code></p></li>
@@ -142,12 +142,12 @@ Default: <code>TRUE</code></p></dd>
 
 
 <dt>shapes</dt>
-<dd><p>Shapes for each <code>stat.by</code> group.
+<dd><p>Shapes for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, shape
 names (typically integers 0 - 17), or a named vector mapping
-<code>stat.by</code> groups to specific shape names.
+groups to specific shape names.
 See "Aesthetics" section below for additional information.
-Default: <code>FALSE</code></p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>test</dt>
@@ -274,13 +274,11 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-in"><span>    <span class="va">p</span><span class="op">$</span><span class="va">code</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ggplot</span><span style="color: #BBBB00;">(</span>data, <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Age (days)`, y = .diversity<span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_ribbon</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping   = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>ymin = .ymin, ymax = .ymax, color = `Delivery mode`, fill = `Delivery mode`<span style="color: #BB00BB;">)</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping   = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>ymin = .ymin, ymax = .ymax<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data      = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     alpha     = <span style="color: #BB00BB;">0.25</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     linewidth = <span style="color: #BB00BB;">0.2</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_line</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mapping = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>color = `Delivery mode`<span style="color: #BB00BB;">)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data    = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_line</span><span style="color: #BBBB00;">(</span>data = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"fit"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_vline</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping  = <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>xintercept = `Age (days)`<span style="color: #BB00BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data     = <span style="color: #00BB00;">~</span><span style="color: #00BBBB;">attr</span><span style="color: #BB00BB;">(</span>., <span style="color: #BBBB00;">"stat_vline"</span><span style="color: #BB00BB;">)</span>, </span>
@@ -294,8 +292,6 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     caption = <span style="color: #BBBB00;">"Low p-value indicates trendline means are different.\nBenjamini &amp; Hochberg FDR correction in use."</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     y       = <span style="color: #BBBB00;">"Shannon Diversity"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_color_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_fill_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_continuous</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span>expand = <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(0.15</span>, <span style="color: #BB00BB;">0</span>, <span style="color: #BB00BB;">0.15</span>, <span style="color: #BB00BB;">0)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_bw</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>

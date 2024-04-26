@@ -44,22 +44,22 @@
 distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations = 999) {
   
   
-  params <- eval_envir(environment())
-  remove(list = intersect(env_names(params), ls()))
-  
-  
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env()
   cache_file <- get_cache_file('distmat_stats', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
+  
   #________________________________________________________
   # Sanity checking
   #________________________________________________________
+  params <- list2env(params)
   with(params, {
     test <- match.arg(tolower(test), c("adonis2", "mrpp", "none"))
+    validate_var_range('seed', n = 1, int = TRUE)
     stopifnot(is_scalar_integerish(seed) && !is.na(seed))
     stopifnot(is_scalar_integerish(permutations) && !is.na(permutations))
     stopifnot(!is.null(names(groups)))
@@ -76,7 +76,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
     grouping <- groups[attr(dm, 'Labels')]
     set.seed(seed)
     
-    res <- test %>%
+    test %>%
       switch(
         adonis2 = vegan::adonis2(formula = dm ~ grouping, permutations = permutations),
         mrpp    = vegan::mrpp(dat = dm, grouping = grouping, permutations = permutations) ) %>%
@@ -88,8 +88,6 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
         warning = function (w) data.frame(.stat=NA, .z=NA, .p.val=NA) ) %>%
       data.frame(row.names = NULL, .n = attr(dm, 'Size'), .) %>%
       as_rbiom_tbl()
-    
-    return (res)
   })
   
   
@@ -119,6 +117,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
   #________________________________________________________
   # Return the statistics table.
   #________________________________________________________
+  attr(stats, 'cmd') <- current_cmd('distmat_stats')
   set_cache_value(cache_file, stats)
   return (stats)
   

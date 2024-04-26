@@ -177,10 +177,16 @@
 #' @param stat.by   Dataset field with the statistical groups. Must be 
 #'        categorical. Default: `NULL`
 #'        
+#' @param color.by   Dataset field with the group to color by. Must be 
+#'        categorical. Default: `stat.by`
+#'        
+#' @param shape.by   Dataset field with the group for shapes. Must be 
+#'        categorical. Default: `stat.by`
+#'        
 #' @param facet.by   Dataset field(s) to use for faceting. Must be categorical. 
 #'        Default: `NULL`
 #'        
-#' @param colors   How to color the `stat.by` groups. Options are:
+#' @param colors   How to color the groups. Options are:
 #'        \itemize{
 #'            \item{`TRUE` - }{ Automatically select colorblind-friendly colors. }
 #'            \item{`FALSE` or `NULL` - }{ Don't use colors. }
@@ -191,17 +197,17 @@
 #'        See "Aesthetics" section below for additional information.
 #'        Default: `TRUE`
 #'        
-#' @param shapes   Shapes for each `stat.by` group. 
+#' @param shapes   Shapes for each group. 
 #'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, shape 
 #'        names (typically integers 0 - 17), or a named vector mapping 
-#'        `stat.by` groups to specific shape names.
+#'        groups to specific shape names.
 #'        See "Aesthetics" section below for additional information.
-#'        Default: `FALSE`
+#'        Default: `TRUE`
 #'        
-#' @param patterns   Patterns for each `stat.by` group. 
+#' @param patterns   Patterns for each group. 
 #'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, pattern 
 #'        names (`"brick"`, `"chevron"`, `"fish"`, `"grid"`, etc), or a named 
-#'        vector mapping `stat.by` groups to specific pattern names.
+#'        vector mapping groups to specific pattern names.
 #'        See "Aesthetics" section below for additional information.
 #'        Default: `FALSE`
 #' 

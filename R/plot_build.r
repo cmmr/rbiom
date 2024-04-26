@@ -129,16 +129,18 @@ plot_build <- function (params) {
     "residual"   = c('color'),
     "linerange"  = c('color'),
     "errorbar"   = c('color'),
+    "spider"     = c('color'),
+    "name"       = c('color'),
     "confidence" = c('color', 'fill'),
     "violin"     = c('color', 'fill'),
     "bar"        = c('color', 'fill'),
     "crossbar"   = c('color', 'fill'),
     "box"        = c('color', 'fill'),
+    "stack"      = c('color', 'fill'),
     "pointrange" = c('color', 'fill', 'shape'),
     "point"      = c('color',         'shape'),
     "dot"        = c('color',         'shape'),
     "strip"      = c('color',         'shape') )
-  
   
   args <- list()
   
@@ -146,9 +148,10 @@ plot_build <- function (params) {
   shapes <- if (!is.null(params$shapes))   list(values   = params$shapes)   else NULL
   fills  <- if (!is.null(params$patterns)) list(patterns = params$patterns) else colors
   
-  if (!is.null(colors)) args[['color']] <- params$stat.by
-  if (!is.null(shapes)) args[['shape']] <- params$stat.by
-  if (!is.null(fills))  args[['fill']]  <- params$stat.by
+  if (!is.null(colors)) args[['color']] <- if (hasName(params, 'color.by')) params$color.by else params$stat.by
+  if (!is.null(shapes)) args[['shape']] <- if (hasName(params, 'shape.by')) params$shape.by else params$stat.by
+  if (!is.null(fills))  args[['fill']]  <- if (hasName(params, 'color.by')) params$color.by else params$stat.by
+  
   
   for (layer in intersect(names(layers), names(specs))) {
     
@@ -227,7 +230,7 @@ plot_build <- function (params) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'ggtree', 'confidence', 'stats_bg', 'stripe', 'violin', 
+    'ggplot', 'ggtree', 'confidence', 'stats_bg', 'stripe', 'density', 'violin', 
     'residual', 'point', 'trend', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
     'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
     'arrow', 'taxon', 'brackets', 'stats_vline', 'stats_label', 'stats_text', 'stack', 'hline', 'vline', 

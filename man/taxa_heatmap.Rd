@@ -11,7 +11,6 @@ taxa_heatmap(
   grid = "bilbao",
   color.by = NULL,
   order.by = NULL,
-  limit.by = NULL,
   other = FALSE,
   unc = "singly",
   lineage = FALSE,
@@ -25,7 +24,7 @@ taxa_heatmap(
   tree_height = 10,
   track_height = 10,
   legend = "right",
-  title = TRUE,
+  title = NULL,
   xlab.angle = "auto",
   ...
 )
@@ -47,10 +46,12 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
-\item{grid}{Color palette name, or a list with entries for \code{label},
-\code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
-\code{guide}. See the Track Definitions section for details.
-Default: \code{list(label = "{rank} Abundance", colors = "bilbao")}.}
+\item{grid}{Color palette name, or a list as expected \code{\link[=plot_heatmap]{plot_heatmap()}}.
+Default: \code{"bilbao"}}
+
+\item{color.by}{A character vector of metadata fields to display as tracks
+at the top of the plot. Or, a list as expected by the \code{tracks}
+argument of \code{\link[=plot_heatmap]{plot_heatmap()}}. Default: \code{NULL}}
 
 \item{other}{Sum all non-itemized taxa into an "Other" taxa. When
 \code{FALSE}, only returns taxa matched by the \code{taxa}
@@ -168,7 +169,13 @@ Display taxa abundances as a heatmap.
     # Keep and rarefy the 10 most deeply sequenced samples.
     hmp10 <- rarefy(hmp50, n = 10)
     
-    taxa_heatmap(hmp10, rank="Phylum", color.by="Body Site")
+    taxa_heatmap(hmp10, rank = "Phylum", color.by = "Body Site")
+    
+    taxa_heatmap(hmp10, rank = "Genus", color.by = c("Sex", "Body Site"))
+    
+    taxa_heatmap(hmp10, rank = "Phylum", color.by = list(
+      'Sex'       = list(colors = c(Male = "#0000FF", Female = "violetred")), 
+      'Body Site' = list(colors = "muted", label = "Source") ))
     
 }
 \seealso{

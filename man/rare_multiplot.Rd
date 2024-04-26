@@ -52,7 +52,7 @@ categorical. Default: \code{NULL}}
 \item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
 Default: \code{NULL}}
 
-\item{colors}{How to color the \code{stat.by} groups. Options are:
+\item{colors}{How to color the groups. Options are:
 \itemize{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
@@ -63,12 +63,12 @@ Default: \code{NULL}}
 See "Aesthetics" section below for additional information.
 Default: \code{TRUE}}
 
-\item{shapes}{Shapes for each \code{stat.by} group.
+\item{shapes}{Shapes for each group.
 Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, shape
 names (typically integers 0 - 17), or a named vector mapping
-\code{stat.by} groups to specific shape names.
+groups to specific shape names.
 See "Aesthetics" section below for additional information.
-Default: \code{FALSE}}
+Default: \code{TRUE}}
 
 \item{test}{Method for computing p-values: \code{'none'}, \code{'emmeans'}, or
 \code{'emtrends'}. Default: \code{'emmeans'}}

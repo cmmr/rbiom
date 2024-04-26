@@ -134,7 +134,7 @@ Default: <code>NULL</code></p></dd>
 
 
 <dt>colors</dt>
-<dd><p>How to color the <code>stat.by</code> groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
+<dd><p>How to color the groups. Options are:</p><ul><li><p><code>TRUE</code> -  Automatically select colorblind-friendly colors.</p></li>
 <li><p><code>FALSE</code> or <code>NULL</code> -  Don't use colors.</p></li>
 <li><p>a palette name -  Auto-select colors from this set. E.g. <code>"okabe"</code></p></li>
 <li><p>character vector -  Custom colors to use. E.g. <code>c("red", "#00FF00")</code></p></li>
@@ -144,12 +144,12 @@ Default: <code>TRUE</code></p></dd>
 
 
 <dt>shapes</dt>
-<dd><p>Shapes for each <code>stat.by</code> group.
+<dd><p>Shapes for each group.
 Options are similar to <code>colors</code>'s: <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, shape
 names (typically integers 0 - 17), or a named vector mapping
-<code>stat.by</code> groups to specific shape names.
+groups to specific shape names.
 See "Aesthetics" section below for additional information.
-Default: <code>FALSE</code></p></dd>
+Default: <code>TRUE</code></p></dd>
 
 
 <dt>test</dt>
@@ -262,7 +262,17 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">rare_multiplot</span><span class="op">(</span><span class="va">hmp50</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="rare_multiplot-1.png" alt="" width="768" height="384"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval_envir(environment(), ...):</span> <span style="color: #BB0000;">✖</span> function (biom, rline = TRUE, counts = TRUE, labels = TRUE, y.trans =</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   "log10", , ...) , {, biom &lt;- as_rbiom(biom), params &lt;-</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   eval_envir(environment(), ...), cmd &lt;- sprintf("rare_stacked(%s)",</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   as.args(params, 2, rare_stacked)), remove(list = intersect(env_names(params),</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   ls())), cache_file &lt;- get_cache_file("rare_stacked", params), if</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   (isTRUE(attr(cache_file, "exists", exact = TRUE))) ,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   return(readRDS(cache_file)), with(params, {,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   stopifnot(is_scalar_logical(rline) || is_scalar_integerish(rline)),</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   stopifnot(!is.na(rline)), }), with(params, {, .ss &lt;- sort(sample_sums(biom)),</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   if (isTRUE(rline)) {, rline &lt;- (sum(.ss) * 0.1)/length(.ss), …, return(fig),</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   and } does not accept parameter(s): adiv, facet.by, stat.by</span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

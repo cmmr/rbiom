@@ -5,7 +5,7 @@
 #' 
 #' @family visualization
 #' 
-#' @param mtx   A numeric \code{matrix} with named rows and columns.
+#' @param mtx   A numeric `matrix` with named rows and columns.
 #' 
 #' @param tracks   List of track definitions. See details below.
 #'        Default: `NULL`.
@@ -521,12 +521,12 @@ plot_heatmap <- function (
     #________________________________________________________
     # Outline around the main grid
     #________________________________________________________
-    gglayers %<>% ggpush(geom_rect(
-      mapping = aes(
-        xmin = 0.5, 
-        xmax = !!(ncol(mtx) + 0.5), 
-        ymin = 0.5, 
-        ymax = !!(nrow(mtx) + 0.5) ), 
+    gglayers %<>% ggpush(annotate(
+      geom = "rect", 
+      xmin = 0.5, 
+      xmax = ncol(mtx) + 0.5, 
+      ymin = 0.5, 
+      ymax = nrow(mtx) + 0.5, 
       size  = 0.2,
       color = "black", 
       fill  = NA ))
@@ -594,7 +594,7 @@ plot_heatmap <- function (
     gglayers %<>% ggpush(new_scale_fill())
     gglayers %<>% ggpush(geom_tile(data = data, mapping = track[['mapping']], .indent = 4))
     gglayers %<>% ggpush(do.call(layer[['fun']], c(layer[['args']], .indent = 4)))
-    gglayers %<>% ggpush(geom_rect(mapping = track[['outline']], color = "black", fill = NA, linewidth = 0.2 ))
+    gglayers %<>% ggpush(do.call(annotate, c(list(geom = "rect", color = "black", fill = NA, linewidth = 0.2), track[['outline']])))
   }
   
   
@@ -625,7 +625,9 @@ plot_heatmap <- function (
   p %<>% add_class('rbiom_plot')
   
   
+  attr(p, 'cmd') <- current_cmd('plot_heatmap')
   set_cache_value(cache_file, p)
+  
   return (p)
 }
 

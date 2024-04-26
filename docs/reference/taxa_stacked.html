@@ -80,7 +80,6 @@
 <span>  label.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  dist <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
 <span>  clust <span class="op">=</span> <span class="st">"complete"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -119,8 +118,8 @@ Default: <code>6</code>.</p></dd>
 <dd><p>A character vector of colors or patterns to use in
 the graph. A named character vector can be used to map taxon names to
 specific colors or patterns. Set to <code>TRUE</code> to auto-select colors
-or patterns, or to <code>FALSE</code> to disable per-taxa colors
-or patterns. Default: <code>colors=TRUE, patterns=FALSE</code>.</p></dd>
+or patterns, or to <code>FALSE</code> to disable per-taxa colors or patterns.
+Default: <code>colors=TRUE, patterns=FALSE</code>.</p></dd>
 
 
 <dt>label.by, order.by</dt>
@@ -131,9 +130,9 @@ arranged based on <code>dist</code> and <code>clust</code>, below.
 Default: <code>label.by=NULL, order.by=NULL</code>.</p></dd>
 
 
-<dt>facet.by, limit.by</dt>
-<dd><p>Metadata columns to
-use for data partitioning. Default: <code>NULL</code></p></dd>
+<dt>facet.by</dt>
+<dd><p>Dataset field(s) to use for faceting. Must be categorical.
+Default: <code>NULL</code></p></dd>
 
 
 <dt>dist, clust</dt>
@@ -226,7 +225,10 @@ respectively.</p>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_stacked</span><span class="op">(</span><span class="va">biom</span>, rank<span class="op">=</span><span class="st">"Phylum"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sync_metadata():</span> could not find function "sync_metadata"</span>
+<span class="r-plt img"><img src="taxa_stacked-1.png" alt="" width="768" height="384"></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">taxa_stacked</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"genus"</span>, facet.by <span class="op">=</span> <span class="st">"body site"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="taxa_stacked-2.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>
     </div>

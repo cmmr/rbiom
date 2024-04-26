@@ -9,11 +9,8 @@
 #' @param colors,patterns   A character vector of colors or patterns to use in
 #'        the graph. A named character vector can be used to map taxon names to 
 #'        specific colors or patterns. Set to `TRUE` to auto-select colors
-#'        or patterns, or to `FALSE` to disable per-taxa colors
-#'        or patterns. Default: \code{colors=TRUE, patterns=FALSE}.
-#' 
-#' @param facet.by,limit.by   Metadata columns to 
-#'        use for data partitioning. Default: `NULL`
+#'        or patterns, or to `FALSE` to disable per-taxa colors or patterns. 
+#'        Default: \code{colors=TRUE, patterns=FALSE}.
 #' 
 #' @param label.by,order.by   What metadata column to use for labeling and/or
 #'        sorting the samples across the x-axis. Set \code{label.by='.sample'} 
@@ -39,26 +36,26 @@
 #'     
 #'     taxa_stacked(biom, rank="Phylum")
 #'     
+#'     taxa_stacked(biom, rank = "genus", facet.by = "body site")
+#'     
 taxa_stacked <- function (
     biom, rank = -1, taxa = 6, colors = TRUE, patterns = FALSE,
-    label.by = NULL, order.by = NULL, facet.by = NULL, limit.by = NULL, 
+    label.by = NULL, order.by = NULL, facet.by = NULL, 
     dist = "euclidean", clust = "complete", other = TRUE, 
     unc = "singly", lineage = FALSE, xlab.angle = 90, ...) {
   
   biom <- as_rbiom(biom)
   
-  params <- eval_envir(environment(), ...)
-  cmd    <- sprintf("taxa_stacked(%s)", as.args(params, 2, taxa_stacked))
-  remove(list = intersect(env_names(params), ls()))
-  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env(..., .dots = TRUE)
   cache_file <- get_cache_file('taxa_stacked', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
+  params <- list2env(params)
   
   
   #________________________________________________________
@@ -107,12 +104,9 @@ taxa_stacked <- function (
     validate_dist()
     validate_clust()
     
-    validate_meta_aes('label.by', null_ok = TRUE)
-    validate_meta_aes('order.by', null_ok = TRUE, max = Inf)
-    validate_meta_aes('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
-    validate_meta_aes('limit.by', null_ok = TRUE, max = Inf)
-    
-    sync_metadata()
+    validate_biom_field('label.by', null_ok = TRUE)
+    validate_biom_field('order.by', null_ok = TRUE, max = Inf)
+    validate_biom_field('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
     
     if (biom$n_samples < 1)
       stop("At least one sample is needed for a stacked bar plot.")
@@ -185,44 +179,17 @@ taxa_stacked <- function (
     .ycol  <- '.abundance'
     .xmode <- 'factor'
     
+    stat.by    <- ".taxa"
+    color.by   <- ".taxa"
+    pattern.by <- ".taxa"
   })
-  
-  
-  
-  #________________________________________________________
-  # Inject color.by and pattern.by arguments as needed.
-  #________________________________________________________
-  
-  taxa <- levels(params$.ggdata[['.taxa']])
-  n    <- length(taxa)
-  
-  if (!isFALSE(values <- params$colors)) {
-    if (!is_null(names(values))) { values <- params$colors[taxa]
-    } else                       { values <- get_n_colors(n, values) }
-    params$color.by <- list('.taxa' = list('values' = values))
-    attr(params$color.by, 'display') <- FALSE
-  }
-  
-  if (!isFALSE(values <- params$patterns)) {
-    if (!is_null(names(values))) { values <- params$patterns[taxa]
-    } else                       { values <- get_n_patterns(n, values) }
-    params$pattern.by <- list('.taxa' = list('values' = values))
-    attr(params$pattern.by, 'display') <- FALSE
-  }
-  
-  remove("taxa", "n")
   
   
   
   #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
-  do_init <- "stack"
-  if (!is_null(params$color.by))   do_init %<>% c("fill")
-  if (!is_null(params$pattern.by)) do_init %<>% c("pattern")
-  if (!is_null(params$facet.by))   do_init %<>% c("facet")
-  
-  init_layers(params, do_init = do_init)
+  init_layers(params, do_init = "stack")
   
   
   
@@ -336,42 +303,18 @@ taxa_stacked <- function (
     'mapping|y' = params$.ycol )
   
   
-  #________________________________________________________
-  # Pattern-specific aes / non-aes mappings
-  #________________________________________________________
-  if (has_layer(params, 'pattern')) {
-    
-    set_layer(
-      params = params, 
-      layer  = 'stack',
-      'mapping|pattern_type' = ".taxa", 
-      'pattern'              = "magick", 
-      'pattern_res'          = 120,
-      'fill'                 = "white",
-      'color'                = "black" )
-    
-    if (isFALSE(params$colors)) { set_layer(params, 'stack', 'pattern_fill'         = "black")
-    } else                      { set_layer(params, 'stack', 'mapping|pattern_fill' = ".taxa") }
-    
-  } else {
-    set_layer(params, 'stack', 'mapping|fill' = ".taxa")
-  }
-  
-  
   
   
   #________________________________________________________
   # Non-aes parameters
   #________________________________________________________
   legend_title <- ifelse(eq(params$labs.title, params$rank), "", params$rank)
-  if (has_layer(params, 'pattern')) {
-                                    set_layer(params, 'labs', pattern_type  = legend_title)
-    if (has_layer(params, 'fill'))  set_layer(params, 'labs', pattern_fill  = legend_title)
-    if (has_layer(params, 'color')) set_layer(params, 'labs', pattern_color = legend_title)
+  if (!(is.null(params$colors) || isFALSE(params$colors))) {
+    set_layer(params, 'labs', color = legend_title)
+    set_layer(params, 'labs', fill  = legend_title)
     
-  } else {
-    if (has_layer(params, 'fill'))  set_layer(params, 'labs', fill  = legend_title)
-    if (has_layer(params, 'color')) set_layer(params, 'labs', color = legend_title)
+  } else if (!(is.null(params$patterns) || isFALSE(params$patterns))) {
+    set_layer(params, 'labs', fill  = legend_title)
   }
   remove("legend_title")
   
@@ -393,7 +336,7 @@ taxa_stacked <- function (
     plot_build()
   
   
-  attr(p, 'cmd') <- cmd
+  attr(p, 'cmd') <- current_cmd('taxa_stacked')
   set_cache_value(cache_file, p)
   
   return (p)

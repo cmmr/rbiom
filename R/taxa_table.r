@@ -6,92 +6,97 @@ taxa_table <- function (
     biom, rank = -1, taxa = 6, lineage = FALSE, 
     md = ".all", unc = "singly", other = FALSE, trans = "none" ) {
   
-  biom   <- as_rbiom(biom)
-  params <- eval_envir(environment())
-  cmd    <- sprintf("taxa_table(%s)", as.args(params, fun = taxa_table))
+  biom <- as_rbiom(biom)
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env()
   cache_file <- get_cache_file('taxa_table', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
-  
-  #________________________________________________________
-  # Validate user's arguments.
-  #________________________________________________________
-  validate_rank(max = Inf)
-  validate_biom_field('md', max = Inf, null_ok = TRUE)
-  
-  
-  
-  #________________________________________________________
-  # Return multiple ranks in a single table.
-  #________________________________________________________
-  tbl <- NULL
-  
-  for (r in rank)
-    tbl %<>% dplyr::bind_rows(local({
-      
-      mtx <- taxa_matrix(
-        biom    = biom, 
-        rank    = r, 
-        taxa    = taxa, 
-        lineage = lineage, 
-        sparse  = FALSE, 
-        unc     = unc, 
-        other   = other,
-        trans   = trans )
-      
-      
-      #________________________________________________________
-      # Pivot Longer
-      #________________________________________________________
-      tibble(
-        '.rank'      = r,
-        '.sample'    = colnames(mtx)[col(mtx)],
-        '.taxa'      = rownames(mtx)[row(mtx)],
-        '.abundance' = as.numeric(mtx) )
-      
-    }))
-  
-  tbl[['.rank']]   %<>%  factor(., levels = rank)
-  tbl[['.sample']] %<>% {factor(., levels = intersect(biom$samples, .))}
-  tbl[['.taxa']]   %<>% {factor(., levels = unique(.))}
-  
-  
-  
-  #________________________________________________________
-  # Add Metadata
-  #________________________________________________________
-  if (length(md) > 0)
-    tbl %<>% left_join( 
-      by = '.sample',
-      y  = biom$metadata[,unique(c('.sample', md))] )
+  params <- list2env(params)
+  tbl <- with(params, {
+    
+    
+    #________________________________________________________
+    # Validate user's arguments.
+    #________________________________________________________
+    validate_rank(max = Inf)
+    validate_biom_field('md', max = Inf, null_ok = TRUE)
+    
+    
+    
+    #________________________________________________________
+    # Return multiple ranks in a single table.
+    #________________________________________________________
+    tbl <- NULL
+    
+    for (r in rank)
+      tbl %<>% dplyr::bind_rows(local({
+        
+        mtx <- taxa_matrix(
+          biom    = biom, 
+          rank    = r, 
+          taxa    = taxa, 
+          lineage = lineage, 
+          sparse  = FALSE, 
+          unc     = unc, 
+          other   = other,
+          trans   = trans )
+        
+        
+        #________________________________________________________
+        # Pivot Longer
+        #________________________________________________________
+        tibble(
+          '.rank'      = r,
+          '.sample'    = colnames(mtx)[col(mtx)],
+          '.taxa'      = rownames(mtx)[row(mtx)],
+          '.abundance' = as.numeric(mtx) )
+        
+      }))
+    
+    tbl[['.rank']]   %<>%  factor(., levels = rank)
+    tbl[['.sample']] %<>% {factor(., levels = intersect(biom$samples, .))}
+    tbl[['.taxa']]   %<>% {factor(., levels = unique(.))}
+    
+    
+    
+    #________________________________________________________
+    # Add Metadata
+    #________________________________________________________
+    if (length(md) > 0)
+      tbl %<>% left_join( 
+        by = '.sample',
+        y  = biom$metadata[,unique(c('.sample', md))] )
+    
+    tbl
+  })
   
   
   
   #________________________________________________________
   # Descriptive label for y-axis.
   #________________________________________________________
-  resp_label <- {
+  resp_label <- with(params, {
     if      (eq(trans, 'percent')) { "Relative Abundance" }
     else if (is.null(biom$depth))  { "Unrarefied Counts"  }
     else                           { "Rarefied Counts"    }
-  }
+  })
   
   
   
   tbl %<>% as_rbiom_tbl()
-  attr(tbl, 'cmd')      <- cmd
   attr(tbl, 'response') <- ".abundance"
   attr(tbl, 'resp_label') <- resp_label
   
-  set_cache_value(cache_file, tbl)
   
+  attr(tbl, 'cmd') <- current_cmd('taxa_table')
+  set_cache_value(cache_file, tbl)
   
   return (tbl)
 }

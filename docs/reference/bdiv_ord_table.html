@@ -81,11 +81,9 @@ p.adj) only only have an effect when rank is not NULL."><!-- mathjax --><script 
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  md <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  split.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  split.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  test <span class="op">=</span> <span class="st">"adonis2"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  permutations <span class="op">=</span> <span class="fl">999</span>,</span>
@@ -140,27 +138,20 @@ to include all metadata fields. Default: <code>'.all'</code></p></dd>
 <code>3L</code>. Default: <code>2L</code></p></dd>
 
 
-<dt>split.by</dt>
-<dd><p>Dataset field(s) that the data should be split by prior to
-any calculations. Must be categorical. Default: <code>NULL</code></p></dd>
-
-
 <dt>stat.by</dt>
 <dd><p>The categorical or numeric metadata field over which
 statistics should be calculated. Required.</p></dd>
+
+
+<dt>split.by</dt>
+<dd><p>Dataset field(s) that the data should be split by prior to
+any calculations. Must be categorical. Default: <code>NULL</code></p></dd>
 
 
 <dt>tree</dt>
 <dd><p>A <code>phylo</code> object representing the phylogenetic
 relationships of the taxa in <code>biom</code>. Only required when
 computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
-
-
-<dt>within, between</dt>
-<dd><p>Dataset field(s) for intra- or inter- sample
-comparisons. Alternatively, dataset field names given elsewhere can
-be prefixed with <code>'=='</code> or <code>'!='</code> to assign them to <code>within</code> or
-<code>between</code>, respectively. Default: <code>NULL</code></p></dd>
 
 
 <dt>test</dt>
@@ -247,21 +238,6 @@ Abbreviations are allowed.</p></dd>
 <code>$taxa_stats</code>, and <code>$taxa_stats$code</code> are set.</p>
     </div>
     <div class="section level2">
-    <h2 id="metadata-comparisons">Metadata Comparisons<a class="anchor" aria-label="anchor" href="#metadata-comparisons"></a></h2>
-    
-
-
-<p>Prefix metadata fields with <code>==</code> or <code>!=</code> to limit comparisons to within or
-between groups, respectively. For example, <code>stat.by = '==Sex'</code> will
-run calculations only for intra-group comparisons, returning "Male" and
-"Female", but NOT "Female vs Male". Similarly, setting
-<code>stat.by = '!=Body Site'</code> will only show the inter-group comparisons, such
-as "Saliva vs Stool", "Anterior nares vs Buccal mucosa", and so on.</p>
-<p>The same effect can be achieved by using the <code>within</code> and <code>between</code>
-parameters. <code>stat.by = '==Sex'</code> is equivalent to
-<code>stat.by = 'Sex', within = 'Sex'</code>.</p>
-    </div>
-    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity: 
 <code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
@@ -281,15 +257,35 @@ parameters. <code>stat.by = '==Sex'</code> is equivalent to
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">ord</span> <span class="op">&lt;-</span> <span class="fu">bdiv_ord_table</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"bray"</span>, <span class="st">"pcoa"</span>, stat.by<span class="op">=</span><span class="st">"Body Site"</span>, rank<span class="op">=</span><span class="st">"g"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in validate_meta_cmp(c("md", "stat.by", "split.by")):</span> validate_meta_cmp() has been replaced by validate_cmp().</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ord</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ord' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .weighted .bdiv       .ord  .sample     .x       .y `Body Site`  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> TRUE      Bray-Curtis PCoA  HMP01   -<span style="color: #BB0000;">0.387</span> -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">95</span> Buccal mucosa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> TRUE      Bray-Curtis PCoA  HMP02   -<span style="color: #BB0000;">0.461</span> -<span style="color: #BB0000;">0.013</span><span style="color: #BB0000; text-decoration: underline;">5</span>  Buccal mucosa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> TRUE      Bray-Curtis PCoA  HMP03   -<span style="color: #BB0000;">0.407</span> -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">3</span>  Saliva       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> TRUE      Bray-Curtis PCoA  HMP04   -<span style="color: #BB0000;">0.378</span> -<span style="color: #BB0000;">0.012</span><span style="color: #BB0000; text-decoration: underline;">3</span>  Saliva       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> TRUE      Bray-Curtis PCoA  HMP05   -<span style="color: #BB0000;">0.452</span> -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">4</span>  Buccal mucosa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> TRUE      Bray-Curtis PCoA  HMP06   -<span style="color: #BB0000;">0.411</span> -<span style="color: #BB0000;">0.012</span><span style="color: #BB0000; text-decoration: underline;">3</span>  Saliva       </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">ord</span><span class="op">$</span><span class="va">stats</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ord' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     adonis2 ~ `Body Site`. 999 permutations.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .weighted .bdiv          .n .stat    .z .p.val .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> TRUE      Bray-Curtis    50  19.2  72.2  0.001  0.001</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">ord</span><span class="op">$</span><span class="va">taxa_stats</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ord' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Test:     adonis2 ~ taxa. 999 permutations.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .weighted .bdiv       .rank .taxa                .n .stat    .z .p.val .adj.p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> TRUE      Bray-Curtis Genus Lactobacillus        50  8.62  16.8  0.001  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> TRUE      Bray-Curtis Genus Streptococcus        50 10.1   19.5  0.001  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> TRUE      Bray-Curtis Genus Bacteroides          50  8.72  16.7  0.001  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> TRUE      Bray-Curtis Genus Corynebacterium 1    50  8.53  16.0  0.001  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> TRUE      Bray-Curtis Genus Haemophilus          50  6.56  12.3  0.001  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> TRUE      Bray-Curtis Genus Propionibacterium    50  5.84  11.3  0.001  0.001</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    </span></span>
 </code></pre></div>

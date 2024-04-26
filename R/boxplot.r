@@ -67,7 +67,7 @@
 
 stats_boxplot <- function (
     df, x = NULL, y = attr(df, 'response'), layers = 'x', 
-    stat.by = x, facet.by = NULL, colors = TRUE, shapes = FALSE, patterns = FALSE, 
+    stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, caption = TRUE, ... ) {
   
@@ -132,7 +132,7 @@ stats_boxplot <- function (
 
 adiv_boxplot <- function (
     biom, x = NULL, adiv = "Shannon", layers = 'x', 
-    stat.by = x, facet.by = NULL, colors = TRUE, shapes = FALSE, patterns = FALSE, 
+    stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
     trans = "none", caption = TRUE, ... ) {
@@ -195,7 +195,7 @@ adiv_boxplot <- function (
 bdiv_boxplot <- function (
     biom, x = NULL, bdiv = "Bray-Curtis", layers = "x", 
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
-    stat.by = x, facet.by = NULL, colors = TRUE, shapes = FALSE, patterns = FALSE, 
+    stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
     trans = "none", caption = TRUE, ... ) {
@@ -299,7 +299,7 @@ bdiv_boxplot <- function (
 taxa_boxplot <- function (
     biom, x = NULL, rank = -1, layers = 'x', 
     taxa = 6, unc = 'singly', other = FALSE, p.top = Inf, y.trans = 'sqrt', 
-    stat.by = x, facet.by = NULL, colors = TRUE, shapes = FALSE, patterns = FALSE, 
+    stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
     trans = "none", caption = TRUE, ... ) {

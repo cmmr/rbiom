@@ -249,11 +249,11 @@ tracks_df <- function (tracks, bounds=c(0,1), side="top") {
         height = !!signif(bounds_w, sf),
         width  = 1 )
       
-      tracks[[i]][['outline']] <- aes(
+      tracks[[i]][['outline']] <- list(
         xmin = 0.5,
-        xmax = !!(length(values) + 0.5),
-        ymin = !!signif(bounds[i] - bounds_w / 2, sf),
-        ymax = !!signif(bounds[i] + bounds_w / 2, sf) )
+        xmax = length(values) + 0.5,
+        ymin = signif(bounds[i] - bounds_w / 2, sf),
+        ymax = signif(bounds[i] + bounds_w / 2, sf) )
       
     } else {
       
@@ -268,11 +268,11 @@ tracks_df <- function (tracks, bounds=c(0,1), side="top") {
         height = 1,
         width  = !!signif(bounds_w, sf) )
       
-      tracks[[i]][['outline']] <- aes(
-        xmin = !!signif(bounds[i] - bounds_w / 2, sf),
-        xmax = !!signif(bounds[i] + bounds_w / 2, sf),
+      tracks[[i]][['outline']] <- list(
+        xmin = signif(bounds[i] - bounds_w / 2, sf),
+        xmax = signif(bounds[i] + bounds_w / 2, sf),
         ymin = 0.5,
-        ymax = !!(length(values) + 0.5) )
+        ymax = length(values) + 0.5 )
     }
     
     tracks[[i]][['label_at']] <- signif(bounds[i], sf)

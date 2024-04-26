@@ -10,10 +10,12 @@ bdiv_ord_plot(
   ord = "UMAP",
   weighted = TRUE,
   layers = "petm",
-  color.by = NULL,
-  shape.by = NULL,
+  stat.by = NULL,
+  color.by = stat.by,
+  shape.by = stat.by,
   facet.by = NULL,
-  limit.by = NULL,
+  colors = TRUE,
+  shapes = TRUE,
   tree = NULL,
   test = "adonis2",
   seed = 0,
@@ -60,9 +62,30 @@ Single letter abbreviations are also accepted. For instance,
 \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and \code{"pe"}.
 See \link[=plots]{plot types} for examples of each. Default: \code{"pe"}}
 
+\item{stat.by}{The categorical or numeric metadata field over which
+statistics should be calculated. Required.}
+
 \item{color.by, shape.by, facet.by, limit.by}{Metadata columns to use for
 aesthetics and partitioning. See below for details.
 Default: \code{NULL}}
+
+\item{colors}{How to color the groups. Options are:
+\itemize{
+\item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
+\item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
+\item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
+\item{character vector - }{ Custom colors to use. E.g. \code{c("red", "#00FF00")} }
+\item{named character vector - }{ Explicit mapping. E.g. \code{c(Male = "blue", Female = "red")} }
+}
+See "Aesthetics" section below for additional information.
+Default: \code{TRUE}}
+
+\item{shapes}{Shapes for each group.
+Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, shape
+names (typically integers 0 - 17), or a named vector mapping
+groups to specific shape names.
+See "Aesthetics" section below for additional information.
+Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -145,7 +168,7 @@ Ordinate samples and taxa on a 2D plane based on beta diversity distances.
     
     biom <- rarefy(hmp50)
     
-    bdiv_ord_plot(biom, layers="pemt", color.by="Body Site", rank="g")
+    bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
     
 }
 \seealso{

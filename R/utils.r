@@ -684,18 +684,18 @@ bool_switch <- function (test, yes, no) {
 #____________________________________________________________________
 fun_params <- function (fun, params) {
   
-  stopifnot(is.function(fun))
-  
   if (is.environment(params))
     params <- as.list(params, all.names = TRUE)
   
+  stopifnot(is.function(fun))
   stopifnot(is.list(params))
   
   if (is.list(params$.dots))
     params <- c(params[names(params) != ".dots"], params$.dots)
   
-  fetch <- intersect(formalArgs(fun), names(params))
+  if (!"..." %in% formalArgs(fun))
+    params <- params[intersect(formalArgs(fun), names(params))]
   
-  return (params[fetch])
+  return (params)
 }
 

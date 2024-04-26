@@ -3,7 +3,6 @@
 #' The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
 #' \code{p.adj}) only only have an effect when \code{rank} is not `NULL`.
 #' 
-#' @inherit documentation_cmp
 #' @inherit documentation_dist_test
 #' @inherit documentation_rank.NULL
 #' @inherit documentation_default
@@ -39,38 +38,25 @@
 
 bdiv_ord_table <- function (
     biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, md = NULL, k = 2, 
-    split.by = NULL, stat.by = NULL, tree = NULL, within = NULL, between = NULL,
+    stat.by = NULL, split.by = NULL, tree = NULL, 
     test = "adonis2", seed = 0, permutations = 999, rank = NULL, taxa = 6, 
     p.top = Inf, p.adj = 'fdr', unc = "singly", ...) {
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
   
-  params <- eval_envir(environment(), ...)
-  
-  
-  #________________________________________________________
-  # See if this result is already in the cache.
-  #________________________________________________________
-  cache_file <- get_cache_file('bdiv_ord_table', params)
-  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
-    return (readRDS(cache_file))
-  
-  
-  
-  
+
   #________________________________________________________
   # Validate and restructure user's arguments.
   #________________________________________________________
+  
   biom <- biom$clone()
   biom$counts %<>% rescale_cols()
   tree %<>% aa(display = "tree")
+  
   validate_ord(max = Inf)
   validate_bdiv(max = Inf)
   validate_bool("weighted", max = Inf)
-  
-  # Validates and appends to `within` and `between`.
-  validate_meta_cmp(c('md', 'stat.by', 'split.by'))
   
   validate_biom_field('md',       null_ok = TRUE, max = Inf)
   validate_biom_field('stat.by',  null_ok = TRUE)
@@ -81,12 +67,17 @@ bdiv_ord_table <- function (
   #________________________________________________________
   # Biplot - determine taxonomic rank
   #________________________________________________________
-  if (missing(rank) && is.character(taxa)) {
+  if (is.character(taxa)) {
+    
     rank <- names(which.max(lapply(biom$taxonomy, function (x) sum(x %in% taxa))))
+    
+    if (!is.null(rank))
+      cli_warn("`rank` is ignored when `taxa` is a character vector.")
     
   } else {
     validate_rank(max = Inf, null_ok = TRUE)
   }
+  
   
   
   
@@ -103,8 +94,7 @@ bdiv_ord_table <- function (
       #________________________________________________________
       # Sample Ordination(s). x/y/z coordinates.
       #________________________________________________________
-      args          <- c(list(dm = dm, ord = ord, k = k, seed = seed), params$.dots)
-      sample_coords <- do.call(distmat_ord_table, args)
+      sample_coords <- distmat_ord_table(dm = dm, ord = ord, k = k, seed = seed, ...)
       attr(dm, 'sample_coords') <- sample_coords
       
       
@@ -161,13 +151,13 @@ bdiv_ord_table <- function (
   
   
   if (!is.null(sample_stats)) {
-    sample_stats[['.adj.p']] <- signif(p.adjust(sample_stats[['.p.val']], method = p.adj), 3)
+    sample_stats[['.adj.p']] <- p.adjust(sample_stats[['.p.val']], method = p.adj)
     attr(sample_stats, 'tbl_sum') <- c(
       'Test' = paste0(test, " ~ ", coan(stat.by), ". ", permutations, " permutations."))
   }
   
   if (!is.null(taxa_stats)) {
-    taxa_stats[['.adj.p']] <- signif(p.adjust(taxa_stats[['.p.val']], method = p.adj), 3)
+    taxa_stats[['.adj.p']] <- p.adjust(taxa_stats[['.p.val']], method = p.adj)
     if (p.top < 1)
       taxa_stats <- taxa_stats[taxa_stats[['.adj.p']] <= p.top,,drop=FALSE]
     attr(taxa_stats, 'tbl_sum') <- c(
@@ -336,7 +326,6 @@ bdiv_ord_table <- function (
   attr(sample_coords, 'taxa_stats')  <- taxa_stats
   
   
-  set_cache_value(cache_file, sample_coords)
   return (sample_coords)
 }
 

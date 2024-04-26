@@ -5,11 +5,9 @@
 
 <!-- badges: start -->
 
-[![Travis-CI Build
-Status](https://travis-ci.org/cmmr/rbiom.svg?branch=master)](https://travis-ci.org/cmmr/rbiom)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
-[![Anaconda-Server
-Badge](https://anaconda.org/conda-forge/r-rbiom/badges/version.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![cran](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
+[![conda](https://anaconda.org/conda-forge/r-rbiom/badges/version.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
 <!-- badges: end -->
 
 This package is a toolkit for working with Biological Observation Matrix
@@ -52,27 +50,22 @@ biom   <- rarefy(infile)
 #### Explore associations with metadata.
 
 ``` r
-bdiv_ord_plot(biom, color.by = "Body Site", facet.by = "Sex")
+# bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
+adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
 ```
 
 ![](man/figures/README-bdiv-1.png)<!-- -->
 
 ``` r
-adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), color.by = "Body Site")
+taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
 ```
 
 ![](man/figures/README-bdiv-2.png)<!-- -->
 
-``` r
-taxa_corrplot(biom, x = "Age", layers = "stc", taxa = .01, color.by = "bod")
-```
-
-![](man/figures/README-bdiv-3.png)<!-- -->
-
 #### Summarize counts by taxonomic rank.
 
 ``` r
-taxa_heatmap(biom, taxa = 30, color.by = c("body", "age"), limit.by = c(sex = "Male"))
+taxa_heatmap(biom, taxa = 30, color.by = c("body", "age"))
 ```
 
 ![](man/figures/README-taxa-1.png)<!-- -->
@@ -85,20 +78,20 @@ taxa_stacked(biom, rank = "Phylum")
 
 ``` r
 taxa_table(biom, 'Phylum')
-#> # A tibble: 637 × 8
-#>    .rank  .sample .taxa               .abundance   Age   BMI `Body Site`   Sex  
-#>    <fct>  <chr>   <fct>                    <dbl> <dbl> <dbl> <fct>         <fct>
-#>  1 Phylum HMP01   Actinobacteria              13    22    20 Buccal mucosa Fema…
-#>  2 Phylum HMP01   Bacteroidetes              192    22    20 Buccal mucosa Fema…
-#>  3 Phylum HMP01   Cyanobacteria                0    22    20 Buccal mucosa Fema…
-#>  4 Phylum HMP01   Deinococcus Thermus          0    22    20 Buccal mucosa Fema…
-#>  5 Phylum HMP01   Firmicutes                 854    22    20 Buccal mucosa Fema…
-#>  6 Phylum HMP01   Fusobacteria                37    22    20 Buccal mucosa Fema…
-#>  7 Phylum HMP01   Gracilibacteria             13    22    20 Buccal mucosa Fema…
-#>  8 Phylum HMP01   Proteobacteria              74    22    20 Buccal mucosa Fema…
-#>  9 Phylum HMP01   Saccharibacteria             0    22    20 Buccal mucosa Fema…
-#> 10 Phylum HMP01   Spirochaetae                 0    22    20 Buccal mucosa Fema…
-#> # ℹ 627 more rows
+#> # A tibble: 294 × 8
+#>    .rank  .sample .taxa          .abundance   Age   BMI `Body Site`   Sex   
+#>    <fct>  <chr>   <fct>               <dbl> <dbl> <dbl> <fct>         <fct> 
+#>  1 Phylum HMP01   Firmicutes            854    22    20 Buccal mucosa Female
+#>  2 Phylum HMP01   Bacteroidetes         192    22    20 Buccal mucosa Female
+#>  3 Phylum HMP01   Actinobacteria         13    22    20 Buccal mucosa Female
+#>  4 Phylum HMP01   Proteobacteria         74    22    20 Buccal mucosa Female
+#>  5 Phylum HMP01   Fusobacteria           37    22    20 Buccal mucosa Female
+#>  6 Phylum HMP01   Tenericutes             0    22    20 Buccal mucosa Female
+#>  7 Phylum HMP02   Firmicutes            808    24    23 Buccal mucosa Male  
+#>  8 Phylum HMP02   Bacteroidetes         186    24    23 Buccal mucosa Male  
+#>  9 Phylum HMP02   Actinobacteria         53    24    23 Buccal mucosa Male  
+#> 10 Phylum HMP02   Proteobacteria         97    24    23 Buccal mucosa Male  
+#> # ℹ 284 more rows
 ```
 
 ## Parallel Processing
