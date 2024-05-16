@@ -10,19 +10,7 @@ rare_multiplot(
   layers = "tc",
   rline = TRUE,
   stat.by = NULL,
-  facet.by = NULL,
-  colors = TRUE,
-  shapes = FALSE,
-  test = "none",
-  fit = "log",
-  at = NULL,
-  level = 0.95,
-  p.adj = "fdr",
-  trans = "none",
-  alt = "!=",
-  mu = 0,
-  caption = TRUE,
-  ...
+  facet.by = NULL
 )
 }
 \arguments{
@@ -51,61 +39,6 @@ categorical. Default: \code{NULL}}
 
 \item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
 Default: \code{NULL}}
-
-\item{colors}{How to color the groups. Options are:
-\itemize{
-\item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
-\item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
-\item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
-\item{character vector - }{ Custom colors to use. E.g. \code{c("red", "#00FF00")} }
-\item{named character vector - }{ Explicit mapping. E.g. \code{c(Male = "blue", Female = "red")} }
-}
-See "Aesthetics" section below for additional information.
-Default: \code{TRUE}}
-
-\item{shapes}{Shapes for each group.
-Options are similar to \code{colors}'s: \code{TRUE}, \code{FALSE}, \code{NULL}, shape
-names (typically integers 0 - 17), or a named vector mapping
-groups to specific shape names.
-See "Aesthetics" section below for additional information.
-Default: \code{TRUE}}
-
-\item{test}{Method for computing p-values: \code{'none'}, \code{'emmeans'}, or
-\code{'emtrends'}. Default: \code{'emmeans'}}
-
-\item{fit}{How to fit the trendline.
-Options are \code{'lm'}, \code{'log'}, and \code{'gam'}.
-Default: \code{'log'}}
-
-\item{at}{Position(s) along the x-axis where the means or slopes should be
-evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
-and selects the position where the p-value is most significant.}
-
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
-
-\item{p.adj}{Method to use for multiple comparisons adjustment of
-p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
-
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
-
-\item{alt}{Alternative hypothesis direction. Options are \code{'!='}
-(two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
-(greater than \code{mu}). Default: \code{'!='}}
-
-\item{mu}{Reference value to test against. Default: \code{0}}
-
-\item{caption}{Add methodology caption beneath the plot.
-Default: \code{TRUE}}
-
-\item{...}{Additional parameters to pass along to ggplot2 functions.
-Prefix a parameter name with a layer name to pass it to only that
-layer. For instance, \code{p.size = 2} ensures only the points have their
-size set to \code{2}.}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,

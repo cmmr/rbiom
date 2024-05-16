@@ -15,30 +15,27 @@
 
 rare_multiplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
-    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = FALSE, 
-    test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
-  
-  biom <- as_rbiom(biom)
-  
-  params <- eval_envir(environment(), ...)
-  remove(list = intersect(env_names(params), ls()))
-  
-  
-  #________________________________________________________
-  # See if this result is already in the cache.
-  #________________________________________________________
-  cache_file <- get_cache_file('rare_multiplot', params)
-  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
-    return (readRDS(cache_file))
+    stat.by = NULL, facet.by = NULL) {
   
   
   #________________________________________________________
   # Build the two subplots, then arrange them together.
   #________________________________________________________
-  corrplot <- do.call(rare_corrplot, fun_params(rare_corrplot, params))
-  stacked  <- do.call(rare_stacked,  fun_params(rare_stacked,  params))
-  plots    <- list(corrplot = corrplot, stacked = stacked)
+  corrplot <- rare_corrplot(
+    biom     = biom, 
+    adiv     = adiv, 
+    layers   = layers, 
+    rline    = rline,
+    stat.by  = stat.by, 
+    facet.by = facet.by, 
+    test     = "none", 
+    caption  = FALSE )
+  
+  stacked <- rare_stacked(
+    biom  = biom, 
+    rline = rline )
+  
+  plots <- list(corrplot = corrplot, stacked = stacked)
   
   
   p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
@@ -63,7 +60,6 @@ rare_multiplot <- function (
   
   
   attr(p, 'cmd') <-  current_cmd('rare_multiplot')
-  set_cache_value(cache_file, p)
   
   return (p)
 }
