@@ -262,17 +262,18 @@ statistics per plot.
 biom <- rarefy(hmp50) %>% 
   subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
 
-p1 <- adiv_boxplot(biom, x = "Body Site")
-p2 <- adiv_boxplot(biom, stat.by = "Body Site")
+p1 <- adiv_boxplot(biom, x = "Body Site", stat.by = NULL)
+p2 <- adiv_boxplot(biom, x = NULL,        stat.by = "Body Site")
 p3 <- adiv_boxplot(biom, x = "Body Site", stat.by = "Body Site")
-p4 <- adiv_boxplot(biom, x = "Sex", stat.by = "Body Site")
+p4 <- adiv_boxplot(biom, x = "Sex",       stat.by = "Body Site")
 
 plots <- list(
-  p1 + ggplot2::labs(subtitle = 'x = "Body Site"'), 
-  p2 + ggplot2::labs(subtitle = 'stat.by = "Body Site"'), 
-  p3 + ggplot2::labs(subtitle = 'x = stat.by = "Body Site"'), 
+  p1 + ggplot2::labs(subtitle = 'x = "Body Site", stat.by = NULL'), 
+  p2 + ggplot2::labs(subtitle = 'x = NULL, stat.by = "Body Site"'), 
+  p3 + ggplot2::labs(subtitle = 'x = "Body Site", stat.by = "Body Site"'), 
   p4 + ggplot2::labs(subtitle = 'x = "Sex", stat.by = "Body Site"')) %>%
-  lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL))
+  lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL)) %>%
+  lapply(`+`, ggplot2::theme(plot.subtitle = ggplot2::element_text(size = 10)))
 
 patchwork::wrap_plots(plots, guides = "collect")
 ```

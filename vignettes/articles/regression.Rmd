@@ -198,7 +198,7 @@ As an example, lets pull the AIC value from the statistics table generated in th
 st$.aic
 ```
 
-These values can be used to decide which `fit` argument to use ("lm", "log", or "gam").
+These values can be used to decide which `fit` argument to use (`"lm"`, `"log"`, or `"gam"`).
 
 ```{r}
 plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
@@ -206,7 +206,7 @@ plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
   dplyr::select(fit, .r.sqr:.fit.p)
 ```
 
-Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best model to use for this set of data and variables.
+Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best model of the three to use for this set of data and variables.
 
 
 
@@ -214,6 +214,10 @@ Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC, and high
 ## Alternative Hypothesis
 
 The three columns `.mean.diff`, `.h1`, and `.p.val` together show the hypothesis and its outcome. Above, we're asking if `.mean.diff` is non-zero. Since `.p.val` is less than 0.05 we can say that it is.
+
+```{r}
+dplyr::select(st, .mean.diff:.p.val)
+```
 
 For a more complete review of alternative hypotheses, see the <a href='statistics.html#hypothesis'>rbiom statistics article</a>.
 
@@ -333,7 +337,7 @@ Above, all the orange and blue points falling on y=0 indicate there are zero Pre
 
 ## Rank Transformation
 
-One method for addessing zero abundances is to rank tranform all the abundances. In rbiom, setting `trans = "rank"` will rank transform all the abundances, without consideration of facets. The default parameters `ties = "random", seed = 0` will assign unique integers (see `base::rank()` for other `ties` options.
+One method for addessing zero abundances is to rank tranform all the abundances. In rbiom, setting `trans = "rank"` will rank transform all the abundances, without consideration of facets. The default parameters `ties = "random", seed = 0` will assign unique integers (see `base::rank()` for other `ties` options).
 
 This will improve the diagnostic plots, but adds noise to the data.
 
@@ -433,7 +437,7 @@ By default, the `*_corrplot()` functions will automatically find the x-axis loca
 stats_corrplot(npregfast::children, 'age', 'height', stat.by = 'sex', at = 12)
 ```
 
-Although you're limited to one `at` value for `_corrplot()` functions, you can provide multiple `at` locations to `stats_table()` or `*_stats()` functions.
+Although you're limited to one `at` value for `*_corrplot()` functions, you can provide multiple `at` locations to `stats_table()` or `*_stats()` functions.
 
 ```{r}
 stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)

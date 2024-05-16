@@ -415,10 +415,10 @@ generated in the last section.</p>
 <code class="sourceCode R"><span><span class="va">st</span><span class="op">$</span><span class="va">.aic</span></span>
 <span><span class="co">#&gt; [1] 16403.78</span></span></code></pre></div>
 <p>These values can be used to decide which <code>fit</code> argument to
-use (“lm”, “log”, or “gam”).</p>
+use (<code>"lm"</code>, <code>"log"</code>, or <code>"gam"</code>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>lm<span class="op">=</span><span class="st">"lm"</span>, log<span class="op">=</span><span class="st">"log"</span>, gam<span class="op">=</span><span class="st">"gam"</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"fit"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">"age"</span>, <span class="st">"height"</span>, <span class="st">"sex"</span>, fit <span class="op">=</span> <span class="va">fit</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">"age"</span>, <span class="st">"height"</span>, <span class="st">"sex"</span>, fit <span class="op">=</span> <span class="va">fit</span><span class="op">)</span> <span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">.r.sqr</span><span class="op">:</span><span class="va">.fit.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   fit    .r.sqr    .adj.r     .aic     .bic   .loglik .fit.p</span></span>
 <span><span class="co">#&gt; 1  lm 0.7896923 0.7894395 16947.72 16976.84 -8468.858      0</span></span>
@@ -426,7 +426,7 @@ use (“lm”, “log”, or “gam”).</p>
 <span><span class="co">#&gt; 3 gam        NA        NA 16403.78 16497.75 -8185.756     NA</span></span></code></pre></div>
 <p>Based on the above table, <code>fit = "gam"</code> has the lowest
 AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best
-model to use for this set of data and variables.</p>
+model of the three to use for this set of data and variables.</p>
 </div>
 <div class="section level3">
 <h3 id="alternative-hypothesis">Alternative Hypothesis<a class="anchor" aria-label="anchor" href="#alternative-hypothesis"></a>
@@ -435,6 +435,13 @@ model to use for this set of data and variables.</p>
 <code>.p.val</code> together show the hypothesis and its outcome. Above,
 we’re asking if <code>.mean.diff</code> is non-zero. Since
 <code>.p.val</code> is less than 0.05 we can say that it is.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">st</span>, <span class="va">.mean.diff</span><span class="op">:</span><span class="va">.p.val</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   .mean.diff .h1     .p.val</span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      -<span style="color: #BB0000;">7.73</span> != 0  8.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-40</span></span></span></code></pre></div>
 <p>For a more complete review of alternative hypotheses, see the
 <a href="statistics.html#hypothesis">rbiom statistics article</a>.</p>
 </div>
@@ -450,7 +457,7 @@ predicted (fitted) values.</p>
 common plots for visualizing residuals are normal Q-Q plots, residual vs
 fitted value plots, and scale-location plots. You can add these plots to
 any rbiom corrplot by setting <code>check = TRUE</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span></span>
 <span>  df       <span class="op">=</span> <span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>,  <span class="co"># dataset</span></span>
 <span>  x        <span class="op">=</span> <span class="st">'age'</span>,                <span class="co"># x-axis variable</span></span>
@@ -460,7 +467,7 @@ any rbiom corrplot by setting <code>check = TRUE</code>.</p>
 <span>  layers   <span class="op">=</span> <span class="st">'tc'</span>,                 <span class="co"># show trendline with conf. int.</span></span>
 <span>  test     <span class="op">=</span> <span class="st">'emmeans'</span>,            <span class="co"># run stats on the means</span></span>
 <span>  check    <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>                <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 <p>The subtitle for each plot tells you what a high quality model will
 look like. For example, the “Normal Q-Q” plot says that “Points should
 fall on the line.” In this case they do, so that particular check
@@ -495,7 +502,7 @@ The original Nature article by Eric J. de Muinck and Pal Trosvik for
 this data set is available online for free at <a href="https://www.nature.com/articles/s41467-018-04641-7" class="external-link">Individuality
 and Convergence of the Infant Gut Microbiota During the First Year of
 Life</a>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gems</span></span>
 <span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Global Enteric Multicenter Study</span><span style="color: #808080;"> ════════════════════════</span></span></span>
 <span><span class="co">#&gt; Stool samples collected from 1006 participants under the</span></span>
@@ -515,7 +522,7 @@ Life</a>.</p>
 <span><span class="co">#&gt; <span style="color: #808080;">── 116 - 11k reads/sample ──────────────────── 2021-03-15 ──</span></span></span>
 <span></span>
 <span></span>
-<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">gems</span><span class="op">)</span></span>
+<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">gems</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 1,006</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
 <span><span class="co">#&gt; $ .sample  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SRS608640", "SRS608279", "SRS607780", "SRS607987", "SRS60842…</span></span>
@@ -553,10 +560,10 @@ one continuous field:</p>
 </h3>
 <p>To start, let’s select just the healthy controls from two countries,
 then rarefy those samples to an even sequencing depth.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hbk</span> <span class="op">&lt;-</span> <span class="va">gems</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">diarrhea</span> <span class="op">==</span> <span class="st">"Control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">country</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Bangladesh"</span>, <span class="st">"Kenya"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hbk</span> <span class="op">&lt;-</span> <span class="va">gems</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">diarrhea</span> <span class="op">==</span> <span class="st">"Control"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">country</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Bangladesh"</span>, <span class="st">"Kenya"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">hbk</span><span class="op">$</span><span class="va">n_samples</span></span>
@@ -571,14 +578,14 @@ use the convenience function <code><a href="../reference/adiv_corrplot.html">adi
 combines the steps of generating a table of alpha diversity values
 (<code><a href="../reference/adiv_table.html">adiv_table()</a></code>) and generating a correlation plot
 (<code><a href="../reference/stats_corrplot.html">stats_corrplot()</a></code>).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_corrplot.html">adiv_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
 <span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
 <span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups</span></span>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-13-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
 <p>Here, the diagnostic plots look pretty good, so we can confidently
 say that children have different Shannon diversity index values,
 depending on whether they live in Bangladesh vs Kenya, and that this
@@ -593,7 +600,7 @@ into a single streamlined function.</p>
 <p>We’ll set <code>layers = "tcrp"</code> to show the residuals on this
 main plot. This will help in explaining an artifact on the “Residuals vs
 Fitted” diagnostic plot.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
 <span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># show residuals on the main plot</span></span>
@@ -603,7 +610,7 @@ Fitted” diagnostic plot.</p>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
 <span>  t.size  <span class="op">=</span> <span class="fl">2</span>,           <span class="co"># make the trendline thicker</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
 <p>Above, all the orange and blue points falling on y=0 indicate there
 are zero Prevotella reads for that sample. This can confound taxa
 abundance analyses, as indicated by the diagnostic plots.</p>
@@ -626,10 +633,10 @@ abundances. In rbiom, setting <code>trans = "rank"</code> will rank
 transform all the abundances, without consideration of facets. The
 default parameters <code>ties = "random", seed = 0</code> will assign
 unique integers (see <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">base::rank()</a></code> for other
-<code>ties</code> options.</p>
+<code>ties</code> options).</p>
 <p>This will improve the diagnostic plots, but adds noise to the
 data.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
 <span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># show residuals on the main plot</span></span>
@@ -640,7 +647,7 @@ data.</p>
 <span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
 <span>  t.size  <span class="op">=</span> <span class="fl">2</span>,           <span class="co"># make the trendline thicker</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level2">
@@ -662,7 +669,7 @@ which pairs of samples are included in the plot. Setting
 <code>within = "country"</code> as below will only plot pairs of samples
 that came from the same country, and prevent <code>stat.by</code> from
 producing a “Bangladesh vs Kenya” trendline.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bdiv_corrplot.html">bdiv_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
 <span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
@@ -670,7 +677,7 @@ producing a “Bangladesh vs Kenya” trendline.</p>
 <span>  within  <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># don't compare samples from different countries</span></span>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
 <p>Here, the main plot tells us:</p>
 <ul>
 <li>In Bangladesh, the closer two children are in age to each other, the
@@ -694,7 +701,7 @@ between x = 0.75 and 0.83 on the “Residuals vs Fitted” and
 </h3>
 <p>Running <code><a href="../reference/bdiv_corrplot.html">bdiv_corrplot()</a></code> with <code>trans = "rank"</code>
 could help make the residuals more normally distributed.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bdiv_corrplot.html">bdiv_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
 <span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
@@ -703,7 +710,7 @@ could help make the residuals more normally distributed.</p>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
 <span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-18-1.png" width="768"></p>
 <p>After rank-transforming:</p>
 <ul>
 <li>The main plot tells a slightly different story.</li>
@@ -727,11 +734,11 @@ from different datasets. However, it is arguable that these two datasets
 are the same, just scaled differently. Therefore if you don’t mind
 potentially incurring a reviewer’s wrath, you can rescale both datasets
 to the same range and compare goodness-of-fit values on those.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>none<span class="op">=</span><span class="st">"none"</span>, rank<span class="op">=</span><span class="st">"rank"</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"trans"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">trans</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/bdiv_table.html">bdiv_table</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hbk</span>, within <span class="op">=</span> <span class="st">"country"</span>, trans <span class="op">=</span> <span class="va">trans</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.distance <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/rescale.html" class="external-link">rescale</a></span><span class="op">(</span><span class="va">.distance</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span>regr <span class="op">=</span> <span class="st">"age"</span>, resp <span class="op">=</span> <span class="st">".distance"</span>, stat.by <span class="op">=</span> <span class="st">"country"</span>, fit <span class="op">=</span> <span class="st">"gam"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/bdiv_table.html">bdiv_table</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hbk</span>, within <span class="op">=</span> <span class="st">"country"</span>, trans <span class="op">=</span> <span class="va">trans</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.distance <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/rescale.html" class="external-link">rescale</a></span><span class="op">(</span><span class="va">.distance</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span>regr <span class="op">=</span> <span class="st">"age"</span>, resp <span class="op">=</span> <span class="st">".distance"</span>, stat.by <span class="op">=</span> <span class="st">"country"</span>, fit <span class="op">=</span> <span class="st">"gam"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.aic</span>, <span class="va">.bic</span>, <span class="va">.loglik</span><span class="op">)</span> <span class="op">)</span></span>
 <span><span class="co">#&gt;   trans      .aic      .bic   .loglik</span></span>
 <span><span class="co">#&gt; 1  none -2785.749 -2698.256  1404.230</span></span>
@@ -747,14 +754,14 @@ data.</p>
 automatically find the x-axis location with the most significant term of
 interest. However, you can override this by providing the
 <code>at</code> parameter.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">'age'</span>, <span class="st">'height'</span>, stat.by <span class="op">=</span> <span class="st">'sex'</span>, at <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-19-1.png" width="768"></p>
+<p><img src="regression_files/figure-html/unnamed-chunk-20-1.png" width="768"></p>
 <p>Although you’re limited to one <code>at</code> value for
-<code>_corrplot()</code> functions, you can provide multiple
+<code>*_corrplot()</code> functions, you can provide multiple
 <code>at</code> locations to <code><a href="../reference/stats_table.html">stats_table()</a></code> or
 <code>*_stats()</code> functions.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">'age'</span>, <span class="st">'height'</span>, stat.by <span class="op">=</span> <span class="st">'sex'</span>, at <span class="op">=</span> <span class="fl">11</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
