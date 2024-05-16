@@ -12,6 +12,7 @@ ENV <- environment(NULL)
   # Empty the cache (mainly for during development)
   if (!is.null(x <- get_cache_dir()))
     unlink(x = dir(x, full.names = TRUE))
+
   
   
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(
@@ -56,6 +57,14 @@ ENV <- environment(NULL)
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
   
+  
+  
+  #________________________________________________________
+  # Attach function names as attribute
+  #________________________________________________________
+  for (i in ls(ENV))
+    if (is.function(ENV[[i]]))
+      attr(ENV[[i]], 'fn') <- i
   
   
   #________________________________________________________

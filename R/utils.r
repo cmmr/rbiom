@@ -96,7 +96,7 @@ eval_envir <- function (env, ...) {
           'regr', 'resp' ))))
     
     if (nzchar(invalid)) {
-      fn <- deparse(rlang::caller_call()[[1]])
+      fn <- attr(rlang::caller_fn(), 'fn') %||% "function"
       cli_abort(c(x = "{fn} does not accept parameter(s): {invalid}"))
     }
     

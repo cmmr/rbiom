@@ -167,12 +167,13 @@ write_biom_json <- function (biom, file) {
       #________________________________________________________
       rows = apply(biom$taxonomy, 1L, function (x) {
         
+        otu <- x[[1]]
         dat <- list(taxonomy=unname(x[-1]))
         
         if (!is.null(biom$sequences))
-          dat[['sequence']] <- biom$sequences[[otu_id]]
+          dat[['sequence']] <- biom$sequences[[otu]]
         
-        list(id=x[[1]], metadata=dat)
+        list(id=otu, metadata=dat)
       }),
       
       

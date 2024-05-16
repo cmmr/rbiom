@@ -322,6 +322,7 @@ taxa_corrplot(
   layers  = "tcrp",      # show residuals on the main plot
   x       = "age",       # x-axis variable
   taxa    = 1,           # select the most abundant taxa
+  rank    = "Genus",     # at the genus level
   stat.by = "country",   # statistical groups
   fit     = "gam",       # smoothed trendline
   t.size  = 2,           # make the trendline thicker
@@ -347,6 +348,7 @@ taxa_corrplot(
   layers  = "tcrp",      # show residuals on the main plot
   x       = "age",       # x-axis variable
   taxa    = 1,           # select the most abundant taxa
+  rank    = "Genus",     # at the genus level
   stat.by = "country",   # statistical groups
   fit     = "gam",       # smoothed trendline
   trans   = "rank",      # rank-transform the abundances
