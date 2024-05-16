@@ -14,7 +14,7 @@ adiv_corrplot(
   colors = TRUE,
   shapes = TRUE,
   test = "emmeans",
-  fit = "lm",
+  fit = "gam",
   at = NULL,
   level = 0.95,
   p.adj = "fdr",
@@ -22,6 +22,7 @@ adiv_corrplot(
   alt = "!=",
   mu = 0,
   caption = TRUE,
+  check = FALSE,
   ...
 )
 }
@@ -72,7 +73,7 @@ Default: \code{TRUE}}
 \code{'emtrends'}. Default: \code{'emmeans'}}
 
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
-Default: \code{'lm'}}
+Default: \code{'gam'}}
 
 \item{at}{Position(s) along the x-axis where the means or slopes should be
 evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
@@ -98,6 +99,9 @@ statistics. Default: \code{"none"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
+
+\item{check}{Generate additional plots to aid in assessing data normality.
+Default: \code{FALSE}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that

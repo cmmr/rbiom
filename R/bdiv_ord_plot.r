@@ -15,10 +15,6 @@
 #'        `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`. 
 #'        See [plot types][plots] for examples of each. Default: `"pe"`
 #'        
-#' @param color.by,shape.by,facet.by,limit.by   Metadata columns to use for 
-#'        aesthetics and partitioning. See below for details. 
-#'        Default: `NULL`
-#'        
 #' @param ...   Parameters for layer geoms (e.g. [ggplot2::geom_point()]). 
 #'        Prefixing parameter names with a layer name ensures that a particular 
 #'        parameter is passed to, and only to, that layer. For instance, 
@@ -30,7 +26,7 @@
 #' @return A \code{ggplot2} plot. \cr
 #'         The computed sample coordinates and ggplot command 
 #'         are available as \code{$data} and \code{$code} respectively. \cr
-#'         If \code{color.by} is given, then \code{$stats} and 
+#'         If \code{stat.by} is given, then \code{$stats} and 
 #'         \code{$stats$code} are set. \cr
 #'         If \code{rank} is given, then \code{$data$taxa_coords}, 
 #'         \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
@@ -46,8 +42,7 @@
 #'     
 bdiv_ord_plot <- function (
     biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, layers = "petm", 
-    stat.by = NULL, color.by = stat.by, shape.by = stat.by, facet.by = NULL, 
-    colors = TRUE, shapes = TRUE,
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {
   
@@ -76,8 +71,6 @@ bdiv_ord_plot <- function (
     validate_rank(max = Inf, null_ok = TRUE)
     
     validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
-    validate_biom_field('color.by', null_ok = TRUE)
-    validate_biom_field('shape.by', null_ok = TRUE, col_type = "cat")
     validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat")
     
   })
@@ -94,7 +87,6 @@ bdiv_ord_plot <- function (
       bdiv         = bdiv,
       ord          = ord,
       weighted     = weighted,
-      md           = c(color.by, shape.by),
       split.by     = facet.by,
       stat.by      = stat.by,
       tree         = tree,
@@ -133,9 +125,9 @@ bdiv_ord_plot <- function (
   #________________________________________________________
   init_layers(
     params  = params, 
-    choices = c( 'p' = "point", 'n' = "name",    's' = "spider", 
-                 'n' = "name",  'd' = "density", 't' = "taxon",
-                 'a' = "arrow", 'e' = "ellipse", 'm' = "mean" ))
+    choices = c( 'p' = "point",   'n' = "name",    's' = "spider", 
+                 'd' = "density", 't' = "taxon", 'm' = "mean",
+                 'a' = "arrow",   'e' = "ellipse" ))
   
   
   
@@ -204,14 +196,6 @@ bdiv_ord_plot <- function (
   }
   
   
-  if (eq(params$stat.by, params$color.by))
-    if (has_layer(params, 'ellipse'))
-      set_layer(
-        params = params, 
-        layer  = 'ellipse', 
-        'mapping|color' = params$stat.by )
-  
-  
   
   #________________________________________________________
   # Default aes and non-aes parameters
@@ -228,6 +212,16 @@ bdiv_ord_plot <- function (
     'x' = NULL, 
     'y' = NULL )
   
+  
+  if (has_layer(params, 'spider'))
+    set_layer(
+      params = params, 
+      layer  = 'spider', 
+      'alpha'        = 0.4, 
+      'size'         = 0.75,
+      'mapping|xend' = ".xend",
+      'mapping|yend' = ".yend" )
+  
   if (has_layer(params, 'name'))
     set_layer(
       params = params, 
@@ -241,15 +235,6 @@ bdiv_ord_plot <- function (
       'alpha'        = 0.5, 
       'color'        = "darkgray",
       'mapping|size' = ".size" )
-  
-  if (has_layer(params, 'spider'))
-    set_layer(
-      params = params, 
-      layer  = 'spider', 
-      'alpha'        = 0.4, 
-      'size'         = 0.75,
-      'mapping|xend' = ".xend",
-      'mapping|yend' = ".yend" )
   
   if (has_layer(params, 'arrow'))
     set_layer(

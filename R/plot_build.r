@@ -129,6 +129,7 @@ plot_build <- function (params) {
     "residual"   = c('color'),
     "linerange"  = c('color'),
     "errorbar"   = c('color'),
+    "ellipse"    = c('color'),
     "spider"     = c('color'),
     "name"       = c('color'),
     "confidence" = c('color', 'fill'),
@@ -153,12 +154,23 @@ plot_build <- function (params) {
   if (!is.null(fills))  args[['fill']]  <- if (hasName(params, 'color.by')) params$color.by else params$stat.by
   
   
+  
   for (layer in intersect(names(layers), names(specs))) {
     
     layerArgs <- args[intersect(specs[[layer]], names(args))]
     layerArgs <- args[setdiff(names(layerArgs), names(layers[[layer]]))]
     
-    if (length(layerArgs) == 0) next
+    
+    #________________________________________________________
+    # `stat.by` is set, by colors/shapes/patterns = FALSE.
+    #________________________________________________________
+    if (length(layerArgs) == 0) {
+      
+      if (!is.null(params$stat.by))
+        set_layer(params, layer, 'mapping|group' = params$stat.by)
+      
+      next
+    }
     
     
     #________________________________________________________
@@ -243,6 +255,7 @@ plot_build <- function (params) {
   
   
   
+  
   #______________________________________________________________
   # Assemble the ggplot object (p)
   #______________________________________________________________
@@ -278,6 +291,70 @@ plot_build <- function (params) {
     }
     
   }
+  
+  
+  
+  #______________________________________________________________
+  # Append QQ plots with patchwork
+  #______________________________________________________________
+  if (isTRUE(params$check)) {
+    
+    p <- local({
+      
+      df <- with(
+        data = attr(params$.ggdata, 'residual'),
+        expr = tibble(
+          .y        = get(params$.ycol), 
+          .fitted   = .fitted, 
+          .residual = .residual, 
+          .std.res  = .std.res ))
+      
+      qq <- ggplot2::ggplot(df, aes(sample = .std.res)) + 
+        ggplot2::geom_qq_line(alpha = 0.5, fullrange = TRUE) +
+        ggplot2::geom_qq(size = 0.2, alpha = 0.5) +
+        ggplot2::labs(
+          title    = "Normal Q-Q",
+          x        = "Theoretical Quantiles",
+          y        = "Standardized Residual",
+          subtitle = "Points should fall on the line." )
+      
+      rf <- ggplot2::ggplot(df, aes(x = .fitted, y = .residual)) + 
+        ggplot2::geom_hline(yintercept = 0, alpha = 0.5, linetype = "dashed") +
+        ggplot2::geom_point(size = 0.2, alpha = 0.5) +
+        ggplot2::geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+        ggplot2::labs(
+          title    = "Residuals vs Fitted",
+          x        = "Fitted Value",
+          y        = "Residual",
+          subtitle = "Flat and horizontal trendline." )
+      
+      sl <- ggplot2::ggplot(df, aes(x = .fitted, y = sqrt(abs(.std.res)))) + 
+        ggplot2::geom_point(size = 0.2, alpha = 0.5) +
+        ggplot2::geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+        ggplot2::labs(
+          title    = "Scale-Location",
+          x        = "Fitted Value",
+          y        = expression(sqrt(abs(` Standardized Residual `))),
+          subtitle = "Flat and horizontal trendline." )
+      
+      diag <- lapply(list(qq, rf, sl), function (x) {
+        x +
+          ggplot2::theme_minimal() +
+          ggplot2::theme(
+            plot.title      = ggplot2::element_text(face = "bold", size = 10), 
+            plot.subtitle   = ggplot2::element_text(face = "italic", size = 9),
+            axis.title      = ggplot2::element_text(size = 9),
+            plot.background = ggplot2::element_rect(linewidth = 1, color = "gray") )
+      })
+      
+      patchwork::wrap_plots(
+        ncol    = 1,
+        heights = c(3, 1),
+        patchwork::free(patchwork::wrap_plots(p)), 
+        patchwork::wrap_plots(diag, nrow = 1) )
+    })
+  }
+  
   
   
   #______________________________________________________________

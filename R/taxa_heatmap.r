@@ -2,6 +2,7 @@
 #' 
 #' @inherit documentation_heatmap
 #' @inherit documentation_default
+#' @inherit bdiv_heatmap sections
 #' 
 #' @family taxa_abundance
 #' @family visualization
@@ -9,7 +10,7 @@
 #' @param grid   Color palette name, or a list as expected [plot_heatmap()].
 #'        Default: `"bilbao"`
 #' 
-#' @param color.by   A character vector of metadata fields to display as tracks 
+#' @param tracks   A character vector of metadata fields to display as tracks 
 #'        at the top of the plot. Or, a list as expected by the `tracks` 
 #'        argument of [plot_heatmap()]. Default: `NULL`
 #' 
@@ -20,22 +21,21 @@
 #'     # Keep and rarefy the 10 most deeply sequenced samples.
 #'     hmp10 <- rarefy(hmp50, n = 10)
 #'     
-#'     taxa_heatmap(hmp10, rank = "Phylum", color.by = "Body Site")
+#'     taxa_heatmap(hmp10, rank = "Phylum", tracks = "Body Site")
 #'     
-#'     taxa_heatmap(hmp10, rank = "Genus", color.by = c("Sex", "Body Site"))
+#'     taxa_heatmap(hmp10, rank = "Genus", tracks = c("sex", "bo"))
 #'     
-#'     taxa_heatmap(hmp10, rank = "Phylum", color.by = list(
-#'       'Sex'       = list(colors = c(Male = "#0000FF", Female = "violetred")), 
+#'     taxa_heatmap(hmp10, rank = "Phylum", tracks = list(
+#'       'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")), 
 #'       'Body Site' = list(colors = "muted", label = "Source") ))
 #'     
 taxa_heatmap <- function (
-    biom, rank = -1, taxa = 6, grid = "bilbao",
-    color.by = NULL, order.by = NULL, 
+    biom, rank = -1, taxa = 6, tracks = NULL, grid = "bilbao",
     other = FALSE, unc = "singly", lineage = FALSE, 
     label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
     clust = "complete", dist = "euclidean", 
     asp = 1, tree_height = 10, track_height = 10, 
-    legend = "right", title = NULL, xlab.angle = "auto", ...) {
+    legend = "right", title = TRUE, xlab.angle = "auto", ...) {
   
   biom <- as_rbiom(biom)
   
@@ -43,7 +43,7 @@ taxa_heatmap <- function (
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- slurp_env(..., .dots = TRUE)
+  params     <- slurp_env(...)
   cache_file <- get_cache_file('taxa_heatmap', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -87,6 +87,8 @@ taxa_heatmap <- function (
       
     })) %>% add_class('rbiom_code')
     
+    attr(p, 'cmd') <- current_cmd('bdiv_heatmap')
+    
     set_cache_value(cache_file, p)
     return (p)
   }
@@ -98,7 +100,7 @@ taxa_heatmap <- function (
   with(params, {
     
     validate_taxa()
-    validate_biom_field('order.by', null_ok = TRUE, max = Inf)
+    # validate_biom_field('order.by', null_ok = TRUE, max = Inf)
     validate_var_choices('rescale', choices = c("none", "cols", "rows"))
     
     if (isFALSE(title)) title <- NULL
@@ -126,8 +128,15 @@ taxa_heatmap <- function (
     }
     
     if (length(clust)    < 1) clust <- "complete"
-    if (length(order.by) > 0) clust <- c(clust[[1]], NA)
+    # if (length(order.by) > 0) clust <- c(clust[[1]], NA)
   })
+  
+  
+  
+  #________________________________________________________
+  # Convert `tracks` into a named list of lists.
+  #________________________________________________________
+  biom_tracks(params)
   
   
   
@@ -145,42 +154,15 @@ taxa_heatmap <- function (
       unc     = unc, 
       other   = other )
     
+    remove("biom", "rank", "taxa", "lineage", "unc", "other")
   })
   
   
   
   #________________________________________________________
-  # Convert aes `color.by` spec to `tracks` format.
+  # Actual plotting is handled by plot_heatmap()
   #________________________________________________________
-  with(params, {
-    
-    if (is.list(color.by)) {
-      tracks   <- color.by
-      color.by <- names(color.by)
-      validate_biom_field('color.by', null_ok = TRUE, max = Inf)
-      names(tracks) <- color.by
-      
-    } else {
-      validate_biom_field('color.by', null_ok = TRUE, max = Inf)
-      tracks <- sapply(color.by, simplify = FALSE, function (i) list() )
-    }
-    
-    for (.i in names(tracks))
-      tracks[[.i]][['values']] <- pull(biom, .i)
-    
-    .dots$tracks <- NULL
-    remove(list = c(".i", "color.by") %>% intersect(ls(all.names = TRUE)))
-  })
-  
-  
-  
-  #________________________________________________________
-  # Arguments to pass on to plot_heatmap
-  #________________________________________________________
-  args <- intersect(formalArgs(plot_heatmap), env_names(params))
-  args <- c(mget(args, envir = params), params$.dots)
-  p    <- do.call(plot_heatmap, args)
-  
+  p <- do.call(plot_heatmap, as.list(params))
   
   attr(p, 'cmd') <- current_cmd('taxa_heatmap')
   set_cache_value(cache_file, p)

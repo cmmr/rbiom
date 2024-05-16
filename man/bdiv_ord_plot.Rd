@@ -11,8 +11,6 @@ bdiv_ord_plot(
   weighted = TRUE,
   layers = "petm",
   stat.by = NULL,
-  color.by = stat.by,
-  shape.by = stat.by,
   facet.by = NULL,
   colors = TRUE,
   shapes = TRUE,
@@ -65,8 +63,7 @@ See \link[=plots]{plot types} for examples of each. Default: \code{"pe"}}
 \item{stat.by}{The categorical or numeric metadata field over which
 statistics should be calculated. Required.}
 
-\item{color.by, shape.by, facet.by, limit.by}{Metadata columns to use for
-aesthetics and partitioning. See below for details.
+\item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
@@ -155,7 +152,7 @@ the \code{pt.} prefix.}
 A \code{ggplot2} plot. \cr
 The computed sample coordinates and ggplot command
 are available as \code{$data} and \code{$code} respectively. \cr
-If \code{color.by} is given, then \code{$stats} and
+If \code{stat.by} is given, then \code{$stats} and
 \code{$stats$code} are set. \cr
 If \code{rank} is given, then \code{$data$taxa_coords},
 \code{$taxa_stats}, and \code{$taxa_stats$code} are set.

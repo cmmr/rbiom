@@ -4,7 +4,8 @@
 #' @export
 taxa_table <- function (
     biom, rank = -1, taxa = 6, lineage = FALSE, 
-    md = ".all", unc = "singly", other = FALSE, trans = "none" ) {
+    md = ".all", unc = "singly", other = FALSE, 
+    trans = "none", ties = "random", seed = 0 ) {
   
   biom <- as_rbiom(biom)
   
@@ -46,7 +47,9 @@ taxa_table <- function (
           sparse  = FALSE, 
           unc     = unc, 
           other   = other,
-          trans   = trans )
+          trans   = trans,
+          ties    = ties, 
+          seed    = seed )
         
         
         #________________________________________________________
@@ -87,6 +90,12 @@ taxa_table <- function (
     else if (is.null(biom$depth))  { "Unrarefied Counts"  }
     else                           { "Rarefied Counts"    }
   })
+  
+  if (eq(params$trans, 'rank'))
+    resp_label %<>% tolower() %>% paste0("Ranked Abundance\n", "(from ", ., ")")
+  
+  if (!params$trans %in% c('none', 'rank', 'percent'))
+    resp_label %<>% paste0("\n(", params$trans, " transformed)")
   
   
   
@@ -136,7 +145,8 @@ taxa_table <- function (
 
 taxa_matrix <- function (
     biom, rank = -1, taxa = NULL, lineage = FALSE, 
-    sparse = FALSE, unc = "singly", other = FALSE, trans = "none" ) {
+    sparse = FALSE, unc = "singly", other = FALSE, 
+    trans = "none", ties = "random", seed = 0 ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -159,6 +169,8 @@ taxa_matrix <- function (
   validate_rank()
   validate_bool("sparse")
   validate_var_choices('trans', c("none", "rank", "log", "log1p", "sqrt", "percent"))
+  validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
+  validate_var_range('seed', n = 1, int = TRUE)
   
   
   #________________________________________________________
@@ -238,8 +250,16 @@ taxa_matrix <- function (
   #________________________________________________________
   # Optionally transform the computed abundance values.
   #________________________________________________________
-  if (trans %in% c("rank", "log", "log1p", "sqrt"))
+  if (eq(trans, "rank")) {
+    
+    mtx %<>% as.matrix() # need those zeroes
+    set.seed(seed)
+    mtx[] <- base::rank(mtx, ties.method = ties)
+    mtx %<>% as.simple_triplet_matrix()
+    
+  } else if (trans %in% c("log", "log1p", "sqrt")) {
     mtx$v <- do.call(`::`, list('base', trans))(mtx$v)
+  }
   
   
   #________________________________________________________

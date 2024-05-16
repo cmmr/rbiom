@@ -53,7 +53,7 @@
 stats_table <- function (
     df, regr = NULL, resp = attr(df, 'response'), 
     stat.by = NULL, split.by = NULL, 
-    test = "emmeans", fit = "lm", at = NULL, 
+    test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
@@ -100,8 +100,8 @@ stats_table <- function (
       cli_warn('`at` is ignored when `regr` = NULL.')
     
     if (test %in% c('wilcox', 'kruskal')) {
-      if (!eq(fit, "lm")) cli_warn('`fit` is ignored when `test` = "{test}".')
-      if (!is.null(regr)) cli_warn('`regr` is ignored when `test` = "{test}".')
+      if (!eq(fit, "gam")) cli_warn('`fit` is ignored when `test` = "{test}".')
+      if (!is.null(regr))  cli_warn('`regr` is ignored when `test` = "{test}".')
     }
     
     if (!is.null(stat.by)) {
@@ -160,7 +160,7 @@ stats_table <- function (
 adiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, adiv = "Shannon", 
     split.by = NULL, trans = "none", 
-    test = "emmeans", fit = "lm", at = NULL, 
+    test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
@@ -194,7 +194,9 @@ adiv_stats <- function (
     p.adj    = p.adj )
   
   
-  attr(stats, 'cmd') <- current_cmd('adiv_stats')
+  attr(stats, 'cmd')  <- current_cmd('adiv_stats')
+  attr(stats, 'data') <- df
+  
   return (stats)
   
 }
@@ -225,7 +227,7 @@ bdiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, bdiv = "Bray-Curtis", 
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
     split.by = NULL, trans = "none", 
-    test = "emmeans", fit = "lm", at = NULL, 
+    test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
@@ -265,6 +267,8 @@ bdiv_stats <- function (
   
   
   attr(stats, 'cmd') <- current_cmd('bdiv_stats')
+  attr(stats, 'data') <- df
+  
   return (stats)
   
 }
@@ -295,7 +299,7 @@ taxa_stats <- function (
     biom, regr = NULL, stat.by = NULL, rank = -1, taxa = 6, 
     lineage = FALSE, unc = "singly", other = FALSE,
     split.by = NULL, trans = "none", 
-    test = "emmeans", fit = "lm", at = NULL, 
+    test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
@@ -334,6 +338,8 @@ taxa_stats <- function (
   
   
   attr(stats, 'cmd') <- current_cmd('taxa_stats')
+  attr(stats, 'data') <- df
+  
   return (stats)
   
 }

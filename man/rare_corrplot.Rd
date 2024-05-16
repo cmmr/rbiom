@@ -22,6 +22,7 @@ rare_corrplot(
   alt = "!=",
   mu = 0,
   caption = TRUE,
+  check = FALSE,
   ...
 )
 }
@@ -101,6 +102,9 @@ statistics. Default: \code{"none"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
+
+\item{check}{Generate additional plots to aid in assessing data normality.
+Default: \code{FALSE}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that

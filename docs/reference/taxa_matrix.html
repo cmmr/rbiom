@@ -20,7 +20,7 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,14 +41,13 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../articles/regression.html">Regression</a>
     <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -91,7 +90,9 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
 <span>  md <span class="op">=</span> <span class="st">".all"</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  trans <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">taxa_matrix</span><span class="op">(</span></span>
@@ -102,7 +103,9 @@ taxa_table() -  Can accept more than one rank and returns a tibble data.frame.
 <span>  sparse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
 <span>  other <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  trans <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  trans <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -169,6 +172,10 @@ Default: <code>FALSE</code></p></dd>
 <code>c("none", "rank", "log", "log1p", "sqrt")</code>. <code>"rank"</code> is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: <code>"none"</code></p></dd>
+
+
+<dt>seed</dt>
+<dd><p>Random seed for permutations. Default: <code>0</code></p></dd>
 
 
 <dt>sparse</dt>

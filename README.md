@@ -65,7 +65,7 @@ taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
 #### Summarize counts by taxonomic rank.
 
 ``` r
-taxa_heatmap(biom, taxa = 30, color.by = c("body", "age"))
+taxa_heatmap(biom, taxa = 30, tracks = c("body", "age"))
 ```
 
 ![](man/figures/README-taxa-1.png)<!-- -->

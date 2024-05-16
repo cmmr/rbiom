@@ -3,8 +3,10 @@ unlink("docs", recursive = TRUE)
 devtools::document()
 # Restart
 # Install
-hmp50 <- as_rbiom(as.list(hmp50))
-usethis::use_data(hmp50, overwrite = TRUE)
+hmp50  <- as_rbiom(as.list(hmp50))
+babies <- as_rbiom(as.list(babies))
+gems   <- as_rbiom(as.list(gems))
+usethis::use_data(hmp50, babies, gems, overwrite = TRUE)
 # Restart
 # Install
 pkgdown::init_site()

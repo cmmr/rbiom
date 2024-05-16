@@ -9,10 +9,8 @@ bdiv_heatmap(
   bdiv = "Bray-Curtis",
   weighted = TRUE,
   tree = NULL,
+  tracks = NULL,
   grid = "devon",
-  color.by = NULL,
-  order.by = NULL,
-  limit.by = NULL,
   label = TRUE,
   label_size = NULL,
   rescale = "none",
@@ -47,24 +45,14 @@ Multiple values allowed.}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
+\item{tracks}{A character vector of metadata fields to display as tracks
+at the top of the plot. Or, a list as expected by the \code{tracks}
+argument of \code{\link[=plot_heatmap]{plot_heatmap()}}. Default: \code{NULL}}
+
 \item{grid}{Color palette name, or a list with entries for \code{label},
 \code{colors}, \code{range}, \code{bins}, \code{na.color}, and/or
 \code{guide}. See the Track Definitions section for details.
 Default: \code{"devon"}}
-
-\item{color.by}{Add annotation tracks for these metadata column(s).
-See "Annotation Tracks" section below for details.
-Default: \code{NULL}}
-
-\item{order.by}{Which metadata column(s) to use for ordering the samples
-across the x and y axes. Overrides any \code{clust} argument.
-See "Ordering and Limiting" section below for details.
-Default: \code{NULL}}
-
-\item{limit.by}{Metadata definition(s) to use for sample subsetting prior
-to calculations.
-See "Ordering and Limiting" section below for details.
-Default: \code{NULL}}
 
 \item{label}{Label the matrix rows and columns. You can supply a list
 or logical vector of length two to control row labels and column
@@ -146,23 +134,20 @@ cases are provided below, with more thorough documentation available at
 https://cmmr.github.io/rbiom .
 
 \preformatted{## Categorical ----------------------------
-color.by = "Body Site"
-color.by = list('Body Site' = "bright")
-color.by = list('Body Site' = c("Stool", "Saliva"), 'colors' = "bright")
-color.by = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+tracks = "Body Site"
+tracks = list('Body Site' = "bright")
+tracks = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
 
 ## Numeric --------------------------------
-color.by = "Age"
-color.by = list('Age' = "reds")
-color.by = list('Age' = c(20,NA), 'colors' = "reds") # at least 20 years old
-color.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
+tracks = "Age"
+tracks = list('Age' = "reds")
 
 ## Multiple Tracks ------------------------
-color.by = c("Body Site", "Age")
-color.by = list('Body Site' = "bright", 'Age' = "reds")
-color.by = list(
+tracks = c("Body Site", "Age")
+tracks = list('Body Site' = "bright", 'Age' = "reds")
+tracks = list(
   'Body Site' = c('Stool' = "blue", 'Saliva' = "green"),
-  'Age'       = list(range = c(20,40), 'colors' = "reds") )
+  'Age'       = list('colors' = "reds") )
 }
 
 The following entries in the track definitions are understood:
@@ -194,58 +179,15 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 \code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
 }
 
-\section{Ordering and Limiting}{
-
-
-\bold{\code{order.by}} controls which metadata column(s) are used to arrange
-samples on the plot. It also enables subsetting to a particular set or
-range of values. Prefix a column name with \code{-} to arrange values in
-descending order rather than ascending.
-
-\preformatted{## Categorical ----------------------------
-order.by = "Body Site"
-order.by = list('Body Site' = c("Stool", "Saliva"))
-
-## Numeric --------------------------------
-order.by = "-Age"
-order.by = list('Age'  = c(20,NA)) # at least 20 years old
-order.by = list('-Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple / Mixed -----------------------
-order.by = c("-Body Site", "Age")
-order.by = list("Body Site", '-Age' = c(20,40))
-}
-
-\bold{\code{limit.by}} is used to specify a subset of samples without any
-side-effects on aesthetics. It is especially useful for limiting the data
-to a single categorical metadata value. Unlike the other *.by parameters,
-\code{limit.by} must always be a named \code{list()}.
-
-\preformatted{## Categorical ----------------------------
-limit.by = list('Sex' = "Male")
-
-## Numeric --------------------------------
-limit.by = list('Age' = c(20,NA)) # at least 20 years old
-limit.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple / Mixed -----------------------
-limit.by = list(
-  'Sex'       = "Male", 
-  'Body Site' = c("Stool", "Saliva")
-  'Age'       = c(20,40) )
-}
-}
-
 \examples{
     library(rbiom)
     
     # Keep and rarefy the 10 most deeply sequenced samples.
     hmp10 <- rarefy(hmp50, n = 10)
     
-    bdiv_heatmap(hmp10, color.by=c("Body Site", "Age"))
+    bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
     
-    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), color.by="sex")
-    
+    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), tracks="sex")
 }
 \seealso{
 Other beta_diversity: 

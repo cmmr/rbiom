@@ -63,8 +63,8 @@
 stats_corrplot <- function (
     df, x, y = attr(df, 'response'), layers = "tc", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
-    test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
-    alt = "!=", mu = 0, caption = TRUE, ... ) {
+    test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
+    alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   #________________________________________________________
@@ -99,7 +99,7 @@ stats_corrplot <- function (
     validate_var_choices('p.adj', choices = p.adjust.methods)
     validate_var_choices('alt',   choices = c("!=", ">", "<"))
     
-    validate_var_range('at',    null_ok = TRUE)
+    validate_var_range('at',    n = 1, null_ok = TRUE)
     validate_var_range('level', n = 1, range = c(0.5, 1))
     validate_var_range('mu',    n = 1)
     
@@ -112,6 +112,7 @@ stats_corrplot <- function (
   # Generate the plot.
   #________________________________________________________
   p <- corrplot_build(params)
+  
   
   attr(p, 'cmd') <- current_cmd('stats_corrplot')
   set_cache_value(cache_file, p)
@@ -146,8 +147,8 @@ stats_corrplot <- function (
 adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "tc", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
-    test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
+    test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
+    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -205,8 +206,9 @@ bdiv_corrplot <- function (
     biom, x, bdiv = "Bray-Curtis", layers = "tc", 
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
-    test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
+    test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
+    trans = "none", ties = "random", seed = 0, 
+    alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -228,14 +230,17 @@ bdiv_corrplot <- function (
       md       = c(x, stat.by, facet.by),
       within   = within,
       between  = between, 
-      trans    = trans,
+      trans    = trans, 
+      ties     = ties, 
+      seed     = seed,
       delta    = x ) %>%
       within({
         .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
         .bdiv <- factor(.bdiv, levels = unique(.bdiv))
         remove(".weighted") })
     
-    remove("biom", "bdiv", "weighted", "tree", "trans")
+    remove("biom", "bdiv", "weighted", "tree")
+    remove("trans", "ties", "seed")
     
     
     #________________________________________________________
@@ -292,7 +297,7 @@ rare_corrplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
+    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -380,8 +385,9 @@ taxa_corrplot <- function (
     biom, x, rank = -1, layers = "tc", 
     taxa = 6, lineage = FALSE, unc = 'singly', other = FALSE, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
-    test = "emmeans", fit = "lm", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, ... ) {
+    test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
+    trans = "none", ties = "random", seed = 0, 
+    alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   params <- list2env(slurp_env(...))
   
@@ -398,15 +404,19 @@ taxa_corrplot <- function (
       md      = c(x, stat.by, facet.by),
       unc     = unc, 
       other   = other,
-      trans   = trans )
+      trans   = trans, 
+      ties    = ties, 
+      seed    = seed )
     
-    remove("biom", "rank", "taxa", "lineage", "unc", "other", "trans")
+    remove("biom", "rank", "taxa", "lineage", "unc", "other")
+    remove("trans", "ties", "seed")
     
     
     #________________________________________________________
     # Adjust facets and y-axis title.
     #________________________________________________________
-    if (nlevels(df$.taxa) > 1) facet.by %<>% c('.taxa')
+    if (nlevels(df$.taxa) > 1) { facet.by %<>% c('.taxa')
+    } else { default('labs.title', levels(df$.taxa)) }
     default('labs.y', attr(df, 'resp_label'))
     
     

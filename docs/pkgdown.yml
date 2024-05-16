@@ -1,4 +1,4 @@
-pandoc: 3.1.1
+pandoc: 3.1.11
 pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
@@ -11,7 +11,7 @@ articles:
   regression: regression.html
   scales: scales.html
   statistics: statistics.html
-last_built: 2024-04-26T23:46Z
+last_built: 2024-05-16T01:49Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles

@@ -18,14 +18,17 @@ taxa_corrplot(
   colors = TRUE,
   shapes = TRUE,
   test = "emmeans",
-  fit = "lm",
+  fit = "gam",
   at = NULL,
   level = 0.95,
   p.adj = "fdr",
   trans = "none",
+  ties = "random",
+  seed = 0,
   alt = "!=",
   mu = 0,
   caption = TRUE,
+  check = FALSE,
   ...
 )
 }
@@ -109,7 +112,7 @@ Default: \code{TRUE}}
 \code{'emtrends'}. Default: \code{'emmeans'}}
 
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
-Default: \code{'lm'}}
+Default: \code{'gam'}}
 
 \item{at}{Position(s) along the x-axis where the means or slopes should be
 evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
@@ -127,6 +130,8 @@ options. Default: \code{"fdr"}}
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
 
+\item{seed}{Random seed for permutations. Default: \code{0}}
+
 \item{alt}{Alternative hypothesis direction. Options are \code{'!='}
 (two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
 (greater than \code{mu}). Default: \code{'!='}}
@@ -135,6 +140,9 @@ statistics. Default: \code{"none"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
+
+\item{check}{Generate additional plots to aid in assessing data normality.
+Default: \code{FALSE}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that

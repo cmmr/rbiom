@@ -109,7 +109,7 @@
 
 stats_emmeans <- function (
     df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, 
-    fit = "lm", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+    fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
   
   stats_validate()
   
@@ -167,8 +167,14 @@ stats_emmeans <- function (
       
       gof <- broom::glance(model)
       
-      if (p_slice <- is.null(at))
-        at <- scales::breaks_extended(100)(data$.regr)
+      # Find pseudo-minimum p-value
+      if (p_slice <- is.null(at)) {
+        lo <- min(data$.regr)
+        hi <- max(data$.regr)
+        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
+        at <- at[at > lo & at < hi]
+        remove("lo", "hi")
+      }
       
       stats <- model %>% 
         emmeans::emmeans(
@@ -321,11 +327,13 @@ stats_emmeans <- function (
       gof <- broom::glance(model)
       
       # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at))
-        at <- labeling::extended(
-          dmin = max(aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          dmax = min(aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
-          m    = 100)
+      if (p_slice <- is.null(at)) {
+        lo <- max(aggregate(pdata, .regr ~ .stat.by, min)$.regr)
+        hi <- min(aggregate(pdata, .regr ~ .stat.by, max)$.regr)
+        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
+        at <- at[at > lo & at < hi]
+        remove("lo", "hi")
+      }
       
       emm <- model %>% 
         emmeans::emmeans(
@@ -446,7 +454,7 @@ stats_emmeans <- function (
 
 stats_emtrends <- function (
     df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, 
-    fit = "lm", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+    fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
   
   stats_validate()
   
@@ -463,8 +471,14 @@ stats_emtrends <- function (
       
       gof <- broom::glance(model)
       
-      if (p_slice <- is.null(at))
-        at <- scales::breaks_extended(100)(data$.regr)
+      # Find pseudo-minimum p-value
+      if (p_slice <- is.null(at)) {
+        lo <- min(data$.regr)
+        hi <- max(data$.regr)
+        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
+        at <- at[at > lo & at < hi]
+        remove("lo", "hi")
+      }
       
       stats <- model %>% 
         emmeans::emtrends(
@@ -551,11 +565,13 @@ stats_emtrends <- function (
       gof <- broom::glance(model)
       
       # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at))
-        at <- seq(
-          from       = max(aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          to         = min(aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
-          length.out = 100)
+      if (p_slice <- is.null(at)) {
+        lo <- max(aggregate(pdata, .regr ~ .stat.by, min)$.regr)
+        hi <- min(aggregate(pdata, .regr ~ .stat.by, max)$.regr)
+        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
+        at <- at[at > lo & at < hi]
+        remove("lo", "hi")
+      }
       
       
       emt <- model %>% 

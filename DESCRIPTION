@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9126
-Date: 2024-04-26
+Version: 2.0.0.9128
+Date: 2024-05-15
 Authors@R: c(
     person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2479-2044")),
@@ -73,6 +73,7 @@ Suggests:
     prettycode,
     ragg,
     rhdf5,
+    see,
     testthat,
     tidytree,
     vdiffr

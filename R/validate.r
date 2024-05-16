@@ -89,13 +89,12 @@ validate_rank <- function (var = "rank", env = parent.frame(), evar = var, null_
   biom    <- get("biom", pos = env, inherits = FALSE)
   choices <- biom$ranks
   
-  
   if (is_integerish(x)) {
     n <- length(choices)
     x <- ifelse(
       test = x >= 0, 
-      yes  = choices[pmin(x + 1, n)], 
-      no   = choices[pmax(n + x, 1)] )
+      yes  = choices[pmin(x + 1,     n)], 
+      no   = choices[pmax(x + 1 + n, 1)] )
   }
   
   validate_var_choices('x', choices, null_ok = null_ok, evar = var, ...)

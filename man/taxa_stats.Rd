@@ -16,7 +16,7 @@ taxa_stats(
   split.by = NULL,
   trans = "none",
   test = "emmeans",
-  fit = "lm",
+  fit = "gam",
   at = NULL,
   level = 0.95,
   alt = "!=",
@@ -85,7 +85,7 @@ statistics. Default: \code{"none"}}
 \code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}
 
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
-Default: \code{'lm'}}
+Default: \code{'gam'}}
 
 \item{at}{Position(s) along the x-axis where the means or slopes should be
 evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions

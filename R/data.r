@@ -12,18 +12,19 @@
 "hmp50"
 
 
+
 #' Global Enteric Multicenter Study (n = 1,006)
 #'
 #' @format An rbiom object with 1,006 samples. 
 #'         Includes metadata and taxonomy.
 #' \itemize{
-#'   \item{Diarrhea - }{Case or Control}
-#'   \item{Sex - }{Male or Female}
-#'   \item{Age (months) - }{0 - 58}
-#'   \item{Country - }{Bangladesh, Gambia, Kenya, or Mali}
+#'   \item{diarrhea - }{Case or Control}
+#'   \item{age - }{0 - 4.8 (years old)}
+#'   \item{country - }{Bangladesh, Gambia, Kenya, or Mali}
 #' }
 #' @source \url{https://doi.org/10.1186/gb-2014-15-6-r76} and \url{https://doi.org/10.1093/nar/gkx1027}
 "gems"
+
 
 
 #' Longitudinal Stool Samples from Infants (n = 2,684)

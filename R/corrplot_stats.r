@@ -129,7 +129,10 @@ corrplot_stats <- function (params) {
 
     # element_markdown
     set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
-    set_layer(params, 'labs',  caption      = local({
+    set_layer(params, 'labs', .overwrite = TRUE, caption = local({
+      
+      curr <- params$layers$labs$caption
+      curr <- if (is.null(curr)) '' else paste0(curr, "\n")
       
       interp <- with(params, glue(switch(
         EXPR = paste0(test, "_", is.null(stat.by)),
@@ -137,20 +140,25 @@ corrplot_stats <- function (params) {
         emmeans_FALSE  = "trendline means are different",
         emtrends_TRUE  = "trendline slope {alt} {mu}",
         emtrends_FALSE = "trendline slopes are different" )))
-
-      meth <- switch(
-        EXPR = params$p.adj,
-        holm       = "Holm",                  # (1979)
-        hochberg   = "Hochberg",              # (1988)
-        hommel     = "Hommel",                # (1988)
-        BH         = "Benjamini & Hochberg",  # (1995)
-        fdr        = "Benjamini & Hochberg",  # (1995)
-        BY         = "Benjamini & Yekutieli", # (2001)
-        bonferroni = "Bonferroni",
-        none       = "no" )
-
-      return(glue("Low p-value indicates {interp}.\n{meth} FDR correction in use."))
-
+      
+      if (nrow(params$.plot_attrs[['stats']]) <= 1) {
+        meth <- ""
+      } else {
+        meth <- switch(
+          EXPR = params$p.adj,
+          holm       = "Holm",                  # (1979)
+          hochberg   = "Hochberg",              # (1988)
+          hommel     = "Hommel",                # (1988)
+          BH         = "Benjamini & Hochberg",  # (1995)
+          fdr        = "Benjamini & Hochberg",  # (1995)
+          BY         = "Benjamini & Yekutieli", # (2001)
+          bonferroni = "Bonferroni",
+          none       = "no" )
+        meth <- paste0("\n", meth, " FDR correction in use.")
+      }
+      
+      return(glue("{curr}Low p-value indicates {interp}.{meth}"))
+      
     }))
   }
   

@@ -689,3 +689,66 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
   
   return (list(fn = fn, fun = eval(parse(text=fn)), args = fn_args))
 }
+
+
+
+#________________________________________________________
+# Convert user's `tracks` into a named list of lists.
+#________________________________________________________
+biom_tracks <- function (params) {
+  
+  stopifnot(is_bare_environment(params))
+  
+  tracks <- params$tracks
+  df     <- params$biom$metadata
+  
+  if (is.null(tracks) || is.character(tracks))
+    tracks <- as.list(tracks)
+  
+  if (!is.list(tracks))
+    cli_abort("Invalid `tracks` specification.")
+  
+  keys <- names(tracks)
+  for (i in seq_along(tracks)) {
+    
+    key <- keys[[i]] %||% ""
+    val <- tracks[[i]]
+    
+    if (is.character(val) && !is.na(val)) {
+      if (key == "" && length(val) == 1) {
+        key <- val
+        val <- list()
+      } else {
+        val <- list(colors = val)
+      }
+    }
+    
+    if (!is.list(val))
+      cli_abort("Invalid `tracks` specification.")
+    
+    
+    if (is.null(names(val$colors))) {
+      
+      validate_df_field('key', evar = 'tracks')
+      
+    } else {
+      
+      # allow abbreviations in color mapping, e.g. sex = c(m = "blue", f = "red")
+      validate_df_field('key', evar = 'tracks', col_type = "cat", force = TRUE)
+      nms <- names(val$colors)
+      validate_var_choices('nms', choices = levels(df[[key]]), evar = key, max = Inf)
+      names(val$colors) <- nms
+    }
+    
+    
+    names(tracks)[[i]] <- key
+    tracks[[i]]        <- val
+    tracks[[i]]$values <- setNames(df[[key]], df$.sample)
+  }
+  
+  params$tracks        <- tracks
+  params$biom$metadata <- df
+  
+  
+  return (invisible(params))
+}

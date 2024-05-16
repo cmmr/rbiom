@@ -260,20 +260,12 @@ stats_fit_model <- function (df, fit, stat.by = FALSE, regr = ".regr", resp = ".
 
 stats_model_str <- function (fit, stat.by = FALSE, regr = ".regr", resp = ".resp") {
   
-  if (is.null(fit)) {
-    
-    format(stats_formula(fit = "lm", stat.by, regr, resp))
-    
-  } else {
-    
-    fn   <- switch(fit, lm = "lm", log = "lm", gam = "gam")
-    frm  <- stats_formula(fit, stat.by, regr, resp)
-    args <- if (fit == "gam") list(method = "REML") else list()
-    
-    glue("{fn}({as.args(c(list(frm), args))})")
-    
-  }
+  stopifnot(fit %in% c('lm', 'log', 'gam'))
   
+  frm  <- stats_formula(fit, stat.by, regr, resp)
+  args <- if (eq(fit, "gam")) list(method = "REML") else list()
+  
+  glue("{fit}({as.args(c(list(frm), args))})")
 }
 
 

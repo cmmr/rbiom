@@ -15,7 +15,9 @@ bdiv_table(
   within = NULL,
   between = NULL,
   delta = ".all",
-  trans = "none"
+  trans = "none",
+  ties = "random",
+  seed = 0
 )
 
 bdiv_matrix(
@@ -25,7 +27,9 @@ bdiv_matrix(
   tree = NULL,
   within = NULL,
   between = NULL,
-  trans = "none"
+  trans = "none",
+  ties = "random",
+  seed = 0
 )
 
 bdiv_distmat(
@@ -74,6 +78,8 @@ Default: \code{TRUE}}
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
+
+\item{seed}{Random seed for permutations. Default: \code{0}}
 }
 \value{
 \itemize{

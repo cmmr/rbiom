@@ -215,7 +215,7 @@
 #'        `'emmeans'`, or `'emtrends'`. Default: `'emmeans'`
 #' 
 #' @param fit   How to fit the trendline. `'lm'`, `'log'`, or `'gam'`. 
-#'        Default: `'lm'`
+#'        Default: `'gam'`
 #'        
 #' @param at   Position(s) along the x-axis where the means or slopes should be 
 #'        evaluated. Default: `NULL`, which samples 100 evenly spaced positions 
@@ -226,6 +226,9 @@
 #'        (greater than `mu`). Default: `'!='`
 #'        
 #' @param mu   Reference value to test against. Default: `0`
+#' 
+#' @param check   Generate additional plots to aid in assessing data normality. 
+#'        Default: `FALSE`
 #'        
 #' @param within,between   Dataset field(s) for intra- or inter- sample 
 #'        comparisons. Alternatively, dataset field names given elsewhere can 

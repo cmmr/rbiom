@@ -8,9 +8,8 @@ taxa_heatmap(
   biom,
   rank = -1,
   taxa = 6,
+  tracks = NULL,
   grid = "bilbao",
-  color.by = NULL,
-  order.by = NULL,
   other = FALSE,
   unc = "singly",
   lineage = FALSE,
@@ -24,7 +23,7 @@ taxa_heatmap(
   tree_height = 10,
   track_height = 10,
   legend = "right",
-  title = NULL,
+  title = TRUE,
   xlab.angle = "auto",
   ...
 )
@@ -46,12 +45,12 @@ mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
 character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
-\item{grid}{Color palette name, or a list as expected \code{\link[=plot_heatmap]{plot_heatmap()}}.
-Default: \code{"bilbao"}}
-
-\item{color.by}{A character vector of metadata fields to display as tracks
+\item{tracks}{A character vector of metadata fields to display as tracks
 at the top of the plot. Or, a list as expected by the \code{tracks}
 argument of \code{\link[=plot_heatmap]{plot_heatmap()}}. Default: \code{NULL}}
+
+\item{grid}{Color palette name, or a list as expected \code{\link[=plot_heatmap]{plot_heatmap()}}.
+Default: \code{"bilbao"}}
 
 \item{other}{Sum all non-itemized taxa into an "Other" taxa. When
 \code{FALSE}, only returns taxa matched by the \code{taxa}
@@ -163,18 +162,71 @@ respectively.
 \description{
 Display taxa abundances as a heatmap.
 }
+\section{Annotation Tracks}{
+
+
+Metadata can be displayed as colored tracks above the heatmap. Common use
+cases are provided below, with more thorough documentation available at
+https://cmmr.github.io/rbiom .
+
+\preformatted{## Categorical ----------------------------
+tracks = "Body Site"
+tracks = list('Body Site' = "bright")
+tracks = list('Body Site' = c('Stool' = "blue", 'Saliva' = "green"))
+
+## Numeric --------------------------------
+tracks = "Age"
+tracks = list('Age' = "reds")
+
+## Multiple Tracks ------------------------
+tracks = c("Body Site", "Age")
+tracks = list('Body Site' = "bright", 'Age' = "reds")
+tracks = list(
+  'Body Site' = c('Stool' = "blue", 'Saliva' = "green"),
+  'Age'       = list('colors' = "reds") )
+}
+
+The following entries in the track definitions are understood:
+
+\itemize{
+\item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+\item{\code{range} - }{ The c(min,max) to use for scale values. }
+\item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
+\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+\item{\code{na.color} - }{ The color to use for \code{NA} values. }
+\item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
+\item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
+}
+
+All built-in color palettes are colorblind-friendly.
+
+Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
+\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
+\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+
+Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
+\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
+\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
+\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
+\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
+\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
+\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
+\code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
+}
+
 \examples{
     library(rbiom)
     
     # Keep and rarefy the 10 most deeply sequenced samples.
     hmp10 <- rarefy(hmp50, n = 10)
     
-    taxa_heatmap(hmp10, rank = "Phylum", color.by = "Body Site")
+    taxa_heatmap(hmp10, rank = "Phylum", tracks = "Body Site")
     
-    taxa_heatmap(hmp10, rank = "Genus", color.by = c("Sex", "Body Site"))
+    taxa_heatmap(hmp10, rank = "Genus", tracks = c("sex", "bo"))
     
-    taxa_heatmap(hmp10, rank = "Phylum", color.by = list(
-      'Sex'       = list(colors = c(Male = "#0000FF", Female = "violetred")), 
+    taxa_heatmap(hmp10, rank = "Phylum", tracks = list(
+      'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")), 
       'Body Site' = list(colors = "muted", label = "Source") ))
     
 }

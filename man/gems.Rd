@@ -8,10 +8,9 @@
 An rbiom object with 1,006 samples.
 Includes metadata and taxonomy.
 \itemize{
-\item{Diarrhea - }{Case or Control}
-\item{Sex - }{Male or Female}
-\item{Age (months) - }{0 - 58}
-\item{Country - }{Bangladesh, Gambia, Kenya, or Mali}
+\item{diarrhea - }{Case or Control}
+\item{age - }{0 - 4.8 (years old)}
+\item{country - }{Bangladesh, Gambia, Kenya, or Mali}
 }
 }
 \source{

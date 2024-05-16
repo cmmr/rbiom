@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9125</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,21 +42,20 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Analysis Basics</h6>
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../articles/regression.html">Regression</a>
     <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -109,9 +108,8 @@ range.</p>
 <h2 id="children-heights">Children Heights<a class="anchor" aria-label="anchor" href="#children-heights"></a>
 </h2>
 <p>To start with a simple example, consider the <code>children</code>
-dataset from the R package <code>npregfast</code>. It contains the age
-and height measurements of 2500 children aged 5 through 19 years, split
-by sex (1292 females and 1208 males).</p>
+dataset from the R package <code>npregfast</code>. It records age, sex,
+and height for 2500 children aged 5 through 19 years.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt;      sex height   age</span></span>
@@ -124,9 +122,8 @@ by sex (1292 females and 1208 males).</p>
 <div class="section level3">
 <h3 id="height-vs-age">Height vs Age<a class="anchor" aria-label="anchor" href="#height-vs-age"></a>
 </h3>
-<p>The most straight forward plot is putting ‘age’ on the x-axis,
-‘height’ on the y-axis, and drawing a straight line that minimizes the
-distances between the observed data points and the linear trendline.</p>
+<p>The most straight-forward plot is putting ‘age’ on the x-axis,
+‘height’ on the y-axis, and overlaying a best-fit linear trendline.</p>
 <p>With this plot, we’re testing the hypothesis “as you get older, your
 height changes”.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -136,6 +133,7 @@ height changes”.</p>
 <span>  y        <span class="op">=</span> <span class="st">'height'</span>,             <span class="co"># y-axis variable</span></span>
 <span>  layers   <span class="op">=</span> <span class="st">'tp'</span>,                 <span class="co"># show trendline and points</span></span>
 <span>  test     <span class="op">=</span> <span class="st">'emtrends'</span>,           <span class="co"># run stats on the slope</span></span>
+<span>  fit      <span class="op">=</span> <span class="st">'lm'</span>,                 <span class="co"># straight trendline</span></span>
 <span>  pt.size  <span class="op">=</span> <span class="fl">0.2</span>,                  <span class="co"># make points smaller</span></span>
 <span>  pt.alpha <span class="op">=</span> <span class="fl">0.2</span> <span class="op">)</span>                 <span class="co"># and semi-transparent</span></span></code></pre></div>
 <p><img src="regression_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
@@ -146,26 +144,30 @@ Therefore it’s safe to say that height changes with age.</p>
 <h3 id="grouped-by-sex">Grouped by Sex<a class="anchor" aria-label="anchor" href="#grouped-by-sex"></a>
 </h3>
 <p>Is the rate of growth influenced by sex? We can add
-<code>stat.by = "sex"</code> to draw separate lines for each sex.</p>
+<code>stat.by = "sex"</code> to draw separate lines for males and
+females.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span></span>
 <span>  df       <span class="op">=</span> <span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>,  <span class="co"># dataset</span></span>
 <span>  x        <span class="op">=</span> <span class="st">'age'</span>,                <span class="co"># x-axis variable</span></span>
 <span>  y        <span class="op">=</span> <span class="st">'height'</span>,             <span class="co"># y-axis variable</span></span>
 <span>  stat.by  <span class="op">=</span> <span class="st">'sex'</span>,                <span class="co"># statistical groups</span></span>
+<span>  fit      <span class="op">=</span> <span class="st">'lm'</span>,                 <span class="co"># straight trendline</span></span>
 <span>  layers   <span class="op">=</span> <span class="st">'tp'</span>,                 <span class="co"># show trendline and points</span></span>
 <span>  test     <span class="op">=</span> <span class="st">'emtrends'</span>,           <span class="co"># run stats on the slopes</span></span>
-<span>  pt.size  <span class="op">=</span> <span class="fl">0.2</span>,                  <span class="co"># make points smaller</span></span>
-<span>  pt.alpha <span class="op">=</span> <span class="fl">0.2</span> <span class="op">)</span>                 <span class="co"># and semi-transparent</span></span></code></pre></div>
+<span>  pt.size  <span class="op">=</span> <span class="fl">0.2</span> <span class="op">)</span>                 <span class="co"># make points smaller</span></span></code></pre></div>
 <p><img src="regression_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
-<p>If you look at the captions of the last two plots, you’ll notice that
-the p-value test automatically switches. When
-<code>stat.by = NULL</code>, <code>test = "emtrends"</code> will test if
-the slope is zero. When <code>stat.by</code> is not <code>NULL</code>,
-<code>test = "emtrends"</code> will test if the trendline slopes are
-equal.</p>
 <p>Here, a p-value of 3.9e-51 indicates that males and females do have
 different growth rates.</p>
+<p>If you look at the captions of the last two plots, you’ll notice that
+the p-value test automatically changes.</p>
+<ul>
+<li>When <code>stat.by = NULL</code>, <code>test = "emtrends"</code>
+will test if the <strong>slope is zero</strong>.</li>
+<li>When <code>stat.by</code> is not <code>NULL</code>,
+<code>test = "emtrends"</code> will test if the trendline <strong>slopes
+are equal</strong>.</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="smoothed-fit">Smoothed Fit<a class="anchor" aria-label="anchor" href="#smoothed-fit"></a>
@@ -182,13 +184,12 @@ which fits several sub-ranges of age with independent splines.</p>
 <span>  fit      <span class="op">=</span> <span class="st">'gam'</span>,                <span class="co"># smoothed trendline</span></span>
 <span>  layers   <span class="op">=</span> <span class="st">'tp'</span>,                 <span class="co"># show trendline and points</span></span>
 <span>  test     <span class="op">=</span> <span class="st">'emtrends'</span>,           <span class="co"># run stats on the slopes</span></span>
-<span>  pt.size  <span class="op">=</span> <span class="fl">0.2</span>,                  <span class="co"># make points smaller</span></span>
-<span>  pt.alpha <span class="op">=</span> <span class="fl">0.2</span> <span class="op">)</span>                 <span class="co"># and semi-transparent</span></span></code></pre></div>
+<span>  pt.size  <span class="op">=</span> <span class="fl">0.2</span> <span class="op">)</span>                 <span class="co"># make points smaller</span></span></code></pre></div>
 <p><img src="regression_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 <p>This gives us a much better idea of the moving average over time.</p>
 <p>We still have <code>test = "emtrends"</code>, so the p-value is
-reported where the differences is slope is most significant - in this
-case, at age = 5.83 years.</p>
+reported where the difference in slope is most significant - in this
+case, at age = 5.9 years.</p>
 </div>
 <div class="section level3">
 <h3 id="difference-in-means">Difference in Means<a class="anchor" aria-label="anchor" href="#difference-in-means"></a>
@@ -208,386 +209,172 @@ confidence interval instead of all the data points.</p>
 <p>Differences in height are most significant at age = 16.8 (p-value =
 8.9e-40).</p>
 </div>
-<div class="section level3">
-<h3 id="stats-table">Stats Table<a class="anchor" aria-label="anchor" href="#stats-table"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="statistics-table">Statistics Table<a class="anchor" aria-label="anchor" href="#statistics-table"></a>
+</h2>
 <p>The complete statistical output is attached to the returned plot as
-<code>$stats</code>. Though not covered in this article, you can also
-access <code>$code</code> and <code>$stats$code</code> to see the
-ggplot2 plotting command and statistics R code, respectively.</p>
+<code>$stats</code>.</p>
+<p>You can also directly generate this table with the
+<code><a href="../reference/stats_table.html">stats_table()</a></code> function.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span></span>
 <span>  df       <span class="op">=</span> <span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>,  <span class="co"># dataset</span></span>
-<span>  x        <span class="op">=</span> <span class="st">'age'</span>,                <span class="co"># x-axis variable</span></span>
-<span>  y        <span class="op">=</span> <span class="st">'height'</span>,             <span class="co"># y-axis variable</span></span>
+<span>  regr     <span class="op">=</span> <span class="st">'age'</span>,                <span class="co"># x-axis variable</span></span>
+<span>  resp     <span class="op">=</span> <span class="st">'height'</span>,             <span class="co"># y-axis variable</span></span>
 <span>  stat.by  <span class="op">=</span> <span class="st">'sex'</span>,                <span class="co"># statistical groups</span></span>
-<span>  fit      <span class="op">=</span> <span class="st">'gam'</span>,                <span class="co"># smoothed trendline</span></span>
-<span>  layers   <span class="op">=</span> <span class="st">'tc'</span>,                 <span class="co"># show trendline with conf. int.</span></span>
+<span>  fit      <span class="op">=</span> <span class="st">'gam'</span>,                <span class="co"># generalized additive model</span></span>
 <span>  test     <span class="op">=</span> <span class="st">'emmeans'</span> <span class="op">)</span>           <span class="co"># run stats on the means</span></span>
 <span></span>
-<span><span class="va">p</span><span class="op">$</span><span class="va">stats</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 14</span></span></span>
-<span><span class="co">#&gt;     age sex    .mean.diff .h1     .p.val   .adj.p .effect.size   .se    .n   .df</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  16.8 femal…      -<span style="color: #BB0000;">7.73</span> != 0  8.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-40</span> 8.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-40</span>        -<span style="color: #BB0000;">1.21</span> 0.575  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: .t.ratio &lt;dbl&gt;, .aic &lt;dbl&gt;, .bic &lt;dbl&gt;, .loglik &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>This is the same table you can generate with the <a href="#stats_table">stats_table()</a> function, and that reference page
-has an explanation of each field.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="babies-dataset">Babies Dataset<a class="anchor" aria-label="anchor" href="#babies-dataset"></a>
-</h2>
-<p>Now that we have the concepts down, let’s switch to the
-<code>babies</code> dataset included with rbiom. It has microbiome data
-from 2,684 stool samples from 12 infants. The original Nature article by
-Eric J. de Muinck and Pal Trosvik for this data set is available online
-for free at <a href="https://www.nature.com/articles/s41467-018-04641-7" class="external-link">Individuality
-and Convergence of the Infant Gut Microbiota During the First Year of
-Life</a>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">babies</span></span>
-<span><span class="co">#&gt; DailyBaby (2018-06-08)</span></span>
-<span><span class="co">#&gt; Data from [Muinck,</span></span>
-<span><span class="co">#&gt; 2018](https://www.nature.com/articles/s41467-018-04641-7).</span></span>
-<span><span class="co">#&gt; Retrieved from</span></span>
-<span><span class="co">#&gt; [MicrobiomeHD](https://doi.org/10.1038/s41467-017-01973-8). </span></span>
-<span><span class="co">#&gt; -----------</span></span>
-<span><span class="co">#&gt;    2684 Samples:  SRR7044380, SRR7058817, SRR7039319, ...</span></span>
-<span><span class="co">#&gt;     506 OTUs:     ASV085, ASV022, ASV251, ..., and ASV500</span></span>
-<span><span class="co">#&gt;       8 Ranks:    .otu, Kingdom, Phylum, ..., and Species</span></span>
-<span><span class="co">#&gt;      10 Metadata: .sample, Subject ID, Sex, ...</span></span>
-<span><span class="co">#&gt;         Tree:     &lt;absent&gt;</span></span>
-<span></span>
-<span></span>
-<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">babies</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2,684</span></span>
-<span><span class="co">#&gt; Columns: 10</span></span>
-<span><span class="co">#&gt; $ .sample                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SRR7044380", "SRR7058817", "SRR7039319"…</span></span>
-<span><span class="co">#&gt; $ `Subject ID`                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> ID3, ID12, ID1, ID6, ID8, ID11, ID11, ID…</span></span>
-<span><span class="co">#&gt; $ Sex                           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Female, Female, Female, Male, Female, Fe…</span></span>
-<span><span class="co">#&gt; $ `Age (days)`                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 255, 31, 222, 41, 79, 228, 52, 32, 178, …</span></span>
-<span><span class="co">#&gt; $ `Child's diet`                <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Breast milk, Breast milk and formula, Br…</span></span>
-<span><span class="co">#&gt; $ `Sample collection`           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Stored in alcohol, Frozen upon collectio…</span></span>
-<span><span class="co">#&gt; $ `Antibiotic exposure`         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> No, No, No, No, No, No, No, No, No, No, …</span></span>
-<span><span class="co">#&gt; $ `Antifungal exposure`         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> No, No, No, No, No, No, No, No, No, No, …</span></span>
-<span><span class="co">#&gt; $ `Delivery mode`               <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Vaginal, Vaginal, Vaginal, Vaginal, Vagi…</span></span>
-<span><span class="co">#&gt; $ `Solid food introduced (Age)` <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 165, 122, 186, 121, 247, 173, 173, 121, …</span></span></code></pre></div>
-<p>We’ll use the <code>age</code>, <code>sex</code>,
-<code>delivery</code>, and <code>subject</code> metadata fields in the
-following examples. <code>age</code> is a continuous variable while the
-rest are categorical.</p>
-</div>
-<div class="section level2">
-<h2 id="normality">Normality<a class="anchor" aria-label="anchor" href="#normality"></a>
-</h2>
-<p>Many common statistical tools rely on the assumption that your data
-is normally distributed.</p>
-<p>In the children dataset, this assumption is accurate.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span></span>
-<span>  check <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pp_check"</span>, <span class="st">"linearity"</span><span class="op">)</span>,</span>
-<span>  x     <span class="op">=</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span></span>
-<span>    data    <span class="op">=</span> <span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>,</span>
-<span>    formula <span class="op">=</span> <span class="va">height</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">age</span>, bs <span class="op">=</span> <span class="st">'cs'</span><span class="op">)</span>, </span>
-<span>    method  <span class="op">=</span> <span class="st">'REML'</span> <span class="op">)</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
-<p>However, microbiome data is usually non-normally distributed.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span></span>
-<span>  check <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pp_check"</span>, <span class="st">"linearity"</span><span class="op">)</span>,</span>
-<span>  x     <span class="op">=</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span></span>
-<span>    data    <span class="op">=</span> <span class="fu"><a href="../reference/adiv_table.html">adiv_table</a></span><span class="op">(</span><span class="va">babies</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">rename</span><span class="op">(</span>age <span class="op">=</span> <span class="st">'Age (days)'</span><span class="op">)</span>,</span>
-<span>    formula <span class="op">=</span> <span class="va">.diversity</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">age</span>, bs <span class="op">=</span> <span class="st">'cs'</span><span class="op">)</span>, </span>
-<span>    method  <span class="op">=</span> <span class="st">'REML'</span> <span class="op">)</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
-</div>
-<div class="section level2">
-<h2 id="draft-text">Draft Text<a class="anchor" aria-label="anchor" href="#draft-text"></a>
-</h2>
-<p>You can use the formula <code>height ~ age</code> as a way of saying
-“as you get older, your height changes”. You can get fancier using a
-formula like <code>height ~ log(age)</code> which says that larger
-values of age have less of an effect on height, or
-<code>height ~ log(age) * sex</code> which also accounts for different
-growth trends of males and females. If you’re of the opinion that height
-and age are linked, but not linearly or logarithmically, you can write
-<code>height ~ s(age)</code> to partition age into sub-ranges and fit
-splines to each independently.</p>
-<p>That’s as complex as it gets for rbiom! And again, rbiom insulates
-you from needing to write any formulas yourself. All you need to do is
-point the functions to the relevant variables.</p>
-<p><img src="regression_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
-<div class="section level3">
-<h3 id="models-and-trendlines">Models and Trendlines<a class="anchor" aria-label="anchor" href="#models-and-trendlines"></a>
-</h3>
-<p>Before we go further, let’s define a couple terms.</p>
-<ul>
-<li>
-<strong>Model Family</strong> - A generalized equation,
-e.g. <code>y = mx + b</code>.</li>
-<li>
-<strong>Fitted Model</strong> - An equation for a specific line,
-e.g. <code>y = 1.2x + 10</code>.</li>
-<li>
-<strong>Coefficients</strong> - In the above fitted model,
-<code>1.2</code> and <code>10</code>.</li>
-</ul>
-<p>For more on this topic, see the online book <a href="https://r4ds.had.co.nz/model-basics.html" class="external-link">R for Data Science</a>
-by Hadley Wickham and Garrett Grolemund.</p>
-<p>You can tell rbiom which model family to use with the
-<code>fit</code> parameter: * <code>fit = "lm"</code> - Fit a linear
-<code>y ~ x</code> model. * <code>fit = "log"</code> - Fit a logarithmic
-<code>y ~ log(x)</code> model. * <code>fit = "gam"</code> - Fit a
-generalized additive <code>y ~ s(x)</code> model.</p>
-<p>One important thing to know about rbiom is that <strong>model fitting
-is done AFTER splitting the dataset</strong>. For example, if your
-formula is <code>height ~ age * sex</code>, then the data will be split
-into two datasets - one of just males and one of just females. Each new
-dataset and the formula of <code>height ~ age</code> is passed on to the
-underlying statistical f</p>
-</div>
-<div class="section level3">
-<h3 id="optimal-modeltrendline">Optimal Model/Trendline<a class="anchor" aria-label="anchor" href="#optimal-modeltrendline"></a>
-</h3>
-<p>So, how do you decide whether to use a linear, logarithmic, or
-smoothed trendline?</p>
-<p>Looking at the different fits with your eye is an excellent place to
-start. There are also some metrics and charts to help you to really
-evaluate the goodness of fit.</p>
-<p>Below (and in the figures above) data is sourced from the R package
-dataset <code><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">npregfast::children</a></code>, which has the age and height
-measurements of 2500 children aged 5 to 19 years, split by sex (1292
-females and 1208 males).</p>
-<p>To start, we can use [broom::glance()] or rbiom’s
-<code><a href="../reference/stats_table.html">stats_table()</a></code> to calculate R<sup>2</sup>, AIC, and other
-goodness of fit metrics.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">children</span> <span class="op">&lt;-</span> <span class="fu">as_tibble</span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span><span class="op">)</span></span>
-<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">children</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2,500</span></span>
-<span><span class="co">#&gt; Columns: 3</span></span>
-<span><span class="co">#&gt; $ sex    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> male, female, female, female, female, female, female, male, fem…</span></span>
-<span><span class="co">#&gt; $ height <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 150.77, 170.59, 167.31, 165.72, 171.67, 143.74, 157.93, 157.73,…</span></span>
-<span><span class="co">#&gt; $ age    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 13.25, 14.17, 15.17, 16.58, 15.17, 12.67, 12.75, 17.17, 16.67, …</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Using broom::glance() directly:</span></span>
-<span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">children</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="st">'height ~ age'</span>      <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span>,</span>
-<span>  <span class="st">'height ~ log(age)'</span> <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="st">'height ~ s(age)'</span>   <span class="op">=</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">age</span>, bs <span class="op">=</span> <span class="st">'cs'</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">'REML'</span><span class="op">)</span> <span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="va">models</span>, <span class="fu">broom</span><span class="fu">::</span><span class="va"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span>model <span class="op">=</span> <span class="va">.id</span>, <span class="va">r.squared</span>, <span class="va">adj.r.squared</span>, <span class="va">logLik</span><span class="op">:</span><span class="va">BIC</span>, <span class="va">p.value</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
-<span><span class="co">#&gt;   model             r.squared adj.r.squared logLik    AIC    BIC p.value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> height ~ age          0.770         0.770 -<span style="color: #BB0000; text-decoration: underline;">8</span><span style="color: #BB0000;">582.</span> <span style="text-decoration: underline;">17</span>171. <span style="text-decoration: underline;">17</span>188.       0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> height ~ log(age)     0.783         0.783 -<span style="color: #BB0000; text-decoration: underline;">8</span><span style="color: #BB0000;">507.</span> <span style="text-decoration: underline;">17</span>020. <span style="text-decoration: underline;">17</span>037.       0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> height ~ s(age)      <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>     -<span style="color: #BB0000; text-decoration: underline;">8</span><span style="color: #BB0000;">402.</span> <span style="text-decoration: underline;">16</span>821. <span style="text-decoration: underline;">16</span>872.      <span style="color: #BB0000;">NA</span></span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Or equivalently with stats_table()</span></span>
-<span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">children</span>, resp <span class="op">=</span> <span class="st">"height"</span>, regr <span class="op">=</span> <span class="st">"age"</span>, fit <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">.r.sqr</span><span class="op">:</span><span class="va">.fit.p</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(height ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">#&gt;   .r.sqr .adj.r   .aic   .bic .loglik .fit.p</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  0.770  0.770 <span style="text-decoration: underline;">17</span>171. <span style="text-decoration: underline;">17</span>188.  -<span style="color: #BB0000; text-decoration: underline;">8</span><span style="color: #BB0000;">582.</span>      0</span></span></code></pre></div>
-<p>Here’s how to interpret this output:</p>
-<ul>
-<li>
-<code>.r.sqr</code> - Coefficient of Determination
-(<i>R</i><sup>2</sup>); range: 0-1, lower is better. Percent of
-variation explained by the model.</li>
-<li>
-<code>.adj.r</code> - <i>R</i><sup>2</sup>, taking degrees of
-freedom into account.</li>
-<li>
-<code>.aic</code> - Akaike Information Criterion; lower is better.
-Preferred when using model for prediction.</li>
-<li>
-<code>.bic</code> - Bayesian Information Criterion; lower is better.
-Preferred when using model for interpretation.</li>
-<li>
-<code>.loglik</code> - Log-Likelihood (negative values); higher
-values (closer to zero) are better.</li>
-<li>
-<code>.fit.p</code> - P-value for observing this fit by chance;
-range: 0-1, lower is better.</li>
-</ul>
-<p>Based on these metrics, the smoothed trendline is optimal.</p>
-<p>We can also visualize the fit with the <code>performance</code> R
-package. Below, compare the graphs for the linear vs smoothed
-trendline.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">children</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span>check <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pp_check"</span>, <span class="st">"linearity"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-13-1.png" width="768"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">children</span>, <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">age</span>, bs <span class="op">=</span> <span class="st">'cs'</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">'REML'</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span>check <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pp_check"</span>, <span class="st">"linearity"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
-<p>Omitting the <code>checks =</code> argument will generate even more
-plots, and adding in the <code>* sex</code> interaction term will
-produce even more plots, but I’ll leave that as an exercise for the
-reader. Just an FYI - the gam formula with an interaction will look like
-<code>height ~ s(age, by=sex, bs='cs') + sex</code>. Aren’t you glad
-that rbiom doesn’t need you to know formulas?</p>
-<p>From these checks we can conclude that our model fits the
-<code>children</code> dataset very well and can give credence to any
-conclusions reached by interpretations of that model.</p>
-</div>
-<div class="section level3">
-<h3 id="stats_table">stats_table()<a class="anchor" aria-label="anchor" href="#stats_table"></a>
-</h3>
-<p>We’ll use <a href="#stats_table">stats_table()</a> in this
-article.</p>
-<p><a href="#stats_table">stats_table()</a> is called by [adiv_stats()],
-[bdiv_stats()], and [taxa_stats()], which in turn are called by the
-<code>*_corrplot()</code> plotting functions. Therefore, once you
-understand how to use <a href="#stats_table">stats_table()</a>, you’ll
-understand all the other regression functions too!</p>
-<p>Here are the first few arguments for <a href="#stats_table">stats_table()</a>, explained in more detail than on
-the reference page.</p>
-<ul>
-<li>
-<code>df</code> - A data.frame with all your data. Typically, this
-will be the data.frame returned by [adiv_stats()], [bdiv_stats()], or
-[taxa_stats()], but a custom-made one is fine too. It doesn’t even have
-to be microbiome data. A nice thing about the <code>_stats()</code>
-functions is they set
-e.g. <code>attr(df, 'response') &lt;- ".abundance"</code> so you don’t
-need to worry about setting <code>stats_table(resp = )</code>.</li>
-<li>
-<code>regr</code> - The independent variable. Such as
-<code>"age"</code> in the <code>babies</code> dataset.</li>
-<li>
-<code>resp</code> - The dependent variable. Will be
-<code>".abundance"</code>, <code>".diversity"</code>, or
-<code>".distance"</code> if calculated by the <code>_stats()</code>
-functions, or <code>"height"</code> from the earlier section.</li>
-</ul>
-<p>As this article goes on, we’ll go over how and when to use additional
-<a href="#stats_table">stats_table()</a> arguments.</p>
-</div>
-<div class="section level3">
-<h3 id="linear-trends">Linear Trends<a class="anchor" aria-label="anchor" href="#linear-trends"></a>
-</h3>
-<p>Let’s explore Firmicutes abundance in the <code>babies</code>
-dataset.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">babies</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span>, taxa <span class="op">=</span> <span class="st">"Firmicutes"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span></span>
-<span>    <span class="va">.sample</span>, <span class="va">.taxa</span>, <span class="va">.abundance</span>, </span>
-<span>    age      <span class="op">=</span> <span class="va">`Age (days)`</span>, </span>
-<span>    sex      <span class="op">=</span> <span class="va">Sex</span>, </span>
-<span>    delivery <span class="op">=</span> <span class="va">`Delivery mode`</span>, </span>
-<span>    subject  <span class="op">=</span> <span class="va">`Subject ID`</span> <span class="op">)</span></span>
-<span></span>
-<span><span class="va">df</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2,684 × 7</span></span></span>
-<span><span class="co">#&gt;   .sample    .taxa      .abundance   age sex    delivery subject</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> SRR7044380 Firmicutes        132   255 Female Vaginal  ID3    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> SRR7058817 Firmicutes         11    31 Female Vaginal  ID12   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> SRR7039319 Firmicutes         55   222 Female Vaginal  ID1    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> SRR7053418 Firmicutes        397    41 Male   Vaginal  ID6    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> SRR7054009 Firmicutes        103    79 Female Vaginal  ID8    </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,679 more rows</span></span></span></code></pre></div>
-<p>The simplest way to find the abundance is to take the average across
-all samples.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">.abundance</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 183.3104</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">$</span><span class="va">.mean</span></span>
-<span><span class="co">#&gt; [1] 183.3104</span></span></code></pre></div>
-<p>Regression comes into play when we suspect that abundance changes
-over time.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">.abundance</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, fit <span class="op">=</span> <span class="st">"lm"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">.slope</span>, <span class="va">.h1</span>, <span class="va">.p.val</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
-<span><span class="co">#&gt;   .slope .h1     .p.val</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">0.127</span> != 0  0.000<span style="text-decoration: underline;">272</span></span></span></code></pre></div>
-<p>Above, we’re modeling <code>.abundance ~ age</code> and using
-[emmeans::emtrends()] behind the scenes see if the resulting trendline
-is non-horizontal.</p>
-<p>Recall from your statistic classes that you are testing a null
-hypothesis H<sub>0</sub> against an alternate hypothesis H<sub>1</sub>.
-In this case our null hypothesis is that the trendline is flat (slope =
-0), indicating no relationship between age and Firmicutes abundance. The
-p-value is the probability that the null hypothesis is correct (a
-p-value of 0.6 is interpreted as a 60% chance that there’s no
-relationship between age and abundance). When the p-value is below a
-certain value (usually 0.05) we accept the alternative hypothesis
-instead - in this case that there IS a relationship between age and
-Firmicutes abundance.</p>
-<p>In the output we see that <code>.slope</code> is -0.127 and our
-alternative hypothesis (<code>.h1</code>) of <code>.slope != 0</code> is
-acceptable since <code>.p.val</code> is less than 0.05. Therefore, the
-mean abundance of Firmicutes decreases over time in babies.</p>
-<p>The un-<code>select()</code>ed output contains columns for confidence
-intervals, goodness of fit measures, and intermediary statistic values
-that we’ll get to later.</p>
-</div>
-<div class="section level3">
-<h3 id="data-normality">Data Normality<a class="anchor" aria-label="anchor" href="#data-normality"></a>
-</h3>
-<p>In statistics, it is crucial to know if your data is normally
-distributed.</p>
-<p>The <code>performance</code> R package has excellent utilities for
-assessing normality and similar characteristics.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">.abundance</span> <span class="op">~</span> <span class="va">age</span> <span class="op">*</span> <span class="va">sex</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-18-1.png" width="768"></p>
-<p>The “Normality of Residuals” plots clearly show we’re dealing with
-non-normal data. To handle this, we need to use non-parametric methods
-or manually apply a rank transformation.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span><span class="op">$</span><span class="va">rt_abundance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">.abundance</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/with.html">with</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">rt_abundance</span> <span class="op">~</span> <span class="va">age</span> <span class="op">*</span> <span class="va">sex</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/check_model.html" class="external-link">check_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="regression_files/figure-html/unnamed-chunk-19-1.png" width="768"></p>
-</div>
-<div class="section level3">
-<h3 id="trends-and-engines">Trends and Engines<a class="anchor" aria-label="anchor" href="#trends-and-engines"></a>
-</h3>
-<p>Now’s a good time to explain two more <code><a href="../reference/stats_table.html">stats_table()</a></code>
-parameters: <code>fit</code> and <code>test</code>.</p>
-<p><code>fit</code> is the shape of the trendline you want to fit (see
-intro section). Options are: * <code>'lm'</code> - Linear (straight
-line), using <code>stats::lm(y ~ x)</code>. * <code>'log'</code> -
-Logarithmic, using <code>stats::lm(y ~ log(x))</code>. *
-<code>'gam'</code> - Generalized additive model, using
-<code>mgcv::gam(y ~ s(x, bs = 'cs'), method = 'REML')</code>.</p>
-<p><code>test</code> is the top-most operator the model. Options are: *
-<code>'emmeans'</code> - To compute means. * <code>'emtrends'</code> -
-To compute trendline slopes.</p>
-</div>
+<span><span class="co"># Print the table transposed, since it's one row by 14 columns.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">st</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              [,1]           </span></span>
+<span><span class="co">#&gt; age          "16.8"         </span></span>
+<span><span class="co">#&gt; sex          "female - male"</span></span>
+<span><span class="co">#&gt; .mean.diff   "-7.730025"    </span></span>
+<span><span class="co">#&gt; .h1          "!= 0"         </span></span>
+<span><span class="co">#&gt; .p.val       "8.875599e-40" </span></span>
+<span><span class="co">#&gt; .adj.p       "8.875599e-40" </span></span>
+<span><span class="co">#&gt; .effect.size "-1.205401"    </span></span>
+<span><span class="co">#&gt; .se          "0.5753545"    </span></span>
+<span><span class="co">#&gt; .n           "2500"         </span></span>
+<span><span class="co">#&gt; .df          "2485"         </span></span>
+<span><span class="co">#&gt; .t.ratio     "-13.43524"    </span></span>
+<span><span class="co">#&gt; .aic         "16403.78"     </span></span>
+<span><span class="co">#&gt; .bic         "16497.75"     </span></span>
+<span><span class="co">#&gt; .loglik      "-8185.756"</span></span></code></pre></div>
+<p>Depending on the arguments given, the <em>estimate</em> term will be
+one of:</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="36%">
+<col width="31%">
+<col width="15%">
+</colgroup>
+<thead><tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Description</strong></th>
+<th><code>test</code></th>
+<th><code>stat.by</code></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>.mean</td>
+<td>Estimated marginal mean.</td>
+<td><code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code></td>
+<td><code>NULL</code></td>
+</tr>
+<tr class="even">
+<td>.mean.diff</td>
+<td>Difference in means.</td>
+<td><code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans()</a></code></td>
+<td>not <code>NULL</code>
+</td>
+</tr>
+<tr class="odd">
+<td>.slope</td>
+<td>Trendline slope.</td>
+<td><code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code></td>
+<td><code>NULL</code></td>
+</tr>
+<tr class="even">
+<td>.slope.diff</td>
+<td>Difference in slopes.</td>
+<td><code><a href="https://rdrr.io/pkg/emmeans/man/emtrends.html" class="external-link">emmeans::emtrends()</a></code></td>
+<td>not <code>NULL</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Other fields in this table include:</p>
+<table class="table">
+<thead><tr class="header">
+<th><strong>Field</strong></th>
+<th><strong>Description</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>.h1</td>
+<td>Alternate hypothesis.</td>
+</tr>
+<tr class="even">
+<td>.p.val</td>
+<td>Probability that null hypothesis is correct.</td>
+</tr>
+<tr class="odd">
+<td>.adj.p</td>
+<td>
+<code>.p.val</code> after adjusting for multiple comparisons.</td>
+</tr>
+<tr class="even">
+<td>.effect.size</td>
+<td>Effect size. See <code><a href="https://rdrr.io/pkg/emmeans/man/eff_size.html" class="external-link">emmeans::eff_size()</a></code>.</td>
+</tr>
+<tr class="odd">
+<td>.lower</td>
+<td>Confidence interval lower bound.</td>
+</tr>
+<tr class="even">
+<td>.upper</td>
+<td>Confidence interval upper bound.</td>
+</tr>
+<tr class="odd">
+<td>.se</td>
+<td>Standard error.</td>
+</tr>
+<tr class="even">
+<td>.n</td>
+<td>Number of samples.</td>
+</tr>
+<tr class="odd">
+<td>.df</td>
+<td>Degrees of freedom.</td>
+</tr>
+<tr class="even">
+<td>.t.ratio</td>
+<td>
+<em>(.mean, .mean.diff, .slope, or .slope.diff)</em> /
+<code>.se</code>
+</td>
+</tr>
+<tr class="odd">
+<td>.r.sqr</td>
+<td>Percent of variation explained by the model.</td>
+</tr>
+<tr class="even">
+<td>.adj.r</td>
+<td>
+<code>.r.sqr</code>, taking degrees of freedom into account.</td>
+</tr>
+<tr class="odd">
+<td>.aic</td>
+<td>Akaike Information Criterion (predictive models).</td>
+</tr>
+<tr class="even">
+<td>.bic</td>
+<td>Bayesian Information Criterion (descriptive models).</td>
+</tr>
+<tr class="odd">
+<td>.loglik</td>
+<td>Log-likelihood goodness-of-fit score.</td>
+</tr>
+<tr class="even">
+<td>.fit.p</td>
+<td>P-value for observing this fit by chance.</td>
+</tr>
+</tbody>
+</table>
 <div class="section level3">
 <h3 id="marginal-means">Marginal Means<a class="anchor" aria-label="anchor" href="#marginal-means"></a>
 </h3>
-<p>The default test for <code><a href="../reference/stats_table.html">stats_table()</a></code> is
-<code>'emmeans'</code>, which computes estimated marginal means (EMMs),
-also known as least-squares means, using the [emmeans::emmeans]
-package.</p>
-<p>Generally speaking, EMMs are means extracted from a statistical
-model. This allows EMMs to take into account more complex associations
-and produce confidence intervals in addition to estimates of the mean.
-For a more information on EMMs, these resources are recommended:</p>
+<p>Estimated marginal means (EMMs; also known as least-squares means)
+are means extracted from a statistical model. This allows EMMs to take
+into account more complex associations and produce confidence intervals
+in addition to estimates of the mean. This approach is employed by
+rbiom’s <code>'emmeans'</code> and <code>'emtrends'</code> tests, using
+the <code><a href="https://rdrr.io/pkg/emmeans/man/emmeans.html" class="external-link">emmeans::emmeans</a></code> package.</p>
+<p>Additional information on EMMs is available at:</p>
 <ul>
 <li><a href="https://www.andrewheiss.com/blog/2022/05/20/marginalia/#marginal-effects-at-the-mean-the-default-in-emmeans" class="external-link">Marginalia:
 A Guide to Figuring Out What the Heck Marginal Effects Are</a></li>
@@ -596,39 +383,10 @@ Probing, and Plotting Interactions in R</a></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="model-selection">Model Selection<a class="anchor" aria-label="anchor" href="#model-selection"></a>
+<h3 id="goodness-of-fit">Goodness of Fit<a class="anchor" aria-label="anchor" href="#goodness-of-fit"></a>
 </h3>
-<p>As per our discussion of age vs height, a straight (linear) trendline
-might not be the best fit for a dataset.</p>
-<p>To evaluate different models, change the <code>fit</code> parameter
-and look at the resultant goodness of fit values.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span>, fit <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">.r.sqr</span><span class="op">:</span><span class="va">.fit.p</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">#&gt;    .r.sqr  .adj.r   .aic   .bic .loglik   .fit.p</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0.004<span style="text-decoration: underline;">93</span> 0.004<span style="text-decoration: underline;">56</span> <span style="text-decoration: underline;">33</span>519. <span style="text-decoration: underline;">33</span>537. -<span style="color: #BB0000; text-decoration: underline;">16</span><span style="color: #BB0000;">757.</span> 0.000<span style="text-decoration: underline;">272</span></span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span>, fit <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">.r.sqr</span><span class="op">:</span><span class="va">.fit.p</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ log(age))</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">#&gt;    .r.sqr  .adj.r   .aic   .bic .loglik .fit.p</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0.002<span style="text-decoration: underline;">32</span> 0.001<span style="text-decoration: underline;">95</span> <span style="text-decoration: underline;">33</span>526. <span style="text-decoration: underline;">33</span>544. -<span style="color: #BB0000; text-decoration: underline;">16</span><span style="color: #BB0000;">760.</span> 0.012<span style="text-decoration: underline;">5</span></span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span>, fit <span class="op">=</span> <span class="st">"gam"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">.aic</span><span class="op">:</span><span class="va">.loglik</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    gam(.abundance ~ s(age, bs = "cs"), method = "REML")</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
-<span><span class="co">#&gt;     .aic   .bic .loglik</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">33</span>520. <span style="text-decoration: underline;">33</span>542. -<span style="color: #BB0000; text-decoration: underline;">16</span><span style="color: #BB0000;">757.</span></span></span></code></pre></div>
-<p>These values are calculated by the [broom::glance()] function.</p>
+<p>The statistics table has several fields for assessing how well the
+model fits the data.</p>
 <ul>
 <li>
 <code>.r.sqr</code> - Coefficient of Determination
@@ -650,172 +408,364 @@ values (closer to zero) are better.</li>
 <code>.fit.p</code> - P-value for observing this fit by chance;
 range: 0-1, lower is better.</li>
 </ul>
-<p>Based on these metrics, the <code>fit = "lm"</code> model is
-optimal.</p>
+<p>Not all of these values can be computed for every model.</p>
+<p>As an example, lets pull the AIC value from the statistics table
+generated in the last section.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">st</span><span class="op">$</span><span class="va">.aic</span></span>
+<span><span class="co">#&gt; [1] 16403.78</span></span></code></pre></div>
+<p>These values can be used to decide which <code>fit</code> argument to
+use (“lm”, “log”, or “gam”).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>lm<span class="op">=</span><span class="st">"lm"</span>, log<span class="op">=</span><span class="st">"log"</span>, gam<span class="op">=</span><span class="st">"gam"</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"fit"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">"age"</span>, <span class="st">"height"</span>, <span class="st">"sex"</span>, fit <span class="op">=</span> <span class="va">fit</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">.r.sqr</span><span class="op">:</span><span class="va">.fit.p</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   fit    .r.sqr    .adj.r     .aic     .bic   .loglik .fit.p</span></span>
+<span><span class="co">#&gt; 1  lm 0.7896923 0.7894395 16947.72 16976.84 -8468.858      0</span></span>
+<span><span class="co">#&gt; 2 log 0.8031003 0.8028636 16783.02 16812.14 -8386.512      0</span></span>
+<span><span class="co">#&gt; 3 gam        NA        NA 16403.78 16497.75 -8185.756     NA</span></span></code></pre></div>
+<p>Based on the above table, <code>fit = "gam"</code> has the lowest
+AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best
+model to use for this set of data and variables.</p>
 </div>
 <div class="section level3">
-<h3 id="means-at-specific-timepoints">Means at Specific Timepoints<a class="anchor" aria-label="anchor" href="#means-at-specific-timepoints"></a>
+<h3 id="alternative-hypothesis">Alternative Hypothesis<a class="anchor" aria-label="anchor" href="#alternative-hypothesis"></a>
 </h3>
-<p>The previous section showed us that Firmicutes abundance decreases
-with age (slope = -0.127). We can use <code>stats_table(at = ...)</code>
-to find the estimated marginal mean of <code>.abundance</code> at any
-value of age.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">90</span>, <span class="fl">150</span>, <span class="fl">210</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">.mean</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 2</span></span></span>
-<span><span class="co">#&gt;     age .mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    30  194.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    90  187.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   150  179.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   210  171.</span></span></code></pre></div>
+<p>The three columns <code>.mean.diff</code>, <code>.h1</code>, and
+<code>.p.val</code> together show the hypothesis and its outcome. Above,
+we’re asking if <code>.mean.diff</code> is non-zero. Since
+<code>.p.val</code> is less than 0.05 we can say that it is.</p>
+<p>For a more complete review of alternative hypotheses, see the
+<a href="statistics.html#hypothesis">rbiom statistics article</a>.</p>
 </div>
-<div class="section level3">
-<h3 id="pairwise-contrasts">Pairwise Contrasts<a class="anchor" aria-label="anchor" href="#pairwise-contrasts"></a>
-</h3>
-<p>Let’s check if the abundance of Firmicutes is different for babies
-born vaginally vs via Cesarean.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, stat.by <span class="op">=</span> <span class="st">"delivery"</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">90</span>, <span class="fl">150</span>, <span class="fl">210</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">delivery</span>, <span class="va">.mean.diff</span>, <span class="va">.h1</span>, <span class="va">.effect.size</span>, <span class="va">.p.val</span>, <span class="va">.adj.p</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age * delivery)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 7</span></span></span>
-<span><span class="co">#&gt;     age delivery           .mean.diff .h1   .effect.size   .p.val   .adj.p</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    30 Cesarean - Vaginal     -<span style="color: #BB0000;">33.3</span>  != 0       -<span style="color: #BB0000;">0.268</span>  0.000<span style="text-decoration: underline;">167</span> 0.000<span style="text-decoration: underline;">666</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    90 Cesarean - Vaginal     -<span style="color: #BB0000;">17.4</span>  != 0       -<span style="color: #BB0000;">0.140</span>  0.003<span style="text-decoration: underline;">14</span>  0.006<span style="text-decoration: underline;">28</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   210 Cesarean - Vaginal      14.6  != 0        0.117  0.121    0.161   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   150 Cesarean - Vaginal      -<span style="color: #BB0000;">1.40</span> != 0       -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">2</span> 0.820    0.820</span></span></code></pre></div>
-<p>Here we see why the <code>at</code> parameter is so important; at day
-30, the difference is very significant, while at day 150, the difference
-is negligible.</p>
-<p>A few new columns are introduced here. <code>.mean.diff</code> is the
-differences in mean abundance. The negative values indicate there is
-more Firmicutes in the babies delivered vaginally. See how the pair is
-listed as <code>Cesarean - Vaginal</code>? You can think “Cesarean
-abundance” <strong>minus</strong> “Vaginal abundance”. In this table,
-the <code>.h1</code> column tells us the alternate hypothesis is that
-the <code>.mean.diff</code> is not equal to zero.</p>
-<p>The <code>.adj.p</code> column is the <code>.p.val</code> corrected
-for multiple comparisons. Since we looked at four timepoints, the
-chances of encountering a randomly significant difference is higher than
-if we looked at just one timepoint. The default
-<code>stats_table(p.adj = 'fdr')</code> uses the Benjamini &amp;
-Hochberg (1995) correction algorithm.</p>
-<p>The <code>.effect.size</code> column gives us an idea of the
-practical significance of <code>.mean.diff</code>. Calculated as
-<code>.mean.diff / standard_deviation</code>, a rough interpretation is
-0.2 = small effect, 0.5 = moderate effect, and 0.8 = large effect.</p>
-<p>Considering this, we can say that babies born vaginally had
-significantly more Firmicutes in their stool than babies born via
-Cesarean. However, this difference is fairly small.</p>
 </div>
-<div class="section level3">
-<h3 id="pairwise-trends">Pairwise Trends<a class="anchor" aria-label="anchor" href="#pairwise-trends"></a>
-</h3>
-<p>The above differences were actually the result of calculating
-separate models for each level of delivery. These underlying trendlines
-can be interesting in their own right as well. The slopes might be
-different, or they might be the same but with different y-intercepts. We
-can find out like this:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, stat.by <span class="op">=</span> <span class="st">"delivery"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">delivery</span>, <span class="va">.slope.diff</span>, <span class="va">.h1</span>, <span class="va">.p.val</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age * delivery)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   delivery           .slope.diff .h1     .p.val</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Cesarean - Vaginal       0.266 != 0  0.000<span style="text-decoration: underline;">995</span></span></span></code></pre></div>
-<p>This shows us that the linear trendline slopes are significantly
-different. The new column <code>.slope.diff</code> is the difference in
-slopes for the two delivery group trendlines.</p>
-<p>But what if we want to know the slope of those two trendlines by
-themselves? We can find those by changing
-<code>stats_table(stat.by = ...)</code> to
-<code>stats_table(split.by = ...)</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, split.by <span class="op">=</span> <span class="st">"delivery"</span>, test <span class="op">=</span> <span class="st">"emtrends"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">delivery</span>, <span class="va">.slope</span>, <span class="va">.h1</span>, <span class="va">.adj.p</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
-<span><span class="co">#&gt;   delivery  .slope .h1       .adj.p</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Vaginal  -<span style="color: #BB0000;">0.192</span>  != 0  0.000<span style="text-decoration: underline;">009</span>55</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Cesarean  0.074<span style="text-decoration: underline;">4</span> != 0  0.212</span></span></code></pre></div>
-<p>This reveals that when babies are born via Cesarean, their Firmicutes
-abundance does NOT change as they get older. But babies born vaginally
-DO see a decrease over time in Firmicutes abundance. Interesting!</p>
-<p>We can check the y-intercepts of the trendlines by checking the mean
-abundances at age = 0.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="va">df</span>, regr <span class="op">=</span> <span class="st">"age"</span>, split.by <span class="op">=</span> <span class="st">"delivery"</span>, at <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">delivery</span>, <span class="va">.mean</span>, <span class="va">.lower</span>, <span class="va">.upper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Model:    lm(.abundance ~ age)</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
-<span><span class="co">#&gt;     age delivery .mean .lower .upper</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     0 Vaginal   208.   197.   219.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     0 Cesarean  167.   151.   183.</span></span></code></pre></div>
-<p>Here we see that the means (and their 95% confidence interval,
-<code>.lower</code> - <code>.upper</code>) are quite different.
-Therefore, at birth, babies born vaginally have more Firmcutes in their
-stool than babies born via Cesarean.</p>
+<div class="section level2">
+<h2 id="checking-residuals">Checking Residuals<a class="anchor" aria-label="anchor" href="#checking-residuals"></a>
+</h2>
+<p>One of the best ways to assess the quality of your model is to
+interrogate the residuals. A “residual” is the vertical distance from a
+data point to the trendline; the difference between observed and
+predicted (fitted) values.</p>
+<p>High quality models will have randomly distributed residuals. Three
+common plots for visualizing residuals are normal Q-Q plots, residual vs
+fitted value plots, and scale-location plots. You can add these plots to
+any rbiom corrplot by setting <code>check = TRUE</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span></span>
+<span>  df       <span class="op">=</span> <span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>,  <span class="co"># dataset</span></span>
+<span>  x        <span class="op">=</span> <span class="st">'age'</span>,                <span class="co"># x-axis variable</span></span>
+<span>  y        <span class="op">=</span> <span class="st">'height'</span>,             <span class="co"># y-axis variable</span></span>
+<span>  stat.by  <span class="op">=</span> <span class="st">'sex'</span>,                <span class="co"># statistical groups</span></span>
+<span>  fit      <span class="op">=</span> <span class="st">'gam'</span>,                <span class="co"># smoothed trendline</span></span>
+<span>  layers   <span class="op">=</span> <span class="st">'tc'</span>,                 <span class="co"># show trendline with conf. int.</span></span>
+<span>  test     <span class="op">=</span> <span class="st">'emmeans'</span>,            <span class="co"># run stats on the means</span></span>
+<span>  check    <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>                <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
+<p>The subtitle for each plot tells you what a high quality model will
+look like. For example, the “Normal Q-Q” plot says that “Points should
+fall on the line.” In this case they do, so that particular check
+indicates high-quality.</p>
+<p>These diagnostic plots are largely subjective/qualitative. That is,
+you must use your best judgement to decide if the residuals appear to
+pass or fail the checks.</p>
+<p>A complete explanation of these diagnostic plots is beyond the scope
+of this article. Readers are encouraged to explore the topic further at
+sites such as:</p>
 <ul>
+<li><a href="https://www.statology.org/linear-regression-assumptions/" class="external-link">The Four
+Assumptions of Linear Regression</a></li>
+<li><a href="http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/" class="external-link">Linear
+Regression Assumptions and Diagnostics in R: Essentials</a></li>
 <li>
-<code>stat.by</code> - An optional categorical variable defining the
-statistical groups. If set, this triggers a pairwise comparison of all
-<code>stat.by</code> groups.</li>
-<li>
-<code>split.by</code> - Optional field(s) to pre-partition the
-dataset by.</li>
-<li>
-<code>test</code> - The options are <code>'fits'</code>,
-<code>'means'</code>, or <code>'slopes'</code>. <code>'fits'</code> will
-return goodness-of-fit metrics. <code>'means'</code> calculates the
-estimated marginal mean of <code>resp</code> at <code>at</code>.
-<code>'means'</code> estimates the trendline slope at <code>at</code>.
-More detail on these later.</li>
-<li>
-<code>fit</code> - For regression, the choices are
-<code>'lm'</code>, <code>'log'</code>, or <code>'gam'</code>. These fit
-straight trend-lines, log-curved trend-lines, and multi-spline
-trend-lines to the data, respectively.</li>
-<li>
-<code>level</code> - The confidence level for calculating a
-confidence interval.</li>
-<li>
-<code>alt</code> - Alternative hypothesis direction. Options are
-<code>'!='</code> (two-sided; not equal to <code>mu</code>),
-<code>'&lt;'</code> (less than <code>mu</code>), or <code>'&gt;'</code>
-(greater than <code>mu</code>).</li>
-<li>
-<code>mu</code> - Reference value to test against.</li>
-<li>
-<code>at</code> - Calculate means or slopes at this
-<code>regr</code> value, or <code>NULL</code> to use the median of
-<code>regr</code>’s values.</li>
-<li>
-<code>p.adj</code> - Method to use for multiple comparisons
-adjustment of p-values. Run <code>p.adjust.methods</code> for a list of
-available options.</li>
+<a href="https://library.virginia.edu/data/articles/diagnostic-plots" class="external-link">Understanding
+Diagnostic Plots for Linear Regression Analysis</a>.</li>
+<li><a href="https://rpubs.com/mbh038/725314" class="external-link">Quantile-Quantile
+plots</a></li>
+<li><a href="https://www.andrew.cmu.edu/user/achoulde/94842/homework/regression_diagnostics.html" class="external-link">Regression
+diagnostic plots</a></li>
 </ul>
-<p>Rbiom has three pre-defined regression models:</p>
-<p><img src="regression_files/figure-html/unnamed-chunk-26-1.png" width="768"></p>
-<p>p(“lm”, y ~ x, “stats::lm(y ~ x)”), p(“log”, y ~ log(x), “stats::lm(y
-~ log(x))”), p(“gam”, y ~ s(x, bs = “cs”), “mgcv::gam(y ~ s(x, bs =
-‘cs’),= ‘REML’)”)</p>
-<p>Visualizations are one of the best ways to identify correlations in
-your dataset. If you can see a trend with your eyes, then you’re on the
-right track. Rbiom’s plotting functions are</p>
-<p>The <code>*_boxplot()</code>, <code>*_corrplot()</code>, and
-<code><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot()</a></code> functions will automatically add p-values
-to your figures whenever possible. The ggplot object they return has
-<code>$data</code>, <code>$code</code>, <code>$stats</code>, and
-<code>$stats$code</code> attributes you can use to automate, reproduce,
-and customize your figures.</p>
 </div>
+<div class="section level2">
+<h2 id="gems-dataset">GEMS Dataset<a class="anchor" aria-label="anchor" href="#gems-dataset"></a>
+</h2>
+<p>Going forward we’ll use the <code>gems</code> dataset included with
+rbiom. GEMS is a case-control study comprising 1,006 stool samples from
+young children with or without diarrhea in four low-income countries.
+The original Nature article by Eric J. de Muinck and Pal Trosvik for
+this data set is available online for free at <a href="https://www.nature.com/articles/s41467-018-04641-7" class="external-link">Individuality
+and Convergence of the Infant Gut Microbiota During the First Year of
+Life</a>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gems</span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Global Enteric Multicenter Study</span><span style="color: #808080;"> ════════════════════════</span></span></span>
+<span><span class="co">#&gt; Stool samples collected from 1006 participants under the</span></span>
+<span><span class="co">#&gt; age of 5 from Bangladesh, Gambia, Kenya, and Mali. Includes</span></span>
+<span><span class="co">#&gt; 492 healthy controls and 514 moderate-to-severe diarrhea</span></span>
+<span><span class="co">#&gt; (MSD) cases. Original study by Pop et al, 2014</span></span>
+<span><span class="co">#&gt; (<span style="color: #0000BB; font-style: italic;">&lt;https://doi.org/10.1186/gb-2014-15-6-r76&gt;</span>); dataset</span></span>
+<span><span class="co">#&gt; retrieved from MicrobiomeDB</span></span>
+<span><span class="co">#&gt; (<span style="color: #0000BB; font-style: italic;">&lt;https://doi.org/10.1093/nar/gkx1027&gt;</span>).</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    1006 Samples: SRS608640, SRS608279, SRS607780, ...</span></span>
+<span><span class="co">#&gt;     767 OTUs:    OTU001, OTU002, OTU003, ..., and OTU767</span></span>
+<span><span class="co">#&gt;       8 Ranks:   .otu, Kingdom, Phylum, ..., and Species</span></span>
+<span><span class="co">#&gt;       4 Fields:  .sample, diarrhea, age, and country</span></span>
+<span><span class="co">#&gt;         Tree:</span></span>
+<span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 116 - 11k reads/sample ──────────────────── 2021-03-15 ──</span></span></span>
+<span></span>
+<span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">gems</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 1,006</span></span>
+<span><span class="co">#&gt; Columns: 4</span></span>
+<span><span class="co">#&gt; $ .sample  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SRS608640", "SRS608279", "SRS607780", "SRS607987", "SRS60842…</span></span>
+<span><span class="co">#&gt; $ diarrhea <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Control, Case, Case, Case, Control, Case, Case, Control, Cont…</span></span>
+<span><span class="co">#&gt; $ age      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.2, 1.4, 0.8, 1.8, 0.6, 4.0, 0.5, 2.2, 0.4, 1.4, 2.1, 2.0, 0…</span></span>
+<span><span class="co">#&gt; $ country  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> Bangladesh, Kenya, Gambia, Gambia, Kenya, Kenya, Mali, Gambia…</span></span></code></pre></div>
+<p>The <code>gems</code> metadata includes two categorical fields and
+one continuous field:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Field</th>
+<th>Type</th>
+<th>Values</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>diarrhea</td>
+<td>categorical</td>
+<td>Case or Control</td>
+</tr>
+<tr class="even">
+<td>age</td>
+<td>continuous</td>
+<td>0 - 4.8 (years old)</td>
+</tr>
+<tr class="odd">
+<td>country</td>
+<td>categorical</td>
+<td>Bangladesh, Gambia, Kenya, or Mali</td>
+</tr>
+</tbody>
+</table>
+<div class="section level3">
+<h3 id="bangladesh-vs-kenya-controls">Bangladesh vs Kenya Controls<a class="anchor" aria-label="anchor" href="#bangladesh-vs-kenya-controls"></a>
+</h3>
+<p>To start, let’s select just the healthy controls from two countries,
+then rarefy those samples to an even sequencing depth.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hbk</span> <span class="op">&lt;-</span> <span class="va">gems</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">diarrhea</span> <span class="op">==</span> <span class="st">"Control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">country</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Bangladesh"</span>, <span class="st">"Kenya"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">hbk</span><span class="op">$</span><span class="va">n_samples</span></span>
+<span><span class="co">#&gt; [1] 256</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="alpha-diversity">Alpha Diversity<a class="anchor" aria-label="anchor" href="#alpha-diversity"></a>
+</h2>
+<p>Since we’re working with an rbiom object - <code>hbk</code> - we can
+use the convenience function <code><a href="../reference/adiv_corrplot.html">adiv_corrplot()</a></code>, which
+combines the steps of generating a table of alpha diversity values
+(<code><a href="../reference/adiv_table.html">adiv_table()</a></code>) and generating a correlation plot
+(<code><a href="../reference/stats_corrplot.html">stats_corrplot()</a></code>).</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_corrplot.html">adiv_corrplot</a></span><span class="op">(</span></span>
+<span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
+<span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
+<span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups</span></span>
+<span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
+<span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-13-1.png" width="768"></p>
+<p>Here, the diagnostic plots look pretty good, so we can confidently
+say that children have different Shannon diversity index values,
+depending on whether they live in Bangladesh vs Kenya, and that this
+difference is most significant at around 1.35 years old.</p>
+</div>
+<div class="section level2">
+<h2 id="taxa-abundance">Taxa Abundance<a class="anchor" aria-label="anchor" href="#taxa-abundance"></a>
+</h2>
+<p>Similar to <code><a href="../reference/adiv_corrplot.html">adiv_corrplot()</a></code>, <code><a href="../reference/taxa_corrplot.html">taxa_corrplot()</a></code>
+combines <code><a href="../reference/taxa_matrix.html">taxa_table()</a></code> and <code><a href="../reference/stats_corrplot.html">stats_corrplot()</a></code>
+into a single streamlined function.</p>
+<p>We’ll set <code>layers = "tcrp"</code> to show the residuals on this
+main plot. This will help in explaining an artifact on the “Residuals vs
+Fitted” diagnostic plot.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
+<span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
+<span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># show residuals on the main plot</span></span>
+<span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
+<span>  taxa    <span class="op">=</span> <span class="fl">1</span>,           <span class="co"># select the most abundant taxa</span></span>
+<span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups</span></span>
+<span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
+<span>  t.size  <span class="op">=</span> <span class="fl">2</span>,           <span class="co"># make the trendline thicker</span></span>
+<span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
+<p>Above, all the orange and blue points falling on y=0 indicate there
+are zero Prevotella reads for that sample. This can confound taxa
+abundance analyses, as indicated by the diagnostic plots.</p>
+<ul>
+<li>Normal Q-Q: This curved shape indicates residuals are more often
+below the trendline.</li>
+<li>Residuals vs Fitted: The points forming a straight black diagonal
+‘line’ are the result of a overabundance of a single value in the data
+(zero).</li>
+<li>Scale-Location: The first half of the curve is due to lots of zero
+counts. The second half of the curve is due to having few samples with
+greater than 350 rarefied Prevotella counts, thereby allowing the gam
+curve to intercept those sample points with better precision.</li>
+</ul>
+<div class="section level3">
+<h3 id="rank-transformation">Rank Transformation<a class="anchor" aria-label="anchor" href="#rank-transformation"></a>
+</h3>
+<p>One method for addessing zero abundances is to rank tranform all the
+abundances. In rbiom, setting <code>trans = "rank"</code> will rank
+transform all the abundances, without consideration of facets. The
+default parameters <code>ties = "random", seed = 0</code> will assign
+unique integers (see <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">base::rank()</a></code> for other
+<code>ties</code> options.</p>
+<p>This will improve the diagnostic plots, but adds noise to the
+data.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
+<span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
+<span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># show residuals on the main plot</span></span>
+<span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
+<span>  taxa    <span class="op">=</span> <span class="fl">1</span>,           <span class="co"># select the most abundant taxa</span></span>
+<span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups</span></span>
+<span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
+<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
+<span>  t.size  <span class="op">=</span> <span class="fl">2</span>,           <span class="co"># make the trendline thicker</span></span>
+<span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="beta-diversity">Beta Diversity<a class="anchor" aria-label="anchor" href="#beta-diversity"></a>
+</h2>
+<p>Like the last two corrplot functions, <code><a href="../reference/bdiv_corrplot.html">bdiv_corrplot()</a></code>
+combines <code><a href="../reference/bdiv_table.html">bdiv_table()</a></code> and <code><a href="../reference/stats_corrplot.html">stats_corrplot()</a></code> to
+generate a beta diversity correlation plot from an rbiom object.</p>
+<p>Beta diversity correlation plots are more conceptually complex, so
+let’s quickly reveal what we’ll be plotting.</p>
+<ul>
+<li>x-axis: the difference in a numeric metadata field between two
+samples.</li>
+<li>y-axis: the difference in overall microbiome composition.</li>
+</ul>
+<p>As with most <code>bdiv_*</code> functions, we can supply a
+<code>within</code> and/or <code>between</code> parameters to limit
+which pairs of samples are included in the plot. Setting
+<code>within = "country"</code> as below will only plot pairs of samples
+that came from the same country, and prevent <code>stat.by</code> from
+producing a “Bangladesh vs Kenya” trendline.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bdiv_corrplot.html">bdiv_corrplot</a></span><span class="op">(</span></span>
+<span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
+<span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
+<span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups </span></span>
+<span>  within  <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># don't compare samples from different countries</span></span>
+<span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
+<span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
+<p>Here, the main plot tells us:</p>
+<ul>
+<li>In Bangladesh, the closer two children are in age to each other, the
+more similar their microbiomes will be. Therefore, you could infer that
+age is an important factor driving microbiome structure for this
+population.</li>
+<li>Kenyan children’s microbiomes are more consistently structured,
+compared to children in Bangladesh. Additionally, the age effect is much
+less pronounced.</li>
+<li>Children about 1 year apart in age have much more similar microbiome
+if they live in Kenya, compared to Bangalesh (p = 7e-143).</li>
+</ul>
+<p>The diagnostic plots here indicate less than optimal distributions of
+residuals, with the “Normal Q-Q” plot showing that many more points lie
+above the trendline than below it. The main plot’s trendlines don’t
+spend much time between y = 0.75 and 0.83, hence the sparsity of points
+between x = 0.75 and 0.83 on the “Residuals vs Fitted” and
+“Scale-Location” plots.</p>
+<div class="section level3">
+<h3 id="rank-transformation-1">Rank Transformation<a class="anchor" aria-label="anchor" href="#rank-transformation-1"></a>
+</h3>
+<p>Running <code><a href="../reference/bdiv_corrplot.html">bdiv_corrplot()</a></code> with <code>trans = "rank"</code>
+could help make the residuals more normally distributed.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bdiv_corrplot.html">bdiv_corrplot</a></span><span class="op">(</span></span>
+<span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
+<span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
+<span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups </span></span>
+<span>  within  <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># don't compare samples from different countries</span></span>
+<span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
+<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
+<span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
+<p>After rank-transforming:</p>
+<ul>
+<li>The main plot tells a slightly different story.</li>
+<li>The “Normal Q-Q” plot indicates that the residuals now have a
+light-tailed distribution.</li>
+</ul>
+<p>You could argue either for or against preferring the transformed
+figure over the original.</p>
+</div>
+<div class="section level3">
+<h3 id="goodness-of-fit-1">Goodness of Fit<a class="anchor" aria-label="anchor" href="#goodness-of-fit-1"></a>
+</h3>
+<p>Comparing the AIC, BIC, and Log-Likelihood values for the
+untransformed and rank-transformed data can tell you which model is
+better, right? Wrong! These values scale with the range of the data, so
+the untransformed beta diversity data in the range of 0 - 1 will result
+in drastically different AIC, BIC, and Log-Likelihood values than the
+rank-transformed data in the range of 1 - 16400.</p>
+<p>Generally speaking, you cannot compare goodness-of-fit values derived
+from different datasets. However, it is arguable that these two datasets
+are the same, just scaled differently. Therefore if you don’t mind
+potentially incurring a reviewer’s wrath, you can rescale both datasets
+to the same range and compare goodness-of-fit values on those.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>none<span class="op">=</span><span class="st">"none"</span>, rank<span class="op">=</span><span class="st">"rank"</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"trans"</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">trans</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/bdiv_table.html">bdiv_table</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hbk</span>, within <span class="op">=</span> <span class="st">"country"</span>, trans <span class="op">=</span> <span class="va">trans</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.distance <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/rescale.html" class="external-link">rescale</a></span><span class="op">(</span><span class="va">.distance</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span>regr <span class="op">=</span> <span class="st">"age"</span>, resp <span class="op">=</span> <span class="st">".distance"</span>, stat.by <span class="op">=</span> <span class="st">"country"</span>, fit <span class="op">=</span> <span class="st">"gam"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.aic</span>, <span class="va">.bic</span>, <span class="va">.loglik</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#&gt;   trans      .aic      .bic   .loglik</span></span>
+<span><span class="co">#&gt; 1  none -2785.749 -2698.256  1404.230</span></span>
+<span><span class="co">#&gt; 2  rank  4518.047  4634.557 -2243.902</span></span></code></pre></div>
+<p>These goodness-of-fit metrics strongly favor the untransformed
+data.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="specific-timepoints">Specific Timepoints<a class="anchor" aria-label="anchor" href="#specific-timepoints"></a>
+</h2>
+<p>By default, the <code>*_corrplot()</code> functions will
+automatically find the x-axis location with the most significant term of
+interest. However, you can override this by providing the
+<code>at</code> parameter.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_corrplot.html">stats_corrplot</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">'age'</span>, <span class="st">'height'</span>, stat.by <span class="op">=</span> <span class="st">'sex'</span>, at <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="regression_files/figure-html/unnamed-chunk-19-1.png" width="768"></p>
+<p>Although you’re limited to one <code>at</code> value for
+<code>_corrplot()</code> functions, you can provide multiple
+<code>at</code> locations to <code><a href="../reference/stats_table.html">stats_table()</a></code> or
+<code>*_stats()</code> functions.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/stats_table.html">stats_table</a></span><span class="op">(</span><span class="fu">npregfast</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/npregfast/man/children.html" class="external-link">children</a></span>, <span class="st">'age'</span>, <span class="st">'height'</span>, stat.by <span class="op">=</span> <span class="st">'sex'</span>, at <span class="op">=</span> <span class="fl">11</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 14</span></span></span>
+<span><span class="co">#&gt;     age sex    .mean.diff .h1     .p.val   .adj.p .effect.size   .se    .n   .df</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    12 femal…       7.23 != 0  2.46<span style="color: #949494;">e</span><span style="color: #BB0000;">-29</span> 1.23<span style="color: #949494;">e</span><span style="color: #BB0000;">-28</span>        1.13  0.635  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    11 femal…       6.02 != 0  2.75<span style="color: #949494;">e</span><span style="color: #BB0000;">-22</span> 6.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-22</span>        0.939 0.614  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    13 femal…       6.04 != 0  6.06<span style="color: #949494;">e</span><span style="color: #BB0000;">-21</span> 1.01<span style="color: #949494;">e</span><span style="color: #BB0000;">-20</span>        0.943 0.638  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    15 femal…      -<span style="color: #BB0000;">2.58</span> != 0  7.21<span style="color: #949494;">e</span><span style="color: #BB0000;">- 7</span> 9.02<span style="color: #949494;">e</span><span style="color: #BB0000;">- 7</span>       -<span style="color: #BB0000;">0.402</span> 0.519  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    14 femal…       2.00 != 0  3.14<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span> 3.14<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span>        0.311 0.553  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: .t.ratio &lt;dbl&gt;, .aic &lt;dbl&gt;, .bic &lt;dbl&gt;, .loglik &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

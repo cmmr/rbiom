@@ -53,7 +53,7 @@ biom <- rarefy(hmp50)
 patchwork::wrap_plots(lapply(
   c("bar", "box", "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange"), 
   FUN = function (layer) {
-  adiv_boxplot(biom, layers = layer, color.by = "Sex", p.label = 0, y.limits = c(0, 4)) + 
+  adiv_boxplot(biom, layers = layer, stat.by = "Sex", p.label = 0, y.limits = c(0, 4)) + 
     ggplot2::labs(title = layer, y = NULL, caption = NULL) +
     ggplot2::theme(legend.position = "none")
   }))
@@ -71,10 +71,10 @@ Unambiguous abbreviations are also accepted. For instance,
 biom <- rarefy(hmp50, depth = 1000)
 
 adiv <- adiv_boxplot(
-  biom = biom, layers = "bes", x = "Sex", color.by = "Sex")
+  biom = biom, layers = "bes", x = "Sex", stat.by = "Sex")
   
 bdiv <- bdiv_boxplot(
-  biom = biom, layers = "xd", x = "==Body Site", color.by = "Body Site", 
+  biom = biom, layers = "xd", x = "==Body Site", stat.by = "Body Site", 
   pt.alpha = 0.2, pt.stroke = 0 )
 
 taxa <- taxa_boxplot(
@@ -91,7 +91,7 @@ patchwork::wrap_plots(
 
 ## Statistics
 
-The categorical groups defined by `x`, `color.by`, etc are used to calculate 
+The categorical groups defined by `x`, `stat.by`, etc are used to calculate 
 non-parametric statistics with the Mann-Whitney or Kruskal-Wallis algorithms. 
 See [Statistics](statistics.html) for details.
 
@@ -124,7 +124,7 @@ biom <- rarefy(hmp50)
 patchwork::wrap_plots(lapply(
   c("trend", "confidence", "point", "residual", "name"), 
   FUN = function (layer) {
-  adiv_corrplot(biom, x = "Age", layers = layer, color.by = "Sex", test = "none", y.limits = c(0, 50)) + 
+  adiv_corrplot(biom, x = "Age", layers = layer, stat.by = "Sex", test = "none", y.limits = c(0, 4)) + 
     ggplot2::labs(title = layer, y = NULL, caption = NULL) +
     ggplot2::theme(legend.position = "none")
   }))
@@ -144,11 +144,11 @@ biom <- rarefy(hmp50, depth = 1000)
 adiv <- adiv_corrplot(biom, layers = "ts", x = "BMI")
   
 bdiv <- bdiv_corrplot(
-  biom = biom, layers = "tc", x = "BMI", color.by = "==Body Site", 
+  biom = biom, layers = "tc", x = "BMI", stat.by = "==Body Site", 
   limit.by = list("Body Site" = c("Buccal mucosa", "Stool")) )
 
 taxa <- taxa_corrplot(
-  biom = biom, layers = "tsr", x = "Age", taxa = 3, color.by = "Body Site", 
+  biom = biom, layers = "tsr", x = "Age", taxa = 3, stat.by = "Body Site", 
   limit.by = list("Body Site" = c("Mid vagina", "Saliva", "Stool")),
   facet.ncol = 1, facet.strip.position = "right" )
 
@@ -175,7 +175,7 @@ biom <- hmp50 %>% subset(`Body Site` %in% c("Saliva", "Buccal mucosa")) %>% rare
 patchwork::wrap_plots(lapply(
   c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow"), 
   FUN = function (layer) {
-  bdiv_ord_plot(biom, layers = layer, color.by = "Body Site", test = "none") + 
+  bdiv_ord_plot(biom, layers = layer, stat.by = "Body Site", test = "none") + 
     ggplot2::ggtitle(layer) +
     ggplot2::theme(legend.position = "none")
   }))
@@ -195,10 +195,10 @@ The layers `c("mean", "taxon", "arrow")` apply to the taxa.
 ```{r}
 biom <- rarefy(hmp50)
 
-p1 <- bdiv_ord_plot(biom, layers = "pse", color.by = "Body Site") +
+p1 <- bdiv_ord_plot(biom, layers = "pse", stat.by = "Body Site") +
         ggplot2::theme(legend.position = "none")
 
-p2 <- bdiv_ord_plot(biom, layers = "emt", color.by = "Body Site")
+p2 <- bdiv_ord_plot(biom, layers = "emt", stat.by = "Body Site")
 
 patchwork::wrap_plots(p1, p2, guides = "collect")
 ```
@@ -222,8 +222,8 @@ below operate on a biom object.
 ```{r}
 biom <- rarefy(hmp50)
 
-bdiv <- bdiv_heatmap(biom, color.by = c("Age", "Body Site"), asp = 0.4)
-taxa <- taxa_heatmap(biom, color.by = c("Age", "Body Site"), asp = 0.4)
+bdiv <- bdiv_heatmap(biom, tracks = c("Age", "Body Site"), asp = 0.4)
+taxa <- taxa_heatmap(biom, tracks = c("Age", "Body Site"), asp = 0.4)
 
 patchwork::wrap_plots(bdiv, taxa, ncol = 1, guides = "collect")
 ```

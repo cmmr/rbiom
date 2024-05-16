@@ -13,7 +13,9 @@ taxa_table(
   md = ".all",
   unc = "singly",
   other = FALSE,
-  trans = "none"
+  trans = "none",
+  ties = "random",
+  seed = 0
 )
 
 taxa_matrix(
@@ -24,7 +26,9 @@ taxa_matrix(
   sparse = FALSE,
   unc = "singly",
   other = FALSE,
-  trans = "none"
+  trans = "none",
+  ties = "random",
+  seed = 0
 )
 }
 \arguments{
@@ -77,6 +81,8 @@ Default: \code{FALSE}}
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
+
+\item{seed}{Random seed for permutations. Default: \code{0}}
 
 \item{sparse}{If true, returns a sparse matrix as described by
 \code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a normal R

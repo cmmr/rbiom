@@ -14,53 +14,22 @@ knitr::opts_chunk$set(
 ```
 
 
-# Introduction
-
-Visualizations are one of the best ways to identify correlations in your 
-dataset. If you can see a trend with your eyes, then you're on the right track. 
-Rbiom's plotting functions are 
-
-```{r, echo=FALSE, results='asis'}
-cat(glue::glue('
-  <table class="table-borderless">
-  <tr>{adiv_boxplot}{bdiv_corrplot}{rare_stacked}{taxa_boxplot}</tr>
-  <tr>{adiv_corrplot}{bdiv_heatmap}{rare_corrplot}{taxa_corrplot}</tr>
-  <tr>{bdiv_boxplot}{bdiv_ord_plot}{taxa_stacked}{taxa_heatmap}</tr>
-  </table>',
-  .transformer = function (text, ...) {
-    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
-  }))
-```
-
-The `*_boxplot()`, `*_corrplot()`, and `bdiv_ord_plot()` functions will 
-automatically add p-values to your figures whenever possible. The ggplot object 
-they return has `$data`, `$code`, `$stats`, and `$stats$code` attributes you 
-can use to automate, reproduce, and customize your figures.
-
-To generate statistics without creating a plot, use one of the following:
-
-```{r, echo=FALSE, results='asis'}
-cat(glue::glue('
-  <table class="table-borderless">
-  <tr>{adiv_stats}{bdiv_stats}{distmat_stats}{taxa_stats}</tr>
-  </table>',
-  .transformer = function (text, ...) {
-    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
-  }))
-```
-
-
-
-\cr
-
 # Quick Start
 
-Your metadata field of interest and microbiome property will determine which 
+The rbiom package includes many statistical functions. If you have an rbiom object, you can use dedicated functions for alpha diversity, beta diversity, and taxa abundance. Otherwise, look to the generic functions that operate on any data.frame or distance matrix.
+
+
+
+
+
+## rbiom Object Functions
+
+Your metadata field and microbiome property of interest will determine which 
 rbiom function to use.
 
 <table>
 <tr>
-<th rowspan=2 class="border-0 border-end border-bottom align-middle">Metadata<br>Property</th>
+<th rowspan=2 class="border-0 border-end border-bottom align-middle">Metadata<br>Field</th>
 <th colspan=3 class="border-0" align="center">Microbiome Property</th>
 </tr><tr>
 <th class="border-bottom">Alpha Diversity<br><span class="eg">Shannon, Simpson</span></th>
@@ -88,25 +57,172 @@ For instance, to explore the effect of Body Site (a categorical metadata field)
 on Shannon Diversity (an alpha diversity metric), we'd use `adiv_boxplot()` to 
 produce a plot with statistics, or `adiv_stats()` if we only want the stats.
 
-Although all the functions have important differences, the statistical methods 
-they employ can be grouped by the three plot types: ordination plot, box plot, 
-and correlation plot.
 
 
-\cr
 
-# Ordination Plots
+
+## Generic Functions
+
+If your data is in a data.frame (or tibble), use:
+
+```{r, echo=FALSE, results='asis'}
+cat(glue::glue('
+  <table class="table-borderless">
+  <tr>{stats_boxplot}{stats_corrplot}{stats_table}</tr>
+  </table>',
+  .transformer = function (text, ...) {
+    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
+  }))
+```
+
+Or, for a distance matrix:
+
+```{r, echo=FALSE, results='asis'}
+cat(glue::glue('
+  <table class="table-borderless">
+  <tr>{distmat_stats}</tr>
+  </table>',
+  .transformer = function (text, ...) {
+    sprintf("<td><code><a href='../reference/%s.html'>%s()</a></code></td>", text, text)
+  }))
+```
+
+
+
+
+
+# Statistics Table
+
+The function `stats_table()` and functions ending in "_stats" (e.g. `adiv_stats()`, `distmat_stats()`) will return a statistics table. Functions with "plot" in their name (e.g. `adiv_boxplot()`, `stats_corrplot()`) will return a plot object `p`. You can access the plot's associated statistics table with `p$stats`. 
+
+
+```{r}
+p <- adiv_boxplot(
+  biom     = rarefy(hmp50),           # Dataset as an rbiom object
+  adiv     = c("Shannon", "Simpson"), # Alpha diversity metrics
+  stat.by  = "Body Site",             # Statistical groups
+  facet.by = "Sex" )                  # Split data prior to stats
+
+p$stats
+```
+
+This table has the following information:
+
+
+
+
+
+## Model
+
+In the upper-left corner, we see ``Model:    kruskal.test(.diversity ~ `Body Site`)``. This tells us that the underlying test used here is base R's `kruskal.test()`, grouping values of `.diversity` by `` `Body Site` ``. In rbiom, `.diversity` is the default name for the column containing alpha diversity values.
+
+
+
+
+
+## Multiple Comparisons
+
+The above table has four rows, meaning we ran data through the model four times. In this case, it was two alpha diversity metrics times two `Sex` facets. The first two columns of the table (`Sex` and `.adiv`) tell us which row is for each combination. Additionally, the `.adj.p` column is the `.p.val` adjusted for multiple comparisons.
+
+
+
+
+
+## Hypothesis
+
+The three columns `.stat`, `.h1`, and `.p.val` together show the hypothesis and its outcome. Above, we're asking if `.stat` is greater than zero. When `.p.val` is less than 0.05 we can say that it is.
+
+That's the very simplified explanation. 
+
+Recall from your statistic classes that you are testing a null hypothesis H<sub>0</sub> against an alternate hypothesis H<sub>1</sub>. In this case, our null hypothesis is that the Kruskal-Wallis statistic is zero (`.stat == 0`), indicating all `` `Body Site` `` groups have similar alpha diversity. The p-value is the probability that the null hypothesis is correct (a p-value of 0.6 is interpreted as a 60% chance that `.stat == 0`). When the p-value is below a certain value (usually 0.05) we accept the alternative hypothesis instead - in this case that `.stat > 0`, meaning `.diversity` does vary by `` `Body Site` ``.
+
+
+
+
+
+## Terms of Interest
+
+The last two columns are:
+
+* `.n` - The number of samples. After rarefying, we have 30 females and 19 males.
+* `.df` - Degrees of freedom. One less than the number of groups. The HMP50 dataset has five body sites: Anterior nares, buccal mucosa, mid vagina, saliva, and stool. However, the male facets don't have any mid vagina samples.
+
+
+
+
+## Data and Code
+
+You can inspect the data passed to `kruskal.test()` by looking at `p$data`. Additionally, the code used to generate the statistics is available in `p$stats$code`. These attributes can help you reproduce and customize your data analysis.
+
+```{r}
+p$data
+
+p$stats$code
+```
+
+When generating statistics with `st <- adiv_stats()`, `bdiv_stats()`, or `taxa_stats()`, the data and code are in `st$data` and `st$code`, respectively. For `st <- stats_table(df = df)`, the data and code are in `df` and `st$code`, respectively.
+
+
+
+## Column Reference
+
+Care has been taken to keep rbiom's statistics tables consistent across functions. However, some tables will provide more information when it is available from the underlying statistical function.
+
+Below is a quick reference guide to all columns that may appear in an rbiom statistics table.
+
+| **Field**      | **Description**                                       |
+| -------------- | ----------------------------------------------------- |
+| `.stat`        | Wilcoxon or Kruskal-Wallis rank sum statistic.        |
+| `.mean`        | Estimated marginal mean. See `emmeans::emmeans()`.    |
+| `.mean.diff`   | Difference in means.                                  |
+| `.slope`       | Trendline slope. See `emmeans::emtrends()`.           |
+| `.slope.diff`  | Difference in slopes.                                 |
+| `.h1`          | Alternate hypothesis.                                 |
+| `.p.val`       | Probability that null hypothesis is correct.          |
+| `.adj.p`       | `.p.val` after adjusting for multiple comparisons.    |
+| `.effect.size` | Effect size. See `emmeans::eff_size()`.               |
+| `.lower`       | Confidence interval lower bound.                      |
+| `.upper`       | Confidence interval upper bound.                      |
+| `.se`          | Standard error.                                       |
+| `.n`           | Number of samples.                                    |
+| `.df`          | Degrees of freedom.                                   |
+| `.t.ratio`     | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
+| `.z`           | Std. effect size. See `vegan::summary.permustats()`.  |
+| `.r.sqr`       | Percent of variation explained by the model.          |
+| `.adj.r`       | `.r.sqr`, taking degrees of freedom into account.     |
+| `.aic`         | Akaike Information Criterion (predictive models).     |
+| `.bic`         | Bayesian Information Criterion (descriptive models).  |
+| `.loglik`      | Log-likelihood goodness-of-fit score.                 |
+| `.fit.p`       | P-value for observing this fit by chance.             |
+
+The `.h1` field will always come immediately after the column it is testing against.
+
+
+
+
+# Plot Output
+
+Visualizations are one of the best ways to identify correlations in your 
+dataset. If you can see a trend with your eyes, then you're on the right track. 
+The statistics-supported plotting functions in rbiom are ordination plots, box 
+plots, and correlation plots.
+
+
+
+
+
+## Ordination Plots
 
 Statistics for ordination plots are the most straight-forward. Set a 
-categorical metadata field to the `color.by` parameter to test whether 
+categorical metadata field to the `stat.by` parameter to test whether 
 inter-sample distances are correlated with that variable.
 
 ```{r}
 p <- bdiv_ord_plot(
-  biom     = rarefy(hmp50), 
-  color.by = "Body Site", 
-  bdiv     = c("Jaccard", "Bray-Curtis"), 
-  ord      = c("PCoA", "UMAP") )
+  biom    = rarefy(hmp50), 
+  stat.by = "Body Site", 
+  bdiv    = c("Jaccard", "Bray-Curtis"), 
+  ord     = c("PCoA", "UMAP") )
 p
 p$stats
 
@@ -131,13 +247,13 @@ to MRPP by specifying `test="mrpp"`. Details on the available tests are below.
 
 
 
-\cr
 
-# Box Plots
+
+## Box Plots
 
 Statistics on box plots will automatically toggle between pairwise and 
-group-wise statistics based on the values of `x` and `color.by`: `x` controls 
-pairwise and `color.by` controls group-wise. You can set `x` and `color.by` to 
+group-wise statistics based on the values of `x` and `stat.by`: `x` controls 
+pairwise and `stat.by` controls group-wise. You can set `x` and `stat.by` to 
 the same categorical metadata field to get colored pairwise statistics, or set 
 them to different categorical metadata fields to get multiple group-wise 
 statistics per plot.
@@ -147,15 +263,15 @@ biom <- rarefy(hmp50) %>%
   subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
 
 p1 <- adiv_boxplot(biom, x = "Body Site")
-p2 <- adiv_boxplot(biom, color.by = "Body Site")
-p3 <- adiv_boxplot(biom, x = "Body Site", color.by = "Body Site")
-p4 <- adiv_boxplot(biom, x = "Sex", color.by = "Body Site")
+p2 <- adiv_boxplot(biom, stat.by = "Body Site")
+p3 <- adiv_boxplot(biom, x = "Body Site", stat.by = "Body Site")
+p4 <- adiv_boxplot(biom, x = "Sex", stat.by = "Body Site")
 
 plots <- list(
   p1 + ggplot2::labs(subtitle = 'x = "Body Site"'), 
-  p2 + ggplot2::labs(subtitle = 'color.by = "Body Site"'), 
-  p3 + ggplot2::labs(subtitle = 'x = color.by = "Body Site"'), 
-  p4 + ggplot2::labs(subtitle = 'x = "Sex", color.by = "Body Site"')) %>%
+  p2 + ggplot2::labs(subtitle = 'stat.by = "Body Site"'), 
+  p3 + ggplot2::labs(subtitle = 'x = stat.by = "Body Site"'), 
+  p4 + ggplot2::labs(subtitle = 'x = "Sex", stat.by = "Body Site"')) %>%
   lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL))
 
 patchwork::wrap_plots(plots, guides = "collect")
@@ -183,7 +299,37 @@ Internally, rbiom uses the non-parametric functions listed below.
 
 
 
-\cr
+
+
+## Correlation Plots
+
+For an in-depth description of correlation plots, see vignette("articles/regression").
+
+Depending on the arguments given to `stat.by` and `test`, you can test:
+
+```{r}
+biom <- gems %>%
+  subset(diarrhea == "Control") %>%
+  subset(country %in% c("Bangladesh", "Kenya")) %>%
+  rarefy()
+
+p1 <- adiv_corrplot(biom, x = "age", test = "emmeans")
+p2 <- adiv_corrplot(biom, x = "age", test = "emmeans", stat.by = "country")
+p3 <- adiv_corrplot(biom, x = "age", test = "emtrends")
+p4 <- adiv_corrplot(biom, x = "age", test = "emtrends", stat.by = "country")
+
+plots <- list(
+  p1 + ggplot2::labs(subtitle = 'Is the mean non-zero?'), 
+  p2 + ggplot2::labs(subtitle = 'Do means vary by group?'), 
+  p3 + ggplot2::labs(subtitle = 'Is the slope non-horizontal?'), 
+  p4 + ggplot2::labs(subtitle = 'Do slopes vary by group?')) %>%
+  lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL))
+
+patchwork::wrap_plots(plots, guides = "collect")
+```
+
+
+
 
 # Background
 
@@ -195,7 +341,7 @@ from the mean are observed less often. Microbial abundances do not follow this
 pattern; it's common to observe high or low abundances more often than a 
 "medium" abundance.
 
-```{r}
+```{r, fig.asp = 0.4}
 library(ggplot2)
 
 patchwork::wrap_plots(
@@ -221,8 +367,7 @@ tests for categorical variables that are based on ranking or permutations.
 | Kruskal-Wallis Rank Sum | `stats::kruskal.test()` | Groupwise boxplot          |
 | Permutational MANOVA    | `vegan::adonis2()`      | `bdiv_ord_plot()` clusters |
 
-For correlation/regression analysis, rbiom uses estimated marginal means 
-(`emmeans::emmeans()`) on rank-transformed values.
+For correlation/regression analysis, rbiom provides diagnostic plots to determine when residual distributions are cause for concern.
 
 Further reading:
 
@@ -232,7 +377,7 @@ Further reading:
 * [R Applications — Part 1: Simple Linear Regression](https://medium.com/datasciencearth/r-applications-part-1-simple-linear-regression-ef5a0e19a05d), 
 particularly the section on [assumption control](https://medium.com/datasciencearth/r-applications-part-1-simple-linear-regression-ef5a0e19a05d#a6f6).
 
-\cr
+
 
 
 ## Compositionality
@@ -247,7 +392,7 @@ propose the use of their analysis tools (
 [metagenomeSeq](https://doi.org/doi:10.18129/B9.bioc.metagenomeSeq), 
 respectively) to apply the proper statistical methods for this situation. 
 Conversely, rbiom does not correct for compositionality. This is because 
-correcting for compositionality introduces extra noise into your dataset and 
-severely limits your selection of metrics and visualizations, typically 
+correcting for compositionality introduces extra noise into the dataset and 
+severely limits the selection of metrics and visualizations, typically 
 without any significant benefit to analysis.
 

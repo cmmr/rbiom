@@ -18,7 +18,7 @@ convert_to_TSE -  TreeSummarizedExperiment
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,14 +39,13 @@ convert_to_TSE -  TreeSummarizedExperiment
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../articles/regression.html">Regression</a>
     <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -113,14 +112,14 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Human Microbiome Project - 50 Sample Demo</span><span style="color: #808080;"> ═══════════════</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      50 Samples:  HMP01, HMP02, HMP03, ..., and HMP50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     490 OTUs:     Unc01yki, Unc53100, LtbAci52, ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       7 Ranks:    .otu, Kingdom, Phylum, ..., and Genus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       5 Metadata: .sample, Age, BMI, Body Site, and Sex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Tree:     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      50 Samples: HMP01, HMP02, HMP03, ..., and HMP50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     490 OTUs:    Unc01yki, Unc53100, LtbAci52, ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       7 Ranks:   .otu, Kingdom, Phylum, ..., and Genus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       5 Fields:  .sample, Age, BMI, Body Site, and Sex</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Tree:    </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">&lt;present&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 182 - 22K reads/sample ──────────────────── 2023-12-05 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 182 - 22k reads/sample ──────────────────── 2023-12-05 ──</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>    <span class="co"># Requires 'SummarizedExperiment' Bioconductor R package</span></span></span>
@@ -128,36 +127,12 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <span class="r-in"><span>      <span class="va">se</span> <span class="op">&lt;-</span> <span class="fu">convert_to_SE</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class: SummarizedExperiment </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 490 50 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> assays(1): OTU table</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(490): Unc01yki Unc53100 ... AnmGenom Unc48787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(6): Kingdom Phylum ... Family Genus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(50): HMP01 HMP02 ... HMP49 HMP50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(4): Age BMI Body Site Sex</span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>    <span class="co"># Requires 'TreeSummarizedExperiment' Bioconductor R package</span></span></span>
 <span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"TreeSummarizedExperiment"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>      <span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">convert_to_TSE</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class: TreeSummarizedExperiment </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 490 50 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> assays(1): OTU table</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(490): Unc01yki Unc53100 ... AnmGenom Unc48787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(6): Kingdom Phylum ... Family Genus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(50): HMP01 HMP02 ... HMP49 HMP50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(4): Age BMI Body Site Sex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowLinks: a LinkDataFrame (490 rows)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowTree: 1 phylo tree(s) (490 leaves)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colLinks: NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colTree: NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> referenceSeq: a DNAStringSet (490 sequences)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

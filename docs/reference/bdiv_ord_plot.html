@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,14 +31,13 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../articles/regression.html">Regression</a>
     <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -78,8 +77,6 @@
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  layers <span class="op">=</span> <span class="st">"petm"</span>,</span>
 <span>  stat.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  color.by <span class="op">=</span> <span class="va">stat.by</span>,</span>
-<span>  shape.by <span class="op">=</span> <span class="va">stat.by</span>,</span>
 <span>  facet.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  shapes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -143,9 +140,8 @@ See plot types for examples of each. Default: <code>"pe"</code></p></dd>
 statistics should be calculated. Required.</p></dd>
 
 
-<dt>color.by, shape.by, facet.by, limit.by</dt>
-<dd><p>Metadata columns to use for
-aesthetics and partitioning. See below for details.
+<dt>facet.by</dt>
+<dd><p>Dataset field(s) to use for faceting. Must be categorical.
 Default: <code>NULL</code></p></dd>
 
 
@@ -259,7 +255,7 @@ the <code>pt.</code> prefix.</p></dd>
 are available as <code>$data</code> and <code>$code</code> respectively. <br></p>
 
 
-<p>If <code>color.by</code> is given, then <code>$stats</code> and
+<p>If <code>stat.by</code> is given, then <code>$stats</code> and
 <code>$stats$code</code> are set. <br></p>
 
 

@@ -63,7 +63,19 @@ plot_facets <- function (params) {
     
     df <- if (xmode == "numeric") {
       
-      plyr::ddply(ggdata, ply_cols(facet.by), function (d) {
+      coords <- ggdata
+      
+      # For corrplots with only trendlines.
+      if (!any(has_layer(params, c('point', 'residual', 'name')))) { 
+        if (has_layer(params, 'confidence')) {
+          ycol   <- ".ymax"
+          coords <- attr(ggdata, 'fit')
+        } else if (has_layer(params, 'trend')) {
+          coords <- attr(ggdata, 'fit')
+        }
+      }
+      
+      plyr::ddply(coords, ply_cols(facet.by), function (d) {
         
         if (is.null(xcol)) d[[xcol <- '.x']] <- 0
         

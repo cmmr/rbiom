@@ -43,8 +43,9 @@ corrplot_build <- function (params) {
   init_layers(
     params  = params,
     choices = c(
-      't' = "trend", 'c' = "confidence", 
-      'p' = "point", 'n' = "name", 'r' = "residual" ) )
+      't' = "trend", 'c' = "confidence", 'p' = "point", 
+      'n' = "name", 'r' = "residual" ) )
+  
   
   
   #________________________________________________________
@@ -71,7 +72,7 @@ corrplot_build <- function (params) {
   #________________________________________________________
   # Do the model fitting just once.
   #________________________________________________________
-  if (any(has_layer(params, c('confidence', 'trend', 'residual'))))
+  if (any(has_layer(params, c('confidence', 'trend', 'residual'))) || isTRUE(params$check))
     params$.models <- local({
       
       models <- with(params, {
@@ -102,9 +103,10 @@ corrplot_build <- function (params) {
   # Residual segments from trendline to point.
   #________________________________________________________
   
-  if (has_layer(params, 'residual')) {
+  if (has_layer(params, 'residual') || isTRUE(params$check)) {
     
-    set_layer(params, 'residual', 'mapping|yend' = ".pred")
+    if (has_layer(params, 'residual'))
+      set_layer(params, 'residual', 'mapping|yend' = ".yend")
     
     
     with(params, {
@@ -112,15 +114,20 @@ corrplot_build <- function (params) {
       attr(.ggdata, 'residual') <- plyr::ldply(.models, function (m) {
         
         mf <- model.frame(m)
+        mf$x %<>% signif(digits = 10)
         at <- list(x = unique(mf$x))
         
         emmeans::emmeans(m, specs = 'x', at = at) %>% 
           summary() %>% 
-          with(tibble(
-            x     = x, 
-            .pred = emmean %>% pmax(.dots$ci.min) %>% pmin(.dots$ci.max) )) %>%
+          with(tibble(x = x, .se = SE, .fitted = emmean)) %>%
           dplyr::right_join(mf, by = 'x') %>% 
-          dplyr::select(!!.xcol := x, !!.ycol := y, .pred) %>% 
+          dplyr::mutate(
+            .residual = y - .fitted,
+            .yend     = .fitted %>% pmax(.dots$ci.min) %>% pmin(.dots$ci.max), 
+            .sd       = sqrt(nrow(mf)) * .se,
+            .std.res  = .residual / .sd ) %>% 
+          dplyr::select(!!.xcol := x, !!.ycol := y, dplyr::starts_with('.')) %>% 
+          dplyr::relocate(.yend, .se, .sd, .after = ".std.res") %>% 
           suppressWarnings() %>% 
           tryCatch(error = function (e) tibble())
         
@@ -232,17 +239,20 @@ corrplot_build <- function (params) {
   
   
   
-  
   #________________________________________________________
   # Build the plot.
   #________________________________________________________
-  fig <- params %>% 
+  p <- params %>% 
     corrplot_stats() %>% 
     plot_facets() %>% 
     plot_build()
   
   
-  return (fig)
+  
+  attr(p, 'models') <- params$.models
+  
+  
+  return (p)
 }
 
 

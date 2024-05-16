@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 biom <- rarefy(hmp50)
 
 bdiv_boxplot(
-  biom     = biom, 
+  biom     = subset(biom, `Body Site` %in% c("Buccal mucosa", "Saliva")), 
   x        = "==Sex", 
   bdiv     = c("Bray-Curtis", "Euclidean"), 
-  facet.by = list("==Body Site" = c("Buccal mucosa", "Saliva")) )
+  facet.by = "==Body Site" )
 
 ```

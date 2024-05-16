@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,14 +49,13 @@
     <a class="dropdown-item" href="articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="articles/regression.html">Regression</a>
     <a class="dropdown-item" href="reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -127,7 +126,7 @@
 <h4 id="summarize-counts-by-taxonomic-rank">Summarize counts by taxonomic rank.<a class="anchor" aria-label="anchor" href="#summarize-counts-by-taxonomic-rank"></a>
 </h4>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">30</span>, color.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">30</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-taxa-1.png"><!-- --></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span></span></code></pre></div>

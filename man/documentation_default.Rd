@@ -214,7 +214,7 @@ Default: \code{FALSE}}
 \code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}
 
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
-Default: \code{'lm'}}
+Default: \code{'gam'}}
 
 \item{at}{Position(s) along the x-axis where the means or slopes should be
 evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
@@ -225,6 +225,9 @@ and selects the position where the p-value is most significant.}
 (greater than \code{mu}). Default: \code{'!='}}
 
 \item{mu}{Reference value to test against. Default: \code{0}}
+
+\item{check}{Generate additional plots to aid in assessing data normality.
+Default: \code{FALSE}}
 
 \item{within, between}{Dataset field(s) for intra- or inter- sample
 comparisons. Alternatively, dataset field names given elsewhere can

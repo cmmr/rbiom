@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9126</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,14 +31,13 @@
     <a class="dropdown-item" href="../articles/rbiom.html">Getting Started</a>
     <a class="dropdown-item" href="../articles/importing.html">Importing Your Data</a>
     <a class="dropdown-item" href="../reference/rbiom_objects.html">Working with rbiom Objects</a>
-    <a class="dropdown-item" href="../articles/diversity.html">Diversity Metrics</a>
     <a class="dropdown-item" href="../articles/statistics.html">Statistics</a>
+    <a class="dropdown-item" href="../articles/regression.html">Regression</a>
     <a class="dropdown-item" href="../reference/speed.html">Speed Ups</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Plotting</h6>
     <a class="dropdown-item" href="../articles/plots.html">Plot Types</a>
     <a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a>
-    <a class="dropdown-item" href="../articles/scales.html">Scales and Transformations</a>
   </div>
 </li>
 <li class="nav-item">
@@ -76,10 +75,8 @@
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tracks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  grid <span class="op">=</span> <span class="st">"devon"</span>,</span>
-<span>  color.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  limit.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  label_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rescale <span class="op">=</span> <span class="st">"none"</span>,</span>
@@ -124,31 +121,17 @@ relationships of the taxa in <code>biom</code>. Only required when
 computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 
 
+<dt>tracks</dt>
+<dd><p>A character vector of metadata fields to display as tracks
+at the top of the plot. Or, a list as expected by the <code>tracks</code>
+argument of <code><a href="plot_heatmap.html">plot_heatmap()</a></code>. Default: <code>NULL</code></p></dd>
+
+
 <dt>grid</dt>
 <dd><p>Color palette name, or a list with entries for <code>label</code>,
 <code>colors</code>, <code>range</code>, <code>bins</code>, <code>na.color</code>, and/or
 <code>guide</code>. See the Track Definitions section for details.
 Default: <code>"devon"</code></p></dd>
-
-
-<dt>color.by</dt>
-<dd><p>Add annotation tracks for these metadata column(s).
-See "Annotation Tracks" section below for details.
-Default: <code>NULL</code></p></dd>
-
-
-<dt>order.by</dt>
-<dd><p>Which metadata column(s) to use for ordering the samples
-across the x and y axes. Overrides any <code>clust</code> argument.
-See "Ordering and Limiting" section below for details.
-Default: <code>NULL</code></p></dd>
-
-
-<dt>limit.by</dt>
-<dd><p>Metadata definition(s) to use for sample subsetting prior
-to calculations.
-See "Ordering and Limiting" section below for details.
-Default: <code>NULL</code></p></dd>
 
 
 <dt>label</dt>
@@ -251,23 +234,20 @@ respectively.</p>
 cases are provided below, with more thorough documentation available at
 https://cmmr.github.io/rbiom .</p>
 <div class="sourceCode"><pre><code><span><span class="co">## Categorical ----------------------------</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span>, <span class="st">'colors'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span><span class="op">)</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Numeric --------------------------------</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="st">"Age"</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Age'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="cn">NA</span><span class="op">)</span>, <span class="st">'colors'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span> <span class="co"># at least 20 years old</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span> <span class="co"># between 20 and 40 years old (inclusive)</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="st">"Age"</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Age'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Multiple Tracks ------------------------</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span>, <span class="st">'Age'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span></span>
-<span><span class="va">color.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="st">"bright"</span>, <span class="st">'Age'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span></span>
+<span><span class="va">tracks</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Stool'</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">'Saliva'</span> <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span>,</span>
-<span>  <span class="st">'Age'</span>       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span>, <span class="st">'colors'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<span>  <span class="st">'Age'</span>       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'colors'</span> <span class="op">=</span> <span class="st">"reds"</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
 
 <p>The following entries in the track definitions are understood:</p>
 <ul><li><p><code>colors</code> -  A pre-defined palette name or custom set of colors to map to.</p></li>
@@ -290,47 +270,6 @@ https://cmmr.github.io/rbiom .</p>
 <code>"tokyo"</code>, <code>"turku"</code>, <code>"bam"</code>, <code>"berlin"</code>,
 <code>"broc"</code>, <code>"cork"</code>, <code>"lisbon"</code>, <code>"roma"</code>,
 <code>"tofino"</code>, <code>"vanimo"</code>, and <code>"vik"</code>.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="ordering-and-limiting">Ordering and Limiting<a class="anchor" aria-label="anchor" href="#ordering-and-limiting"></a></h2>
-    
-
-
-<p><b><code>order.by</code></b> controls which metadata column(s) are used to arrange
-samples on the plot. It also enables subsetting to a particular set or
-range of values. Prefix a column name with <code>-</code> to arrange values in
-descending order rather than ascending.</p>
-<div class="sourceCode"><pre><code><span><span class="co">## Categorical ----------------------------</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="st">"Body Site"</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Body Site'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stool"</span>, <span class="st">"Saliva"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Numeric --------------------------------</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="st">"-Age"</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'Age'</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="co"># at least 20 years old</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">'-Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span> <span class="co"># between 20 and 40 years old (inclusive)</span></span>
-<span></span>
-<span><span class="co">## Multiple / Mixed -----------------------</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span></span>
-<span><span class="va">order.by</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">'-Age'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-
-<p><b><code>limit.by</code></b> is used to specify a subset of samples without any
-side-effects on aesthetics. It is especially useful for limiting the data
-to a single categorical metadata value. Unlike the other *.by parameters,
-<code>limit.by</code> must always be a named <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>.</p>
-<div class="sourceCode"><pre><code>## Categorical ----------------------------
-limit.by = list('Sex' = "Male")
-
-## Numeric --------------------------------
-limit.by = list('Age' = c(20,NA)) # at least 20 years old
-limit.by = list('Age' = c(20,40)) # between 20 and 40 years old (inclusive)
-
-## Multiple / Mixed -----------------------
-limit.by = list(
-  'Sex'       = "Male", 
-  'Body Site' = c("Stool", "Saliva")
-  'Age'       = c(20,40) )
-</code></pre></div>
-
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -367,12 +306,11 @@ limit.by = list(
 <span class="r-in"><span>    <span class="co"># Keep and rarefy the 10 most deeply sequenced samples.</span></span></span>
 <span class="r-in"><span>    <span class="va">hmp10</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, color.by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in validate_meta("col_names", evar = var, null_ok = null_ok, ...):</span> could not find function "validate_meta"</span>
+<span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, tracks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="bdiv_heatmap-1.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, bdiv<span class="op">=</span><span class="st">"uni"</span>, weighted<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>,<span class="cn">F</span><span class="op">)</span>, color.by<span class="op">=</span><span class="st">"sex"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in validate_meta("col_names", evar = var, null_ok = null_ok, ...):</span> could not find function "validate_meta"</span>
-<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, bdiv<span class="op">=</span><span class="st">"uni"</span>, weighted<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>,<span class="cn">F</span><span class="op">)</span>, tracks<span class="op">=</span><span class="st">"sex"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="bdiv_heatmap-2.png" alt="" width="768" height="384"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
