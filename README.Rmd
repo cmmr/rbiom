@@ -64,7 +64,7 @@ biom   <- rarefy(infile)
 
 #### Explore associations with metadata.
 ```{r bdiv}
-# bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
+bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
 adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
 taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
 ```

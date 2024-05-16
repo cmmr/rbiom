@@ -50,17 +50,22 @@ biom   <- rarefy(infile)
 #### Explore associations with metadata.
 
 ``` r
-# bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
-adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
+bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
 ```
 
 ![](man/figures/README-bdiv-1.png)<!-- -->
 
 ``` r
-taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
+adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
 ```
 
 ![](man/figures/README-bdiv-2.png)<!-- -->
+
+``` r
+taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
+```
+
+![](man/figures/README-bdiv-3.png)<!-- -->
 
 #### Summarize counts by taxonomic rank.
 
