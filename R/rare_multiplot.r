@@ -15,7 +15,9 @@
 
 rare_multiplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
-    stat.by = NULL, facet.by = NULL) {
+    stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
+    test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
+    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   #________________________________________________________
@@ -25,11 +27,22 @@ rare_multiplot <- function (
     biom     = biom, 
     adiv     = adiv, 
     layers   = layers, 
-    rline    = rline,
+    rline    = rline, 
     stat.by  = stat.by, 
     facet.by = facet.by, 
-    test     = "none", 
-    caption  = FALSE )
+    colors   = colors, 
+    shapes   = shapes, 
+    test     = test, 
+    fit      = fit, 
+    at       = at, 
+    level    = level, 
+    p.adj    = p.adj, 
+    trans    = trans, 
+    alt      = alt, 
+    mu       = mu, 
+    caption  = caption, 
+    check    = check, 
+    ...  )
   
   stacked <- rare_stacked(
     biom  = biom, 

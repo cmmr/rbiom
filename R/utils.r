@@ -48,6 +48,16 @@ slurp_env <- function (..., .dots = FALSE) {
   rlang::env_unbind(env, '...')
   params <- lapply(as.list(env, all.names = TRUE), eval, envir = env)
   
+  
+  #____________________________________________________________________
+  # Move some parameters into dots.
+  #____________________________________________________________________
+  if (isTRUE(.dots) && hasName(params, 'y.trans')) {
+    params$.dots$y.trans <- params$y.trans
+    params$y.trans       <- NULL
+  }
+  
+  
   rlang::env_unbind(env, names(env))
   
   return (params)

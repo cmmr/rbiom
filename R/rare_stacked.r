@@ -44,17 +44,16 @@ rare_stacked <- function (
   
   biom <- as_rbiom(biom)
   
-  params <- eval_envir(environment(), ...)
-  cmd    <- sprintf("rare_stacked(%s)", as.args(params, 2, rare_stacked))
-  remove(list = intersect(env_names(params), ls()))
-  
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
+  params     <- slurp_env(..., .dots = TRUE)
   cache_file <- get_cache_file('rare_stacked', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
+  
+  params <- list2env(params)
   
   
   #________________________________________________________
@@ -109,10 +108,11 @@ rare_stacked <- function (
     .ggdata %<>% subset(.ymin > 0 & .ymax > 0) %>% as_rbiom_tbl()
     
     .xcol  <- ".sample"
-    .xlab  <- "Sample"
     .ycol  <- ".ymax"
-    .ylab  <- "Sequencing Depth"
     .xmode <- "factor"
+    
+    if (is.null(.dots$labs.x)) .dots$labs.x <- "Sample"
+    if (is.null(.dots$labs.y)) .dots$labs.y <- "Sequencing Depth"
   })
   
   
@@ -151,7 +151,8 @@ rare_stacked <- function (
     set_layer(params, 'labs',  fill = "Reads")
     set_layer(params, 'hline', yintercept = rline, color = "red", linetype="dashed")
     
-    if (isTRUE(params$counts))
+    if (isTRUE(params$counts)) {
+      
       set_layer(params, 'labs', subtitle = local({
         
         samples_before = length(ss)
@@ -173,6 +174,9 @@ rare_stacked <- function (
         return (paste0(samples_retained, "\n", reads_retained))
       }))
       
+      set_layer(params, 'theme', plot.subtitle = element_text(size=10)) 
+    }
+      
     remove("rline", "ss")
   }
   
@@ -180,13 +184,13 @@ rare_stacked <- function (
   
   # Convert layer definitions into a plot.
   #________________________________________________________
-  fig <- plot_build(params)
+  p <- plot_build(params)
   
   
-  attr(fig, 'cmd') <- cmd
-  set_cache_value(cache_file, fig)
+  attr(p, 'cmd') <- current_cmd('rare_stacked')
+  set_cache_value(cache_file, p)
   
-  return (fig)
+  return (p)
 }
 
 

@@ -77,7 +77,7 @@ plot_build <- function (params) {
     # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
     #______________________________________________________________
     if (!has_layer(params, 'labs')) add_layer(params, 'labs')
-    params$layers[['labs']][[axis]] <- sprintf("%s (%s scale)", label, trans)
+    params$layers[['labs']][[axis]] <- sprintf("%s\n(%s scale)", label, trans)
     
     
     
