@@ -34,7 +34,7 @@ not create a second object. See speed ups for more details.
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9130</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -177,7 +177,7 @@ validation checks and inter-component synchronization.</p><table class="table ta
 <span class="r-in"><span>    <span class="co"># Edit the metadata table.</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="mutate.html">mutate</a></span><span class="op">(</span>Obese <span class="op">=</span> <span class="va">BMI</span> <span class="op">&gt;=</span> <span class="fl">30</span>, Sex <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu">rename</span><span class="op">(</span><span class="st">'Years Old'</span> <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'Years Old'</span> <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .sample `Years Old`   BMI `Body Site`     rand Obese</span>

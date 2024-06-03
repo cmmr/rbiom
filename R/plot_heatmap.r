@@ -729,12 +729,12 @@ biom_tracks <- function (params) {
     
     if (is.null(names(val$colors))) {
       
-      validate_df_field('key', evar = 'tracks')
+      validate_df_field('key', evar = 'tracks', drop_na = FALSE)
       
     } else {
       
       # allow abbreviations in color mapping, e.g. sex = c(m = "blue", f = "red")
-      validate_df_field('key', evar = 'tracks', col_type = "cat", force = TRUE)
+      validate_df_field('key', evar = 'tracks', col_type = "cat", drop_na = FALSE)
       nms <- names(val$colors)
       validate_var_choices('nms', choices = levels(df[[key]]), evar = key, max = Inf)
       names(val$colors) <- nms

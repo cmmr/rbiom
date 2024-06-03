@@ -291,6 +291,12 @@ within.rbiom <- function (biom, ..., clone = TRUE) {
 #'     # Subset according to metadata (using base::subset)
 #'     biom <- subset(hmp50, `Body Site` %in% c('Saliva') & Age < 25)
 #'     biom$metadata
+#'     
+#'     # Remove samples with NA metadata values
+#'     biom <- mutate(hmp50, BS2 = na_if(`Body Site`, 'Saliva'))
+#'     biom$metadata
+#'     biom <- na.omit(biom)
+#'     biom$metadata
 #' 
 
 subset.rbiom <- function (biom, ..., clone = TRUE) {
@@ -302,7 +308,7 @@ subset.rbiom <- function (biom, ..., clone = TRUE) {
 
 #' @rdname subset
 #' @export
-`[.rbiom` <- function(biom, i) {
+`[.rbiom` <- function (biom, i) {
   
   #________________________________________________________
   # Sanity checks.
@@ -325,6 +331,23 @@ subset.rbiom <- function (biom, ..., clone = TRUE) {
   
   biom <- biom$clone()
   biom$counts <- biom$counts[,i]
+  return (biom)
+}
+
+#' @rdname subset
+#' @export
+na.omit.rbiom <- function (biom, fields = ".all", clone = TRUE) {
+  
+  if (isTRUE(clone)) biom <- biom$clone()
+  
+  if (length(fields) == 0) return (biom)
+  
+  if (eq(fields, ".all")) fields <- biom$fields
+  validate_biom_field('fields', max = Inf)
+  
+  keep <- complete.cases(biom$metadata[,fields,drop=FALSE])
+  biom$counts <- biom$counts[,keep]
+  
   return (biom)
 }
 

@@ -133,8 +133,11 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
         
         # Drop any row with an NA in a higher-order rank column.
         #________________________________________________________
-        if (eq(unc, "drop"))
-          mtx <- mtx[complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE]),,drop=FALSE]
+        if (eq(unc, "drop")) {
+          keep <- complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE])
+          otus <- otus[keep]
+          mtx  <- mtx[keep,,drop=FALSE]
+        }
         
         
         

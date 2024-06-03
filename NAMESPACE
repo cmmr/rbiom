@@ -150,7 +150,7 @@ importFrom("rlang",
 
 importFrom("slam", "is.simple_triplet_matrix", "as.simple_triplet_matrix", "row_sums", "col_sums")
 
-importFrom("stats", "as.dist", "aggregate", "fivenum", "model.frame", 
+importFrom("stats", "as.dist", "aggregate", "complete.cases", "fivenum", "model.frame", 
            "model.matrix", "na.omit", "setNames", "terms", "weighted.mean")
            # zzz.R also loads `df.residual` and `sigma`
 
@@ -178,6 +178,7 @@ S3method("[",          rbiom)
 S3method(as.list,      rbiom)
 S3method(glimpse,      rbiom)
 S3method(mutate,       rbiom)
+S3method(na.omit,      rbiom)
 S3method(pull,         rbiom)
 S3method(rename,       rbiom)
 S3method(subset,       rbiom)
@@ -210,6 +211,7 @@ export("left_join")
 export("ldply")
 export("llply")
 export("mutate")
+export("na.omit")
 export("pull")
 export("relocate")
 export("rename")

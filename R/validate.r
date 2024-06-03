@@ -489,7 +489,8 @@ validate_biom_field <- function (
     null_ok  = null_ok, 
     max      = max, 
     col_type = col_type, 
-    force    = FALSE )
+    force    = FALSE, 
+    drop_na  = FALSE )
   
   assign(var, x, pos = env)
   
@@ -499,7 +500,8 @@ validate_biom_field <- function (
 
 validate_df_field <- function (
     var, env = parent.frame(), evar = var, 
-    null_ok = FALSE, max = 1, col_type = NULL, force = TRUE ) {
+    null_ok = FALSE, max = 1, col_type = NULL, 
+    force = TRUE, drop_na = TRUE ) {
   
   x <- get(var, pos = env, inherits = FALSE)
   if (is.null(x) && null_ok) return (invisible(NULL))
@@ -548,11 +550,14 @@ validate_df_field <- function (
     if (eq(col_type, "num") && !is_num[[xi]])
       cli_abort("`{evar}` field '{xi}' is not numeric.")
     
+    if (isTRUE(drop_na))
+      df <- df[!is.na(df[[xi]]),,drop=FALSE]
+    
     x[[i]] <- xi
   }
   
   
-  if (isTRUE(force))
+  if (isTRUE(force) || isTRUE(drop_na))
     assign('df', df, pos = env)
   
   assign(var, unique(x), pos = env)

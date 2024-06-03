@@ -65,6 +65,7 @@ reference:
 - title: Subsetting
   contents:
   - subset.rbiom
+  - na.omit.rbiom
   - slice.rbiom
   - rarefy
   

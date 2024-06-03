@@ -4,11 +4,14 @@
 \alias{subset}
 \alias{subset.rbiom}
 \alias{[.rbiom}
+\alias{na.omit.rbiom}
 \title{Subset an rbiom object by sample names or metadata.}
 \usage{
 \method{subset}{rbiom}(biom, ..., clone = TRUE)
 
 \method{[}{rbiom}(biom, i)
+
+\method{na.omit}{rbiom}(biom, fields = ".all", clone = TRUE)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
@@ -34,6 +37,12 @@ Subset an rbiom object by sample names or metadata.
     
     # Subset according to metadata (using base::subset)
     biom <- subset(hmp50, `Body Site` \%in\% c('Saliva') & Age < 25)
+    biom$metadata
+    
+    # Remove samples with NA metadata values
+    biom <- mutate(hmp50, BS2 = na_if(`Body Site`, 'Saliva'))
+    biom$metadata
+    biom <- na.omit(biom)
     biom$metadata
 
 }

@@ -73,6 +73,8 @@ bdiv_ord_plot <- function (
     validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
     validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat")
     
+    na.omit(biom, clone = FALSE, fields = c(stat.by, facet.by))
+    
   })
   
   

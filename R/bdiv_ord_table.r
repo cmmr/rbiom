@@ -62,6 +62,7 @@ bdiv_ord_table <- function (
   validate_biom_field('stat.by',  null_ok = TRUE)
   validate_biom_field('split.by', null_ok = TRUE, col_type = "cat")
   
+  na.omit(biom, clone = FALSE, fields = c(stat.by, split.by))
   
   
   #________________________________________________________

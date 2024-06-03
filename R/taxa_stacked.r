@@ -108,6 +108,8 @@ taxa_stacked <- function (
     validate_biom_field('order.by', null_ok = TRUE, max = Inf)
     validate_biom_field('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
     
+    na.omit(biom, clone = FALSE, fields = c(label.by, order.by, facet.by))
+    
     if (biom$n_samples < 1)
       stop("At least one sample is needed for a stacked bar plot.")
   })

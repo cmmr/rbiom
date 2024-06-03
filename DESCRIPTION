@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9129
+Version: 2.0.0.9130
 Date: 2024-06-03
 Authors@R: c(
     person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
