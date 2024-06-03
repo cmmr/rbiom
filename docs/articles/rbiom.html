@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -194,11 +194,13 @@ Here we’ll import a dataset from a BIOM file.</p>
 <span><span class="co">#&gt; Unc01yki     0     0     0     0     0     0     0     0</span></span>
 <span><span class="co">#&gt; Unc53100  1083   543   301   223  2672   748  2436   321</span></span>
 <span><span class="co">#&gt; LtbAci52     0     0     0     0     0     0     0     0</span></span>
-<span><span class="co">#&gt; CnbTube3     0     0     0     0     0     0     0     0</span></span>
-<span></span>
+<span><span class="co">#&gt; CnbTube3     0     0     0     0     0     0     0     0</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">fields</span></span>
-<span><span class="co">#&gt; [1] ".sample"   "Age"       "BMI"       "Body Site" "Sex"</span></span>
-<span></span>
+<span><span class="co">#&gt; [1] ".sample"   "Age"       "BMI"       "Body Site" "Sex"</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Use pull() to automatically setNames().</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Age'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 </span></span>
@@ -217,24 +219,26 @@ rbiom object, use the object’s <code>$clone()</code> method.</p>
 <div class="container">
 <div class="row">
 <div class="col">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
 <span><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span>  <span class="co"># Correct</span></span>
 <span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
-<span><span class="co">#&gt; [1] 50</span></span>
-<span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 50</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 50</span></span></code></pre></div>
 </div>
 <div class="col">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
 <span><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">a</span>  <span class="co"># Wrong</span></span>
 <span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
-<span><span class="co">#&gt; [1] 50</span></span>
-<span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 50</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
 </div>
@@ -295,11 +299,12 @@ for additional details.</p>
 process drops samples with too few observations, and randomly removes
 observations from the remaining samples, so that all samples have the
 same “rarefaction depth”.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 </span></span>
-<span><span class="co">#&gt;  1660  1371  1353  1895  3939  4150</span></span>
-<span></span>
+<span><span class="co">#&gt;  1660  1371  1353  1895  3939  4150</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -313,7 +318,7 @@ same “rarefaction depth”.</p>
 <code>biom$metadata</code> (a tibble data.frame). The first column,
 <code>'.sample'</code>, is used by rbiom to link sample metadata to
 samples in the abundance table.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'A'</span>, <span class="st">'B'</span><span class="op">)</span>, <span class="va">biom</span><span class="op">$</span><span class="va">n_samples</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="../reference/mutate.html">mutate</a></span><span class="op">(</span>Obese <span class="op">=</span> <span class="va">BMI</span> <span class="op">&gt;=</span> <span class="fl">30</span>, Sex <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'Years Old'</span> <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></span>
@@ -334,7 +339,7 @@ samples in the abundance table.</p>
 </h3>
 <p>Removing samples from the metadata will remove those samples from the
 entire rbiom object.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">`Body Site`</span> <span class="op">==</span> <span class="st">"Anterior nares"</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 6</span></span></span>
@@ -345,8 +350,9 @@ entire rbiom object.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares A     TRUE </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
-<span><span class="va">biom</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">biom</span></span>
 <span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Human Microbiome Project - 50 Sample Demo</span><span style="color: #808080;"> ═══════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      10 Samples: HMP10, HMP15, HMP16, ..., and HMP48</span></span>
@@ -367,7 +373,7 @@ return calculation results for use outside of rbiom. The
 <code>_table</code> suffix indicates the returned object will be a
 tibble data.frame with one computed value per row. Alternatively,
 <code>_matrix</code> will return a base R matrix.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 9</span></span></span>
 <span><span class="co">#&gt;   .rank  .sample .taxa      .abundance `Years Old`   BMI `Body Site` group Obese</span></span>
@@ -377,8 +383,9 @@ tibble data.frame with one computed value per row. Alternatively,
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Phylum HMP10   Proteobac…          3          22    20 Anterior n… B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Phylum HMP10   Bacteroid…          7          22    20 Anterior n… B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Phylum HMP10   Cyanobact…          0          22    20 Anterior n… B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 55 more rows</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 55 more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/taxa_matrix.html">taxa_matrix</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                     HMP10 HMP15 HMP16 HMP25 HMP31 HMP32 HMP34 HMP40</span></span>
 <span><span class="co">#&gt; Actinobacteria        676   862   648   442   670   606  1031   879</span></span>
@@ -405,7 +412,7 @@ of all the different plot options, and <a href="aes.html">Mapping
 Metadata to Aesthetics</a> for guidance on using colors, shapes, and
 patterns to represent metadata values.</p>
 <p>For example, to display an ordination colored by body site:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hmp50</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rbiom_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 <p><code><a href="../reference/adiv_boxplot.html">adiv_boxplot()</a></code>, <code><a href="../reference/adiv_corrplot.html">adiv_corrplot()</a></code>,
@@ -432,14 +439,15 @@ the table.</li>
 </ul>
 <p>The <a href="stats.html">Statistics</a> article reviews this topic in
 greater detail.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">hmp50</span>, color.by <span class="op">=</span> <span class="st">"Body Site"</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
 <p><img src="rbiom_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">stats</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">stats</span><span class="op">$</span><span class="va">code</span></span>
 <span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p><code><a href="../reference/adiv_stats.html">adiv_stats()</a></code>, <code><a href="../reference/bdiv_stats.html">bdiv_stats()</a></code>,

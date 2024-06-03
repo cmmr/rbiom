@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,7 +164,7 @@ respectively.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">rare_stacked</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="rare_stacked-1.png" alt="" width="768" height="384"></span>
@@ -184,7 +184,8 @@ respectively.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     linetype   = <span style="color: #BBBB00;">"dashed"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     fill = <span style="color: #BBBB00;">"Reads"</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     y    = <span style="color: #BBBB00;">".ymax (log10 scale)"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     x    = <span style="color: #BBBB00;">"Sample"</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     y    = <span style="color: #BBBB00;">"Sequencing Depth\n(log10 scale)"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_discrete</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     labels = scales::<span style="color: #00BBBB;">label_number</span><span style="color: #BB00BB;">(</span>scale_cut = scales::<span style="color: #00BBBB;">cut_si(</span><span style="color: #BBBB00;">""</span><span style="color: #00BBBB;">)</span><span style="color: #BB00BB;">)</span>, </span>

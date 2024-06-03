@@ -114,7 +114,7 @@ boxplot_build <- function (params) {
   # Help multiple layers overlay well together
   #________________________________________________________
   
-  dodged    <- !(is.null(params$stat.by) || !eq(params$.xcol, params$stat.by))
+  dodged    <- !eq(params$.xcol, params$stat.by)
   patterned <- !is.null(params$patterns)
   dotted    <- has_layer(params, c('dot', 'strip')) %>% any()
   
@@ -228,11 +228,14 @@ boxplot_build <- function (params) {
     if (dodged)
       set_layer(params, 'dot', dodge.width = 0.8)
     
+    if (patterned)
+      set_layer(params, 'dot', fill = "black")
+    
     if (any(has_layer(params, c("violin", "box", "bar"))))
       set_layer(params, 'dot', color = "black", fill = "black")
     
     if (any(has_layer(params, c("crossbar", "errorbar", "linerange", "pointrange"))))
-      set_layer(params, 'dot', stroke = 0, alpha = 0.4)
+      set_layer(params, 'dot', alpha = 0.4)
   }
   
   
@@ -250,15 +253,15 @@ boxplot_build <- function (params) {
     if (dodged)
       set_layer(params, 'strip', dodge.width = 0.8)
     
+    if (patterned)
+      set_layer(params, 'strip', fill = "black")
+    
     if (any(has_layer(params, c("violin", "box", "bar"))))
-      set_layer(params, 'strip', color = "black")
+      set_layer(params, 'strip', color = "black", fill = "black")
     
     if (any(has_layer(params, c("crossbar", "errorbar", "linerange", "pointrange")))) {
       
       set_layer(params, 'strip', alpha = 0.4)
-      
-      if (is_null(params$shape.by))
-        set_layer(params, 'strip', stroke = 0)
     }
   }
   

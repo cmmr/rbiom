@@ -187,7 +187,7 @@ letters instead of shapes on the plot. Text strings may used as well.
 ``` r
 # One categorical metadata field may be specified.
 stat.by = "Body Site"
-stat.by = "Sex", shapes = c("Stool", "Saliva")
+stat.by = "Sex", shapes = c(7, 8)
 stat.by = "Sex", shapes = c('Stool' = 7, 'Saliva' = 8)
 ```
 

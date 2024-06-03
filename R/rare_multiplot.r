@@ -8,7 +8,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
 #'     rare_multiplot(hmp50, stat.by = "Body Site")
 #'     

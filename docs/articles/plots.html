@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -183,8 +183,9 @@ that the single letter abbreviation for “box” is “x” (“bar” is “b�
 <span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/taxa_boxplot.html">taxa_boxplot</a></span><span class="op">(</span></span>
 <span>  biom <span class="op">=</span> <span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"p"</span>, x <span class="op">=</span> <span class="st">"Body Site"</span>, p.label <span class="op">=</span> <span class="fl">0</span>, taxa <span class="op">=</span> <span class="fl">3</span>, </span>
 <span>  facet.ncol <span class="op">=</span> <span class="fl">1</span>, facet.strip.position <span class="op">=</span> <span class="st">"right"</span> <span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in fun(...): Ignoring unknown parameters: `top`</span></span>
-<span></span>
+<span><span class="co">#&gt; Warning in fun(...): Ignoring unknown parameters: `top`</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">adiv</span>, <span class="va">bdiv</span>, <span class="va">taxa</span><span class="op">)</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">p</span> <span class="op">+</span> </span>
@@ -231,7 +232,7 @@ plot’s <code>layers</code> parameter.</p>
 <div class="section level3">
 <h3 id="examples-1">Examples<a class="anchor" aria-label="anchor" href="#examples-1"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span>, depth <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">adiv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adiv_corrplot.html">adiv_corrplot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"ts"</span>, x <span class="op">=</span> <span class="st">"BMI"</span><span class="op">)</span></span>
@@ -271,7 +272,7 @@ the taxa.</p>
 <div class="section level3">
 <h3 id="examples-2">Examples<a class="anchor" aria-label="anchor" href="#examples-2"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"pse"</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -298,7 +299,7 @@ common use cases below operate on a biom object.</p>
 <div class="section level3">
 <h3 id="examples-3">Examples<a class="anchor" aria-label="anchor" href="#examples-3"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bdiv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_heatmap.html">bdiv_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Body Site"</span><span class="op">)</span>, asp <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
@@ -316,7 +317,7 @@ Both have their own advantages.</p>
 <div class="section level3">
 <h3 id="examples-4">Examples<a class="anchor" aria-label="anchor" href="#examples-4"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span>, taxa <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plots_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
 </div>

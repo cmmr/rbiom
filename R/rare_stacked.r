@@ -29,7 +29,7 @@
 #' 
 #' @export
 #' @examples
-#'     library(rbiom)
+#'     library(rbiom) 
 #'     
 #'     rare_stacked(hmp50)
 #'     

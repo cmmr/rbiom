@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,8 +123,9 @@ R package.</li>
 <span><span class="co">#&gt; OTU3     600     732     402     289</span></span>
 <span><span class="co">#&gt; OTU4     157     772     195     678</span></span>
 <span><span class="co">#&gt; OTU5       7     874     403     735</span></span>
-<span><span class="co">#&gt; OTU6     466     174      63     195</span></span>
-<span></span>
+<span><span class="co">#&gt; OTU6     466     174      63     195</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># convert matrix to rbiom -----------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
@@ -136,8 +137,9 @@ R package.</li>
 <span><span class="co">#&gt;       1 Fields:  .sample</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-05-16 ──</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co"># convert from phyloseq to rbiom ----------------</span></span>
 <span><span class="va">file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"rich_sparse_otu_table.biom"</span>, package<span class="op">=</span><span class="st">"phyloseq"</span><span class="op">)</span></span>
@@ -146,8 +148,9 @@ R package.</li>
 <span><span class="co">#&gt; phyloseq-class experiment-level object</span></span>
 <span><span class="co">#&gt; otu_table()   OTU Table:         [ 5 taxa and 6 samples ]</span></span>
 <span><span class="co">#&gt; sample_data() Sample Data:       [ 6 samples by 4 sample variables ]</span></span>
-<span><span class="co">#&gt; tax_table()   Taxonomy Table:    [ 5 taxa by 7 taxonomic ranks ]</span></span>
-<span></span>
+<span><span class="co">#&gt; tax_table()   Taxonomy Table:    [ 5 taxa by 7 taxonomic ranks ]</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">phy</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Imported PhyloSeq Data</span><span style="color: #808080;"> ══════════════════════════════════</span></span></span>
@@ -158,7 +161,7 @@ R package.</li>
 <span><span class="co">#&gt;       5 Fields:  .sample, BarcodeSequence, ...</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2024-05-16 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
 <p>Now we have <code>biom</code>, an rbiom-class object that can be used
 with this package’s functions. If you loaded your data from a BIOM file
 or phyloseq object, it might already include metadata, ranks, and a
@@ -178,7 +181,7 @@ sample.</p>
 <li>Other column names cannot start with a dot (<code>.</code>).</li>
 <li>Sample names need to match <code>biom$samples</code>.</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create example metadata -----------------------</span></span>
 <span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  .sample   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>,</span>
@@ -190,8 +193,9 @@ sample.</p>
 <span><span class="co">#&gt; 1 Sample1    TX  32         1</span></span>
 <span><span class="co">#&gt; 2 Sample2    TX  19         2</span></span>
 <span><span class="co">#&gt; 3 Sample3    WA  36         1</span></span>
-<span><span class="co">#&gt; 4 Sample4    WA  40         2</span></span>
-<span></span>
+<span><span class="co">#&gt; 4 Sample4    WA  40         2</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># add metadata to rbiom object ------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">md</span></span>
@@ -204,8 +208,9 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-05-16 ──</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># or in a single step ---------------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">mtx</span>, metadata <span class="op">=</span> <span class="va">md</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
@@ -217,22 +222,24 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-05-16 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="setting-categorical-variables">Setting categorical variables<a class="anchor" aria-label="anchor" href="#setting-categorical-variables"></a>
 </h3>
 <p>Any categorical metadata variable that looks numerical, such as
 “treatment” in the above example, will need to be manually changed to a
 categorical variable.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'treatment'</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "numeric"</span></span>
-<span></span>
+<span><span class="co">#&gt; [1] "numeric"</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">treatment</span> <span class="op">%&lt;&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'treatment'</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "factor"</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'treatment'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "factor"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'treatment'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Sample1 Sample2 Sample3 Sample4 </span></span>
 <span><span class="co">#&gt;       1       2       1       2 </span></span>
 <span><span class="co">#&gt; Levels: 1 2</span></span></code></pre></div>
@@ -243,7 +250,7 @@ categorical variable.</p>
 </h2>
 <p>Use <code>$tree</code> to set the tree. You can specify a phylo
 object directly, or a newick file/string.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># define a random tree --------------------------</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">"(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"</span></span>
 <span><span class="va">biom</span></span>
@@ -255,14 +262,14 @@ object directly, or a newick file/string.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;present&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-05-16 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="attach-taxonomy">Attach taxonomy<a class="anchor" aria-label="anchor" href="#attach-taxonomy"></a>
 </h2>
 <p>Use <code>$taxonomy</code> to define taxonomic clades for each
 OTU.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># .otu must match otu_names(biom) ---------------</span></span>
 <span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  .otu   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>,</span>
@@ -275,8 +282,9 @@ OTU.</p>
 <span><span class="co">#&gt; 3 OTU3    Firmicutes    Bacillales</span></span>
 <span><span class="co">#&gt; 4 OTU4 Bacteroidetes   Bacteroidia</span></span>
 <span><span class="co">#&gt; 5 OTU5    Firmicutes Clostridiales</span></span>
-<span><span class="co">#&gt; 6 OTU6    Firmicutes    Bacillales</span></span>
-<span></span>
+<span><span class="co">#&gt; 6 OTU6    Firmicutes    Bacillales</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span> <span class="op">&lt;-</span> <span class="va">map</span></span>
 <span><span class="va">biom</span></span>
 <span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
@@ -287,7 +295,7 @@ OTU.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;present&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-05-16 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

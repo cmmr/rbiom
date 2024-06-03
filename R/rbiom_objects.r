@@ -597,8 +597,8 @@ rbiom <- R6::R6Class(
         
         if (is.factor(value[[i]])) {
           lvls <- levels(value[[i]])
-          if (length(i <- which(lvls != trimws(lvls))) > 0) {
-            cli_warn("Whitespace trimmed from {.field {i}} column value{?s} {.val {lvls[i]}}.")
+          if (length(j <- which(lvls != trimws(lvls))) > 0) {
+            cli_warn("Whitespace trimmed from {.field {i}} column {qty(length(j))} value{?s} {.val {lvls[j]}}.")
             levels(value[[i]]) %<>% trimws()
           }
         }

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9128</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9129</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -269,12 +269,12 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-in"><span>    <span class="va">p</span><span class="op">$</span><span class="va">stats</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    gam(c(.diversity ~ s(`Age (days)`, by = `Delivery mode`, bs = "cs")</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   + , `Delivery mode`), method = "REML")</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 14</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `Age (days)` `Delivery mode`   .mean.diff .h1     .p.val   .adj.p .effect.size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>         218. Cesarean - Vagin…      0.414 != 0  2.68<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> 2.68<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span>        0.694</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 7 more variables: .se &lt;dbl&gt;, .n &lt;int&gt;, .df &lt;int&gt;, .t.ratio &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .aic &lt;dbl&gt;, .bic &lt;dbl&gt;, .loglik &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: .se &lt;dbl&gt;, .n &lt;int&gt;, .df &lt;int&gt;, .t.ratio &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .adj.r &lt;dbl&gt;, .aic &lt;dbl&gt;, .bic &lt;dbl&gt;, .loglik &lt;dbl&gt;</span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">p</span><span class="op">$</span><span class="va">code</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ggplot</span><span style="color: #BBBB00;">(</span>data, <span style="color: #00BBBB;">aes</span><span style="color: #BB00BB;">(</span>x = `Age (days)`, y = .diversity<span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>

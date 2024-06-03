@@ -128,7 +128,7 @@ get_n_shapes <- function (n, values = NULL) {
   
   if (is_null(values))
     values <- local({
-      if (n <= 6)  return (c(16, 17, 15, 3, 7, 8))
+      if (n <= 3)  return (15:17)
       if (n <= 15) return (c(0:14))
       return (c(65:90, 97:122))
     })

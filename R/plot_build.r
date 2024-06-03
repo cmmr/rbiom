@@ -140,8 +140,8 @@ plot_build <- function (params) {
     "stack"      = c('color', 'fill'),
     "pointrange" = c('color', 'fill', 'shape'),
     "point"      = c('color',         'shape'),
-    "dot"        = c('color',         'shape'),
-    "strip"      = c('color',         'shape') )
+    "dot"        = c('color', 'fill', 'shape'),
+    "strip"      = c('color', 'fill', 'shape') )
   
   args <- list()
   

@@ -134,7 +134,7 @@ letters instead of shapes on the plot. Character strings may used as well.
 }
 
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
     rare_multiplot(hmp50, stat.by = "Body Site")
     
