@@ -368,7 +368,7 @@ boxplot_build <- function (params) {
       params = params, 
       layer  = 'stripe',
       'data'    = as.cmd(data.frame(x = stripe_x), list(stripe_x = stripe_x)),
-      'mapping' = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf),
+      'mapping' = aes(xmin = x - 0.5, xmax = x + 0.5, ymin = -Inf, ymax = Inf, x = NULL, y = NULL),
       'fill'    = 'black', color = NA, alpha = 0.05 )
     
     remove("stripe_x")
