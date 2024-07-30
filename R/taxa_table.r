@@ -318,7 +318,15 @@ taxa_means <- function (biom, rank = 0) {
     sort(decreasing = TRUE)
 }
 
+#' @rdname taxa_max
+#' @export
 
+taxa_max <- function (biom, rank = 0) {
+
+    taxa_matrix(biom, rank, sparse = TRUE) %>%
+    slam::rowapply_simple_matrix(x = ., FUN = max, na.rm = TRUE) %>%
+    sort(descending = TRUE)
+}
 
 
 #' Apply `p.top` constraint to data about to be plotted.
