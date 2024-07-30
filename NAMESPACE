@@ -44,6 +44,7 @@ export(`taxa_corrplot`)
 export(`taxa_heatmap`)
 export(`taxa_map`)
 export(`taxa_matrix`)
+export(`taxa_max`)
 export(`taxa_means`)
 export(`taxa_stacked`)
 export(`taxa_stats`)
@@ -130,7 +131,7 @@ importFrom("grDevices", "boxplot.stats")
 importFrom("ggplot2", "aes", "ggplot", "ggplot_add", "ggproto")
 importFrom("lifecycle", "deprecate_warn", "deprecated")
 importFrom("magrittr","%>%", "%<>%")
-importFrom("methods", "is", "as")
+importFrom("methods", "as", "is", "formalArgs")
 importFrom("Rcpp", "sourceCpp")
 
 importFrom("rlang",
@@ -164,9 +165,9 @@ importFrom("dplyr",
 
 importFrom("tibble", "tibble", "as_tibble", "as_tibble_col", "has_rownames", "is_tibble", "rownames_to_column")
 
-importFrom("utils", "download.file", "head", "write.table", "read.csv", 
-           "read.delim", "packageDescription", "packageVersion",
-           "capture.output")
+importFrom("utils", "capture.output", "download.file", "getFromNamespace", "hasName", "head", 
+           "object.size", "packageDescription", "packageVersion", "read.csv", "read.delim", 
+           "write.table")
 
 
 S3method(as_rbiom,     rbiom)

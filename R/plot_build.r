@@ -71,7 +71,13 @@ plot_build <- function (params) {
     label <- params$layers[['labs']][[axis]] %||% params[[var]] %||% ''
     trans <- params$layers[[layer]][['trans']]
     
-    if (is.null(trans)) next
+    if (is.null(trans)) {
+      
+      # Default to hiding the axis label
+      set_layer(params, 'labs', setNames(list(NULL), axis))
+      
+      next
+    }
     
     
     # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
@@ -242,7 +248,7 @@ plot_build <- function (params) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'ggtree', 'confidence', 'stats_bg', 'stripe', 'density', 'violin', 
+    'ggplot', 'confidence', 'stats_bg', 'stripe', 'density', 'violin', 
     'residual', 'point', 'trend', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip', 
     'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean', 
     'arrow', 'taxon', 'brackets', 'stats_vline', 'stats_label', 'stats_text', 'stack', 'hline', 'vline', 

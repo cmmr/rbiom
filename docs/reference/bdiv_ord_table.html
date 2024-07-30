@@ -12,7 +12,7 @@ p.adj) only only have an effect when rank is not NULL."><!-- mathjax --><script 
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9130</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9134</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@ p.adj) only only have an effect when rank is not NULL."><!-- mathjax --><script 
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_ord_table</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
 <span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  ord <span class="op">=</span> <span class="st">"UMAP"</span>,</span>
+<span>  ord <span class="op">=</span> <span class="st">"PCoA"</span>,</span>
 <span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  md <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -112,11 +112,11 @@ Multiple/abbreviated values allowed.</p></dd>
 
 
 <dt>ord</dt>
-<dd><p>Method for reducing dimensionality. Options are:</p><ul><li><p><code>"UMAP"</code> -  Uniform manifold approximation and projection; <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>.</p></li>
-<li><p><code>"PCoA"</code> -  Principal coordinate analysis; <code><a href="https://rdrr.io/pkg/ape/man/pcoa.html" class="external-link">ape::pcoa()</a></code>.</p></li>
+<dd><p>Method for reducing dimensionality. Options are:</p><ul><li><p><code>"PCoA"</code> -  Principal coordinate analysis; <code><a href="https://rdrr.io/pkg/ape/man/pcoa.html" class="external-link">ape::pcoa()</a></code>.</p></li>
+<li><p><code>"UMAP"</code> -  Uniform manifold approximation and projection; <code><a href="https://jlmelville.github.io/uwot/reference/umap.html" class="external-link">uwot::umap()</a></code>.</p></li>
 <li><p><code>"NMDS"</code> -  Nonmetric multidimensional scaling; <code><a href="https://rdrr.io/pkg/vegan/man/metaMDS.html" class="external-link">vegan::metaMDS()</a></code>.</p></li>
 <li><p><code>"tSNE"</code> -  t-distributed stochastic neighbor embedding; <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne::tsne()</a></code>.</p></li>
-</ul><p>Default: <code>"UMAP"</code> <br><br>
+</ul><p>Default: <code>"PCoA"</code> <br><br>
 Multiple/abbreviated values allowed.</p></dd>
 
 

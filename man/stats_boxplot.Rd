@@ -14,6 +14,7 @@ stats_boxplot(
   colors = TRUE,
   shapes = TRUE,
   patterns = FALSE,
+  test = "auto",
   flip = FALSE,
   stripe = NULL,
   ci = "ci",
@@ -70,6 +71,10 @@ vector mapping groups to specific pattern names.
 See "Aesthetics" section below for additional information.
 Default: \code{FALSE}}
 
+\item{test}{Method for computing p-values: \code{'auto'} or \code{'none'}. \code{'auto'}
+will choose Wilcox or Kruskal-Wallis depending on the number of
+groups.}
+
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
 
@@ -117,9 +122,6 @@ Default: \code{TRUE}}
 Prefix a parameter name with a layer name to pass it to only that
 layer. For instance, \code{d.size = 2} ensures only the points on the
 \bold{dot} layer have their size set to \code{2}.}
-
-\item{test}{Method for computing p-values: \code{'none'}, \code{'emmeans'}, or
-\code{'emtrends'}. Default: \code{'emmeans'}}
 }
 \value{
 A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,

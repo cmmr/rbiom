@@ -302,7 +302,7 @@ taxa_matrix <- function (
 taxa_sums <- function (biom, rank = 0) {
   
   taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::row_sums() %>%
+    slam::row_sums(na.rm = TRUE) %>%
     sort(decreasing = TRUE)
 }
 
@@ -314,18 +314,19 @@ taxa_sums <- function (biom, rank = 0) {
 taxa_means <- function (biom, rank = 0) {
   
   taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::row_means() %>%
+    slam::row_means(na.rm = TRUE) %>%
     sort(decreasing = TRUE)
 }
 
-#' @rdname taxa_max
+
+#' @rdname taxa_sums
 #' @export
 
 taxa_max <- function (biom, rank = 0) {
 
-    taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::rowapply_simple_matrix(x = ., FUN = max, na.rm = TRUE) %>%
-    sort(descending = TRUE)
+  taxa_matrix(biom, rank, sparse = TRUE) %>%
+    slam::rowapply_simple_triplet_matrix(max, na.rm = TRUE) %>%
+    sort(decreasing = TRUE)
 }
 
 

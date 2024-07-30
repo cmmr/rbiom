@@ -264,6 +264,7 @@ stats_model_str <- function (fit, stat.by = FALSE, regr = ".regr", resp = ".resp
   
   frm  <- stats_formula(fit, stat.by, regr, resp)
   args <- if (eq(fit, "gam")) list(method = "REML") else list()
+  if (eq(fit, "log")) fit <- "lm"
   
   glue("{fit}({as.args(c(list(frm), args))})")
 }

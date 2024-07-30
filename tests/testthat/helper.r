@@ -1,8 +1,8 @@
 
-# rare50 <- sample_rarefy(hmp50)
-# min50  <- biom_build(counts = otu_matrix(hmp50))
-# 
-# hmp5  <- sample_select(hmp50, 1:5)
-# rare5 <- sample_rarefy(hmp5)
-# min5  <- biom_build(counts = otu_matrix(hmp5))
+rare50 <- rarefy(hmp50)
+# min50  <- as_rbiom(list(counts = hmp50$counts))
+
+hmp5  <- hmp50[1:5]
+rare5 <- rarefy(hmp5)
+min5  <- as_rbiom(list(counts = hmp5$counts))
 

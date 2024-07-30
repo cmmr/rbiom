@@ -139,6 +139,8 @@ write_biom_tsv <- function (biom, file) {
 
 write_biom_json <- function (biom, file) {
   
+  metadata <- biom$metadata
+  
   json <- jsonlite::toJSON(
     auto_unbox = TRUE, 
     x          = list(
@@ -179,10 +181,11 @@ write_biom_json <- function (biom, file) {
       
       # Sample IDs and Metadata
       #________________________________________________________
-      columns = apply(biom$metadata, 1L, function (x) {
+      columns = lapply(seq_len(nrow(metadata)), function (i) {
+        row <- as.list(metadata[i,])
         list(
-          id       = x[[1]], 
-          metadata = if (length(x) > 1) as.list(x[-1]) else NULL )
+          id       = row[[1]], 
+          metadata = if (length(row) > 1) row[-1] else NULL )
       }),
       
       

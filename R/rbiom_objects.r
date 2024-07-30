@@ -24,19 +24,19 @@
 #' 
 #' Reading from fields will not change the rbiom object.
 #' 
-#' | **Accessor**             | **Content**                                              |
-#' | ------------------------ | -------------------------------------------------------- |
-#' | `$counts`                | Abundance of each OTU in each sample.                    |
-#' | `$metadata`              | Sample mappings to metadata (treatment, patient, etc).   |
-#' | `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).    |
-#' | `$otus`, `$n_otus`       | OTU names.                                               |
-#' | `$samples`, `$n_samples` | Sample names.                                            |
-#' | `$fields`, `$n_fields`   | Metadata field names.                                    |
-#' | `$ranks`, `$n_ranks`     | Taxonomic rank names.                                    |
-#' | `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`.   |
-#' | `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `NULL`. |
-#' | `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.              |
-#' | `$date`                  | Date from BIOM file.                                     |
+#' | **Accessor**             | **Content**                                            |
+#' | ------------------------ | ------------------------------------------------------ |
+#' | `$counts`                | Abundance of each OTU in each sample.                  |
+#' | `$metadata`              | Sample mappings to metadata (treatment, patient, etc). |
+#' | `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).  |
+#' | `$otus`, `$n_otus`       | OTU names.                                             |
+#' | `$samples`, `$n_samples` | Sample names.                                          |
+#' | `$fields`, `$n_fields`   | Metadata field names.                                  |
+#' | `$ranks`, `$n_ranks`     | Taxonomic rank names.                                  |
+#' | `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
+#' | `$id`, `$comment`        | Arbitrary strings for describing the dataset.          |
+#' | `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
+#' | `$date`                  | Date from BIOM file.                                   |
 #' 
 #' \cr
 #' 
@@ -46,17 +46,17 @@
 #' Assigning new values to these components will trigger 
 #' validation checks and inter-component synchronization.
 #' 
-#' | **Component**     | **What can be assigned.**                               |
-#' | ----------------- | ------------------------------------------------------- |
-#' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns)  |
-#' | `$metadata`       | data.frame with `'.sample'` column, or a file name      |
-#' | `$taxonomy`       | data.frame with `'.otu'` as the first column            |
-#' | `$otus`           | character vector with new names for the OTUs            |
-#' | `$samples`        | character vector with new names for the samples         |
-#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs    |
-#' | `$sequences`      | character vector of OTU reference sequences             |
-#' | `$id`, `$comment` | string with a title or comment for the dataset          |
-#' | `$date`           | date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string      |
+#' | **Component**     | **What can be assigned.**                              |
+#' | ----------------- | ------------------------------------------------------ |
+#' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns) |
+#' | `$metadata`       | data.frame with `'.sample'` column, or a file name     |
+#' | `$taxonomy`       | data.frame with `'.otu'` as the first column           |
+#' | `$otus`           | character vector with new names for the OTUs           |
+#' | `$samples`        | character vector with new names for the samples        |
+#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs   |
+#' | `$sequences`      | character vector of OTU reference sequences            |
+#' | `$id`, `$comment` | string with dataset's title or comment                 |
+#' | `$date`           | date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string     |
 #' 
 #' \cr
 #' 
@@ -86,6 +86,10 @@
 #'     
 #'     # Display an overall summary of the rbiom object.
 #'     biom
+#'     
+#'     
+#'     # Markdown syntax is supported.
+#'     biom$comment
 #'     
 #'     
 #'     # Demonstrate a few accessors.
@@ -278,7 +282,9 @@ rbiom <- R6::R6Class(
       
       
       if (nzchar(private$.comment)) {
-        cli::cli_text(private$.comment, .envir = stop())
+        private$.comment %>%    # Make clickable hyperlinks.
+          gsub('(\\[.+?\\]\\(.+?\\))', '{.href \\1}', .) %>%
+          cli::cli_text(.envir = stop())
         cat("\n")
       }
       
@@ -320,8 +326,14 @@ rbiom <- R6::R6Class(
       
       if (missing(value)) return (private$.id)
       
-      if (is.null(value) || is.na(value)) value <- ""
-      if (!is_scalar_character(value)) cli_abort("Invalid `id`: {.val {value}}")
+      if (is.null(value) || is.na(value)) value <- "Untitled Dataset"
+      if (!is_scalar_character(value)) cli_abort("Invalid `id`: {.type {value}}")
+      value <- trimws(value, whitespace = "[\\h\\v]")
+      if (nchar(value) < 1)   value <- "Untitled Dataset"
+      if (nchar(value) > 100) {
+        if (interactive()) cli_warn("Truncating `id` to 100 characters.")
+        value <- substr(value, 0, 100)
+      } 
       private$.id <- value
       
       return (self)
@@ -336,12 +348,49 @@ rbiom <- R6::R6Class(
       
       if (missing(value)) return (private$.comment)
       
-      if (is.null(value)) value <- ""
-      stopifnot(is_scalar_character(value))
+      if (is.null(value) || is.na(value)) value <- ""
+      if (!is_scalar_character(value)) cli_abort("Invalid `comment`: {.type {value}}")
+      value <- trimws(value, whitespace = "[\\h\\v]")
+      if (nchar(value) > 5000) {
+        if (interactive()) cli_warn("Truncating `comment` to 5000 characters.")
+        value <- substr(value, 0, 5000)
+      } 
       private$.comment <- value
       
       return (self)
     },
+    
+    
+    
+    # #________________________________________________________
+    # # Get or set an rbiom object's comment in HTML format.
+    # #________________________________________________________
+    # comment_html = function (value) {
+    #   
+    #   if (!nzchar(system.file(package = "pandoc")))
+    #     cli_abort("`$comment_html` requires the {.pkg pandoc} R package.")
+    #   
+    #   # Return existing markdown comment, converted to html.
+    #   if (missing(value)) {
+    #     md   <- private$.comment
+    #     html <- pandoc::pandoc_convert(text = md, from = 'markdown', to = 'html')
+    #     html <- paste0(collapse = '\n', html)
+    #     return (html)
+    #   }
+    #   
+    #   # Sanity check incoming html string for type and length.
+    #   if (is.null(value) || is.na(value)) value <- ""
+    #   if (!is_scalar_character(value)) cli_abort("Invalid `comment_html`: {.type {value}}")
+    #   if (nchar(value) > 5000) cli_abort("Invalid `comment_html`: maximum length is 5000 characters.")
+    #   
+    #   # Save the provided html comment in markdown format.
+    #   html <- value
+    #   md   <- pandoc::pandoc_convert(text = html, from = 'html', to = 'markdown')
+    #   md   <- paste0(collapse = '\n', md)
+    #   private$.comment <- md
+    #   
+    #   return (self)
+    # },
     
     
     
@@ -527,6 +576,9 @@ rbiom <- R6::R6Class(
           
           
           if (grepl("\\.(xls|xlsx)$", tolower(fp))) {
+            
+            if (nchar(system.file(package = "openxlsx")) == 0)
+              stop("CRAN R package 'openxlsx' must be installed to import Excel files.")
             
             value <- openxlsx::read.xlsx(fp, sheet = 1)
             

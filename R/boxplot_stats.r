@@ -14,13 +14,14 @@ boxplot_stats <- function (params) {
   stat.by  <- params$stat.by
   facet.by <- params$facet.by
   p.label  <- params$p.label
+  test     <- params$test
   
   
   
   #________________________________________________________
   # No work to do.
   #________________________________________________________
-  if (plyr::empty(ggdata) || is.null(stat.by) || all(p.label == 0)) {
+  if (plyr::empty(ggdata) || is.null(stat.by) || all(p.label == 0) || eq(test, 'none')) {
     set_layer(params, 'yaxis', expand = c(0.02, 0, 0.02, 0))
     return (invisible(params))
   }

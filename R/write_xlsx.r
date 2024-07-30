@@ -2,6 +2,9 @@
 #' @rdname write_biom
 #' @export
 write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = 'singly') {
+
+  if (nchar(system.file(package = "openxlsx")) == 0)
+    stop("CRAN R package 'openxlsx' must be installed to use write_xlsx().")
   
   
   #________________________________________________________

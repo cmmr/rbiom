@@ -37,9 +37,9 @@ ENV <- environment(NULL)
     'stat_ellipse', 'stat_smooth', 
     'theme', 'theme_bw', 'theme_void' )})
 
-  lapply(FUN = cmd_wrap, pkg="ggtree", {c(
-    'ggtree', 'geom_tiplab', 'geom_cladelab', 
-    'gheatmap', 'hexpand', 'vexpand' )})
+  # lapply(FUN = cmd_wrap, pkg="ggtree", {c(
+  #   'ggtree', 'geom_tiplab', 'geom_cladelab', 
+  #   'gheatmap', 'hexpand', 'vexpand' )})
   
   
   lapply(FUN = cmd_wrap, pkg="fillpattern", {c('fill_pattern', 'scale_fill_pattern')})

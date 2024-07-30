@@ -30,7 +30,7 @@
 #'     
 #'     # Sometimes taxonomic names are incomplete ----------------------------
 #'     otus <- c('GemAsacc', 'GcbBacte', 'Unc58411')
-#'     taxa_map(hmp50) %>% filter(.otu %in% otus) %>% select(Phylum:.otu)
+#'     taxa_map(hmp50, unc = "asis") %>% filter(.otu %in% otus) %>% select(Phylum:.otu)
 #'     
 #'     # rbiom can replace them with unique placeholders ---------------------
 #'     taxa_map(hmp50, unc = "singly") %>% filter(.otu %in% otus) %>% select(Class:.otu)

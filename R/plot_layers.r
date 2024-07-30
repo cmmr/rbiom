@@ -293,7 +293,6 @@ add_layer <- function (params, layer, fn = NULL) {
   attr(result, 'function') <- switch(
     EXPR = layer,
     'ggplot'       = ggplot,
-    'ggtree'       = ggtree,
     'arrow'        = geom_segment,
     'bar'          = geom_bar,
     'box'          = geom_boxplot,
@@ -388,7 +387,6 @@ add_layer <- function (params, layer, fn = NULL) {
   regex <- switch(
     EXPR = layer,
     'ggplot'       = "^g(|gplot)\\.",
-    'ggtree'       = "^g(|gtree)\\.",
     'arrow'        = "^a(|rrow)\\.",
     'bar'          = "^(r|bar)\\.",
     'box'          = "^b(|ox)\\.",

@@ -26,14 +26,14 @@ Source code can be found at <https://github.com/cmmr/rbiom>
 The latest stable version can be installed from CRAN.
 
 ``` r
-install.packages("rbiom")
+install.packages("rbiom", dependencies=TRUE)
 ```
 
 The development version is available on GitHub.
 
 ``` r
 install.packages("remotes")
-remotes::install_github("cmmr/rbiom")
+remotes::install_github("cmmr/rbiom", dependencies=TRUE)
 ```
 
 ## Usage

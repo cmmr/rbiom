@@ -3,11 +3,14 @@
 \name{taxa_sums}
 \alias{taxa_sums}
 \alias{taxa_means}
+\alias{taxa_max}
 \title{Get summary taxa abundances.}
 \usage{
 taxa_sums(biom, rank = 0)
 
 taxa_means(biom, rank = 0)
+
+taxa_max(biom, rank = 0)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.

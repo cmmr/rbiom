@@ -45,7 +45,7 @@ The rbiom object has many helpful accessors.
 | `$fields`, `$n_fields`   | Metadata field names.                                  |
 | `$ranks`, `$n_ranks`     | Taxonomic rank names.                                  |
 | `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
-| `$id`, `$comment`        | Arbitrary strings for describing the dataset, or `""`. |
+| `$id`, `$comment`        | Arbitrary strings for describing the dataset.          |
 | `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
 
 ```{r}
@@ -98,15 +98,15 @@ inter-component OTU/sample synchronization. See
 [Working with rbiom Objects](../reference/rbiom_objects.html) for additional
 details.
 
-| Component    | What can be assigned.                                  |
-|--------------|--------------------------------------------------------|
-| `$counts`    | matrix of abundances; OTUs (rows) by samples (columns) |
-| `$metadata`  | data.frame with `'.sample'` as the first column        |
-| `$taxonomy`  | data.frame with `'.otu'` as the first column           |
-| `$tree`      | phylo object with the phylogenetic tree for OTUs       |
-| `$sequences` | character vector of reference sequences for OTUs       |
-| `$id`        | string with a title for the dataset                    |
-| `$comment`   | string with additional information about the dataset   |
+| Component       | What can be assigned.                                  |
+|-----------------|--------------------------------------------------------|
+| `$counts`       | matrix of abundances; OTUs (rows) by samples (columns) |
+| `$metadata`     | data.frame with `'.sample'` as the first column        |
+| `$taxonomy`     | data.frame with `'.otu'` as the first column           |
+| `$tree`         | phylo object with the phylogenetic tree for OTUs       |
+| `$sequences`    | character vector of reference sequences for OTUs       |
+| `$id`           | string with a title for the dataset                    |
+| `$comment`      | string with additional dataset information             |
 
 
 

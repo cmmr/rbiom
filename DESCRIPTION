@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9131
-Date: 2024-06-06
+Version: 2.0.0.9134
+Date: 2024-07-30
 Authors@R: c(
     person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2479-2044")),
@@ -17,7 +17,7 @@ Description:
     All CPU intensive operations are written in C.
 URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
-License: AGPL-3.0-or-later
+License: AGPL-3.0-or-later + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.2.0)
@@ -49,9 +49,9 @@ Imports:
     lifecycle,
     magrittr,
     methods,
-    openxlsx,
     optparse,
     patchwork,
+    pillar,
     plyr,
     R6,
     Rcpp,
@@ -61,19 +61,17 @@ Imports:
     scales,
     slam,
     tibble,
-    tsne,
-    uwot,
     vegan
 Suggests:
     ggdensity,
-    ggtree,
     npregfast,
-    performance,
+    openxlsx,
     phyloseq,
     prettycode,
     ragg,
+    reshape2,
     rhdf5,
-    see,
     testthat,
-    tidytree,
+    tsne,
+    uwot,
     vdiffr

@@ -455,7 +455,8 @@ keep_cols <- function (df, ...) {
 rename_cols <- function(df, ...) {
   
   vals <- list(...)
-  if (length(vals) == 1) vals <- as.list(vals[[1]])
+  if (length(vals) == 1 && is.list(vals[[1]]))
+    vals <- as.list(vals[[1]])
   
   x <- attr(df, 'names', exact = TRUE)
   for (i in names(vals))

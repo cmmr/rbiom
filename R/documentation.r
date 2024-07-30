@@ -38,12 +38,12 @@
 #'        
 #' @param ord    Method for reducing dimensionality. Options are:
 #'        \itemize{
-#'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"PCoA"` - }{ Principal coordinate analysis; [ape::pcoa()]. }
+#'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
 #'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
 #'        }
-#'        Default: `"UMAP"` \cr\cr
+#'        Default: `"PCoA"` \cr\cr
 #'        Multiple/abbreviated values allowed.
 #'     
 #' @param weighted  Take relative abundances into account. When 

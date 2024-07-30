@@ -220,7 +220,7 @@ plot_heatmap <- function (
   label_size_x <- tail(label_size, 1) %>% signif(digits = 3)
   label_size_y <- head(label_size, 1)
   
-  if (is.null(tracks)) {
+  if (is.null(tracks) || length(tracks) == 0) {
     n_left <- n_top <- 0
   } else {
     n_left <- sum(sapply(tracks, function (x) is.list(x) && eq(x[['side']], 'left')))
@@ -519,21 +519,6 @@ plot_heatmap <- function (
     
     
     #________________________________________________________
-    # Outline around the main grid
-    #________________________________________________________
-    gglayers %<>% ggpush(annotate(
-      geom = "rect", 
-      xmin = 0.5, 
-      xmax = ncol(mtx) + 0.5, 
-      ymin = 0.5, 
-      ymax = nrow(mtx) + 0.5, 
-      size  = 0.2,
-      color = "black", 
-      fill  = NA ))
-    
-    
-    
-    #________________________________________________________
     # Call scale_y_continuous and scale_y_continuous
     #________________________________________________________
     
@@ -548,6 +533,21 @@ plot_heatmap <- function (
     remove("xlabels", "xbreaks", "ylabels", "ybreaks", "x_args", "y_args")
     
   }
+  
+  
+  
+  #________________________________________________________
+  # Outline around the main grid
+  #________________________________________________________
+  gglayers %<>% ggpush(annotate(
+    geom = "rect", 
+    xmin = 0.5, 
+    xmax = ncol(mtx) + 0.5, 
+    ymin = 0.5, 
+    ymax = nrow(mtx) + 0.5, 
+    size  = 0.2,
+    color = "black", 
+    fill  = NA ))
   
   
   

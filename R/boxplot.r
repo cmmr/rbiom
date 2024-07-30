@@ -17,8 +17,9 @@
 #'        `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`.
 #'        Default: `"x"`
 #' 
-#' @param test   Method for computing p-values: `'none'`, `'emmeans'`, or 
-#'        `'emtrends'`. Default: `'emmeans'`
+#' @param test   Method for computing p-values: `'auto'` or `'none'`. `'auto'`
+#'        will choose Wilcox or Kruskal-Wallis depending on the number of 
+#'        groups.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 functions. 
 #'        Prefix a parameter name with a layer name to pass it to only that
@@ -68,7 +69,7 @@
 stats_boxplot <- function (
     df, x = NULL, y = attr(df, 'response'), layers = 'x', 
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
-    flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
+    test = 'auto', flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, caption = TRUE, ... ) {
   
   

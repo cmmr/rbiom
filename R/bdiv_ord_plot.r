@@ -41,7 +41,7 @@
 #'     bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
 #'     
 bdiv_ord_plot <- function (
-    biom, bdiv = "Bray-Curtis", ord = "UMAP", weighted = TRUE, layers = "petm", 
+    biom, bdiv = "Bray-Curtis", ord = "PCoA", weighted = TRUE, layers = "petm", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {

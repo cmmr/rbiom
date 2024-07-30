@@ -31,7 +31,7 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
    \verb{$fields}, \verb{$n_fields} \tab Metadata field names. \cr
    \verb{$ranks}, \verb{$n_ranks} \tab Taxonomic rank names. \cr
    \verb{$tree}, \verb{$sequences} \tab Phylogenetic tree / sequences for the OTUs, or \code{NULL}. \cr
-   \verb{$id}, \verb{$comment} \tab Arbitrary strings for describing the dataset, or \code{NULL}. \cr
+   \verb{$id}, \verb{$comment} \tab Arbitrary strings for describing the dataset. \cr
    \verb{$depth} \tab Rarefaction depth, or \code{NULL} if unrarefied. \cr
    \verb{$date} \tab Date from BIOM file. \cr
 }
@@ -53,7 +53,7 @@ validation checks and inter-component synchronization.\tabular{ll}{
    \verb{$samples} \tab character vector with new names for the samples \cr
    \verb{$tree} \tab phylo object with the phylogenetic tree for the OTUs \cr
    \verb{$sequences} \tab character vector of OTU reference sequences \cr
-   \verb{$id}, \verb{$comment} \tab string with a title or comment for the dataset \cr
+   \verb{$id}, \verb{$comment} \tab string with dataset's title or comment \cr
    \verb{$date} \tab date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string \cr
 }
 
@@ -87,6 +87,10 @@ All functions return an rbiom object.\tabular{ll}{
     
     # Display an overall summary of the rbiom object.
     biom
+    
+    
+    # Markdown syntax is supported.
+    biom$comment
     
     
     # Demonstrate a few accessors.

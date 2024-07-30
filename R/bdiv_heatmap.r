@@ -109,8 +109,6 @@ bdiv_heatmap <- function (
   with(params, {
     
     validate_bdiv(max = Inf)
-    
-    validate_bool("trees")
     validate_bool("weighted", max = Inf)
     
     # validate_biom_field('order.by', null_ok = TRUE, max = Inf)

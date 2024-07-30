@@ -25,6 +25,7 @@ boxplot_build <- function (params) {
     validate_df_field('stat.by',  col_type = "cat", null_ok = TRUE)
     validate_df_field('facet.by', col_type = "cat", null_ok = TRUE, max = Inf)
     
+    validate_var_choices('test',       choices = c('auto', 'none'))
     validate_var_choices('p.adj',      choices = p.adjust.methods)
     validate_var_choices('ci',         choices = c('ci', 'range', 'sd', 'se', 'mad'))
     validate_var_choices('xlab.angle', choices = c('auto', '0', '30', '90'))

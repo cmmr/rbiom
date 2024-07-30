@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9130</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9134</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -192,17 +192,17 @@ the statistics.</p><table class="table table"><tr><td><strong>Field</strong></td
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sex           .mean.diff .h1    .p.val  .adj.p .effect.size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Male - Female      0.765 != 0  0.009<span style="text-decoration: underline;">92</span> 0.009<span style="text-decoration: underline;">92</span>        0.788</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female - Male     -<span style="color: #BB0000;">0.765</span> != 0  0.009<span style="text-decoration: underline;">92</span> 0.009<span style="text-decoration: underline;">92</span>       -<span style="color: #BB0000;">0.788</span></span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Sex"</span>, split.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    gam(.diversity ~ Sex, method = "REML")</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `Body Site`    Sex           .mean.diff .h1   .p.val .adj.p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Saliva         Male - Female     0.236  != 0   0.226  0.333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Stool          Male - Female     0.243  != 0   0.228  0.333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Buccal mucosa  Male - Female     0.541  != 0   0.250  0.333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Anterior nares Male - Female     0.044<span style="text-decoration: underline;">0</span> != 0   0.831  0.831</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Saliva         Female - Male    -<span style="color: #BB0000;">0.236</span>  != 0   0.226  0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Stool          Female - Male    -<span style="color: #BB0000;">0.243</span>  != 0   0.228  0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Buccal mucosa  Female - Male    -<span style="color: #BB0000;">0.541</span>  != 0   0.250  0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Anterior nares Female - Male    -<span style="color: #BB0000;">0.044</span><span style="color: #BB0000; text-decoration: underline;">0</span> != 0   0.831  0.831</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Mid vagina     <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, test <span class="op">=</span> <span class="st">"kruskal"</span><span class="op">)</span></span></span>

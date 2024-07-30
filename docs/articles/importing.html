@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9130</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9134</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,7 +129,7 @@ R package.</li>
 <span><span class="co"># convert matrix to rbiom -----------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Untitled Dataset</span><span style="color: #808080;"> ════════════════════════════════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       4 Samples: Sample1, Sample2, Sample3, and Sample4</span></span>
 <span><span class="co">#&gt;       6 OTUs:    OTU2, OTU3, OTU5, OTU4, OTU1, and OTU6</span></span>
@@ -137,7 +137,7 @@ R package.</li>
 <span><span class="co">#&gt;       1 Fields:  .sample</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -161,7 +161,7 @@ R package.</li>
 <span><span class="co">#&gt;       5 Fields:  .sample, BarcodeSequence, ...</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 <p>Now we have <code>biom</code>, an rbiom-class object that can be used
 with this package’s functions. If you loaded your data from a BIOM file
 or phyloseq object, it might already include metadata, ranks, and a
@@ -200,7 +200,7 @@ sample.</p>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">mtx</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">md</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Untitled Dataset</span><span style="color: #808080;"> ════════════════════════════════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       4 Samples: Sample1, Sample2, Sample3, and Sample4</span></span>
 <span><span class="co">#&gt;       6 OTUs:    OTU2, OTU3, OTU5, OTU4, OTU1, and OTU6</span></span>
@@ -208,13 +208,13 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># or in a single step ---------------------------</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">mtx</span>, metadata <span class="op">=</span> <span class="va">md</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Untitled Dataset</span><span style="color: #808080;"> ════════════════════════════════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       4 Samples: Sample1, Sample2, Sample3, and Sample4</span></span>
 <span><span class="co">#&gt;       6 OTUs:    OTU2, OTU3, OTU5, OTU4, OTU1, and OTU6</span></span>
@@ -222,7 +222,7 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="setting-categorical-variables">Setting categorical variables<a class="anchor" aria-label="anchor" href="#setting-categorical-variables"></a>
 </h3>
@@ -254,7 +254,7 @@ object directly, or a newick file/string.</p>
 <code class="sourceCode R"><span><span class="co"># define a random tree --------------------------</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">"(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Untitled Dataset</span><span style="color: #808080;"> ════════════════════════════════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       4 Samples: Sample1, Sample2, Sample3, and Sample4</span></span>
 <span><span class="co">#&gt;       6 OTUs:    OTU2, OTU3, OTU5, OTU4, OTU1, and OTU6</span></span>
@@ -262,7 +262,7 @@ object directly, or a newick file/string.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;present&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="attach-taxonomy">Attach taxonomy<a class="anchor" aria-label="anchor" href="#attach-taxonomy"></a>
@@ -287,7 +287,7 @@ OTU.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">taxonomy</span> <span class="op">&lt;-</span> <span class="va">map</span></span>
 <span><span class="va">biom</span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">An rbiom object</span><span style="color: #808080;"> ═════════════════════════════════════════</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Untitled Dataset</span><span style="color: #808080;"> ════════════════════════════════════════</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       4 Samples: Sample1, Sample2, Sample3, and Sample4</span></span>
 <span><span class="co">#&gt;       6 OTUs:    OTU2, OTU3, OTU5, OTU4, OTU1, and OTU6</span></span>
@@ -295,7 +295,7 @@ OTU.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:</span></span>
 <span><span class="co">#&gt; <span style="font-style: italic;">&lt;present&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-06-03 ──</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2024-07-30 ──</span></span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
