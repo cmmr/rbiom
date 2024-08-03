@@ -61,16 +61,16 @@ apcoa <- function (distmat, covariates)  {
   if (length(rn_intersect) < 3)
     stop("Please provide at least 3 samples as input to apcoa().")
   
-  distmat    <- as.dist(as.matrix(distmat)[rn_intersect, rn_intersect])
+  distmat    <- stats::as.dist(as.matrix(distmat)[rn_intersect, rn_intersect])
   covariates <- covariates[rn_intersect,,drop=F]
   
-  formula <- reformulate(response = "distmat", termlabels = names(covariates))
+  formula <- stats::reformulate(response = "distmat", termlabels = names(covariates))
   
   lhs          <- distmat
   formula[[2]] <- NULL
-  rhs.frame    <- model.frame(formula, covariates, drop.unused.levels = TRUE)
+  rhs.frame    <- stats::model.frame(formula, covariates, drop.unused.levels = TRUE)
   
-  rhs <- model.matrix(formula, rhs.frame)
+  rhs <- stats::model.matrix(formula, rhs.frame)
   
   grps   <- attr(rhs, "assign", exact = TRUE)
   qrhs   <- qr(rhs)
@@ -107,7 +107,7 @@ apcoa <- function (distmat, covariates)  {
   plotMatrix
   
   
-  set_cache_value(cache_file, result)
+  set_cache_value(cache_file, plotMatrix)
   return (plotMatrix)
 }
 

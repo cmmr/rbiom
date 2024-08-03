@@ -7,7 +7,7 @@
 \format{
 An rbiom object with 50 samples.
 Includes metadata, taxonomy, phylogeny, and sequences.
-\itemize{
+\describe{
 \item{Sex - }{Male or Female}
 \item{Body Site - }{Anterior nares, Buccal mucosa, Mid vagina, Saliva, or Stool}
 \item{Age - }{21 - 40}

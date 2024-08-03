@@ -11,7 +11,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, ...)
 \code{\link[=bdiv_distmat]{bdiv_distmat()}} or \code{\link[stats:dist]{stats::dist()}}. Required.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
-\itemize{
+\describe{
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }

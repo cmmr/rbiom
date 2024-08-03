@@ -1,7 +1,6 @@
 useDynLib(rbiom, .registration = TRUE)
 
 
-
 export(`adiv_boxplot`)
 export(`adiv_corrplot`)
 export(`adiv_matrix`)
@@ -124,50 +123,26 @@ importMethodsFrom("emmeans")
 import("RcppParallel")
 
 importFrom("ape", "print.phylo")
-importFrom("cli", "cli_text", "cli_abort", "cli_warn", "cli_inform", "cli_vec", "qty")
-importFrom("glue", "glue", "glue_data", "glue_collapse", "backtick", "single_quote", "double_quote")
-importFrom("graphics", "boxplot", "hist")
-importFrom("grDevices", "boxplot.stats")
-importFrom("ggplot2", "aes", "ggplot", "ggplot_add", "ggproto")
-importFrom("lifecycle", "deprecate_warn", "deprecated")
+importFrom("ggnewscale", "new_scale_fill")
+importFrom("ggplot2", "aes")
+importFrom("ggrepel", "geom_text_repel", "geom_label_repel")
+importFrom("ggtext", "element_markdown", "geom_textbox")
 importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "as", "is", "formalArgs")
-importFrom("Rcpp", "sourceCpp")
-
-importFrom("rlang",
-           "%||%", "hash", "enquo", "quo_name", "has_name", "expr", 
-           "get_env", "env_names", "env_has", "env_clone", 
-           "as_label", ".data", "as_name", "quo", "sym", "data_sym", "quo_squash",
-           "caller_call", "caller_env", "caller_fn", 
-           "call_match", "call_args", "call_args_names", "call_name",
-           "is_na", "is_null", 
-           "is_environment", "is_bare_environment", 
-           "is_list", "is_formula", "is_function",
-           "is_true", "is_false", "is_logical", "is_scalar_logical", 
-           "is_atomic", "is_scalar_atomic",
-           "is_character", "is_scalar_character", "is_string", 
-           "is_integerish", "is_scalar_integerish", 
-           "is_double", "is_scalar_double")
-
-importFrom("slam", "is.simple_triplet_matrix", "as.simple_triplet_matrix", "row_sums", "col_sums")
-
-importFrom("stats", "as.dist", "aggregate", "complete.cases", "fivenum", "model.frame", 
-           "model.matrix", "na.omit", "setNames", "terms", "weighted.mean")
-           # zzz.R also loads `df.residual` and `sigma`
-
-importFrom("plyr", ".", "empty", "adply", "alply", "daply", "ddply", "dlply", "ldply", "llply")
+importFrom("stats", "as.formula", "density", "mad", "median", "na.omit", "p.adjust", "sd", "setNames", "t.test", "var")
+importFrom("plyr", ".", "ddply", "ldply", "llply")
 importFrom("pillar", "tbl_sum", "glimpse")
 
+importFrom("slam", 
+           "simple_triplet_matrix", "as.simple_triplet_matrix", "is.simple_triplet_matrix",
+           "col_sums", "row_sums", "rollup")
+
 importFrom("dplyr", 
-           "mutate", "pull", "rename", "select", 
+           ".data", "any_of", "mutate", "pull", "rename", "select", 
            "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
            "filter", "relocate", "across", "everything", "left_join")
 
-importFrom("tibble", "tibble", "as_tibble", "as_tibble_col", "has_rownames", "is_tibble", "rownames_to_column")
-
-importFrom("utils", "capture.output", "download.file", "getFromNamespace", "hasName", "head", 
-           "object.size", "packageDescription", "packageVersion", "read.csv", "read.delim", 
-           "write.table")
+importFrom("utils", "capture.output", "combn", "getFromNamespace", "hasName", "head", "tail")
 
 
 S3method(as_rbiom,     rbiom)
@@ -203,11 +178,8 @@ S3method(select, rbiom)
 export(".")
 export("%>%")
 export("%<>%")
-export("as_tibble")
-export("boxplot")
 export("ddply")
 export("glimpse")
-export("glue")
 export("left_join")
 export("ldply")
 export("llply")
@@ -223,4 +195,3 @@ export("slice_tail")
 export("slice_min")
 export("slice_max")
 export("slice_sample")
-export("tibble")

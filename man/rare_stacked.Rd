@@ -31,7 +31,7 @@ rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
 a non-linear axis. Options are:
-\itemize{
+\describe{
 \item{\code{"sqrt"} - }{ square-root transformation }
 \item{\code{"log1p"} - }{ log(y + 1) transformation }
 \item{\code{NULL} - }{ no transformation }

@@ -7,7 +7,7 @@
 \format{
 An rbiom object with 1,006 samples.
 Includes metadata and taxonomy.
-\itemize{
+\describe{
 \item{diarrhea - }{Case or Control}
 \item{age - }{0 - 4.8 (years old)}
 \item{country - }{Bangladesh, Gambia, Kenya, or Mali}

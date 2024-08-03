@@ -2,7 +2,7 @@
 #' Save an rbiom object to a file.
 #' 
 #' Automatically creates directories and adds compression based on file name.
-#' \itemize{
+#' \describe{
 #'   \item{`write_biom()` - }{ According to [BIOM format](http://biom-format.org/documentation/) specification. }
 #'   \item{`write_xlsx()` - }{ Raw data and summary tables in Excel file format. See details. }
 #'   \item{`write_fasta()` - }{ Sequences only in fasta format. `biom` may also be a named character vector. }
@@ -23,9 +23,8 @@
 #'        files, the BioConductor R package \code{rhdf5} must be installed.
 #'        Default: `"json"`
 #' 
-#' @param depth,n,seed   Passed on to [rarefy_cols()]. For `write_xlsx()` only, 
-#'        `depth=0` disables rarefaction. 
-#'        Default: `depth='auto', n=NULL, seed=0`
+#' @param depth,n   Passed on to [rarefy_cols()]. For `write_xlsx()` only, 
+#'        `depth=0` disables rarefaction. Default: `depth='auto', n=NULL`
 #'                   
 #' @param seed   Random seed to use in rarefying. See [rarefy_cols()] function
 #'        for details. Default: `0`
@@ -123,7 +122,7 @@ write_biom_tsv <- function (biom, file) {
   } else if (grepl("\\.bz2$", tolower(file))) { con <- bzfile(file, "w")
   } else                                      { con <- base::file(file, "w") }
   
-  write.table(tbl, con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+  utils::write.table(tbl, con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
   
   close(con)
   
@@ -154,7 +153,7 @@ write_biom_json <- function (biom, file) {
       format              = "1.0.0", 
       type                = "OTU table",
       format_url          = "http://biom-format.org",
-      generated_by        = paste("rbiom", packageVersion("rbiom")),
+      generated_by        = paste("rbiom", utils::packageVersion("rbiom")),
       matrix_type         = "sparse",
       matrix_element_type = ifelse(all(biom$counts[['v']] %% 1 == 0), "int", "float"),
       shape               = dim(biom$counts),
@@ -253,15 +252,15 @@ write_biom_hdf5 <- function (biom, file) {
   
   # Attributes
   #________________________________________________________
-  rhdf5::h5writeAttribute(biom$id,                                 h5, 'id')
-  rhdf5::h5writeAttribute("OTU table",                             h5, 'type')
-  rhdf5::h5writeAttribute(biom$comment,                            h5, 'comment')
-  rhdf5::h5writeAttribute("http://biom-format.org",                h5, 'format-url')
-  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),                    h5, 'format-version', 3)
-  rhdf5::h5writeAttribute(paste("rbiom", packageVersion("rbiom")), h5, 'generated-by')
-  rhdf5::h5writeAttribute(biom$date,                               h5, 'creation-date')
-  rhdf5::h5writeAttribute(dim(biom$counts),                        h5, 'shape', 2)
-  rhdf5::h5writeAttribute(length(biom$counts[['v']]),              h5, 'nnz')
+  rhdf5::h5writeAttribute(biom$id,                    h5, 'id')
+  rhdf5::h5writeAttribute("OTU table",                h5, 'type')
+  rhdf5::h5writeAttribute(biom$comment,               h5, 'comment')
+  rhdf5::h5writeAttribute("http://biom-format.org",   h5, 'format-url')
+  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),       h5, 'format-version', 3)
+  rhdf5::h5writeAttribute(biom$date,                  h5, 'creation-date')
+  rhdf5::h5writeAttribute(dim(biom$counts),           h5, 'shape', 2)
+  rhdf5::h5writeAttribute(length(biom$counts[['v']]), h5, 'nnz')
+  rhdf5::h5writeAttribute(paste("rbiom", utils::packageVersion("rbiom")), h5, 'generated-by')
   
   
   
@@ -368,7 +367,7 @@ write_biom_hdf5 <- function (biom, file) {
 write_metadata <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$metadata %>%
-      write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
+      utils::write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
   })
 }
 
@@ -380,7 +379,7 @@ write_metadata <- function (biom, file, quote = FALSE, sep = "\t", ...) {
 write_counts <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$counts %>% 
-     write.table(file = con, sep = sep, quote = quote, ...)
+      utils::write.table(file = con, sep = sep, quote = quote, ...)
   })
 }
 
@@ -390,7 +389,7 @@ write_counts <- function (biom, file, quote = FALSE, sep = "\t", ...) {
 write_taxonomy <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$taxonomy %>%
-      write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
+      utils::write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
   })
 }
 
@@ -430,7 +429,7 @@ write_tree <- function (biom, file=NULL) {
   
   
   rootNode <- setdiff(tree$edge[,1], tree$edge[,2])
-  parentAt <- aggregate(1:nrow(tree$edge), by=list(tree$edge[,1]), c, simplify=FALSE)
+  parentAt <- stats::aggregate(1:nrow(tree$edge), by=list(tree$edge[,1]), c, simplify=FALSE)
   parentAt <- setNames(lapply(parentAt[,2], unlist), parentAt[,1])
   
   fx <- function (root=NULL) ({

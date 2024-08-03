@@ -271,19 +271,19 @@ plots <- list(
   p1 + ggplot2::labs(subtitle = 'x = "Body Site", stat.by = NULL'), 
   p2 + ggplot2::labs(subtitle = 'x = NULL, stat.by = "Body Site"'), 
   p3 + ggplot2::labs(subtitle = 'x = "Body Site", stat.by = "Body Site"'), 
-  p4 + ggplot2::labs(subtitle = 'x = "Sex", stat.by = "Body Site"')) %>%
+  p4 + ggplot2::labs(subtitle = 'x = "Sex", stat.by = "Body Site"') ) %>%
   lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL)) %>%
   lapply(`+`, ggplot2::theme(plot.subtitle = ggplot2::element_text(size = 10)))
 
 patchwork::wrap_plots(plots, guides = "collect")
 ```
 
-Above, the two plots on the left are annotated with pairwise statistics while 
-the two on the right have group-wise statistics. As with other plots, you can 
-find the full statistics tables and reproducible R code in the plot attributes.
+Above, the lower-left plot is annotated with pairwise statistics while the two 
+on the right have group-wise statistics. As with other plots, you can find the 
+full statistics tables and reproducible R code in the plot attributes.
 
 ```{r}
-p1$stats
+p3$stats
 
 p2$stats
 
@@ -304,9 +304,16 @@ Internally, rbiom uses the non-parametric functions listed below.
 
 ## Correlation Plots
 
-For an in-depth description of correlation plots, see vignette("articles/regression").
+For an in-depth description of correlation plots, see the 
+[rbiom regression article](regression.html).
 
 Depending on the arguments given to `stat.by` and `test`, you can test:
+
+* Is the mean non-zero?
+* Do means vary by group?
+* Is the slope (trendline) non-horizontal?
+* Do slopes vary by group?
+
 
 ```{r}
 biom <- gems %>%
@@ -368,7 +375,13 @@ tests for categorical variables that are based on ranking or permutations.
 | Kruskal-Wallis Rank Sum | `stats::kruskal.test()` | Groupwise boxplot          |
 | Permutational MANOVA    | `vegan::adonis2()`      | `bdiv_ord_plot()` clusters |
 
-For correlation/regression analysis, rbiom provides diagnostic plots to determine when residual distributions are cause for concern.
+For correlation/regression analysis, rbiom provides diagnostic plots to determine when residual distributions are cause for concern. To enable this feature, set `check = TRUE`.
+
+```{r}
+adiv_corrplot(biom, x = "age", test = "emmeans", check = TRUE)
+```
+
+
 
 Further reading:
 

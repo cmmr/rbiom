@@ -2,7 +2,7 @@
 #' Convert an rbiom object to a SummarizedExperiment object.
 #' 
 #' Requires the relevant Bioconductor R package to be installed:
-#' \itemize{
+#' \describe{
 #'   \item{`convert_to_SE` - }{ [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/) }
 #'   \item{`convert_to_TSE` - }{ [TreeSummarizedExperiment](https://bioconductor.org/packages/TreeSummarizedExperiment/) }
 #' }

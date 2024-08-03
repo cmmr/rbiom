@@ -60,7 +60,7 @@ Default: \code{6}.}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -87,7 +87,7 @@ Default: \code{Inf}}
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
 a non-linear axis. Options are:
-\itemize{
+\describe{
 \item{\code{"sqrt"} - }{ square-root transformation }
 \item{\code{"log1p"} - }{ log(y + 1) transformation }
 \item{\code{NULL} - }{ no transformation }
@@ -103,7 +103,7 @@ categorical. Default: \code{NULL}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -158,7 +158,7 @@ Default: \code{"auto"}.}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
-\itemize{
+\describe{
 \item{\code{p.label = 0.05} - }{ Show p-values that are <= 0.05. }
 \item{\code{p.label = 0} - }{ Don't show any p-values on the plot. }
 \item{\code{p.label = 1} - }{ Show all p-values on the plot. }
@@ -226,6 +226,7 @@ letters instead of shapes on the plot. Character strings may used as well.
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()},

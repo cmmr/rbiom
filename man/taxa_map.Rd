@@ -17,7 +17,7 @@ character vector for mapping OTUs to taxa names.}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }

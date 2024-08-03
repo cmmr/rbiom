@@ -36,7 +36,7 @@ character vector of taxa names will show only those named taxa.
 Default: \code{6}.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
-\itemize{
+\describe{
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
@@ -71,7 +71,7 @@ level ranks. Default: \code{FALSE}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -88,7 +88,7 @@ value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
 \item{sparse}{If true, returns a sparse matrix as described by
-\code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a normal R
+\code{\link[=simple_triplet_matrix]{simple_triplet_matrix()}}, otherwise returns a normal R
 matrix object. Default: \code{FALSE}}
 
 \item{p.top}{Only display taxa with the most significant differences in
@@ -102,7 +102,7 @@ Default: \code{Inf}}
 \item{y.trans}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
 a non-linear axis. Options are:
-\itemize{
+\describe{
 \item{\code{"sqrt"} - }{ square-root transformation }
 \item{\code{"log1p"} - }{ log(y + 1) transformation }
 \item{\code{NULL} - }{ no transformation }
@@ -127,7 +127,7 @@ Default: \code{"ci"}}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
-\itemize{
+\describe{
 \item{\code{p.label = 0.05} - }{ Show p-values that are <= 0.05. }
 \item{\code{p.label = 0} - }{ Don't show any p-values on the plot. }
 \item{\code{p.label = 1} - }{ Show all p-values on the plot. }
@@ -186,7 +186,7 @@ categorical. Default: \code{stat.by}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -261,6 +261,10 @@ use cases. Default: \code{TRUE}}
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
+
+\item{ties}{When \code{trans="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
 }
 \description{
 documentation_default

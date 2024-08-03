@@ -13,6 +13,9 @@
 #' 
 #' @param x   Dataset field with the x-axis values. Equivalent to the `regr` 
 #'        argument in [stats_table()]. Required.
+#' 
+#' @param y   A numeric metadata column name to use for the y-axis. 
+#'        Default: `attr(df, 'response')`
 #'           
 #' @param layers   One or more of 
 #'        `c("trend", "confidence", "point", "name", "residual")`. Single 
@@ -316,7 +319,7 @@ rare_corrplot <- function (
     #________________________________________________________
     df <- local({
       
-      upper <- fivenum(sample_sums(biom))[[4]]
+      upper <- stats::fivenum(sample_sums(biom))[[4]]
       rLvls <- floor(seq(from = 5, to = upper, length.out = 10))
       
       plyr::ldply(rLvls, .id = ".depth", function (rLvl) {

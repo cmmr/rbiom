@@ -6,14 +6,20 @@
 \alias{within.rbiom}
 \title{Evaluate expressions on metadata.}
 \usage{
-\method{with}{rbiom}(biom, ...)
+\method{with}{rbiom}(data, expr, ...)
 
-\method{within}{rbiom}(biom, ..., clone = TRUE)
+\method{within}{rbiom}(data, expr, clone = TRUE, ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{data}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{...}{Passed on to \code{\link[base:with]{base::with()}} or \code{\link[base:with]{base::within()}}.}
+\item{expr}{Passed on to \code{\link[base:with]{base::with()}} or \code{\link[base:with]{base::within()}}.}
+
+\item{...}{Not used.}
+
+\item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
+is modified in place as a side-effect. See \link[=speed]{speed ups} for
+use cases. Default: \code{TRUE}}
 }
 \value{
 See description.
@@ -36,10 +42,10 @@ an rbiom object.
 }
 \seealso{
 Other transformations: 
-\code{\link{mutate}()},
+\code{\link{modify_metadata}},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
-\code{\link{slice}()},
+\code{\link{slice_metadata}},
 \code{\link{subset}()}
 }
 \concept{transformations}

@@ -9,9 +9,31 @@ ENV <- environment(NULL)
 .onLoad <- function(libname, pkgname) {
   
   
-  # Empty the cache (mainly for during development)
-  if (!is.null(x <- get_cache_dir()))
-    unlink(x = dir(x, full.names = TRUE))
+  # Add imports of imports to our namespace (avoiding NOTE about 20+ imports).
+  
+  # 'ggplot2' -> 'scales' -> R6::R6Class
+  # 'ggplot2' -> 'scales' -> labeling::extended
+  # 'ggplot2' -> 'scales' -> lifecycle::deprecate_warn
+  # 'ggplot2' ->  'cli', 'glue', 'rlang', 'tibble'
+  #________________________________________________________
+  for (fn in c("cli_text", "cli_abort", "cli_warn", "qty"))
+    assign(x = fn, value = getFromNamespace(x = fn, ns = "cli"), pos = ENV)
+  
+  for (fn in c("glue", "single_quote", "double_quote"))
+    assign(x = fn, value = getFromNamespace(x = fn, ns = "glue"), pos = ENV)
+  
+  for (fn in c("tibble", "as_tibble"))
+    assign(x = fn, value = getFromNamespace(x = fn, ns = "tibble"), pos = ENV)
+  
+  for (fn in c(
+   "%||%", ":=", ".data", "hash", "env_names", "env_has", 
+   "is_na", "is_null", "is_bare_environment", "is_list", "is_formula", 
+   "is_true", "is_false", "is_logical", "is_scalar_logical", 
+   "is_character", "is_scalar_character", "is_string", 
+   "is_integerish", "is_scalar_integerish", "is_double", "is_scalar_double" ))
+    assign(x = fn, value = getFromNamespace(x = fn, ns = "rlang"), pos = ENV)
+  
+  
 
   
   
@@ -53,7 +75,7 @@ ENV <- environment(NULL)
   lapply(FUN = cmd_wrap, pkg="graphics",    {c('pairs')})
   lapply(FUN = cmd_wrap, pkg="grid",        {c('arrow', 'unit')})
   lapply(FUN = cmd_wrap, pkg="patchwork",   {c('inset_element')})
-  lapply(FUN = cmd_wrap, pkg="scales",      {c('alpha','trans_new', 'label_number', 'cut_si')})
+  lapply(FUN = cmd_wrap, pkg="scales",      {c('alpha', 'trans_new', 'label_number', 'cut_si')})
   
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
   
@@ -73,9 +95,11 @@ ENV <- environment(NULL)
   rlang::catch_cnd(
     ggplot2::ggsave(
       filename = nullfile(), 
-      plot = ggplot2::ggplot(iris, ggplot2::aes(Species, Sepal.Length)) +
-        ggbeeswarm::geom_beeswarm(method="center"), 
-      device = 'png', width = 7, height = 7, units = "in") )
+      device = 'png', width = 7, height = 7, units = "in", 
+      plot = ggplot2::ggplot() +
+        ggbeeswarm::geom_beeswarm(
+          mapping = ggplot2::aes(x = rep(LETTERS[1:3],50), y = 1:150), 
+          method="center") ))
   
   
   
@@ -86,5 +110,13 @@ ENV <- environment(NULL)
   assign('attr', pos = ENV, function (x, which, exact = TRUE) {
     base::attr(x, which, exact)
   })
+  
+  
+  
+  #____________________________________________________________________
+  # Empty the cache (mainly for during development)
+  #____________________________________________________________________
+  if (!is.null(x <- get_cache_dir()))
+    unlink(x = dir(x, full.names = TRUE))
   
 }

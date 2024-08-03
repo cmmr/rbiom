@@ -67,7 +67,7 @@ similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 \code{clust = c(rows = "complete", cols = NA)}, or simply
 \code{clust = c("complete", NA)}. Options are:
-\itemize{
+\describe{
 \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
 \item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
 \item{A method name - }{ \code{"ward.D"},
@@ -82,7 +82,7 @@ by similarity. You can supply a list or character vector of length
 two to control the row and column clustering separately, for example
 \code{dist = c(rows = "euclidean", cols = "maximum")}, or simply
 \code{dist = c("euclidean", "maximum")}. Options are:
-\itemize{
+\describe{
 \item{A \code{dist} class object}{ E.g. from \code{\link[stats:dist]{stats::dist()}} or \code{\link[=bdiv_distmat]{bdiv_distmat()}}. }
 \item{A method name - }{ \code{"euclidean"},
 \code{"maximum"}, \code{"manhattan"}, \code{"canberra"},
@@ -152,7 +152,7 @@ plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
 
 The following entries in the track definitions are understood:
 
-\itemize{
+\describe{
 \item{\code{values} - }{ The metadata values. When unnamed, order must match matrix. }
 \item{\code{range} - }{ The c(min,max) to use for scale values. }
 \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }

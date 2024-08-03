@@ -37,7 +37,7 @@ provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
-\itemize{
+\describe{
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
@@ -68,7 +68,7 @@ relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{test}{Permutational test for accessing significance. Options are:
-\itemize{
+\describe{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
@@ -109,7 +109,7 @@ options. Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -150,6 +150,7 @@ The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},

@@ -10,7 +10,7 @@ stats_validate <- function () {
   with(parent.frame(), {
     
     df <- df[,c(regr, resp, stat.by, split.by),drop = FALSE]
-    df <- df[complete.cases(df),,drop = FALSE]
+    df <- df[stats::complete.cases(df),,drop = FALSE]
     if (nrow(df) == 0) cli_abort("No rows after removing NA values.")
     
     
@@ -32,10 +32,10 @@ stats_validate <- function () {
 
 
 
-stats_run <- function (df, stat.by, split.by, func) {
+stats_run <- function (df, stat.by, split.by, func, pairwise) {
   
   
-  if (length(formalArgs(func)) == 1) {
+  if (isFALSE(pairwise)) {
     
     plyr::ddply(df, ply_cols(split.by), function (data) {
       
@@ -43,7 +43,7 @@ stats_run <- function (df, stat.by, split.by, func) {
         error = function (e) data.frame()[1,], 
         expr  = suppressWarnings({
           
-          func(data)
+          func(data, NULL)
           
         }))
       
@@ -119,7 +119,7 @@ stats_finalize <- function (stats, df, regr, resp, stat.by, split.by, fit, p.adj
       "    ", gsub("\n", "\n    ", code), "\n\n",
       "  }))\n",
       "}) %>% \n",
-      "  as_tibble()"
+      "  tibble::as_tibble()"
     )
   }
   
@@ -144,6 +144,8 @@ stats_finalize <- function (stats, df, regr, resp, stat.by, split.by, fit, p.adj
   # Correct for multiple comparisons and arrange by p.val.
   #________________________________________________________
   if (hasName(stats, '.p.val')) {
+    
+    .p.val <- NULL # for CRAN check only
     
     stats <- stats %>% 
       dplyr::mutate(.adj.p = p.adjust(.p.val, p.adj), .after = .p.val) %>% 

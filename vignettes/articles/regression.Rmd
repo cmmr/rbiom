@@ -32,7 +32,7 @@ head(npregfast::children)
 
 ## Height vs Age
 
-The most straight-forward plot is putting 'age' on the x-axis, 'height' on the y-axis, and overlaying a best-fit linear trendline.
+First, let's plot 'age' vs 'height', and overlay a best-fit linear trendline.
 
 With this plot, we're testing the hypothesis "as you get older, your height changes".
 
@@ -60,7 +60,7 @@ stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
   y        = 'height',             # y-axis variable
-  stat.by  = 'sex',                # statistical groups
+  stat.by  = 'sex',                # statistical groups   <====
   fit      = 'lm',                 # straight trendline
   layers   = 'tp',                 # show trendline and points
   test     = 'emtrends',           # run stats on the slopes
@@ -86,7 +86,7 @@ stats_corrplot(
   x        = 'age',                # x-axis variable
   y        = 'height',             # y-axis variable
   stat.by  = 'sex',                # statistical groups
-  fit      = 'gam',                # smoothed trendline
+  fit      = 'gam',                # smoothed trendline   <====
   layers   = 'tp',                 # show trendline and points
   test     = 'emtrends',           # run stats on the slopes
   pt.size  = 0.2 )                 # make points smaller
@@ -109,10 +109,11 @@ stats_corrplot(
   stat.by  = 'sex',                # statistical groups
   fit      = 'gam',                # smoothed trendline
   layers   = 'tc',                 # show trendline with conf. int.
-  test     = 'emmeans' )           # run stats on the means
+  test     = 'emmeans' )           # run stats on the means   <====
 ```
 
-Differences in height are most significant at age = 16.8 (p-value = 8.9e-40).
+Differences in height are most significant at age = 16.8 
+(where p-value = 8.9e-40).
 
 
 
@@ -239,7 +240,7 @@ stats_corrplot(
   fit      = 'gam',                # smoothed trendline
   layers   = 'tc',                 # show trendline with conf. int.
   test     = 'emmeans',            # run stats on the means
-  check    = TRUE )                # display diagnostic plots
+  check    = TRUE )                # display diagnostic plots   <====
 ```
 
 The subtitle for each plot tells you what a high quality model will look like. For example, the "Normal Q-Q" plot says that "Points should fall on the line." In this case they do, so that particular check indicates high-quality.

@@ -330,7 +330,7 @@ validate_meta_aes <- function (var, env = parent.frame(), null_ok = FALSE, aes =
   # Remove prefixes and confirm metadata fields exist.
   #________________________________________________________
   col_names <- names(results)
-  validate_meta('col_names', evar = var, null_ok = null_ok, ...)
+  validate_var_choices('col_names', evar = var, null_ok = null_ok, ...)
   
   if (any(duplicated(names(results))))
     stop ("Duplicate metadata fields specified in `", var, "`.")

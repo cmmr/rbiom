@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9134
-Date: 2024-07-30
+Version: 2.0.0.9135
+Date: 2024-08-01
 Authors@R: c(
     person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2479-2044")),
@@ -17,13 +17,13 @@ Description:
     All CPU intensive operations are written in C.
 URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
-License: AGPL-3.0-or-later + file LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.2.0)
 Additional_repositories: https://cmmr.github.io/rbiom
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Config/Needs/website: rmarkdown
 Config/testthat/edition: 3
 Config/testthat/parallel: true
@@ -31,47 +31,54 @@ LinkingTo:
     Rcpp,
     RcppParallel
 Imports:
+    cluster,
+    methods,
+    mgcv,
+    stats,
+    utils,
     ape,
     broom,
-    cli,
     dplyr,
     emmeans,
-    fillpattern,
     ggbeeswarm,
     ggnewscale,
     ggplot2,
     ggrepel,
     ggtext,
-    glue,
-    graphics,
     jsonlite,
-    labeling,
-    lifecycle,
     magrittr,
-    methods,
-    optparse,
     patchwork,
     pillar,
     plyr,
-    R6,
-    Rcpp,
     RcppParallel,
-    rlang,
     R.utils,
-    scales,
     slam,
-    tibble,
     vegan
 Suggests:
+    Biostrings,
+    cli,
+    crayon,
     ggdensity,
+    fillpattern,
+    glue,
     npregfast,
+    labeling,
+    lifecycle,
     openxlsx,
+    optparse,
     phyloseq,
+    pkgconfig,
     prettycode,
+    R6,
     ragg,
     reshape2,
     rhdf5,
+    rlang,
+    scales,
+    SummarizedExperiment,
     testthat,
+    tibble,
+    TreeSummarizedExperiment,
     tsne,
     uwot,
     vdiffr

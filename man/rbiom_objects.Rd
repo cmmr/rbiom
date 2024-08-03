@@ -46,15 +46,15 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
 Assigning new values to these components will trigger
 validation checks and inter-component synchronization.\tabular{ll}{
    \strong{Component} \tab \strong{What can be assigned.} \cr
-   \verb{$counts} \tab matrix of abundances; OTUs (rows) by samples (columns) \cr
-   \verb{$metadata} \tab data.frame with \code{'.sample'} column, or a file name \cr
-   \verb{$taxonomy} \tab data.frame with \code{'.otu'} as the first column \cr
-   \verb{$otus} \tab character vector with new names for the OTUs \cr
-   \verb{$samples} \tab character vector with new names for the samples \cr
-   \verb{$tree} \tab phylo object with the phylogenetic tree for the OTUs \cr
-   \verb{$sequences} \tab character vector of OTU reference sequences \cr
-   \verb{$id}, \verb{$comment} \tab string with dataset's title or comment \cr
-   \verb{$date} \tab date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string \cr
+   \verb{$counts} \tab Matrix of abundances; OTUs (rows) by samples (columns). \cr
+   \verb{$metadata} \tab Data.frame with \code{'.sample'} column, or a file name. \cr
+   \verb{$taxonomy} \tab Data.frame with \code{'.otu'} as the first column. \cr
+   \verb{$otus} \tab Character vector with new names for the OTUs. \cr
+   \verb{$samples} \tab Character vector with new names for the samples. \cr
+   \verb{$tree} \tab Phylo object with the phylogenetic tree for the OTUs. \cr
+   \verb{$sequences} \tab Named character vector of OTU reference sequences. \cr
+   \verb{$id}, \verb{$comment} \tab String with dataset's title or comment. \cr
+   \verb{$date} \tab Date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string. \cr
 }
 
 
@@ -66,8 +66,8 @@ validation checks and inter-component synchronization.\tabular{ll}{
 
 All functions return an rbiom object.\tabular{ll}{
    \strong{Function} \tab \strong{Transformation} \cr
-   \code{\emph{<rbiom>}$clone()} \tab Safely duplicate an rbiom object. \cr
-   \code{\link[=subset]{\emph{<rbiom>}[]}} \tab Subset to a specific set of sample names. \cr
+   \code{<rbiom>$clone()} \tab Safely duplicate an rbiom object. \cr
+   \code{\link[=subset]{<rbiom>[}} \tab Subset to a specific set of sample names. \cr
    \code{\link[=subset]{subset()}} \tab Subset samples according to metadata properties. \cr
    \code{\link[=slice]{slice()}} \tab Subset to a specific number of samples. \cr
    \code{\link[=mutate]{mutate()}} \tab Create, modify, and delete metadata fields. \cr
@@ -89,8 +89,8 @@ All functions return an rbiom object.\tabular{ll}{
     biom
     
     
-    # Markdown syntax is supported.
-    biom$comment
+    # Markdown syntax for comments is recommended.
+    biom$comment \%>\% cli::cli_text()
     
     
     # Demonstrate a few accessors.

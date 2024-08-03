@@ -39,7 +39,7 @@ provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
 Multiple/abbreviated values allowed.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
-\itemize{
+\describe{
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
@@ -58,7 +58,7 @@ Multiple values allowed.}
 The first four are sample-centric; the last three are taxa-centric.
 Single letter abbreviations are also accepted. For instance,
 \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and \code{"pe"}.
-See \link[=plots]{plot types} for examples of each. Default: \code{"pe"}}
+Default: \code{"pe"}}
 
 \item{stat.by}{The categorical or numeric metadata field over which
 statistics should be calculated. Required.}
@@ -67,7 +67,7 @@ statistics should be calculated. Required.}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -89,7 +89,7 @@ relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{test}{Permutational test for accessing significance. Options are:
-\itemize{
+\describe{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
@@ -129,7 +129,7 @@ options. Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -171,6 +171,7 @@ Ordinate samples and taxa on a 2D plane based on beta diversity distances.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_table}()},

@@ -198,7 +198,7 @@ using colors, shapes, and patterns to represent metadata values.
 For example, to display an ordination colored by body site:
 
 ```{r, fig.asp = 0.45}
-bdiv_ord_plot(biom = hmp50, color.by = "Body Site")
+bdiv_ord_plot(biom = hmp50, stat.by = "Body Site")
 ```
 
 `adiv_boxplot()`, `adiv_corrplot()`, `bdiv_boxplot()`, `bdiv_corrplot()`, 
@@ -211,17 +211,17 @@ bdiv_ord_plot(biom = hmp50, color.by = "Body Site")
 # Analyze
 
 Visualizations are an excellent way to observe differences between sample 
-groups. When `color.by` is set, boxplots, corrplots, and ord_plots will include 
+groups. When `stat.by` is set, boxplots, corrplots, and ord_plots will include 
 the following:
 
 * p-values and brief methodology on the plot itself.
 * `$stats` attribute with a detailed statistics table.
 * `$stats$code` attribute with the R code used to generate the table.
 
-The [Statistics](stats.html) article reviews this topic in greater detail.
+The [rbiom statistics article](statistics.html) reviews this topic in greater detail.
 
 ```{r, fig.asp = 0.45}
-p <- adiv_boxplot(hmp50, color.by = "Body Site", facet.by = "Sex")
+p <- adiv_boxplot(hmp50, stat.by = "Body Site", facet.by = "Sex")
 p
 p$stats
 

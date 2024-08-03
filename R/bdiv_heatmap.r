@@ -44,7 +44,7 @@
 #' 
 #' The following entries in the track definitions are understood: 
 #' 
-#' \itemize{
+#' \describe{
 #'   \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
 #'   \item{\code{range} - }{ The c(min,max) to use for scale values. }
 #'   \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }

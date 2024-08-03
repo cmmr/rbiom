@@ -24,7 +24,7 @@ test_that("Rarefaction", {
   expect_gt(r2, .3)
   
   # simple_triplet_matrix in, simple_triplet_matrix out
-  x  <- slam::as.simple_triplet_matrix(matrix(runif(100, 0, 1000), ncol=10))
+  x  <- as.simple_triplet_matrix(matrix(runif(100, 0, 1000), ncol=10))
   y  <- rarefy(x, depth=100)
   z  <- merge(
     reshape2::melt(as.matrix(x)), 

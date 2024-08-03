@@ -11,3 +11,10 @@
 ^.*\.Rproj$
 ^vignettes/articles$
 ^README\.Rmd$
+^build.r
+^conda
+^install.sh
+^paper.bib
+^paper.md
+^pkgdown
+^rbiom.txt

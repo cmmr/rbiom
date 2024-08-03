@@ -1,18 +1,17 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
-  aes: aes.html
-  bdiv_cmp: bdiv_cmp.html
-  diversity: diversity.html
-  importing: importing.html
-  plots: plots.html
-  rbiom: rbiom.html
-  regression: regression.html
-  scales: scales.html
-  statistics: statistics.html
-last_built: 2024-07-30T17:26Z
+  articles/aes: aes.html
+  articles/bdiv_cmp: bdiv_cmp.html
+  articles/diversity: diversity.html
+  articles/importing: importing.html
+  articles/plots: plots.html
+  articles/rbiom: rbiom.html
+  articles/regression: regression.html
+  articles/scales: scales.html
+  articles/statistics: statistics.html
+last_built: 2024-08-03T01:40Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles
-

@@ -9,12 +9,14 @@
 #' 
 #' @param biom   Object which can be coerced to an rbiom-class object.
 #'        For example:
-#'        \itemize{
+#'        \describe{
 #'          \item{\emph{file} - }{ Filepath or URL to a biom file. }
 #'          \item{\emph{matrix} - }{ An abundance matrix with OTUs in rows and samples in columns. }
 #'          \item{`phyloseq`-class object - }{ From the phyloseq Bioconductor R package. }
 #'          \item{\emph{list} - }{ With `counts` and optionally `metadata`, `taxonomy`, `tree`, etc (see details). }
 #'        }
+#' 
+#' @param ...   Not used.
 #'
 #' @export
 #' @examples
@@ -44,12 +46,12 @@ as_rbiom <- function(biom, ...) {
 
 
 #' @export
-as_rbiom.rbiom <- function (biom) {
+as_rbiom.rbiom <- function (biom, ...) {
   
   #________________________________________________________
   # Already an rbiom/R6 object.
   #________________________________________________________
-  if (!identical(pv1 <- biom$pkg_version, pv2 <- packageVersion("rbiom"))) {
+  if (!identical(pv1 <- biom$pkg_version, pv2 <- utils::packageVersion("rbiom"))) {
     
     # if (getOption("rbiom.inform", default = TRUE))
     #   cli_inform(.frequency = "regularly", .frequency_id = "up_convert", c(
@@ -70,11 +72,11 @@ as_rbiom.rbiom <- function (biom) {
 #________________________________________________________
 
 #' @export
-as_rbiom.matrix <- function (biom) { rbiom$new(counts = biom) }
+as_rbiom.matrix <- function (biom, ...) { rbiom$new(counts = biom) }
 
 
 #' @export
-as_rbiom.simple_triplet_matrix <- function (biom) { rbiom$new(counts = biom) }
+as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom) }
 
 
 #________________________________________________________
@@ -82,13 +84,13 @@ as_rbiom.simple_triplet_matrix <- function (biom) { rbiom$new(counts = biom) }
 #________________________________________________________
 
 #' @export
-as_rbiom.phyloseq <- function (biom) {
+as_rbiom.phyloseq <- function (biom, ...) {
   
   if (!nzchar(system.file(package = "phyloseq")))
     cli_abort("Bioconductor R package 'phyloseq' must be installed to use as_rbiom.phyloseq().")
   
   rbiom$new(
-    counts    = biom %>% phyloseq::otu_table() %>% slam::as.simple_triplet_matrix(), 
+    counts    = biom %>% phyloseq::otu_table() %>% as.simple_triplet_matrix(), 
     metadata  = biom %>% phyloseq::sample_data(errorIfNULL = FALSE) %>% data.frame(), 
     taxonomy  = biom %>% phyloseq::tax_table(errorIfNULL = FALSE) %>% data.frame(), 
     sequences = biom %>% phyloseq::refseq(errorIfNULL = FALSE) %>% as.vector(), 
@@ -99,7 +101,7 @@ as_rbiom.phyloseq <- function (biom) {
 
 
 #' @export
-as_rbiom.default <- function (biom) {
+as_rbiom.default <- function (biom, ...) {
   
   
   #________________________________________________________

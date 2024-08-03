@@ -1,10 +1,13 @@
 
 #' Print code blocks neatly.
 #' 
+#' @param x   An object of class `rbiom_code`.
+#' @param ...   Not used.
+#' 
 #' @noRd
 #' @keywords internal
 #' @export
-print.rbiom_code <- function (x) {
+print.rbiom_code <- function (x, ...) {
   
   if (nzchar(system.file(package = "prettycode"))) {
     
@@ -28,7 +31,6 @@ print.rbiom_code <- function (x) {
   
   return (invisible(NULL))
 }
-
 
 
 
@@ -85,12 +87,15 @@ tbl_sum.rbiom_tbl <- function (x) {
 #' 
 #' @family conversion
 #' 
+#' @param ...   Not used.
+#' 
 #' @return A list with names
 #'         `c('counts', 'metadata', 'taxonomy', 'tree', 'sequences', 'id', 'comment', 'date', 'generated_by')`.
 #' 
 #' @export
 #' 
-as.list.rbiom <- function (biom) {
+as.list.rbiom <- function (x, ...) {
+  biom <- x
   list(
     'counts'       = biom$counts, 
     'metadata'     = biom$metadata, 
@@ -112,7 +117,7 @@ as.list.rbiom <- function (biom) {
 #' 
 #' @family samples
 #' 
-#' @param field   The metadata field name specified as:
+#' @param var   The metadata field name specified as:
 #' \itemize{
 #'   \item{The metadata field name to retrieve. Can be abbreviated.}
 #'   \item{A positive integer, giving the position counting from the left.}
@@ -123,7 +128,7 @@ as.list.rbiom <- function (biom) {
 #' @param name   The column to be used as names for a named vector. 
 #'        Specified in a similar manner as var. Default: `".sample"`
 #' 
-#' @param ...   Passed on to [dplyr::pull()].
+#' @param ...   Not used.
 #' 
 #' @return A vector of metadata values, named with sample names.
 #' 
@@ -137,10 +142,11 @@ as.list.rbiom <- function (biom) {
 #'     
 #'     pull(hmp50, 'bod') %>% head(4)
 #'     
-pull.rbiom <- function (biom, field = -1, name = ".sample", ...) {
-  if (!is_integerish(field)) validate_biom_field("field")
-  if (!is_integerish(name))  validate_biom_field("name", null_ok = TRUE)
-  dplyr::pull(.data = biom$metadata, var = field, name = name, ...)
+pull.rbiom <- function (.data, var = -1, name = ".sample", ...) {
+  biom <- .data
+  if (!is_integerish(var))  validate_biom_field("var")
+  if (!is_integerish(name)) validate_biom_field("name", null_ok = TRUE)
+  dplyr::pull(.data = biom$metadata, var = var, name = name)
 }
 
 
@@ -148,14 +154,14 @@ pull.rbiom <- function (biom, field = -1, name = ".sample", ...) {
 
 #' Get a glimpse of your metadata.
 #' 
-#' @inherit documentation_default
+#' @inherit documentation_biom.rbiom
 #' 
 #' @family metadata
 #' 
 #' @param width   Width of output. See [pillar::glimpse()] documentation. 
 #'        Default: `NULL`
 #' 
-#' @param ...   Unused, for extensibility.
+#' @param ...   Not used.
 #' 
 #' @return The original `biom`, invisibly.
 #' 
@@ -165,8 +171,9 @@ pull.rbiom <- function (biom, field = -1, name = ".sample", ...) {
 #'     
 #'     glimpse(hmp50)
 #'     
-glimpse.rbiom <- function (biom, width = NULL, ...) {
-  eval.parent(pillar::glimpse(x = biom$metadata, width = width, ...))
+glimpse.rbiom <- function (x, width = NULL, ...) {
+  biom <- x
+  eval.parent(pillar::glimpse(x = biom$metadata, width = width))
   return (invisible(biom))
 }
 
@@ -183,7 +190,7 @@ glimpse.rbiom <- function (biom, width = NULL, ...) {
 #' @inherit documentation_return.biom return
 #' @inherit documentation_default
 #' 
-#' @name mutate
+#' @name modify_metadata
 #' @family transformations
 #' 
 #' @param ...   Passed on to [dplyr::mutate()] or [dplyr::rename()].
@@ -204,18 +211,18 @@ glimpse.rbiom <- function (biom, width = NULL, ...) {
 #'     biom <- rename(biom, 'Age (years)' = "Age")
 #'     biom$metadata
 #' 
-mutate.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
+mutate.rbiom <- function (.data, ..., clone = TRUE) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
   biom$metadata <- eval.parent(dplyr::mutate(.data = biom$metadata, ...))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
 
-#' @rdname mutate
+#' @rdname modify_metadata
 #' @export
-rename.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
+rename.rbiom <- function (.data, ..., clone = TRUE) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
   biom$metadata <- eval.parent(dplyr::rename(.data = biom$metadata, ...))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
@@ -230,11 +237,14 @@ rename.rbiom <- function (biom, ..., clone = TRUE) {
 #' an rbiom object.
 #' 
 #' @inherit documentation_biom.rbiom
+#' @inherit documentation_default
 #' 
 #' @name with
 #' @family transformations
 #' 
-#' @param ...   Passed on to [base::with()] or [base::within()].
+#' @param expr   Passed on to [base::with()] or [base::within()].
+#' 
+#' @param ...   Not used.
 #' 
 #' @return See description.
 #' 
@@ -250,17 +260,32 @@ rename.rbiom <- function (biom, ..., clone = TRUE) {
 #'     })
 #'     biom$metadata
 #' 
-with.rbiom <- function (biom, ...) {
-  eval.parent(base::with(data = biom$metadata, ...))
+with.rbiom <- function (data, expr, ...) {
+  eval(expr = substitute(expr), envir = data$metadata, enclos = parent.frame())
 }
 
 
 
 #' @rdname with
 #' @export
-within.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(base::within(data = biom$metadata, ...))
+within.rbiom <- function (data, expr, clone = TRUE, ...) {
+  
+  biom <- if (isTRUE(clone)) data$clone() else data
+  data <- biom$metadata
+  
+  # copied from base::within.data.frame
+  parent <- parent.frame()
+  e <- evalq(environment(), data, parent)
+  eval(substitute(expr), e)
+  l <- as.list(e, all.names = TRUE)
+  l <- l[!vapply(l, is.null, NA, USE.NAMES = FALSE)]
+  nl <- names(l)
+  del <- setdiff(names(data), nl)
+  data[nl] <- l
+  data[del] <- NULL
+  
+  biom$metadata <- data
+  
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -277,7 +302,15 @@ within.rbiom <- function (biom, ..., clone = TRUE) {
 #' @name subset
 #' @family transformations
 #' 
-#' @param ...   Passed on to [base::subset()].
+#' @param subset   Logical expression for rows to keep. See [base::subset()].
+#' 
+#' @param i   The sample names to keep. Or a logical/integer vector indicating 
+#'        which sample names from `biom$samples` to keep.
+#' 
+#' @param fields   Which metadata field(s) to check for `NA`s, or `".all"` to
+#'        check all metadata fields.
+#' 
+#' @param ...   Not used.
 #' 
 #' 
 #' @export
@@ -299,9 +332,10 @@ within.rbiom <- function (biom, ..., clone = TRUE) {
 #'     biom$metadata
 #' 
 
-subset.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(base::subset(x = biom$metadata, ...))
+subset.rbiom <- function (x, subset, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) x$clone() else x
+  keep <- eval(expr = substitute(subset), envir = biom$metadata, enclos = parent.frame())
+  biom <- biom[keep]
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -336,19 +370,19 @@ subset.rbiom <- function (biom, ..., clone = TRUE) {
 
 #' @rdname subset
 #' @export
-na.omit.rbiom <- function (biom, fields = ".all", clone = TRUE) {
+na.omit.rbiom <- function (object, fields = ".all", clone = TRUE, ...) {
   
-  if (isTRUE(clone)) biom <- biom$clone()
+  biom <- if (isTRUE(clone)) object$clone() else object
   
   if (length(fields) == 0) return (biom)
   
   if (eq(fields, ".all")) fields <- biom$fields
   validate_biom_field('fields', max = Inf)
   
-  keep <- complete.cases(biom$metadata[,fields,drop=FALSE])
+  keep <- stats::complete.cases(biom$metadata[,fields,drop=FALSE])
   biom$counts <- biom$counts[,keep]
   
-  return (biom)
+  if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
@@ -360,11 +394,13 @@ na.omit.rbiom <- function (biom, fields = ".all", clone = TRUE) {
 #' @inherit documentation_biom.rbiom
 #' @inherit documentation_return.biom return
 #' @inherit documentation_default
+#' @inheritParams dplyr::slice
 #' 
-#' @name slice
+#' @name slice_metadata
 #' @family transformations
 #' 
-#' @param ...   Passed on to [dplyr::slice()].
+#' @param ...   For `slice()`, integer row indexes. For other `slice_*()` 
+#'        functions, not used. See [dplyr::slice()].
 #' 
 #' 
 #' @export
@@ -383,54 +419,60 @@ na.omit.rbiom <- function (biom, fields = ".all", clone = TRUE) {
 #'     biom <- slice_sample(hmp50, n = 3)
 #'     biom$metadata
 #' 
-slice.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(dplyr::slice(.data = biom$metadata, ...))
+slice.rbiom <- function (.data, ..., .by = NULL, .preserve = FALSE, clone = TRUE) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(dplyr::slice(
+    .data = biom$metadata, ..., .by = .by, .preserve = .preserve ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
-#' @rdname slice
+#' @rdname slice_metadata
 #' @export
-slice_head.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(dplyr::slice_head(.data = biom$metadata, ...))
+slice_head.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(dplyr::slice_head(
+    .data = biom$metadata, n = n, prop = prop, by = by ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
-#' @rdname slice
+#' @rdname slice_metadata
 #' @export
-slice_tail.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(dplyr::slice_tail(.data = biom$metadata, ...))
+slice_tail.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(dplyr::slice_tail(
+    .data = biom$metadata, n = n, prop = prop, by = by ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
-#' @rdname slice
+#' @rdname slice_metadata
 #' @export
-slice_min.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(dplyr::slice_min(.data = biom$metadata, ...))
+slice_min.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TRUE, na_rm = FALSE, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(dplyr::slice_min(
+    .data = biom$metadata, order_by = order_by, n = n, prop = prop, by = by, with_ties = with_ties, na_rm = na_rm ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
-#' @rdname slice
+#' @rdname slice_metadata
 #' @export
-slice_max.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(slice_max(.data = biom$metadata, ...))
+slice_max.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TRUE, na_rm = FALSE, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(slice_max(
+    .data = biom$metadata, order_by = order_by, n = n, prop = prop, by = by, with_ties = with_ties, na_rm = na_rm ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
-#' @rdname slice
+#' @rdname slice_metadata
 #' @export
-slice_sample.rbiom <- function (biom, ..., clone = TRUE) {
-  if (isTRUE(clone)) biom <- biom$clone()
-  biom$metadata <- eval.parent(slice_sample(.data = biom$metadata, ...))
+slice_sample.rbiom <- function (.data, n, prop, by = NULL, weight_by = NULL, replace = FALSE, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) .data$clone() else .data
+  biom$metadata <- eval.parent(slice_sample(
+    .data = biom$metadata, n = n, prop = prop, by = by,  weight_by = weight_by, replace = replace ))
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 

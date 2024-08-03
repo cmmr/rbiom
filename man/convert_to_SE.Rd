@@ -18,7 +18,7 @@ A SummarizedExperiment or TreeSummarizedExperiment object.
 }
 \description{
 Requires the relevant Bioconductor R package to be installed:
-\itemize{
+\describe{
 \item{\code{convert_to_SE} - }{ \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} }
 \item{\code{convert_to_TSE} - }{ \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment} }
 }

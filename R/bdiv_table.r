@@ -6,7 +6,7 @@
 #' @family beta_diversity
 #' 
 #' @return
-#' \itemize{
+#' \describe{
 #'   \item{`bdiv_matrix()` - }{ An R matrix of samples x samples. }
 #'   \item{`bdiv_distmat()` - }{ A dist-class distance matrix. }
 #'   \item{`bdiv_table()` - }{
@@ -114,8 +114,8 @@ bdiv_table <- function (
           '.weighted' = w,
           '.bdiv'     = b,
           '.distance' = as.numeric(mtx) ) %>%
-          dplyr::filter(.sample1 < .sample2) %>%
-          dplyr::filter(!is.na(.distance))
+          dplyr::filter(.data$.sample1 < .data$.sample2) %>%
+          dplyr::filter(!is.na(.data$.distance))
         
       }))
   
@@ -373,7 +373,7 @@ bdiv_distmat <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
     within = NULL, between = NULL, trans = "none" ) {
   
-  as.dist(bdiv_matrix(
+  stats::as.dist(bdiv_matrix(
     biom     = biom, 
     bdiv     = bdiv, 
     weighted = weighted, 

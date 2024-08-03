@@ -34,6 +34,9 @@ mentioned below should match column names in \code{df}. Required.}
 \item{x}{A categorical metadata column name to use for the x-axis. Or
 \code{NULL}, which groups all samples into a single category.}
 
+\item{y}{A numeric metadata column name to use for the y-axis.
+Default: \code{attr(df, 'response')}}
+
 \item{layers}{One or more of
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
@@ -47,7 +50,7 @@ categorical. Default: \code{NULL}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -106,7 +109,7 @@ Default: \code{"auto"}.}
 
 \item{p.label}{Minimum adjusted p-value to display on the plot with a
 bracket.
-\itemize{
+\describe{
 \item{\code{p.label = 0.05} - }{ Show p-values that are <= 0.05. }
 \item{\code{p.label = 0} - }{ Don't show any p-values on the plot. }
 \item{\code{p.label = 1} - }{ Show all p-values on the plot. }

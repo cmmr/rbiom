@@ -9,7 +9,7 @@
 #'        
 #' @return A data.frame with summary statistics from [vegan::permustats()]. 
 #'         The columns are:
-#'        \itemize{
+#'        \describe{
 #'          \item{\emph{.n} - }{ The size of the distance matrix. }
 #'          \item{\emph{.stat} - }{ 
 #'                The observed statistic. For mrpp, this is the overall 

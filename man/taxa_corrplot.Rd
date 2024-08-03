@@ -68,7 +68,7 @@ level ranks. Default: \code{FALSE}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -91,7 +91,7 @@ categorical. Default: \code{NULL}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -129,6 +129,10 @@ options. Default: \code{"fdr"}}
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
+
+\item{ties}{When \code{trans="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
@@ -181,6 +185,7 @@ letters instead of shapes on the plot. Character strings may used as well.
 \seealso{
 Other taxa_abundance: 
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()},
 \code{\link{taxa_stats}()},

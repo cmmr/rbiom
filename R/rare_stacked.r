@@ -126,7 +126,11 @@ rare_stacked <- function (
   #________________________________________________________
   # Add default layer parameters.
   #________________________________________________________
+  
+  xmin <- xmax <- ymin <- ymax <- NULL # for CRAN check only
   set_layer(params, 'rect',  mapping = .qw(xmin, xmax, ymin, ymax), color=NA)
+  remove("xmin", "xmax", "ymin", "ymax")
+  
   set_layer(params, 'yaxis', expand = c(0,0))
   set_layer(params, 'theme', panel.grid.major.x = element_blank())
   

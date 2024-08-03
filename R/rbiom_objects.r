@@ -46,17 +46,17 @@
 #' Assigning new values to these components will trigger 
 #' validation checks and inter-component synchronization.
 #' 
-#' | **Component**     | **What can be assigned.**                              |
-#' | ----------------- | ------------------------------------------------------ |
-#' | `$counts`         | matrix of abundances; OTUs (rows) by samples (columns) |
-#' | `$metadata`       | data.frame with `'.sample'` column, or a file name     |
-#' | `$taxonomy`       | data.frame with `'.otu'` as the first column           |
-#' | `$otus`           | character vector with new names for the OTUs           |
-#' | `$samples`        | character vector with new names for the samples        |
-#' | `$tree`           | phylo object with the phylogenetic tree for the OTUs   |
-#' | `$sequences`      | character vector of OTU reference sequences            |
-#' | `$id`, `$comment` | string with dataset's title or comment                 |
-#' | `$date`           | date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string     |
+#' | **Component**     | **What can be assigned.**                               |
+#' | ----------------- | ------------------------------------------------------- |
+#' | `$counts`         | Matrix of abundances; OTUs (rows) by samples (columns). |
+#' | `$metadata`       | Data.frame with `'.sample'` column, or a file name.     |
+#' | `$taxonomy`       | Data.frame with `'.otu'` as the first column.           |
+#' | `$otus`           | Character vector with new names for the OTUs.           |
+#' | `$samples`        | Character vector with new names for the samples.        |
+#' | `$tree`           | Phylo object with the phylogenetic tree for the OTUs.   |
+#' | `$sequences`      | Named character vector of OTU reference sequences.      |
+#' | `$id`, `$comment` | String with dataset's title or comment.                 |
+#' | `$date`           | Date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string.     |
 #' 
 #' \cr
 #' 
@@ -65,14 +65,14 @@
 #' 
 #' All functions return an rbiom object.
 #' 
-#' | **Function**                            | **Transformation**                               |
-#' | --------------------------------------- | ------------------------------------------------ |
-#' | \code{\emph{<rbiom>}$clone()}           | Safely duplicate an rbiom object.                |
-#' | \code{\link[=subset]{\emph{<rbiom>}[]}} | Subset to a specific set of sample names.        |
-#' | [subset()]                              | Subset samples according to metadata properties. |
-#' | [slice()]                               | Subset to a specific number of samples.          |
-#' | [mutate()]                              | Create, modify, and delete metadata fields.      |
-#' | [rarefy()]                              | Sub-sample OTU counts to an even sampling depth. |
+#' | **Function**                     | **Transformation**                               |
+#' | -------------------------------- | ------------------------------------------------ |
+#' | \code{<rbiom>$clone()}           | Safely duplicate an rbiom object.                |
+#' | \code{\link[=subset]{<rbiom>[}}  | Subset to a specific set of sample names.        |
+#' | [subset()]                       | Subset samples according to metadata properties. |
+#' | [slice()]                        | Subset to a specific number of samples.          |
+#' | [mutate()]                       | Create, modify, and delete metadata fields.      |
+#' | [rarefy()]                       | Sub-sample OTU counts to an even sampling depth. |
 #' 
 #' \cr
 #' 
@@ -88,8 +88,8 @@
 #'     biom
 #'     
 #'     
-#'     # Markdown syntax is supported.
-#'     biom$comment
+#'     # Markdown syntax for comments is recommended.
+#'     biom$comment %>% cli::cli_text()
 #'     
 #'     
 #'     # Demonstrate a few accessors.
@@ -137,7 +137,7 @@ rbiom <- R6::R6Class(
     .date         = "",
     .generated_by = "",
     
-    .pkg_version  = packageVersion("rbiom"),
+    .pkg_version  = utils::packageVersion("rbiom"),
     .hashes       = list(
       .counts       = rlang::hash(NULL),
       .metadata     = rlang::hash(NULL),
@@ -183,7 +183,7 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Sync OTU names between counts, taxonomy, and seqs.
       #________________________________________________________
-      otus <- rev(sort(slam::row_sums(private$.counts)))
+      otus <- rev(sort(row_sums(private$.counts)))
       otus <- names(otus[otus > 0])
       
       if (!identical(otus, rownames(private$.counts))) {
@@ -248,7 +248,7 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Value found by read_biom(). Read-only hereafter.
       #________________________________________________________
-      private$.generated_by <- paste("rbiom", packageVersion("rbiom"))
+      private$.generated_by <- paste("rbiom", utils::packageVersion("rbiom"))
       if (!is.null(generated_by <- dots[['generated_by']]))
         if (is_scalar_character(generated_by) && !is.na(generated_by))
           private$.generated_by <- generated_by
@@ -271,32 +271,36 @@ rbiom <- R6::R6Class(
       rlang::local_options(cli.width = width)
       
       
-      cat("\n")
-      title <- ifelse(nzchar(private$.id), private$.id, "An rbiom object")
-      div   <- cli::cli_div(theme = list(
-        rule = list("color" = "grey50", "line-type" = "double"),
-        span = list("color" = "white") ))
-      cli::cli_rule(paste0("{.span ", title, "}"), .envir = stop())
-      cli::cli_end(div)
-      cat("\n")
+      div <- cli::cli_div(theme = list(
+        'rule' = list(color = "grey50", 'line-type' = "double"),
+        'span' = list(color = "white") ))
       
+      cli::cli_text("\n")
+      title <- ifelse(nzchar(private$.id), private$.id, "An rbiom object")
+      cli::cli_rule(paste0("{.span ", title, "}"), .envir = stop())
+      
+      cli::cli_end(div)
+      cli::cli_text("\n")
+      
+      
+      div <- cli::cli_div(theme = list(
+        'span.url' = list(color = "grey50"),
+        'rule'     = list(color = "grey50"),
+        'span.q'   = list(fmt = function (x) gsub(" ", "\u00a0", x)) ))
       
       if (nzchar(private$.comment)) {
         private$.comment %>%    # Make clickable hyperlinks.
           gsub('(\\[.+?\\]\\(.+?\\))', '{.href \\1}', .) %>%
           cli::cli_text(.envir = stop())
-        cat("\n")
+        cli::cli_text("\n")
       }
       
-      
-      cat(sprintf("%7.0f Samples: %s\n", length(sids),   vw(sids,   width - 20)))
-      cat(sprintf("%7.0f OTUs:    %s\n", length(otus),   vw(otus,   width - 20)))
-      cat(sprintf("%7.0f Ranks:   %s\n", length(ranks),  vw(ranks,  width - 20)))
-      cat(sprintf("%7.0f Fields:  %s\n", length(fields), vw(fields, width - 20)))
-      cat("        Tree:    ")
-      cli::cli_text("{.emph {ifelse(is.null(private$.tree), '<absent>', '<present>')}}")
-      cat("\n")
-      
+      cli::cli_text("{.q {sprintf('%7.0f Samples: %s\n', length(sids),   vw(sids,   width - 20))}}")
+      cli::cli_text("{.q {sprintf('%7.0f OTUs:    %s\n', length(otus),   vw(otus,   width - 20))}}")
+      cli::cli_text("{.q {sprintf('%7.0f Ranks:   %s\n', length(ranks),  vw(ranks,  width - 20))}}")
+      cli::cli_text("{.q {sprintf('%7.0f Fields:  %s\n', length(fields), vw(fields, width - 20))}}")
+      cli::cli_text("{.q {'        Tree:    '}}{.emph {ifelse(is.null(private$.tree), '<absent>', '<present>')}}")
+      cli::cli_text("\n")
       
       if (is.null(depth <- private$.depth))
         depth <- range(col_sums(private$.counts)) %>%
@@ -304,13 +308,12 @@ rbiom <- R6::R6Class(
           sub(' ', '', .) %>% 
           paste(collapse = " - ")
       
-      div <- cli::cli_div(theme = list(rule = list("color" = "grey50")))
       cli::cli_rule(
         left   = paste(depth, 'reads/sample'), 
         right  = substr(private$.date, 1, 10) )
-      cli::cli_end(div)
-      cat("\n")
       
+      cli::cli_end(div)
+      cli::cli_text("\n")
     }
     
   ), # /public
@@ -354,7 +357,7 @@ rbiom <- R6::R6Class(
       if (nchar(value) > 5000) {
         if (interactive()) cli_warn("Truncating `comment` to 5000 characters.")
         value <- substr(value, 0, 5000)
-      } 
+      }
       private$.comment <- value
       
       return (self)
@@ -502,13 +505,13 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Make '.otu' the first column.
       #________________________________________________________
-      if (!has_rownames(value) && !hasName(value, '.otu'))
+      if (!tibble::has_rownames(value) && !hasName(value, '.otu'))
         cli_abort(c(x = "Taxonomy table must have row names or an '.otu' column."))
       
-      if (has_rownames(value) && hasName(value, '.otu'))
+      if (tibble::has_rownames(value) && hasName(value, '.otu'))
         cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
       
-      if (has_rownames(value)) { value %<>% rownames_to_column('.otu')
+      if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.otu')
       } else                   { value %<>% relocate(.otu) }
       
       
@@ -590,7 +593,7 @@ rbiom <- R6::R6Class(
             ch  <- c(strsplit(readLines(con = fp, n = 1), '')[[1]], "\t")
             sep <- ch[[head(which(ch %in% c("\t", ",", ";")), 1)]]
             
-            value <- read.delim(
+            value <- utils::read.delim(
               file        = value, 
               sep         = sep, 
               check.names = FALSE,
@@ -623,13 +626,13 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Make '.sample' the first column.
       #________________________________________________________
-      if (!has_rownames(value) && !hasName(value, '.sample'))
+      if (!tibble::has_rownames(value) && !hasName(value, '.sample'))
         cli_abort(c(x = "Metadata table must have row names or a '.sample' column."))
       
-      if (has_rownames(value) && hasName(value, '.sample'))
+      if (tibble::has_rownames(value) && hasName(value, '.sample'))
         cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
       
-      if (has_rownames(value)) { value %<>% rownames_to_column('.sample')
+      if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.sample')
       } else                   { value %<>% relocate(.sample) }
       
       
@@ -702,8 +705,8 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Coerce value to slam matrix.
       #________________________________________________________
-      value <- slam::as.simple_triplet_matrix(value)
-      stopifnot(slam::is.simple_triplet_matrix(value))
+      value <- as.simple_triplet_matrix(value)
+      stopifnot(is.simple_triplet_matrix(value))
       
       
       #________________________________________________________
@@ -774,8 +777,8 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Drop zero abundance samples/otus.
       #________________________________________________________
-      sids <- names(which(slam::col_sums(value) > 0))
-      otus <- names(which(slam::row_sums(value) > 0))
+      sids <- names(which(col_sums(value) > 0))
+      otus <- names(which(row_sums(value) > 0))
       
       if (length(sids) == 0)
         cli_abort(c(

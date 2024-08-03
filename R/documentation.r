@@ -37,7 +37,7 @@
 #'        Default: `6`.
 #'        
 #' @param ord    Method for reducing dimensionality. Options are:
-#'        \itemize{
+#'        \describe{
 #'            \item{`"PCoA"` - }{ Principal coordinate analysis; [ape::pcoa()]. }
 #'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
@@ -72,7 +72,7 @@
 #'        
 #' @param unc  How to handle unclassified, uncultured, and similarly ambiguous
 #'        taxa names. Options are: 
-#'        \itemize{
+#'        \describe{
 #'          \item{`"singly"` - }{ Replaces them with the OTU name. }
 #'          \item{`"grouped"` - }{ Replaces them with a higher rank's name. }
 #'          \item{`"drop"` - }{ Excludes them from the result. }
@@ -89,7 +89,7 @@
 #'        Default: `FALSE`
 #'        
 #' @param sparse  If true, returns a sparse matrix as described by 
-#'        [slam::simple_triplet_matrix()], otherwise returns a normal R
+#'        [simple_triplet_matrix()], otherwise returns a normal R
 #'        matrix object. Default: `FALSE`
 #'        
 #' @param p.top   Only display taxa with the most significant differences in 
@@ -103,7 +103,7 @@
 #' @param y.trans   The transformation to apply to the y-axis. Visualizing 
 #'        differences of both high- and low-abundance taxa is best done with
 #'        a non-linear axis. Options are: 
-#'        \itemize{
+#'        \describe{
 #'          \item{`"sqrt"` - }{ square-root transformation }
 #'          \item{`"log1p"` - }{ log(y + 1) transformation }
 #'          \item{`NULL` - }{ no transformation }
@@ -128,7 +128,7 @@
 #'
 #' @param p.label   Minimum adjusted p-value to display on the plot with a 
 #'        bracket.
-#'        \itemize{
+#'        \describe{
 #'          \item{`p.label = 0.05` - }{ Show p-values that are <= 0.05. }
 #'          \item{`p.label = 0` - }{ Don't show any p-values on the plot. }
 #'          \item{`p.label = 1` - }{ Show all p-values on the plot. }
@@ -187,7 +187,7 @@
 #'        Default: `NULL`
 #'        
 #' @param colors   How to color the groups. Options are:
-#'        \itemize{
+#'        \describe{
 #'            \item{`TRUE` - }{ Automatically select colorblind-friendly colors. }
 #'            \item{`FALSE` or `NULL` - }{ Don't use colors. }
 #'            \item{a palette name - }{ Auto-select colors from this set. E.g. `"okabe"` }
@@ -262,6 +262,10 @@
 #'        `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for 
 #'        correcting for non-normally distributions before applying regression 
 #'        statistics. Default: `"none"`
+#' 
+#' @param ties   When `trans="rank"`, how to rank identical values.
+#'        Options are: `c("average", "first", "last", "random", "max", "min")`. 
+#'        See `rank()` for details. Default: `"random"`
 #'   
 NULL
 
@@ -274,6 +278,14 @@ NULL
 #' @keywords internal
 #' 
 #' @param biom    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
+#' 
+#' @param .data    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
+#' 
+#' @param x    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
+#' 
+#' @param object    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
+#' 
+#' @param data    An [rbiom object][rbiom_objects], such as from [as_rbiom()].
 #' 
 NULL
 
@@ -323,6 +335,8 @@ NULL
 #'        highest, `-1` is the lowest rank, `-2` is the second 
 #'        lowest, and `0` is the OTU "rank". Run `biom$ranks` to 
 #'        see all options for a given rbiom object. Default: `.otu`.
+#' 
+#' @return A numeric factor assigning samples to clusters.
 #' 
 NULL
 
@@ -413,7 +427,7 @@ NULL
 #'        control the row and column clustering separately, for example 
 #'        `clust = c(rows = "complete", cols = NA)`, or simply 
 #'        `clust = c("complete", NA)`. Options are:
-#'        \itemize{
+#'        \describe{
 #'          \item{`FALSE` or `NA` - }{ Disable reordering. }
 #'          \item{An `hclust` class object}{ E.g. from [stats::hclust()]. }
 #'          \item{A method name - }{ `"ward.D"`, 
@@ -428,7 +442,7 @@ NULL
 #'        two to control the row and column clustering separately, for example 
 #'        `dist = c(rows = "euclidean", cols = "maximum")`, or simply 
 #'        `dist = c("euclidean", "maximum")`. Options are:
-#'        \itemize{
+#'        \describe{
 #'          \item{A `dist` class object}{ E.g. from [stats::dist()] or [bdiv_distmat()]. }
 #'          \item{A method name - }{ `"euclidean"`, 
 #'            `"maximum"`, `"manhattan"`, `"canberra"`, 
@@ -466,7 +480,7 @@ NULL
 #'        statistics should be calculated. Required.
 #'        
 #' @param test    Permutational test for accessing significance. Options are:
-#'        \itemize{
+#'        \describe{
 #'            \item{`"adonis2"` - }{ Permutational MANOVA; [vegan::adonis2()]. }
 #'            \item{`"mrpp"` - }{ Multiple response permutation procedure; [vegan::mrpp()]. }
 #'            \item{`"none"` - }{ Don't run any statistics. }

@@ -15,7 +15,7 @@ correspond to \code{attr(dm, 'Labels')}. Values can be either
 categorical or numeric. Required.}
 
 \item{test}{Permutational test for accessing significance. Options are:
-\itemize{
+\describe{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
@@ -31,7 +31,7 @@ Default: \code{999}}
 \value{
 A data.frame with summary statistics from \code{\link[vegan:permustats]{vegan::permustats()}}.
 The columns are:
-\itemize{
+\describe{
 \item{\emph{.n} - }{ The size of the distance matrix. }
 \item{\emph{.stat} - }{
 The observed statistic. For mrpp, this is the overall
@@ -68,6 +68,7 @@ Run statistics on a distance matrix vs a categorical or numeric variable.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},

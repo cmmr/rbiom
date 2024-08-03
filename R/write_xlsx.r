@@ -50,11 +50,11 @@ write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = 's
       if ('Reads Per Step' %in% names(attributes(full))) {
         rps <- attr(full, 'Reads Per Step', exact = TRUE)
       } else {
-        rps <- data.frame(Mapped=slam::col_sums(full$counts))
+        rps <- data.frame(Mapped=col_sums(full$counts))
       }
       
       rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
-      rps[['Rarefied']] <- slam::col_sums(rare$counts)[rownames(rps)]
+      rps[['Rarefied']] <- col_sums(rare$counts)[rownames(rps)]
       rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
       
       df <- tibble::as_tibble(rps, rownames = '.sample')
@@ -123,7 +123,7 @@ write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = 's
   openxlsx::writeData(wb, 'OTU Taxonomy', local({
     
     tbl <- biom$taxonomy %>%
-      relocate(.otu)
+      relocate('.otu')
     
     if (!is.null(seqs <- full$sequences))
       tbl %<>% mutate(.sequence = unname(seqs[tbl$.otu]))
@@ -165,7 +165,7 @@ write_xlsx <- function (biom, file, depth = 'auto', n = NULL, seed = 0, unc = 's
   for (rank in rare$ranks[-1]) {
     openxlsx::addWorksheet(wb, rank)
     taxa_matrix(rare, rank, lineage = TRUE) %>%
-      tibble::as_tibble(rps, rownames = paste0('.', tolower(rank))) %>%
+      tibble::as_tibble(rownames = paste0('.', tolower(rank))) %>%
       openxlsx::writeData(wb = wb, sheet = rank)
   }
   

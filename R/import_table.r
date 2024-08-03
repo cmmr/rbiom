@@ -30,7 +30,7 @@ import_table <- function (filename, matrix = FALSE, ...) {
     on.exit(unlink(tmp), add=TRUE)
     
     res <- tryCatch(
-      expr  = download.file(filename, tmp, quiet=TRUE),
+      expr  = utils::download.file(filename, tmp, quiet=TRUE),
       error = function (e) stop("Can't download ", filename,"\n", e) )
     if (!eq(res, 0L) || !file.exists(tmp))
       stop("Download failed for ", filename)
@@ -59,7 +59,7 @@ import_table <- function (filename, matrix = FALSE, ...) {
   read_table_args[['check.names']] %<>% if.null(FALSE)
   
   df <- tryCatch(
-    expr  = do.call(read.table, read_table_args),
+    expr  = do.call(utils::read.table, read_table_args),
     error = function (e) stop("Can't parse file ", filename, "\n", e) )
   
   

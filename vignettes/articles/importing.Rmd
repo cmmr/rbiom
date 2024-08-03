@@ -46,7 +46,7 @@ biom
 ```
 
 
-Now we have `biom`, an rbiom-class object that can be used with this package's functions. If you loaded your data from a BIOM file or phyloseq object, it might already include metadata, ranks, and a tree. These attributes are technically optional, however, more analyses are possible when extra information about samples and OTUs are present.
+Now we have `biom`, an rbiom-class object that can be used with this package's functions. If you loaded your data from a BIOM file or phyloseq object, it might already include metadata, ranks, and a tree. These attributes are technically optional. However, more analyses are possible when extra information about samples and OTUs are present.
 
 
 

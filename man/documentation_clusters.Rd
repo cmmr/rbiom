@@ -13,6 +13,9 @@ highest, \code{-1} is the lowest rank, \code{-2} is the second
 lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
 see all options for a given rbiom object. Default: \code{.otu}.}
 }
+\value{
+A numeric factor assigning samples to clusters.
+}
 \description{
 documentation_clusters
 }

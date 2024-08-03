@@ -61,7 +61,7 @@ to include all metadata fields. Default: \code{'.all'}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -82,14 +82,18 @@ Default: \code{FALSE}}
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
 
+\item{ties}{When \code{trans="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
+
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
 \item{sparse}{If true, returns a sparse matrix as described by
-\code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a normal R
+\code{\link[=simple_triplet_matrix]{simple_triplet_matrix()}}, otherwise returns a normal R
 matrix object. Default: \code{FALSE}}
 }
 \value{
-\itemize{
+\describe{
 \item{\code{taxa_matrix()} - }{
 A numeric matrix with taxa as rows, and samples as columns. }
 \item{\code{taxa_table()} - }{
@@ -97,7 +101,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
 }
 }
 \description{
-\itemize{
+\describe{
 \item{\code{taxa_matrix()} - }{ Accepts a single \code{rank} and returns a matrix. }
 \item{\code{taxa_table()} - }{ Can accept more than one \code{rank} and returns a tibble data.frame.  }
 }
@@ -114,6 +118,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
 \seealso{
 Other taxa_abundance: 
 \code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},
 \code{\link{taxa_stacked}()},

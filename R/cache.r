@@ -78,7 +78,7 @@ set_cache_value <- function (cache_file, result) {
   #________________________________________________________
   # Don't write objects that are larger than the cache size.
   #________________________________________________________
-  result_size <- as.integer(object.size(result))
+  result_size <- as.integer(utils::object.size(result))
   
   if (result_size < cache_size) {
     

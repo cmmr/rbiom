@@ -69,9 +69,9 @@ Other rarefaction:
 \code{\link{sample_sums}()}
 
 Other transformations: 
-\code{\link{mutate}()},
+\code{\link{modify_metadata}},
 \code{\link{rarefy}()},
-\code{\link{slice}()},
+\code{\link{slice_metadata}},
 \code{\link{subset}()},
 \code{\link{with}()}
 }

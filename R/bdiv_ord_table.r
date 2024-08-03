@@ -290,13 +290,19 @@ bdiv_ord_table <- function (
           FUN    = aa(bdiv_distmat, display = "bdiv_distmat") )
         dm_args[['tree']] <- tree
         
+        tm_args <- list(
+          biom = aa(NA, display = 'biom'), 
+          rank = aa(NA, display = 'rank'), 
+          taxa = taxa, 
+          unc  = unc )
+        
         paste(collapse = "\n", c(
           "iters      <- list(%s)"  %>% sprintf(as.args(iters)),
           "dm_list    <- blply(%s)" %>% sprintf(as.args(dm_args, fun = blply)),
           "ranks      <- %s"        %>% sprintf(as.args(list(rank))),
           "taxa_stats <- plyr::ldply(dm_list, function (dm) {",
           "  plyr::ldply(setNames(ranks, ranks), .id = '.rank', function (rank) {",
-          "    taxa_mtx <- t(%s)" %>% fmt_cmd(taxa_matrix, biom_, rank_, taxa, unc),
+          "    taxa_mtx <- t(taxa_matrix(%s))" %>% sprintf(as.args(tm_args, fun = taxa_matrix)),
           "    plyr::adply(taxa_mtx, 2L, .id = '.taxa', function (abundances) {",
           "      abundances <- abundances[attr(dm, 'Labels')]",
           "      set.seed(%i)" %>% sprintf(seed),

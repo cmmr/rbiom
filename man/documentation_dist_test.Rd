@@ -8,7 +8,7 @@
 statistics should be calculated. Required.}
 
 \item{test}{Permutational test for accessing significance. Options are:
-\itemize{
+\describe{
 \item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }

@@ -150,7 +150,7 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
     
     # Depth is given as minimum percent of obs. to keep.
     if (depth < 1) {
-      sums  <- slam::col_sums(mtx)
+      sums  <- col_sums(mtx)
       depth <- (sum(sums) * depth) / length(sums)
       depth <- min(sums[sums >= depth])
     }
@@ -243,7 +243,7 @@ rare_suggest <- function (mtx) {
   stopifnot(is.simple_triplet_matrix(mtx))
   
   if (all(mtx$v %% 1 == 0)) {
-    sums  <- slam::col_sums(mtx)
+    sums  <- col_sums(mtx)
     depth <- (sum(sums) * .1) / length(sums)
     depth <- min(sums[sums >= depth])
   } else {

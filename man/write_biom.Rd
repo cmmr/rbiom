@@ -42,16 +42,15 @@ Default: \code{"json"}}
 \item{quote, sep, ...}{Parameters passed on to \code{\link[=write.table]{write.table()}}.
 Default: \verb{quote=FALSE, sep="\\t"}}
 
-\item{depth, n, seed}{Passed on to \code{\link[=rarefy_cols]{rarefy_cols()}}. For \code{write_xlsx()} only,
-\code{depth=0} disables rarefaction.
-Default: \verb{depth='auto', n=NULL, seed=0}}
+\item{depth, n}{Passed on to \code{\link[=rarefy_cols]{rarefy_cols()}}. For \code{write_xlsx()} only,
+\code{depth=0} disables rarefaction. Default: \verb{depth='auto', n=NULL}}
 
 \item{seed}{Random seed to use in rarefying. See \code{\link[=rarefy_cols]{rarefy_cols()}} function
 for details. Default: \code{0}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
-\itemize{
+\describe{
 \item{\code{"singly"} - }{ Replaces them with the OTU name. }
 \item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
 \item{\code{"drop"} - }{ Excludes them from the result. }
@@ -65,7 +64,7 @@ The normalized filepath that was written to (invisibly).
 }
 \description{
 Automatically creates directories and adds compression based on file name.
-\itemize{
+\describe{
 \item{\code{write_biom()} - }{ According to \href{http://biom-format.org/documentation/}{BIOM format} specification. }
 \item{\code{write_xlsx()} - }{ Raw data and summary tables in Excel file format. See details. }
 \item{\code{write_fasta()} - }{ Sequences only in fasta format. \code{biom} may also be a named character vector. }

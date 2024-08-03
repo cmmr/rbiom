@@ -66,7 +66,7 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
   #________________________________________________________
   # Move '.otu' to last column of taxonomy map.
   #________________________________________________________
-  tbl <- relocate(biom$taxonomy, .otu, .after = last_col())
+  tbl <- relocate(biom$taxonomy, '.otu', .after = dplyr::last_col())
   if (!is.null(rank)) rank <- which(colnames(tbl) == rank)
   
   
@@ -125,7 +125,7 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
         # Replace NA with "Unc. <Higher Rank>".
         #________________________________________________________
         if (eq(unc, "grouped"))
-          for (i in which(!complete.cases(mtx)))
+          for (i in which(!stats::complete.cases(mtx)))
             for (j in rev(which(is.na(mtx[i,]))))
               if (!is.null(x <- na.omit(c("N/A", mtx[i,seq_len(j - 1)]))))
                 mtx[i,j] <- paste("Unc.", tail(x, 1))
@@ -134,7 +134,7 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
         # Drop any row with an NA in a higher-order rank column.
         #________________________________________________________
         if (eq(unc, "drop")) {
-          keep <- complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE])
+          keep <- stats::complete.cases(mtx[,1:if.null(rank, ncol(mtx)),drop=FALSE])
           otus <- otus[keep]
           mtx  <- mtx[keep,,drop=FALSE]
         }
@@ -142,7 +142,7 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
         
         
         tbl <- as_tibble(mtx) %>%
-          relocate(.otu) %>%
+          relocate('.otu') %>%
           mutate(across(everything(), as.factor))
         
         
@@ -159,7 +159,7 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
   
   
   
-  tbl %<>% relocate(.otu, .after = last_col())
+  tbl %<>% relocate('.otu', .after = dplyr::last_col())
   if (!is.null(rank)) {
     
     if (isTRUE(lineage)) {

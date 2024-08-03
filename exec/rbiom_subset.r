@@ -14,6 +14,9 @@
 #============================================================================================
 
 
+if (nchar(system.file(package = "optparse")) == 0)
+  stop("CRAN R package 'optparse' must be installed to use this script.")
+
 
 opt_parser <- optparse::OptionParser(
   
@@ -134,9 +137,9 @@ if (!is.null(f <- opt$metadata)) {
   biom <- local({
     
     new_md <- if (endsWith(tolower(f), ".csv")) {
-      read.csv(f, check.names=FALSE, stringsAsFactors=FALSE)
+      utils::read.csv(f, check.names=FALSE, stringsAsFactors=FALSE)
     } else {
-      read.delim(f, check.names=FALSE, stringsAsFactors=FALSE)
+      utils::read.delim(f, check.names=FALSE, stringsAsFactors=FALSE)
     }
     
     

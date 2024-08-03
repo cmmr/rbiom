@@ -4,12 +4,12 @@
 \alias{pull.rbiom}
 \title{Map sample names to metadata field values.}
 \usage{
-\method{pull}{rbiom}(biom, field = -1, name = ".sample", ...)
+\method{pull}{rbiom}(.data, var = -1, name = ".sample", ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{.data}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{field}{The metadata field name specified as:
+\item{var}{The metadata field name specified as:
 \itemize{
 \item{The metadata field name to retrieve. Can be abbreviated.}
 \item{A positive integer, giving the position counting from the left.}
@@ -20,7 +20,7 @@ Default: \code{-1}}
 \item{name}{The column to be used as names for a named vector.
 Specified in a similar manner as var. Default: \code{".sample"}}
 
-\item{...}{Passed on to \code{\link[dplyr:pull]{dplyr::pull()}}.}
+\item{...}{Not used.}
 }
 \value{
 A vector of metadata values, named with sample names.

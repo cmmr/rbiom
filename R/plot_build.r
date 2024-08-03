@@ -307,6 +307,8 @@ plot_build <- function (params) {
     
     p <- local({
       
+      .fitted <- .residual <- .std.res <- NULL # for CRAN check only
+      
       df <- with(
         data = attr(params$.ggdata, 'residual'),
         expr = tibble(

@@ -113,7 +113,7 @@ corrplot_build <- function (params) {
       
       attr(.ggdata, 'residual') <- plyr::ldply(.models, function (m) {
         
-        mf <- model.frame(m)
+        mf <- stats::model.frame(m)
         mf$x %<>% signif(digits = 10)
         at <- list(x = unique(mf$x))
         
@@ -169,7 +169,7 @@ corrplot_build <- function (params) {
         
         attr(.ggdata, 'fit') <- as_tibble(plyr::ldply(.models, function (m) {
           
-          dr <- range(model.frame(m)$x %||% exp(model.frame(m)$`log(x)`))
+          dr <- range(stats::model.frame(m)$x %||% exp(stats::model.frame(m)$`log(x)`))
           at <- list(x = seq(from = dr[[1]], to = dr[[2]], length.out = 100))
           
           emmeans::emmeans(m, specs = 'x', at = at, infer = TRUE, level = level) %>% 
@@ -189,7 +189,7 @@ corrplot_build <- function (params) {
         
         attr(.ggdata, 'fit') <- as_tibble(plyr::ldply(.models, function (m) {
           
-          dr <- range(model.frame(m)$x %||% exp(model.frame(m)$`log(x)`))
+          dr <- range(stats::model.frame(m)$x %||% exp(stats::model.frame(m)$`log(x)`))
           at <- list(x = seq(from = dr[[1]], to = dr[[2]], length.out = 100))
           
           if (fit == 'lm') at %<>% within(x %<>% range()) # list(x = c(min,max))

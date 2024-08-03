@@ -7,20 +7,32 @@
 \alias{na.omit.rbiom}
 \title{Subset an rbiom object by sample names or metadata.}
 \usage{
-\method{subset}{rbiom}(biom, ..., clone = TRUE)
+\method{subset}{rbiom}(x, subset, clone = TRUE, ...)
 
 \method{[}{rbiom}(biom, i)
 
-\method{na.omit}{rbiom}(biom, fields = ".all", clone = TRUE)
+\method{na.omit}{rbiom}(object, fields = ".all", clone = TRUE, ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{x}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{...}{Passed on to \code{\link[base:subset]{base::subset()}}.}
+\item{subset}{Logical expression for rows to keep. See \code{\link[base:subset]{base::subset()}}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
+
+\item{...}{Not used.}
+
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+
+\item{i}{The sample names to keep. Or a logical/integer vector indicating
+which sample names from \code{biom$samples} to keep.}
+
+\item{object}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+
+\item{fields}{Which metadata field(s) to check for \code{NA}s, or \code{".all"} to
+check all metadata fields.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -48,10 +60,10 @@ Subset an rbiom object by sample names or metadata.
 }
 \seealso{
 Other transformations: 
-\code{\link{mutate}()},
+\code{\link{modify_metadata}},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()},
-\code{\link{slice}()},
+\code{\link{slice_metadata}},
 \code{\link{with}()}
 }
 \concept{transformations}

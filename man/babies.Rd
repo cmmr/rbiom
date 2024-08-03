@@ -7,7 +7,7 @@
 \format{
 An rbiom object with 2,684 samples.
 Includes metadata and taxonomy.
-\itemize{
+\describe{
 \item{Subject ID - }{ID1, ID2, ..., ID12}
 \item{Sex - }{Male or Female}
 \item{Age (days) - }{1 - 266}

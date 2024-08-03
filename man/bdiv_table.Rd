@@ -79,10 +79,14 @@ Default: \code{TRUE}}
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
 
+\item{ties}{When \code{trans="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
+
 \item{seed}{Random seed for permutations. Default: \code{0}}
 }
 \value{
-\itemize{
+\describe{
 \item{\code{bdiv_matrix()} - }{ An R matrix of samples x samples. }
 \item{\code{bdiv_distmat()} - }{ A dist-class distance matrix. }
 \item{\code{bdiv_table()} - }{
@@ -138,6 +142,7 @@ parameters. \code{stat.by = '==Sex'} is equivalent to
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},

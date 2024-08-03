@@ -55,7 +55,7 @@ biom_merge <- function (...) {
   otus <- unique(otus)
   
   
-  counts <- slam::simple_triplet_matrix(
+  counts <- simple_triplet_matrix(
     i        = match(do.call(c, lapply(biom_list, function (b) { rownames(b$counts)[b$counts$i] })), otus),
     j        = match(do.call(c, lapply(biom_list, function (b) { colnames(b$counts)[b$counts$j] })), samples),
     v        = do.call(c, lapply(biom_list, function (b) { b$counts$v })),

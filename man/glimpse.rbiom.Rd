@@ -4,16 +4,15 @@
 \alias{glimpse.rbiom}
 \title{Get a glimpse of your metadata.}
 \usage{
-\method{glimpse}{rbiom}(biom, width = NULL, ...)
+\method{glimpse}{rbiom}(x, width = NULL, ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{x}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{width}{Width of output. See \code{\link[pillar:glimpse]{pillar::glimpse()}} documentation.
 Default: \code{NULL}}
 
-\item{...}{Unused, for extensibility.}
+\item{...}{Not used.}
 }
 \value{
 The original \code{biom}, invisibly.

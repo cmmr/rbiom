@@ -113,7 +113,7 @@ boxplot_stats <- function (params) {
         mean   = {function (v) { mean(v)                   }},
         violin = {function (v) { max(density(v)[['x']])    }},
         box    = switch(as.character(isFALSE(params$outliers)), 
-          'TRUE'  = {function (v) { boxplot.stats(v)$stats[5]                        }},
+          'TRUE'  = {function (v) { grDevices::boxplot.stats(v)$stats[5]             }},
           'FALSE' = {function (v) { max(v)                                           }} ),
         vline  = switch(params$ci, 
           'range' = {function (v) { max(v)                                           }},
@@ -236,6 +236,8 @@ boxplot_stats <- function (params) {
       dplyr::select(-any_of('.id'))
     
     
+    .xmin <- .xmax <- .step <- .ypos <- .tick <- .label <- NULL # for CRAN check only
+    
     attr(ggdata, 'stat_labels') <- tibble(
         stats,
         .x = (stats[['.xmin']] + stats[['.xmax']]) / 2,
@@ -249,6 +251,8 @@ boxplot_stats <- function (params) {
         .y    = c(stats[['.ypos']], stats[['.ypos']], stats[['.ypos']]),
         .yend = c(stats[['.ypos']], stats[['.tick']], stats[['.tick']]) ) %>%
       dplyr::select(-c(.xmin, .xmax, .step, .ypos, .tick, .label))
+    
+    remove('.xmin', '.xmax', '.step', '.ypos', '.tick', '.label')
     
     
     set_layer(
@@ -283,7 +287,7 @@ boxplot_stats <- function (params) {
     
     attr(ggdata, 'stat_labels') <- stats %>% 
       plyr::ddply(ply_cols(c(xcol, facet.by)), function (z) {
-        tibble(!!ycol := z$.ypos * 1.10, .label = z$.label) })
+        tibble(!!ycol := z$.ypos[[1]] * 1.10, .label = z$.label[[1]]) })
     
     set_layer(
       params = params, 
@@ -302,6 +306,7 @@ boxplot_stats <- function (params) {
         plyr::ddply(ply_cols(facet.by), function (z) {
           
           if (is.null(xcol)) {
+            z <- head(z, 1)
             z[['.x']]    <- -0.4
             z[['.xend']] <-  0.4
           } else {
@@ -320,11 +325,14 @@ boxplot_stats <- function (params) {
               z[[xcol]] %<>% factor(levels = xcats)
             }
             
+            z <- z[which(!duplicated(z[[xcol]])),,drop=FALSE]
             z[['.x']]    <- as.numeric(z[[xcol]]) - .4
             z[['.xend']] <- as.numeric(z[[xcol]]) + .4
           }
           
           z[['.y']] <- z[['.ypos']] * 1.08
+          
+          .x <- .xend <- .y <- NULL # for CRAN check only
           
           return (dplyr::select(z, c(.x, .xend, .y)))
         }) %>%

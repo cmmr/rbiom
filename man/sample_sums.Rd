@@ -19,10 +19,11 @@ Sum the observations in each sample.
 }
 \examples{
     library(rbiom)
+    library(ggplot2)
     
     sample_sums(hmp50) \%>\% sort() \%>\% head()
     
-    hist(sample_sums(hmp50))
+    ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 }
 \seealso{
 Other samples: 

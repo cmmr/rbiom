@@ -389,7 +389,7 @@ aes_toString <- function (x) {
 
 #____________________________________________________________________
 # A command as a string. Assumes dist=dist, ord=ord, etc.
-# Example: fmt("dm <- %s", bdiv_distmat, biom, weighted, tree)
+# Example: fmt_cmd("dm <- %s", bdiv_distmat, biom, weighted, tree)
 #____________________________________________________________________
 fmt_cmd <- function (.fmt, .fun, ...) {
   x    <- all.vars(match.call())[-c(1,2)]
@@ -542,12 +542,12 @@ finite_check <- function (df, col=".y", metric=NULL) {
   
   if ('.sample' %in% names(df)) {
     msg %<>% paste0(
-      glue_collapse(
+      glue::glue_collapse(
         x = paste(df[bad,'.sample'], "=", df[bad,col]), 
         width = 100, sep = ", ", last = ", and " ))
   } else {
     msg %<>% paste0(
-      glue_collapse(
+      glue::glue_collapse(
         x = as.character(unique(df[bad,col])), 
         width = 100, sep = ", ", last = ", and " ))
   }

@@ -4,10 +4,12 @@
 \alias{as.list.rbiom}
 \title{Convert an rbiom object to a base R list.}
 \usage{
-\method{as.list}{rbiom}(biom)
+\method{as.list}{rbiom}(x, ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+\item{x}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
+
+\item{...}{Not used.}
 }
 \value{
 A list with names

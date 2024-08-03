@@ -57,7 +57,7 @@ adiv_table <- function (
     '.depth'     = mtx[,'Depth'][row(mtx)],
     '.adiv'      = colnames(mtx)[col(mtx)] %>% factor(levels = adiv),
     '.diversity' = as.numeric(mtx) ) %>%
-    dplyr::filter(!is.na(.adiv))
+    dplyr::filter(!is.na(.data$.adiv))
   
   
   
@@ -84,8 +84,8 @@ adiv_table <- function (
     
   } else {
     
-    resp_label <- "\u03B1 Dissimilarity" %>% 
-      aa(display = '"\\u03B1 Dissimilarity"')
+    resp_label <- "\u03B1 Diversity" %>% 
+      aa(display = '"\\u03B1 Diversity"')
   }
   
   
@@ -192,10 +192,11 @@ adiv_matrix <- function (biom, trans = "none") {
 #' @export
 #' @examples
 #'     library(rbiom)
+#'     library(ggplot2)
 #'     
 #'     sample_sums(hmp50) %>% sort() %>% head()
 #'     
-#'     hist(sample_sums(hmp50))
+#'     ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 
 sample_sums <- function (biom) {
   biom <- as_rbiom(biom)

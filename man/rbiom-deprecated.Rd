@@ -130,7 +130,15 @@ read.tree(src)
 
 sample.names(biom)
 
-\method{select}{rbiom}(biom, samples = NULL, nTop = NULL, nRandom = NULL, seed = 0)
+\method{select}{rbiom}(
+  .data,
+  samples = NULL,
+  nTop = NULL,
+  nRandom = NULL,
+  seed = 0,
+  biom = NULL,
+  ...
+)
 
 sequences(biom)
 
@@ -402,7 +410,7 @@ Use \code{\link[=as_rbiom]{as_rbiom()}} instead.
 
 \section{\code{repair}}{
 
-Use \link{as_rbiom(as.list(biom))} instead.
+Use \code{as_rbiom(as.list(biom))} instead.
 }
 
 \section{\code{sample_subset}}{
@@ -437,49 +445,52 @@ Use \code{\link[=taxa_sums]{taxa_sums()}} instead.
 
 \section{\code{comments-set}}{
 
-Use \link{$comment} instead.
+Use \verb{biom$comment <-} instead.
 }
 
 \section{\code{counts-set}}{
 
-Use \link{$counts} instead.
+Use \verb{biom$counts <-} instead.
 }
 
 \section{\code{id-set}}{
 
-Use \link{$id} instead.
+Use \verb{biom$id <-} instead.
 }
 
 \section{\code{metadata-set}}{
 
-Use \link{$metadata} instead.
+Use \verb{biom$metadata <-} instead.
 }
 
 \section{\code{phylogeny-set}}{
 
-Use \link{$tree} instead.
+Use \verb{biom$tree <-} instead.
 }
 
 \section{\code{sample.names-set}}{
 
+Use \verb{biom$samples <-} instead.
 }
 
 \section{\code{sequences-set}}{
 
-Use \code{\link[=otu_sequences]{otu_sequences()}} instead.
+Use \verb{biom$sequences <-} instead.
 }
 
 \section{\code{taxa.names-set}}{
 
+Use \verb{biom$otus <-} instead.
 }
 
 \section{\code{taxa.ranks-set}}{
 
+Use \verb{biom$ranks <-} instead.
 }
 
 \section{\code{taxonomy-set}}{
 
-Use \link{$taxonomy} instead.
+Use \verb{biom$taxonomy <-} instead.
 }
 
 \keyword{internal}

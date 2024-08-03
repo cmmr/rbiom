@@ -47,7 +47,7 @@
 #' 
 #' The following entries in the track definitions are understood: 
 #' 
-#' \itemize{
+#' \describe{
 #'   \item{\code{values} - }{ The metadata values. When unnamed, order must match matrix. }
 #'   \item{\code{range} - }{ The c(min,max) to use for scale values. }
 #'   \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
@@ -164,6 +164,13 @@ plot_heatmap <- function (
   # Allow different specs for rows and cols.
   # For example, dist = c("euclidean", "canberra")
   #________________________________________________________
+  
+  # for CRAN check only
+  label_rows <- label_cols <- NULL
+  trees_rows <- trees_cols <- NULL
+  clust_rows <- clust_cols <- NULL
+  dist_rows  <- dist_cols  <- NULL
+  
   for (i in c("label", "trees", "clust", "dist")) {
     val <- get(i)
     
@@ -248,47 +255,47 @@ plot_heatmap <- function (
   # Cluster matrix's rows/cols and generate data.frames for dendrograms
   #________________________________________________________
   if (!isFALSE(clust_cols) && !is.na(clust_cols)) {
-    
+
     dm <- dist_cols
     hc <- clust_cols
     if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(t(mtx), method = dm)
     if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm,   method = hc)
     mtx <- mtx[,hc[['order']]]
-    
+
     if (isTRUE(trees_cols)) {
-      
+
       bounds <- 0.5 + nrow(mtx) + c(0, tree_height_top)
       if (isTRUE(n_top > 0))
         bounds <- bounds + (nrow(mtx) / 50) + track_height_top * n_top
-      
+
       trees_cols <- dendro(hc, bounds, side = "top")
     }
     remove("dm", "hc")
-    
+
   } else {
     trees_cols <- FALSE
   }
   
   if (!isFALSE(clust_rows) && !is.na(clust_rows)) {
-    
+
     dm <- dist_rows
     hc <- clust_rows
     if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
     if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
-    
+
     hc  <- rev(hc) # Move interesting taxa to top rows of plot.
     mtx <- mtx[hc[['order']],]
-    
+
     if (isTRUE(trees_rows)) {
-      
+
       bounds <- 0.5 - c(0, tree_height_left)
       if (isTRUE(n_left > 0))
         bounds <- bounds - (ncol(mtx) / 50) - track_height_top * n_left
-      
+
       trees_rows <- dendro(hc, bounds, side = "left")
     }
     remove("dm", "hc")
-    
+
   } else {
     trees_rows <- FALSE
   }
@@ -426,7 +433,10 @@ plot_heatmap <- function (
   # In order to label any tracks, switch to continuous
   #________________________________________________________
   if (length(all_tracks) == 0) {
+    
+    x <- y <- fill <- NULL # for CRAN check only
     gglayers %<>% ggpush(geom_raster(aes(x=x, y=y, fill=fill)))
+    remove("x", "y", "fill")
     
     if (isFALSE(label_cols))
       gglayers %<>% ggpush(scale_x_discrete(breaks = NULL))
@@ -438,7 +448,10 @@ plot_heatmap <- function (
     }
     
   } else {
+    
+    x <- y <- fill <- NULL # for CRAN check only
     gglayers %<>% ggpush(geom_raster(aes(x=as.numeric(x), y=as.numeric(y), fill=fill)))
+    remove("x", "y", "fill")
     
     
     #________________________________________________________
@@ -575,6 +588,8 @@ plot_heatmap <- function (
   if (!is_null(all_trees)) {
     
     attr(gglayers[[1]][['data']], 'trees') <- as_rbiom_tbl(all_trees)
+    
+    xend <- yend <- NULL # for CRAN check only
     
     gglayers %<>% ggpush(geom_segment( 
       data    = ~ attr(., 'trees', exact = TRUE),

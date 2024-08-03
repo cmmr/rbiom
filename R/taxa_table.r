@@ -115,7 +115,7 @@ taxa_table <- function (
 
 #' Taxa abundances per sample.
 #' 
-#' \itemize{
+#' \describe{
 #'   \item{`taxa_matrix()` - }{ Accepts a single `rank` and returns a matrix. }
 #'   \item{`taxa_table()` - }{ Can accept more than one `rank` and returns a tibble data.frame.  }
 #' }
@@ -126,7 +126,7 @@ taxa_table <- function (
 #' @family taxa_abundance
 #' 
 #' @return 
-#' \itemize{
+#' \describe{
 #'   \item{`taxa_matrix()` - }{
 #'     A numeric matrix with taxa as rows, and samples as columns. }
 #'   \item{`taxa_table()` - }{
@@ -193,7 +193,7 @@ taxa_matrix <- function (
       
       counts <- biom$counts
       if (eq(trans, 'percent')) counts <- rescale_cols(counts)
-      mtx <- slam::rollup(counts[names(map),], 1L, map, sum)
+      mtx <- rollup(counts[names(map),], 1L, map, sum)
       mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
       
       stopifnot(is(mtx, "simple_triplet_matrix"))
@@ -209,7 +209,7 @@ taxa_matrix <- function (
   if (!is_null(taxa)) {
     
     if (is.numeric(taxa) && length(taxa) == 1) {
-      rel <- sort(slam::row_means(t(t(mtx) / slam::col_sums(mtx))), decreasing = TRUE)
+      rel <- sort(slam::row_means(t(t(mtx) / col_sums(mtx))), decreasing = TRUE)
       if (taxa >= 1) { taxa <- head(names(rel), taxa) 
       } else         { taxa <- names(rel)[rel >= taxa] }
       
@@ -217,12 +217,12 @@ taxa_matrix <- function (
       taxa <- intersect(as.character(taxa), rownames(mtx))
       
     } else {
-      stop ("Invalid argument for `taxa`: ", capture.output(str(taxa)))
+      stop ("Invalid argument for `taxa`: ", capture.output(utils::str(taxa)))
     }
     
     
     if (length(taxa) == 0)
-      stop("No taxa match the criteria: ", capture.output(str(taxa)))
+      stop("No taxa match the criteria: ", capture.output(utils::str(taxa)))
     
     
     if (isFALSE(other) || is.null(other)) {
@@ -235,9 +235,9 @@ taxa_matrix <- function (
         other <- "Other"
       
       mtx <- mtx[setdiff(rownames(mtx), taxa),,drop=FALSE] %>% 
-        slam::col_sums() %>%
+        col_sums() %>%
         matrix(., nrow = 1, dimnames = list(other, names(.))) %>%
-        slam::as.simple_triplet_matrix() %>%
+        as.simple_triplet_matrix() %>%
         rbind(mtx[taxa,,drop=FALSE], .)
       
       taxa <- c(taxa, other)
@@ -302,7 +302,7 @@ taxa_matrix <- function (
 taxa_sums <- function (biom, rank = 0) {
   
   taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::row_sums(na.rm = TRUE) %>%
+    row_sums(na.rm = TRUE) %>%
     sort(decreasing = TRUE)
 }
 

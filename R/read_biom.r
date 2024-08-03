@@ -23,9 +23,9 @@
 #' 
 #' @return An rbiom class object containing the parsed data. This object
 #'     can be treated as a list with the following named elements:
-#'     \itemize{
+#'     \describe{
 #'         \item{\code{$counts} - }{
-#'           A numeric [slam::simple_triplet_matrix()] (sparse matrix) of 
+#'           A numeric [simple_triplet_matrix()] (sparse matrix) of 
 #'           observation counts. Taxa (OTUs) as rows and samples as columns. 
 #'           Access or modify using `$counts`. }
 #'         \item{\code{$metadata} - }{
@@ -107,7 +107,7 @@ read_biom <- function (src, tree='auto') {
     on.exit(unlink(fp), add=TRUE)
     
     # To do: switch to curl::curl_download
-    if (!eq(0L, try(download.file(src, fp, quiet=TRUE), silent=TRUE)))
+    if (!eq(0L, try(utils::download.file(src, fp, quiet=TRUE), silent=TRUE)))
         stop(sprintf("Cannot retrieve URL %s", src))
 
   } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
@@ -260,7 +260,7 @@ read_biom <- function (src, tree='auto') {
 #' Inspects a file to see if it's most likely hdf5, json, or tab-delimited.
 #' Also reports gzip or bzip2 compression.
 #' 
-#' @noRd
+#' @keywords internal
 #' 
 #' @param file  The path to an rbiom file.
 #' 
@@ -328,9 +328,9 @@ read_biom_tsv <- function (fp) {
   csv <- min(gregexpr(",",   lines[[1]])[[1]], fixed=TRUE)
   tsv <- min(gregexpr("\\t", lines[[1]])[[1]], fixed=TRUE)
 
-  if (csv > -1 && tsv > -1) { importFn <- if (csv < tsv) read.csv else read.delim
-  } else if (csv > -1)      { importFn <- read.csv
-  } else if (tsv > -1)      { importFn <- read.delim
+  if (csv > -1 && tsv > -1) { importFn <- if (csv < tsv) utils::read.csv else utils::read.delim
+  } else if (csv > -1)      { importFn <- utils::read.csv
+  } else if (tsv > -1)      { importFn <- utils::read.delim
   } else                    { stop("Cannot find comma or tab delimiters in file.") }
 
   mat <- try(importFn(fp, header=FALSE, colClasses="character"), silent=TRUE)
@@ -494,7 +494,7 @@ parse_tsv_counts <- function (mtx) {
   if (length(mtx) == 0 || sum(mtx) == 0)
     stop("No abundance counts.")
 
-  slam::as.simple_triplet_matrix(mtx)
+  as.simple_triplet_matrix(mtx)
 }
 
 parse_json_counts <- function (json) {
@@ -509,7 +509,7 @@ parse_json_counts <- function (json) {
   SampleIDs <- sapply(json$columns, function (x) unlist(x$id))
 
   if (json$matrix_type == "sparse")
-    counts <- slam::simple_triplet_matrix(
+    counts <- simple_triplet_matrix(
                     i        = sapply(json$data, function (x) x[[1]]) + 1,
                     j        = sapply(json$data, function (x) x[[2]]) + 1,
                     v        = sapply(json$data, function (x) x[[3]]),
@@ -518,7 +518,7 @@ parse_json_counts <- function (json) {
                     dimnames = list(TaxaIDs, SampleIDs))
 
   if (json$matrix_type == "dense")
-    counts <- slam::as.simple_triplet_matrix(
+    counts <- as.simple_triplet_matrix(
                     matrix(
                       data     = unlist(json$data),
                       byrow    = TRUE,
@@ -533,7 +533,7 @@ parse_hdf5_counts <- function (hdf5) {
 
   indptr <- as.numeric(hdf5$observation$matrix$indptr)
 
-  slam::simple_triplet_matrix(
+  simple_triplet_matrix(
         i        = unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)])))),
         j        = as.numeric(hdf5$observation$matrix$indices) + 1,
         v        = as.numeric(hdf5$observation$matrix$data),

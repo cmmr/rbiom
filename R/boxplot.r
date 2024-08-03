@@ -9,7 +9,10 @@
 #' 
 #' 
 #' @param x   A categorical metadata column name to use for the x-axis. Or 
-#'        `NULL`, which groups all samples into a single category. 
+#'        `NULL`, which groups all samples into a single category.
+#' 
+#' @param y   A numeric metadata column name to use for the y-axis. 
+#'        Default: `attr(df, 'response')`
 #'        
 #' @param layers   One or more of 
 #'        `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`. 

@@ -73,7 +73,7 @@ categorical. Default: \code{NULL}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }
@@ -111,6 +111,10 @@ options. Default: \code{"fdr"}}
 \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
 correcting for non-normally distributions before applying regression
 statistics. Default: \code{"none"}}
+
+\item{ties}{When \code{trans="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
@@ -162,6 +166,7 @@ letters instead of shapes on the plot. Character strings may used as well.
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_heatmap}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},

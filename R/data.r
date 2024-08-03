@@ -2,7 +2,7 @@
 #'
 #' @format An rbiom object with 50 samples. 
 #'         Includes metadata, taxonomy, phylogeny, and sequences.
-#' \itemize{
+#' \describe{
 #'   \item{Sex - }{Male or Female}
 #'   \item{Body Site - }{Anterior nares, Buccal mucosa, Mid vagina, Saliva, or Stool}
 #'   \item{Age - }{21 - 40}
@@ -17,7 +17,7 @@
 #'
 #' @format An rbiom object with 1,006 samples. 
 #'         Includes metadata and taxonomy.
-#' \itemize{
+#' \describe{
 #'   \item{diarrhea - }{Case or Control}
 #'   \item{age - }{0 - 4.8 (years old)}
 #'   \item{country - }{Bangladesh, Gambia, Kenya, or Mali}
@@ -31,7 +31,7 @@
 #'
 #' @format An rbiom object with 2,684 samples. 
 #'         Includes metadata and taxonomy.
-#' \itemize{
+#' \describe{
 #'   \item{Subject ID - }{ID1, ID2, ..., ID12}
 #'   \item{Sex - }{Male or Female}
 #'   \item{Age (days) - }{1 - 266}

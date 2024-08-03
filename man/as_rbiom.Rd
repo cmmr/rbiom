@@ -9,12 +9,14 @@ as_rbiom(biom, ...)
 \arguments{
 \item{biom}{Object which can be coerced to an rbiom-class object.
 For example:
-\itemize{
+\describe{
 \item{\emph{file} - }{ Filepath or URL to a biom file. }
 \item{\emph{matrix} - }{ An abundance matrix with OTUs in rows and samples in columns. }
 \item{\code{phyloseq}-class object - }{ From the phyloseq Bioconductor R package. }
 \item{\emph{list} - }{ With \code{counts} and optionally \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details). }
 }}
+
+\item{...}{Not used.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.

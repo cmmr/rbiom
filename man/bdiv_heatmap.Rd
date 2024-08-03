@@ -79,7 +79,7 @@ similarity. You can supply a list or character vector of length two to
 control the row and column clustering separately, for example
 \code{clust = c(rows = "complete", cols = NA)}, or simply
 \code{clust = c("complete", NA)}. Options are:
-\itemize{
+\describe{
 \item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
 \item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
 \item{A method name - }{ \code{"ward.D"},
@@ -152,7 +152,7 @@ tracks = list(
 
 The following entries in the track definitions are understood:
 
-\itemize{
+\describe{
 \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
 \item{\code{range} - }{ The c(min,max) to use for scale values. }
 \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
@@ -192,6 +192,7 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 \seealso{
 Other beta_diversity: 
 \code{\link{bdiv_boxplot}()},
+\code{\link{bdiv_clusters}()},
 \code{\link{bdiv_corrplot}()},
 \code{\link{bdiv_ord_plot}()},
 \code{\link{bdiv_ord_table}()},

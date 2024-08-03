@@ -9,30 +9,11 @@ ggplot.rbiom <- function (biom, ...) {
   return (p)
 }
 
-# ggplot_add.rbiom_gg <- function (object, plot, object_name) {
-#   
-#   p <- NextMethod()
-#   
-#   if (is(object, 'rbiom_gg'))
-#     object$stat_params$biom <- attr(plot, 'biom')
-#   
-#   attr(p, 'biom') <- attr(plot, 'biom')
-#   class(p) <- c('rbiom_gg', class(p))
-#   
-#   return (p)
-# }
-
 
 StatDendro <- ggplot2::ggproto(
   "StatDendro", 
   ggplot2::Stat,
   
-  # setup_params = function (data, params, ...) {
-  #   dots <- list()
-  #   browser()
-  #   return (params)
-  # },
-  # 
   setup_data = function (data, params, ...) {
     
     data$.sample <- params$biom$samples
@@ -47,18 +28,6 @@ StatDendro <- ggplot2::ggproto(
     return (data)
   },
   
-  # compute_layer = function (self, data, params, layout, ...) {
-  #   dots <- list()
-  #   browser()
-  #   return (params)
-  # },
-  # 
-  # compute_panel = function (self, data, scales, ...) {
-  #   dots <- list()
-  #   browser()
-  #   return (params)
-  # },
-  
   compute_group = function (self, data, scales, ...) {
     return (data)
   }
@@ -66,20 +35,7 @@ StatDendro <- ggplot2::ggproto(
 
 
 geom_dendro <- function (mapping = NULL, data = NULL, bounds = c(0, 1), side = "top", ...) {
-  
-  # if (!is.null(data)) {
-  #   data <- stats::hclust(rbiom::bdiv_distmat(data))
-  #   data <- dendro(hc = data, bounds = bounds, side = side)
-  #   # data <- dendro(hc = data, bounds = bounds, side = side)
-  # }
-  
-  # if (is.null(mapping)) {
-  #   mapping <- ggplot2::aes(x = x, y = y, xend = xend, yend = yend)
-  # } else {
-  #   mapping <- utils::modifyList(mapping, ggplot2::aes(x = x, y = y, xend = xend, yend = yend))
-  # }
  
-  
   gg <- ggplot2::layer(
     data        = data, 
     mapping     = mapping, 
@@ -230,6 +186,8 @@ tracks_df <- function (tracks, bounds=c(0,1), side="top") {
   bounds_w <- abs(diff(bounds)) / length(tracks)
   bounds   <- rev(seq_along(tracks) - 0.5) * bounds_w + min(bounds)
   
+  
+  x <- y <- fill <- NULL # for CRAN check only
   
   for (i in seq_along(tracks)) {
     

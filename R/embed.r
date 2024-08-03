@@ -14,7 +14,7 @@
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     p <- bdiv_ord_plot(biom, color.by="Sex")
+#'     p <- bdiv_ord_plot(biom, stat.by="Sex")
 #'     
 #'     attr(p, 'stats') %>% embed_csv(row.names=FALSE) %>% cat("\n\n")
 #'
@@ -22,10 +22,10 @@
 embed_csv <- function (df, label="Download Data (CSV)", filename="data.csv", ...) {
   
   as.data.frame(df) %>%
-    write.csv(...) %>%
+    utils::write.csv(...) %>%
     capture.output() %>%
     paste(collapse = "\n") %>%
-    openssl::base64_encode() %>%
+    jsonlite::base64_enc() %>%
     sprintf(
       fmt = '<a download=%s href="data:text/csv;base64,%s">%s</a>', 
       double_quote(filename), ., label) %>%
@@ -43,7 +43,7 @@ embed_csv <- function (df, label="Download Data (CSV)", filename="data.csv", ...
 #' 
 #' @examples
 #'     library(rbiom)
-#'     p <- adiv_boxplot(hmp50, color.by = "Body Site")
+#'     p <- adiv_boxplot(hmp50, stat.by = "Body Site")
 #'     attr(p, 'code') %>% embed_code() %>% cat("\n\n")
 
 embed_code <- function (text) {

@@ -12,10 +12,16 @@ stats_wilcox <- function (
   
   alternative <- switch(alt, '!=' = "two.sided", '>' = "greater", '<' = "less")
   
+  # for CRAN check only
+  estimate <- p.value <- conf.int <- statistic <- .stat.by <- NULL
+  
+  func     <- NULL
+  pairwise <- NULL
   
   if (is.null(stat.by)) {
     
-    func <- function (data) {
+    pairwise <- FALSE # CRAN check requires consistent func signature
+    func <- function (data, pair) {
       
       stats::wilcox.test(
           formula     = .resp ~ 1, 
@@ -59,6 +65,7 @@ stats_wilcox <- function (
     
   } else {
     
+    pairwise <- TRUE # CRAN check requires consistent func signature
     func <- function (data, pair) {
         
         stats::wilcox.test(
@@ -96,7 +103,7 @@ stats_wilcox <- function (
   }
   
   
-  stats <- stats_run(df, stat.by, split.by, func) %>% aa(code = code)
+  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
   stats <- stats_finalize(stats, df, regr = NULL, resp, stat.by, split.by, fit = "lm", p.adj)
   
   attr(stats, 'tbl_sum')[['Model']] %<>% sub("^lm", "wilcox.test", .)
@@ -121,7 +128,10 @@ stats_kruskal <- function (
     cli_abort("`stat.by` required when `test` = 'kruskal'.")
   
   
-  func <- function (data) {
+  pairwise <- FALSE
+  func <- function (data, pair) {
+    
+    statistic <- p.value <- parameter <- NULL # for CRAN check only
     
     data %>% 
       stats::kruskal.test(.resp ~ .stat.by, .) %>%
@@ -146,7 +156,7 @@ stats_kruskal <- function (
   
   
   
-  stats <- stats_run(df, stat.by, split.by, func) %>% aa(code = code)
+  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
   stats <- stats_finalize(stats, df, regr = NULL, resp, stat.by, split.by, fit = "lm", p.adj, pairwise = FALSE)
   
   attr(stats, 'tbl_sum')[['Model']] %<>% sub("^lm", "kruskal.test", .)

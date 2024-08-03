@@ -13,7 +13,7 @@
 #'        The first four are sample-centric; the last three are taxa-centric. 
 #'        Single letter abbreviations are also accepted. For instance, 
 #'        `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`. 
-#'        See [plot types][plots] for examples of each. Default: `"pe"`
+#'        Default: `"pe"`
 #'        
 #' @param ...   Parameters for layer geoms (e.g. [ggplot2::geom_point()]). 
 #'        Prefixing parameter names with a layer name ensures that a particular 

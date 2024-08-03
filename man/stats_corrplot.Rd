@@ -32,6 +32,9 @@ mentioned below should match column names in \code{df}. Required.}
 \item{x}{Dataset field with the x-axis values. Equivalent to the \code{regr}
 argument in \code{\link[=stats_table]{stats_table()}}. Required.}
 
+\item{y}{A numeric metadata column name to use for the y-axis.
+Default: \code{attr(df, 'response')}}
+
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
@@ -45,7 +48,7 @@ categorical. Default: \code{NULL}}
 Default: \code{NULL}}
 
 \item{colors}{How to color the groups. Options are:
-\itemize{
+\describe{
 \item{\code{TRUE} - }{ Automatically select colorblind-friendly colors. }
 \item{\code{FALSE} or \code{NULL} - }{ Don't use colors. }
 \item{a palette name - }{ Auto-select colors from this set. E.g. \code{"okabe"} }

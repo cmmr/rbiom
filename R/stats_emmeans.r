@@ -113,10 +113,19 @@ stats_emmeans <- function (
   
   stats_validate()
   
+  # for CRAN check only
+  emmean <- contrast <- estimate <- NULL
+  p.value <- lower.CL <- upper.CL <- SE <- t.ratio <- NULL
+  .regr <- .p.val <- .t.ratio <- .se <- .stat.by <- NULL
+  
+  
+  func     <- NULL
+  pairwise <- NULL
   
   if (is.null(regr) && is.null(stat.by)) {
     
-    func <- function (data) {
+    pairwise <- FALSE # CRAN check requires consistent func signature
+    func <- function (data, pair) {
       
       data %>% 
         stats::lm(.resp ~ 1, .) %>% 
@@ -160,8 +169,8 @@ stats_emmeans <- function (
   
   else if (!is.null(regr) && is.null(stat.by)) {
     
-    
-    func <- function (data) {
+    pairwise <- FALSE # CRAN check requires consistent func signature
+    func <- function (data, pair) {
       
       model <- stats_fit_model(data, fit, stat.by = FALSE, regr = TRUE)
       
@@ -251,6 +260,7 @@ stats_emmeans <- function (
   
   else if (is.null(regr) && !is.null(stat.by)) {
     
+    pairwise <- TRUE # CRAN check requires consistent func signature
     func <- function (data, pair) {
       
       model <- data %>%
@@ -319,6 +329,7 @@ stats_emmeans <- function (
   
   else if (!is.null(regr) && !is.null(stat.by)) {
     
+    pairwise <- TRUE # CRAN check requires consistent func signature
     func <- function (data, pair) {
       
       pdata <- subset(data, .stat.by %in% pair)
@@ -328,8 +339,8 @@ stats_emmeans <- function (
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
-        lo <- max(aggregate(pdata, .regr ~ .stat.by, min)$.regr)
-        hi <- min(aggregate(pdata, .regr ~ .stat.by, max)$.regr)
+        lo <- max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr)
+        hi <- min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr)
         at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
         at <- at[at > lo & at < hi]
         remove("lo", "hi")
@@ -383,8 +394,8 @@ stats_emmeans <- function (
       at_def <- glue("
         
         at    <- labeling::extended(
-          dmin = max(aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          dmax = min(aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
+          dmin = max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
+          dmax = min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
           m    = 100 ){ifelse(fit == 'gam', '', '\n        ')}
         ")
     } else {
@@ -440,7 +451,7 @@ stats_emmeans <- function (
   if (!is.null(regr) && is.null(at))
     code %<>% paste0(' %>% \n  dplyr::arrange(.p.val, desc(.t.ratio), .se) %>% \n  dplyr::slice_head(n = 1)')
   
-  stats <- stats_run(df, stat.by, split.by, func) %>% aa(code = code)
+  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
   stats <- stats_finalize(stats, df, regr, resp, stat.by, split.by, fit, p.adj)
   
   return (stats)
@@ -462,10 +473,19 @@ stats_emtrends <- function (
     cli_abort('`regr` field is required when `test` = "emtrends".')
   
   
+  # for CRAN check only
+  .regr <- .regr.trend <- .stat.by <- NULL
+  p.value <- lower.CL <- upper.CL <- NULL
+  SE <- t.ratio <- contrast <- estimate <- NULL
+  
+  
+  func     <- NULL
+  pairwise <- NULL
   
   if (is.null(stat.by)) {
     
-    func <- function (data) {
+    pairwise <- FALSE
+    func <- function (data, pair) {
       
       model <- stats_fit_model(data, fit, stat.by = FALSE)
       
@@ -557,6 +577,7 @@ stats_emtrends <- function (
   
   else if (!is.null(stat.by)) {
     
+    pairwise <- TRUE
     func <- function (data, pair) {
       
       pdata <- subset(data, .stat.by %in% pair)
@@ -566,8 +587,8 @@ stats_emtrends <- function (
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
-        lo <- max(aggregate(pdata, .regr ~ .stat.by, min)$.regr)
-        hi <- min(aggregate(pdata, .regr ~ .stat.by, max)$.regr)
+        lo <- max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr)
+        hi <- min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr)
         at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
         at <- at[at > lo & at < hi]
         remove("lo", "hi")
@@ -620,8 +641,8 @@ stats_emtrends <- function (
       at_def <- glue("
         
         at    <- labeling::extended(
-          dmin = max(aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          dmax = min(aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
+          dmin = max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
+          dmax = min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
           m    = 100 ){ifelse(fit == 'gam', '', '\n        ')}
         ")
     } else {
@@ -677,7 +698,7 @@ stats_emtrends <- function (
   if (is.null(at))
     code %<>% paste0(' %>% \n  dplyr::slice_min(.p.val)')
   
-  stats <- stats_run(df, stat.by, split.by, func) %>% aa(code = code)
+  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
   stats <- stats_finalize(stats, df, regr, resp, stat.by, split.by, fit, p.adj)
   
   return (stats)
