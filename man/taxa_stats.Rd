@@ -144,6 +144,7 @@ A convenience wrapper for \code{\link[=taxa_table]{taxa_table()}} + \code{\link[
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},

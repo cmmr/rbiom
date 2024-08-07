@@ -1,5 +1,5 @@
 
-biom <- readRDS("inputs/biom.rds")
+biom <- readRDS(test_path("inputs/biom.rds"))
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Alpha Diversity
@@ -7,14 +7,14 @@ biom <- readRDS("inputs/biom.rds")
 
 context("Alpha Diversity")
 
-curr <- adiv_table(biom)
-prev <- readRDS("outputs/adiv_table.rds")
+curr <- adiv_matrix(biom)
+prev <- readRDS(test_path("outputs/adiv_table.rds"))
 
 test_that("Diversity Metrics", {
-  expect_equal(tolerance = 0.0001, curr[['OTUs']],    prev[['OTUs']])
-  expect_equal(tolerance = 0.0001, curr[['Shannon']], prev[['Shannon']])
-  expect_equal(tolerance = 0.0001, curr[['Simpson']], prev[['Simpson']])
-  expect_equal(tolerance = 0.0001, curr[['Chao1']],   prev[['Chao1']])
+  expect_equal(tolerance = 0.0001, unname(curr[,'OTUs']),    prev[['OTUs']])
+  expect_equal(tolerance = 0.0001, unname(curr[,'Shannon']), prev[['Shannon']])
+  expect_equal(tolerance = 0.0001, unname(curr[,'Simpson']), prev[['Simpson']])
+  expect_equal(tolerance = 0.0001, unname(curr[,'Chao1']),   prev[['Chao1']])
 })
 
 remove("curr", "prev")

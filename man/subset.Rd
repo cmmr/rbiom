@@ -41,7 +41,8 @@ An \link[=rbiom_objects]{rbiom object}.
 Subset an rbiom object by sample names or metadata.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
+    library(dplyr)
     
     # Subset to specific samples
     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]

@@ -159,13 +159,8 @@ letters instead of shapes on the plot. Character strings may used as well.
     library(rbiom)
     
     df <- adiv_table(rarefy(hmp50))
-    stats_boxplot(df, "Body Site")
-    stats_boxplot(
-      df       = df, 
-      x        = "Age", 
-      stat.by  = "Body Site", 
-      facet.by = "Sex", 
-      layers   = "trend" )
+    stats_boxplot(df, x = "Body Site")
+    stats_boxplot(df, x = "Sex", stat.by = "Body Site", layers = "be")
 }
 \seealso{
 Other visualization: 

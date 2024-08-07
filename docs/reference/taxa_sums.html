@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,11 +54,19 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">taxa_sums</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">taxa_sums</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, sort <span class="op">=</span> <span class="cn">NULL</span>, lineage <span class="op">=</span> <span class="cn">FALSE</span>, unc <span class="op">=</span> <span class="st">"singly"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">taxa_means</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu">taxa_means</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, sort <span class="op">=</span> <span class="cn">NULL</span>, lineage <span class="op">=</span> <span class="cn">FALSE</span>, unc <span class="op">=</span> <span class="st">"singly"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">taxa_max</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">taxa_apply</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  <span class="va">FUN</span>,</span>
+<span>  rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
+<span>  sort <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,17 +79,69 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 
 
 <dt id="arg-rank">rank<a class="anchor" aria-label="anchor" href="#arg-rank"></a></dt>
-<dd><p>The taxonomic rank to return sums or means for. The default,
-<code>0</code>, returns per-OTU summaries.</p></dd>
+<dd><p>What rank(s) of taxa to display. E.g. <code>"Phylum"</code>,
+<code>"Genus"</code>, <code>".otu"</code>, etc. An integer vector can also be
+given, where <code>1</code> is the highest rank, <code>2</code> is the second
+highest, <code>-1</code> is the lowest rank, <code>-2</code> is the second
+lowest, and <code>0</code> is the OTU "rank". Run <code>biom$ranks</code> to
+see all options for a given rbiom object. Default: <code>-1</code>.</p></dd>
+
+
+<dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
+<dd><p>Sort the result. Options: <code>NULL</code>, <code>"asc"</code>, or <code>"desc"</code>, where
+<code>NULL</code> will not sort the result. <code>"asc"</code> will sort in ascending order
+(smallest to largest), and <code>"desc"</code> in descending order (largest to
+smallest). Ignored when the result is not a simple numeric vector.
+Default: <code>NULL</code></p></dd>
+
+
+<dt id="arg-lineage">lineage<a class="anchor" aria-label="anchor" href="#arg-lineage"></a></dt>
+<dd><p>Include all ranks in the name of the taxa. For instance,
+setting to <code>TRUE</code> will produce
+<code>Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales</code>.
+Otherwise the taxa name will simply be <code>Coriobacteriales</code>. You
+want to set this to TRUE when <code>unc = "asis"</code> and you have taxa
+names (such as <em>Incertae_Sedis</em>) that map to multiple higher
+level ranks. Default: <code>FALSE</code></p></dd>
+
+
+<dt id="arg-unc">unc<a class="anchor" aria-label="anchor" href="#arg-unc"></a></dt>
+<dd><p>How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
+<dd><p>Replaces them with the OTU name.</p></dd>
+
+<dt><code>"grouped"</code> - </dt>
+<dd><p>Replaces them with a higher rank's name.</p></dd>
+
+<dt><code>"drop"</code> - </dt>
+<dd><p>Excludes them from the result.</p></dd>
+
+<dt><code>"asis"</code> - </dt>
+<dd><p>To not check/modify any taxa names.</p></dd>
+
+
+</dl><p>Default: <code>"singly"</code> <br><br>
+Abbreviations are allowed.</p></dd>
+
+
+<dt id="arg-fun">FUN<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
+<dd><p>The function to apply to each row of the <code><a href="taxa_matrix.html">taxa_matrix()</a></code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Optional arguments to <code>FUN</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named, sorted numeric vector.</p>
+    <p>For <code>taxa_sums</code> and <code>taxa_means</code>, a named numeric vector.
+For <code>taxa_apply</code>, a named vector or list with the results of <code>FUN</code>.
+The names are the taxa IDs.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other taxa_abundance:
+<code><a href="sample_sums.html">sample_sums</a>()</code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot</a>()</code>,
 <code><a href="taxa_clusters.html">taxa_clusters</a>()</code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot</a>()</code>,
@@ -96,15 +156,35 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span> </span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_sums</span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Unc01yki Unc53100 LtbAci52 CnbTube3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    24096    23409    15996    14734 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Abiotrophia Acidaminococcus   Acinetobacter  Actinobacillus </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             135              62              44             242 </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">taxa_means</span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'Family'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Lactobacillaceae   Streptococcaceae Corynebacteriaceae     Bacteroidaceae </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             803.74             492.16             364.74             323.22 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Staphylococcaceae </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             275.52 </span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Acidaminococcaceae    Actinomycetaceae       Aerococcaceae      Alcaligenaceae </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               14.58               16.92                2.86               11.28 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Alicyclobacillaceae </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                0.12 </span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">taxa_apply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">max</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Abiotrophia Acidaminococcus   Acinetobacter  Actinobacillus     Actinomyces </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              78              59              42             100             105 </span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">taxa_apply</span><span class="op">(</span><span class="va">hmp50</span>, <span class="va">fivenum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Abiotrophia</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0  0  0  1 78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Acidaminococcus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0  0  0  0 59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Acinetobacter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0  0  0  0 42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Actinobacillus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]   0   0   0   2 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $Actinomyces</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]   0   0   1  21 105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

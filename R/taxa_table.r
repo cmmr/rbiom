@@ -137,7 +137,7 @@ taxa_table <- function (
 #' @examples
 #'     library(rbiom)
 #'     
-#'     biom$ranks
+#'     hmp50$ranks
 #'     
 #'     taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
 #'     
@@ -285,10 +285,19 @@ taxa_matrix <- function (
 #' 
 #' @family taxa_abundance
 #' 
-#' @param rank  The taxonomic rank to return sums or means for. The default, 
-#'        \code{0}, returns per-OTU summaries.
+#' @param sort  Sort the result. Options: `NULL`, `"asc"`, or `"desc"`, where
+#'        `NULL` will not sort the result. `"asc"` will sort in ascending order 
+#'        (smallest to largest), and `"desc"` in descending order (largest to 
+#'        smallest). Ignored when the result is not a simple numeric vector. 
+#'        Default: `NULL`
+#' 
+#' @param FUN  The function to apply to each row of the `taxa_matrix()`.
+#' 
+#' @param ...  Optional arguments to `FUN`.
 #'        
-#' @return A named, sorted numeric vector.
+#' @return For `taxa_sums` and `taxa_means`, a named numeric vector.
+#'         For `taxa_apply`, a named vector or list with the results of `FUN`.
+#'         The names are the taxa IDs.
 #' 
 #' @export
 #' @examples
@@ -297,13 +306,13 @@ taxa_matrix <- function (
 #'     taxa_sums(hmp50) %>% head(4)
 #'     
 #'     taxa_means(hmp50, 'Family') %>% head(5)
-#'
+#'     
+#'     taxa_apply(hmp50, max) %>% head(5)
+#'     
+#'     taxa_apply(hmp50, fivenum) %>% head(5)
 
-taxa_sums <- function (biom, rank = 0) {
-  
-  taxa_matrix(biom, rank, sparse = TRUE) %>%
-    row_sums(na.rm = TRUE) %>%
-    sort(decreasing = TRUE)
+taxa_sums <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly") {
+  taxa_apply(biom, FUN = base::sum, rank, sort, lineage, unc)
 }
 
 
@@ -311,23 +320,45 @@ taxa_sums <- function (biom, rank = 0) {
 #' @rdname taxa_sums
 #' @export
 
-taxa_means <- function (biom, rank = 0) {
-  
-  taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::row_means(na.rm = TRUE) %>%
-    sort(decreasing = TRUE)
+taxa_means <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly") {
+  taxa_apply(biom, FUN = base::mean, rank, sort, lineage, unc)
 }
+
 
 
 #' @rdname taxa_sums
 #' @export
 
-taxa_max <- function (biom, rank = 0) {
-
-  taxa_matrix(biom, rank, sparse = TRUE) %>%
-    slam::rowapply_simple_triplet_matrix(max, na.rm = TRUE) %>%
-    sort(decreasing = TRUE)
+taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc = "singly", ...) {
+  
+  stopifnot(is.function(FUN))
+  validate_var_choices('sort', choices = c('asc', 'desc'), null_ok = TRUE)
+  
+  mtx <- taxa_matrix(biom = biom, rank = rank, lineage = lineage, sparse = TRUE, unc = unc)
+  
+  res <- if (identical(FUN, base::sum))  { slam::row_sums(mtx)
+  } else if (identical(FUN, base::mean)) { slam::row_means(mtx)
+  } else { slam::rowapply_simple_triplet_matrix(mtx, FUN, ...) }
+  
+  if (is.numeric(res) && !is.null(sort))
+    res <- base::sort(res, decreasing = (sort == 'desc'))
+  
+  return (res)
 }
+
+
+
+#' @name taxa_max-deprecated
+#' @rdname rbiom-deprecated
+#' @section \code{taxa_max}:
+#' Use `taxa_apply(biom, max, sort = 'desc')` instead.
+#' @export
+
+taxa_max <- function (biom, rank = -1, lineage = FALSE, unc = "singly") {
+  lifecycle::deprecate_warn("2.0.0", "taxa_max()", "taxa_apply()")
+  taxa_apply(biom, FUN = base::max, rank, sort = 'desc', lineage, unc)
+}
+
 
 
 #' Apply `p.top` constraint to data about to be plotted.

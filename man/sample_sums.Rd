@@ -2,26 +2,65 @@
 % Please edit documentation in R/adiv_table.r
 \name{sample_sums}
 \alias{sample_sums}
-\title{Sum the observations in each sample.}
+\alias{sample_apply}
+\title{Summarize the taxa observations in each sample.}
 \usage{
-sample_sums(biom)
+sample_sums(biom, rank = -1, sort = NULL, unc = "singly")
+
+sample_apply(biom, FUN, rank = -1, sort = NULL, unc = "singly", ...)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
+
+\item{sort}{Sort the result. Options: \code{NULL} - don't sort; \code{"asc"} - in
+ascending order (smallest to largest); \code{"desc"} - in descending order
+(largest to smallest). Ignored when the result is not a simple
+numeric vector. Default: \code{NULL}}
+
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
+\describe{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
+
+\item{FUN}{The function to apply to each column of \code{taxa_matrix()}.}
+
+\item{...}{Optional arguments to \code{FUN}.}
 }
 \value{
-A named numeric vector of the number of observations in each
-sample. The names are the sample IDs.
+For \code{sample_sums}, A named numeric vector of the number of
+observations in each sample. For \code{sample_apply}, a named vector or
+list with the results of \code{FUN}. The names are the taxa IDs.
 }
 \description{
-Sum the observations in each sample.
+Summarize the taxa observations in each sample.
 }
 \examples{
     library(rbiom)
     library(ggplot2)
     
-    sample_sums(hmp50) \%>\% sort() \%>\% head()
+    sample_sums(hmp50, sort = 'asc') \%>\% head()
+    
+    # Unique OTUs and "cultured" classes per sample
+    nnz <- function (x) sum(x > 0) # number of non-zeroes
+    sample_apply(hmp50, nnz, 'otu') \%>\% head()
+    sample_apply(hmp50, nnz, 'class', unc = 'drop') \%>\% head()
+    
+    # Number of reads in each sample's most abundant family
+    sample_apply(hmp50, base::max, 'f', sort = 'desc') \%>\% head()
     
     ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 }
@@ -35,6 +74,17 @@ Other rarefaction:
 \code{\link{rare_stacked}()},
 \code{\link{rarefy}()},
 \code{\link{rarefy_cols}()}
+
+Other taxa_abundance: 
+\code{\link{taxa_boxplot}()},
+\code{\link{taxa_clusters}()},
+\code{\link{taxa_corrplot}()},
+\code{\link{taxa_heatmap}()},
+\code{\link{taxa_stacked}()},
+\code{\link{taxa_stats}()},
+\code{\link{taxa_sums}()},
+\code{\link{taxa_table}()}
 }
 \concept{rarefaction}
 \concept{samples}
+\concept{taxa_abundance}

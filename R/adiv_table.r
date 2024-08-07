@@ -54,7 +54,7 @@ adiv_table <- function (
   mtx <- mtx[, unique(c('Depth', adiv))]
   tbl <- tibble(
     '.sample'    = rownames(mtx)[row(mtx)] %>% factor(levels = rownames(mtx)),
-    '.depth'     = mtx[,'Depth'][row(mtx)],
+    '.depth'     = unname(mtx[,'Depth'][row(mtx)]),
     '.adiv'      = colnames(mtx)[col(mtx)] %>% factor(levels = adiv),
     '.diversity' = as.numeric(mtx) ) %>%
     dplyr::filter(!is.na(.data$.adiv))
@@ -179,28 +179,68 @@ adiv_matrix <- function (biom, trans = "none") {
 
 
 
-#' Sum the observations in each sample.
+#' Summarize the taxa observations in each sample.
 #' 
 #' @inherit documentation_default
 #' 
 #' @family samples
 #' @family rarefaction
+#' @family taxa_abundance
 #' 
-#' @return A named numeric vector of the number of observations in each 
-#'         sample. The names are the sample IDs.
+#' @param sort  Sort the result. Options: `NULL` - don't sort; `"asc"` - in 
+#'        ascending order (smallest to largest); `"desc"` - in descending order 
+#'        (largest to smallest). Ignored when the result is not a simple 
+#'        numeric vector. Default: `NULL`
+#' 
+#' @param FUN  The function to apply to each column of `taxa_matrix()`.
+#' 
+#' @param ...  Optional arguments to `FUN`.
+#' 
+#' @return For `sample_sums`, A named numeric vector of the number of 
+#'         observations in each sample. For `sample_apply`, a named vector or 
+#'         list with the results of `FUN`. The names are the taxa IDs.
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
 #'     library(ggplot2)
 #'     
-#'     sample_sums(hmp50) %>% sort() %>% head()
+#'     sample_sums(hmp50, sort = 'asc') %>% head()
+#'     
+#'     # Unique OTUs and "cultured" classes per sample
+#'     nnz <- function (x) sum(x > 0) # number of non-zeroes
+#'     sample_apply(hmp50, nnz, 'otu') %>% head()
+#'     sample_apply(hmp50, nnz, 'class', unc = 'drop') %>% head()
+#'     
+#'     # Number of reads in each sample's most abundant family
+#'     sample_apply(hmp50, base::max, 'f', sort = 'desc') %>% head()
 #'     
 #'     ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 
-sample_sums <- function (biom) {
-  biom <- as_rbiom(biom)
-  col_sums(biom$counts)
+sample_sums <- function (biom, rank = -1, sort = NULL, unc = "singly") {
+  sample_apply(biom, FUN = base::sum, rank, sort, unc)
+}
+
+
+
+#' @rdname sample_sums
+#' @export
+
+sample_apply <- function (biom, FUN, rank = -1, sort = NULL, unc = "singly", ...) {
+  
+  stopifnot(is.function(FUN))
+  validate_var_choices('sort', choices = c('asc', 'desc'), null_ok = TRUE)
+  
+  mtx <- taxa_matrix(biom = biom, rank = rank, sparse = TRUE, unc = unc)
+  
+  res <- if (identical(FUN, base::sum))  { slam::col_sums(mtx)
+  } else if (identical(FUN, base::mean)) { slam::col_means(mtx)
+  } else { slam::colapply_simple_triplet_matrix(mtx, FUN, ...) }
+  
+  if (is.numeric(res) && !is.null(sort))
+    res <- base::sort(res, decreasing = (sort == 'desc'))
+  
+  return (res)
 }
 
 

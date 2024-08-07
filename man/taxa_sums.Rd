@@ -3,24 +3,67 @@
 \name{taxa_sums}
 \alias{taxa_sums}
 \alias{taxa_means}
-\alias{taxa_max}
+\alias{taxa_apply}
 \title{Get summary taxa abundances.}
 \usage{
-taxa_sums(biom, rank = 0)
+taxa_sums(biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly")
 
-taxa_means(biom, rank = 0)
+taxa_means(biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly")
 
-taxa_max(biom, rank = 0)
+taxa_apply(
+  biom,
+  FUN,
+  rank = -1,
+  sort = NULL,
+  lineage = FALSE,
+  unc = "singly",
+  ...
+)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
-\item{rank}{The taxonomic rank to return sums or means for. The default,
-\code{0}, returns per-OTU summaries.}
+\item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
+\code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
+given, where \code{1} is the highest rank, \code{2} is the second
+highest, \code{-1} is the lowest rank, \code{-2} is the second
+lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
+see all options for a given rbiom object. Default: \code{-1}.}
+
+\item{sort}{Sort the result. Options: \code{NULL}, \code{"asc"}, or \code{"desc"}, where
+\code{NULL} will not sort the result. \code{"asc"} will sort in ascending order
+(smallest to largest), and \code{"desc"} in descending order (largest to
+smallest). Ignored when the result is not a simple numeric vector.
+Default: \code{NULL}}
+
+\item{lineage}{Include all ranks in the name of the taxa. For instance,
+setting to \code{TRUE} will produce
+\verb{Bacteria; Actinobacteria; Coriobacteriia; Coriobacteriales}.
+Otherwise the taxa name will simply be \code{Coriobacteriales}. You
+want to set this to TRUE when \code{unc = "asis"} and you have taxa
+names (such as \emph{Incertae_Sedis}) that map to multiple higher
+level ranks. Default: \code{FALSE}}
+
+\item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
+taxa names. Options are:
+\describe{
+\item{\code{"singly"} - }{ Replaces them with the OTU name. }
+\item{\code{"grouped"} - }{ Replaces them with a higher rank's name. }
+\item{\code{"drop"} - }{ Excludes them from the result. }
+\item{\code{"asis"} - }{ To not check/modify any taxa names. }
+}
+Default: \code{"singly"} \cr\cr
+Abbreviations are allowed.}
+
+\item{FUN}{The function to apply to each row of the \code{taxa_matrix()}.}
+
+\item{...}{Optional arguments to \code{FUN}.}
 }
 \value{
-A named, sorted numeric vector.
+For \code{taxa_sums} and \code{taxa_means}, a named numeric vector.
+For \code{taxa_apply}, a named vector or list with the results of \code{FUN}.
+The names are the taxa IDs.
 }
 \description{
 Get summary taxa abundances.
@@ -31,10 +74,14 @@ Get summary taxa abundances.
     taxa_sums(hmp50) \%>\% head(4)
     
     taxa_means(hmp50, 'Family') \%>\% head(5)
-
+    
+    taxa_apply(hmp50, max) \%>\% head(5)
+    
+    taxa_apply(hmp50, fivenum) \%>\% head(5)
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},

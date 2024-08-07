@@ -226,6 +226,7 @@ letters instead of shapes on the plot. Character strings may used as well.
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},
 \code{\link{taxa_heatmap}()},

@@ -449,7 +449,8 @@ add_layer <- function (params, layer, fn = NULL) {
   #________________________________________________________
   for (i in grep(regex, names(layer_params), value = TRUE))
     if (!isFALSE(attr(layer_params[[i]], 'display')))
-      result[sub(regex, "", i, perl = TRUE)] <- layer_params[[i]]
+      if (!i %in% c('p.top', 'p.label', 'p.adj'))
+        result[sub(regex, "", i, perl = TRUE)] <- layer_params[[i]]
   
   
   

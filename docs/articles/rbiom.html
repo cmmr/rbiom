@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -212,6 +212,10 @@ rbiom object, use the object’s <code>$clone()</code> method.</p>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 50</span></span>
 <span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: <span style="color: #00BBBB;">ℹ</span> Dropping 44 samples from biom object since they are not in the new metadata:</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP07"</span>, <span style="color: #0000BB;">"HMP08"</span>, <span style="color: #0000BB;">"HMP09"</span>, <span style="color: #0000BB;">"HMP10"</span>, <span style="color: #0000BB;">"HMP11"</span>, <span style="color: #0000BB;">"HMP12"</span>, <span style="color: #0000BB;">"HMP13"</span>, <span style="color: #0000BB;">"HMP14"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP15"</span>, <span style="color: #0000BB;">"HMP16"</span>, <span style="color: #0000BB;">"HMP17"</span>, <span style="color: #0000BB;">"HMP18"</span>, <span style="color: #0000BB;">"HMP19"</span>, <span style="color: #0000BB;">"HMP20"</span>, <span style="color: #0000BB;">"HMP21"</span>, <span style="color: #0000BB;">"HMP22"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP23"</span>, <span style="color: #0000BB;">"HMP24"</span>, …, <span style="color: #0000BB;">"HMP49"</span>, and <span style="color: #0000BB;">"HMP50"</span>.</span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 50</span></span></code></pre></div>
 </div>
@@ -223,6 +227,10 @@ rbiom object, use the object’s <code>$clone()</code> method.</p>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 50</span></span>
 <span><span class="va">b</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: <span style="color: #00BBBB;">ℹ</span> Dropping 44 samples from biom object since they are not in the new metadata:</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP07"</span>, <span style="color: #0000BB;">"HMP08"</span>, <span style="color: #0000BB;">"HMP09"</span>, <span style="color: #0000BB;">"HMP10"</span>, <span style="color: #0000BB;">"HMP11"</span>, <span style="color: #0000BB;">"HMP12"</span>, <span style="color: #0000BB;">"HMP13"</span>, <span style="color: #0000BB;">"HMP14"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP15"</span>, <span style="color: #0000BB;">"HMP16"</span>, <span style="color: #0000BB;">"HMP17"</span>, <span style="color: #0000BB;">"HMP18"</span>, <span style="color: #0000BB;">"HMP19"</span>, <span style="color: #0000BB;">"HMP20"</span>, <span style="color: #0000BB;">"HMP21"</span>, <span style="color: #0000BB;">"HMP22"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"HMP23"</span>, <span style="color: #0000BB;">"HMP24"</span>, …, <span style="color: #0000BB;">"HMP49"</span>, and <span style="color: #0000BB;">"HMP50"</span>.</span></span>
 <span><span class="va">a</span><span class="op">$</span><span class="va">n_samples</span></span>
 <span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
 </div>
@@ -308,7 +316,7 @@ samples in the abundance table.</p>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        B     FALSE</span></span>
@@ -327,7 +335,7 @@ entire rbiom object.</p>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`    group Obese</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
@@ -343,7 +351,7 @@ entire rbiom object.</p>
 <span><span class="co">#&gt; (<span style="color: #808080; font-style: italic;">&lt;https://hmpdacc.org&gt;</span>).</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      10 Samples: HMP10, HMP15, HMP16, ..., and HMP48</span></span>
-<span><span class="co">#&gt;     126 OTUs:    CnbTube3, PpbAcne6, Unc02qsf, ...</span></span>
+<span><span class="co">#&gt;     126 OTUs:    Unc01yki, Unc53100, LtbAci52, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:   .otu, Kingdom, Phylum, ..., and Genus</span></span>
 <span><span class="co">#&gt;       6 Fields:  .sample, Years Old, BMI, ..., and Obese</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>

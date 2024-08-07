@@ -180,10 +180,11 @@ letters instead of shapes on the plot. Character strings may used as well.
     
     biom <- rarefy(hmp50)
     
-    taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 4) 
+    taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 1) 
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_heatmap}()},

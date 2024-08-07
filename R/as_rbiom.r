@@ -16,7 +16,7 @@
 #'          \item{\emph{list} - }{ With `counts` and optionally `metadata`, `taxonomy`, `tree`, etc (see details). }
 #'        }
 #' 
-#' @param ...   Not used.
+#' @param ...   Properties to overwrite in biom: `metadata`, `taxonomy`, `tree`, etc (see details).
 #'
 #' @export
 #' @examples
@@ -36,7 +36,7 @@
 #'       days      = c(12, 3, 7, 8) )
 #'     
 #'     # convert data set to rbiom ---------------------
-#'     biom <- as_rbiom(list(counts = mtx, metadata = df))
+#'     biom <- as_rbiom(mtx, metadata = df, id = "My BIOM")
 #'     biom
 #' 
 as_rbiom <- function(biom, ...) {
@@ -51,14 +51,11 @@ as_rbiom.rbiom <- function (biom, ...) {
   #________________________________________________________
   # Already an rbiom/R6 object.
   #________________________________________________________
-  if (!identical(pv1 <- biom$pkg_version, pv2 <- utils::packageVersion("rbiom"))) {
+  if (!identical(biom$pkg_version, utils::packageVersion("rbiom"))) {
     
-    # if (getOption("rbiom.inform", default = TRUE))
-    #   cli_inform(.frequency = "regularly", .frequency_id = "up_convert", c(
-    #     '!' = "Up converting rbiom object from version {pv1} to {pv2}.",
-    #     'i' = "It is recommended to save rbiom objects to BIOM files, not RDS files." ))
-    
-    biom <- do.call(rbiom$new, as.list(biom))
+    args <- c(list(...), as.list(biom))
+    args <- args[!duplicated(names(args))]
+    biom <- do.call(rbiom$new, args)
   }
   
   return (biom)
@@ -72,11 +69,11 @@ as_rbiom.rbiom <- function (biom, ...) {
 #________________________________________________________
 
 #' @export
-as_rbiom.matrix <- function (biom, ...) { rbiom$new(counts = biom) }
+as_rbiom.matrix <- function (biom, ...) { rbiom$new(counts = biom, ...) }
 
 
 #' @export
-as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom) }
+as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom, ...) }
 
 
 #________________________________________________________
@@ -86,16 +83,24 @@ as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom
 #' @export
 as_rbiom.phyloseq <- function (biom, ...) {
   
-  if (!nzchar(system.file(package = "phyloseq")))
+  dots <- list(...)
+  
+  if (!nzchar(system.file(package = "phyloseq")) || isTRUE(dots$no_phyloseq))
     cli_abort("Bioconductor R package 'phyloseq' must be installed to use as_rbiom.phyloseq().")
   
-  rbiom$new(
+  args <- list(
     counts    = biom %>% phyloseq::otu_table() %>% as.simple_triplet_matrix(), 
     metadata  = biom %>% phyloseq::sample_data(errorIfNULL = FALSE) %>% data.frame(), 
     taxonomy  = biom %>% phyloseq::tax_table(errorIfNULL = FALSE) %>% data.frame(), 
     sequences = biom %>% phyloseq::refseq(errorIfNULL = FALSE) %>% as.vector(), 
     tree      = biom %>% phyloseq::phy_tree(errorIfNULL = FALSE), 
     id        = "Imported PhyloSeq Data" )
+  
+  args <- c(dots, args)
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  return (biom)
 }
 
 
@@ -108,15 +113,19 @@ as_rbiom.default <- function (biom, ...) {
   # Read new rbiom object from filename / URL / JSON.
   #________________________________________________________
   if (is_scalar_character(biom))
-    return (read_biom(src = biom))
+    return (read_biom(src = biom, ...))
   
   
   
   #________________________________________________________
   # A list with 'counts' and possibly other elements.
   #________________________________________________________
-  if (is.list(biom) && hasName(biom, "counts"))
-    return (do.call(rbiom$new, biom))
+  if (is.list(biom) && hasName(biom, "counts")) {
+    args <- c(list(counts = biom$counts), list(...), biom)
+    args <- args[!duplicated(names(args))]
+    biom <- do.call(rbiom$new, args)
+    return (biom)
+  }
   
   
   

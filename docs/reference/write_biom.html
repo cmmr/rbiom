@@ -43,7 +43,7 @@ Tab-separated values.
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,9 +131,11 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>Path to the output file. File names ending in <code>.gz</code> or
-<code>.bz2</code> will be compressed accordingly. <code>write_fasta()</code> and
-<code>write_tree()</code> can have <code>file=NULL</code>, which returns a string of the
-output which would have been written.</p></dd>
+<code>.bz2</code> will be compressed accordingly. <br><br>
+Setting <code>file=NULL</code> for <code>write_fasta()</code>, <code>write_tree()</code>, and
+<code>write_biom(format='json')</code>, and returns a string of the output which
+would have been written. For <code>write_biom(format='tab')</code>, <code>file=NULL</code>
+returns the tibble that would have been written.</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
@@ -180,7 +182,8 @@ Abbreviations are allowed.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The normalized filepath that was written to (invisibly).</p>
+    <p>The normalized filepath that was written to (invisibly), unless
+<code>file=NULL</code> (see <code>file</code> argument above).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

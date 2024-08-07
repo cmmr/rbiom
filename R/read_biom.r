@@ -87,7 +87,9 @@
 #'
 
 
-read_biom <- function (src, tree='auto') {
+read_biom <- function (src, tree='auto', ...) {
+  
+  dots <- list(...)
 
   #________________________________________________________
   # Sanity check input values
@@ -221,15 +223,21 @@ read_biom <- function (src, tree='auto') {
   # Assemble everything as an rbiom class object.
   #________________________________________________________
   
-  biom <- rbiom$new(
-    'counts'    = counts,
-    'metadata'  = metadata,
-    'taxonomy'  = taxonomy,
-    'tree'      = phylogeny,
-    'sequences' = sequences,
-    'id'        = info$id,
-    'date'      = info$date,
-    'comment'   = info$comment )
+  args <- c(
+    list(
+      'counts' = counts, 
+      'tree'   = phylogeny),
+    dots,
+    list(
+      'metadata'  = metadata, 
+      'taxonomy'  = taxonomy, 
+      'sequences' = sequences, 
+      'id'        = info$id, 
+      'date'      = info$date, 
+      'comment'   = info$comment ))
+  
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
   
   
   #________________________________________________________
@@ -242,14 +250,6 @@ read_biom <- function (src, tree='auto') {
     if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
       cl[i] <- list(val)
   }
-  
-  
-  #________________________________________________________
-  # Determine if these counts are pre-rarefied
-  #________________________________________________________
-  ss <- sample_sums(biom)
-  if (isTRUE(length(d <- unique(ss)) == 1))
-    attr(biom, 'rarefaction') <- d
   
   
   return (biom)

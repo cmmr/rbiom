@@ -232,6 +232,7 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},

@@ -29,9 +29,11 @@ write_xlsx(biom, file, depth = "auto", n = NULL, seed = 0, unc = "singly")
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{file}{Path to the output file. File names ending in \code{.gz} or
-\code{.bz2} will be compressed accordingly. \code{write_fasta()} and
-\code{write_tree()} can have \code{file=NULL}, which returns a string of the
-output which would have been written.}
+\code{.bz2} will be compressed accordingly. \cr\cr
+Setting \code{file=NULL} for \code{write_fasta()}, \code{write_tree()}, and
+\code{write_biom(format='json')}, and returns a string of the output which
+would have been written. For \code{write_biom(format='tab')}, \code{file=NULL}
+returns the tibble that would have been written.}
 
 \item{format}{Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"},
 corresponding to classic tabular format, BIOM format version 1.0 and
@@ -60,7 +62,8 @@ Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
 }
 \value{
-The normalized filepath that was written to (invisibly).
+The normalized filepath that was written to (invisibly), unless
+\code{file=NULL} (see \code{file} argument above).
 }
 \description{
 Automatically creates directories and adds compression based on file name.

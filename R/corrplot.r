@@ -382,7 +382,7 @@ rare_corrplot <- function (
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 4) 
+#'     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 1) 
 
 taxa_corrplot <- function (
     biom, x, rank = -1, layers = "tc", 

@@ -135,15 +135,11 @@ rbiom <- R6::R6Class(
     .id           = "", 
     .comment      = "", 
     .date         = "",
-    .generated_by = "",
+    .generated_by = paste("rbiom", utils::packageVersion("rbiom")),
     
     .pkg_version  = utils::packageVersion("rbiom"),
-    .hashes       = list(
-      .counts       = rlang::hash(NULL),
-      .metadata     = rlang::hash(NULL),
-      .taxonomy     = rlang::hash(NULL),
-      .tree         = rlang::hash(NULL),
-      .sequences    = rlang::hash(NULL) ),
+    .hash         = NULL,
+    .tree_hash    = NULL,
     
     
     
@@ -154,54 +150,54 @@ rbiom <- R6::R6Class(
     # OTUs are ordered by overall abundance.
     # Sample order is taken from metadata.
     #________________________________________________________
-    sync = function (sids = NULL) {
+    sync = function (sids = NULL, otus = NULL) {
+      
+      mtx <- private$.counts
       
       #________________________________________________________
-      # Sync sample names between counts and metadata.
+      # Ordering of sids/otus when not explicitly provided.
       #________________________________________________________
-      if (is.null(sids))
-        sids <- private$.metadata[['.sample']]
+      if (is.null(sids)) sids <- intersect(colnames(mtx), private$.metadata[['.sample']])
+      if (is.null(otus)) otus <- intersect(rownames(mtx), private$.taxonomy[['.otu']])
       
-      sids <- sids %>%
-        intersect(private$.metadata[['.sample']]) %>%
-        intersect(colnames(private$.counts))
       
-      private$.counts              <- private$.counts[,sids]
-      private$.hashes[['.counts']] <- rlang::hash(private$.counts)
+      #________________________________________________________
+      # Maintain the $counts matrix.
+      #________________________________________________________
+      if (!identical(sids, colnames(mtx)) || !identical(otus, rownames(mtx)))
+        mtx <- mtx[otus,sids]
       
+      
+      #________________________________________________________
+      # Drop zero abundance otus/samples.
+      #________________________________________________________
+      i <- sort(unique(mtx$i))
+      j <- sort(unique(mtx$j))
+      if (!length(c(i, j)) == nrow(mtx) + ncol(mtx)) {
+        mtx  <- mtx[i,j]
+        otus <- otus[i]
+        sids <- sids[j]
+      }
+      
+      
+      #________________________________________________________
+      # Update any components that are out of sync.
+      #________________________________________________________
       if (!identical(sids, private$.metadata[['.sample']]))
         private$.metadata <- private$.metadata[match(sids, private$.metadata[['.sample']]),]
       
-      # Drop missing factor levels
-      for (i in which(sapply(private$.metadata, is.factor)))
-        if (!all(levels(private$.metadata[[i]]) %in% private$.metadata[[i]]))
-          private$.metadata[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
-      
-      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
-      
-      
-      #________________________________________________________
-      # Sync OTU names between counts, taxonomy, and seqs.
-      #________________________________________________________
-      otus <- rev(sort(row_sums(private$.counts)))
-      otus <- names(otus[otus > 0])
-      
-      if (!identical(otus, rownames(private$.counts))) {
-        private$.counts              <- private$.counts[otus,]
-        private$.hashes[['.counts']] <- rlang::hash(private$.counts)
-      }
-      
-      if (!identical(otus, private$.taxonomy[['.otu']])) {
+      if (!identical(otus, private$.taxonomy[['.otu']]))
         private$.taxonomy <- private$.taxonomy[match(otus, private$.taxonomy[['.otu']]),]
-        private$.hashes[['.taxonomy']] <- rlang::hash(private$.taxonomy)
-      }
       
       if (!is.null(private$.sequences))
-        if (!identical(names(private$.sequences), otus)) {
-          private$.sequences              <- private$.sequences[otus]
-          private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
-        }
+        if (!identical(names(private$.sequences), otus))
+          private$.sequences <- private$.sequences[otus]
       
+      
+      private$.hash     <- NULL
+      private$.counts   <- mtx
+      private$.metadata <- relevel(private$.metadata)
+      private$.taxonomy <- relevel(private$.taxonomy)
       
       return (invisible(private))
     }
@@ -246,12 +242,11 @@ rbiom <- R6::R6Class(
           private$.date <- date
       
       #________________________________________________________
-      # Value found by read_biom(). Read-only hereafter.
+      # Read-only hereafter.
       #________________________________________________________
-      private$.generated_by <- paste("rbiom", utils::packageVersion("rbiom"))
-      if (!is.null(generated_by <- dots[['generated_by']]))
-        if (is_scalar_character(generated_by) && !is.na(generated_by))
-          private$.generated_by <- generated_by
+      for (i in c('generated_by', 'pkg_version'))
+        if (is_scalar_character(dots[[i]]) && !is.na(dots[[i]]))
+          private[[paste0('.', i)]] <- dots[[i]]
       
     },
     
@@ -336,8 +331,10 @@ rbiom <- R6::R6Class(
       if (nchar(value) > 100) {
         if (interactive()) cli_warn("Truncating `id` to 100 characters.")
         value <- substr(value, 0, 100)
-      } 
-      private$.id <- value
+      }
+      
+      private$.hash <- NULL
+      private$.id   <- value
       
       return (self)
     },
@@ -358,6 +355,8 @@ rbiom <- R6::R6Class(
         if (interactive()) cli_warn("Truncating `comment` to 5000 characters.")
         value <- substr(value, 0, 5000)
       }
+      
+      private$.hash    <- NULL
       private$.comment <- value
       
       return (self)
@@ -402,17 +401,22 @@ rbiom <- R6::R6Class(
     #________________________________________________________
     hash = function () {
       
-      rlang::hash(list(
-        private$.hashes$.counts,
-        private$.hashes$.metadata,
-        private$.hashes$.taxonomy,
-        private$.hashes$.tree,
-        private$.hashes$.sequences,
-        private$.depth, 
-        private$.id, 
-        private$.comment, 
-        private$.date, 
-        private$.generated_by ))
+      if (is.null(private$.hash)) {
+        
+        private$.hash <- rlang::hash(list(
+          private$.counts,
+          private$.metadata,
+          private$.taxonomy,
+          private$.sequences,
+          private$.tree_hash, 
+          private$.depth, 
+          private$.id, 
+          private$.comment, 
+          private$.date, 
+          private$.generated_by ))
+      }
+      
+      return (private$.hash)
     },
     
     
@@ -432,7 +436,7 @@ rbiom <- R6::R6Class(
       
       if (is_character(value)) {
         
-        rownames(private$.counts) %<>% trimws()
+        names(value) %<>% trimws()
         otus <- rownames(private$.counts)
         
         if (length(missing <- setdiff(otus, names(value))) != 0)
@@ -442,8 +446,8 @@ rbiom <- R6::R6Class(
       }
       
       
-      private$.sequences              <- value
-      private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
+      private$.hash      <-  NULL
+      private$.sequences <- value
       
       return (self)
     },
@@ -479,8 +483,9 @@ rbiom <- R6::R6Class(
           cli_abort(('x' = sprintf("OTUs missing from tree: {missing}")))
       }
       
-      private$.tree              <- value
-      private$.hashes[['.tree']] <- rlang::hash(private$.tree)
+      private$.hash      <- NULL
+      private$.tree      <- value
+      private$.tree_hash <- rlang::hash(value)
       
       return (self)
     },
@@ -512,43 +517,48 @@ rbiom <- R6::R6Class(
         cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
       
       if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.otu')
-      } else                   { value %<>% relocate(.otu) }
+      } else                           { value %<>% relocate(.otu) }
       
       
       #________________________________________________________
       # Disallow column names starting with a "."
       #________________________________________________________
-      if (length(badnames <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
-        cli_abort(c(x = "Taxonomy rank{?s} can't start with a '.': {badnames}."))
+      if (length(i <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
+        cli_abort(c(x = "Taxonomy rank{?s} can't start with a '.': {.val {i}}."))
       
       
       #________________________________________________________
       # Convert all cols (except .otu) to factor.
       #________________________________________________________
-      for (i in seq_len(ncol(value))[-1]) {
-        
+      for (i in seq_len(ncol(value))[-1])
         if (!is.factor(value[[i]])) value[[i]] %<>% as.factor()
-        
-        lvls <- levels(value[[i]])
-        if (length(i <- which(lvls != trimws(lvls))) > 0) {
-          cli_warn("Whitespace trimmed from {.field {i}} column value{?s} {.val {lvls[i]}}.")
-          levels(value[[i]]) %<>% trimws()
-        }
-      }
+      
+      
+      #________________________________________________________
+      # Intersect with OTU names from $counts.
+      #________________________________________________________
       value[['.otu']] %<>% as.character() %>% trimws()
+      otus <- intersect(value[['.otu']], rownames(private$.counts))
+      
+      if (length(otus) == 0) cli_abort(c(
+        'i' = "No matching OTU names.", 
+        '*' = "Expected: {vw(rownames(private$.counts))}", 
+        '*' = "Provided: {vw(value[['.otu']])}", 
+        'x' = "Can't subset to zero OTUs." ))
+      
+      if (length(i <- setdiff(rownames(private$.counts), otus)) != 0)
+        cli_warn(c('i' = paste(
+          "Dropping {length(i)} OTU{?s} from biom object",
+          "since they are not in the new taxonomy: {.val {i}}." )))
+      
+      if (length(i <- setdiff(value[['.otu']], otus)) != 0)
+        cli_warn(c('i' = paste(
+          "Ignoring taxonomy for {length(i)} OTU{?s}", 
+          "not currently in biom object: {.val {i}}." )))
       
       
-      #________________________________________________________
-      # Match OTU ordering in counts.
-      #________________________________________________________
-      otus <- rownames(private$.counts)
-      if (length(missing <- setdiff(otus, value[['.otu']])) != 0)
-        cli_abort(c(x = "OTUs missing from new taxonomy table: {missing}."))
-      value <- value[match(otus, value[['.otu']]),]
-      
-      
-      private$.taxonomy              <- value
-      private$.hashes[['.taxonomy']] <- rlang::hash(private$.taxonomy)
+      private$.taxonomy <- value
+      private$sync(otus = otus)
       
       return (self)
     },
@@ -633,60 +643,49 @@ rbiom <- R6::R6Class(
         cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
       
       if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.sample')
-      } else                   { value %<>% relocate(.sample) }
+      } else                           { value %<>% relocate(.sample) }
       
       
       #________________________________________________________
       # Disallow column names starting with a "."
       #________________________________________________________
-      if (length(badnames <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
-        cli_abort(c(x = "Metadata field{?s} can't start with a '.': {badnames}."))
+      if (length(i <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
+        cli_abort(c(x = "Metadata field{?s} can't start with a '.': {.val {i}}."))
       
       
       #________________________________________________________
       # Convert all character cols (except .sample) to factor.
       #________________________________________________________
-      for (i in colnames(value)[-1]) {
-        
+      for (i in colnames(value)[-1])
         if (is.character(value[[i]])) value[[i]] %<>% as.factor()
-        
-        if (is.factor(value[[i]])) {
-          lvls <- levels(value[[i]])
-          if (length(j <- which(lvls != trimws(lvls))) > 0) {
-            cli_warn("Whitespace trimmed from {.field {i}} column {qty(length(j))} value{?s} {.val {lvls[j]}}.")
-            levels(value[[i]]) %<>% trimws()
-          }
-        }
+      
+      
+      #________________________________________________________
+      # Intersect with sample names from $counts.
+      #________________________________________________________
+      value[['.sample']] %<>% as.character() %>% trimws()
+      sids <- intersect(value[['.sample']], colnames(private$.counts))
+      
+      if (length(sids) == 0) cli_abort(c(
+        'i' = "No matching sample names.", 
+        '*' = "Expected: {vw(colnames(private$.counts))}", 
+        '*' = "Provided: {vw(value[['.sample']])}", 
+        'x' = "Can't subset to zero samples." ))
+      
+      if (length(i <- setdiff(colnames(private$.counts), sids)) != 0) {
+        cli_warn(c('i' = paste(
+          "Dropping {length(i)} sample{?s} from biom object",
+          "since they are not in the new metadata: {.val {i}}." )))
       }
       
-      value[['.sample']] %<>% as.character() %>% trimws()
+      if (length(i <- setdiff(value[['.sample']], sids)) != 0)
+        cli_warn(c('i' = paste(
+          "Ignoring metadata for {length(i)} sample{?s}", 
+          "not currently in biom object: {.val {i}}." )))
       
       
-      
-      #________________________________________________________
-      # Enforce unnamed vectors.
-      #________________________________________________________
-      for (i in colnames(value))
-        if (!is.null(names(value[[i]])))
-          value[[i]] %<>% unname()
-      
-      
-      
-      #________________________________________________________
-      # Prevent dropping all samples.
-      #________________________________________________________
-      if (!any(colnames(private$.counts) %in% value[['.sample']]))
-        cli_abort(c(
-          'i' = "No matching sample names.", 
-          '*' = "Expected: {vw(colnames(private$.counts))}", 
-          '*' = "Provided: {vw(value[['.sample']])}", 
-          'x' = "Can't subset to zero samples." ))
-      
-      
-      private$.metadata              <- value
-      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
-      
-      private$sync()
+      private$.metadata <- value
+      private$sync(sids = sids)
       
       
       return (self)
@@ -705,98 +704,77 @@ rbiom <- R6::R6Class(
       #________________________________________________________
       # Coerce value to slam matrix.
       #________________________________________________________
-      value <- as.simple_triplet_matrix(value)
-      stopifnot(is.simple_triplet_matrix(value))
+      mtx <- as.simple_triplet_matrix(value)
+      stopifnot(is.simple_triplet_matrix(mtx))
       
       
       #________________________________________________________
       # Sanity check the new matrix.
       #________________________________________________________
-      if (!is.numeric(value)) cli_abort("Matrix must be numeric, not {.type {value$v}}.")
-      if (any(value$v < 0))   cli_abort("Matrix can't have negative values.")
-      if (sum(value) == 0)    cli_abort("Matrix is all zeroes.")
+      if (length(mtx$v) == 0) cli_abort("Matrix is all zeroes.")
+      if (!is.numeric(mtx$v)) cli_abort("Matrix must be numeric, not {.type {mtx$v}}.")
+      if (any(mtx$v < 0))     cli_abort("Matrix can't have negative values.")
       
-      sids <- colnames(value)
-      otus <- rownames(value)
+      sids <- colnames(mtx)
+      otus <- rownames(mtx)
       if (!is.character(sids)) cli_abort("Column names must be sample names, not {.type {sids}}.")
       if (!is.character(otus)) cli_abort("Row names must be OTU names, not {.type {otus}}.")
       
       sids <- trimws(sids)
       otus <- trimws(otus)
-      if (length(i <- which(sids != colnames(value))) > 0)
-        cli_warn("Trimming whitespace from sample name{?s}: {.val {colnames(value)[i]}}.")
-      if (length(i <- which(otus != rownames(value))) > 0)
-        cli_warn("Trimming whitespace from OTU name{?s}: {.val {rownames(value)[i]}}.")
+      if (length(i <- which(sids != colnames(mtx))) > 0)
+        cli_warn("Trimming whitespace from sample name{?s}: {.val {colnames(mtx)[i]}}.")
+      if (length(i <- which(otus != rownames(mtx))) > 0)
+        cli_warn("Trimming whitespace from OTU name{?s}: {.val {rownames(mtx)[i]}}.")
       
       if (length(dups <- sids[duplicated(sids)]) > 0) cli_abort("Duplicated sample name{?s}: {dups}.")
       if (length(dups <- otus[duplicated(otus)]) > 0) cli_abort("Duplicated OTU name{?s}: {dups}.")
-      colnames(value) <- sids
-      rownames(value) <- otus
+      colnames(mtx) <- sids
+      rownames(mtx) <- otus
       
       
       #________________________________________________________
       # First time loading counts.
       #________________________________________________________
       if (is.null(private$.counts)) {
-        
-        private$.counts   <- value
-        private$.metadata <- tibble::tibble(.sample = colnames(value))
-        private$.taxonomy <- tibble::tibble(.otu    = rownames(value))
-        
-        private$.hashes[['.counts']]    <- rlang::hash(private$.counts)
-        private$.hashes[['.metadata']]  <- rlang::hash(private$.metadata)
-        private$.hashes[['.taxonomy']]  <- rlang::hash(private$.taxonomy)
+        private$.metadata <- tibble::tibble(.sample = sids)
+        private$.taxonomy <- tibble::tibble(.otu    = otus)
       }
-      
       
       #________________________________________________________
       # Intersect with current row/col names.
       #________________________________________________________
       else {
-        sids <- intersect(colnames(value), colnames(private$.counts))
-        otus <- intersect(rownames(value), rownames(private$.counts))
+        sids <- intersect(sids, colnames(private$.counts))
+        otus <- intersect(otus, rownames(private$.counts))
         
         if (length(sids) == 0)
           cli_abort(c(
             'i' = "Column names don't match any sample names.", 
             '*' = "Expected: {vw(colnames(private$.counts))}", 
-            '*' = "Provided: {vw(colnames(value))}", 
+            '*' = "Provided: {vw(sids)}", 
             'x' = "Can't subset to zero samples." ))
         
         if (length(otus) == 0)
           cli_abort(c(
             'i' = "Row names don't match any OTU names.", 
             '*' = "Expected: {vw(rownames(private$.counts))}", 
-            '*' = "Provided: {vw(rownames(value))}", 
+            '*' = "Provided: {vw(otus)}", 
             'x' = "Can't subset to zero OTUs." ))
         
-        value <- value[otus,sids]
+        mtx <- mtx[otus, sids]
       }
-      
-      
-      #________________________________________________________
-      # Drop zero abundance samples/otus.
-      #________________________________________________________
-      sids <- names(which(col_sums(value) > 0))
-      otus <- names(which(row_sums(value) > 0))
-      
-      if (length(sids) == 0)
-        cli_abort(c(
-          'i' = "Matrix is all zeros.", 
-          'x' = "Can't subset to zero samples/OTUs." ))
-      
-      private$.counts              <- value[otus, sids]
-      private$.hashes[['.counts']] <- rlang::hash(private$.counts)
       
       
       #________________________________________________________
       # Note the rarefaction depth, or NULL if unrarefied.
       #________________________________________________________
-      ss <- unique(round(col_sums(private$.counts), 2))
+      ss <- unique(round(col_sums(mtx), 2))
       private$.depth <- if (length(ss) == 1) ss else NULL
       
       
-      private$sync(sids = sids)
+      private$.counts <- mtx
+      private$sync()
       
       return (self)
     },
@@ -824,6 +802,7 @@ rbiom <- R6::R6Class(
           i = "Expected POSIXt object or string in {.code {fmt}} format."))
       
       
+      private$.hash <- NULL
       private$.date <- strftime(posix, fmt, tz="UTC")
       
       return (self)
@@ -847,11 +826,9 @@ rbiom <- R6::R6Class(
       prev <- private$.counts$dimnames[[2]]
       map  <- function (x) value[match(x, prev)]
       
+      private$.hash                   <-  NULL
       private$.counts$dimnames[[2]]  %<>% map()
       private$.metadata[['.sample']] %<>% map()
-      
-      private$.hashes[['.counts']]   <- rlang::hash(private$.counts)
-      private$.hashes[['.metadata']] <- rlang::hash(private$.metadata)
       
       return (self)
     },
@@ -874,15 +851,11 @@ rbiom <- R6::R6Class(
       prev <- private$.counts$dimnames[[1]]
       map  <- function (x) value[match(x, prev)]
       
+      private$.hash                  <-  NULL
       private$.counts$dimnames[[1]] %<>% map()
       private$.taxonomy[['.otu']]   %<>% map()
       if (!is.null(private$.sequences)) names(private$.sequences) %<>% map()
       if (!is.null(private$.tree))      private$.tree$tip.label   %<>% map()
-      
-      private$.hashes[['.counts']]    <- rlang::hash(private$.counts)
-      private$.hashes[['.taxonomy']]  <- rlang::hash(private$.taxonomy)
-      private$.hashes[['.sequences']] <- rlang::hash(private$.sequences)
-      private$.hashes[['.tree']]      <- rlang::hash(private$.tree)
       
       return (self)
     },

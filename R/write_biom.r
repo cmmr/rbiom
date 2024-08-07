@@ -13,9 +13,11 @@
 #' @inherit documentation_default
 #' 
 #' @param file  Path to the output file. File names ending in \code{.gz} or 
-#'        \code{.bz2} will be compressed accordingly. `write_fasta()` and 
-#'        `write_tree()` can have `file=NULL`, which returns a string of the
-#'        output which would have been written.
+#'        \code{.bz2} will be compressed accordingly. \cr\cr
+#'        Setting `file=NULL` for `write_fasta()`, `write_tree()`, and 
+#'        `write_biom(format='json')`, and returns a string of the output which 
+#'        would have been written. For `write_biom(format='tab')`, `file=NULL`
+#'        returns the tibble that would have been written.
 #' 
 #' @param format  Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"}, 
 #'        corresponding to classic tabular format, BIOM format version 1.0 and 
@@ -32,7 +34,8 @@
 #' @param quote,sep,...   Parameters passed on to [write.table()].
 #'        Default: `quote=FALSE, sep="\t"`
 #' 
-#' @return The normalized filepath that was written to (invisibly).
+#' @return The normalized filepath that was written to (invisibly), unless 
+#'         `file=NULL` (see `file` argument above).
 #' 
 #' @details
 #' 
@@ -59,25 +62,32 @@
 #'       outfile <- write_xlsx(hmp10, tempfile(fileext = ".xlsx"))
 #'     }
 #' 
-write_biom <- function (biom, file, format="json") {
+write_biom <- function (biom, file, format = "json") {
   
   biom <- as_rbiom(biom)
   
-  stopifnot(is_scalar_character(file) && !is_na(file))
   format <- match.arg(tolower(format), c("tab", "json", "hdf5"))
   
-  
   #________________________________________________________
-  # Refuse to overwrite existing files.
+  # Allow NULL for json and tab
   #________________________________________________________
+  if (format == "hdf5" || !is.null(file)) {
+    
+    stopifnot(is_scalar_character(file) && !is_na(file))
   
-  file <- normalizePath(file, winslash = "/", mustWork = FALSE)
   
-  if (!dir.exists(dirname(file)))
-    dir.create(dirname(file), recursive = TRUE)
-  
-  if (file.exists(file))
-      stop("Output file already exists: ", file)
+    #________________________________________________________
+    # Refuse to overwrite existing files.
+    #________________________________________________________
+    
+    file <- normalizePath(file, winslash = "/", mustWork = FALSE)
+    
+    if (!dir.exists(dirname(file)))
+      dir.create(dirname(file), recursive = TRUE)
+    
+    if (file.exists(file))
+        stop("Output file already exists: ", file)
+  }
   
   
   switch (format, 
@@ -114,6 +124,8 @@ write_biom_tsv <- function (biom, file) {
   if (ncol(biom$taxonomy) > 1)
     tbl[['Taxonomy']] <- apply(biom$taxonomy[,-1], 1L, paste, collapse="; ")
   
+  
+  if (is.null(file)) return (tbl)
   
   
   # Compress when writing according to file extension.
@@ -198,6 +210,8 @@ write_biom_json <- function (biom, file) {
         biom$counts$v )
     ))
   
+  
+  if (is.null(file)) return (as.character(json))
   
   if        (grepl("\\.gz$",  tolower(file))) { con <- gzfile(file, "w")
   } else if (grepl("\\.bz2$", tolower(file))) { con <- bzfile(file, "w")
@@ -420,7 +434,7 @@ write_fasta <- function (biom, file = NULL) {
 
 #' @rdname write_biom
 #' @export
-write_tree <- function (biom, file=NULL) {
+write_tree <- function (biom, file = NULL) {
   
   tree <- if (is(biom, "phylo")) biom else as_rbiom(biom)$tree
   

@@ -710,3 +710,36 @@ fun_params <- function (fun, params) {
   return (params)
 }
 
+
+
+
+#____________________________________________________________________
+# Remove unused factor levels and whitespace from a tibble.
+#____________________________________________________________________
+relevel <- function (tbl) {
+  
+  for (i in seq_len(ncol(tbl))) {
+    
+    # Enforce unnamed vectors.
+    if (!is.null(names(tbl[[i]]))) tbl[[i]] %<>% unname()
+    
+    if (is.factor(tbl[[i]])) {
+      
+      lvls <- levels(tbl[[i]])
+      lvls[which(!(lvls %in% as.character(tbl[[i]])))] <- NA
+      if (any(is.na(lvls))) levels(tbl[[i]]) <- lvls
+      
+      lvls <- lvls[!is.na(lvls)]
+      if (length(f <- which(lvls != trimws(lvls))) > 0) {
+        field <- names(tbl)[[i]]
+        cli_warn("Whitespace trimmed from {.field {field}} column {qty(length(f))} value{?s} {.val {lvls[f]}}.")
+        levels(tbl[[i]]) %<>% trimws()
+      }
+    }
+  }
+  
+  attributes(tbl) <- attributes(tbl)[order(names(attributes(tbl)))]
+  
+  return (tbl)
+}
+

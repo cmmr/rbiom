@@ -255,8 +255,8 @@ bdiv_stats <- function (
   stats <- stats_table(
     df       = df, 
     regr     = regr, 
-    stat.by  = stat.by, 
-    split.by = split.by, 
+    stat.by  = sub("^(==|!=)", "", stat.by), 
+    split.by = sub("^(==|!=)", "", split.by), 
     test     = test, 
     fit      = fit, 
     at       = at, 

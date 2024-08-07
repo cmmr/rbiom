@@ -11,7 +11,7 @@ between BIOM files."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,27 +96,31 @@ rbiom objects, or valid arguments to the <code>src</code> parameter of
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Merged BIOM</span><span style="color: #808080;"> ═════════════════════════════════════════════</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       8 Samples: HMP01, HMP02, HMP03, ..., and HMP08 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     168 OTUs:    Unc53100, Unc26984, Unc00c7g, ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     168 OTUs:    Unc53100, PpbAcne6, UncO2012, ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       1 Ranks:   .otu </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       1 Fields:  .sample </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 1.4k - 4.2k reads/sample ────────────────── 2024-08-03 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 1.4k - 4.2k reads/sample ────────────────── 2024-08-07 ──</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">tree</span>     <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="va">tree</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">$</span><span class="va">metadata</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #00BBBB;">ℹ</span> Ignoring metadata for 42 samples not currently in biom object: <span style="color: #0000BB;">"HMP09"</span>,</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP10"</span>, <span style="color: #0000BB;">"HMP11"</span>, <span style="color: #0000BB;">"HMP12"</span>, <span style="color: #0000BB;">"HMP13"</span>, <span style="color: #0000BB;">"HMP14"</span>, <span style="color: #0000BB;">"HMP15"</span>, <span style="color: #0000BB;">"HMP16"</span>, <span style="color: #0000BB;">"HMP17"</span>,</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP18"</span>, <span style="color: #0000BB;">"HMP19"</span>, <span style="color: #0000BB;">"HMP20"</span>, <span style="color: #0000BB;">"HMP21"</span>, <span style="color: #0000BB;">"HMP22"</span>, <span style="color: #0000BB;">"HMP23"</span>, <span style="color: #0000BB;">"HMP24"</span>, <span style="color: #0000BB;">"HMP25"</span>,</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP26"</span>, …, <span style="color: #0000BB;">"HMP49"</span>, and <span style="color: #0000BB;">"HMP50"</span>.</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Merged BIOM</span><span style="color: #808080;"> ═════════════════════════════════════════════</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       8 Samples: HMP01, HMP02, HMP03, ..., and HMP08 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     168 OTUs:    Unc53100, Unc26984, Unc00c7g, ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     168 OTUs:    Unc53100, PpbAcne6, UncO2012, ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       1 Ranks:   .otu </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       5 Fields:  .sample, Age, BMI, Body Site, and Sex </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 1.4k - 4.2k reads/sample ────────────────── 2024-08-03 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 1.4k - 4.2k reads/sample ────────────────── 2024-08-07 ──</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

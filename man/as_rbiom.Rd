@@ -16,7 +16,7 @@ For example:
 \item{\emph{list} - }{ With \code{counts} and optionally \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details). }
 }}
 
-\item{...}{Not used.}
+\item{...}{Properties to overwrite in biom: \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details).}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -42,7 +42,7 @@ Use \code{b <- a$clone()} to create copies, not \code{b <- a}.
       days      = c(12, 3, 7, 8) )
     
     # convert data set to rbiom ---------------------
-    biom <- as_rbiom(list(counts = mtx, metadata = df))
+    biom <- as_rbiom(mtx, metadata = df, id = "My BIOM")
     biom
 
 }

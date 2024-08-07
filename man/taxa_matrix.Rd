@@ -109,7 +109,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
 \examples{
     library(rbiom)
     
-    biom$ranks
+    hmp50$ranks
     
     taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
     
@@ -117,6 +117,7 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
 }
 \seealso{
 Other taxa_abundance: 
+\code{\link{sample_sums}()},
 \code{\link{taxa_boxplot}()},
 \code{\link{taxa_clusters}()},
 \code{\link{taxa_corrplot}()},

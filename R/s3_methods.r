@@ -315,7 +315,8 @@ within.rbiom <- function (data, expr, clone = TRUE, ...) {
 #' 
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
+#'     library(dplyr)
 #'     
 #'     # Subset to specific samples
 #'     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
@@ -450,9 +451,19 @@ slice_tail.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
 #' @rdname slice_metadata
 #' @export
 slice_min.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TRUE, na_rm = FALSE, clone = TRUE, ...) {
+  
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(dplyr::slice_min(
-    .data = biom$metadata, order_by = order_by, n = n, prop = prop, by = by, with_ties = with_ties, na_rm = na_rm ))
+  
+  biom$metadata <- eval.parent(
+    expr = dplyr::slice_min(
+      .data     = biom$metadata, 
+      order_by  = {{order_by}}, 
+      n         = n, 
+      prop      = prop, 
+      by        = by, 
+      with_ties = with_ties, 
+      na_rm     = na_rm ))
+  
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -460,9 +471,19 @@ slice_min.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TR
 #' @rdname slice_metadata
 #' @export
 slice_max.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TRUE, na_rm = FALSE, clone = TRUE, ...) {
+  
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(slice_max(
-    .data = biom$metadata, order_by = order_by, n = n, prop = prop, by = by, with_ties = with_ties, na_rm = na_rm ))
+  
+  biom$metadata <- eval.parent(
+    expr = slice_max(
+      .data     = biom$metadata, 
+      order_by  = {{order_by}}, 
+      n         = n, 
+      prop      = prop, 
+      by        = by, 
+      with_ties = with_ties, 
+      na_rm     = na_rm ))
+  
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,6 +108,10 @@ and <b>.diversity</b>, followed by any metadata fields requested by
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Subset to 10 samples.</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #00BBBB;">ℹ</span> Dropping 40 samples from biom object since they are not in the new metadata:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP11"</span>, <span style="color: #0000BB;">"HMP12"</span>, <span style="color: #0000BB;">"HMP13"</span>, <span style="color: #0000BB;">"HMP14"</span>, <span style="color: #0000BB;">"HMP15"</span>, <span style="color: #0000BB;">"HMP16"</span>, <span style="color: #0000BB;">"HMP17"</span>, <span style="color: #0000BB;">"HMP18"</span>,</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP19"</span>, <span style="color: #0000BB;">"HMP20"</span>, <span style="color: #0000BB;">"HMP21"</span>, <span style="color: #0000BB;">"HMP22"</span>, <span style="color: #0000BB;">"HMP23"</span>, <span style="color: #0000BB;">"HMP24"</span>, <span style="color: #0000BB;">"HMP25"</span>, <span style="color: #0000BB;">"HMP26"</span>,</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"HMP27"</span>, <span style="color: #0000BB;">"HMP28"</span>, …, <span style="color: #0000BB;">"HMP49"</span>, and <span style="color: #0000BB;">"HMP50"</span>.</span>
 <span class="r-in"><span>    <span class="fu">adiv_table</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .sample .depth .adiv   .diversity   Age   BMI `Body Site`    Sex   </span>
@@ -128,15 +132,15 @@ and <b>.diversity</b>, followed by any metadata fields requested by
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 50 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .sample .depth .adiv .diversity</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> HMP01     <span style="text-decoration: underline;">1</span>353 OTUs          46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> HMP01     <span style="text-decoration: underline;">1</span>353 OTUs          44</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> HMP02     <span style="text-decoration: underline;">1</span>353 OTUs          75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> HMP03     <span style="text-decoration: underline;">1</span>353 OTUs          75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> HMP04     <span style="text-decoration: underline;">1</span>353 OTUs          77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> HMP05     <span style="text-decoration: underline;">1</span>353 OTUs          40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> HMP06     <span style="text-decoration: underline;">1</span>353 OTUs          86</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> HMP07     <span style="text-decoration: underline;">1</span>353 OTUs          45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> HMP08     <span style="text-decoration: underline;">1</span>353 OTUs          62</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> HMP09     <span style="text-decoration: underline;">1</span>353 OTUs          94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> HMP04     <span style="text-decoration: underline;">1</span>353 OTUs          79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> HMP05     <span style="text-decoration: underline;">1</span>353 OTUs          44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> HMP06     <span style="text-decoration: underline;">1</span>353 OTUs          80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> HMP07     <span style="text-decoration: underline;">1</span>353 OTUs          42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> HMP08     <span style="text-decoration: underline;">1</span>353 OTUs          59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> HMP09     <span style="text-decoration: underline;">1</span>353 OTUs          97</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> HMP10     <span style="text-decoration: underline;">1</span>353 OTUs          25</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 40 more rows</span></span>
 </code></pre></div>

@@ -13,7 +13,7 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9135</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9137</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,7 @@ available at help("&amp;lt;function&amp;gt;-deprecated").'></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Deprecated functions in package <span class="pkg">rbiom</span>.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/rbiom-deprecated.r" class="external-link"><code>R/rbiom-deprecated.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/rbiom-deprecated.r" class="external-link"><code>R/rbiom-deprecated.r</code></a>, <a href="https://github.com/cmmr/rbiom/blob/HEAD/R/taxa_table.r" class="external-link"><code>R/taxa_table.r</code></a></small>
       <div class="d-none name"><code>rbiom-deprecated.Rd</code></div>
     </div>
 
@@ -154,7 +154,7 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">is.rarefied</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">read_biom</span><span class="op">(</span><span class="va">src</span>, tree <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span>
+<span><span class="fu">read_biom</span><span class="op">(</span><span class="va">src</span>, tree <span class="op">=</span> <span class="st">"auto"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">repair</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span>
 <span></span>
@@ -188,7 +188,9 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 <span></span>
 <span><span class="fu">taxa.ranks</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="fu">taxonomy</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span></code></pre></div>
+<span><span class="fu">taxonomy</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">taxa_max</span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, lineage <span class="op">=</span> <span class="cn">FALSE</span>, unc <span class="op">=</span> <span class="st">"singly"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -496,6 +498,12 @@ available at <code>help("&lt;function&gt;-deprecated")</code>.</p>
 
 
 <p>Use <code>biom$taxonomy &lt;-</code> instead.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="taxa-max"><code>taxa_max</code><a class="anchor" aria-label="anchor" href="#taxa-max"></a></h2>
+
+
+<p>Use <code>taxa_apply(biom, max, sort = 'desc')</code> instead.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

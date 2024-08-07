@@ -3,9 +3,10 @@ unlink("docs", recursive = TRUE)
 devtools::document()
 # Restart
 # Install
-hmp50  <- as_rbiom(as.list(hmp50))
-babies <- as_rbiom(as.list(babies))
-gems   <- as_rbiom(as.list(gems))
+genby  <- paste("rbiom", utils::packageVersion("rbiom"))
+hmp50  <- as_rbiom(as.list(hmp50),  generated_by = genby)
+babies <- as_rbiom(as.list(babies), generated_by = genby)
+gems   <- as_rbiom(as.list(gems),   generated_by = genby)
 usethis::use_data(hmp50, babies, gems, overwrite = TRUE)
 # Restart
 # Install
