@@ -23,7 +23,7 @@
 #'     adiv_table(biom, adiv = ".all", md = NULL)
 
 adiv_table <- function (
-    biom, adiv = "Shannon", md = ".all", trans = "none" ) {
+    biom, adiv = "Shannon", md = ".all", transform = "none" ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -50,7 +50,7 @@ adiv_table <- function (
   #________________________________________________________
   # Compute adiv values
   #________________________________________________________
-  mtx <- adiv_matrix(biom = biom, trans = trans)
+  mtx <- adiv_matrix(biom = biom, transform = transform)
   mtx <- mtx[, unique(c('Depth', adiv))]
   tbl <- tibble(
     '.sample'    = rownames(mtx)[row(mtx)] %>% factor(levels = rownames(mtx)),
@@ -122,7 +122,7 @@ adiv_table <- function (
 #'     
 #'     adiv_matrix(biom)
 
-adiv_matrix <- function (biom, trans = "none") {
+adiv_matrix <- function (biom, transform = "none") {
   
   biom <- as_rbiom(biom)
   
@@ -142,7 +142,7 @@ adiv_matrix <- function (biom, trans = "none") {
   #________________________________________________________
   # Check for valid arguments.
   #________________________________________________________
-  validate_var_choices('trans', c("none", "rank", "log", "log1p", "sqrt"))
+  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt"))
   
   
   
@@ -157,9 +157,14 @@ adiv_matrix <- function (biom, trans = "none") {
   #________________________________________________________
   # Optionally transform the computed diversity values.
   #________________________________________________________
-  if (trans != "none") # "rank", "log", "log1p", "sqrt"
-    for (i in c('OTUs', 'Shannon', 'Chao1', 'Simpson', 'InvSimpson'))
-      df[[i]] <- do.call(`::`, list('base', trans))(df[[i]])
+  if (transform != "none") # "rank", "log", "log1p", "sqrt", "percent"
+    for (i in c('OTUs', 'Shannon', 'Chao1', 'Simpson', 'InvSimpson')) {
+      if (transform == "percent") {
+        df[[i]] <- tryCatch(df[[i]] / sum(df[[i]]), error = function (e) { warning(e); df[[i]] })
+      } else {
+        df[[i]] <- do.call(`::`, list('base', transform))(df[[i]])
+      }
+    }
   
   
   

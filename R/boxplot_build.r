@@ -156,16 +156,16 @@ boxplot_build <- function (params) {
     
     
     # Bar charts need extra help on non-linear axes
-    if (is_null(layers[['yaxis']][['trans']])) {
+    if (is_null(layers[['yaxis']][['transform']])) {
       set_layer(params, 'bar', fun="mean")
       
     } else {
-      trans <- layers[['yaxis']][['trans']]
-      fun <- if (trans == 'sqrt')  { as.cmd(function (y) sqrt(mean(y * y)))
-      } else if (trans == 'log1p') { as.cmd(function (y) log1p(mean(exp(y) - 1)))
+      transform <- layers[['yaxis']][['transform']]
+      fun <- if (transform == 'sqrt')  { as.cmd(function (y) sqrt(mean(y * y)))
+      } else if (transform == 'log1p') { as.cmd(function (y) log1p(mean(exp(y) - 1)))
       } else { stop('Bar charts can only be re-scaled using sqrt or log1p.') }
       set_layer(params, 'bar', fun=fun)
-      remove("fun", "trans")
+      remove("fun", "transform")
       
     }
   }

@@ -4,7 +4,14 @@
 \alias{taxa_map}
 \title{Map OTUs names to taxa names at a given rank.}
 \usage{
-taxa_map(biom, rank = NULL, unc = "singly", lineage = FALSE)
+taxa_map(
+  biom,
+  rank = NULL,
+  taxa = Inf,
+  unc = "singly",
+  lineage = FALSE,
+  other = FALSE
+)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -14,6 +21,12 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 transformed as per \code{unc}. Alternatively, a single taxonomic rank
 (rank name or integer position in \code{biom$ranks}) which returns a named
 character vector for mapping OTUs to taxa names.}
+
+\item{taxa}{Which taxa to display. An integer value will show the top n
+most abundant taxa. A value 0 <= n < 1 will show any taxa with that
+mean abundance or greater (e.g. \code{0.1} implies >= 10\%). A
+character vector of taxa names will show only those named taxa.
+Default: \code{6}.}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -33,6 +46,13 @@ Otherwise the taxa name will simply be \code{Coriobacteriales}. You
 want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
 level ranks. Default: \code{FALSE}}
+
+\item{other}{Sum all non-itemized taxa into an "Other" taxa. When
+\code{FALSE}, only returns taxa matched by the \code{taxa}
+argument. Specifying \code{TRUE} adds "Other" to the returned set.
+A string can also be given to imply \code{TRUE}, but with that
+value as the name to use instead of "Other".
+Default: \code{FALSE}}
 }
 \value{
 A tibble data.frame when \code{rank=NULL}, or a character vector named

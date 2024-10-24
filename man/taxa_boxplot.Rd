@@ -13,7 +13,6 @@ taxa_boxplot(
   unc = "singly",
   other = FALSE,
   p.top = Inf,
-  y.trans = "sqrt",
   stat.by = x,
   facet.by = NULL,
   colors = TRUE,
@@ -27,7 +26,8 @@ taxa_boxplot(
   outliers = NULL,
   xlab.angle = "auto",
   p.label = 0.05,
-  trans = "none",
+  transform = "none",
+  y.transform = "sqrt",
   caption = TRUE,
   ...
 )
@@ -83,18 +83,6 @@ taxa with an adjusted p-value <= \code{p.top} are displayed.
 Recommended to be used in combination with the \code{taxa} parameter
 to set a lower bound on the mean abundance of considered taxa.
 Default: \code{Inf}}
-
-\item{y.trans}{The transformation to apply to the y-axis. Visualizing
-differences of both high- and low-abundance taxa is best done with
-a non-linear axis. Options are:
-\describe{
-\item{\code{"sqrt"} - }{ square-root transformation }
-\item{\code{"log1p"} - }{ log(y + 1) transformation }
-\item{\code{NULL} - }{ no transformation }
-}
-These methods allow visualization of both high- and low-abundance
-taxa simultaneously, without complaint about 'zero' count
-observations. Default: \code{"sqrt"}}
 
 \item{stat.by}{Dataset field with the statistical groups. Must be
 categorical. Default: \code{NULL}}
@@ -167,10 +155,24 @@ If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
 Default: \code{0.05}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
+
+\item{y.transform}{The transformation to apply to the y-axis. Visualizing
+differences of both high- and low-abundance taxa is best done with
+a non-linear axis. Options are:
+\describe{
+\item{\code{"sqrt"} - }{ square-root transformation }
+\item{\code{"log1p"} - }{ log(y + 1) transformation }
+\item{\code{"none"} - }{ no transformation }
+}
+These methods allow visualization of both high- and low-abundance
+taxa simultaneously, without complaint about 'zero' count
+observations. Default: \code{"sqrt"}\cr\cr
+Use \code{xaxis.transform} or \code{yaxis.transform} to pass custom values
+directly to ggplot2's \verb{scale_*} functions.}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}

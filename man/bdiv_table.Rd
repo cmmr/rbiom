@@ -15,7 +15,7 @@ bdiv_table(
   within = NULL,
   between = NULL,
   delta = ".all",
-  trans = "none",
+  transform = "none",
   ties = "random",
   seed = 0
 )
@@ -27,7 +27,7 @@ bdiv_matrix(
   tree = NULL,
   within = NULL,
   between = NULL,
-  trans = "none",
+  transform = "none",
   ties = "random",
   seed = 0
 )
@@ -39,7 +39,7 @@ bdiv_distmat(
   tree = NULL,
   within = NULL,
   between = NULL,
-  trans = "none"
+  transform = "none"
 )
 }
 \arguments{
@@ -74,12 +74,12 @@ be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
 Default: \code{TRUE}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
-\item{ties}{When \code{trans="rank"}, how to rank identical values.
+\item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 

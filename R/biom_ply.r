@@ -37,15 +37,13 @@
 #' @return For `bdply()`, a tibble data.frame comprising the accumulated 
 #'         outputs of `FUN`, along with the columns specified by 
 #'         `vars` and `iters`. For `blply()`, a named list that has details
-#'         about `vars` and `iters` in `attr(,"split_labels")`.
+#'         about `vars` and `iters` in `attr(,'split_labels')`.
 #' 
 #' 
 #' 
 #' @export
 #' @examples
 #'     library(rbiom)
-#'     
-#'     # bdply ----------------------------------------------------
 #'     
 #'     bdply(hmp50, "Sex", `$`, 'n_samples')
 #'     
@@ -82,7 +80,7 @@ bdply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   if (is.null(vars)) {
     
     if (nrow(iters) == 0) {
-      result <- list(do.call(FUN, c(list(biom), dots)))
+      result <- do.call(FUN, c(list(biom), dots))
       
     } else {
       result <- plyr::adply(iters, 1L, function (iter) {
@@ -142,7 +140,6 @@ blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   
   dots  <- list(...)
   iters <- expand.grid(iters, stringsAsFactors = FALSE)
-  
   
   
   #________________________________________________________

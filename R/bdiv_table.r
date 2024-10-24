@@ -46,7 +46,7 @@
 bdiv_table <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
     md = ".all", within = NULL, between = NULL, delta = '.all', 
-    trans = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0 ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -100,7 +100,7 @@ bdiv_table <- function (
           tree     = tree, 
           within   = within, 
           between  = between, 
-          trans    = trans, 
+          transform    = transform, 
           ties     = ties, 
           seed     = seed )
         
@@ -184,18 +184,18 @@ bdiv_table <- function (
       w <- ifelse(weighted, "Weighted", "Unweighted")
       bdiv %<>% paste("Distance")
       
-      if (eq(params$trans, 'rank')) { paste0("Ranked ", w, "\n", bdiv) }
+      if (eq(params$transform, 'rank')) { paste0("Ranked ", w, "\n", bdiv) }
       else                          { paste(w, bdiv)                   }
       
     } else {
-      if (eq(params$trans, 'rank')) { "Ranked \u03B2 Dissimilarity" }
+      if (eq(params$transform, 'rank')) { "Ranked \u03B2 Dissimilarity" }
       else                          { "\u03B2 Dissimilarity"        }
     }
     
   })
   
-  if (!params$trans %in% c('none', 'rank', 'percent'))
-    resp_label %<>% paste0("\n(", params$trans, " transformed)")
+  if (!params$transform %in% c('none', 'rank', 'percent'))
+    resp_label %<>% paste0("\n(", params$transform, " transformed)")
   
   resp_label %<>% aa(
     display = paste0('"', sub('\u03B2', '\\u03B2', resp_label, fixed = TRUE), '"'))
@@ -221,7 +221,7 @@ bdiv_table <- function (
 bdiv_matrix <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
     within = NULL, between = NULL, 
-    trans = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0 ) {
   
   #________________________________________________________
   # Take care not to cache filepath to tree.
@@ -258,7 +258,7 @@ bdiv_matrix <- function (
   #________________________________________________________
   validate_bdiv()
   validate_bool("weighted")
-  validate_var_choices('trans', c("none", "rank", "log", "log1p", "sqrt"))
+  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
   validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
   validate_var_range('seed', n = 1, int = TRUE)
   
@@ -333,12 +333,15 @@ bdiv_matrix <- function (
   #________________________________________________________
   # Optionally transform the computed distance values.
   #________________________________________________________
-  if (eq(trans, "rank")) {
+  if (eq(transform, "rank")) {
     set.seed(seed)
     distances <- base::rank(distances, ties.method = ties)
     
-  } else if (trans %in% c("log", "log1p", "sqrt")) {
-    distances <- do.call(`::`, list('base', trans))(distances)
+  } else if (eq(transform, "percent")) {
+    distances <- tryCatch(distances / sum(distances), error = function (e) { warning(e); distances })
+    
+  } else if (transform %in% c("log", "log1p", "sqrt")) {
+    distances <- do.call(`::`, list('base', transform))(distances)
   }
   
   
@@ -371,7 +374,7 @@ bdiv_matrix <- function (
 #' @export
 bdiv_distmat <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
-    within = NULL, between = NULL, trans = "none" ) {
+    within = NULL, between = NULL, transform = "none" ) {
   
   stats::as.dist(bdiv_matrix(
     biom     = biom, 
@@ -380,5 +383,5 @@ bdiv_distmat <- function (
     tree     = tree, 
     within   = within, 
     between  = between, 
-    trans    = trans ))
+    transform    = transform ))
 }

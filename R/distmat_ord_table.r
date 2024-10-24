@@ -68,10 +68,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
       res  <- do.call(ape::pcoa, args)[['vectors']][,1:k]
       
     } else if (o == "tSNE") {
-      
-      if (nchar(system.file(package = "tsne")) == 0)
-        stop("CRAN R package 'tsne' must be installed to use 'tSNE' ordination.")
-      
+      require_package('tsne', 'use "tSNE" ordination')
       args <- c(fun_params(tsne::tsne, dots), list(X = dm, k = k))
       res  <- suppressMessages(do.call(tsne::tsne, args))
       rownames(res) <- attr(dm, "Labels", exact = TRUE)
@@ -83,10 +80,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
       rownames(res) <- attr(dm, "Labels", exact = TRUE)
       
     } else if (o == "UMAP") {
-      
-      if (nchar(system.file(package = "uwot")) == 0)
-        stop("CRAN R package 'uwot' must be installed to use 'UMAP' ordination.")
-      
+      require_package('uwot', 'use "UMAP" ordination')
       args <- c(fun_params(uwot::umap, dots), list(X = dm))
       args[['n_components']] %<>% if.null(k)
       args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))

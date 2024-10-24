@@ -39,7 +39,7 @@
 #'     biom <- as_rbiom(mtx, metadata = df, id = "My BIOM")
 #'     biom
 #' 
-as_rbiom <- function(biom, ...) {
+as_rbiom <- function (biom, ...) {
   UseMethod("as_rbiom")
 }
 
@@ -83,10 +83,9 @@ as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom
 #' @export
 as_rbiom.phyloseq <- function (biom, ...) {
   
-  dots <- list(...)
+  require_package('phyloseq', 'use as_rbiom.phyloseq()', repo = 'bioc')
   
-  if (!nzchar(system.file(package = "phyloseq")) || isTRUE(dots$no_phyloseq))
-    cli_abort("Bioconductor R package 'phyloseq' must be installed to use as_rbiom.phyloseq().")
+  dots <- list(...)
   
   args <- list(
     counts    = biom %>% phyloseq::otu_table() %>% as.simple_triplet_matrix(), 

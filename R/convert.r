@@ -13,6 +13,8 @@
 #' 
 #' @inherit documentation_default
 #' 
+#' @param ...  Not Used.
+#' 
 #' @return A SummarizedExperiment or TreeSummarizedExperiment object.
 #' 
 #' @export
@@ -34,12 +36,12 @@
 #'       print(tse)
 #'     }
 
-convert_to_SE <- function (biom) {
+convert_to_SE <- function (biom, ...) {
   
+  require_package('SummarizedExperiment', 'use convert_to_SE()', repo = 'bioc')
+  
+  dots <- list(...)
   biom <- as_rbiom(biom)
-  
-  if (nchar(system.file(package = "SummarizedExperiment")) == 0)
-    stop("Bioconductor R package 'SummarizedExperiment' must be installed to use convert_to_SE().")
   
   SummarizedExperiment::SummarizedExperiment(
     assays  = list('OTU table' = as.matrix(biom$counts)),
@@ -52,12 +54,12 @@ convert_to_SE <- function (biom) {
 #' @rdname convert_to_SE
 #' @export
 
-convert_to_TSE <- function (biom) {
+convert_to_TSE <- function (biom, ...) {
   
+  require_package('TreeSummarizedExperiment', 'use convert_to_TSE()', repo = 'bioc')
+  
+  dots <- list(...)
   biom <- as_rbiom(biom)
-  
-  if (nchar(system.file(package = "TreeSummarizedExperiment")) == 0)
-    stop("Bioconductor R package 'TreeSummarizedExperiment' must be installed to use convert_to_TSE().")
   
   TreeSummarizedExperiment::TreeSummarizedExperiment(
     assays       = list('OTU table' = as.matrix(biom$counts)),

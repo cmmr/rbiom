@@ -18,5 +18,4 @@ test_that("as_rbiom.phyloseq", {
   phy_mtx  <- structure(attr(phy, 'otu_table'), class=NULL, taxa_are_rows = NULL)
   biom_mtx <- as.matrix(as_rbiom(phy)$counts)
   expect_equal(biom_mtx, phy_mtx)
-  expect_error(as_rbiom(phy, no_phyloseq = TRUE))
 })

@@ -99,17 +99,19 @@ Recommended to be used in combination with the \code{taxa} parameter
 to set a lower bound on the mean abundance of considered taxa.
 Default: \code{Inf}}
 
-\item{y.trans}{The transformation to apply to the y-axis. Visualizing
+\item{y.transform}{The transformation to apply to the y-axis. Visualizing
 differences of both high- and low-abundance taxa is best done with
 a non-linear axis. Options are:
 \describe{
 \item{\code{"sqrt"} - }{ square-root transformation }
 \item{\code{"log1p"} - }{ log(y + 1) transformation }
-\item{\code{NULL} - }{ no transformation }
+\item{\code{"none"} - }{ no transformation }
 }
 These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
-observations. Default: \code{"sqrt"}}
+observations. Default: \code{"sqrt"}\cr\cr
+Use \code{xaxis.transform} or \code{yaxis.transform} to pass custom values
+directly to ggplot2's \verb{scale_*} functions.}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
@@ -257,12 +259,12 @@ use cases. Default: \code{TRUE}}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
-\item{ties}{When \code{trans="rank"}, how to rank identical values.
+\item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 }

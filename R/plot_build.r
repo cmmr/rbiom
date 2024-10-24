@@ -57,39 +57,27 @@ plot_build <- function (params) {
   # x-axis and y-axis transformations
   #______________________________________________________________
   
-  if (is_string(params$trans, c("rank", "log", "log1p", "sqrt")))
-    params$.ylab %<>% sprintf("%s(%s)", params$trans, .)
-  
-  if (eq(params$trans, 'percent'))
-    set_layer(params, 'yaxis', labels = scales::percent)
-  
-  
   for (axis in c('x', 'y')) {
     
     var   <- sprintf(".%scol", axis)
     layer <- sprintf("%saxis", axis)
     label <- params$layers[['labs']][[axis]] %||% params[[var]] %||% ''
-    trans <- params$layers[[layer]][['trans']]
+    xy_transform <- params$layers[[layer]][['transform']]
     
-    if (is.null(trans)) {
-      
-      # Default to hiding the axis label
-      set_layer(params, 'labs', setNames(list(NULL), axis))
-      
-      next
-    }
+    
+    if (is.null(xy_transform)) next
     
     
     # Set axis label to, e.g., `.ylab <- "Abundance (log scale)"`
     #______________________________________________________________
     if (!has_layer(params, 'labs')) add_layer(params, 'labs')
-    params$layers[['labs']][[axis]] <- sprintf("%s\n(%s scale)", label, trans)
+    params$layers[['labs']][[axis]] <- sprintf("%s\n(%s scale)", label, xy_transform)
     
     
     
     # Change 10000 to 10k for log scales.
     #______________________________________________________________
-    if (trans %in% c("log", "log10", "log1p"))
+    if (isTRUE(xy_transform %in% c("log", "log10", "log1p")))
       set_layer(params, layer, labels = label_number(scale_cut = cut_si("")))
     
     
@@ -97,25 +85,25 @@ plot_build <- function (params) {
     # Force sqrt scale to display zero tick mark.
     # Handle sqrt- and log1p- transforming of Inf and -Inf
     #______________________________________________________________
-    if (eq(trans, "log1p") && isTRUE(params$stripe)) {
+    if (eq(xy_transform, "log1p") && isTRUE(params$stripe)) {
       
-      params$layers[[layer]][['trans']] <- trans_new(
+      params$layers[[layer]][['transform']] <- trans_new(
         name      = paste0(axis, "_log1p"), 
         transform = function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, 
         inverse   = as.cmd(base::expm1) )
     
-    } else if (eq(trans, "sqrt")) {
+    } else if (eq(xy_transform, "sqrt")) {
       
       if (isTRUE(params$stripe)) {
         
-        params$layers[[layer]][['trans']] <- trans_new(
+        params$layers[[layer]][['transform']] <- trans_new(
           name      = paste0(axis, "_sqrt"), 
           transform = function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, 
           inverse   = function (y) ifelse(y<0, 0, y^2) )
         
       } else {
         
-        params$layers[[layer]][['trans']] <- trans_new(
+        params$layers[[layer]][['transform']] <- trans_new(
           name      = paste0(axis, "_sqrt"), 
           transform = as.cmd(base::sqrt), 
           inverse   = function (y) ifelse(y<0, 0, y^2) )

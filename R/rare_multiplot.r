@@ -17,7 +17,7 @@ rare_multiplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    transform = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   #________________________________________________________
@@ -37,7 +37,7 @@ rare_multiplot <- function (
     at       = at, 
     level    = level, 
     p.adj    = p.adj, 
-    trans    = trans, 
+    transform    = transform, 
     alt      = alt, 
     mu       = mu, 
     caption  = caption, 

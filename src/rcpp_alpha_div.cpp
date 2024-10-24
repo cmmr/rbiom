@@ -49,6 +49,11 @@ List rcpp_alpha_div(List sparseMatrix) {
 
   for (int s = 1; s <= nSamples; s++) {
     
+    // if (s % 1000 == 0) {
+    //   Rcpp::checkUserInterrupt();
+    // }
+    
+    
     int   nOTUs = (int)(FinalOTUs[s - 1]);
     float Depth = (float)(FinalDepth[s - 1]);
     

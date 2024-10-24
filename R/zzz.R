@@ -11,27 +11,33 @@ ENV <- environment(NULL)
   
   # Add imports of imports to our namespace (avoiding NOTE about 20+ imports).
   
+  # 'tidyverse' -> 'ggplot2'
+  # 'tidyverse' -> 'readr'
   # 'ggplot2' -> 'scales' -> R6::R6Class
   # 'ggplot2' -> 'scales' -> labeling::extended
   # 'ggplot2' -> 'scales' -> lifecycle::deprecate_warn
   # 'ggplot2' ->  'cli', 'glue', 'rlang', 'tibble'
   #________________________________________________________
-  for (fn in c("cli_text", "cli_abort", "cli_warn", "qty"))
-    assign(x = fn, value = getFromNamespace(x = fn, ns = "cli"), pos = ENV)
+  include <- function (pkg, ...) {
+    
+    if (!nzchar(system.file(package = pkg)))
+      stop("Package `", pkg, "` is not available from `tidyverse`.")
+    
+    for (i in c(...))
+      assign(i, getFromNamespace(x = i, ns = pkg), ENV)
+  }
   
-  for (fn in c("glue", "single_quote", "double_quote"))
-    assign(x = fn, value = getFromNamespace(x = fn, ns = "glue"), pos = ENV)
-  
-  for (fn in c("tibble", "as_tibble"))
-    assign(x = fn, value = getFromNamespace(x = fn, ns = "tibble"), pos = ENV)
-  
-  for (fn in c(
-   "%||%", ":=", ".data", "hash", "env_names", "env_has", 
-   "is_na", "is_null", "is_bare_environment", "is_list", "is_formula", 
-   "is_true", "is_false", "is_logical", "is_scalar_logical", 
-   "is_character", "is_scalar_character", "is_string", 
-   "is_integerish", "is_scalar_integerish", "is_double", "is_scalar_double" ))
-    assign(x = fn, value = getFromNamespace(x = fn, ns = "rlang"), pos = ENV)
+  include("ggplot2", "aes")
+  include("readr",   "read_table")
+  include("cli",     "cli_text", "cli_abort", "cli_warn", "qty")
+  include("glue",    "glue", "single_quote", "double_quote")
+  include("tibble",  "tibble", "as_tibble")
+  include("rlang", c(
+    "%||%", ":=", ".data", "hash", "env_names", "env_has", "is_empty",
+    "is_na", "is_null", "is_bare_environment", "is_list", "is_formula", 
+    "is_true", "is_false", "is_logical", "is_scalar_logical", 
+    "is_character", "is_scalar_character", "is_string", 
+    "is_integerish", "is_scalar_integerish", "is_double", "is_scalar_double" ))
   
   
 

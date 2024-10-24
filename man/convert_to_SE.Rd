@@ -5,13 +5,15 @@
 \alias{convert_to_TSE}
 \title{Convert an rbiom object to a SummarizedExperiment object.}
 \usage{
-convert_to_SE(biom)
+convert_to_SE(biom, ...)
 
-convert_to_TSE(biom)
+convert_to_TSE(biom, ...)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+
+\item{...}{Not Used.}
 }
 \value{
 A SummarizedExperiment or TreeSummarizedExperiment object.

@@ -22,7 +22,7 @@ adiv_boxplot(
   outliers = NULL,
   xlab.angle = "auto",
   p.label = 0.05,
-  trans = "none",
+  transform = "none",
   caption = TRUE,
   ...
 )
@@ -117,10 +117,10 @@ If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
 Default: \code{0.05}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}

@@ -4,7 +4,7 @@
 \alias{adiv_table}
 \title{Calculate the alpha diversity of each sample.}
 \usage{
-adiv_table(biom, adiv = "Shannon", md = ".all", trans = "none")
+adiv_table(biom, adiv = "Shannon", md = ".all", transform = "none")
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -19,10 +19,10 @@ Multiple/abbreviated values allowed.}
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 }
 \value{
 A data frame of alpha diversity values. \cr

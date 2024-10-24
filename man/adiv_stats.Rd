@@ -10,7 +10,7 @@ adiv_stats(
   stat.by = NULL,
   adiv = "Shannon",
   split.by = NULL,
-  trans = "none",
+  transform = "none",
   test = "emmeans",
   fit = "gam",
   at = NULL,
@@ -39,10 +39,10 @@ Multiple/abbreviated values allowed.}
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
 \item{test}{Method for computing p-values: \code{'wilcox'}, \code{'kruskal'},
 \code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}

@@ -36,6 +36,10 @@ List rcpp_rarefy(List sparseMatrix, int depth, int seed = 0) {
   int last_idx  = max(mtxSample);
 
   for (int sample_idx = first_idx; sample_idx <= last_idx; sample_idx++) {
+    
+    // if (sample_idx % 1000 == 0) {
+    //   Rcpp::checkUserInterrupt();
+    // }
 
 
     //======================================================

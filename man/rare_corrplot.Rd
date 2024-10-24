@@ -18,7 +18,7 @@ rare_corrplot(
   at = NULL,
   level = 0.95,
   p.adj = "fdr",
-  trans = "none",
+  transform = "none",
   alt = "!=",
   mu = 0,
   caption = TRUE,
@@ -89,10 +89,10 @@ Default: \code{0.95}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
 \item{alt}{Alternative hypothesis direction. Options are \code{'!='}
 (two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}

@@ -100,17 +100,19 @@
 #'        to set a lower bound on the mean abundance of considered taxa. 
 #'        Default: `Inf`
 #'        
-#' @param y.trans   The transformation to apply to the y-axis. Visualizing 
+#' @param y.transform   The transformation to apply to the y-axis. Visualizing 
 #'        differences of both high- and low-abundance taxa is best done with
 #'        a non-linear axis. Options are: 
 #'        \describe{
 #'          \item{`"sqrt"` - }{ square-root transformation }
 #'          \item{`"log1p"` - }{ log(y + 1) transformation }
-#'          \item{`NULL` - }{ no transformation }
+#'          \item{`"none"` - }{ no transformation }
 #'        }
 #'        These methods allow visualization of both high- and low-abundance
 #'        taxa simultaneously, without complaint about 'zero' count
-#'        observations. Default: `"sqrt"`
+#'        observations. Default: `"sqrt"`\cr\cr
+#'        Use `xaxis.transform` or `yaxis.transform` to pass custom values 
+#'        directly to ggplot2's `scale_*` functions.
 #'        
 #' @param flip   Transpose the axes, so that taxa are present as rows instead
 #'        of columns. Default: `FALSE`
@@ -258,12 +260,12 @@
 #' 
 #' @param labels   Show sample names under each bar. Default: `FALSE`
 #' 
-#' @param trans   Transformation to apply. Options are: 
-#'        `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for 
-#'        correcting for non-normally distributions before applying regression 
-#'        statistics. Default: `"none"`
+#' @param transform   Transformation to apply. Options are: 
+#'        `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is 
+#'        useful for correcting for non-normally distributions before applying 
+#'        regression statistics. Default: `"none"`
 #' 
-#' @param ties   When `trans="rank"`, how to rank identical values.
+#' @param ties   When `transform="rank"`, how to rank identical values.
 #'        Options are: `c("average", "first", "last", "random", "max", "min")`. 
 #'        See `rank()` for details. Default: `"random"`
 #'   
@@ -316,6 +318,24 @@ NULL
 #'        highest, `-1` is the lowest rank, `-2` is the second 
 #'        lowest, and `0` is the OTU "rank". Run `biom$ranks` to 
 #'        see all options for a given rbiom object. Default: `NULL`.
+#' 
+NULL
+
+
+
+# rank - 2 ====
+#' documentation_rank.2
+#' 
+#' @name documentation_rank.2
+#' @keywords internal
+#'        
+#' @param rank   What rank(s) of taxa to compute biplot coordinates and 
+#'        statistics for, or `NULL` to disable. E.g. `"Phylum"`, 
+#'        `"Genus"`, `".otu"`, etc. An integer vector can also be 
+#'        given, where `1` is the highest rank, `2` is the second 
+#'        highest, `-1` is the lowest rank, `-2` is the second 
+#'        lowest, and `0` is the OTU "rank". Run `biom$ranks` to 
+#'        see all options for a given rbiom object. Default: `2`.
 #' 
 NULL
 

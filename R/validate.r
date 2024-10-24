@@ -139,22 +139,62 @@ validate_formula <- function (var = "formula", env = parent.frame(), evar = var)
 
 
 
-validate_layers <- function (var = "layers", choices, env = parent.frame(), ...) {
-  
-  stopifnot(is_scalar_character(choices))
-  choices <- strsplit(choices, '', fixed = TRUE)[[1]]
+validate_layers <- function (var = "layers", choices, env = parent.frame()) {
   
   x <- get(var, pos = env, inherits = FALSE)
-  if (!is_scalar_character(x) || is.na(x) || nchar(trimws(x)) == 0)
-    cli_abort("{.arg {var}} must be a single string, not {.val {x}}")
   
-  x <- strsplit(trimws(x), '', fixed = TRUE)[[1]]
-  assign(var, x, pos = env)
+  if (!is_character(x) || anyNA(x)) cli_abort("`{var}` must be character, not {.type {x}}.")
+  if (anyNA(x))                     cli_abort("`{var}` cannot have any NA values.")
   
-  validate_var_choices(var, choices, env, max = Inf, ...)
+  if (is.null(names(choices))) names(choices) <- substr(choices, 1, 1)
+  
+  layer_names <- NULL
+  for (i in tolower(x[nchar(x) > 0]))
+    layer_names <- c(layer_names, local({
+      
+      if (i %in% choices)        return (i)
+      if (i %in% names(choices)) return (choices[[i]])
+      
+      pm <- pmatch(i, choices)
+      ii <- strsplit(i, '')[[1]]
+      
+      if (length(x) > 1 && !is.na(pm)) return (choices[[pm]])
+      if (all(ii %in% names(choices))) return (choices[ii])
+      if (!is.na(pm))                  return (choices[[pm]])
+      return (choices[intersect(ii, names(choices))])
+    }))
+  
+  layer_names <- layer_names[!is.na(layer_names)]
+  
+  
+  if (length(layer_names) == 0)
+    cli_abort("Invalid `{var}` argument: {.val {x}}.")
+  
+  assign(var, layer_names, pos = env)
 }
 
 
+
+validate_string <- function (
+    var, env = parent.frame(), evar = var, 
+    null_ok = FALSE, na_ok = FALSE, 
+    if_true = TRUE, if_false = FALSE, if_na = NA, if_null = NULL ) {
+  
+  x <- get(var, pos = env, inherits = FALSE)
+  
+  if (is_empty(x)) x <- NULL
+  if (is_true(x))  x <- if_true
+  if (is_false(x)) x <- if_false
+  if (is_null(x))  x <- if_null
+  if (is_na(x))    x <- if_na
+  
+  if (length(x) > 1)          stop ("`", evar, "` can't be longer than 1 value.")
+  if (is_null(x) && !null_ok) stop ("`", evar, "` cannot be NULL.")
+  if (anyNA(x)   && !na_ok)   stop ("`", evar, "` cannot be NA.")
+  
+  assign(var, x, pos = env)
+  return (invisible(NULL))
+}
 
 
 validate_var_choices <- function (

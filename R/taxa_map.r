@@ -39,7 +39,7 @@
 #'     taxa_map(hmp50, unc = "grouped") %>% filter(.otu %in% otus) %>% select(Class:Genus)
 #'
 
-taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
+taxa_map <- function (biom, rank = NULL, taxa = Inf, unc = "singly", lineage = FALSE, other = FALSE) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -59,8 +59,10 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
   # Validate user's arguments.
   #________________________________________________________
   validate_rank(null_ok = TRUE)
+  validate_taxa()
   validate_unc()
   validate_bool("lineage")
+  validate_string('other', if_true = 'Other', if_false = NULL, null_ok = TRUE)
   
   
   #________________________________________________________
@@ -169,6 +171,26 @@ taxa_map <- function (biom, rank = NULL, unc = "singly", lineage = FALSE) {
       
     } else {
       tbl <- setNames(tbl[[rank]], as.character(tbl[['.otu']]))
+    }
+    
+    
+    # Drop or rename taxa to 'Other'
+    if (!all(is.infinite(taxa))) {
+      
+      if (is.numeric(n <- taxa)) {
+        taxa <- taxa_means(biom, rank, sort = 'desc', lineage, unc)
+        if (n >= 1) { taxa <- head(names(taxa), n)
+        } else      { taxa <- names(taxa)[taxa >= n] }
+      }
+      
+      tbl <- factor(tbl, levels = taxa)
+    
+      if (is.null(other)) {
+        tbl <- tbl[!is.na(tbl)]
+      } else {
+        tbl <- addNA(tbl)
+        levels(tbl) <- ifelse(is.na(levels(tbl)), other, levels(tbl))
+      }
     }
   }
   

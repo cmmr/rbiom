@@ -22,7 +22,7 @@ taxa_corrplot(
   at = NULL,
   level = 0.95,
   p.adj = "fdr",
-  trans = "none",
+  transform = "none",
   ties = "random",
   seed = 0,
   alt = "!=",
@@ -125,12 +125,12 @@ Default: \code{0.95}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
-\item{ties}{When \code{trans="rank"}, how to rank identical values.
+\item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 

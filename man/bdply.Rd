@@ -37,7 +37,7 @@ Default: \code{FALSE}}
 For \code{bdply()}, a tibble data.frame comprising the accumulated
 outputs of \code{FUN}, along with the columns specified by
 \code{vars} and \code{iters}. For \code{blply()}, a named list that has details
-about \code{vars} and \code{iters} in \code{attr(,"split_labels")}.
+about \code{vars} and \code{iters} in \code{attr(,'split_labels')}.
 }
 \description{
 \code{blply()} and \code{bdply()} let you divide your biom dataset into smaller
@@ -52,8 +52,6 @@ Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::d
 }
 \examples{
     library(rbiom)
-    
-    # bdply ----------------------------------------------------
     
     bdply(hmp50, "Sex", `$`, 'n_samples')
     

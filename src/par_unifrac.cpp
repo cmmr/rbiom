@@ -29,6 +29,8 @@ struct TraverseTree : public Worker
   
   void operator()(std::size_t begin_in, std::size_t end_in) {
     
+    // Rcpp::checkUserInterrupt();
+    
     int begin = static_cast<int>(begin_in);
     int end   = static_cast<int>(end_in);
     
@@ -80,6 +82,8 @@ struct WeighEdges : public Worker
   {}
   
   void operator()(std::size_t begin_in, std::size_t end_in) {
+    
+    // Rcpp::checkUserInterrupt();
     
     int begin = static_cast<int>(begin_in);
     int end   = static_cast<int>(end_in);
@@ -139,6 +143,8 @@ struct PairwiseDist : public Worker
   {}
   
   void operator()(std::size_t begin, std::size_t end) {
+    
+    // Rcpp::checkUserInterrupt();
     
     int nTreeEdges = sampleEdgeWt.ncol();
     

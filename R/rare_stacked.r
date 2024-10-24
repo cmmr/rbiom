@@ -13,18 +13,20 @@
 #'        Default: `TRUE`.
 #' 
 #' @param counts   Display the number of samples and reads remaining after
-#'        rarefying to \code{rline} reads per sample. Default: `TRUE`.
+#'        rarefying to `rline` reads per sample. Default: `TRUE`.
 #'        
 #' @param labels   Show sample names under each bar. Default: `TRUE`.
 #'        
-#' @param trans   Y-axis transformation. Options are \code{"log10"} or 
-#'        `NULL`.  Default: \code{"log10"}.
+#' @param y.transform   Y-axis transformation. Options are `"log10"` or 
+#'        `"none"`.  Default: `"log10"`.\cr\cr
+#'        Use `xaxis.transform` or `yaxis.transform` to pass custom values 
+#'        directly to ggplot2's `scale_*` functions.
 #'        
 #' @param ...   Additional parameters to pass along to ggplot2 functions. 
-#'        Prefix a parameter name with \code{r.} to ensure it gets 
+#'        Prefix a parameter name with `r.` to ensure it gets 
 #'        passed to (and only to) \link[ggplot2]{geom_hline}. For instance, 
-#'        \code{r.color = "black"} ensures only the horizontal rarefaction line 
-#'        has its color set to \code{"black"}.
+#'        `r.color = "black"` ensures only the horizontal rarefaction line 
+#'        has its color set to `"black"`.
 #' 
 #' 
 #' @export
@@ -40,7 +42,7 @@
 #'     
 
 rare_stacked <- function (
-    biom, rline = TRUE, counts = TRUE, labels = TRUE, y.trans = "log10", ...) {
+    biom, rline = TRUE, counts = TRUE, labels = TRUE, y.transform = "log10", ...) {
   
   biom <- as_rbiom(biom)
   
@@ -62,6 +64,8 @@ rare_stacked <- function (
   with(params, {
     stopifnot(is_scalar_logical(rline) || is_scalar_integerish(rline))
     stopifnot(!is.na(rline))
+    validate_var_choices('y.transform', c('none', 'log10'))
+    if (y.transform == 'none' || exists('yaxis.transform')) remove('y.transform')
   })
   
   
@@ -134,11 +138,11 @@ rare_stacked <- function (
   set_layer(params, 'yaxis', expand = c(0,0))
   set_layer(params, 'theme', panel.grid.major.x = element_blank())
   
-  # if (params$trans == "log10") {
-  #   set_layer(params, 'yaxis', c(loglabels(params$.ss), trans="log10"))
-  # } else {
-  #   set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
-  # }
+  if (is.null(params$y.transform)) {
+    set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
+  } else if (params$y.transform == 'log10') {
+    set_layer(params, 'yaxis', c(loglabels(params$.ss), transform = 'log10'))
+  }
   
   if (isTRUE(labels)) {
     set_layer(params, 'point', mapping     = list(x = ".x"), y = 1, alpha = 0)

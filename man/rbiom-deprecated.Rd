@@ -186,7 +186,7 @@ depths_barplot(
   rline = TRUE,
   counts = TRUE,
   labels = TRUE,
-  trans = "log10",
+  transform = "log10",
   ...
 )
 

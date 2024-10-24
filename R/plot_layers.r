@@ -6,45 +6,8 @@ init_layers <- function (
   
   
   layer_names <- do_init
-  
-  if (!is_null(params$facet.by))
-    layer_names %<>% c('facet')
-  
-  
-  if (!is.null(choices)) {
-    
-    stopifnot(is_scalar_character(var) && env_has(params, var))
-    spec <- get(var, pos = params, inherits = FALSE)
-    
-    if (!is_character(spec) || anyNA(spec))
-      cli_abort("`{var}` must be character, not {.type {spec}}.")
-    
-    if (anyNA(spec))
-      cli_abort("`{var}` cannot have any NA values.")
-    
-    
-    for (i in tolower(spec[nchar(spec) > 0]))
-      layer_names <- c(layer_names, local({
-        
-        if (i %in% choices)        return (i)
-        if (i %in% names(choices)) return (choices[[i]])
-        
-        pm <- pmatch(i, choices)
-        ii <- strsplit(i, '')[[1]]
-        
-        if (length(spec) > 1 && !is.na(pm)) return (choices[[pm]])
-        if (all(ii %in% names(choices)))    return (choices[ii])
-        if (!is.na(pm))                     return (choices[[pm]])
-        return (choices[intersect(ii, names(choices))])
-      }))
-    
-    layer_names <- layer_names[!is.na(layer_names)]
-    
-    
-    if (length(layer_names) == 0)
-      cli_abort("Invalid `{var}` argument: {.val {spec}}.")
-    
-  }
+  if (!is_null(params$facet.by)) layer_names %<>% c('facet')
+  if (!is.null(choices))         layer_names %<>% c(validate_layers(var, choices, env = params))
   
   
   
@@ -276,7 +239,7 @@ add_layer <- function (params, layer, fn = NULL) {
   
   
   # Arrays and functions need list wrappers too.
-  # plot(yaxis.expand=1:4, yaxis.trans=sqrt)
+  # plot(yaxis.expand=1:4, yaxis.transform=sqrt)
   #________________________________________________________
   for (i in seq_along(layer_params))
     if (length(layer_params[[i]]) > 1 || is.function(layer_params[[i]]))

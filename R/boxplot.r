@@ -134,7 +134,7 @@ adiv_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
-    trans = "none", caption = TRUE, ... ) {
+    transform = "none", caption = TRUE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -146,9 +146,9 @@ adiv_boxplot <- function (
       biom  = biom, 
       adiv  = adiv, 
       md    = c(x, stat.by, facet.by), 
-      trans = trans )
+      transform = transform )
     
-    remove("biom", "adiv", "trans")
+    remove("biom", "adiv", "transform")
     
     
     #________________________________________________________
@@ -197,7 +197,7 @@ bdiv_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
-    trans = "none", caption = TRUE, ... ) {
+    transform = "none", caption = TRUE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -219,14 +219,14 @@ bdiv_boxplot <- function (
       md       = c(x, stat.by, facet.by),
       within   = within,
       between  = between, 
-      trans    = trans,
+      transform    = transform,
       delta    = NULL ) %>%
       within({
         .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
         .bdiv <- factor(.bdiv, levels = unique(.bdiv))
         remove(".weighted") })
     
-    remove("biom", "bdiv", "weighted", "tree", "trans")
+    remove("biom", "bdiv", "weighted", "tree", "transform")
     
     
     #________________________________________________________
@@ -297,14 +297,18 @@ bdiv_boxplot <- function (
 
 taxa_boxplot <- function (
     biom, x = NULL, rank = -1, layers = 'x', 
-    taxa = 6, unc = 'singly', other = FALSE, p.top = Inf, y.trans = 'sqrt', 
+    taxa = 6, unc = 'singly', other = FALSE, p.top = Inf, 
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
-    trans = "none", caption = TRUE, ... ) {
+    transform = 'none', y.transform = 'sqrt', caption = TRUE, ... ) {
   
   
   p <- with(slurp_env(...), {
+    
+    validate_var_choices('transform',   c('none', 'rank', 'log', 'log1p', 'sqrt', 'percent'))
+    validate_var_choices('y.transform', c('none', 'log1p', 'sqrt'))
+    
     
     #________________________________________________________
     # Compute taxa abundance.
@@ -316,9 +320,17 @@ taxa_boxplot <- function (
       md      = c(x, stat.by, facet.by), 
       unc     = unc, 
       other   = other,
-      trans   = trans )
+      transform   = transform )
     
-    remove("biom", "rank", "taxa", "unc", "other", "trans")
+    remove('biom', 'rank', 'taxa', 'unc', 'other')
+    
+    
+    #________________________________________________________
+    # Re-code transformation arguments for plot_build.
+    #________________________________________________________
+    if (transform == 'percent') default('y.labels', as.cmd(scales::percent))
+    if (y.transform == 'none' || exists('yaxis.transform')) remove('y.transform')
+    remove('transform')
     
     
     #________________________________________________________

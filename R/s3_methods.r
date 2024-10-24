@@ -111,6 +111,32 @@ as.list.rbiom <- function (x, ...) {
 
 
 
+
+#' Convert an rbiom object to a simple count matrix.
+#' 
+#' Identical to running `as.matrix(biom$counts)`.
+#' 
+#' @inherit documentation_biom.rbiom
+#' 
+#' @family conversion
+#' 
+#' @param ...   Not used.
+#' 
+#' @return A base R matrix with OTUs as rows and samples as columns.
+#' 
+#' @export
+#' @examples
+#'     library(rbiom)
+#'     
+#'     as.matrix(hmp50)[1:5,1:5]
+#' 
+as.matrix.rbiom <- function (x, ...) {
+  as.matrix(x$counts)
+}
+
+
+
+
 #' Map sample names to metadata field values.
 #' 
 #' @inherit documentation_biom.rbiom
@@ -293,7 +319,11 @@ within.rbiom <- function (data, expr, clone = TRUE, ...) {
 
 
 
-#' Subset an rbiom object by sample names or metadata.
+#' Subset an rbiom object by sample names, OTU names, metadata, or taxonomy.
+#' 
+#' Dropping samples or OTUs will lead to observations being removed from the 
+#' OTU matrix (`biom$counts`). OTUs and samples with zero observations are 
+#' automatically removed from the rbiom object.
 #'
 #' @inherit documentation_biom.rbiom
 #' @inherit documentation_return.biom return
@@ -304,11 +334,16 @@ within.rbiom <- function (data, expr, clone = TRUE, ...) {
 #' 
 #' @param subset   Logical expression for rows to keep. See [base::subset()].
 #' 
-#' @param i   The sample names to keep. Or a logical/integer vector indicating 
-#'        which sample names from `biom$samples` to keep.
+#' @param i,j   The sample or OTU names to keep. Or a logical/integer vector 
+#'        indicating which sample names from `biom$samples` or `biom$otus` to 
+#'        keep. Subsetting with `[i]` takes `i` as samples, whereas `[i,j]` 
+#'        takes `i` as otus and `j` as samples (corresponding to `[rows, cols]`
+#'        in the underlying `biom$counts` matrix).
 #' 
 #' @param fields   Which metadata field(s) to check for `NA`s, or `".all"` to
 #'        check all metadata fields.
+#' 
+#' @param drop   Not used
 #' 
 #' @param ...   Not used.
 #' 
@@ -322,9 +357,21 @@ within.rbiom <- function (data, expr, clone = TRUE, ...) {
 #'     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
 #'     biom$metadata
 #'     
-#'     # Subset according to metadata (using base::subset)
+#'     # Subset to specific OTUs
+#'     biom <- hmp50[c('LtbAci52', 'UncO2012'),] # <- Trailing ,
+#'     biom$taxonomy
+#'     
+#'     # Subset to specific samples and OTUs
+#'     biom <- hmp50[c('LtbAci52', 'UncO2012'), c('HMP20', 'HMP42', 'HMP12')]
+#'     as.matrix(biom)
+#'     
+#'     # Subset samples according to metadata
 #'     biom <- subset(hmp50, `Body Site` %in% c('Saliva') & Age < 25)
 #'     biom$metadata
+#'     
+#'     # Subset OTUs according to taxonomy
+#'     biom <- subset_taxa(hmp50, Phylum == 'Cyanobacteria')
+#'     biom$taxonomy
 #'     
 #'     # Remove samples with NA metadata values
 #'     biom <- mutate(hmp50, BS2 = na_if(`Body Site`, 'Saliva'))
@@ -336,38 +383,21 @@ within.rbiom <- function (data, expr, clone = TRUE, ...) {
 subset.rbiom <- function (x, subset, clone = TRUE, ...) {
   biom <- if (isTRUE(clone)) x$clone() else x
   keep <- eval(expr = substitute(subset), envir = biom$metadata, enclos = parent.frame())
-  biom <- biom[keep]
+  biom$counts <- biom$counts[,keep]
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
 #' @rdname subset
 #' @export
-`[.rbiom` <- function (biom, i) {
-  
-  #________________________________________________________
-  # Sanity checks.
-  #________________________________________________________
-  if (is.null(i) || !(is.character(i) || is_integerish(i) || is.logical(i)))
-    cli_abort("Expected a character, integer, or logical vector, not {.type {i}}.")
-  
-  if (anyNA(i))
-    cli_abort("Can't subset rbiom samples: NA in vector")
-  
-  if (is.character(i) && length(x <- setdiff(i, biom$samples)) > 0)
-    cli_abort("Sample{?s} not in `biom`: {x}")
-  
-  if (is.numeric(i) && length(x <- i[i < 1 | i > biom$n_samples]) > 0)
-    cli_abort("Invalid sample indices: {x}")
-  
-  if (is.logical(i) && length(i) != biom$n_samples)
-    cli_abort("Logical vector must have {biom$n_samples} items, not {length(i)}.")
-  
-  
-  biom <- biom$clone()
-  biom$counts <- biom$counts[,i]
-  return (biom)
+`[.rbiom` <- function (x, i, j, ..., clone = TRUE, drop = FALSE) {
+  biom        <- if (isTRUE(clone)) x$clone() else x
+  biom$counts <- if (nargs() == 2) biom$counts[,i,drop] else biom$counts[i,j,drop]
+  if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
+
+
+
 
 #' @rdname subset
 #' @export

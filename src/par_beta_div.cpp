@@ -268,6 +268,9 @@ struct BetaDivWorker : public Worker {
     : counts(counts), pairs(pairs), algorithm(algorithm), distances(distances) {}
   
   void operator()(std::size_t begin, std::size_t end) {
+    
+    // Rcpp::checkUserInterrupt();
+    
     for (std::size_t i = begin; i < end; i++) {
       
       // rows we will operate on

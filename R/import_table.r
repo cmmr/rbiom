@@ -1,115 +1,324 @@
 
-#' Read a data.frame from a filename/URL. Auto-detects separator.
+#' Read a data.frame from a file/URL/string. Auto-detects field separator.
 #' 
 #' @noRd
+#' @keywords internal
 #' 
-#' @param filename  A file name or URL. Must be tab- or comma-separated 
-#'        content. Either all or no fields should be quoted.
+#' @param file  A file name, URL, or literal data string.
+#'        File types supported: csv, tsv, json, xls, and xlsx.
 #' 
-#' @param matrix  Set to `TRUE` to convert data.frame to a matrix. Set to
-#'        \code{"character"}, \code{"integer"}, etc to coerce to a matrix of
-#'        that type. The default, `FALSE`, does no conversion.
+#' @param ...  Not used.
 #' 
-#' @param ...  Additional arguments for \code{read.table()}.
-#' 
-#' @return A data.frame or matrix.
+#' @return A tibble data.frame.
 #' 
 
-import_table <- function (filename, matrix = FALSE, ...) {
+import_table <- function (file, ...) {
   
-  read_table_args <- list(...)
-  stopifnot(is_scalar_character(filename) && !is.na(filename))
-    
-    
+  dots <- list(...)
+  
+  stopifnot(is_scalar_character(file))
+  stopifnot(!is.na(file))
+  stopifnot(nzchar(trimws(file)))
+  
+  
   #________________________________________________________
-  # Download from a URL.
+  # Import first sheet from an Excel file.
   #________________________________________________________
-  if (grepl("^.{3,5}://", filename)) {
-    
-    tmp <- tempfile()
-    on.exit(unlink(tmp), add=TRUE)
-    
-    res <- tryCatch(
-      expr  = utils::download.file(filename, tmp, quiet=TRUE),
-      error = function (e) stop("Can't download ", filename,"\n", e) )
-    if (!eq(res, 0L) || !file.exists(tmp))
-      stop("Download failed for ", filename)
-    
-    filename <- tmp
+  if (grepl("\\.(xls|xlsx)$", tolower(file))) {
+    df <- readxl::read_excel(file) # from tidyverse pkg
   }
   
   
-  
   #________________________________________________________
-  # Import from a file.
+  # Import from a text file, URL, or literal data string.
   #________________________________________________________
-  if (!file.exists(filename))
-    stop("File not found: ", filename)
-  
-  
-  
-  #________________________________________________________
-  # See if first line has more tabs or commas.
-  #________________________________________________________
-  line  <- strsplit(readLines(filename, 1L), '')[[1]]
-  sep   <- ifelse(sum(line == "\t") > sum(line == ","), "\t", ',')
-  
-  read_table_args[['file']]         <-  filename
-  read_table_args[['sep']]         %<>% if.null(sep)
-  read_table_args[['check.names']] %<>% if.null(FALSE)
-  
-  df <- tryCatch(
-    expr  = do.call(utils::read.table, read_table_args),
-    error = function (e) stop("Can't parse file ", filename, "\n", e) )
-  
-  
-  
-  #________________________________________________________
-  # Enforce unique row/column names.
-  #________________________________________________________
-  
-  if (any(x <- duplicated(rownames(df)))) {
-    x <- unique(rownames(df)[x])
-    if (length(x) > 4) x <- c(head(x, 4), "...")
-    msg <- "Duplicated row names in %s: %s"
-    stop(sprintf(msg, filename, paste(collapse = ", ", x)))
+  else {
+    
+    # Heuristics for flagging as a json file or string.
+    is_json <- endsWith(tolower(file), '.json')
+    is_json <- is_json || startsWith(file, '[')
+    if (!is_json && file.exists(file))
+      is_json <- is_json || identical(readChar(file, 1L), '[')
+    
+    
+    if (is_json) {
+      df <- as_tibble(jsonlite::fromJSON(file))
+      
+    } else {
+      
+      # read_delim will auto-detect the field separator
+      df <- readr::read_delim(
+        file           = file,  
+        trim_ws        = TRUE, 
+        name_repair    = trimws,
+        show_col_types = FALSE )
+    }
   }
+  
+  
+  #________________________________________________________
+  # Enforce unique column names.
+  #________________________________________________________
   
   if (any(x <- duplicated(colnames(df)))) {
     x <- unique(colnames(df)[x])
-    if (length(x) > 4) x <- c(head(x, 4), "...")
-    msg <- "Duplicated column names in %s: %s"
-    stop(sprintf(msg, filename, paste(collapse = ", ", x)))
+    cli_abort("Duplicated column names in {.file {file}}: {.val {x}}")
   }
   
   
   
-  
-  #________________________________________________________
-  # Coerce to matrix.
-  #________________________________________________________
-  
-  if (isFALSE(matrix)) return (df)
-  
-  mtx <- tryCatch(
-      expr  = as(df, 'matrix'),
-      error = function (e)
-        stop("Can't convert ", filename, " to matrix.\n", e) )
-  
-  if (is_scalar_character(matrix) && !typeof(mtx) == matrix)
-    mtx[] <- tryCatch(
-      expr  = as(mtx, matrix),
-      error = function (e)
-        stop("Can't coerce ", filename, " to ", matrix, ".\n", e) )
-  
-  if (!isTRUE(read_table_args[['header']]))    colnames(mtx) <- NULL
-  if (is.null(read_table_args[['row.names']])) rownames(mtx) <- NULL
-  
-  
-  
-  return (mtx)
+  return (df)
 }
 
 
 
+
+#' @noRd
+#' @keywords internal
+import_metadata <- function (value, sids) {
+  
+  #________________________________________________________
+  # Erasing all the metadata.
+  #________________________________________________________
+  if (is.null(value)) return (tibble(.sample = sids))
+  
+  #________________________________________________________
+  # Load metadata from a file.
+  #________________________________________________________
+  if (is_scalar_character(value)) value <- import_table(file = value)
+  
+  #________________________________________________________
+  # Convert data.frame/matrix to tibble.
+  #________________________________________________________
+  value <- tibble::as_tibble(value, rownames = NA, .name_repair = trimws)
+  
+  
+  #________________________________________________________
+  # Auto-detect the column with sample names.
+  #________________________________________________________
+  if (!tibble::has_rownames(value) && !hasName(value, '.sample'))
+    for (i in seq_len(ncol(value)))
+      if (!as.logical(anyDuplicated(vals <- trimws(value[[i]]))))
+        if (any(vals %in% sids)) {
+          colnames(value)[i] <- '.sample'
+          break
+        }
+  
+  
+  #________________________________________________________
+  # Make '.sample' the first column.
+  #________________________________________________________
+  if (!tibble::has_rownames(value) && !hasName(value, '.sample'))
+    cli_abort(c(x = "Metadata table must have row names or a '.sample' column."))
+  
+  if (tibble::has_rownames(value) && hasName(value, '.sample'))
+    cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
+  
+  if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.sample')
+  } else                           { value %<>% relocate(.sample) }
+  
+  
+  #________________________________________________________
+  # Disallow column names starting with a "."
+  #________________________________________________________
+  if (length(i <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
+    cli_abort(c(x = "Metadata field{?s} can't start with a '.': {.val {i}}."))
+  
+  
+  #________________________________________________________
+  # Convert all character cols (except .sample) to factor.
+  #________________________________________________________
+  value[['.sample']] %<>% as.character() %>% trimws()
+  for (i in colnames(value)[-1])
+    if (is.character(value[[i]])) value[[i]] %<>% trimws() %>% as.factor()
+  
+  
+  #________________________________________________________
+  # Intersect with sample names from $counts.
+  #________________________________________________________
+  expected <- sids
+  provided <- unique(value[['.sample']])
+  
+  if (length(intersect(expected, provided)) == 0)
+    cli_abort(c(
+      'i' = "No matching sample names.", 
+      '*' = "Expected: {.val {expected}}", 
+      '*' = "Provided: {.val {provided}}", 
+      'x' = "Can't subset to zero samples." ))
+  
+  if (length(i <- setdiff(expected, provided)) > 0)
+    cli_warn(c('i' = paste(
+      "Dropping {length(i)} sample{?s} from biom object",
+      "since they are not in the new metadata: {.val {i}}." )))
+
+  if (length(i <- setdiff(provided, expected)) > 0)
+    cli_warn(c('i' = paste(
+      "Ignoring metadata for {length(i)} sample{?s}", 
+      "not currently in biom object: {.val {i}}." )))
+  
+  value <- value[value[['.sample']] %in% expected,,drop=FALSE]
+  remove('expected', 'provided', 'i')
+  
+  
+  #________________________________________________________
+  # Drop duplicate sample mappings. Warn if non-identical.
+  #________________________________________________________
+  if (as.logical(anyDuplicated(value[['.sample']]))) {
+    
+    not_equal <- function (x) (length(unique(as.character(x))) > 1)
+    to_string <- function (i, x) jsonlite::toJSON(as.vector(x[i,,drop=FALSE]), auto_unbox = TRUE)
+    
+    plyr::d_ply(value, '.sample', function (x) {
+      
+      if (nrow(x) == 1) return (NULL)
+      sid <- x[1,1]
+      x   <- x[,apply(x, 2L, not_equal),drop=FALSE]
+      if (ncol(x) == 0) return (NULL)
+      
+      rlang::warn(
+        message = c(i = paste0("Discarding subsequent metadata for sample ", sid)),
+        body    = setNames(
+          object = sapply(1:nrow(x), to_string, x), 
+          nm     = c('v', rep('x', nrow(x) - 1)) ))
+    })
+   
+    value <- value[!duplicated(value[['.sample']]),,drop=FALSE]
+    remove("not_equal", "to_string")
+  }
+  
+  
+  return (value)
+}
+
+
+#' @noRd
+#' @keywords internal
+import_taxonomy <- function (value, otus) {
+  
+  #________________________________________________________
+  # Erasing all the taxonomy.
+  #________________________________________________________
+  if (is.null(value)) return (tibble(.otu = otus))
+  
+  
+  #________________________________________________________
+  # Load taxonomy from a file.
+  #________________________________________________________
+  if (is_scalar_character(value)) value <- import_table(file = value)
+  
+  #________________________________________________________
+  # Convert data.frame/matrix to tibble.
+  #________________________________________________________
+  value <- tibble::as_tibble(value, rownames = NA, .name_repair = trimws)
+  
+  
+  #________________________________________________________
+  # Auto-detect the column with OTU names.
+  #________________________________________________________
+  if (!tibble::has_rownames(value) && !hasName(value, '.otu'))
+    for (i in seq_len(ncol(value)))
+      if (!as.logical(anyDuplicated(vals <- trimws(value[[i]]))))
+        if (any(vals %in% otus)) {
+          colnames(value)[i] <- '.otu'
+          break
+        }
+  
+  
+  #________________________________________________________
+  # Make '.otu' the first column.
+  #________________________________________________________
+  if (!tibble::has_rownames(value) && !hasName(value, '.otu'))
+    cli_abort(c(x = "Taxonomy table must have row names or an '.otu' column."))
+  
+  if (tibble::has_rownames(value) && hasName(value, '.otu'))
+    cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
+  
+  if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.otu')
+  } else                           { value %<>% relocate(.otu) }
+  
+  
+  #________________________________________________________
+  # Disallow column names starting with a "."
+  #________________________________________________________
+  if (length(i <- grep("^\\.", colnames(value)[-1], value = TRUE)) != 0)
+    cli_abort(c(x = "Taxonomy rank{?s} can't start with a '.': {.val {i}}."))
+  
+  
+  #________________________________________________________
+  # Convert all cols (except .otu) to factor.
+  #________________________________________________________
+  value[['.otu']] %<>% as.character() %>% trimws()
+  for (i in seq_len(ncol(value))[-1])
+    if (!is.factor(value[[i]])) value[[i]] %<>% trimws() %>% as.factor()
+  
+  
+  #________________________________________________________
+  # Intersect with OTU names from $counts.
+  #________________________________________________________
+  expected <- otus
+  provided <- unique(value[['.otu']])
+  
+  if (length(intersect(expected, provided)) == 0)
+    cli_abort(c(
+      'i' = "No matching OTU names between counts and taxonomy.", 
+      '*' = "Expected: {.val {expected}}", 
+      '*' = "Provided: {.val {provided}}", 
+      'x' = "Can't subset to zero OTUs." ))
+  
+  if (length(i <- setdiff(expected, provided)) > 0)
+    cli_warn(c('i' = paste(
+      "Dropping {length(i)} OTU{?s} from biom object",
+      "since they are not in the new taxonomy: {.val {i}}." )))
+  
+  if (length(i <- setdiff(provided, expected)) > 0)
+    cli_warn(c('i' = paste(
+      "Ignoring taxonomy for {length(i)} OTU{?s}", 
+      "not currently in biom object: {.val {i}}." )))
+  
+  value <- value[value[['.otu']] %in% expected,,drop=FALSE]
+  remove('expected', 'provided', 'i')
+  
+  
+  #________________________________________________________
+  # Drop duplicate OTU mappings. Warn if non-identical.
+  #________________________________________________________
+  if (as.logical(anyDuplicated(value[['.otu']]))) {
+    
+    if (ncol(value) == 1) {
+      keep <- which(!duplicated(value[['.otu']]))
+      
+    } else {
+      
+      keep <- sapply(split(1:nrow(value), value[['.otu']]), function (i) {
+        
+        if (length(i) == 1) return (i)
+        
+        lineages <- apply(value[i,-1,drop=FALSE], 1L, paste, collapse = "; ")
+        longest  <- which.max(nchar(lineages))
+        
+        if (length(unique(lineages)) > 1)
+          rlang::warn(
+            message = c(i = paste0("Discarding less verbose mapping for OTU ", value[i[[1]],1])),
+            body    = setNames(
+              object = lineages, 
+              nm     = ifelse(seq_along(lineages) == longest, 'v', 'x') ))
+        
+        return (i[[longest]])
+      })
+    }
+    
+    value <- value[sort(unname(keep)),,drop=FALSE]
+    remove("keep")
+  }
+  
+  
+  #________________________________________________________
+  # Drop unused factor levels.
+  #________________________________________________________
+  for (i in seq_len(ncol(value))[-1])
+    value[[i]] %<>% { factor(., levels = intersect(levels(.), unique(.))) }
+  
+  
+  return (value)
+}
 

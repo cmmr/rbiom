@@ -13,6 +13,12 @@
 #'        rbiom objects, or valid arguments to the \code{src} parameter of 
 #'        [read_biom()] (for instance file names).
 #'        
+#' @param metadata,taxonomy,tree,sequences,id,comment Replace the corresponding 
+#'        data in the merged rbiom object with these values. Set to `NULL` to
+#'        not inherit a particular component. The default, `NA`, will attempt
+#'        to create the component based on `...` values. The merged 
+#'        phylogenetic tree cannot be inferred.
+#'        
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -27,7 +33,7 @@
 #'     biom$metadata <- hmp50$metadata
 #'     print(biom)
 
-biom_merge <- function (...) { 
+biom_merge <- function (..., metadata = NA, taxonomy = NA, tree = NULL, sequences = NA, id = NA, comment = NA) { 
   
   dots      <- list(...)
   biom_list <- lapply(dots, function (dot) {
@@ -37,20 +43,23 @@ biom_merge <- function (...) {
     if (length(dot) < 1)       return (NULL)
     if (is(dot[[1]], 'rbiom')) return (dot[[1]])
     if (is.character(dot))     return (read_biom(src = dot))
-    stop("Unknown argument to biom_merge(): ", dot)
+    cli::cli_abort("Unknown argument to biom_merge(): ", dot)
     
   })
   biom_list <- biom_list[sapply(biom_list, is, 'rbiom')]
   
-  if (length(biom_list) == 0) stop("No BIOM datasets provided to biom_merge().")
+  if (length(biom_list) == 0) cli::cli_abort("No BIOM datasets provided to biom_merge().")
   if (length(biom_list) == 1) return (biom_list[[1]]) 
   
   
   samples <- do.call(c, lapply(biom_list, function (x) { colnames(x[['counts']]) }))
   otus    <- do.call(c, lapply(biom_list, function (x) { rownames(x[['counts']]) }))
   
-  if (any(duplicated(samples))) stop("Sample names are not unique among BIOM datasets.")
-  if (!any(duplicated(otus)))   warning("No overlapping OTU names. Likely incompatible datasets.")
+  if (length(dups <- unique(samples[duplicated(samples)])) > 0)
+    cli::cli_abort("Sample names are not unique among BIOM datasets: {.val {dups}}")
+  
+  if (!any(duplicated(otus)))
+    cli::cli_warn("No overlapping OTU names. Likely incompatible datasets.")
   
   otus <- unique(otus)
   
@@ -64,28 +73,31 @@ biom_merge <- function (...) {
     dimnames = list(otus, samples) )
   
   
-  metadata <- dplyr::bind_rows(lapply(biom_list, `[[`, 'metadata'))
-  taxonomy <- dplyr::bind_rows(lapply(biom_list, `[[`, 'taxonomy'))
+  if (is.na(metadata))  metadata  <- dplyr::bind_rows(lapply(biom_list, `[[`, 'metadata'))
+  if (is.na(taxonomy))  taxonomy  <- dplyr::bind_rows(lapply(biom_list, `[[`, 'taxonomy'))
+  if (is.na(sequences)) sequences <- do.call(c,       lapply(biom_list, `[[`, 'sequences'))
   
-  if (ncol(taxonomy) > 1) {
-    taxstrs <- apply(taxonomy, 1L, paste, collapse = "; ")
-    for (otu in otus)
-      if (length(strs <- unique(taxstrs[which(names(taxstrs) == otu)])) > 1)
-        warning("OTU '", otu, "' has multiple taxonomic mappings:", paste("\n  ", strs))
+  if (is.na(id)) {
+    id <- unique(do.call(c, lapply(biom_list, `[[`, 'id')))
+    id <- setdiff(id, 'Untitled Dataset')
+    if (length(id) != 1) id <- "Merged BIOM"
   }
   
-  taxonomy <- taxonomy[!duplicated(taxonomy[['.otu']]),]
-  
-  
-  sequences <- do.call(c, lapply(biom_list, `[[`, 'sequences'))
+  if (is.na(comment)) {
+    comment <- unique(do.call(c, lapply(biom_list, `[[`, 'comment')))
+    comment <- setdiff(comment, '')
+    if (length(comment) != 1) comment <- NULL
+  }
   
   
   rbiom$new(
-    id        = "Merged BIOM",
+    id        = id,
+    comment   = comment,
     counts    = counts, 
     metadata  = metadata, 
     taxonomy  = taxonomy,
-    sequences = sequences )
+    sequences = sequences,
+    tree      = tree )
 }
 
 

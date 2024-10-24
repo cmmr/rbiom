@@ -105,6 +105,11 @@ void readtree2(
     CharacterVector lLab) {
   
   
+  // if ((*eIdx) % 1000 == 0) {
+  //   Rcpp::checkUserInterrupt();
+  // }
+  
+  
   unsigned int i;
   
   // Trim off whitespace from beginning and end of string section

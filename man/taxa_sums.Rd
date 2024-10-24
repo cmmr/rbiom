@@ -6,9 +6,23 @@
 \alias{taxa_apply}
 \title{Get summary taxa abundances.}
 \usage{
-taxa_sums(biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly")
+taxa_sums(
+  biom,
+  rank = -1,
+  sort = NULL,
+  lineage = FALSE,
+  unc = "singly",
+  transform = "none"
+)
 
-taxa_means(biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly")
+taxa_means(
+  biom,
+  rank = -1,
+  sort = NULL,
+  lineage = FALSE,
+  unc = "singly",
+  transform = "none"
+)
 
 taxa_apply(
   biom,
@@ -17,6 +31,7 @@ taxa_apply(
   sort = NULL,
   lineage = FALSE,
   unc = "singly",
+  transform = "none",
   ...
 )
 }
@@ -55,6 +70,11 @@ taxa names. Options are:
 }
 Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
+
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 
 \item{FUN}{The function to apply to each row of the \code{taxa_matrix()}.}
 

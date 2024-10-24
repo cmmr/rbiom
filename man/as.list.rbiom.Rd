@@ -18,4 +18,8 @@ A list with names
 \description{
 Convert an rbiom object to a base R list.
 }
+\seealso{
+Other conversion: 
+\code{\link{as.matrix.rbiom}()}
+}
 \concept{conversion}

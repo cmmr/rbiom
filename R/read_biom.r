@@ -411,7 +411,7 @@ read_biom_hdf5 <- function (fp) {
 
 parse_json_metadata <- function (json) {
   
-  if (anyDuplicated(names(json$columns[[1]]$metadata)))
+  if (as.logical(anyDuplicated(names(json$columns[[1]]$metadata))))
     cli_abort("Metadata column names are not unique.")
   
   df <- as.data.frame(

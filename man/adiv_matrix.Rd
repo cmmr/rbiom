@@ -4,16 +4,16 @@
 \alias{adiv_matrix}
 \title{Create a matrix of samples x alpha diversity metrics.}
 \usage{
-adiv_matrix(biom, trans = "none")
+adiv_matrix(biom, transform = "none")
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
-\item{trans}{Transformation to apply. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
-correcting for non-normally distributions before applying regression
-statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply. Options are:
+\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
+useful for correcting for non-normally distributions before applying
+regression statistics. Default: \code{"none"}}
 }
 \value{
 A numeric matrix with samples as rows and columns named

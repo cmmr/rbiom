@@ -47,17 +47,6 @@ slurp_env <- function (..., .dots = FALSE) {
   
   rlang::env_unbind(env, '...')
   params <- lapply(as.list(env, all.names = TRUE), eval, envir = env)
-  
-  
-  #____________________________________________________________________
-  # Move some parameters into dots.
-  #____________________________________________________________________
-  if (isTRUE(.dots) && hasName(params, 'y.trans')) {
-    params$.dots$y.trans <- params$y.trans
-    params$y.trans       <- NULL
-  }
-  
-  
   rlang::env_unbind(env, names(env))
   
   return (params)
@@ -78,15 +67,6 @@ eval_envir <- function (env, ...) {
   #____________________________________________________________________
   params <- lapply(as.list(env), eval) %>%
     rlang::new_environment(parent = rlang::ns_env('rbiom'))
-  
-  
-  #____________________________________________________________________
-  # Move some parameters into dots.
-  #____________________________________________________________________
-  if (hasName(params, 'y.trans')) {
-    dots[['y.trans']] <- params[['y.trans']]
-    rlang::env_unbind(params, 'y.trans')
-  }
   
   
   #____________________________________________________________________
@@ -741,5 +721,26 @@ relevel <- function (tbl) {
   attributes(tbl) <- attributes(tbl)[order(names(attributes(tbl)))]
   
   return (tbl)
+}
+
+
+
+require_package <- function (pkg, reason = 'for this command', repo = 'cran') {
+  
+  if (nzchar(system.file(package = pkg))) return (invisible(NULL))
+  
+  if (startsWith(tolower(repo), 'c')) {
+    cli_abort(c(
+      'x' = "CRAN R package {.pkg {pkg}} is required {reason}.",
+      'i' = "To install {.pkg {pkg}}, run:",
+      '>' = " install.packages('{pkg}')" ))
+  } else {
+    cli_abort(c(
+      'x' = "Bioconductor R package {.pkg {pkg}} is required {reason}.",
+      'i' = "To install {.pkg {pkg}}, run:",
+      '>' = " install.packages('BiocManager')",
+      '>' = " BiocManager::install('{pkg}')" ))
+  }
+  
 }
 

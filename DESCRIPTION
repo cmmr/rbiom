@@ -1,14 +1,17 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9137
-Date: 2024-08-06
+Version: 2.0.0.9140
+Date: 2024-10-24
 Authors@R: c(
-    person("Daniel P.", "Smith", , "dansmith01@gmail.com", role  = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-2479-2044")),
-    person("Alkek Center for Metagenomics and Microbiome Research", role = c("cph", "fnd"))
-  )
-Maintainer: Daniel P. Smith <dansmith01@gmail.com>
+    person(
+      "Daniel P.", "Smith",
+      email   = "dansmith01@gmail.com",
+      role    = c("aut", "cre"),
+      comment = c(ORCID = "0000-0002-2479-2044")),
+    person(
+      "Alkek Center for Metagenomics and Microbiome Research", 
+      role = c("cph", "fnd") ))
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Features include reading/writing all 'BIOM' formats, rarefaction, alpha
@@ -41,11 +44,9 @@ Imports:
     dplyr,
     emmeans,
     ggbeeswarm,
+    ggraph,
     ggnewscale,
-    ggplot2,
-    ggrepel,
     ggtext,
-    jsonlite,
     magrittr,
     patchwork,
     pillar,
@@ -53,14 +54,18 @@ Imports:
     RcppParallel,
     R.utils,
     slam,
+    tidyverse,
     vegan
 Suggests:
     Biostrings,
     cli,
     crayon,
-    ggdensity,
     fillpattern,
+    ggdensity,
+    ggplot2,
+    ggrepel,
     glue,
+    jsonlite,
     npregfast,
     labeling,
     lifecycle,
@@ -71,6 +76,8 @@ Suggests:
     prettycode,
     R6,
     ragg,
+    readr,
+    readxl,
     reshape2,
     rhdf5,
     rlang,
@@ -78,6 +85,7 @@ Suggests:
     SummarizedExperiment,
     testthat,
     tibble,
+    tidygraph,
     TreeSummarizedExperiment,
     tsne,
     uwot,

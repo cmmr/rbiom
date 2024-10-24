@@ -151,7 +151,7 @@ adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "tc", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    transform = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -163,9 +163,9 @@ adiv_corrplot <- function (
       biom  = biom, 
       adiv  = adiv, 
       md    = c(x, stat.by, facet.by), 
-      trans = trans )
+      transform = transform )
     
-    remove("biom", "adiv", "trans")
+    remove("biom", "adiv", "transform")
     
     
     #________________________________________________________
@@ -210,7 +210,7 @@ bdiv_corrplot <- function (
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", ties = "random", seed = 0, 
+    transform = "none", ties = "random", seed = 0, 
     alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
@@ -233,7 +233,7 @@ bdiv_corrplot <- function (
       md       = c(x, stat.by, facet.by),
       within   = within,
       between  = between, 
-      trans    = trans, 
+      transform    = transform, 
       ties     = ties, 
       seed     = seed,
       delta    = x ) %>%
@@ -243,7 +243,7 @@ bdiv_corrplot <- function (
         remove(".weighted") })
     
     remove("biom", "bdiv", "weighted", "tree")
-    remove("trans", "ties", "seed")
+    remove("transform", "ties", "seed")
     
     
     #________________________________________________________
@@ -300,7 +300,7 @@ rare_corrplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    transform = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -327,11 +327,11 @@ rare_corrplot <- function (
           biom  = rarefy(biom, depth = rLvl),
           adiv  = adiv,
           md    = c(stat.by, facet.by), 
-          trans = trans )
+          transform = transform )
       })
       
     })
-    remove("rline", "biom", "adiv", "trans")
+    remove("rline", "biom", "adiv", "transform")
     
     
     #________________________________________________________
@@ -389,7 +389,7 @@ taxa_corrplot <- function (
     taxa = 6, lineage = FALSE, unc = 'singly', other = FALSE, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
-    trans = "none", ties = "random", seed = 0, 
+    transform = "none", ties = "random", seed = 0, 
     alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   params <- list2env(slurp_env(...))
@@ -407,12 +407,12 @@ taxa_corrplot <- function (
       md      = c(x, stat.by, facet.by),
       unc     = unc, 
       other   = other,
-      trans   = trans, 
+      transform   = transform, 
       ties    = ties, 
       seed    = seed )
     
     remove("biom", "rank", "taxa", "lineage", "unc", "other")
-    remove("trans", "ties", "seed")
+    remove("transform", "ties", "seed")
     
     
     #________________________________________________________

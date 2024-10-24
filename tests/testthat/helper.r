@@ -1,6 +1,6 @@
 
 rare50 <- rarefy(hmp50)
-# min50  <- as_rbiom(list(counts = hmp50$counts))
+min50  <- as_rbiom(list(counts = hmp50$counts))
 
 hmp5 <- hmp50[1:5]
 
@@ -30,4 +30,22 @@ expect_equal_rbiom <- function (a, b) {
   expect_equal(a$tree$edge,          b$tree$edge)
   expect_equal(a$tree$edge.length,   b$tree$edge.length)
   
+}
+
+expect_identical_integer <- function (a, b) {
+  expect_identical(as.integer(a), as.integer(b))
+}
+
+expect_identical_json <- function (a, b) {
+  expect_identical(as.character(jsonlite::toJSON(a)), b)
+}
+
+
+# Convert all factors to character before comparing.
+expect_equal_tibble <- function (a, b) {
+  expect_s3_class(a, 'tbl_df')
+  expect_s3_class(b, 'tbl_df')
+  a <- mutate(a, across(where(is.factor), as.character))
+  b <- mutate(b, across(where(is.factor), as.character))
+  expect_equal(a, b)
 }

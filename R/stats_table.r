@@ -93,7 +93,7 @@ stats_table <- function (
     #________________________________________________________
     # Warn about invalid combinations of parameters.
     #________________________________________________________
-    if (anyDuplicated(c(regr, resp, stat.by, split.by)))
+    if (as.logical(anyDuplicated(c(regr, resp, stat.by, split.by))))
       cli_abort("`regr`, `resp`, `stat.by`, `split.by` must all be unique.")
     
     if (is.null(regr) && !is.null(at))
@@ -159,7 +159,7 @@ stats_table <- function (
 
 adiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, adiv = "Shannon", 
-    split.by = NULL, trans = "none", 
+    split.by = NULL, transform = "none", 
     test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
@@ -171,7 +171,7 @@ adiv_stats <- function (
     biom  = biom, 
     adiv  = adiv, 
     md    = c(regr, stat.by, split.by), 
-    trans = trans )
+    transform = transform )
   
   if (nlevels(df$.adiv) > 1)
     split.by %<>% c('.adiv')
@@ -226,7 +226,7 @@ adiv_stats <- function (
 bdiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, bdiv = "Bray-Curtis", 
     weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
-    split.by = NULL, trans = "none", 
+    split.by = NULL, transform = "none", 
     test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
@@ -243,7 +243,7 @@ bdiv_stats <- function (
     within   = within, 
     between  = between, 
     delta    = regr, 
-    trans    = trans )
+    transform    = transform )
   
   if (nlevels(df$.bdiv) > 1)
     split.by %<>% c('.bdiv')
@@ -298,13 +298,13 @@ bdiv_stats <- function (
 taxa_stats <- function (
     biom, regr = NULL, stat.by = NULL, rank = -1, taxa = 6, 
     lineage = FALSE, unc = "singly", other = FALSE,
-    split.by = NULL, trans = "none", 
+    split.by = NULL, transform = "none", 
     test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
   
   
   #________________________________________________________
-  # Compute beta diversity values
+  # Compute taxa abundance values
   #________________________________________________________
   df <- taxa_table(
     biom    = biom, 
@@ -314,7 +314,7 @@ taxa_stats <- function (
     md      = setdiff(c(regr, stat.by, split.by), ".taxa"), 
     unc     = unc, 
     other   = other, 
-    trans   = trans )
+    transform   = transform )
   
   if (nlevels(df$.rank) > 1) split.by %<>% c('.rank')
   if (!eq(stat.by, ".taxa")) split.by %<>% c('.taxa')

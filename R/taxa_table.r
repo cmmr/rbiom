@@ -5,7 +5,7 @@
 taxa_table <- function (
     biom, rank = -1, taxa = 6, lineage = FALSE, 
     md = ".all", unc = "singly", other = FALSE, 
-    trans = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0 ) {
   
   biom <- as_rbiom(biom)
   
@@ -47,7 +47,7 @@ taxa_table <- function (
           sparse  = FALSE, 
           unc     = unc, 
           other   = other,
-          trans   = trans,
+          transform   = transform,
           ties    = ties, 
           seed    = seed )
         
@@ -86,16 +86,16 @@ taxa_table <- function (
   # Descriptive label for y-axis.
   #________________________________________________________
   resp_label <- with(params, {
-    if      (eq(trans, 'percent')) { "Relative Abundance" }
+    if      (eq(transform, 'percent')) { "Relative Abundance" }
     else if (is.null(biom$depth))  { "Unrarefied Counts"  }
     else                           { "Rarefied Counts"    }
   })
   
-  if (eq(params$trans, 'rank'))
+  if (eq(params$transform, 'rank'))
     resp_label %<>% tolower() %>% paste0("Ranked Abundance\n", "(from ", ., ")")
   
-  if (!params$trans %in% c('none', 'rank', 'percent'))
-    resp_label %<>% paste0("\n(", params$trans, " transformed)")
+  if (!params$transform %in% c('none', 'rank', 'percent'))
+    resp_label %<>% paste0("\n(", params$transform, " transformed)")
   
   
   
@@ -146,7 +146,7 @@ taxa_table <- function (
 taxa_matrix <- function (
     biom, rank = -1, taxa = NULL, lineage = FALSE, 
     sparse = FALSE, unc = "singly", other = FALSE, 
-    trans = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0 ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -168,7 +168,7 @@ taxa_matrix <- function (
   validate_taxa(null_ok = TRUE)
   validate_rank()
   validate_bool("sparse")
-  validate_var_choices('trans', c("none", "rank", "log", "log1p", "sqrt", "percent"))
+  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
   validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
   validate_var_range('seed', n = 1, int = TRUE)
   
@@ -192,7 +192,7 @@ taxa_matrix <- function (
     expr  = local({
       
       counts <- biom$counts
-      if (eq(trans, 'percent')) counts <- rescale_cols(counts)
+      if (eq(transform, 'percent')) counts <- rescale_cols(counts)
       mtx <- rollup(counts[names(map),], 1L, map, sum)
       mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
       
@@ -250,15 +250,15 @@ taxa_matrix <- function (
   #________________________________________________________
   # Optionally transform the computed abundance values.
   #________________________________________________________
-  if (eq(trans, "rank")) {
+  if (eq(transform, "rank")) {
     
     mtx %<>% as.matrix() # need those zeroes
     set.seed(seed)
     mtx[] <- base::rank(mtx, ties.method = ties)
     mtx %<>% as.simple_triplet_matrix()
     
-  } else if (trans %in% c("log", "log1p", "sqrt")) {
-    mtx$v <- do.call(`::`, list('base', trans))(mtx$v)
+  } else if (transform %in% c("log", "log1p", "sqrt")) {
+    mtx$v <- do.call(`::`, list('base', transform))(mtx$v)
   }
   
   
@@ -311,8 +311,8 @@ taxa_matrix <- function (
 #'     
 #'     taxa_apply(hmp50, fivenum) %>% head(5)
 
-taxa_sums <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly") {
-  taxa_apply(biom, FUN = base::sum, rank, sort, lineage, unc)
+taxa_sums <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly", transform = "none") {
+  taxa_apply(biom, FUN = base::sum, rank, sort, lineage, unc, transform)
 }
 
 
@@ -320,8 +320,8 @@ taxa_sums <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "sin
 #' @rdname taxa_sums
 #' @export
 
-taxa_means <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly") {
-  taxa_apply(biom, FUN = base::mean, rank, sort, lineage, unc)
+taxa_means <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "singly", transform = "none") {
+  taxa_apply(biom, FUN = base::mean, rank, sort, lineage, unc, transform)
 }
 
 
@@ -329,12 +329,12 @@ taxa_means <- function (biom, rank = -1, sort = NULL, lineage = FALSE, unc = "si
 #' @rdname taxa_sums
 #' @export
 
-taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc = "singly", ...) {
+taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc = "singly", transform = "none", ...) {
   
   stopifnot(is.function(FUN))
   validate_var_choices('sort', choices = c('asc', 'desc'), null_ok = TRUE)
   
-  mtx <- taxa_matrix(biom = biom, rank = rank, lineage = lineage, sparse = TRUE, unc = unc)
+  mtx <- taxa_matrix(biom = biom, rank = rank, lineage = lineage, sparse = TRUE, unc = unc, transform = transform)
   
   res <- if (identical(FUN, base::sum))  { slam::row_sums(mtx)
   } else if (identical(FUN, base::mean)) { slam::row_means(mtx)
@@ -357,6 +357,20 @@ taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc 
 taxa_max <- function (biom, rank = -1, lineage = FALSE, unc = "singly") {
   lifecycle::deprecate_warn("2.0.0", "taxa_max()", "taxa_apply()")
   taxa_apply(biom, FUN = base::max, rank, sort = 'desc', lineage, unc)
+}
+
+
+
+
+
+#' @rdname subset
+#' @export
+
+subset_taxa <- function (x, subset, clone = TRUE, ...) {
+  biom <- if (isTRUE(clone)) x$clone() else x
+  keep <- eval(expr = substitute(subset), envir = biom$taxonomy, enclos = parent.frame())
+  biom$counts <- biom$counts[keep,]
+  if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
 
