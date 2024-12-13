@@ -418,7 +418,7 @@ NULL
 #'        or logical vector of length two to control row labels and column 
 #'        labels separately, for example 
 #'        `label = c(rows = TRUE, cols = FALSE)`, or simply 
-#'        `label = c(T, F)`. Other valid options are `"rows"`,
+#'        `label = c(TRUE, FALSE)`. Other valid options are `"rows"`,
 #'        `"cols"`, `"both"`, `"bottom"`, `"right"`,
 #'        and `"none"`.
 #'        Default: `TRUE`
@@ -437,7 +437,8 @@ NULL
 #' @param trees   Draw a dendrogram for rows (left) and columns (top). You can 
 #'        supply a list or logical vector of length two to control the row tree 
 #'        and column tree separately, for example 
-#'        `trees = c(rows = T, cols = F)`, or simply `trees = c(T, F)`. 
+#'        `trees = c(rows = TRUE, cols = FALSE)`, 
+#'        or simply `trees = c(TRUE, FALSE)`. 
 #'        Other valid options are `"rows"`, `"cols"`, `"both"`, 
 #'        `"left"`, `"top"`, and `"none"`.
 #'        Default: `TRUE`

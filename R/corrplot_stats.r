@@ -43,13 +43,9 @@ corrplot_stats <- function (params) {
   #________________________________________________________
   # Use p.top to retain only most significant taxa.
   #________________________________________________________
-  if (isTRUE(is.finite(params$p.top))) {
-    
-    apply_p.top(params)
-    
-    if (plyr::empty(params$.ggdata))
-      return (params)
-  }
+  apply_p.top(params)
+  if (plyr::empty(params$.ggdata))
+    return (invisible(params))
   
   
   

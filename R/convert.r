@@ -38,7 +38,7 @@
 
 convert_to_SE <- function (biom, ...) {
   
-  require_package('SummarizedExperiment', 'use convert_to_SE()', repo = 'bioc')
+  require_package('SummarizedExperiment', 'to use convert_to_SE()')
   
   dots <- list(...)
   biom <- as_rbiom(biom)
@@ -56,7 +56,7 @@ convert_to_SE <- function (biom, ...) {
 
 convert_to_TSE <- function (biom, ...) {
   
-  require_package('TreeSummarizedExperiment', 'use convert_to_TSE()', repo = 'bioc')
+  require_package('TreeSummarizedExperiment', 'to use convert_to_TSE()')
   
   dots <- list(...)
   biom <- as_rbiom(biom)

@@ -20,6 +20,7 @@ stats_boxplot(
   ci = "ci",
   level = 0.95,
   p.adj = "fdr",
+  p.top = Inf,
   outliers = NULL,
   xlab.angle = "auto",
   p.label = 0.05,
@@ -98,6 +99,14 @@ Default: \code{0.95}}
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
+
+\item{p.top}{Only display taxa with the most significant differences in
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most
+significant taxa are displayed. If \code{p.top} is less than one, all
+taxa with an adjusted p-value <= \code{p.top} are displayed.
+Recommended to be used in combination with the \code{taxa} parameter
+to set a lower bound on the mean abundance of considered taxa.
+Default: \code{Inf}}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.
 \code{FALSE} to always hide. \code{NULL} to only hide them when

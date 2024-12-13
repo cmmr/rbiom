@@ -84,8 +84,7 @@ adiv_table <- function (
     
   } else {
     
-    resp_label <- "\u03B1 Diversity" %>% 
-      aa(display = '"\\u03B1 Diversity"')
+    resp_label <- "Alpha Diversity"
   }
   
   

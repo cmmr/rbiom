@@ -37,7 +37,7 @@ validate_tree <- function (var = "tree", env = parent.frame(), evar = var, null_
   x <- get(var, pos = env, inherits = FALSE)
   
   if (is.null(x) && null_ok) return (invisible(NULL))
-  if (is(x, 'phylo'))        return (invisible(NULL))
+  if (inherits(x, 'phylo'))  return (invisible(NULL))
   
   if (is_scalar_character(x)) {
     x <- read_tree(x)
@@ -123,28 +123,12 @@ validate_bool <- function (var, env = parent.frame(), evar = var, max = 1, null_
 
 
 
-
-validate_formula <- function (var = "formula", env = parent.frame(), evar = var) {
-  
-  f <- get(var, pos = env, inherits = FALSE)
-  
-  #________________________________________________________
-  # Sanity check user-specified regression formula.
-  #________________________________________________________
-  if (!is_formula(f) || !identical(all.vars(f), c("y", "x")))
-    cli_abort("`{evar}` must be a formula of the form y ~ x.")
-  
-  return (invisible(NULL))
-}
-
-
-
 validate_layers <- function (var = "layers", choices, env = parent.frame()) {
   
   x <- get(var, pos = env, inherits = FALSE)
   
-  if (!is_character(x) || anyNA(x)) cli_abort("`{var}` must be character, not {.type {x}}.")
-  if (anyNA(x))                     cli_abort("`{var}` cannot have any NA values.")
+  if (anyNA(x))         cli_abort("`{var}` cannot have any NA values.")
+  if (!is_character(x)) cli_abort("`{var}` must be character, not {.type {x}}.")
   
   if (is.null(names(choices))) names(choices) <- substr(choices, 1, 1)
   
@@ -203,7 +187,7 @@ validate_var_choices <- function (
   
   if (!hasName(env, var)) {
     if (dne_ok) return (invisible(NULL))
-    cli_abort("{.var {var}} does not exist.")
+    cli_abort("{.var {evar}} does not exist.")
   }
   
   x <- get(var, pos = env, inherits = FALSE)
@@ -222,10 +206,7 @@ validate_var_choices <- function (
   } else {
     
     if (!is_character(x) && !is_na(x))
-      stop(sprintf(
-        fmt = "`%s` must be character, not %s",
-        evar, 
-        paste(collapse = ", ", class(x)) ))
+      cli_abort("{.var {evar}} must be character, not {.type {x}}.")
     
     pm <- pmatch(tolower(x), tolower(choices))
     
@@ -257,7 +238,7 @@ validate_var_range <- function (
   
   if (!hasName(env, var)) {
     if (dne_ok) return (invisible(NULL))
-    cli_abort("{.var {var}} does not exist.")
+    cli_abort("{.var {evar}} does not exist.")
   }
   
   x <- get(var, pos = env, inherits = FALSE)
@@ -267,7 +248,7 @@ validate_var_range <- function (
   if (!null_ok && is.null(x)) stop ("`", evar, "` cannot be NULL.")
   
   if (!is.numeric(x) && !all(is.na(x)))
-    stop ("`", evar, "` must be numeric.")
+    cli_abort("{.var {evar}} must be numeric, not {.type {x}}.")
   
   if (!is.na(n) && length(x) != n)
     stop ("`", evar, "` must be length ", n, ", not ", length(x), ".")
@@ -293,168 +274,6 @@ validate_var_length <- function (evar, x, max, null_ok, na_ok = FALSE) {
 
 
 
-
-
-
-
-
-
-#________________________________________________________
-#' Convert all *.by params into long form.
-#' 
-#' @noRd
-#' @keywords internal
-#'
-#' Examples values for color.by:
-#' 
-#' "Body Site"
-#' c("Body Site" = "okabe")
-#' list("Body Site")
-#' list("Body Site" = "okabe")
-#' list("Body Site" = list(values = "okabe", name = "Swab Location"))
-#' list("Body Site" = list(values = c("red", "green", "blue"), name = "Swab Location"))
-#' list("Body Site" = list(values = c(Saliva = "red", Stool = "green"), name = "Swab Location"))
-#' 
-#' 
-#' c("Body Site", "Sex")
-#' c("Body Site" = "okabe", "Sex")
-#' c("Body Site" = "okabe", "Sex" = "muted")
-#' list("Body Site", "Sex")
-#' 
-validate_meta_aes <- function (var, env = parent.frame(), null_ok = FALSE, aes = NULL, ...) {
-  
-  x <- get(var, pos = env, inherits = FALSE)
-  if (is.null(x) && null_ok) return (invisible(NULL))
-  
-  
-  if (exists('biom', env)) {
-    biom    <- get("biom", pos = env, inherits = FALSE)
-    choices <- biom$fields
-    is_num  <- sapply(USE.NAMES = TRUE, choices, function (i) is.numeric(biom$metadata[[i]]))
-  }
-  else if (exists('df', env)) {
-    df      <- get("df", pos = env, inherits = FALSE)
-    choices <- colnames(df)
-    is_num  <- sapply(USE.NAMES = TRUE, choices, function (i) is.numeric(df[[i]]))
-  }
-  else {
-    cli_abort("Can't find `biom` or `df` for validate_meta_aes().")
-  }
-  
-  
-  #________________________________________________________
-  # Allow ".all" option.
-  #________________________________________________________
-  if (eq(x, ".all")) x <- choices[-1]
-  
-  
-  #________________________________________________________
-  # Initial pass - convert `x` to a named list.
-  #________________________________________________________
-  results <- list()
-  for (i in seq_along(x)) {
-    
-    key <- names(x)[[i]]
-    val <- x[[i]]
-    
-    if (isTRUE(nzchar(key))) {
-      results[[key]] <- val
-    } else {
-      stopifnot(is_scalar_character(val))
-      results[[val]] <- list()
-    }
-  }
-  
-  
-  #________________________________________________________
-  # Remove prefixes and confirm metadata fields exist.
-  #________________________________________________________
-  col_names <- names(results)
-  validate_var_choices('col_names', evar = var, null_ok = null_ok, ...)
-  
-  if (any(duplicated(names(results))))
-    stop ("Duplicate metadata fields specified in `", var, "`.")
-  
-  names(results) <- col_names
-  for (i in c("within", "between", "revsort"))
-    attr(results, i) <- attr(col_names, i, exact = TRUE)
-  
-  remove("col_names", "i")
-  
-  
-  
-  #________________________________________________________
-  # Check each metadata field's specs.
-  #________________________________________________________
-  for (col_name in names(results)) {
-    
-    col_spec <- results[[col_name]]
-    col_type <- ifelse(is_num[[col_name]], "num", "cat")
-    
-    
-    #________________________________________________________
-    # Convert short-hand specification to long-form.
-    #________________________________________________________
-    result <- local({
-      
-      if (is_list(col_spec))                      return (col_spec)
-      if (aes == "color" && is_palette(col_spec)) return (list(color = col_spec))
-      
-      if (col_type == "cat") {
-        
-        if (is.numeric(col_spec))
-          cli_abort("In {.arg {var}}, can't subset categorical field {.field {col_name}} by numeric values: {.val {col_spec}}")
-        
-        return (list(values = col_spec))
-        
-      } else if (col_type == "num") {
-        
-        if (!is.numeric(col_spec) || length(col_spec) == 0)
-          cli_abort("In {.arg {var}}, can't subset numeric field {.field {col_name}} by {.type {col_spec}}: {.val {col_spec}}")
-        
-        return (list(range = col_spec))
-      }
-    })
-    
-    
-    #________________________________________________________
-    # Only allow 'range' if numeric; 'values' if categorical.
-    #________________________________________________________
-    if (hasName(result, 'range')) {
-      x <- result[['range']]
-      
-      if (col_type != "num")
-        cli_abort("In {.arg {var}}, can't apply numeric range to non-numeric {.field {col_name}} field.")
-      
-      if (!is.numeric(x) || length(x) == 0)
-        cli_abort("In {.arg {var}}, range for {.field {col_name}} must be numeric, not {.type {x}} of length {length(x)}: {.val {x}}")
-    }
-    
-    if (hasName(result, 'values')) {
-      x <- result[['values']]
-      
-      if (col_type != "cat")
-        cli_abort("In {.arg {var}}, can't filter by `values` on non-categorical {.field {col_name}} field. Use {.code range = c(min, max)} instead.")
-      
-      if (!is.character(result[['values']]) && !eq(var, "shape.by"))
-        cli_abort("In {.arg {var}}, values for {.field {col_name}} must be a character vector, not {.type {x}}: {.val {x}}")
-    }
-    
-    
-    attr(result, 'col_name') <- col_name
-    attr(result, 'col_type') <- col_type
-    
-    results[[col_name]] <- result
-  }
-  
-  
-  if (length(results) == 0)
-    results <- NULL
-  
-  
-  assign(var, results, pos = env)
-  return (invisible(NULL))
-}
 
 
 
@@ -496,11 +315,6 @@ validate_var_cmp <- function (vars, env = parent.frame()) {
   
   assign('within',  within,  pos = env)
   assign('between', between, pos = env)
-}
-
-
-validate_meta_cmp <- function (...) {
-  cli_abort('validate_meta_cmp() has been replaced by validate_cmp().')
 }
 
 
@@ -555,8 +369,8 @@ validate_df_field <- function (
     x <- setdiff(choices, '.sample')
     
     # Exit early if '.all' resolved to NULL
-    if (is.null(x) && null_ok) {
-      assign(var, x, pos = env)
+    if (length(x) == 0 && null_ok) {
+      assign(var, NULL, pos = env)
       return (invisible(NULL))
     }
   }

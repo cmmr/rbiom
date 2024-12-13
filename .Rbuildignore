@@ -18,3 +18,8 @@
 ^paper.md
 ^pkgdown
 ^rbiom.txt
+^report.*
+^\.github$
+^lib$
+^_pkgdown\.yml$
+^pkgdown$

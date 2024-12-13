@@ -1,57 +1,57 @@
 
-ggplot.rbiom <- function (biom, ...) {
-  
-  p <- ggplot2::ggplot(data = biom$metadata, ...)
-  
-  attr(p, 'biom') <- biom
-  class(p) <- c('rbiom_gg', class(p))
-  
-  return (p)
-}
-
-
-StatDendro <- ggplot2::ggproto(
-  "StatDendro", 
-  ggplot2::Stat,
-  
-  setup_data = function (data, params, ...) {
-    
-    data$.sample <- params$biom$samples
-    
-    data <- plyr::ddply(data, c("PANEL", "group"), function (df) {
-      b  <- params$biom[df$.sample]
-      dm <- bdiv_distmat(b)
-      hc <- stats::hclust(dm)
-      dendro(hc = hc, bounds = params$bounds, side = params$side)
-    })
-    
-    return (data)
-  },
-  
-  compute_group = function (self, data, scales, ...) {
-    return (data)
-  }
-)
-
-
-geom_dendro <- function (mapping = NULL, data = NULL, bounds = c(0, 1), side = "top", ...) {
- 
-  gg <- ggplot2::layer(
-    data        = data, 
-    mapping     = mapping, 
-    stat        = StatDendro, 
-    geom        = ggplot2::GeomSegment, 
-    position    = "identity", 
-    show.legend = FALSE, 
-    inherit.aes = FALSE, 
-    params      = list(...) )
-  
-  gg$stat_params$bounds <- bounds
-  gg$stat_params$side   <- side
-  
-  class(gg) <- c('rbiom_gg', class(gg))
-  return (gg)
-}
+# ggplot.rbiom <- function (biom, ...) {
+#   
+#   p <- ggplot2::ggplot(data = biom$metadata, ...)
+#   
+#   attr(p, 'biom') <- biom
+#   class(p) <- c('rbiom_gg', class(p))
+#   
+#   return (p)
+# }
+# 
+# 
+# StatDendro <- ggplot2::ggproto(
+#   "StatDendro", 
+#   ggplot2::Stat,
+#   
+#   setup_data = function (data, params, ...) {
+#     
+#     data$.sample <- params$biom$samples
+#     
+#     data <- plyr::ddply(data, c("PANEL", "group"), function (df) {
+#       b  <- params$biom[df$.sample]
+#       dm <- bdiv_distmat(b)
+#       hc <- stats::hclust(dm)
+#       dendro(hc = hc, bounds = params$bounds, side = params$side)
+#     })
+#     
+#     return (data)
+#   },
+#   
+#   compute_group = function (self, data, scales, ...) {
+#     return (data)
+#   }
+# )
+# 
+# 
+# geom_dendro <- function (mapping = NULL, data = NULL, bounds = c(0, 1), side = "top", ...) {
+#  
+#   gg <- ggplot2::layer(
+#     data        = data, 
+#     mapping     = mapping, 
+#     stat        = StatDendro, 
+#     geom        = ggplot2::GeomSegment, 
+#     position    = "identity", 
+#     show.legend = FALSE, 
+#     inherit.aes = FALSE, 
+#     params      = list(...) )
+#   
+#   gg$stat_params$bounds <- bounds
+#   gg$stat_params$side   <- side
+#   
+#   class(gg) <- c('rbiom_gg', class(gg))
+#   return (gg)
+# }
 
 
 

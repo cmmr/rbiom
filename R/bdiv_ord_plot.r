@@ -127,7 +127,7 @@ bdiv_ord_plot <- function (
   #________________________________________________________
   init_layers(
     params  = params, 
-    choices = c( 'p' = "point",   'n' = "name",    's' = "spider", 
+    choices = c( 'p' = "point",   'n' = "name",  's' = "spider", 
                  'd' = "density", 't' = "taxon", 'm' = "mean",
                  'a' = "arrow",   'e' = "ellipse" ))
   
@@ -173,7 +173,7 @@ bdiv_ord_plot <- function (
       set_layer(
         params = params, 
         layer  = 'continuous_scale',
-        'scale_name' = "size",
+        # 'scale_name' = "size",
         'palette'    = as.cmd(scales::area_pal(range = c(2,5))),
         'aesthetics' = c("size", "point.size"), 
         'name'       = "Taxa Abundance", 
@@ -220,7 +220,7 @@ bdiv_ord_plot <- function (
       params = params, 
       layer  = 'spider', 
       'alpha'        = 0.4, 
-      'size'         = 0.75,
+      'linewidth'    = 0.75,
       'mapping|xend' = ".xend",
       'mapping|yend' = ".yend" )
   
@@ -244,7 +244,7 @@ bdiv_ord_plot <- function (
       layer  = 'arrow', 
       'alpha'        = 0.4,
       'color'        = "darkgray", 
-      'size'         = 0.75, 
+      'linewidth'    = 0.75, 
       'arrow'        = arrow(ends="first", length=unit(.5,"cm")),
       'mapping|xend' = ".xend",
       'mapping|yend' = ".yend" )
@@ -269,7 +269,7 @@ bdiv_ord_plot <- function (
     layer  = 'theme', 
     'axis.text'        = element_blank(),
     'axis.ticks'       = element_blank(),
-    'panel.border'     = element_rect(color = "black", fill = FALSE, size = 1),
+    'panel.border'     = element_rect(color = "black", fill = FALSE, linewidth = 1),
     'panel.grid.major' = element_blank(),
     'panel.grid.minor' = element_blank(),
     'panel.background' = element_rect(fill = "white"))

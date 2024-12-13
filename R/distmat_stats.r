@@ -63,7 +63,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
     stopifnot(is_scalar_integerish(seed) && !is.na(seed))
     stopifnot(is_scalar_integerish(permutations) && !is.na(permutations))
     stopifnot(!is.null(names(groups)))
-    stopifnot(is(dm, 'dist'))
+    stopifnot(inherits(dm, 'dist'))
   })
   if (params$test == "none") return (NULL)
   

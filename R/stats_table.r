@@ -235,15 +235,15 @@ bdiv_stats <- function (
   # Compute beta diversity values
   #________________________________________________________
   df <- bdiv_table(
-    biom     = biom, 
-    bdiv     = bdiv, 
-    weighted = weighted, 
-    tree     = tree, 
-    md       = c(regr, stat.by, split.by, within, between), 
-    within   = within, 
-    between  = between, 
-    delta    = regr, 
-    transform    = transform )
+    biom      = biom, 
+    bdiv      = bdiv, 
+    weighted  = weighted, 
+    tree      = tree, 
+    md        = c(regr, stat.by, split.by, within, between), 
+    within    = within, 
+    between   = between, 
+    delta     = regr, 
+    transform = transform )
   
   if (nlevels(df$.bdiv) > 1)
     split.by %<>% c('.bdiv')
@@ -255,8 +255,8 @@ bdiv_stats <- function (
   stats <- stats_table(
     df       = df, 
     regr     = regr, 
-    stat.by  = sub("^(==|!=)", "", stat.by), 
-    split.by = sub("^(==|!=)", "", split.by), 
+    stat.by  = if (!is.null(stat.by))  sub("^(==|!=)", "", stat.by), 
+    split.by = if (!is.null(split.by)) sub("^(==|!=)", "", split.by), 
     test     = test, 
     fit      = fit, 
     at       = at, 

@@ -5,7 +5,9 @@
 # Called in .onLoad to assign function names in pkg env.
 #________________________________________________________
 
-cmd_wrap <- function (pkg, fn) {
+cmd_wrap <- function (pkg, fn, env = NULL) {
+  
+  if (is_null(env)) env <- ENV
   
   if (nzchar(system.file(package = pkg))) {
   
@@ -37,7 +39,7 @@ cmd_wrap <- function (pkg, fn) {
       return (res)
     }
     newfun %<>% aa(fn = fn, pkgfn = pkgfn, formalArgs = formalArgs(fun))
-    assign(x = fn, value = newfun, pos = ENV)
+    assign(x = fn, value = newfun, pos = env)
     
     
   } else {
@@ -45,7 +47,7 @@ cmd_wrap <- function (pkg, fn) {
     # Case when an optional dependency is not installed.
     #________________________________________________________
     
-    assign(fn, pos = ENV, function (...) {
+    assign(fn, pos = env, function (...) {
       stop("R package '", pkg, "' must be installed to use this feature.")
     })
   }
@@ -63,8 +65,11 @@ cmd_wrap <- function (pkg, fn) {
 #   return (res)
 # }
 
-basewrap <- function (pkg, fn) {
-  assign(paste0(".", fn), pos = ENV, function (..., .indent = 0, .display = NULL) {
+basewrap <- function (pkg, fn, env = NULL) {
+  
+  if (is_null(env)) env <- ENV
+  
+  assign(paste0(".", fn), pos = env, function (..., .indent = 0, .display = NULL) {
     fun  <- do.call(`::`, list(pkg, fn))
     res  <- fun(...)
     args <- as.args(list(...), fun = fun, indent = .indent)

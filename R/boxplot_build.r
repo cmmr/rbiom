@@ -12,7 +12,7 @@ boxplot_build <- function (params) {
     #________________________________________________________
     # Validate and pre-process user's arguments.
     #________________________________________________________
-    if (is(df, 'rbiom')) df <- df$metadata
+    if (inherits(df, 'rbiom')) df <- df$metadata
     if (!inherits(df, 'data.frame'))
       cli_abort("`df` must be a data.frame or rbiom object, not {.type {df}}.")
     
@@ -53,11 +53,11 @@ boxplot_build <- function (params) {
     # Check for uniqueness among named metadata fields.
     #________________________________________________________
     if (any(.xcol %in% facet.by)) {
-      cli_warn("{.val {.xcol}} is assigned to `x`; removing from `facet.by`.")
+      cli_warn("{.val {(.xcol)}} is assigned to `x`; removing from `facet.by`.", .frequency = "always")
       facet.by %<>% setdiff(.xcol)
     }
     if (any(stat.by %in% facet.by)) {
-      cli_warn("{.val {stat.by}} is assigned to `stat.by`; removing from `facet.by`.")
+      cli_warn("{.val {stat.by}} is assigned to `stat.by`; removing from `facet.by`.", .frequency = "always")
       facet.by %<>% setdiff(stat.by)
     }
     
@@ -279,7 +279,7 @@ boxplot_build <- function (params) {
       params$.vlineFun <- function (vals) {
         level <- params$level
         tt    <- try(t.test(vals, conf.level = level), silent = TRUE)
-        if (!is(tt, "htest")) tt <- list(estimate = NA, conf.int = c(NA, NA))
+        if (!inherits(tt, "htest")) tt <- list(estimate = NA, conf.int = c(NA, NA))
         data.frame(
           .y    = ifelse(isTRUE(unname(tt$estimate) >= 0), unname(tt$estimate), 0),
           .ymin = ifelse(isTRUE(tt$conf.int[1]      >= 0), tt$conf.int[1],      0),

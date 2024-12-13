@@ -78,7 +78,8 @@ taxa_map <- function (biom, rank = NULL, taxa = Inf, unc = "singly", lineage = F
   #________________________________________________________
   if (unc != "asis" && ncol(tbl) > 1)
     tbl <- tryCatch(
-      expr = local({
+      error = function (e) stop("Error in renaming taxa: ", e),
+      expr  = local({
         
         mtx  <- as.matrix(tbl)
         otus <- mtx[,'.otu']
@@ -154,10 +155,7 @@ taxa_map <- function (biom, rank = NULL, taxa = Inf, unc = "singly", lineage = F
         
         
         return (tbl)
-      }), 
-      
-      error = function (e)
-        stop("Error in renaming taxa: ", e) )
+      }))
   
   
   

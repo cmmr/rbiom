@@ -41,7 +41,7 @@ alpha.div <- function (biom, rarefy = FALSE) {
   # Log intervals until rLvl/2, then even intervals until rLvl*2
   if (eq(rarefy, "multi"))
     rarefy <- local({
-      rLvl  <- rare_suggest(biom)
+      rLvl  <- rare_suggest(biom$counts)
       rLvls <- 10 ** (c(1,3,5,7,8,9) * (log10(rLvl / 2) / 10))
       rLvls <- c(rLvls, seq(from = rLvl / 2, to = rLvl * 2, length.out = 5))
       rLvls <- floor(rLvls)
@@ -78,7 +78,7 @@ alpha.div <- function (biom, rarefy = FALSE) {
 #' @section \code{beta.div}:
 #' Use [bdiv_table()] or [bdiv_distmat()] instead.
 #' @export
-beta.div <- function (biom, method, weighted = TRUE, tree = NULL, long = FALSE, md = FALSE) {
+beta.div <- function (biom, method = "Bray-Curtis", weighted = TRUE, tree = NULL, long = FALSE, md = FALSE) {
   
   if (isTRUE(long) || !isFALSE(md)) {
     
@@ -87,7 +87,8 @@ beta.div <- function (biom, method, weighted = TRUE, tree = NULL, long = FALSE, 
       what    = "beta.div()",
       details = "Please use `bdiv_table()` instead for generating a data.frame." )
     
-    if (isTRUE(md)) md <- ".all"
+    if (isFALSE(md)) md <- NULL
+    if (isTRUE(md))  md <- ".all"
     
     bdiv_table(biom = biom, bdiv = method, weighted = weighted, tree = tree, md = md)
     
@@ -120,7 +121,13 @@ counts <- function (biom) {
 #' Use `biom$id`, `biom$comment`, etc instead.
 #' @export
 info <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "info()", "Use `biom$id`, `biom$comment`, etc instead.")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0",
+    what    = "info()", 
+    details = "Use `biom$id`, `biom$comment`, etc instead." )
+  
+  biom <- as_rbiom(biom)
   list(
     id                  = biom$id, 
     comment             = biom$comment, 
@@ -141,7 +148,11 @@ info <- function (biom) {
 #' Use `biom$metadata` or `pull(biom, field)` instead.
 #' @export
 metadata <- function (biom, field = NULL, cleanup = FALSE) {
-  lifecycle::deprecate_warn("2.0.0", "metadata()", "Use `biom$metadata` or `pull(biom, field)` instead.")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "metadata()", 
+    details = "Use `biom$metadata` or `pull(biom, field)` instead." )
   if (!missing(cleanup)) warning("`cleanup` is defunct")
   
   biom <- as_rbiom(biom)
@@ -155,7 +166,12 @@ metadata <- function (biom, field = NULL, cleanup = FALSE) {
 #' Use `biom$n_samples` instead.
 #' @export
 nsamples <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "nsamples()", "biom$n_samples")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "nsamples()", 
+    details = "Use `biom$n_samples` instead." )
+  
   as_rbiom(biom)$n_samples
 }
 
@@ -166,7 +182,12 @@ nsamples <- function (biom) {
 #' Use `biom$n_otus` instead.
 #' @export
 ntaxa <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "ntaxa()", "biom$n_otus")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "ntaxa()", 
+    details = "Use `biom$n_otus` instead." )
+  
   as_rbiom(biom)$n_otus
 }
 
@@ -177,7 +198,12 @@ ntaxa <- function (biom) {
 #' Use `biom$tree` instead.
 #' @export
 phylogeny <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "phylogeny()", "biom$tree")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "phylogeny()", 
+    details = "Use `biom$tree` instead." )
+  
   as_rbiom(biom)$tree
 }
 
@@ -188,22 +214,9 @@ phylogeny <- function (biom) {
 #' Use [as_rbiom()] instead.
 #' @export
 read.biom <- function (src, tree = "auto", prune = FALSE) {
-  
   lifecycle::deprecate_warn("2.0.0", "read.biom()", "as_rbiom()")
   if (!missing(prune)) warning("`prune` argument is defunct")
-  
-  biom <- as_rbiom(biom = src)
-  
-  if (isTRUE(tree) && is.null(biom$tree))
-    cli_abort("Dataset does not include a phylogenetic tree.")
-  
-  if (isTRUE(tree))  tree <- "auto"
-  if (isFALSE(tree)) tree <- NULL
-  
-  if (!identical(tree, "auto"))
-    biom$tree <- tree
-  
-  return (biom)
+  read_biom_internal(src = src, tree = tree)
 }
 
 
@@ -235,7 +248,12 @@ read.tree <- function (src) {
 #' Use `biom$samples` instead.
 #' @export
 sample.names <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "sample.names()", "biom$samples")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "sample.names()", 
+    details = "Use `biom$samples` instead." )
+  
   as_rbiom(biom)$samples
 }
 
@@ -270,7 +288,12 @@ select.rbiom <- function (.data, samples = NULL, nTop = NULL, nRandom = NULL, se
 #' Use `biom$sequences` instead.
 #' @export
 sequences <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "sequences()", "biom$sequences")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "sequences()", 
+    details = "Use `biom$sequences` instead." )
+  
   as_rbiom(biom)$tree
 }
 
@@ -292,7 +315,12 @@ subtree <- function (tree, tips) {
 #' Use `biom$otus` instead.
 #' @export
 taxa.names <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "taxa.names()", "biom$otus")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxa.names()", 
+    details = "Use `biom$otus` instead." )
+  
   as_rbiom(biom)$otus
 }
 
@@ -303,7 +331,12 @@ taxa.names <- function (biom) {
 #' Use `biom$ranks` instead.
 #' @export
 taxa.ranks <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "taxa.ranks()", "biom$ranks")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxa.ranks()", 
+    details = "Use `biom$ranks` instead." )
+  
   as_rbiom(biom)$ranks
 }
 
@@ -335,7 +368,8 @@ taxa.rollup <- function (
       what    = "taxa.rollup()",
       details = "Please use `taxa_table()` instead for generating a data.frame." )
     
-    if (isTRUE(md)) md <- ".all"
+    if (isFALSE(md)) md <- NULL
+    if (isTRUE(md))  md <- ".all"
     
     taxa_table(
       biom    = biom, 
@@ -367,7 +401,12 @@ taxa.rollup <- function (
 #' Use `$taxonomy` instead.
 #' @export
 taxonomy <- function (biom, ranks = NULL, unc = "asis") {
-  lifecycle::deprecate_warn("2.0.0", "taxonomy()", "Use `biom$taxonomy` or `taxa_map(biom, rank)` instead.")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxonomy()", 
+    details = "Use `biom$taxonomy` or `taxa_map(biom, rank)` instead." )
+  
   biom <- as_rbiom(biom)
   if (is.null(ranks)) biom$taxonomy else taxa_map(biom, ranks)
 }
@@ -379,7 +418,12 @@ taxonomy <- function (biom, ranks = NULL, unc = "asis") {
 #' Use `tree$tip.label` instead.
 #' @export
 tips <- function (x) {
-  lifecycle::deprecate_warn("2.0.0", "tips()", "tree$tip.label")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "tips()", 
+    details = "Use `tree$tip.label` instead." )
+  
   validate_tree("x")
   x$tip.label
 }
@@ -434,7 +478,7 @@ write.tree <- function (tree, file = NULL) {
 #' @section \code{write.xlsx}:
 #' Use [write_xlsx()] instead.
 #' @export
-write.xlsx <- function (biom, outfile, depth = NULL, seed = 0) {
+write.xlsx <- function (biom, outfile, depth = 0.1, seed = 0) {
   lifecycle::deprecate_warn("2.0.0", "write.xlsx()", "write_xlsx()")
   write_xlsx(biom = biom, file = outfile, depth = depth, seed = seed)
 }
@@ -472,7 +516,12 @@ as.percent <- function (biom) {
 #' Use `biom$comment` instead.
 #' @export
 comments <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "comments()", "biom$comment")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "comments()", 
+    details = "Use `biom$comment` instead." )
+  
   as_rbiom(biom)$comment
 }
 
@@ -505,7 +554,12 @@ depths_barplot <- function (biom, rline = TRUE, counts = TRUE, labels = TRUE, tr
 #' Use `!is.null(biom$tree)` instead.
 #' @export
 has.phylogeny <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "has.phylogeny()", "!is.null(biom$tree)")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "has.phylogeny()", 
+    details = "Use `!is.null(biom$tree)` instead." )
+  
   !is.null(as_rbiom(biom)$tree)
 }
 
@@ -516,7 +570,12 @@ has.phylogeny <- function (biom) {
 #' Use `!is.null(biom$sequences)` instead.
 #' @export
 has.sequences <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "has.sequences()", "!is.null(biom$sequences)")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "has.sequences()", 
+    details = "Use `!is.null(biom$sequences)` instead." )
+  
   !is.null(as_rbiom(biom)$sequences)
 }
 
@@ -528,7 +587,12 @@ has.sequences <- function (biom) {
 #' Use `biom$id` instead.
 #' @export
 id <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "id()", "biom$id")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "id()", 
+    details = "Use `biom$id` instead." )
+  
   as_rbiom(biom)$id
 }
 
@@ -540,7 +604,12 @@ id <- function (biom) {
 #' Use `!is.null(biom$depth)` instead.
 #' @export
 is.rarefied <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "is.rarefied()", "!is.null(biom$depth)")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "is.rarefied()", 
+    details = "Use `!is.null(biom$depth)` instead." )
+  
   !is.null(as_rbiom(biom)$depth)
 }
 
@@ -550,7 +619,10 @@ is.rarefied <- function (biom) {
 #' @section \code{read_biom}:
 #' Use [as_rbiom()] instead.
 #' @export
-read_biom <- read.biom
+read_biom <- function (src, tree = "auto", ...) {
+  lifecycle::deprecate_warn("2.0.0", "read_biom()", "as_rbiom()")
+  read_biom_internal(src = src, tree = tree, ...)
+}
 
 
 #' @name repair-deprecated
@@ -559,7 +631,12 @@ read_biom <- read.biom
 #' Use `as_rbiom(as.list(biom))` instead.
 #' @export
 repair <- function (biom) {
-  lifecycle::deprecate_warn("2.0.0", "repair()", "as_rbiom(as.list(biom))")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "repair()", 
+    details = "Use `as_rbiom(as.list(biom))` instead." )
+  
   as_rbiom(as.list(biom))
 }
 
@@ -614,6 +691,18 @@ sample.sums <- function (biom, long = FALSE, md = FALSE) {
 # }
 
 
+
+#' @name taxa_max-deprecated
+#' @rdname rbiom-deprecated
+#' @section \code{taxa_max}:
+#' Use `taxa_apply(biom, max, sort = 'desc')` instead.
+#' @export
+taxa_max <- function (biom, rank = -1, lineage = FALSE, unc = "singly") {
+  lifecycle::deprecate_warn("2.0.0", "taxa_max()", "taxa_apply()")
+  taxa_apply(biom, FUN = base::max, rank, sort = 'desc', lineage, unc)
+}
+
+
 #' @name taxa.means-deprecated
 #' @rdname rbiom-deprecated
 #' @section \code{taxa.means}:
@@ -621,6 +710,7 @@ sample.sums <- function (biom, long = FALSE, md = FALSE) {
 #' @export
 taxa.means <- function (biom, rank = NULL) {
   lifecycle::deprecate_warn("2.0.0", "taxa.means()", "taxa_means()")
+  if (is.null(rank)) rank <- 'OTU'
   taxa_means(biom = biom, rank = rank)
 }
 
@@ -632,6 +722,7 @@ taxa.means <- function (biom, rank = NULL) {
 #' @export
 taxa.sums <- function (biom, rank = NULL) {
   lifecycle::deprecate_warn("2.0.0", "taxa.sums()", "taxa_sums()")
+  if (is.null(rank)) rank <- 'OTU'
   taxa_sums(biom = biom, rank = rank)
 }
 
@@ -664,8 +755,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$comment <-` instead.
 #' @export
 `comments<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "comments()", "$comment")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "comments()", 
+    details = "Use `biom$comment` instead." )
+  
   x$comment <- value
+  return (x)
 }
 
 
@@ -675,8 +772,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$counts <-` instead.
 #' @export
 `counts<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "counts()", "$counts")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "counts()", 
+    details = "Use `biom$counts` instead." )
+  
   x$counts <- value
+  return (x)
 }
 
 
@@ -686,8 +789,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$id <-` instead.
 #' @export
 `id<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "id()", "$id")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "id()", 
+    details = "Use `biom$id` instead." )
+  
   x$id <- value
+  return (x)
 }
 
 
@@ -697,8 +806,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$metadata <-` instead.
 #' @export
 `metadata<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "metadata()", "$metadata")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "metadata()", 
+    details = "Use `biom$metadata` instead." )
+  
   x$metadata <- value
+  return (x)
 }
 
 
@@ -708,8 +823,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$tree <-` instead.
 #' @export
 `phylogeny<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "phylogeny()", "$tree")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "tree()", 
+    details = "Use `biom$tree` instead." )
+  
   x$tree <- value
+  return (x)
 }
 
 
@@ -719,19 +840,20 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$samples <-` instead.
 #' @export
 `sample.names<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "sample.names()", "$samples")
   
-  stopifnot(isa(x, "rbiom"))
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "sample.names()", 
+    details = "Use `biom$samples` instead." )
+  
+  stopifnot(inherits(x, "rbiom"))
   stopifnot(is.character(value))
   stopifnot(length(value) == ncol(x$counts))
   
-  b <- as.list(x)
-  colnames(b$counts)      <- value
-  b$metadata[['.sample']] <- value
-  if (!is.null(b$sequences))
-    names(b$sequences) <- value
+  colnames(x$counts)      <- value
+  x$metadata[['.sample']] <- value
   
-  as_rbiom(b)
+  return (x)
 }
 
 
@@ -741,8 +863,14 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$sequences <-` instead.
 #' @export
 `sequences<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "sequences()", "$sequences")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "sequences()", 
+    details = "Use `biom$sequences` instead." )
+  
   x$sequences <- value
+  return (x)
 }
 
 
@@ -752,19 +880,22 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$otus <-` instead.
 #' @export
 `taxa.names<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "taxa.names()", "$otus")
   
-  stopifnot(isa(x, "rbiom"))
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxa.names()", 
+    details = "Use `biom$otus` instead." )
+  
+  stopifnot(inherits(x, "rbiom"))
   stopifnot(is.character(value))
   stopifnot(length(value) == nrow(x$counts))
   
-  b <- as.list(x)
-  if (!is.null(b$tree))
-    b$tree$tip.label <- value[match(rownames(b$counts), b$tree$tip.label)]
-  rownames(b$counts)   <- value
-  b$taxonomy[['.otu']] <- value
+  if (!is.null(x$tree))      x$tree$tip.label   <- value[match(rownames(x$counts), x$tree$tip.label)]
+  if (!is.null(x$sequences)) names(x$sequences) <- value
+  rownames(x$counts)   <- value
+  x$taxonomy[['.otu']] <- value
   
-  as_rbiom(b)
+  return (x)
 }
 
 
@@ -774,12 +905,15 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$ranks <-` instead.
 #' @export
 `taxa.ranks<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "taxa.ranks()", "$ranks")
   
-  df <- x$taxonomy
-  colnames(df) <- value
-  x$taxonomy <- df
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxa.ranks()", 
+    details = "Use `biom$ranks` instead." )
   
+  stopifnot(length(value) == ncol(x$taxonomy))
+  
+  colnames(x$taxonomy) <- value
   return (x)
 }
 
@@ -790,7 +924,13 @@ top_taxa <- function (biom, rank = 'OTU', n = Inf) {
 #' Use `biom$taxonomy <-` instead.
 #' @export
 `taxonomy<-` <- function (x, value) {
-  lifecycle::deprecate_warn("2.0.0", "taxonomy()", "$taxonomy")
+  
+  lifecycle::deprecate_warn(
+    when    = "2.0.0", 
+    what    = "taxonomy()", 
+    details = "Use `biom$taxonomy` instead." )
+  
   x$taxonomy <- value
+  return (x)
 }
 

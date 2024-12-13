@@ -100,16 +100,6 @@ eval_envir <- function (env, ...) {
 }
 
 
-
-#____________________________________________________________________
-# Stop with an error message if variable isn't an rbiom object.
-#____________________________________________________________________
-must_be_rbiom <- function (biom) {
-  if (!(is(biom, 'rbiom') && is(biom, 'R6')))
-    cli_abort(('x' = "`biom` must be an rbiom object, not {.type {biom}}."))
-}
-
-
 #____________________________________________________________________
 # Check if two objects are identical, ignoring attr(,'hash').
 #____________________________________________________________________
@@ -117,40 +107,6 @@ eq <- function (x, y) {
   if (hasName(attributes(x), 'hash')) attr(x, 'hash') <- NULL
   if (hasName(attributes(y), 'hash')) attr(y, 'hash') <- NULL
   identical(x, y)
-}
-
-
-
-#____________________________________________________________________
-# Expand layer string / char vector to possible values
-# x = "dr" or c("d", "bar") or more examples below
-# choices = c(d = "dot", r = "bar")
-# default = "dr"
-#____________________________________________________________________
-layer_match <- function (x, choices, default) {
-  
-  result <- c()
-  
-  for (i in tolower(x[nchar(x) > 0]))
-    result <- c(result, local({
-      
-      if (i %in% names(choices)) return (choices[[i]])
-      
-      pm <- pmatch(i, choices)
-      ii <- strsplit(i, '')[[1]]
-      
-      if (length(x) > 1 && !is.na(pm)) return (choices[[pm]])
-      if (all(ii %in% names(choices))) return (choices[ii])
-      if (!is.na(pm))                  return (choices[[pm]])
-      return (choices[intersect(ii, names(choices))])
-    }))
-  
-  result <- result[!is.na(result)]
-  
-  if (length(result) == 0)
-    result <- choices[strsplit(default, '')[[1]]]
-  
-  return (result)
 }
 
 
@@ -181,44 +137,6 @@ as.cmd <- function (expr, env=NULL) {
     cmd <- paste(trimws(cmd), collapse = " ")
   
   structure(eval(expr), 'display' = cmd)
-}
-
-
-
-#____________________________________________________________________
-# Run a command and add attr(,cmd) and attr(,display) to result.
-#____________________________________________________________________
-run.cmd <- function (f, args, hist=NULL, lhs=NULL, display=lhs, envir = parent.frame()) {
-  
-  fn  <- as.character(substitute(f))
-  fun <- f
-  if (is_scalar_character(f)) {
-    fn  <- f
-    x   <- strsplit(f, "::", fixed = TRUE)[[1]]
-    fun <- if (length(x) == 1) get(x[[1]]) else getFromNamespace(x[[2]], ns = x[[1]])
-  }
-  
-  cmd <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
-  if (is.null(display)) display <- if.null(lhs, cmd)
-  if (!is.null(lhs))    cmd <- sprintf("%s <- %s", lhs, cmd)
-  if (!is.null(hist))   cmd <- paste(collapse = "\n", c(attr(hist, 'code'), cmd))
-  
-  return (aa(do.call(fun, args), display = display, code = cmd))
-}
-
-
-#____________________________________________________________________
-# Take attr(,'code') from `hist` and append `lhs <- fn(args)`.
-#____________________________________________________________________
-append.cmd <- function (x, fn, args, lhs = NULL, hist = NULL, display = lhs, fun = get(fn)) {
-  
-  cmd <- sprintf("%s(%s)", fn, as.args(args, fun=fun))
-  
-  if (is.null(display)) display <- if.null(lhs, cmd)
-  if (!is.null(lhs))    cmd <- sprintf("%s <- %s", lhs, cmd)
-  if (!is.null(hist))   cmd <- paste(collapse = "\n", c(attr(hist, 'code'), cmd))
-  
-  return (aa(x, display = display, code = cmd))
 }
 
 
@@ -277,12 +195,12 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
     } else if (is_character(val))     { double_quote(val) 
     } else if (is_logical(val))       { as.character(val) %>% setNames(names(val))
     } else if (is.numeric(val))       { as.character(val) %>% setNames(names(val))
-    } else if (is(val, 'quosures'))   { as.character(val)
-    } else if (is(val, 'rbiom'))      { "biom"
+    } else if (inherits(val, 'quosures'))   { as.character(val)
+    } else if (inherits(val, 'rbiom'))      { "biom"
     } else if (is.data.frame(val))    { "data"
-    } else if (is(val, 'formula'))    { format(val)
+    } else if (inherits(val, 'formula'))    { format(val)
     } else if (is.function(val))      { fun_toString(val)
-    } else if (is(val, 'uneval'))     { aes_toString(val)
+    } else if (inherits(val, 'uneval'))     { aes_toString(val)
     } else if (is.factor(val))        { as.character(val) %>% setNames(names(val))
     } else if (is_list(val))          { paste0("list(", as.args(val), ")")
     } else                            { capture.output(val) }
@@ -351,8 +269,8 @@ aes_toString <- function (x) {
   for (key in keys) {
     
     val <- x[[key]]
-    val <- if (is(val, 'quosure')) { capture.output(rlang::quo_get_expr(val))
-    } else if (is(val, 'formula')) { capture.output(as.name(all.vars(val)))
+    val <- if (inherits(val, 'quosure')) { capture.output(rlang::quo_get_expr(val))
+    } else if (inherits(val, 'formula')) { capture.output(as.name(all.vars(val)))
     } else if (is.logical(val))    { as.character(val)
     } else if (is.numeric(val))    { as.character(val)
     } else                         { double_quote(val) }
@@ -385,23 +303,6 @@ fmt_cmd <- function (.fmt, .fun, ...) {
 }
 
 
-
-#____________________________________________________________________
-# rbind(), but add/rearrange columns as needed
-#____________________________________________________________________
-append_df <- function (...) {
-  
-  Reduce(
-    x = Filter(f = Negate(is.null), x = list(...)),
-    f = function (x, y) ({
-      xy <- unique(c(names(x), names(y)))
-      for (i in setdiff(xy, names(x))) x[[i]] <- NA
-      for (i in setdiff(xy, names(y))) y[[i]] <- NA
-      rbind(x[,xy,drop=F], y[,xy,drop=F])
-    }))
-}
-
-
 #____________________________________________________________________
 # Add attributes to an object.
 #____________________________________________________________________
@@ -422,11 +323,6 @@ drop_cols <- function (df, ...) {
   if (is_null(cols) || is_null(df)) return (df)
   df[,setdiff(colnames(df), cols),drop=FALSE]
 }
-drop_empty <- function (df) {
-  if (is_null(df))   return (NULL)
-  if (nrow(df) == 0) return (df)
-  df[,apply(df, 2L, function (x) !all(is.na(x))),drop=FALSE]
-}
 keep_cols <- function (df, ...) {
   cols <- unique(unlist(list(...)))
   if (is_null(cols) || is_null(df)) return (NULL)
@@ -446,14 +342,6 @@ rename_cols <- function(df, ...) {
   attr(df, 'names') <- x
   return (df)
 }
-rename_response <- function(df, new) {
-  old <- attr(df, 'response', exact = TRUE)
-  stopifnot(is_scalar_character(old) && !is_na(old))
-  stopifnot(is_string(old, colnames(old)))
-  names(df)[which(names(df) == old)] <- new
-  attr(df, 'response') <- new
-  return (df)
-}
 
 
 #____________________________________________________________________
@@ -461,7 +349,7 @@ rename_response <- function(df, new) {
 #____________________________________________________________________
 ply_cols <- function (cols) {
   
-  if (is(cols, 'quoted')) return (cols)
+  if (inherits(cols, 'quoted')) return (cols)
   
   structure(lapply(cols, as.name), class = "quoted")
   
@@ -470,69 +358,6 @@ ply_cols <- function (cols) {
   #   vars <- c(plyr::as.quoted(as.name(col)), vars)
   # 
   # return (vars)
-}
-
-
-#____________________________________________________________________
-# Insert a new named column after a specified column index/name
-#____________________________________________________________________
-insert_col <- function (df, after=0, col, val) {
-  
-  if (is_null(df))                  return (NULL)
-  if (is_null(col) || is_null(val)) return (df)
-  
-  df <- cbind(df, val)
-  colnames(df)[ncol(df)] <- col
-  
-  
-  after <- after %||% 0
-  if (is.character(after))
-    after <- which(colnames(df) == after) %>% head(1) %||% 0
-  if (after > ncol(df) - 1)
-    after <- ncol(df)
-  
-  pos <- unique(c(seq_len(after), ncol(df), seq_len(ncol(df))))
-  df  <- df[,pos,drop=F]
-  
-  return (df)
-}
-
-
-#____________________________________________________________________
-# Identify and remove rows of df with bad values
-#____________________________________________________________________
-finite_check <- function (df, col=".y", metric=NULL) {
-  
-  if (all(is.finite(df[[col]])))
-    return (NULL)
-  
-  bad <- which(!is.finite(df[[col]]))
-  n   <- length(bad)
-  
-  if (is_null(metric))
-    if (".metric" %in% names(df))
-      if (length(unique(df[['.metric']])) == 1)
-        metric <- df[1,'.metric']
-  
-  metric <- ifelse(is_null(metric), "", paste0(metric, " "))
-  msg    <- ifelse(n == 1, 
-                   paste0("One sample had a non-finite ", metric, "value and was excluded from this plot:\n"),
-                   paste0(n, " samples had non-finite ", metric, "values and were excluded from this plot:\n") )
-  
-  
-  if ('.sample' %in% names(df)) {
-    msg %<>% paste0(
-      glue::glue_collapse(
-        x = paste(df[bad,'.sample'], "=", df[bad,col]), 
-        width = 100, sep = ", ", last = ", and " ))
-  } else {
-    msg %<>% paste0(
-      glue::glue_collapse(
-        x = as.character(unique(df[bad,col])), 
-        width = 100, sep = ", ", last = ", and " ))
-  }
-  
-  list('bad' = bad, 'msg' = msg)
 }
 
 
@@ -564,14 +389,6 @@ loglabels <- function (values) {
 #     return (as.character(scientific(n)))
 #   })
 # }
-
-
-#____________________________________________________________________
-# Turn unquoted barewords into a character vector.
-#____________________________________________________________________
-qw <- function (...) {
-  all.vars(match.call())
-}
 
 #____________________________________________________________________
 # Easily create list(x = ".x", label = ".label")
@@ -622,14 +439,6 @@ vw <- function (x, width = min(80, floor(getOption("width") * 0.75))) {
 
 
 #____________________________________________________________________
-# String describing object's class.
-#____________________________________________________________________
-of_class <- function (x) {
-  paste0(" of class ", paste(collapse = " / ", class(x)))
-}
-
-
-#____________________________________________________________________
 # Prepend a new class to an object's class list.
 #____________________________________________________________________
 add_class <- function (obj, cls) {
@@ -643,21 +452,10 @@ add_class <- function (obj, cls) {
 
 
 #____________________________________________________________________
-# Shorthand for replacing NAs with something else.
-#____________________________________________________________________
-if.na <- function (x, replacement) {
-  if (!is.na(x))                 return (x)
-  if (!is.function(replacement)) return (replacement)
-  return (replacement())
-}
-
-#____________________________________________________________________
 # Shorthand for replacing NULLs with something else.
 #____________________________________________________________________
 if.null <- function (x, replacement) {
-  if (!is_null(x))               return (x)
-  if (!is.function(replacement)) return (replacement)
-  return (replacement())
+  if (is_null(x)) replacement else x
 }
 
 
@@ -725,22 +523,15 @@ relevel <- function (tbl) {
 
 
 
-require_package <- function (pkg, reason = 'for this command', repo = 'cran') {
+require_package <- function (pkg, reason = 'for this command') {
   
   if (nzchar(system.file(package = pkg))) return (invisible(NULL))
   
-  if (startsWith(tolower(repo), 'c')) {
-    cli_abort(c(
-      'x' = "CRAN R package {.pkg {pkg}} is required {reason}.",
-      'i' = "To install {.pkg {pkg}}, run:",
-      '>' = " install.packages('{pkg}')" ))
-  } else {
-    cli_abort(c(
-      'x' = "Bioconductor R package {.pkg {pkg}} is required {reason}.",
-      'i' = "To install {.pkg {pkg}}, run:",
-      '>' = " install.packages('BiocManager')",
-      '>' = " BiocManager::install('{pkg}')" ))
-  }
+  cli_abort(c(
+    'x' = "The {.pkg {pkg}} R package is required {reason}.",
+    'i' = "To install {.pkg {pkg}}, run:",
+    '>' = if (!nzchar(system.file(package = 'pak'))) " {.run install.packages('pak')}",
+    '>' = " {.run pak::pkg_install('{pkg}')}" ))
   
 }
 

@@ -148,7 +148,7 @@ set_layer <- function (params, layer, ..., .fn = NULL, .overwrite = FALSE) {
   
   
   # Expand lists. For cases of e.g.
-  # set_layer(params, 'box', fill="white", list(size=2))
+  # set_layer(params, 'box', fill="white", list(linewidth=2))
   keyvals <- list()
   for (i in seq_along(dots)) {
     if (isTRUE(nzchar(key <- names(dots)[[i]]))) {

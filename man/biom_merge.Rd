@@ -15,9 +15,9 @@ biom_merge(
 )
 }
 \arguments{
-\item{...}{Any number of rbiom objects (e.g. from \code{\link[=read_biom]{read_biom()}}), lists of
-rbiom objects, or valid arguments to the \code{src} parameter of
-\code{\link[=read_biom]{read_biom()}} (for instance file names).}
+\item{...}{Any number of rbiom objects (e.g. from \code{\link[=as_rbiom]{as_rbiom()}}), lists of
+rbiom objects, or valid arguments to the \code{biom} parameter of
+\code{\link[=as_rbiom]{as_rbiom()}} (for instance file names).}
 
 \item{metadata, taxonomy, tree, sequences, id, comment}{Replace the corresponding
 data in the merged rbiom object with these values. Set to \code{NULL} to

@@ -43,7 +43,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
     
     validate_ord(max = Inf)
     validate_var_range('k', range = c(2, 3), n = 1, int = TRUE)
-    stopifnot(is(dm, 'dist'))
+    stopifnot(inherits(dm, 'dist'))
     
     if (is.null(attr(dm, 'display', exact = TRUE)))
       attr(dm, 'display') <- "dm"
@@ -68,7 +68,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
       res  <- do.call(ape::pcoa, args)[['vectors']][,1:k]
       
     } else if (o == "tSNE") {
-      require_package('tsne', 'use "tSNE" ordination')
+      require_package('tsne', 'to use "tSNE" ordination')
       args <- c(fun_params(tsne::tsne, dots), list(X = dm, k = k))
       res  <- suppressMessages(do.call(tsne::tsne, args))
       rownames(res) <- attr(dm, "Labels", exact = TRUE)
@@ -80,7 +80,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
       rownames(res) <- attr(dm, "Labels", exact = TRUE)
       
     } else if (o == "UMAP") {
-      require_package('uwot', 'use "UMAP" ordination')
+      require_package('uwot', 'to use "UMAP" ordination')
       args <- c(fun_params(uwot::umap, dots), list(X = dm))
       args[['n_components']] %<>% if.null(k)
       args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))

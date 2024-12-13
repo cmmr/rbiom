@@ -83,7 +83,7 @@ as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom
 #' @export
 as_rbiom.phyloseq <- function (biom, ...) {
   
-  require_package('phyloseq', 'use as_rbiom.phyloseq()', repo = 'bioc')
+  require_package('phyloseq', 'to convert from phyloseq.')
   
   dots <- list(...)
   
@@ -111,8 +111,8 @@ as_rbiom.default <- function (biom, ...) {
   #________________________________________________________
   # Read new rbiom object from filename / URL / JSON.
   #________________________________________________________
-  if (is_scalar_character(biom))
-    return (read_biom(src = biom, ...))
+  if (is_scalar_character(biom) && !is.na(biom))
+    return (read_biom_internal(src = biom, ...))
   
   
   

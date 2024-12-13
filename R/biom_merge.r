@@ -9,9 +9,9 @@
 #' 
 #' @family biom
 #' 
-#' @param ...  Any number of rbiom objects (e.g. from [read_biom()]), lists of
-#'        rbiom objects, or valid arguments to the \code{src} parameter of 
-#'        [read_biom()] (for instance file names).
+#' @param ...  Any number of rbiom objects (e.g. from [as_rbiom()]), lists of
+#'        rbiom objects, or valid arguments to the \code{biom} parameter of 
+#'        [as_rbiom()] (for instance file names).
 #'        
 #' @param metadata,taxonomy,tree,sequences,id,comment Replace the corresponding 
 #'        data in the merged rbiom object with these values. Set to `NULL` to
@@ -38,15 +38,15 @@ biom_merge <- function (..., metadata = NA, taxonomy = NA, tree = NULL, sequence
   dots      <- list(...)
   biom_list <- lapply(dots, function (dot) {
       
-    if (is(dot, 'rbiom'))      return (dot)
-    if (length(dot) > 1)       return (do.call(biom_merge, dot))
-    if (length(dot) < 1)       return (NULL)
-    if (is(dot[[1]], 'rbiom')) return (dot[[1]])
-    if (is.character(dot))     return (read_biom(src = dot))
-    cli::cli_abort("Unknown argument to biom_merge(): ", dot)
+    if (inherits(dot, 'rbiom'))         return (dot)
+    if (length(dot) > 1)          return (do.call(biom_merge, dot))
+    if (length(dot) < 1)          return (NULL)
+    if (inherits(dot[[1]], 'rbiom'))    return (dot[[1]])
+    if (is_scalar_character(dot)) return (read_biom_internal(src = dot))
+    cli::cli_abort("Unknown argument to biom_merge(): {.typeof {dot}}")
     
   })
-  biom_list <- biom_list[sapply(biom_list, is, 'rbiom')]
+  biom_list <- biom_list[sapply(biom_list, inherits, 'rbiom')]
   
   if (length(biom_list) == 0) cli::cli_abort("No BIOM datasets provided to biom_merge().")
   if (length(biom_list) == 1) return (biom_list[[1]]) 

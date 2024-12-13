@@ -58,7 +58,7 @@ Default: \code{"devon"}}
 or logical vector of length two to control row labels and column
 labels separately, for example
 \code{label = c(rows = TRUE, cols = FALSE)}, or simply
-\code{label = c(T, F)}. Other valid options are \code{"rows"},
+\code{label = c(TRUE, FALSE)}. Other valid options are \code{"rows"},
 \code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
 and \code{"none"}.
 Default: \code{TRUE}}
@@ -92,7 +92,8 @@ Default: \code{"complete"}}
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
 supply a list or logical vector of length two to control the row tree
 and column tree separately, for example
-\code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}.
+\code{trees = c(rows = TRUE, cols = FALSE)},
+or simply \code{trees = c(TRUE, FALSE)}.
 Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"},
 \code{"left"}, \code{"top"}, and \code{"none"}.
 Default: \code{TRUE}}
@@ -187,7 +188,7 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
     
     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
     
-    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), tracks="sex")
+    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(TRUE,FALSE), tracks="sex")
 }
 \seealso{
 Other beta_diversity: 

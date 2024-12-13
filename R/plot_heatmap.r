@@ -19,30 +19,33 @@
 #' heatmap grid to visualize associated metadata values.
 #'          
 #' \preformatted{## Categorical ----------------------------
-#' cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
-#' tracks   = list('Sex' = cat_vals)
-#' tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
-#' tracks   = list('Sex' = list(
-#'   'values' = cat_vals, 
-#'   'colors' = c('Male' = "blue", 'Female' = "red")) )
+#' cat_vals <- sample(c("Male", "Female"), 10, replace = TRUE)
+#' tracks   <- list('Sex' = cat_vals)
+#' tracks   <- list('Sex' = list(values = cat_vals, colors = "bright"))
+#' tracks   <- list('Sex' = list(
+#'   values = cat_vals, 
+#'   colors = c('Male' = "blue", 'Female' = "red")) )
 #' 
 #' ## Numeric --------------------------------
-#' num_vals = sample(25:40, 10, replace = TRUE)
-#' tracks   = list('Age' = num_vals)
-#' tracks   = list('Age' = list('values' = num_vals, 'colors' = "greens"))
-#' tracks   = list('Age' = list('values' = num_vals, 'range' = c(0,50)))
-#' tracks   = list('Age' = list(
-#'   'label'  = "Age (Years)",
-#'   'values' = num_vals, 
-#'   'colors' = c("azure", "darkblue", "darkorchid") ))
+#' num_vals <- sample(25:40, 10, replace = TRUE)
+#' tracks   <- list('Age' = num_vals)
+#' tracks   <- list('Age' = list(values = num_vals, colors = "greens"))
+#' tracks   <- list('Age' = list(values = num_vals, range = c(0,50)))
+#' tracks   <- list('Age' = list(
+#'   label  = "Age (Years)",
+#'   values = num_vals, 
+#'   colors = c("azure", "darkblue", "darkorchid") ))
 #' 
 #' ## Multiple Tracks ------------------------
-#' tracks = list('Sex' = cat_vals, 'Age' = num_vals)
-#' tracks = list(
-#'   list('label' = "Sex", values' = cat_vals, 'colors' = "bright"),
-#'   list('label' = "Age", values' = num_vals, 'colors' = "greens") )
+#' tracks <- list('Sex' = cat_vals, 'Age' = num_vals)
+#' tracks <- list(
+#'   list(label = "Sex", values = cat_vals, colors = "bright"),
+#'   list(label = "Age", values = num_vals, colors = "greens") )
 #'   
-#' plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
+#'   
+#' mtx           <- matrix(sample(1:50), ncol = 10)
+#' dimnames(mtx) <- list(letters[1:5], LETTERS[1:10])
+#' plot_heatmap(mtx = mtx, tracks = tracks)
 #' }
 #' 
 #' The following entries in the track definitions are understood: 
@@ -132,10 +135,10 @@ plot_heatmap <- function (
     (is_logical(trees) && length(trees) <= 2) ||
     is_string(trees, c("rows", "cols", "both", "left", "top", "none")) )
   
-  if (!any(is_na(clust), is_false(clust), is(clust, 'hclust')))
+  if (!any(is_na(clust), is_false(clust), inherits(clust, 'hclust')))
     validate_clust(max = 2, na_ok = TRUE)
   
-  if (!is(dist, 'dist'))
+  if (!inherits(dist, 'dist'))
     validate_dist(max = 2)
   
   stopifnot(is_null(label_size)   || (is_double(label_size)   && length(label_size)   <= 2) )
@@ -258,8 +261,8 @@ plot_heatmap <- function (
 
     dm <- dist_cols
     hc <- clust_cols
-    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(t(mtx), method = dm)
-    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm,   method = hc)
+    if (!inherits(dm, 'dist') && !inherits(hc, 'hclust')) dm <- stats::dist(t(mtx), method = dm)
+    if (!inherits(hc, 'hclust'))                    hc <- stats::hclust(dm,   method = hc)
     mtx <- mtx[,hc[['order']]]
 
     if (isTRUE(trees_cols)) {
@@ -280,8 +283,8 @@ plot_heatmap <- function (
 
     dm <- dist_rows
     hc <- clust_rows
-    if (!is(dm, 'dist') && !is(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
-    if (!is(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
+    if (!inherits(dm, 'dist') && !inherits(hc, 'hclust')) dm <- stats::dist(mtx,  method = dm)
+    if (!inherits(hc, 'hclust'))                    hc <- stats::hclust(dm, method = hc)
 
     hc  <- rev(hc) # Move interesting taxa to top rows of plot.
     mtx <- mtx[hc[['order']],]
@@ -475,9 +478,9 @@ plot_heatmap <- function (
             paste(collapse = ", ", single_quote(xlabels)) ))
         
         xbreaks <- structure(
-          .Data   = c(xbreaks, 1:length(levels(df[['x']]))),
-          display = sprintf( fmt = "c(%s, 1:%i)", 
-            paste(collapse = ", ", xbreaks), length(levels(df[['x']])) ))
+          .Data   = c(xbreaks, 1:nlevels(df[['x']])),
+          display = sprintf(fmt = "c(%s, 1:%i)", 
+            paste(collapse = ", ", xbreaks), nlevels(df[['x']]) ))
       }
       
     } else if (isTRUE(label_cols)) {
@@ -487,8 +490,8 @@ plot_heatmap <- function (
         display = "levels(data[['x']])" )
       
       xbreaks <- structure(
-        .Data   = 1:length(levels(df[['x']])),
-        display = sprintf("1:%i", length(levels(df[['x']]))) )
+        .Data   = 1:nlevels(df[['x']]),
+        display = sprintf("1:%i", nlevels(df[['x']])) )
     }
     
     
@@ -525,8 +528,8 @@ plot_heatmap <- function (
         display = "levels(data[['y']])" )
       
       ybreaks <- structure(
-        .Data   = 1:length(levels(df[['x']])),
-        display = sprintf("1:%i", length(levels(df[['x']]))) )
+        .Data   = 1:nlevels(df[['y']]),
+        display = sprintf("1:%i", nlevels(df[['y']])) )
     }
     
     
@@ -553,14 +556,14 @@ plot_heatmap <- function (
   # Outline around the main grid
   #________________________________________________________
   gglayers %<>% ggpush(annotate(
-    geom = "rect", 
-    xmin = 0.5, 
-    xmax = ncol(mtx) + 0.5, 
-    ymin = 0.5, 
-    ymax = nrow(mtx) + 0.5, 
-    size  = 0.2,
-    color = "black", 
-    fill  = NA ))
+    geom      = "rect", 
+    xmin      = 0.5, 
+    xmax      = ncol(mtx) + 0.5, 
+    ymin      = 0.5, 
+    ymax      = nrow(mtx) + 0.5, 
+    linewidth = 0.2,
+    color     = "black", 
+    fill      = NA ))
   
   
   

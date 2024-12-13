@@ -10,7 +10,7 @@ plot_build <- function (params) {
   ggdata <- params$.ggdata
   
   stopifnot(has_layer(params, 'ggplot'))
-  stopifnot(is(ggdata, 'data.frame'))
+  stopifnot(inherits(ggdata, 'data.frame'))
   
   
   #______________________________________________________________
@@ -200,7 +200,7 @@ plot_build <- function (params) {
     
     # Create the aes object for `mapping`=
     #______________________________________________________________
-    if (hasName(args, 'mapping') && !is(args[['mapping']], "uneval")) {
+    if (hasName(args, 'mapping') && !inherits(args[['mapping']], "uneval")) {
     
       aes_args <- args[['mapping']]
       aes_args <- aes_args[!sapply(aes_args, is.null)]

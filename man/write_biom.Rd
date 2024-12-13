@@ -22,7 +22,7 @@ write_fasta(biom, file = NULL)
 
 write_tree(biom, file = NULL)
 
-write_xlsx(biom, file, depth = "auto", n = NULL, seed = 0, unc = "singly")
+write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -45,7 +45,7 @@ Default: \code{"json"}}
 Default: \verb{quote=FALSE, sep="\\t"}}
 
 \item{depth, n}{Passed on to \code{\link[=rarefy_cols]{rarefy_cols()}}. For \code{write_xlsx()} only,
-\code{depth=0} disables rarefaction. Default: \verb{depth='auto', n=NULL}}
+\code{depth=0} disables rarefaction. Default: \verb{depth=0.1, n=NULL}}
 
 \item{seed}{Random seed to use in rarefying. See \code{\link[=rarefy_cols]{rarefy_cols()}} function
 for details. Default: \code{0}}
@@ -92,7 +92,7 @@ Per Sample' tab.
       hmp10$counts <- hmp10$counts[,1:10] \%>\% rarefy_cols()
       
       attr(hmp10, "Weighted UniFrac")   <- bdiv_distmat(hmp10, 'unifrac')
-      attr(hmp10, "Unweighted Jaccard") <- bdiv_distmat(hmp10, 'jaccard', weighted=F)
+      attr(hmp10, "Unweighted Jaccard") <- bdiv_distmat(hmp10, 'jaccard', weighted=FALSE)
       
       outfile <- write_xlsx(hmp10, tempfile(fileext = ".xlsx"))
     }

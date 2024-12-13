@@ -44,7 +44,7 @@ get_cache_file <- function (fn, params) {
   hash <- getOption("rbiom.cache_hash", default = "")
   if (!is.function(hash)) hash <- rlang::hash
   
-  params  %<>% lapply(function (x) { if (is(x, "rbiom")) x$hash else hash(x) })
+  params  %<>% lapply(function (x) { if (inherits(x, "rbiom")) x$hash else hash(x) })
   cache_key  <- hash(c(list(fn), params[order(names(params))]))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   cache_file <- normalizePath(cache_file, winslash = "/", mustWork = FALSE)

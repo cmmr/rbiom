@@ -67,7 +67,7 @@ stats_corrplot <- function (
     df, x, y = attr(df, 'response'), layers = "tc", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
-    alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    p.top = Inf, alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
   
   
   #________________________________________________________
@@ -251,12 +251,12 @@ bdiv_corrplot <- function (
     #________________________________________________________
     if (nlevels(df$.bdiv) > 1) facet.by %<>% c('.bdiv')
     
-    default('labs.x', aa(paste("\u0394", x), display = paste0('"\\u0394 ', x, '"')))
+    default('labs.x', paste("Change in", x))
     default('labs.y', attr(df, 'resp_label'))
     
     if (length(c(within, between)) > 0 && isTRUE(caption))
       labs.caption <- paste(sep = "\n", c(
-        if (exists('labs.caption', inherits = F)) labs.caption, 
+        if (exists('labs.caption', inherits = FALSE)) labs.caption, 
         glue("within: {within}"), glue("between: {between}") ))
     
     remove("within", "between")
@@ -340,10 +340,10 @@ rare_corrplot <- function (
     if (nlevels(df$.adiv) > 1) facet.by %<>% c('.adiv')
     
     default('labs.x', "Rarefaction Depth")
-    if (!exists('labs.y', inherits = F))
+    if (!exists('labs.y', inherits = FALSE))
       labs.y <- ifelse(
         test = nlevels(df$.adiv) > 1, 
-        yes  = aa("\u03B1 Diversity", display = '"\\u03B1 Diversity"'), 
+        yes  = "Alpha Diversity", 
         no   = switch(
           EXPR = levels(df$.adiv), 
           'OTUs'  = "Observed OTUs", 

@@ -1,4 +1,6 @@
 
+# library(testthat)
+
 rare50 <- rarefy(hmp50)
 min50  <- as_rbiom(list(counts = hmp50$counts))
 

@@ -69,11 +69,7 @@ bdiv_ord_table <- function (
   # Biplot - determine taxonomic rank
   #________________________________________________________
   if (is.character(taxa)) {
-    
     rank <- names(which.max(lapply(biom$taxonomy, function (x) sum(x %in% taxa))))
-    
-    if (!is.null(rank))
-      cli_warn("`rank` is ignored when `taxa` is a character vector.")
     
   } else {
     validate_rank(max = Inf, null_ok = TRUE)

@@ -59,12 +59,11 @@
 #'     or simple placeholders in the returned object when they are not provided 
 #'     by the BIOM file.
 #' 
-#' @export
 #' @examples
 #'     library(rbiom)
 #'
 #'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read_biom(infile)
+#'     biom <- read_biom_internal(infile)
 #'
 #'     print(biom)
 #'
@@ -87,7 +86,7 @@
 #'
 
 
-read_biom <- function (src, tree='auto', ...) {
+read_biom_internal <- function (src, tree = 'auto', ...) {
   
   dots <- list(...)
 
@@ -95,8 +94,8 @@ read_biom <- function (src, tree='auto', ...) {
   # Sanity check input values
   #________________________________________________________
 
-  if (length(src) != 1 || !is(src, "character"))
-    stop("Data source for read_biom() must be a single string.")
+  if (!is_scalar_character(src) || is.na(src))
+    stop("Data source for read_biom_internal() must be a single string.")
 
 
   #________________________________________________________
@@ -158,31 +157,20 @@ read_biom <- function (src, tree='auto', ...) {
     # HDF5 file format  #
     #___________________#
     
-    if (!requireNamespace("rhdf5", quietly = TRUE)) {
-      stop(paste0(
-        "\n",
-        "Error: rbiom requires the R package 'rhdf5' to be installed\n",
-        "in order to read and write HDF5 formatted BIOM files.\n\n",
-        "Please run the following commands to install 'rhdf5':\n",
-        "   install.packages('BiocManager')\n",
-        "   BiocManager::install('rhdf5')\n\n" ))
-    }
+    require_package('rhdf5', 'to read HDF5 formatted BIOM files')
+    if (!rhdf5::H5Fis_hdf5(fp)) stop("HDF5 file not recognized by rhdf5.")
     
-    if (!rhdf5::H5Fis_hdf5(fp)) {
-      stop("HDF5 file not recognized by rhdf5.")
-    }
+    h5        <- read_biom_hdf5(fp)
+    counts    <- parse_hdf5_counts(h5)
+    sequences <- parse_hdf5_sequences(h5)
+    taxonomy  <- parse_hdf5_taxonomy(h5)
+    metadata  <- parse_hdf5_metadata(h5)
+    info      <- parse_hdf5_info(h5)
+    phylogeny <- parse_hdf5_tree(h5, tree)
     
-    
-    hdf5      <- read_biom_hdf5(fp)
-    counts    <- parse_hdf5_counts(hdf5)
-    sequences <- parse_hdf5_sequences(hdf5)
-    taxonomy  <- parse_hdf5_taxonomy(hdf5)
-    metadata  <- parse_hdf5_metadata(hdf5)
-    info      <- parse_hdf5_info(hdf5)
-    phylogeny <- parse_hdf5_tree(hdf5, tree)
-    
-    rhdf5::H5Fclose(hdf5)
-    remove("hdf5")
+    rhdf5::H5Fflush(h5)
+    rhdf5::H5Fclose(h5)
+    remove("h5")
     
   } else if (startsWith(format, "json")) {
     
@@ -241,10 +229,10 @@ read_biom <- function (src, tree='auto', ...) {
   
   
   #________________________________________________________
-  # Attach read_biom() call to provenance tracking
+  # Attach as_rbiom() call to provenance tracking
   #________________________________________________________
   cl <- match.call()
-  cl[[1]] <- as.name("read_biom")
+  cl[[1]] <- as.name("as_rbiom")
   for (i in seq_along(cl)[-1]) {
     val <- eval.parent(cl[[i]])
     if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
@@ -302,74 +290,47 @@ read_biom_tsv <- function (fp) {
   # Read in all the lines from the file
   #________________________________________________________
 
-  lines <- try(readLines(fp, warn=FALSE), silent=TRUE)
-  if (is(lines, "try-error"))
-    stop(sprintf("Unable to parse tab delimited file. %s", as.character(lines)))
-
-
-  #________________________________________________________
-  # Write to a temp file all the lines that have content and don't begin with '#'
-  #________________________________________________________
-
-  lines <- trimws(lines)
-  lines <- c(
-    grep("^#SampleID", lines, value=TRUE),             # Keep
-    grep("^#OTU",      lines, value=TRUE),             # Keep
-    grep("^#",         lines, value=TRUE, invert=TRUE) # Discard
-  )
-  fp <- tempfile()
-  writeLines(lines, fp, "\n")
-
-
-  #________________________________________________________
-  # Comma or a tab first? To infer csv vs tsv format.
-  #________________________________________________________
-
-  csv <- min(gregexpr(",",   lines[[1]])[[1]], fixed=TRUE)
-  tsv <- min(gregexpr("\\t", lines[[1]])[[1]], fixed=TRUE)
-
-  if (csv > -1 && tsv > -1) { importFn <- if (csv < tsv) utils::read.csv else utils::read.delim
-  } else if (csv > -1)      { importFn <- utils::read.csv
-  } else if (tsv > -1)      { importFn <- utils::read.delim
-  } else                    { stop("Cannot find comma or tab delimiters in file.") }
-
-  mat <- try(importFn(fp, header=FALSE, colClasses="character"), silent=TRUE)
-  if (is(mat, "try-error"))
-    stop(sprintf("Error parsing file: %s", as.character(mat)))
-
-  mat <- try(as.matrix(mat), silent=TRUE)
-  if (is(mat, "try-error"))
-    stop(sprintf("Error converting to matrix: %s", as.character(mat)))
-
-
-  #________________________________________________________
-  # Ensure we have at least one taxa (row headers) and one sample (column headers)
-  #________________________________________________________
-
-  if (nrow(mat) < 2 || ncol(mat) < 2) {
-    msg <- "Unable to parse provided file: found %i rows and %i columns"
-    stop(sprintf(msg, nrow(mat), ncol(mat)))
-  }
+  lines <- tryCatch(
+    error = function (e) stop("can't parse csv/tsv file - ", e),
+    expr  = readLines(fp, warn=FALSE))
   
-  
+  lines <- lines[nzchar(trimws(lines))]
+  if (length(lines) == 0) stop("Input file is empty.")
+
+
   #________________________________________________________
-  # Check for duplicate taxa or sample names
+  # Find the header line; check if ',' or '\t' comes first.
   #________________________________________________________
   
-  dupTaxaNames   <- unique(mat[duplicated(mat[,1]),1])
-  dupSampleNames <- unique(mat[1,duplicated(mat[1,])])
-  if (length(dupTaxaNames)   > 5) dupTaxaNames[[5]]   <- sprintf("... +%i more", length(dupTaxaNames)   - 4)
-  if (length(dupSampleNames) > 5) dupSampleNames[[5]] <- sprintf("... +%i more", length(dupSampleNames) - 4)
-  if (length(dupTaxaNames)   > 0) stop(sprintf("Duplicate taxa names: %s", paste(collapse=",", dupTaxaNames)))
-  if (length(dupSampleNames) > 0) stop(sprintf("Duplicate sample names: %s", paste(collapse=",", dupSampleNames)))
-  
-  
+  header <- lines[[c(grep("^#(Sample|OTU)", lines, ignore.case = TRUE), 1)[[1]]]]
+  sep    <- head(c(intersect(strsplit(header, '',)[[1]], c(',', '\t')), ','), 1)
+
+
   #________________________________________________________
-  # Move the Taxa and Sample names into the matrix headers
+  # Read the file again, includes quote support.
   #________________________________________________________
   
-  dimnames(mat) <- list(mat[,1], mat[1,])
-  mat <- mat[-1,-1, drop=FALSE]
+  mat <- tryCatch(
+    error = function (e) stop("can't parse file - ", e),
+    expr  = as.matrix(read.table(
+      file         = fp, 
+      sep          = sep, 
+      col.names    = strsplit(header, sep, fixed = TRUE)[[1]],
+      row.names    = 1,
+      colClasses   = 'character', 
+      allowEscapes = TRUE,
+      skipNul      = TRUE,
+      as.is        = TRUE,
+      check.names  = FALSE )))
+
+
+  #________________________________________________________
+  # Check for duplicate row/col names
+  #________________________________________________________
+  
+  if (length(x <- rownames(mat)[duplicated(rownames(mat))])) cli_abort('Duplicated IDs: {.val {x}}')
+  if (length(x <- colnames(mat)[duplicated(colnames(mat))])) cli_abort('Duplicated IDs: {.val {x}}')
+  
 
   return (mat)
 }
@@ -377,7 +338,7 @@ read_biom_tsv <- function (fp) {
 read_biom_json <- function (fp) {
 
   json <- try(jsonlite::read_json(path=fp), silent=TRUE)
-  if (is(json, "try-error"))
+  if (inherits(json, "try-error"))
     stop(sprintf("Unable to parse JSON file. %s", as.character(json)))
 
   if (!all(c('data', 'matrix_type', 'rows', 'columns') %in% names(json)))
@@ -388,23 +349,23 @@ read_biom_json <- function (fp) {
 
 read_biom_hdf5 <- function (fp) {
   
-  hdf5 <- try(rhdf5::H5Fopen(fp), silent=TRUE)
-  if (is(hdf5, "try-error")) {
-    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
-    stop(sprintf("Unable to parse HDF5 file. %s", as.character(hdf5)))
+  h5 <- try(rhdf5::H5Fopen(fp, 'H5F_ACC_RDONLY'), silent=TRUE)
+  if (inherits(h5, "try-error")) {
+    try(rhdf5::H5Fclose(h5), silent=TRUE)
+    stop(sprintf("Unable to parse HDF5 file. %s", as.character(h5)))
   }
   
-  entries  <- with(rhdf5::h5ls(hdf5), paste(sep="/", group, name))
+  entries  <- with(rhdf5::h5ls(h5), paste(sep="/", group, name))
   expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", 
                  "/observation/ids", "/observation/matrix/data", "/sample/ids" )
   
-  missing  <- setdiff(expected, entries)
+  missing <- setdiff(expected, entries)
   if (length(missing) > 0) {
-    try(rhdf5::H5Fclose(hdf5), silent=TRUE)
+    try(rhdf5::H5Fclose(h5), silent=TRUE)
     stop(sprintf("BIOM file requires: %s", paste(collapse=",", missing)))
   }
   
-  return (hdf5)
+  return (h5)
 }
 
 
@@ -440,22 +401,22 @@ parse_json_metadata <- function (json) {
   return (df)
 }
 
-parse_hdf5_metadata <- function (hdf5) {
+parse_hdf5_metadata <- function (h5) {
 
-  keys <- names(hdf5$sample$metadata)
+  keys <- names(h5$sample$metadata)
   vals <- lapply(keys, function (k) {
     
-    obj_class <- typeof(hdf5$sample$metadata[[k]])
+    obj_class <- typeof(h5$sample$metadata[[k]])
     
     if (eq(obj_class, "character")) {
-      as(hdf5$sample$metadata[[k]], "character")
+      as(h5$sample$metadata[[k]], "character")
     } else {
-      as(hdf5$sample$metadata[[k]], "numeric")
+      as(h5$sample$metadata[[k]], "numeric")
     }
   })
 
   as.data.frame(
-    row.names        = hdf5$sample$ids,
+    row.names        = h5$sample$ids,
     check.names      = FALSE,
     stringsAsFactors = FALSE,
     setNames(vals, keys)
@@ -471,8 +432,8 @@ parse_json_info <- function (json) {
   return (info)
 }
 
-parse_hdf5_info <- function (hdf5) {
-  attrs <- rhdf5::h5readAttributes(hdf5, "/")
+parse_hdf5_info <- function (h5) {
+  attrs <- rhdf5::h5readAttributes(h5, "/")
   for (i in names(attrs)) {
     attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
   }
@@ -529,19 +490,19 @@ parse_json_counts <- function (json) {
   return (counts)
 }
 
-parse_hdf5_counts <- function (hdf5) {
+parse_hdf5_counts <- function (h5) {
 
-  indptr <- as.numeric(hdf5$observation$matrix$indptr)
+  indptr <- as.numeric(h5$observation$matrix$indptr)
 
   simple_triplet_matrix(
         i        = unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)])))),
-        j        = as.numeric(hdf5$observation$matrix$indices) + 1,
-        v        = as.numeric(hdf5$observation$matrix$data),
-        nrow     = length(hdf5$observation$ids),
-        ncol     = length(hdf5$sample$ids),
+        j        = as.numeric(h5$observation$matrix$indices) + 1,
+        v        = as.numeric(h5$observation$matrix$data),
+        nrow     = length(h5$observation$ids),
+        ncol     = length(h5$sample$ids),
         dimnames = list(
-          as.character(hdf5$observation$ids),
-          as.character(hdf5$sample$ids)
+          as.character(h5$observation$ids),
+          as.character(h5$sample$ids)
       ))
 }
 
@@ -606,12 +567,12 @@ parse_json_taxonomy <- function (json) {
     return (taxaNames)
   })
 
-  if (is(taxa_table, "matrix")) {
+  if (inherits(taxa_table, "matrix")) {
     # 'Normal' situation of same number of ranks (>1) per taxa string.
     
     taxa_table <- t(taxa_table)
     
-  } else if (is(taxa_table, "list")) {
+  } else if (inherits(taxa_table, "list")) {
     # Handle instances where some taxa strings have more levels than others.
     
     n <- sapply(taxa_table, length)
@@ -634,15 +595,15 @@ parse_json_taxonomy <- function (json) {
   return (taxa_table)
 }
 
-parse_hdf5_taxonomy <- function (hdf5) {
+parse_hdf5_taxonomy <- function (h5) {
   
-  if ("taxonomy" %in% names(hdf5$observation$metadata)) {
-    taxa_table           <- t(hdf5$observation$metadata$taxonomy)
-    rownames(taxa_table) <- as.character(hdf5$observation$ids)
+  if ("taxonomy" %in% names(h5$observation$metadata)) {
+    taxa_table           <- t(h5$observation$metadata$taxonomy)
+    rownames(taxa_table) <- as.character(h5$observation$ids)
     colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
     
   } else {
-    ids        <- as.character(hdf5$observation$ids)
+    ids        <- as.character(h5$observation$ids)
     taxa_table <- matrix(
       data     = character(0), 
       nrow     = length(ids), 
@@ -674,14 +635,14 @@ parse_json_sequences <- function (json) {
   return (res)
 }
 
-parse_hdf5_sequences <- function (hdf5) {
+parse_hdf5_sequences <- function (h5) {
   
   # No sequence information
-  if (!"sequences" %in% names(hdf5$observation$metadata))
+  if (!"sequences" %in% names(h5$observation$metadata))
     return (NULL)
   
-  ids  <- as.character(hdf5$observation$ids)
-  seqs <- as.character(hdf5$observation$metadata$sequences)
+  ids  <- as.character(h5$observation$ids)
+  seqs <- as.character(h5$observation$metadata$sequences)
   
   res <- setNames(seqs, ids)
     
@@ -703,10 +664,10 @@ parse_json_tree <- function (json, tree_mode) {
   } else if (eq(tree_mode, 'auto')) {
     tree <- unlist(json[['phylogeny']])
     if (is_null(tree))       return (NULL)
-    if (is.na(tree))         return (NULL)
-    if (!is.character(tree)) return (NULL)
     if (!length(tree) == 1)  return (NULL)
+    if (!is.character(tree)) return (NULL)
     if (!nchar(tree) >= 1)   return (NULL)
+    if (is.na(tree))         return (NULL)
     
   } else {
     tree <- tree_mode
@@ -716,7 +677,7 @@ parse_json_tree <- function (json, tree_mode) {
   # Try to read it, assuming newick format
   #________________________________________________________
   tree <- try(read_tree(tree), silent=TRUE)
-  if (is(tree, "try-error")) {
+  if (inherits(tree, "try-error")) {
     errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
     if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
@@ -747,7 +708,7 @@ parse_json_tree <- function (json, tree_mode) {
   return (tree)
 }
 
-parse_hdf5_tree <- function (hdf5, tree_mode) {
+parse_hdf5_tree <- function (h5, tree_mode) {
   
   # Obey the tree argument
   #________________________________________________________
@@ -758,31 +719,26 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
     
     # See if a tree is included in the BIOM file
     #________________________________________________________
-    tree <- as.character(hdf5$observation$`group-metadata`$phylogeny)
+    tree <- as.character(h5$observation$`group-metadata`$phylogeny)
     
     errmsg <- NULL
     
-    if (is_null(tree) || eq(tree, character(0))) {
-      errmsg <- "There is no tree in this BIOM file."
-      
-    } else if (!length(tree)) {
-      errmsg <- "There is no tree in this BIOM file."
+    if (length(tree) == 0) {
+      if (isTRUE(tree_mode)) stop("There is no tree in this BIOM file.")
+      return (NULL)
       
     } else {
     
       # Assume it's newick format unless otherwise indicated
       #________________________________________________________
-      attrs <- rhdf5::h5readAttributes(hdf5, "observation/group-metadata/phylogeny")
+      attrs <- rhdf5::h5readAttributes(h5, "observation/group-metadata/phylogeny")
       if ("data_type" %in% names(attrs)) {
         data_type <- tolower(as.character(attrs[['data_type']]))
-        if (!eq(data_type, "newick"))
-          errmsg <- sprintf("Phylogeny is not Newick format, is '%s'.", data_type)
+        if (!eq(data_type, "newick")) {
+          if (isTRUE(tree_mode)) stop("Phylogeny is not Newick format, is ", data_type)
+          return (NULL)
+        }
       }
-    }
-    
-    if (!is_null(errmsg)) {
-      if (eq(tree_mode, TRUE)) stop(errmsg)
-      return (NULL)
     }
     
   } else {
@@ -793,8 +749,8 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
   # Try to read the Newick-formatted tree
   #________________________________________________________
   tree <- try(read_tree(tree), silent=TRUE)
-  if (is(tree, "try-error")) {
-    errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
+  if (inherits(tree, "try-error")) {
+    errmsg <- sprintf("can't parse reference tree. %s", as.character(tree))
     if (!eq(tree_mode, 'auto')) stop(errmsg)
     cat(file=stderr(), errmsg)
     return (NULL)
@@ -803,7 +759,7 @@ parse_hdf5_tree <- function (hdf5, tree_mode) {
   
   # Make sure it has all the OTUs from the table
   #________________________________________________________
-  TaxaIDs <- as.character(hdf5$observation$ids)
+  TaxaIDs <- as.character(h5$observation$ids)
   missing <- setdiff(TaxaIDs, tree$tip.label)
   if (length(missing) > 0) {
     if (length(missing) > 6)

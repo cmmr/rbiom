@@ -37,7 +37,7 @@ embed_csv <- function (df, label="Download Data (CSV)", filename="data.csv", ...
 #' 
 #' @noRd
 #' 
-#' @param text   Some R code.
+#' @param text   Some R code in a string.
 #' @return Markdown-compatible syntax highlighted code block.
 #' @family embed
 #' 

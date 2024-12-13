@@ -38,7 +38,7 @@ Default: \code{NULL}.}
 or logical vector of length two to control row labels and column
 labels separately, for example
 \code{label = c(rows = TRUE, cols = FALSE)}, or simply
-\code{label = c(T, F)}. Other valid options are \code{"rows"},
+\code{label = c(TRUE, FALSE)}. Other valid options are \code{"rows"},
 \code{"cols"}, \code{"both"}, \code{"bottom"}, \code{"right"},
 and \code{"none"}.
 Default: \code{TRUE}}
@@ -57,7 +57,8 @@ Default: \code{"none"}}
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
 supply a list or logical vector of length two to control the row tree
 and column tree separately, for example
-\code{trees = c(rows = T, cols = F)}, or simply \code{trees = c(T, F)}.
+\code{trees = c(rows = TRUE, cols = FALSE)},
+or simply \code{trees = c(TRUE, FALSE)}.
 Other valid options are \code{"rows"}, \code{"cols"}, \code{"both"},
 \code{"left"}, \code{"top"}, and \code{"none"}.
 Default: \code{TRUE}}
@@ -124,30 +125,33 @@ One or more colored tracks can be placed on the left and/or top of the
 heatmap grid to visualize associated metadata values.
 
 \preformatted{## Categorical ----------------------------
-cat_vals = sample(c("Male", "Female"), 10, replace = TRUE)
-tracks   = list('Sex' = cat_vals)
-tracks   = list('Sex' = list('values' = cat_vals, 'colors' = "bright"))
-tracks   = list('Sex' = list(
-  'values' = cat_vals, 
-  'colors' = c('Male' = "blue", 'Female' = "red")) )
+cat_vals <- sample(c("Male", "Female"), 10, replace = TRUE)
+tracks   <- list('Sex' = cat_vals)
+tracks   <- list('Sex' = list(values = cat_vals, colors = "bright"))
+tracks   <- list('Sex' = list(
+  values = cat_vals, 
+  colors = c('Male' = "blue", 'Female' = "red")) )
 
 ## Numeric --------------------------------
-num_vals = sample(25:40, 10, replace = TRUE)
-tracks   = list('Age' = num_vals)
-tracks   = list('Age' = list('values' = num_vals, 'colors' = "greens"))
-tracks   = list('Age' = list('values' = num_vals, 'range' = c(0,50)))
-tracks   = list('Age' = list(
-  'label'  = "Age (Years)",
-  'values' = num_vals, 
-  'colors' = c("azure", "darkblue", "darkorchid") ))
+num_vals <- sample(25:40, 10, replace = TRUE)
+tracks   <- list('Age' = num_vals)
+tracks   <- list('Age' = list(values = num_vals, colors = "greens"))
+tracks   <- list('Age' = list(values = num_vals, range = c(0,50)))
+tracks   <- list('Age' = list(
+  label  = "Age (Years)",
+  values = num_vals, 
+  colors = c("azure", "darkblue", "darkorchid") ))
 
 ## Multiple Tracks ------------------------
-tracks = list('Sex' = cat_vals, 'Age' = num_vals)
-tracks = list(
-  list('label' = "Sex", values' = cat_vals, 'colors' = "bright"),
-  list('label' = "Age", values' = num_vals, 'colors' = "greens") )
+tracks <- list('Sex' = cat_vals, 'Age' = num_vals)
+tracks <- list(
+  list(label = "Sex", values = cat_vals, colors = "bright"),
+  list(label = "Age", values = num_vals, colors = "greens") )
   
-plot_heatmap(matrix(sample(1:50), ncol=10), tracks = tracks)
+  
+mtx           <- matrix(sample(1:50), ncol = 10)
+dimnames(mtx) <- list(letters[1:5], LETTERS[1:10])
+plot_heatmap(mtx = mtx, tracks = tracks)
 }
 
 The following entries in the track definitions are understood:

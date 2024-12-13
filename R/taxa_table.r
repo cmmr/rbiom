@@ -196,7 +196,7 @@ taxa_matrix <- function (
       mtx <- rollup(counts[names(map),], 1L, map, sum)
       mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
       
-      stopifnot(is(mtx, "simple_triplet_matrix"))
+      stopifnot(inherits(mtx, "simple_triplet_matrix"))
       
       return (mtx)
     }))
@@ -348,19 +348,6 @@ taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc 
 
 
 
-#' @name taxa_max-deprecated
-#' @rdname rbiom-deprecated
-#' @section \code{taxa_max}:
-#' Use `taxa_apply(biom, max, sort = 'desc')` instead.
-#' @export
-
-taxa_max <- function (biom, rank = -1, lineage = FALSE, unc = "singly") {
-  lifecycle::deprecate_warn("2.0.0", "taxa_max()", "taxa_apply()")
-  taxa_apply(biom, FUN = base::max, rank, sort = 'desc', lineage, unc)
-}
-
-
-
 
 
 #' @rdname subset
@@ -368,8 +355,10 @@ taxa_max <- function (biom, rank = -1, lineage = FALSE, unc = "singly") {
 
 subset_taxa <- function (x, subset, clone = TRUE, ...) {
   biom <- if (isTRUE(clone)) x$clone() else x
-  keep <- eval(expr = substitute(subset), envir = biom$taxonomy, enclos = parent.frame())
-  biom$counts <- biom$counts[keep,]
+  df   <- biom$taxonomy
+  keep <- eval(expr = substitute(subset), envir = df, enclos = parent.frame())
+  df   <- biom$counts[keep,,drop = FALSE]
+  suppressWarnings(biom$counts <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -390,12 +379,11 @@ apply_p.top <- function (params) {
   stats  <- params$.plot_attrs[['stats']]
   vline  <- attr(ggdata, 'vline', exact = TRUE)
   
-  stopifnot(all(c('.taxa', '.rank')  %in% names(ggdata)))
-  stopifnot('.taxa' %in% names(stats))
   
-  if (!hasName(stats, '.adj.p'))
-    stop ("No p-values to apply `p.top` constraint on.")
-  
+  if (!is.finite(p.top))          return (invisible(params))
+  if (!hasName(stats,  '.adj.p')) return (invisible(params))
+  if (!hasName(ggdata, '.taxa'))  return (invisible(params))
+  if (!hasName(ggdata, '.rank'))  return (invisible(params))
   
   
   #________________________________________________________

@@ -16,13 +16,14 @@
 read_fasta <- function (file, ids = NULL) {
   
   if (!file.exists(file))
-    return(simpleError(paste0("File '", file, "' does not exist.")))
+    cli_abort("Fasta file {.file {file}} does not exist.")
   
   
   #________________________________________________________
   # Open uncompressed files as well as gzip/bzip2/xz/lzma.
   #________________________________________________________
   con <- gzfile(file, "r")
+  on.exit(close(con), add = TRUE)
   
   
   #________________________________________________________
@@ -36,10 +37,10 @@ read_fasta <- function (file, ids = NULL) {
     if (eq(substr(line, 1, 1), ">")) {
       sid <- substr(line, 2, nchar(line))
       
-      if (sid %in% names(res)) {
-        close(con)
-        return(simpleError(paste0("Sequence ID '", sid, "' is used more than once in '", file, "'.")))
-      }
+      if (sid %in% names(res))
+        cli_abort(c(
+          '!' = "Fasta file {.file {file}}", 
+          'x' = 'Has multiple entries for {.val {sid}}.' ))
       
       if (!is_null(ids))
         if (!sid %in% ids)
@@ -56,15 +57,18 @@ read_fasta <- function (file, ids = NULL) {
     
   }
   
-  close(con)
-  
   
   #________________________________________________________
   # Ensure we return as many IDs as requested
   #________________________________________________________
   if (!is_null(ids)) {
+    
+    if (length(x <- setdiff(ids, names(res))))
+      cli_abort(c(
+        '!' = "In fasta file {.file {file}}", 
+        'x' = 'Expected IDs are missing: {.val {x}}.' ))
+    
     res <- res[ids]
-    names(res) <- ids
   }
   
   

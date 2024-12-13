@@ -60,18 +60,14 @@ boxplot_stats <- function (params) {
   params$.plot_attrs[['stats']] <- stats
   
   
-  
-  
   #________________________________________________________
   # Implement `p.top` for taxa_boxplot().
   #________________________________________________________
-  if (isTRUE(is.finite(params$p.top))) {
-    
-    apply_p.top(params)
-    
-    if (plyr::empty(params$.ggdata))
-      return (invisible(params))
-  }
+  params <- apply_p.top(params)
+  ggdata <- params$.ggdata
+  stats  <- params$.plot_attrs[['stats']]
+  if (plyr::empty(ggdata)) return (invisible(params))
+  
   
   
   #________________________________________________________
@@ -208,8 +204,8 @@ boxplot_stats <- function (params) {
         if (isTRUE(params$.free_x)) {
           
           xcats <- dplyr::left_join(
-              x  = z[,facet.by,F],
-              y  = ggdata[,c(xcol, facet.by),F], 
+              x  = z[,facet.by,FALSE],
+              y  = ggdata[,c(xcol, facet.by),FALSE], 
               by = facet.by ) %>% 
             dplyr::pull(xcol) %>% 
             unique() %>% 
@@ -315,8 +311,8 @@ boxplot_stats <- function (params) {
             if (isTRUE(params$.free_x)) {
               
               xcats <- dplyr::left_join(
-                x  = z[,facet.by,F],
-                y  = ggdata[,c(xcol, facet.by),F], 
+                x  = z[,facet.by,FALSE],
+                y  = ggdata[,c(xcol, facet.by),FALSE], 
                 by = facet.by ) %>% 
                 dplyr::pull(xcol) %>% 
                 unique() %>% 

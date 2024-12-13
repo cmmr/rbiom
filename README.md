@@ -8,6 +8,11 @@
 [![cran](http://www.r-pkg.org/badges/version/rbiom)](https://cran.r-project.org/package=rbiom)
 [![conda](https://anaconda.org/conda-forge/r-rbiom/badges/version.svg)](https://anaconda.org/conda-forge/r-rbiom)
 [![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
+[![dev](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
+[![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
+[![R-CMD-check](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
 <!-- badges: end -->
 
 This package is a toolkit for working with Biological Observation Matrix
@@ -26,14 +31,14 @@ Source code can be found at <https://github.com/cmmr/rbiom>
 The latest stable version can be installed from CRAN.
 
 ``` r
-install.packages("rbiom", dependencies=TRUE)
+install.packages("pak")
+pak::pak("rbiom")
 ```
 
 The development version is available on GitHub.
 
 ``` r
-install.packages("remotes")
-remotes::install_github("cmmr/rbiom", dependencies=TRUE)
+pak::pak("cmmr/rbiom")
 ```
 
 ## Usage
@@ -120,4 +125,3 @@ through your operating system’s package manager.
   `udunits2-devel openssl-devel libxml2-devel libcurl-devel gdal-devel`
 - csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev gdal_dev`
 - brew (OSX): `udunits`
-

@@ -188,17 +188,14 @@ bdiv_table <- function (
       else                          { paste(w, bdiv)                   }
       
     } else {
-      if (eq(params$transform, 'rank')) { "Ranked \u03B2 Dissimilarity" }
-      else                          { "\u03B2 Dissimilarity"        }
+      if (eq(params$transform, 'rank')) { "Ranked Beta Dissimilarity" }
+      else                          { "Beta Dissimilarity"        }
     }
     
   })
   
   if (!params$transform %in% c('none', 'rank', 'percent'))
     resp_label %<>% paste0("\n(", params$transform, " transformed)")
-  
-  resp_label %<>% aa(
-    display = paste0('"', sub('\u03B2', '\\u03B2', resp_label, fixed = TRUE), '"'))
   
   
   

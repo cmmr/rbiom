@@ -52,7 +52,7 @@ Visualize the number of observations per sample.
     
     rare_stacked(hmp50)
     
-    rare_stacked(hmp50, rline = 500, r.size = 2, r.linetype = "twodash")
+    rare_stacked(hmp50, rline = 500, r.linewidth = 2, r.linetype = "twodash")
     
     fig <- rare_stacked(hmp50, counts = FALSE)
     fig$code

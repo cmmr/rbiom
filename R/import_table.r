@@ -115,7 +115,7 @@ import_metadata <- function (value, sids) {
     cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
   
   if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.sample')
-  } else                           { value %<>% relocate(.sample) }
+  } else                           { value %<>% relocate('.sample') }
   
   
   #________________________________________________________
@@ -234,7 +234,7 @@ import_taxonomy <- function (value, otus) {
     cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
   
   if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.otu')
-  } else                           { value %<>% relocate(.otu) }
+  } else                           { value %<>% relocate('.otu') }
   
   
   #________________________________________________________

@@ -47,13 +47,14 @@ read_tree <- function (src) {
   #________________________________________________________
   # Get the Newick data into a string
   #________________________________________________________
-  if (!startsWith(text, '('))
-    text <- tryCatch(
-      error = function (e) stop("Can't read file ", src, ".\n", e), 
-      expr  = local({
-        con <- gzfile(text)
-        on.exit(close(con))
-        paste0(collapse = "", readLines(con, warn = FALSE)) }))
+  if (!startsWith(text, '(') && length(text) == 1)
+    if (file.exists(text) || grepl('^(http|ftp)s{0,1}://', tolower(text)))
+      text <- tryCatch(
+        error = function (e) cli_abort("Can't read file {.file {src}}: {e}"), 
+        expr  = local({
+          con <- gzfile(text)
+          on.exit(close(con))
+          paste0(collapse = "", readLines(con, warn = FALSE)) }))
   
   stopifnot(is_scalar_character(text) && !is_na(text))
   
@@ -124,8 +125,8 @@ tree_subset <- function (tree, tips) {
   # Did we get a tree?
   #________________________________________________________
   
-  if (!is(tree, "phylo"))
-    cli_abort(c(x = "Can't convert {.type {tree}} to a `phylo` object."))
+  if (!inherits(tree, "phylo"))
+    cli_abort("Can't convert {.type {tree}} to a `phylo` object.")
   
   nTips <- length(setdiff(tree$edge[,2], tree$edge[,1]))
   
@@ -136,8 +137,8 @@ tree_subset <- function (tree, tips) {
   
   if (is.character(tips)) {
     
-    if (length(missing <- tips[!tips %in% tree$tip.label]) > 0)
-      cli_abort(('x' = sprintf("Tips missing from tree: {missing}")))
+    if (length(x <- setdiff(tips, tree$tip.label)))
+      cli_abort("Tips missing from tree: {x}.")
     
     tips <- which(tree$tip.label %in% tips)
   }
@@ -161,12 +162,14 @@ tree_subset <- function (tree, tips) {
   #________________________________________________________
   
   if (is.numeric(tips)) {
-    if (max(tips) > nTips)  cli_abort("There aren't that many tips in the tree.")
-    if (min(tips) < 1)      cli_abort("Tips with index < 1 are not allowed.")
-    if (any(tips %% 1 > 0)) cli_abort("Tip indices must be whole numbers.")
+    if (length(tips) > 0) {
+      if (max(tips) > nTips)  cli_abort("`tips` index {.val {max(tips)}} doesn't exist.")
+      if (min(tips) < 1)      cli_abort("`tips` index {.val {min(tips)}} doesn't exist.")
+      if (any(tips %% 1 > 0)) cli_abort("`tips` indices must be whole numbers.")
+    }
     
   } else {
-    cli_abort("Tips must be given as character, logical, or numeric.")
+    cli_abort("`tips` must character, logical, or numeric, not {.type {tips}}.")
   }
   
   

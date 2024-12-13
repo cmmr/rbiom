@@ -66,7 +66,7 @@ bdply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   #________________________________________________________
   # Sanity checks
   #________________________________________________________
-  if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
+  if (!inherits(FUN, 'function')) stop("Please provide a function to FUN.")
   
   
   dots  <- list(...)
@@ -93,7 +93,7 @@ bdply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
     
     
     try(silent = TRUE, biom <- as_rbiom(biom))
-    if (!is(biom, 'rbiom'))
+    if (!inherits(biom, 'rbiom'))
       stop("Can't apply metadata partitions to non-rbiom object.")
     
     data <- biom$metadata
@@ -135,7 +135,7 @@ blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   #________________________________________________________
   # Sanity checks
   #________________________________________________________
-  if (!is(FUN, 'function')) stop("Please provide a function to FUN.")
+  if (!inherits(FUN, 'function')) stop("Please provide a function to FUN.")
   
   
   dots  <- list(...)
@@ -159,7 +159,7 @@ blply <- function (biom, vars, FUN, ..., iters = list(), prefix = FALSE) {
   } else {
     
     try(silent = TRUE, biom <- as_rbiom(biom))
-    if (!is(biom, 'rbiom'))
+    if (!inherits(biom, 'rbiom'))
       stop("Can't apply metadata partitions to non-rbiom object.")
     
     

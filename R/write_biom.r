@@ -26,7 +26,7 @@
 #'        Default: `"json"`
 #' 
 #' @param depth,n   Passed on to [rarefy_cols()]. For `write_xlsx()` only, 
-#'        `depth=0` disables rarefaction. Default: `depth='auto', n=NULL`
+#'        `depth=0` disables rarefaction. Default: `depth=0.1, n=NULL`
 #'                   
 #' @param seed   Random seed to use in rarefying. See [rarefy_cols()] function
 #'        for details. Default: `0`
@@ -57,7 +57,7 @@
 #'       hmp10$counts <- hmp10$counts[,1:10] %>% rarefy_cols()
 #'       
 #'       attr(hmp10, "Weighted UniFrac")   <- bdiv_distmat(hmp10, 'unifrac')
-#'       attr(hmp10, "Unweighted Jaccard") <- bdiv_distmat(hmp10, 'jaccard', weighted=F)
+#'       attr(hmp10, "Unweighted Jaccard") <- bdiv_distmat(hmp10, 'jaccard', weighted=FALSE)
 #'       
 #'       outfile <- write_xlsx(hmp10, tempfile(fileext = ".xlsx"))
 #'     }
@@ -218,7 +218,7 @@ write_biom_json <- function (biom, file) {
   } else                                      { con <- base::file(file, "w") }
   
   res <- try(writeChar(json, con, eos=NULL), silent = TRUE)
-  if (is(res, "try-error"))
+  if (inherits(res, "try-error"))
     stop(sprintf("Can't save to '%s': %s", file, res))
   
   close(con)
@@ -235,32 +235,24 @@ write_biom_json <- function (biom, file) {
 
 write_biom_hdf5 <- function (biom, file) {
   
-  if (!requireNamespace("rhdf5", quietly = TRUE)) {
-    stop(paste0(
-      "\n",
-      "Error: rbiom requires the R package 'rhdf5' to be installed\n",
-      "in order to read and write HDF5 formatted BIOM files.\n\n",
-      "Please run the following commands to install 'rhdf5':\n",
-      "   install.packages('BiocManager')\n",
-      "   BiocManager::install('rhdf5')\n\n" ))
-  }
+  require_package('rhdf5', 'to write HDF5 formatted BIOM files')
   
   res <- try(rhdf5::h5createFile(file), silent = TRUE)
-  if (!eq(res, TRUE))
-    stop(sprintf("Can't create file '%s': %s", file, as.character(res)))
+  if (!isTRUE(res))
+    cli_abort("Can't create file {.file {file}}: {res}")
   
-  invisible(rhdf5::h5createGroup(file, '/observation'))
-  invisible(rhdf5::h5createGroup(file, '/observation/matrix'))
-  invisible(rhdf5::h5createGroup(file, '/observation/metadata'))
-  invisible(rhdf5::h5createGroup(file, '/observation/group-metadata'))
-  invisible(rhdf5::h5createGroup(file, '/sample'))
-  invisible(rhdf5::h5createGroup(file, '/sample/matrix'))
-  invisible(rhdf5::h5createGroup(file, '/sample/metadata'))
-  invisible(rhdf5::h5createGroup(file, '/sample/group-metadata'))
+  invisible(rhdf5::h5createGroup(file, 'observation'))
+  invisible(rhdf5::h5createGroup(file, 'observation/matrix'))
+  invisible(rhdf5::h5createGroup(file, 'observation/metadata'))
+  invisible(rhdf5::h5createGroup(file, 'observation/group-metadata'))
+  invisible(rhdf5::h5createGroup(file, 'sample'))
+  invisible(rhdf5::h5createGroup(file, 'sample/matrix'))
+  invisible(rhdf5::h5createGroup(file, 'sample/metadata'))
+  invisible(rhdf5::h5createGroup(file, 'sample/group-metadata'))
   
-  h5 <- try(rhdf5::H5Fopen(file), silent = TRUE)
-  if (!is(h5, "H5IdComponent"))
-    stop(sprintf("Can't open file '%s': %s", file, as.character(h5)))
+  h5 <- try(rhdf5::H5Fopen(file, 'H5F_ACC_RDWR'), silent = TRUE)
+  if (!inherits(h5, "H5IdComponent"))
+    cli_abort("Can't open HDF5 file {.file {file}}: {h5}")
   
   
   
@@ -270,9 +262,9 @@ write_biom_hdf5 <- function (biom, file) {
   rhdf5::h5writeAttribute("OTU table",                h5, 'type')
   rhdf5::h5writeAttribute(biom$comment,               h5, 'comment')
   rhdf5::h5writeAttribute("http://biom-format.org",   h5, 'format-url')
-  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),       h5, 'format-version', 3)
+  rhdf5::h5writeAttribute(as.integer(c(2,1,0)),       h5, 'format-version') #, 3)
   rhdf5::h5writeAttribute(biom$date,                  h5, 'creation-date')
-  rhdf5::h5writeAttribute(dim(biom$counts),           h5, 'shape', 2)
+  rhdf5::h5writeAttribute(dim(biom$counts),           h5, 'shape') #, 2)
   rhdf5::h5writeAttribute(length(biom$counts[['v']]), h5, 'nnz')
   rhdf5::h5writeAttribute(paste("rbiom", utils::packageVersion("rbiom")), h5, 'generated-by')
   
@@ -307,7 +299,7 @@ write_biom_hdf5 <- function (biom, file) {
   # Sample Metadata
   #________________________________________________________
   if (ncol(biom$metadata) > 1) {
-    plyr::l_ply(names(metadata)[-1], function (field) {
+    plyr::l_ply(names(biom$metadata)[-1], function (field) {
       
       if (grepl('/', field, fixed = TRUE))
         cli_abort(c(
@@ -315,7 +307,7 @@ write_biom_hdf5 <- function (biom, file) {
           'i' = "Either change the field name, or save to JSON format instead.", 
           'x' = "Metadata field {.val {field}} not encodable." ))
       
-      h5path <- sprintf("/sample/metadata/%s", field)
+      h5path <- sprintf("sample/metadata/%s", field)
       values <- biom$metadata[[field]]
       
       if (is.numeric(values)) {
@@ -358,12 +350,13 @@ write_biom_hdf5 <- function (biom, file) {
   #________________________________________________________
   if (!is.null(biom$tree)) {
     
-    h5path <- '/observation/group-metadata/phylogeny'
+    h5path <- 'observation/group-metadata/phylogeny'
     x      <- write_tree(biom$tree)
     rhdf5::h5writeDataset(x, h5, h5path)
     
-    h5path <- h5&'observation'&'group-metadata'&'phylogeny'
-    rhdf5::h5writeAttribute("newick", h5path, 'data_type')
+    h5d <- rhdf5::H5Dopen(h5, h5path)
+    rhdf5::h5writeAttribute("newick", h5d, 'data_type')
+    rhdf5::H5Dclose(h5d)
   }
   
   
@@ -393,6 +386,7 @@ write_metadata <- function (biom, file, quote = FALSE, sep = "\t", ...) {
 write_counts <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$counts %>% 
+      as.matrix() %>% 
       utils::write.table(file = con, sep = sep, quote = quote, ...)
   })
 }
@@ -436,7 +430,7 @@ write_fasta <- function (biom, file = NULL) {
 #' @export
 write_tree <- function (biom, file = NULL) {
   
-  tree <- if (is(biom, "phylo")) biom else as_rbiom(biom)$tree
+  tree <- if (inherits(biom, "phylo")) biom else as_rbiom(biom)$tree
   
   if (is.null(tree))
     cli_abort(c('x' = "rbiom object does not have a tree."))

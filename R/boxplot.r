@@ -68,7 +68,7 @@ stats_boxplot <- function (
     df, x = NULL, y = attr(df, 'response'), layers = 'x', 
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     test = 'auto', flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
-    outliers = NULL, xlab.angle = 'auto', p.label = 0.05, caption = TRUE, ... ) {
+    p.top = Inf, outliers = NULL, xlab.angle = 'auto', p.label = 0.05, caption = TRUE, ... ) {
   
   
   #________________________________________________________
@@ -238,14 +238,14 @@ bdiv_boxplot <- function (
       default('labs.x', NULL)
     } else {
       validate_df_field('x')
-      default('labs.x', aa(paste("\u0394", x), display = paste0('"\\u0394 ', x, '"')))
+      default('labs.x', paste("Change in", x))
     }
     
     default('labs.y', attr(df, 'resp_label'))
     
     if (length(c(within, between)) > 0 && isTRUE(caption))
       labs.caption <- paste(sep = "\n", c(
-        if (exists('labs.caption', inherits = F)) labs.caption, 
+        if (exists('labs.caption', inherits = FALSE)) labs.caption, 
         glue("within: {within}"), glue("between: {between}") ))
     
     remove("within", "between")
@@ -314,13 +314,13 @@ taxa_boxplot <- function (
     # Compute taxa abundance.
     #________________________________________________________
     df <- taxa_table(
-      biom    = biom, 
-      rank    = rank, 
-      taxa    = taxa, 
-      md      = c(x, stat.by, facet.by), 
-      unc     = unc, 
-      other   = other,
-      transform   = transform )
+      biom      = biom, 
+      rank      = rank, 
+      taxa      = taxa, 
+      md        = c(x, stat.by, facet.by), 
+      unc       = unc, 
+      other     = other,
+      transform = transform )
     
     remove('biom', 'rank', 'taxa', 'unc', 'other')
     

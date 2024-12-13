@@ -174,7 +174,7 @@ plot_facets <- function (params) {
     
   } else {
     
-    nfacets <- ggdata[,facet.by,drop=F] %>%
+    nfacets <- ggdata[,facet.by,drop=FALSE] %>%
       apply(1L, paste, collapse="|@#|") %>%
       unique() %>%
       length()

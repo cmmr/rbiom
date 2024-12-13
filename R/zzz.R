@@ -4,31 +4,27 @@
 # Log ggplot commands, complete with arguments.
 #________________________________________________________
 
-ENV <- environment(NULL)
+ENV <- environment()
 
-.onLoad <- function(libname, pkgname) {
+.onLoad <- function(libname, pkgname) { # nocov start
   
   
   # Add imports of imports to our namespace (avoiding NOTE about 20+ imports).
   
-  # 'tidyverse' -> 'ggplot2'
-  # 'tidyverse' -> 'readr'
+  # 'ggplot2' -> 'cli', 'glue', 'rlang', 'tibble'
   # 'ggplot2' -> 'scales' -> R6::R6Class
   # 'ggplot2' -> 'scales' -> labeling::extended
   # 'ggplot2' -> 'scales' -> lifecycle::deprecate_warn
-  # 'ggplot2' ->  'cli', 'glue', 'rlang', 'tibble'
   #________________________________________________________
   include <- function (pkg, ...) {
     
     if (!nzchar(system.file(package = pkg)))
-      stop("Package `", pkg, "` is not available from `tidyverse`.")
+      stop("Please install the `", pkg, "` R package.")
     
     for (i in c(...))
       assign(i, getFromNamespace(x = i, ns = pkg), ENV)
   }
   
-  include("ggplot2", "aes")
-  include("readr",   "read_table")
   include("cli",     "cli_text", "cli_abort", "cli_warn", "qty")
   include("glue",    "glue", "single_quote", "double_quote")
   include("tibble",  "tibble", "as_tibble")
@@ -38,9 +34,6 @@ ENV <- environment(NULL)
     "is_true", "is_false", "is_logical", "is_scalar_logical", 
     "is_character", "is_scalar_character", "is_string", 
     "is_integerish", "is_scalar_integerish", "is_double", "is_scalar_double" ))
-  
-  
-
   
   
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(
@@ -86,7 +79,6 @@ ENV <- environment(NULL)
   lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
   
   
-  
   #________________________________________________________
   # Attach function names as attribute
   #________________________________________________________
@@ -105,9 +97,7 @@ ENV <- environment(NULL)
       plot = ggplot2::ggplot() +
         ggbeeswarm::geom_beeswarm(
           mapping = ggplot2::aes(x = rep(LETTERS[1:3],50), y = 1:150), 
-          method="center") ))
-  
-  
+          method  = "center") ))
   
   
   #____________________________________________________________________
@@ -118,11 +108,10 @@ ENV <- environment(NULL)
   })
   
   
-  
   #____________________________________________________________________
   # Empty the cache (mainly for during development)
   #____________________________________________________________________
-  if (!is.null(x <- get_cache_dir()))
-    unlink(x = dir(x, full.names = TRUE))
+  # if (!is.null(x <- get_cache_dir()))
+  #   unlink(x = dir(x, full.names = TRUE))
   
-}
+} # nocov end

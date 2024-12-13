@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.0.9140
-Date: 2024-10-24
+Version: 2.0.0.9141
+Date: 2024-12-12
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -44,6 +44,7 @@ Imports:
     dplyr,
     emmeans,
     ggbeeswarm,
+    ggplot2,
     ggraph,
     ggnewscale,
     ggtext,
@@ -53,8 +54,8 @@ Imports:
     plyr,
     RcppParallel,
     R.utils,
+    readr,
     slam,
-    tidyverse,
     vegan
 Suggests:
     Biostrings,
@@ -62,7 +63,6 @@ Suggests:
     crayon,
     fillpattern,
     ggdensity,
-    ggplot2,
     ggrepel,
     glue,
     jsonlite,
@@ -76,7 +76,6 @@ Suggests:
     prettycode,
     R6,
     ragg,
-    readr,
     readxl,
     reshape2,
     rhdf5,

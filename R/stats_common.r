@@ -135,7 +135,7 @@ stats_finalize <- function (stats, df, regr, resp, stat.by, split.by, fit, p.adj
   # The `regr` field should be first.
   #________________________________________________________
   if (!is.null(regr) && hasName(stats, regr) && names(stats)[[1]] != regr) {
-    stats <- dplyr::relocate(stats, regr, .before = 1)
+    stats <- dplyr::relocate(stats, any_of(regr), .before = 1)
     code %<>% paste0(" %>% \n", glue("  dplyr::relocate({single_quote(regr)}, .before = 1)"))
   }
   
@@ -240,9 +240,7 @@ stats_formula <- function (fit, stat.by = FALSE, regr = TRUE, resp = ".resp", k 
       'gam' = "{resp} ~ s({regr}, by={stat.by}, bs='cs'{k}) + {stat.by}" )
   }
   
-  
   as.formula(glue(frm), env = baseenv())
-  
 }
 
 

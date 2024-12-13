@@ -354,7 +354,7 @@ rb_init <- function(
   if (isTRUE(nzchar(comment))) self$comment   <- comment
   
   #________________________________________________________
-  # Date found by read_biom(), or current date/time.
+  # Date found by read_biom_internal(), or current date/time.
   #________________________________________________________
   private$.date <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
   if (!is.null(date <- dots[['date']]))
@@ -439,7 +439,7 @@ rb_id <- function (self, private, value) {
   value <- trimws(value, whitespace = "[\\h\\v]")
   if (nchar(value) < 1)   value <- "Untitled Dataset"
   if (nchar(value) > 100) {
-    if (interactive()) cli_warn("Truncating `id` to 100 characters.")
+    cli_warn("Truncating `id` to 100 characters.")
     value <- substr(value, 0, 100)
   }
   
@@ -456,7 +456,7 @@ rb_comment <- function (self, private, value) {
   if (!is_scalar_character(value)) cli_abort("Invalid `comment`: {.type {value}}")
   value <- trimws(value, whitespace = "[\\h\\v]")
   if (nchar(value) > 5000) {
-    if (interactive()) cli_warn("Truncating `comment` to 5000 characters.")
+    cli_warn("Truncating `comment` to 5000 characters.")
     value <- substr(value, 0, 5000)
   }
   
@@ -535,7 +535,7 @@ rb_tree <- function (self, private, value) {
     otus <- private$.counts$dimnames[[1]]
     tips <- value$tip.label <- trimws(value$tip.label)
     if (length(missing <- setdiff(otus, tips)) > 0)
-      cli_abort(('x' = sprintf("OTUs missing from tree: {missing}")))
+      cli_abort(c('x' = sprintf("OTUs missing from tree: {missing}")))
   }
   
   private$.hash      <- NULL
@@ -705,13 +705,4 @@ rb_otus <- function (self, private, value) {
   if (!is.null(private$.sequences)) names(private$.sequences) %<>% map()
   if (!is.null(private$.tree))      private$.tree$tip.label   %<>% map()
 }
-
-
-
-
-
-
-
-
-rb__eof <- function () {NULL}
 

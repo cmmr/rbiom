@@ -39,7 +39,7 @@ print.rbiom_code <- function (x, ...) {
 #' @noRd
 #' @keywords internal
 #' @export
-`$.rbiom_tbl` <- function(obj, nm) {
+`$.rbiom_tbl` <- function (obj, nm) {
   
   if (!nm %in% c('cmd', 'code', 'stats', 'taxa_coords', 'taxa_stats')) {
     NextMethod()
@@ -452,8 +452,9 @@ na.omit.rbiom <- function (object, fields = ".all", clone = TRUE, ...) {
 #' 
 slice.rbiom <- function (.data, ..., .by = NULL, .preserve = FALSE, clone = TRUE) {
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(dplyr::slice(
-    .data = biom$metadata, ..., .by = .by, .preserve = .preserve ))
+  df   <- biom$metadata
+  df   <- eval.parent(dplyr::slice(df, ..., .by = {{.by}}, .preserve = .preserve))
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -462,8 +463,9 @@ slice.rbiom <- function (.data, ..., .by = NULL, .preserve = FALSE, clone = TRUE
 #' @export
 slice_head.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(dplyr::slice_head(
-    .data = biom$metadata, n = n, prop = prop, by = by ))
+  df   <- biom$metadata
+  df   <- eval.parent(dplyr::slice_head(df, n = n, prop = prop, by = {{by}}))
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -472,8 +474,9 @@ slice_head.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
 #' @export
 slice_tail.rbiom <- function (.data, n, prop, by = NULL, clone = TRUE, ...) {
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(dplyr::slice_tail(
-    .data = biom$metadata, n = n, prop = prop, by = by ))
+  df   <- biom$metadata
+  df   <- eval.parent(dplyr::slice_tail(df, n = n, prop = prop, by = {{by}}))
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -484,16 +487,17 @@ slice_min.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TR
   
   biom <- if (isTRUE(clone)) .data$clone() else .data
   
-  biom$metadata <- eval.parent(
+  df <- eval.parent(
     expr = dplyr::slice_min(
-      .data     = biom$metadata, 
-      order_by  = {{order_by}}, 
-      n         = n, 
-      prop      = prop, 
-      by        = by, 
-      with_ties = with_ties, 
+      .data     = biom$metadata,
+      order_by  = {{order_by}},
+      n         = n,
+      prop      = prop,
+      by        = {{by}},
+      with_ties = with_ties,
       na_rm     = na_rm ))
   
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -504,16 +508,17 @@ slice_max.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TR
   
   biom <- if (isTRUE(clone)) .data$clone() else .data
   
-  biom$metadata <- eval.parent(
+  df <- eval.parent(
     expr = slice_max(
       .data     = biom$metadata, 
       order_by  = {{order_by}}, 
       n         = n, 
       prop      = prop, 
-      by        = by, 
+      by        = {{by}}, 
       with_ties = with_ties, 
       na_rm     = na_rm ))
   
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -522,8 +527,9 @@ slice_max.rbiom <- function (.data, order_by, n, prop, by = NULL, with_ties = TR
 #' @export
 slice_sample.rbiom <- function (.data, n, prop, by = NULL, weight_by = NULL, replace = FALSE, clone = TRUE, ...) {
   biom <- if (isTRUE(clone)) .data$clone() else .data
-  biom$metadata <- eval.parent(slice_sample(
-    .data = biom$metadata, n = n, prop = prop, by = by,  weight_by = weight_by, replace = replace ))
+  df   <- biom$metadata
+  df   <- eval.parent(slice_sample(df, n = n, prop = prop, by = {{by}},  weight_by = {{weight_by}}, replace = replace))
+  suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 

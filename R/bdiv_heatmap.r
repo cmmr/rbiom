@@ -80,7 +80,7 @@
 #'     
 #'     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
 #'     
-#'     bdiv_heatmap(hmp10, bdiv="uni", weighted=c(T,F), tracks="sex")
+#'     bdiv_heatmap(hmp10, bdiv="uni", weighted=c(TRUE,FALSE), tracks="sex")
 
 bdiv_heatmap <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, tracks = NULL, 
