@@ -10,9 +10,6 @@
 [![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
 [![dev](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
 [![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
-[![R-CMD-check](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
 <!-- badges: end -->
 
 This package is a toolkit for working with Biological Observation Matrix

@@ -10,7 +10,5 @@ gems   <- as_rbiom(as.list(gems),   generated_by = genby)
 usethis::use_data(hmp50, babies, gems, overwrite = TRUE)
 # Restart
 # Install
-pkgdown::init_site()
 cat(" ", file = "README.Rmd", append = TRUE)
 devtools::build_readme()
-pkgdown::build_site(preview = FALSE, devel = TRUE)

@@ -8,6 +8,8 @@ test_that("biom_merge", {
   
   expect_equal_rbiom(actual, expected)
   
+  skip_on_cran()
+  
   expect_error(biom_merge())
   expect_error(biom_merge(NA))
   expect_error(biom_merge(list()))

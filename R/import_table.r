@@ -111,11 +111,16 @@ import_metadata <- function (value, sids) {
   if (!tibble::has_rownames(value) && !hasName(value, '.sample'))
     cli_abort(c(x = "Metadata table must have row names or a '.sample' column."))
   
-  if (tibble::has_rownames(value) && hasName(value, '.sample'))
-    cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
+  if (tibble::has_rownames(value) && hasName(value, '.sample')) {
+    if (!all(rownames(value) == paste0('', seq_len(nrow(value)))))
+      if (!all(rownames(value) == value$.sample))
+        cli_abort(c(x = "Row names are not allowed when a '.sample' column is present."))
+    value %<>% tibble::remove_rownames()
+  }
   
   if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.sample')
   } else                           { value %<>% relocate('.sample') }
+  
   
   
   #________________________________________________________
@@ -230,8 +235,12 @@ import_taxonomy <- function (value, otus) {
   if (!tibble::has_rownames(value) && !hasName(value, '.otu'))
     cli_abort(c(x = "Taxonomy table must have row names or an '.otu' column."))
   
-  if (tibble::has_rownames(value) && hasName(value, '.otu'))
-    cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
+  if (tibble::has_rownames(value) && hasName(value, '.otu')) {
+    if (!all(rownames(value) == paste0('', seq_len(nrow(value)))))
+      if (!all(rownames(value) == value$.otu))
+        cli_abort(c(x = "Row names are not allowed when an '.otu' column is present."))
+    value %<>% tibble::remove_rownames()
+  }
   
   if (tibble::has_rownames(value)) { value %<>% tibble::rownames_to_column('.otu')
   } else                           { value %<>% relocate('.otu') }

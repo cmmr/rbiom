@@ -87,9 +87,9 @@ A string can also be given to imply \code{TRUE}, but with that
 value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
-\item{sparse}{If true, returns a sparse matrix as described by
-\code{\link[=simple_triplet_matrix]{simple_triplet_matrix()}}, otherwise returns a normal R
-matrix object. Default: \code{FALSE}}
+\item{sparse}{If \code{TRUE}, returns a
+\code{\link[simple_triplet_matrix:simple_triplet_matrix]{simple_triplet_matrix::simple_triplet_matrix()}}, otherwise returns a
+normal R matrix object. Default: \code{FALSE}}
 
 \item{p.top}{Only display taxa with the most significant differences in
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most

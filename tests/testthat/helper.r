@@ -34,10 +34,6 @@ expect_equal_rbiom <- function (a, b) {
   
 }
 
-expect_identical_integer <- function (a, b) {
-  expect_identical(as.integer(a), as.integer(b))
-}
-
 expect_identical_json <- function (a, b) {
   expect_identical(as.character(jsonlite::toJSON(a)), b)
 }

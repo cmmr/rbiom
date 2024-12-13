@@ -57,6 +57,7 @@ convert_to_SE <- function (biom, ...) {
 convert_to_TSE <- function (biom, ...) {
   
   require_package('TreeSummarizedExperiment', 'to use convert_to_TSE()')
+  require_package('Biostrings',               'to use convert_to_TSE()')
   
   dots <- list(...)
   biom <- as_rbiom(biom)

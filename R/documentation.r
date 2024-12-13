@@ -88,9 +88,9 @@
 #'        value as the name to use instead of "Other".
 #'        Default: `FALSE`
 #'        
-#' @param sparse  If true, returns a sparse matrix as described by 
-#'        [simple_triplet_matrix()], otherwise returns a normal R
-#'        matrix object. Default: `FALSE`
+#' @param sparse  If `TRUE`, returns a 
+#'        [simple_triplet_matrix::simple_triplet_matrix()], otherwise returns a 
+#'        normal R matrix object. Default: `FALSE`
 #'        
 #' @param p.top   Only display taxa with the most significant differences in 
 #'        abundance. If `p.top` is >= 1, then the `p.top` most 

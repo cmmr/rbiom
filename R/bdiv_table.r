@@ -307,6 +307,9 @@ bdiv_matrix <- function (
     
     x <- apply(x, 1L, as.integer)
     
+    if (!is.matrix(x))
+      x <- matrix(x, nrow = 1)
+    
     return (x)
   })
   

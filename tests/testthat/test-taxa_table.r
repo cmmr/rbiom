@@ -1,5 +1,7 @@
 test_that("taxa_table", {
   
+  skip_on_cran()
+  
   expect_silent(taxa_table(hmp5, transform = "percent"))
   expect_silent(taxa_table(hmp5, transform = "rank"))
   expect_silent(taxa_table(hmp5, transform = "log1p"))

@@ -1,5 +1,7 @@
 test_that("write_xlsx", {
   
+  skip_on_cran()
+  
   tfile <- tempfile(fileext = '.xlsx')
   on.exit(unlink(tfile), add = TRUE)
   

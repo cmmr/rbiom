@@ -1,5 +1,6 @@
 
 test_that("convert_to_SE", {
+  skip_on_cran()
   
   x <- suppressMessages(convert_to_SE(hmp5))
   
@@ -11,6 +12,7 @@ test_that("convert_to_SE", {
 
 
 test_that("convert_to_TSE", {
+  skip_on_cran()
   
   x <- suppressMessages(convert_to_TSE(hmp5))
   

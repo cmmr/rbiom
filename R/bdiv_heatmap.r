@@ -169,8 +169,8 @@ bdiv_heatmap <- function (
   #________________________________________________________
   # Sanity Check
   #________________________________________________________
-  if (params$biom$n_samples < 1)
-    cli_abort("At least one sample is needed for a bdiv heatmap.")
+  if (params$biom$n_samples < 2)
+    cli_abort("At least two samples are needed for a bdiv heatmap.")
   
   
   #________________________________________________________

@@ -6,6 +6,8 @@ test_that("bdply", {
   expect_equal(bdply(min5,  NULL,  `$`, 'n_samples')$value, 5)
   expect_equal(bdply(hmp50, "Sex", `$`, 'n_samples')$V1, c(30, 20))
   
+  skip_on_cran()
+  
   
   iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
   fun   <- function (b, w, d) {
@@ -42,6 +44,8 @@ test_that("blply", {
   
   x <- blply(hmp50, "Sex", `$`, 'n_samples') %>% unlist()
   expect_identical(x, c(Female = 30L, Male = 20L))
+  
+  skip_on_cran()
   
   
   iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))

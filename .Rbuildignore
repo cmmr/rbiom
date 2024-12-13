@@ -16,8 +16,8 @@
 ^install.sh
 ^paper.bib
 ^paper.md
+^paper.txt
 ^pkgdown
-^rbiom.txt
 ^report.*
 ^\.github$
 ^lib$

@@ -10,8 +10,8 @@ test_that("import_table", {
   readr::write_delim(hmp5$taxonomy, file_tsv, delim = "\t")
   expect_equal_tibble(import_taxonomy(file_tsv, otus = hmp5$otus), hmp5$taxonomy)
   
-  
   skip_on_cran()
+  
   
   file_xlsx <- tempfile(fileext = '.xlsx')
   file_json <- tempfile(fileext = '.json')
@@ -51,8 +51,8 @@ test_that("import_table", {
   expect_equal_tibble(import_taxonomy(y, otus = hmp5$otus),    hmp5$taxonomy)
   
   # Missing or overabundant row ids.
-  x <- as.data.frame(hmp5$metadata); rownames(x) <- x[[1]]
-  y <- as.data.frame(hmp5$taxonomy); rownames(y) <- y[[1]]
+  x <- as.data.frame(hmp5$metadata); rownames(x) <- rev(x[[1]])
+  y <- as.data.frame(hmp5$taxonomy); rownames(y) <- rev(y[[1]])
   expect_error(import_metadata(x, sids = hmp5$samples))
   expect_error(import_taxonomy(y, otus = hmp5$otus))
   expect_error(import_metadata(hmp5$metadata[,-1], sids = hmp5$samples))

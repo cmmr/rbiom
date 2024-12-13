@@ -88,9 +88,9 @@ See \code{rank()} for details. Default: \code{"random"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
-\item{sparse}{If true, returns a sparse matrix as described by
-\code{\link[=simple_triplet_matrix]{simple_triplet_matrix()}}, otherwise returns a normal R
-matrix object. Default: \code{FALSE}}
+\item{sparse}{If \code{TRUE}, returns a
+\code{\link[simple_triplet_matrix:simple_triplet_matrix]{simple_triplet_matrix::simple_triplet_matrix()}}, otherwise returns a
+normal R matrix object. Default: \code{FALSE}}
 }
 \value{
 \describe{

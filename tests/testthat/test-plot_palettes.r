@@ -2,6 +2,10 @@ test_that("plot_palettes", {
   
   expect_true(is_palette('-okabe'))
   expect_false(is_palette('dne'))
+  
+  skip_on_cran()
+  
+  
   expect_silent(get_palette('-okabe'))
   expect_silent(get_n_colors(12, TRUE))
   expect_silent(get_n_colors(20))
