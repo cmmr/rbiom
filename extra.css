@@ -1,0 +1,25 @@
+.nav-text.text-muted {
+  color: white !important;
+}
+
+h3 {
+  margin-top: 30px;
+}
+
+.active>.nav-link {
+  color: white !important;
+}
+
+th>.eg {
+  font-size: smaller;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.template-article #main>div {
+  margin-bottom: 40px; 
+}
+
+.template-article .section.level3 {
+  margin-top: 50px; 
+}
