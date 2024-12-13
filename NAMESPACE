@@ -152,9 +152,6 @@ importFrom("utils", "capture.output", "combn", "getFromNamespace", "hasName", "h
 
 
 S3method(as_rbiom,     rbiom)
-S3method(as_rbiom,     matrix)
-S3method(as_rbiom,     simple_triplet_matrix)
-S3method(as_rbiom,     phyloseq)
 S3method(as_rbiom,     default)
 S3method("[",          rbiom)
 S3method(as.list,      rbiom)

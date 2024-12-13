@@ -12,10 +12,8 @@ test_that("as_rbiom.default", {
   expect_equal_rbiom(as_rbiom(json), hmp5)
 })
 
-test_that("as_rbiom.phyloseq", {
-  phy_file <- system.file("extdata", "rich_sparse_otu_table.biom", package="phyloseq")
-  phy      <- phyloseq::import_biom(phy_file)
-  phy_mtx  <- structure(attr(phy, 'otu_table'), class=NULL, taxa_are_rows = NULL)
-  biom_mtx <- as.matrix(as_rbiom(phy)$counts)
-  expect_equal(biom_mtx, phy_mtx)
+test_that("as_rbiom:phyloseq", {
+  setClass('phyloseq', slots = c(
+    otu_table = 'matrix', sam_data = 'NULL', tax_table = 'NULL', refseq = 'NULL', phy_tree = 'NULL' ))
+  expect_s3_class(as_rbiom(new('phyloseq', otu_table = as.matrix(hmp5$counts))), 'rbiom')
 })

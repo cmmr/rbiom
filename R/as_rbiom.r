@@ -59,47 +59,6 @@ as_rbiom.rbiom <- function (biom, ...) {
   }
   
   return (biom)
-  
-}
-
-
-
-#________________________________________________________
-# Create an rbiom object from just count data.
-#________________________________________________________
-
-#' @export
-as_rbiom.matrix <- function (biom, ...) { rbiom$new(counts = biom, ...) }
-
-
-#' @export
-as_rbiom.simple_triplet_matrix <- function (biom, ...) { rbiom$new(counts = biom, ...) }
-
-
-#________________________________________________________
-# Allow passing phyloseq objects to rbiom functions.
-#________________________________________________________
-
-#' @export
-as_rbiom.phyloseq <- function (biom, ...) {
-  
-  require_package('phyloseq', 'to convert from phyloseq.')
-  
-  dots <- list(...)
-  
-  args <- list(
-    counts    = biom %>% phyloseq::otu_table() %>% as.simple_triplet_matrix(), 
-    metadata  = biom %>% phyloseq::sample_data(errorIfNULL = FALSE) %>% data.frame(), 
-    taxonomy  = biom %>% phyloseq::tax_table(errorIfNULL = FALSE) %>% data.frame(), 
-    sequences = biom %>% phyloseq::refseq(errorIfNULL = FALSE) %>% as.vector(), 
-    tree      = biom %>% phyloseq::phy_tree(errorIfNULL = FALSE), 
-    id        = "Imported PhyloSeq Data" )
-  
-  args <- c(dots, args)
-  args <- args[!duplicated(names(args))]
-  biom <- do.call(rbiom$new, args)
-  
-  return (biom)
 }
 
 
@@ -107,13 +66,11 @@ as_rbiom.phyloseq <- function (biom, ...) {
 #' @export
 as_rbiom.default <- function (biom, ...) {
   
-  
   #________________________________________________________
-  # Read new rbiom object from filename / URL / JSON.
+  # Starting from a matrix-type.
   #________________________________________________________
-  if (is_scalar_character(biom) && !is.na(biom))
-    return (read_biom_internal(src = biom, ...))
-  
+  if (inherits(biom, c('matrix', 'simple_triplet_matrix')))
+    return (rbiom$new(counts = biom, ...))
   
   
   #________________________________________________________
@@ -127,11 +84,39 @@ as_rbiom.default <- function (biom, ...) {
   }
   
   
+  #________________________________________________________
+  # Read new rbiom object from filename / URL / JSON.
+  #________________________________________________________
+  if (is_scalar_character(biom) && !is.na(biom))
+    return (read_biom_internal(src = biom, ...))
+  
+  
+  #________________________________________________________
+  # Convert from phyloseq.
+  #________________________________________________________
+  if (inherits(biom, 'phyloseq')) {
+    
+    dots <- list(...)
+    
+    args <- list(
+      counts    = as.simple_triplet_matrix(biom@otu_table), 
+      metadata  = if (!is.null(biom@sam_data))  data.frame(biom@sam_data), 
+      taxonomy  = if (!is.null(biom@tax_table)) data.frame(biom@tax_table), 
+      sequences = if (!is.null(biom@refseq))    as.vector(biom@refseq), 
+      tree      = if (!is.null(biom@phy_tree))  biom@phy_tree, 
+      id        = "Imported PhyloSeq Data" )
+    
+    args <- c(dots, args)
+    args <- args[!duplicated(names(args))]
+    biom <- do.call(rbiom$new, args)
+    
+    return (biom)
+  }
+  
   
   cli_abort(c(
     'x' = "Unable to convert {.type {biom}} to {.cls rbiom/R6}.",
-    'i' = "See {.fun as_rbiom} for a list of accepted data types for `biom`."))
-  
+    'i' = "See {.fun as_rbiom} for a list of accepted data types for `biom`." ))
 }
 
 
