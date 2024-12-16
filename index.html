@@ -13,8 +13,8 @@
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Read/Write, Analyze, and Visualize BIOM Data">
-<meta name="description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Features include reading/writing all BIOM formats, rarefaction, alpha diversity, beta diversity (including UniFrac), summarizing counts by taxonomic level, subsetting, visualizations, and statistical analysis. All CPU intensive operations are written in C.">
-<meta property="og:description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Features include reading/writing all BIOM formats, rarefaction, alpha diversity, beta diversity (including UniFrac), summarizing counts by taxonomic level, subsetting, visualizations, and statistical analysis. All CPU intensive operations are written in C.">
+<meta name="description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Read/write all BIOM formats. Compute rarefaction, alpha diversity, and beta diversity (including UniFrac). Summarize counts by taxonomic level. Subset based on metadata. Generate visualizations and statistical analyses. CPU intensive operations are coded in C++ for speed.">
+<meta property="og:description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Read/write all BIOM formats. Compute rarefaction, alpha diversity, and beta diversity (including UniFrac). Summarize counts by taxonomic level. Subset based on metadata. Generate visualizations and statistical analyses. CPU intensive operations are coded in C++ for speed.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9143</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -196,8 +196,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=rbiom" class="external-link"><img src="http://www.r-pkg.org/badges/version/rbiom" alt="cran"></a></li>
-<li><a href="https://anaconda.org/conda-forge/r-rbiom" class="external-link"><img src="https://anaconda.org/conda-forge/r-rbiom/badges/version.svg" alt="conda"></a></li>
+<li><a href="https://cran.r-project.org/package=rbiom" class="external-link"><img src="https://img.shields.io/badge/CRAN-2.0.1-blue.svg" alt="cran"></a></li>
+<li><a href="https://anaconda.org/conda-forge/r-rbiom" class="external-link"><img src="https://img.shields.io/badge/Conda-2.0.1-blue.svg" alt="conda"></a></li>
 <li><a href="https://cranlogs.r-pkg.org/" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/rbiom" alt="downloads"></a></li>
 <li><a href="https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg" alt="dev"></a></li>
 <li><a href="https://app.codecov.io/gh/cmmr/rbiom" class="external-link"><img src="https://codecov.io/gh/cmmr/rbiom/graph/badge.svg" alt="covr"></a></li>
