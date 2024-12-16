@@ -1,5 +1,5 @@
 
-# rbiom 2.0.0
+# rbiom 2.0.1
 
 * Major release with significant new features.
 * Plotting added.
@@ -7,7 +7,7 @@
 * Caching added.
 * Clearer naming scheme for functions. Previous names still work but are deprecated.
 * Generation of human-readable ggplot2 code for modifying plots outside of rbiom.
-* Provenience tracking for BIOM objects and derivatives.
+* Provenance tracking for BIOM objects and derivatives.
 
 
 # rbiom 1.0.3

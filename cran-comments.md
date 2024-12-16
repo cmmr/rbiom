@@ -13,19 +13,13 @@
 There were no ERRORs or WARNINGs.
 
 
-There were 2 NOTEs:
-
-
-* checking package dependencies ... NOTE
-  Package suggested but not available for checking: 'rhdf5'
-
-  The BioConductor package 'rhdf5' is an optional dependency. It's not available on all platforms.
+There was 1 NOTE:
 
 
 * checking installed package size ... NOTE
-  installed size is  5.8Mb
+  installed size is  6.5Mb
   sub-directories of 1Mb or more:
-    libs   5.4Mb
+    libs   3.9Mb
 
   Including Rcpp and RcppParallel sometimes results in compiled libraries of this size.
 
