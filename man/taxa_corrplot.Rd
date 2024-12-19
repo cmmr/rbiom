@@ -178,9 +178,8 @@ letters instead of shapes on the plot. Character strings may used as well.
 \examples{
     library(rbiom) 
     
-    biom <- rarefy(hmp50)
-    
-    taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 1) 
+    biom <- rarefy(subset(hmp50, `Body Site` \%in\% c('Buccal mucosa', 'Saliva')))
+    taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 'Streptococcus')
 }
 \seealso{
 Other taxa_abundance: 

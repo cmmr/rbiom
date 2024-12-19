@@ -1,6 +1,42 @@
 useDynLib(rbiom, .registration = TRUE)
 
 
+import("RcppParallel")
+
+importFrom("ape", "pcoa")
+importFrom("broom", "glance")
+importFrom("emmeans", "emmeans", "emtrends", "eff_size")
+
+importFrom("dplyr", 
+           ".data", "any_of", "mutate", "pull", "rename", "select", 
+           "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
+           "filter", "relocate", "across", "everything", "left_join")
+
+importFrom("fillpattern", "fill_pattern", "scale_fill_pattern")
+importFrom("ggnewscale", "new_scale_fill")
+importFrom("ggplot2", "aes")
+importFrom("ggtext", "element_markdown", "geom_textbox")
+importFrom("jsonlite", "base64_enc", "read_json", "toJSON")
+importFrom("magrittr","%>%", "%<>%")
+importFrom("methods", "as", "formalArgs")
+importFrom("pillar", "tbl_sum", "glimpse")
+importFrom("plyr", ".", "ddply", "ldply", "llply")
+
+importFrom("stats", "as.formula", "median", "na.omit", "p.adjust", "sd", "setNames", "t.test", "var")
+importFrom("readr", "read_delim")
+importFrom("readxl", "read_excel")
+
+importFrom("slam", 
+           "simple_triplet_matrix", "as.simple_triplet_matrix", "is.simple_triplet_matrix",
+           "col_sums", "row_sums", "rollup")
+importFrom("tidyplots", "tidyplot")
+
+importFrom("utils",
+           "capture.output", "combn", "download.file", "getFromNamespace", "hasName", 
+           "head", "object.size", "packageVersion", "read.table", "str", "tail", 
+           "write.csv", "write.table")
+
+
 export(`adiv_boxplot`)
 export(`adiv_corrplot`)
 export(`adiv_matrix`)
@@ -18,7 +54,6 @@ export(`bdiv_ord_table`)
 export(`bdiv_stats`)
 export(`bdiv_table`)
 export(`bdply`)
-export(`biom_file_format`)
 export(`biom_merge`)
 export(`blply`)
 export(`convert_to_TSE`)
@@ -31,6 +66,7 @@ export(`rare_multiplot`)
 export(`rare_stacked`)
 export(`rarefy`)
 export(`rarefy_cols`)
+export(`read_biom`)
 export(`read_fasta`)
 export(`read_tree`)
 export(`rescale_cols`)
@@ -117,38 +153,6 @@ export(`write.fasta`)
 export(`write.tree`)
 export(`write.xlsx`)
 
-
-
-importClassesFrom("slam")
-importClassesFrom("ggplot2")
-
-importMethodsFrom("broom")
-importMethodsFrom("emmeans")
-
-import("RcppParallel")
-
-importFrom("ape", "print.phylo")
-importFrom("ggnewscale", "new_scale_fill")
-importFrom("ggplot2", "aes")
-importFrom("ggraph", "ggraph", "geom_edge_link", "geom_edge_link2", "geom_edge_elbow", "geom_edge_elbow2", "geom_node_point")
-importFrom("ggtext", "element_markdown", "geom_textbox")
-importFrom("magrittr","%>%", "%<>%")
-importFrom("methods", "as", "formalArgs")
-importFrom("stats", "as.formula", "density", "mad", "median", "na.omit", "p.adjust", "sd", "setNames", "t.test", "var")
-importFrom("plyr", ".", "ddply", "ldply", "llply")
-importFrom("pillar", "tbl_sum", "glimpse")
-importFrom("readr",   "read_table")
-
-importFrom("slam", 
-           "simple_triplet_matrix", "as.simple_triplet_matrix", "is.simple_triplet_matrix",
-           "col_sums", "row_sums", "rollup")
-
-importFrom("dplyr", 
-           ".data", "any_of", "mutate", "pull", "rename", "select", 
-           "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
-           "filter", "relocate", "across", "everything", "left_join")
-
-importFrom("utils", "capture.output", "combn", "getFromNamespace", "hasName", "head", "read.table", "tail")
 
 
 S3method(as_rbiom,     rbiom)

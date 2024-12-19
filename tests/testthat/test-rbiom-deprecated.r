@@ -12,7 +12,9 @@ test_that("rbiom-deprecated", {
   expect_warning(seqs <- write.fasta(biom$sequences, tempfile()))
   
   expect_warning(read.biom(file))
-  expect_warning(read_biom(file))
+  expect_warning(read_biom(file, tree = TRUE))
+  expect_warning(read_biom(file, tree = FALSE))
+  expect_warning(read_biom(file, tree = 'auto'))
   expect_warning(read.tree(tree))
   expect_warning(read.fasta(seqs))
   

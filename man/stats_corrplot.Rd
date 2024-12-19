@@ -133,7 +133,8 @@ letters instead of shapes on the plot. Character strings may used as well.
 \examples{
     library(rbiom)
     
-    df <- adiv_table(rarefy(hmp50))
+    biom <- subset(hmp50, `Body Site` \%in\% c('Saliva', 'Stool'))
+    df   <- adiv_table(rarefy(biom))
     stats_corrplot(df, "age", stat.by = "body")
     stats_corrplot(
       df       = df, 

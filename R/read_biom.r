@@ -1,7 +1,6 @@
-#' Extracts counts, metadata, taxonomy, and phylogeny from a biom file.
+#' Parse counts, metadata, taxonomy, and phylogeny from a BIOM file.
 #' 
-#' @noRd
-#' @keywords internal
+#' @inherit documentation_return.biom return
 #'
 #' @param src   Input data as either a file path, URL, or JSON string.
 #'        BIOM files can be formatted according to 
@@ -12,58 +11,18 @@
 #'        have \code{\{} as their first character. Compressed (gzip or bzip2) 
 #'        BIOM files are also supported. NOTE: to read HDF5 formatted BIOM 
 #'        files, the BioConductor R package \code{rhdf5} must be installed.
-#'     
-#' @param tree   By default, the tree will be read from the BIOM file specified 
-#'        in \code{src}. Specifying \code{tree=TRUE} will do the same, but will 
-#'        generate an error message if a tree is not present. Setting 
-#'        \code{tree=FALSE} will return an rbiom object without any tree 
-#'        data. You may also provide a file path, URL, or Newick string to load 
-#'        that tree data into the returned rbiom object. 
-#'        Default: \code{"auto"}
 #' 
-#' @return An rbiom class object containing the parsed data. This object
-#'     can be treated as a list with the following named elements:
-#'     \describe{
-#'         \item{\code{$counts} - }{
-#'           A numeric [simple_triplet_matrix()] (sparse matrix) of 
-#'           observation counts. Taxa (OTUs) as rows and samples as columns. 
-#'           Access or modify using `$counts`. }
-#'         \item{\code{$metadata} - }{
-#'           A [tibble::tibble()] (data frame) containing any embedded 
-#'           metadata. Sample IDs are in the \code{.sample} column. 
-#'           Access or modify using `$metadata`. }
-#'         \item{\code{$taxonomy} - }{
-#'           A [tibble::tibble()] (data frame) mapping OTU IDs to taxonomic 
-#'           clades. Columns are named .otu, Kingdom, Phylum, Class, Order, 
-#'           Family, Genus, Species, and Strain, or TaxLvl.1, TaxLvl.2, ... , 
-#'           TaxLvl.N when more than 8 levels of taxonomy are encoded in the 
-#'           biom file. Access or modify using `$taxonomy`. }
-#'         \item{\code{$tree} - }{
-#'           An object of class \code{phylo} defining the phylogenetic 
-#'           relationships between the OTUs. Although the official 
-#'           specification for BIOM only includes phylogenetic trees in BIOM 
-#'           version 2.1, if an rbiom version 1.0 file includes a 
-#'           \code{phylogeny} entry with newick data, then it will be loaded
-#'           here as well. The \pkg{ape} package has additional functions for 
-#'           working with \code{phylo} objects. Access or modify using 
-#'           `$tree`. }
-#'         \item{\code{$sequences} - }{
-#'           A named character vector, where the names are OTU IDs and the 
-#'           values are the nucleic acid sequences they represent. 
-#'           These values are not part of the official BIOM specification, but 
-#'           will be read and written when defined. Access or modify using 
-#'           `$sequences`. }
-#'        }
-#'     \code{metadata}, \code{taxonomy}, and \code{phylogeny} are optional
-#'     components of the BIOM file specification and therefore will be NULL
-#'     or simple placeholders in the returned object when they are not provided 
-#'     by the BIOM file.
+#' @param ...   Properties to set in the new rbiom object, for example, 
+#'        `metadata`, `id`, `comment`, or `tree`.
 #' 
+#' @seealso `as_rbiom()`
+#' 
+#' @export
 #' @examples
 #'     library(rbiom)
 #'
 #'     infile <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom <- read_biom_internal(infile)
+#'     biom <- read_biom(infile)
 #'
 #'     print(biom)
 #'
@@ -82,97 +41,56 @@
 #'     # Phylogenetic tree
 #'     biom$tree %>%
 #'       tree_subset(1:10) %>%
-#'       ape::plot.phylo()
+#'       plot()
 #'
 
-
-read_biom_internal <- function (src, tree = 'auto', ...) {
+read_biom <- function (src, ...) {
   
   dots <- list(...)
-
-  #________________________________________________________
-  # Sanity check input values
-  #________________________________________________________
-
-  if (!is_scalar_character(src) || is.na(src))
-    stop("Data source for read_biom_internal() must be a single string.")
-
-
-  #________________________________________________________
-  # Get the url or text for the src/BIOM data into a file
-  #________________________________________________________
-
-  if (length(grep("^(ht|f)tps{0,1}://.+", src)) == 1) {
-
-    fp <- tempfile()
-    on.exit(unlink(fp), add=TRUE)
-    
-    # To do: switch to curl::curl_download
-    if (!eq(0L, try(utils::download.file(src, fp, quiet=TRUE), silent=TRUE)))
-        stop(sprintf("Cannot retrieve URL %s", src))
-
-  } else if (length(grep("^[ \t\n]*\\{", src)) == 1) {
-
-    fp <- tempfile(fileext=".biom")
-    on.exit(unlink(fp), add=TRUE)
-    if (!is_null(try(writeChar(src, fp, eos=NULL), silent=TRUE)))
-        stop(sprintf("Cannot write text to file %s", fp))
-
-  } else {
-
-    fp <- normalizePath(src)
-  }
-
-  if (!file.exists(fp))
-    stop(sprintf("Cannot locate file %s", fp))
   
-  # If date field is missing from the biom file, use file creation time.
-  fp_date <- strftime(file.info(fp)[['ctime']], "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
-  
-
-  #________________________________________________________
-  # Decompress files that are in gzip or bzip2 format
-  #________________________________________________________
-  
-  format <- biom_file_format(file = fp)
-  
-  if (endsWith(format, ".gz")) {
-    fp <- R.utils::gunzip(fp, destname=tempfile(), remove=FALSE)
-    on.exit(unlink(fp), add=TRUE)
-    
-  } else if (endsWith(format, ".bz2")) {
-    fp <- R.utils::bunzip2(fp, destname=tempfile(), remove=FALSE)
-    on.exit(unlink(fp), add=TRUE)
+  if (is.logical(dots$tree) || identical(dots$tree, 'auto')) {
+    details <- "`tree` must be a newick string, phylo object, or NULL."
+    lifecycle::deprecate_warn("2.0.0", "read_biom()", details = details)
+    if (identical(dots$tree, FALSE)) { dots['tree'] <- list(NULL) }
+    else                             { dots$tree    <- NULL       }
   }
   
   
+  #________________________________________________________
+  # Get the data into a file.
+  #________________________________________________________
+  fpath  <- as_filepath(src)
+  format <- fpath$format
+  fp     <- fpath$path
+  on.exit(fpath$cleanup(), add = TRUE)
+  
   
   #________________________________________________________
-  # Process the file according to its internal format
+  # Process the file according to its internal format.
   #________________________________________________________
   
-  if (startsWith(format, "hdf5")) {
+  if (format == "hdf5") {
     
     #___________________#
     # HDF5 file format  #
     #___________________#
     
     require_package('rhdf5', 'to read HDF5 formatted BIOM files')
-    if (!rhdf5::H5Fis_hdf5(fp)) stop("HDF5 file not recognized by rhdf5.")
+    if (!rhdf5::H5Fis_hdf5(fp))
+      cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
     
     h5        <- read_biom_hdf5(fp)
     counts    <- parse_hdf5_counts(h5)
-    sequences <- parse_hdf5_sequences(h5)
-    taxonomy  <- parse_hdf5_taxonomy(h5)
-    metadata  <- parse_hdf5_metadata(h5)
     info      <- parse_hdf5_info(h5)
-    phylogeny <- parse_hdf5_tree(h5, tree)
+    sequences <- if (!hasName(dots, 'sequences')) parse_hdf5_sequences(h5)
+    taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_hdf5_taxonomy(h5)
+    metadata  <- if (!hasName(dots, 'metadata'))  parse_hdf5_metadata(h5)
+    phylogeny <- if (!hasName(dots, 'tree'))      parse_hdf5_tree(h5)
     
-    rhdf5::H5Fflush(h5)
     rhdf5::H5Fclose(h5)
     remove("h5")
     
-  } else if (startsWith(format, "json")) {
+  } else if (format == "json") {
     
     #___________________#
     # JSON file format  #
@@ -180,30 +98,30 @@ read_biom_internal <- function (src, tree = 'auto', ...) {
     
     json      <- read_biom_json(fp)
     counts    <- parse_json_counts(json)
-    sequences <- parse_json_sequences(json)
-    taxonomy  <- parse_json_taxonomy(json)
-    metadata  <- parse_json_metadata(json)
     info      <- parse_json_info(json)
-    phylogeny <- parse_json_tree(json, tree)
+    sequences <- if (!hasName(dots, 'sequences')) parse_json_sequences(json)
+    taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_json_taxonomy(json)
+    metadata  <- if (!hasName(dots, 'metadata'))  parse_json_metadata(json)
+    phylogeny <- if (!hasName(dots, 'tree'))      parse_json_tree(json)
     
     remove("json")
     
-  } else {
+  } else if (format == "text") {
     
     #___________________#
     # TSV file format   #
     #___________________#
     
-    if (eq(tree, TRUE))
-      stop("It is impossible to load a phylogenetic tree from an rbiom file in tab-separated format.")
-    
     mtx       <- read_biom_tsv(fp)
     counts    <- parse_tsv_counts(mtx)
+    info      <- list(id = fpath$id, type = 'OTU table')
+    taxonomy  <- if (!hasName(dots, 'taxonomy')) parse_tsv_taxonomy(mtx)
+    metadata  <- if (!hasName(dots, 'metadata')) data.frame(row.names=colnames(counts))
     sequences <- NULL
-    taxonomy  <- parse_tsv_taxonomy(mtx)
-    metadata  <- data.frame(row.names=colnames(counts))
-    info      <- list(id=tools::md5sum(fp)[[1]], type="OTU table")
     phylogeny <- NULL
+    
+  } else {
+    cli_abort("`src` data type not recognized: {src}")
   }
   
   
@@ -213,13 +131,13 @@ read_biom_internal <- function (src, tree = 'auto', ...) {
   
   args <- c(
     list(
-      'counts' = counts, 
-      'tree'   = phylogeny),
+      'counts' = counts),
     dots,
     list(
       'metadata'  = metadata, 
       'taxonomy'  = taxonomy, 
       'sequences' = sequences, 
+      'tree'      = phylogeny, 
       'id'        = info$id, 
       'date'      = info$date, 
       'comment'   = info$comment ))
@@ -241,45 +159,6 @@ read_biom_internal <- function (src, tree = 'auto', ...) {
   
   
   return (biom)
-}
-
-
-
-#' Inspects a file to see if it's most likely hdf5, json, or tab-delimited.
-#' Also reports gzip or bzip2 compression.
-#' 
-#' @keywords internal
-#' 
-#' @param file  The path to an rbiom file.
-#' 
-#' @return One of \code{c("tsv", "tsv.gz", "tsv.bz2", "json", "json.gz", 
-#'         "json.bz2", "hdf5")}.
-#'         
-#' @examples
-#'     fp <- system.file("extdata", "hmp50.bz2", package = "rbiom")
-#'     biom_file_format(file = fp)
-#'
-biom_file_format <- function (file) {
-  
-  stopifnot(file.exists(file))
-  
-  con <- base::file(file)
-  on.exit(close(con))
-  
-  format <- local({
-    first4 <- readChar(con, nchars = min(4L, file.size(file)))
-    if (startsWith(first4, '{')) return ("json")
-    if (eq(first4, "\x89HDF"))   return ("hdf5")
-    return ("tsv")
-  })
-  
-  format <- switch(
-    EXPR = summary(con)$class,
-    'gzfile' = paste0(format, ".gz"),
-    'bzfile' = paste0(format, ".bz2"),
-    format)
-  
-  return (format)
 }
 
 
@@ -337,12 +216,12 @@ read_biom_tsv <- function (fp) {
 
 read_biom_json <- function (fp) {
 
-  json <- try(jsonlite::read_json(path=fp), silent=TRUE)
-  if (inherits(json, "try-error"))
-    stop(sprintf("Unable to parse JSON file. %s", as.character(json)))
-
-  if (!all(c('data', 'matrix_type', 'rows', 'columns') %in% names(json)))
-    stop("BIOM file requires: data, matrix_type, shape, rows, columns")
+  json <- tryCatch(
+    expr  = read_json(path = fp),
+    error = function (e) cli_abort("Can't read JSON file {.file {fp}}: {e}") )
+  
+  if (length(x <- setdiff(c('data', 'matrix_type', 'rows', 'columns'), names(json))))
+    cli_abort("BIOM file is missing {.var {x}}")
 
   return (json)
 }
@@ -651,133 +530,14 @@ parse_hdf5_sequences <- function (h5) {
 
 
 
-parse_json_tree <- function (json, tree_mode) {
-  
-  # Obey the tree argument
-  #________________________________________________________
-  if (eq(tree_mode, TRUE)) {
-    tree <- unlist(json[['phylogeny']])
-    
-  } else if (eq(tree_mode, FALSE)) {
-    return (NULL)
-    
-  } else if (eq(tree_mode, 'auto')) {
-    tree <- unlist(json[['phylogeny']])
-    if (is_null(tree))       return (NULL)
-    if (!length(tree) == 1)  return (NULL)
-    if (!is.character(tree)) return (NULL)
-    if (!nchar(tree) >= 1)   return (NULL)
-    if (is.na(tree))         return (NULL)
-    
-  } else {
-    tree <- tree_mode
-  }
-  
-
-  # Try to read it, assuming newick format
-  #________________________________________________________
-  tree <- try(read_tree(tree), silent=TRUE)
-  if (inherits(tree, "try-error")) {
-    errmsg <- sprintf("Unable to read embedded phylogeny. %s", as.character(tree))
-    if (!eq(tree_mode, 'auto')) stop(errmsg)
-    cat(file=stderr(), errmsg)
-    return (NULL)
-  }
-
-
-  # Make sure it has all the OTUs from the table
-  #________________________________________________________
-  TaxaIDs <- sapply(json$rows, function (x) unlist(x$id))
-  missing <- setdiff(TaxaIDs, tree$tip.label)
-  if (length(missing) > 0) {
-    if (length(missing) > 6)
-      missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
-    errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
-    if (!eq(tree_mode, 'auto')) stop(errmsg)
-    cat(file=stderr(), errmsg)
-    return (NULL)
-  }
-  
-  
-  # Drop any extra taxa found in the tree
-  #________________________________________________________
-  if (length(tree$tip.label) > length(TaxaIDs))
-    tree <- tree_subset(tree, TaxaIDs)
-
-
-  return (tree)
+parse_json_tree <- function (json) {
+  tree <- as.character(unlist(json[['phylogeny']]))
+  if (isTRUE(startsWith(tree, '('))) tree else NULL
 }
 
-parse_hdf5_tree <- function (h5, tree_mode) {
-  
-  # Obey the tree argument
-  #________________________________________________________
-  if (eq(tree_mode, FALSE)) {
-    return (NULL)
-  
-  } else if (eq(tree_mode, TRUE) || eq(tree_mode, 'auto')) {
-    
-    # See if a tree is included in the BIOM file
-    #________________________________________________________
-    tree <- as.character(h5$observation$`group-metadata`$phylogeny)
-    
-    errmsg <- NULL
-    
-    if (length(tree) == 0) {
-      if (isTRUE(tree_mode)) stop("There is no tree in this BIOM file.")
-      return (NULL)
-      
-    } else {
-    
-      # Assume it's newick format unless otherwise indicated
-      #________________________________________________________
-      attrs <- rhdf5::h5readAttributes(h5, "observation/group-metadata/phylogeny")
-      if ("data_type" %in% names(attrs)) {
-        data_type <- tolower(as.character(attrs[['data_type']]))
-        if (!eq(data_type, "newick")) {
-          if (isTRUE(tree_mode)) stop("Phylogeny is not Newick format, is ", data_type)
-          return (NULL)
-        }
-      }
-    }
-    
-  } else {
-    tree <- tree_mode
-  }
-  
-  
-  # Try to read the Newick-formatted tree
-  #________________________________________________________
-  tree <- try(read_tree(tree), silent=TRUE)
-  if (inherits(tree, "try-error")) {
-    errmsg <- sprintf("can't parse reference tree. %s", as.character(tree))
-    if (!eq(tree_mode, 'auto')) stop(errmsg)
-    cat(file=stderr(), errmsg)
-    return (NULL)
-  }
-  
-  
-  # Make sure it has all the OTUs from the table
-  #________________________________________________________
-  TaxaIDs <- as.character(h5$observation$ids)
-  missing <- setdiff(TaxaIDs, tree$tip.label)
-  if (length(missing) > 0) {
-    if (length(missing) > 6)
-      missing <- c(missing[1:5], sprintf("+ %i more", length(missing) - 5))
-    errmsg <- sprintf("OTUs missing from tree: %s\n", paste(collapse=",", missing))
-    if (!eq(tree_mode, 'auto')) stop(errmsg)
-    cat(file=stderr(), errmsg)
-    return (NULL)
-  }
-  
-  
-  # Drop any extra taxa found in the tree
-  #________________________________________________________
-  if (length(tree$tip.label) > length(TaxaIDs))
-    tree <- tree_subset(tree, TaxaIDs)
-  
-  
-  return (tree)
+parse_hdf5_tree <- function (h5) {
+  tree <- as.character(h5$observation$`group-metadata`$phylogeny)
+  if (isTRUE(startsWith(tree, '('))) tree else NULL
 }
 
 

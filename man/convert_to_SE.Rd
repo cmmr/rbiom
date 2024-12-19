@@ -32,19 +32,20 @@ TreeSummarizedExperiment additionally includes the tree and sequences.
 }
 \examples{
     
-    library(rbiom) 
+    library(rbiom)
     
-    print(hmp50)
+    hmp5 <- hmp[1:5]
+    print(hmp5)
       
     # Requires 'SummarizedExperiment' Bioconductor R package
     if (nzchar(system.file(package = "SummarizedExperiment"))) {
-      se <- convert_to_SE(hmp50)
+      se <- convert_to_SE(hmp5)
       print(se)
     }
       
     # Requires 'TreeSummarizedExperiment' Bioconductor R package
     if (nzchar(system.file(package = "TreeSummarizedExperiment"))) {
-      tse <- convert_to_TSE(hmp50)
+      tse <- convert_to_TSE(hmp5)
       print(tse)
     }
 }

@@ -22,10 +22,10 @@
 embed_csv <- function (df, label="Download Data (CSV)", filename="data.csv", ...) {
   
   as.data.frame(df) %>%
-    utils::write.csv(...) %>%
+    write.csv(...) %>%
     capture.output() %>%
     paste(collapse = "\n") %>%
-    jsonlite::base64_enc() %>%
+    base64_enc() %>%
     sprintf(
       fmt = '<a download=%s href="data:text/csv;base64,%s">%s</a>', 
       double_quote(filename), ., label) %>%

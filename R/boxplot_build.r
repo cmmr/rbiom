@@ -220,7 +220,7 @@ boxplot_build <- function (params) {
     
     set_layer(params, 'dot', cex = 0.5, size = ptsize, method="center")
     
-    if (utils::packageVersion("ggbeeswarm") >= "0.7.0.9000") {
+    if (packageVersion("ggbeeswarm") >= "0.7.0.9000") {
       set_layer(params, 'dot', corral = "random", corral.width = 0.9)
     } else {
       set_layer(params, 'dot', groupOnX = TRUE)
@@ -248,7 +248,7 @@ boxplot_build <- function (params) {
     
     set_layer(params, 'strip', size = ptsize)
     
-    if (utils::packageVersion("ggbeeswarm") < "0.7.0.9000")
+    if (packageVersion("ggbeeswarm") < "0.7.0.9000")
       set_layer(params, 'strip', groupOnX = TRUE)
     
     if (dodged)
@@ -293,7 +293,7 @@ boxplot_build <- function (params) {
       }
     } else if (ci == "mad") {
       params$.vlineFun <- function (vals) {
-        med <- median(vals); dev <- mad(vals, med)
+        med <- median(vals); dev <- stats::mad(vals, med)
         data.frame(.y = med, .ymin = med - dev, .ymax = med + dev)
       }
     } else if (ci == "sd") {

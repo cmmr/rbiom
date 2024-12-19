@@ -2,19 +2,23 @@ test_that("read_biom", {
   
   skip_on_cran()
   
-  f <- expect_silent(write_biom(hmp5, tempfile()))
-  expect_silent(read_biom_internal(src = f, tree = TRUE))
-  expect_silent(read_biom_internal(src = f, tree = FALSE))
-  unlink(f)
+  f <- expect_silent(write_biom(hmp5, tempfile(), 'json'))
+  g <- expect_silent(write_biom(min5, tempfile(), 'json'))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
+  unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
-  expect_silent(read_biom_internal(src = f))
-  unlink(f)
+  g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
+  unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(fileext = '.gz'), 'tab'))
-  expect_silent(read_biom_internal(src = f))
-  expect_error(read_biom_internal(src = f, tree = TRUE))
-  unlink(f)
+  g <- expect_silent(write_biom(min5, tempfile(fileext = '.gz'), 'tab'))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
+  unlink(c(f, g))
   
   expect_error(read_biom_hdf5(tempfile()))
   expect_silent(parse_hdf5_taxonomy(list(observation = list(ids = c('a', 'b', 'c')))))
@@ -37,24 +41,4 @@ test_that("read_biom", {
   
   expect_null(parse_json_sequences(list(rows = list(list(metadata=list())))))
   expect_null(parse_hdf5_sequences(list(observation = list(list(metadata=list())))))
-  
-  expect_null(parse_json_tree(list(phylogeny = NULL),         tree_mode = 'auto'))
-  expect_null(parse_json_tree(list(phylogeny = NA),           tree_mode = 'auto'))
-  expect_null(parse_json_tree(list(phylogeny = FALSE),        tree_mode = 'auto'))
-  expect_null(parse_json_tree(list(phylogeny = character(0)), tree_mode = 'auto'))
-  expect_null(parse_json_tree(list(phylogeny = c('a', 'b')),  tree_mode = 'auto'))
-  expect_null(parse_json_tree(list(phylogeny = ''),           tree_mode = 'auto'))
-  
-  tree <- expect_silent(write_tree(tree_subset(hmp5$tree, 1:5)))
-  hdf5 <- list(observation = list('group-metadata' = list()))
-  
-  expect_error(parse_json_tree(list(),  tree_mode = 'not a tree'))
-  expect_error(parse_json_tree(list(rows = list(list(id='t1'))), tree_mode = tree))
-  
-  expect_null(parse_hdf5_tree(list(),  tree_mode = FALSE))
-  expect_null(parse_hdf5_tree(hdf5,    tree_mode = 'auto'))
-  expect_error(parse_hdf5_tree(hdf5,   tree_mode = TRUE))
-  expect_error(parse_hdf5_tree(list(), tree_mode = tree))
-  expect_error(parse_hdf5_tree(list(), tree_mode = 'not a tree'))
-  expect_error(parse_hdf5_tree(list(rows = list(list(id='t1'))), tree_mode = tree))
 })

@@ -136,7 +136,8 @@ letters instead of shapes on the plot. Character strings may used as well.
 \examples{
     library(rbiom)
     
-    rare_corrplot(hmp50, stat.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
+    biom <- subset(hmp50, `Body Site` \%in\% c('Saliva', 'Stool'))
+    rare_corrplot(biom, stat.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
     
 }
 \seealso{

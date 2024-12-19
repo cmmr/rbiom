@@ -89,7 +89,7 @@ See \code{rank()} for details. Default: \code{"random"}}
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
 \item{sparse}{If \code{TRUE}, returns a
-\code{\link[simple_triplet_matrix:simple_triplet_matrix]{simple_triplet_matrix::simple_triplet_matrix()}}, otherwise returns a
+\code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a
 normal R matrix object. Default: \code{FALSE}}
 }
 \value{

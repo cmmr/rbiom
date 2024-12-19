@@ -68,8 +68,6 @@
 \alias{id}
 \alias{is.rarefied-deprecated}
 \alias{is.rarefied}
-\alias{read_biom-deprecated}
-\alias{read_biom}
 \alias{repair-deprecated}
 \alias{repair}
 \alias{sample_subset-deprecated}
@@ -204,8 +202,6 @@ has.sequences(biom)
 id(biom)
 
 is.rarefied(biom)
-
-read_biom(src, tree = "auto", ...)
 
 repair(biom)
 
@@ -412,11 +408,6 @@ Use \code{biom$id} instead.
 \section{\code{is.rarefied}}{
 
 Use \code{!is.null(biom$depth)} instead.
-}
-
-\section{\code{read_biom}}{
-
-Use \code{\link[=as_rbiom]{as_rbiom()}} instead.
 }
 
 \section{\code{repair}}{

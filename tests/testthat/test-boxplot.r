@@ -18,4 +18,5 @@ test_that("boxplot", {
   expect_silent(adiv_boxplot(rare50, x = 'Body Site', stat.by = 'Body Site'))
   expect_silent(adiv_boxplot(rare50, x = 'Body Site', stat.by = 'Sex'))
   expect_silent(adiv_boxplot(rare50, stat.by = 'Sex'))
+  expect_silent(adiv_boxplot(rare50, facet.by = 'Sex', stat.by = 'Body Site', scales = 'free'))
 })

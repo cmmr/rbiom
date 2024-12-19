@@ -89,7 +89,7 @@
 #'        Default: `FALSE`
 #'        
 #' @param sparse  If `TRUE`, returns a 
-#'        [simple_triplet_matrix::simple_triplet_matrix()], otherwise returns a 
+#'        [slam::simple_triplet_matrix()], otherwise returns a 
 #'        normal R matrix object. Default: `FALSE`
 #'        
 #' @param p.top   Only display taxa with the most significant differences in 

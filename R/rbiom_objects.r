@@ -135,9 +135,9 @@ rbiom <- R6::R6Class(
     .id           = "", 
     .comment      = "", 
     .date         = "",
-    .generated_by = paste("rbiom", utils::packageVersion("rbiom")),
+    .generated_by = paste("rbiom", packageVersion("rbiom")),
     
-    .pkg_version  = utils::packageVersion("rbiom"),
+    .pkg_version  = packageVersion("rbiom"),
     .hash         = NULL,
     .tree_hash    = NULL,
     
@@ -354,7 +354,7 @@ rb_init <- function(
   if (isTRUE(nzchar(comment))) self$comment   <- comment
   
   #________________________________________________________
-  # Date found by read_biom_internal(), or current date/time.
+  # Date found by read_biom(), or current date/time.
   #________________________________________________________
   private$.date <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
   if (!is.null(date <- dots[['date']]))

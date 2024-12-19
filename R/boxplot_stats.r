@@ -105,15 +105,15 @@ boxplot_stats <- function (params) {
         if (has_layer(params, 'bar'))        "mean"   else NULL ) %>% 
       unique() %>%
       lapply(switch,
-        max    = {function (v) { max(v)                    }},
-        mean   = {function (v) { mean(v)                   }},
-        violin = {function (v) { max(density(v)[['x']])    }},
+        max    = {function (v) { max(v)                        }},
+        mean   = {function (v) { mean(v)                       }},
+        violin = {function (v) { max(stats::density(v)[['x']]) }},
         box    = switch(as.character(isFALSE(params$outliers)), 
           'TRUE'  = {function (v) { grDevices::boxplot.stats(v)$stats[5]             }},
           'FALSE' = {function (v) { max(v)                                           }} ),
         vline  = switch(params$ci, 
           'range' = {function (v) { max(v)                                           }},
-          'mad'   = {function (v) { median(v) + mad(v, median(v))                    }},
+          'mad'   = {function (v) { median(v) + stats::mad(v, median(v))             }},
           'sd'    = {function (v) { mean(v) + sd(v)                                  }},
           'se'    = {function (v) { mean(v) + sqrt(var(v)/length(v))                 }},
           'ci'    = {function (v) { t.test(v, conf.level = params$level)$conf.int[2] }} ))

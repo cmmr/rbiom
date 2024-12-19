@@ -217,12 +217,12 @@ taxa_matrix <- function (
       taxa <- intersect(as.character(taxa), rownames(mtx))
       
     } else {
-      stop ("Invalid argument for `taxa`: ", capture.output(utils::str(taxa)))
+      stop ("Invalid argument for `taxa`: ", capture.output(str(taxa)))
     }
     
     
     if (length(taxa) == 0)
-      stop("No taxa match the criteria: ", capture.output(utils::str(taxa)))
+      stop("No taxa match the criteria: ", capture.output(str(taxa)))
     
     
     if (isFALSE(other) || is.null(other)) {

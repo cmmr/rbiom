@@ -12,7 +12,7 @@
 #' 
 #'        
 #' @param ...  Additional arguments to pass on to [uwot::umap()], 
-#'        [ape::pcoa()], [vegan::metaMDS()], or [tsne::tsne()].
+#'        [pcoa()], [vegan::metaMDS()], or [tsne::tsne()].
 #'             
 #' @return A data.frame with columns \code{.sample}, \code{.weighted}, 
 #'         \code{.bdiv}, \code{.ord}, \code{.x}, \code{.y}, and (optionally) 

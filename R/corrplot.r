@@ -54,7 +54,8 @@
 #' @examples
 #'     library(rbiom)
 #'     
-#'     df <- adiv_table(rarefy(hmp50))
+#'     biom <- subset(hmp50, `Body Site` %in% c('Saliva', 'Stool'))
+#'     df   <- adiv_table(rarefy(biom))
 #'     stats_corrplot(df, "age", stat.by = "body")
 #'     stats_corrplot(
 #'       df       = df, 
@@ -293,7 +294,8 @@ bdiv_corrplot <- function (
 #' @examples
 #'     library(rbiom)
 #'     
-#'     rare_corrplot(hmp50, stat.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
+#'     biom <- subset(hmp50, `Body Site` %in% c('Saliva', 'Stool'))
+#'     rare_corrplot(biom, stat.by = "body", adiv = c("sh", "o"), facet.by = "Sex")
 #'     
 
 rare_corrplot <- function (
@@ -380,9 +382,8 @@ rare_corrplot <- function (
 #' @examples
 #'     library(rbiom) 
 #'     
-#'     biom <- rarefy(hmp50)
-#'     
-#'     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 1) 
+#'     biom <- rarefy(subset(hmp50, `Body Site` %in% c('Buccal mucosa', 'Saliva')))
+#'     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 'Streptococcus')
 
 taxa_corrplot <- function (
     biom, x, rank = -1, layers = "tc", 

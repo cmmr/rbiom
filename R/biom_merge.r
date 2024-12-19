@@ -42,7 +42,7 @@ biom_merge <- function (..., metadata = NA, taxonomy = NA, tree = NULL, sequence
     if (length(dot) > 1)          return (do.call(biom_merge, dot))
     if (length(dot) < 1)          return (NULL)
     if (inherits(dot[[1]], 'rbiom'))    return (dot[[1]])
-    if (is_scalar_character(dot)) return (read_biom_internal(src = dot))
+    if (is_scalar_character(dot)) return (read_biom(src = dot))
     cli::cli_abort("Unknown argument to biom_merge(): {.typeof {dot}}")
     
   })

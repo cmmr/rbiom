@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.1
-Date: 2024-12-16
+Version: 2.0.1.900
+Date: 2024-12-19
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -42,48 +42,42 @@ Imports:
     broom,
     dplyr,
     emmeans,
-    ggbeeswarm,
-    ggplot2,
-    ggraph,
+    fillpattern,
     ggnewscale,
+    ggplot2,
     ggtext,
+    jsonlite,
     magrittr,
-    patchwork,
     pillar,
     plyr,
     RcppParallel,
-    R.utils,
     readr,
+    readxl,
     slam,
+    tidyplots,
     vegan
 Suggests:
     Biostrings,
     cli,
     crayon,
-    fillpattern,
+    ggbeeswarm,
     ggdensity,
     ggrepel,
     glue,
-    jsonlite,
-    npregfast,
     labeling,
     lifecycle,
     openxlsx,
     optparse,
+    patchwork,
     pkgconfig,
     prettycode,
     R6,
-    ragg,
-    readxl,
-    reshape2,
     rhdf5,
     rlang,
     scales,
     SummarizedExperiment,
     testthat,
     tibble,
-    tidygraph,
     TreeSummarizedExperiment,
     tsne,
-    uwot,
-    vdiffr
+    uwot

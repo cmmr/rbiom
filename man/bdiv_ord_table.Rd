@@ -119,7 +119,7 @@ Default: \code{"singly"} \cr\cr
 Abbreviations are allowed.}
 
 \item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
-\code{\link[ape:pcoa]{ape::pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
+\code{\link[=pcoa]{pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
 }
 \value{
 A data.frame with columns \code{.sample}, \code{.weighted},

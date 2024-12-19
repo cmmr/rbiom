@@ -11,10 +11,12 @@ ENV <- environment()
   
   # Add imports of imports to our namespace (avoiding NOTE about 20+ imports).
   
-  # 'ggplot2' -> 'cli', 'glue', 'rlang', 'tibble'
-  # 'ggplot2' -> 'scales' -> R6::R6Class
-  # 'ggplot2' -> 'scales' -> labeling::extended
-  # 'ggplot2' -> 'scales' -> lifecycle::deprecate_warn
+  
+  # ggplot2 -> cli, glue, rlang, tibble
+  # ggplot2 -> scales -> R6::R6Class
+  # ggplot2 -> scales -> labeling::extended
+  # ggplot2 -> scales -> lifecycle::deprecate_warn
+  # tidyplots -> ggbeeswarm, ggrepel, patchwork
   #________________________________________________________
   include <- function (pkg, ...) {
     
@@ -64,19 +66,17 @@ ENV <- environment()
   
   
   lapply(FUN = cmd_wrap, pkg="fillpattern", {c('fill_pattern', 'scale_fill_pattern')})
-  lapply(FUN = cmd_wrap, pkg="generics",    {c('tidy', 'glance', 'augment')})
   lapply(FUN = cmd_wrap, pkg="ggbeeswarm",  {c('geom_beeswarm', 'geom_quasirandom')})
   lapply(FUN = cmd_wrap, pkg="ggdensity",   {c('geom_hdr', 'geom_hdr_lines')})
-  lapply(FUN = cmd_wrap, pkg="ggh4x",       {c('facetted_pos_scales')})
   lapply(FUN = cmd_wrap, pkg="ggnewscale",  {c('new_scale_fill')})
   lapply(FUN = cmd_wrap, pkg="ggrepel",     {c('geom_text_repel', 'geom_label_repel')})
   lapply(FUN = cmd_wrap, pkg="ggtext",      {c('element_markdown', 'geom_textbox')})
   lapply(FUN = cmd_wrap, pkg="graphics",    {c('pairs')})
   lapply(FUN = cmd_wrap, pkg="grid",        {c('arrow', 'unit')})
-  lapply(FUN = cmd_wrap, pkg="patchwork",   {c('inset_element')})
+  lapply(FUN = cmd_wrap, pkg="patchwork",   {c('free', 'inset_element', 'wrap_plots')})
   lapply(FUN = cmd_wrap, pkg="scales",      {c('alpha', 'trans_new', 'label_number', 'cut_si')})
   
-  lapply(FUN = basewrap, pkg="base", {c('c', 'rep', 'summary')})
+  lapply(FUN = basewrap, pkg="base", {c('c', 'rep')})
   
   
   #________________________________________________________

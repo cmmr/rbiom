@@ -4,55 +4,45 @@
 #' @noRd
 #' @keywords internal
 #' 
-#' @param file  A file name, URL, or literal data string.
+#' @param src  A file name, URL, or literal data string.
 #'        File types supported: csv, tsv, json, xls, and xlsx.
-#' 
-#' @param ...  Not used.
 #' 
 #' @return A tibble data.frame.
 #' 
 
-import_table <- function (file, ...) {
+import_table <- function (src) {
   
-  dots <- list(...)
-  
-  stopifnot(is_scalar_character(file))
-  stopifnot(!is.na(file))
-  stopifnot(nzchar(trimws(file)))
+  #________________________________________________________
+  # Get the data into a file.
+  #________________________________________________________
+  fpath  <- as_filepath(src)
+  format <- fpath$format
+  path   <- fpath$path
+  on.exit(fpath$cleanup(), add = TRUE)
   
   
   #________________________________________________________
-  # Import first sheet from an Excel file.
+  # Read json/text/excel data into a data frame.
   #________________________________________________________
-  if (grepl("\\.(xls|xlsx)$", tolower(file))) {
-    df <- readxl::read_excel(file) # from tidyverse pkg
-  }
+  tbl <- if (format == 'excel') {
+    read_excel(path = path) # from tidyverse pkg
   
-  
-  #________________________________________________________
-  # Import from a text file, URL, or literal data string.
-  #________________________________________________________
-  else {
+  } else if (format == 'json') {
+    as_tibble(read_json(path = path, simplifyVector = TRUE))
     
-    # Heuristics for flagging as a json file or string.
-    is_json <- endsWith(tolower(file), '.json')
-    is_json <- is_json || startsWith(file, '[')
-    if (!is_json && file.exists(file))
-      is_json <- is_json || identical(readChar(file, 1L), '[')
+  } else if (format == 'text') {
     
+    # read_delim auto-detects encoding and separator. 
+    # Don't use read.table - it chokes on UTF-8 symbols.
+    readr::read_delim(
+      file           = path,  
+      trim_ws        = TRUE, 
+      name_repair    = trimws,
+      show_col_types = FALSE )
+  
     
-    if (is_json) {
-      df <- as_tibble(jsonlite::fromJSON(file))
-      
-    } else {
-      
-      # read_delim will auto-detect the field separator
-      df <- readr::read_delim(
-        file           = file,  
-        trim_ws        = TRUE, 
-        name_repair    = trimws,
-        show_col_types = FALSE )
-    }
+  } else {
+    cli_abort("`src` data type not recognized: {src}")
   }
   
   
@@ -60,14 +50,113 @@ import_table <- function (file, ...) {
   # Enforce unique column names.
   #________________________________________________________
   
-  if (any(x <- duplicated(colnames(df)))) {
-    x <- unique(colnames(df)[x])
-    cli_abort("Duplicated column names in {.file {file}}: {.val {x}}")
+  if (any(x <- duplicated(colnames(tbl)))) {
+    x <- unique(colnames(tbl)[x])
+    cli_abort("Duplicated column names in {.file {src}}: {.val {x}}")
   }
   
   
+  return (tbl)
+}
+
+
+#' Determine if a file path, URL, or literal data string.
+#' is 'text', 'json', 'hdf5', or 'excel' format.
+#' 
+#' @noRd
+#' @keywords internal
+#' 
+#' @param src  A file path, URL, or literal data string.
+#' @param filename  The string to examine for file extensions.
+#' 
+#' @return 'text', 'json', 'hdf5', or 'excel'. 
+#'         'AsIs' class when `src` is literal data rather than a file.
+#' 
+
+file_type <- function (src, filename = src) {
   
-  return (df)
+  if (!is_nz_string(src)) cli_abort('`src` must be a string, not {.type {src}}.')
+  if (is_url(src))        cli_abort('`src` cannot be a URL: {.url {src}}.')
+  
+  if (startsWith(src, '{') || startsWith(src, '[')) return (I('json'))
+  if (grepl('\n', src, fixed = TRUE))               return (I('text'))
+  
+  if (!file.exists(src)) cli_abort('File not found: {filename}.')
+  
+  x <- sub('\\.(gz|bz2)$', '', tolower(filename))
+  if (grepl('\\.(xls|xlsx)$', x))        return ('excel')
+  if (grepl('\\.(txt|tsv|csv|tab)$', x)) return ('text')
+  if (grepl('\\.json$', x))              return ('json')
+  if (grepl('\\.(hdf|hdf5)$', x))        return ('hdf5')
+  
+  con  <- base::file(src)
+  cls  <- summary(con)$class
+  peek <- suppressWarnings(readChar(con, 1L))
+  close(con)
+  
+  if (cls %in% c('gzfile', 'bzfile'))
+    return (ifelse(peek %in% c('{', '['), 'json', 'text'))
+  
+  con  <- base::file(src, 'rb', raw = TRUE)
+  peek <- readBin(con, 'raw', 8L)
+  close(con)
+  
+  if (peek[[1]] %in% charToRaw('{['))                                      return ('json')
+  if (identical(peek[1:4], charToRaw('\x89HDF')))                          return ('hdf5')
+  if (identical(peek[1:4], charToRaw('\x50\x4B\x03\x04')))                 return ('excel')
+  if (identical(peek[1:8], charToRaw('\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'))) return ('excel')
+  
+  return ('text')
+}
+
+
+
+#' Pull URLs to a local file. Save literal data to a file.
+#' `$rm()` will remove any files created by this function.
+#' 
+#' @noRd
+#' @keywords internal
+#' 
+#' @param src  A file path, URL, or literal data string.
+#' 
+#' @return list(id, path, format, cleanup)
+#' 
+
+as_filepath <- function (src) {
+    
+  if (is_url(src)) {
+    
+    id      <- src
+    path    <- tempfile()
+    cleanup <- function () unlink(path)
+    if (!eq(0L, x <- try(download.file(url = src, path, quiet=TRUE), silent=TRUE)))
+      cli_abort("Cannot retrieve URL {.url {src}}: {x}")
+    
+    format <- file_type(src = path, filename = src)
+    
+  } else {
+    
+    format <- file_type(src = src)
+    
+    if (inherits(format, 'AsIs')) {
+      
+      # Save literal data string to a temp file.
+      id      <- paste('Parsed from', format, 'string')
+      path    <- tempfile()
+      cleanup <- function () unlink(path)
+      writeChar(object = src, con = path, eos = NULL)
+      class(format) <- NULL
+      
+    } else {
+      id      <- normalizePath(src, winslash = '/')
+      path    <- src
+      cleanup <- function () NULL
+    }
+  }
+  
+  result <- list(id = id, path = path, format = format, cleanup = cleanup)
+  
+  return (result)
 }
 
 
@@ -85,7 +174,7 @@ import_metadata <- function (value, sids) {
   #________________________________________________________
   # Load metadata from a file.
   #________________________________________________________
-  if (is_scalar_character(value)) value <- import_table(file = value)
+  if (is_scalar_character(value)) value <- import_table(src = value)
   
   #________________________________________________________
   # Convert data.frame/matrix to tibble.
@@ -171,7 +260,7 @@ import_metadata <- function (value, sids) {
   if (as.logical(anyDuplicated(value[['.sample']]))) {
     
     not_equal <- function (x) (length(unique(as.character(x))) > 1)
-    to_string <- function (i, x) jsonlite::toJSON(as.vector(x[i,,drop=FALSE]), auto_unbox = TRUE)
+    to_string <- function (i, x) toJSON(as.vector(x[i,,drop=FALSE]), auto_unbox = TRUE)
     
     plyr::d_ply(value, '.sample', function (x) {
       
@@ -209,7 +298,7 @@ import_taxonomy <- function (value, otus) {
   #________________________________________________________
   # Load taxonomy from a file.
   #________________________________________________________
-  if (is_scalar_character(value)) value <- import_table(file = value)
+  if (is_scalar_character(value)) value <- import_table(src = value)
   
   #________________________________________________________
   # Convert data.frame/matrix to tibble.

@@ -134,7 +134,7 @@ write_biom_tsv <- function (biom, file) {
   } else if (grepl("\\.bz2$", tolower(file))) { con <- bzfile(file, "w")
   } else                                      { con <- base::file(file, "w") }
   
-  utils::write.table(tbl, con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+  write.table(tbl, con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
   
   close(con)
   
@@ -152,7 +152,7 @@ write_biom_json <- function (biom, file) {
   
   metadata <- biom$metadata
   
-  json <- jsonlite::toJSON(
+  json <- toJSON(
     auto_unbox = TRUE, 
     x          = list(
       
@@ -165,7 +165,7 @@ write_biom_json <- function (biom, file) {
       format              = "1.0.0", 
       type                = "OTU table",
       format_url          = "http://biom-format.org",
-      generated_by        = paste("rbiom", utils::packageVersion("rbiom")),
+      generated_by        = paste("rbiom", packageVersion("rbiom")),
       matrix_type         = "sparse",
       matrix_element_type = ifelse(all(biom$counts[['v']] %% 1 == 0), "int", "float"),
       shape               = dim(biom$counts),
@@ -266,7 +266,7 @@ write_biom_hdf5 <- function (biom, file) {
   rhdf5::h5writeAttribute(biom$date,                  h5, 'creation-date')
   rhdf5::h5writeAttribute(dim(biom$counts),           h5, 'shape') #, 2)
   rhdf5::h5writeAttribute(length(biom$counts[['v']]), h5, 'nnz')
-  rhdf5::h5writeAttribute(paste("rbiom", utils::packageVersion("rbiom")), h5, 'generated-by')
+  rhdf5::h5writeAttribute(paste("rbiom", packageVersion("rbiom")), h5, 'generated-by')
   
   
   
@@ -360,7 +360,6 @@ write_biom_hdf5 <- function (biom, file) {
   }
   
   
-  rhdf5::H5Fflush(h5)
   rhdf5::H5Fclose(h5)
   
   return (invisible(file))
@@ -374,7 +373,7 @@ write_biom_hdf5 <- function (biom, file) {
 write_metadata <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$metadata %>%
-      utils::write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
+      write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
   })
 }
 
@@ -387,7 +386,7 @@ write_counts <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$counts %>% 
       as.matrix() %>% 
-      utils::write.table(file = con, sep = sep, quote = quote, ...)
+      write.table(file = con, sep = sep, quote = quote, ...)
   })
 }
 
@@ -397,7 +396,7 @@ write_counts <- function (biom, file, quote = FALSE, sep = "\t", ...) {
 write_taxonomy <- function (biom, file, quote = FALSE, sep = "\t", ...) {
   write_wrapper(file, function (con) {
     as_rbiom(biom)$taxonomy %>%
-      utils::write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
+      write.table(file = con, quote = quote, sep = sep, row.names = FALSE, ...)
   })
 }
 

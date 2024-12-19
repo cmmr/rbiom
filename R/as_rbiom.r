@@ -51,7 +51,7 @@ as_rbiom.rbiom <- function (biom, ...) {
   #________________________________________________________
   # Already an rbiom/R6 object.
   #________________________________________________________
-  if (!identical(biom$pkg_version, utils::packageVersion("rbiom"))) {
+  if (!identical(biom$pkg_version, packageVersion("rbiom"))) {
     
     args <- c(list(...), as.list(biom))
     args <- args[!duplicated(names(args))]
@@ -88,7 +88,7 @@ as_rbiom.default <- function (biom, ...) {
   # Read new rbiom object from filename / URL / JSON.
   #________________________________________________________
   if (is_scalar_character(biom) && !is.na(biom))
-    return (read_biom_internal(src = biom, ...))
+    return (read_biom(src = biom, ...))
   
   
   #________________________________________________________

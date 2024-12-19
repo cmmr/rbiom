@@ -418,3 +418,13 @@ validate_df_field <- function (
   
   return (invisible(NULL))
 }
+
+
+is_nz_string <- function (str) {
+  isTRUE(is_scalar_character(str) && !is_na(str) && nzchar(trimws(str)))
+}
+
+is_url <- function (str) {
+  if (!is_nz_string(str)) return (FALSE)
+  isTRUE(grepl('^(http|ftp)s{0,1}://', tolower(str)))
+}

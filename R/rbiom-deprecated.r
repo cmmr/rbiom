@@ -216,7 +216,8 @@ phylogeny <- function (biom) {
 read.biom <- function (src, tree = "auto", prune = FALSE) {
   lifecycle::deprecate_warn("2.0.0", "read.biom()", "as_rbiom()")
   if (!missing(prune)) warning("`prune` argument is defunct")
-  read_biom_internal(src = src, tree = tree)
+  tree <- switch(as.character(tree %||% 'NULL'), 'auto' = NA, 'TRUE' = NA, 'FALSE' = NULL, tree)
+  if (is.na(tree)) read_biom(src = src) else read_biom(src = src, tree = tree)
 }
 
 
@@ -611,17 +612,6 @@ is.rarefied <- function (biom) {
     details = "Use `!is.null(biom$depth)` instead." )
   
   !is.null(as_rbiom(biom)$depth)
-}
-
-
-#' @name read_biom-deprecated
-#' @rdname rbiom-deprecated
-#' @section \code{read_biom}:
-#' Use [as_rbiom()] instead.
-#' @export
-read_biom <- function (src, tree = "auto", ...) {
-  lifecycle::deprecate_warn("2.0.0", "read_biom()", "as_rbiom()")
-  read_biom_internal(src = src, tree = tree, ...)
 }
 
 

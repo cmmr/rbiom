@@ -64,8 +64,8 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
   tbl <- plyr::ldply(ords, .id = ".ord", function (o) {
     
     if (o == "PCoA") {
-      args <- c(fun_params(ape::pcoa, dots), list(D = dm))
-      res  <- do.call(ape::pcoa, args)[['vectors']][,1:k]
+      args <- c(fun_params(pcoa, dots), list(D = dm))
+      res  <- do.call(pcoa, args)[['vectors']][,1:k]
       
     } else if (o == "tSNE") {
       require_package('tsne', 'to use "tSNE" ordination')
@@ -109,7 +109,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
     attr(tbl, 'tbl_sum') <- c(
       'Ordination' = switch(
         EXPR = unname(ords),
-        PCoA = "ape::pcoa(%s)",
+        PCoA = "pcoa(%s)",
         tSNE = "tsne::tsne(%s)",
         NMDS = "vegan::metaMDS(%s)",
         UMAP = "uwot::umap(%s)" ) %>%
