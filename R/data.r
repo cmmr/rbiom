@@ -22,7 +22,7 @@
 #'   \item{age - }{0 - 4.8 (years old)}
 #'   \item{country - }{Bangladesh, Gambia, Kenya, or Mali}
 #' }
-#' @source \url{https://doi.org/10.1186/gb-2014-15-6-r76} and \url{https://doi.org/10.1093/nar/gkx1027}
+#' @source \doi{10.1186/gb-2014-15-6-r76} and \doi{10.1093/nar/gkx1027}
 "gems"
 
 
@@ -42,5 +42,5 @@
 #'   \item{Delivery mode - }{Cesarean or Vaginal}
 #'   \item{Solid food introduced (Age) - }{116 - 247}
 #' }
-#' @source \url{https://www.nature.com/articles/s41467-018-04641-7} and \url{https://doi.org/10.1038/s41467-017-01973-8}
+#' @source \url{https://www.nature.com/articles/s41467-018-04641-7} and \doi{10.1038/s41467-017-01973-8}
 "babies"

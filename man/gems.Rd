@@ -14,7 +14,7 @@ Includes metadata and taxonomy.
 }
 }
 \source{
-\url{https://doi.org/10.1186/gb-2014-15-6-r76} and \url{https://doi.org/10.1093/nar/gkx1027}
+\doi{10.1186/gb-2014-15-6-r76} and \doi{10.1093/nar/gkx1027}
 }
 \usage{
 gems

@@ -22,7 +22,7 @@
 #'     
 #'     library(rbiom)
 #'     
-#'     hmp5 <- hmp[1:5]
+#'     hmp5 <- hmp50[1:5]
 #'     print(hmp5)
 #'       
 #'     # Requires 'SummarizedExperiment' Bioconductor R package

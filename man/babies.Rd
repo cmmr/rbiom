@@ -20,7 +20,7 @@ Includes metadata and taxonomy.
 }
 }
 \source{
-\url{https://www.nature.com/articles/s41467-018-04641-7} and \url{https://doi.org/10.1038/s41467-017-01973-8}
+\url{https://www.nature.com/articles/s41467-018-04641-7} and \doi{10.1038/s41467-017-01973-8}
 }
 \usage{
 babies
