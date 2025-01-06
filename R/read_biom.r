@@ -48,128 +48,114 @@ read_biom <- function (src, ...) {
   
   dots <- list(...)
   
-  biom <- tryCatch(
-    error   = function (e) stop(e),
-    warning = function (w) {
-      if (isTRUE(dots$debug)) {
-        cat(file = stderr(), 'Warning:', w$message)
-        cat(file = stdout(), 'Warning:', w$message)
-      }
-      warning (w)
-    },
-    expr    = {
+  if (is.logical(dots$tree) || identical(dots$tree, 'auto')) {
+    details <- "`tree` must be a newick string, phylo object, or NULL."
+    lifecycle::deprecate_warn("2.0.0", "read_biom()", details = details)
+    if (identical(dots$tree, FALSE)) { dots['tree'] <- list(NULL) }
+    else                             { dots$tree    <- NULL       }
+  }
+  
+  
+  #________________________________________________________
+  # Get the data into a file.
+  #________________________________________________________
+  fpath  <- as_filepath(src)
+  format <- fpath$format
+  fp     <- fpath$path
+  on.exit(fpath$cleanup(), add = TRUE)
+  
+  
+  #________________________________________________________
+  # Process the file according to its internal format.
+  #________________________________________________________
+  
+  if (format == "hdf5") {
     
-    if (is.logical(dots$tree) || identical(dots$tree, 'auto')) {
-      details <- "`tree` must be a newick string, phylo object, or NULL."
-      lifecycle::deprecate_warn("2.0.0", "read_biom()", details = details)
-      if (identical(dots$tree, FALSE)) { dots['tree'] <- list(NULL) }
-      else                             { dots$tree    <- NULL       }
-    }
+    #___________________#
+    # HDF5 file format  #
+    #___________________#
     
+    require_package('rhdf5', 'to read HDF5 formatted BIOM files')
+    if (!rhdf5::H5Fis_hdf5(fp))
+      cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
     
-    #________________________________________________________
-    # Get the data into a file.
-    #________________________________________________________
-    fpath  <- as_filepath(src)
-    format <- fpath$format
-    fp     <- fpath$path
-    on.exit(fpath$cleanup(), add = TRUE)
+    h5        <- read_biom_hdf5(fp)
+    counts    <- parse_hdf5_counts(h5)
+    info      <- parse_hdf5_info(h5)
+    sequences <- if (!hasName(dots, 'sequences')) parse_hdf5_sequences(h5)
+    taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_hdf5_taxonomy(h5)
+    metadata  <- if (!hasName(dots, 'metadata'))  parse_hdf5_metadata(h5)
+    phylogeny <- if (!hasName(dots, 'tree'))      parse_hdf5_tree(h5)
     
+    rhdf5::H5Fclose(h5)
+    remove("h5")
     
-    #________________________________________________________
-    # Process the file according to its internal format.
-    #________________________________________________________
+  } else if (format == "json") {
     
-    if (format == "hdf5") {
-      
-      #___________________#
-      # HDF5 file format  #
-      #___________________#
-      
-      require_package('rhdf5', 'to read HDF5 formatted BIOM files')
-      if (!rhdf5::H5Fis_hdf5(fp))
-        cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
-      
-      h5        <- read_biom_hdf5(fp)
-      counts    <- parse_hdf5_counts(h5)
-      info      <- parse_hdf5_info(h5)
-      sequences <- if (!hasName(dots, 'sequences')) parse_hdf5_sequences(h5)
-      taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_hdf5_taxonomy(h5)
-      metadata  <- if (!hasName(dots, 'metadata'))  parse_hdf5_metadata(h5)
-      phylogeny <- if (!hasName(dots, 'tree'))      parse_hdf5_tree(h5)
-      
-      rhdf5::H5Fclose(h5)
-      remove("h5")
-      
-    } else if (format == "json") {
-      
-      #___________________#
-      # JSON file format  #
-      #___________________#
-      
-      json      <- read_biom_json(fp)
-      counts    <- parse_json_counts(json)
-      info      <- parse_json_info(json)
-      sequences <- if (!hasName(dots, 'sequences')) parse_json_sequences(json)
-      taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_json_taxonomy(json)
-      metadata  <- if (!hasName(dots, 'metadata'))  parse_json_metadata(json)
-      phylogeny <- if (!hasName(dots, 'tree'))      parse_json_tree(json)
-      
-      remove("json")
-      
-    } else if (format == "text") {
-      
-      #___________________#
-      # TSV file format   #
-      #___________________#
-      
-      mtx       <- read_biom_tsv(fp)
-      counts    <- parse_tsv_counts(mtx)
-      info      <- list(id = fpath$id, type = 'OTU table')
-      taxonomy  <- if (!hasName(dots, 'taxonomy')) parse_tsv_taxonomy(mtx)
-      metadata  <- if (!hasName(dots, 'metadata')) data.frame(row.names=colnames(counts))
-      sequences <- NULL
-      phylogeny <- NULL
-      
-    } else {
-      cli_abort("`src` data type not recognized: {src}")
-    }
+    #___________________#
+    # JSON file format  #
+    #___________________#
     
+    json      <- read_biom_json(fp)
+    counts    <- parse_json_counts(json)
+    info      <- parse_json_info(json)
+    sequences <- if (!hasName(dots, 'sequences')) parse_json_sequences(json)
+    taxonomy  <- if (!hasName(dots, 'taxonomy'))  parse_json_taxonomy(json)
+    metadata  <- if (!hasName(dots, 'metadata'))  parse_json_metadata(json)
+    phylogeny <- if (!hasName(dots, 'tree'))      parse_json_tree(json)
     
-    #________________________________________________________
-    # Assemble everything as an rbiom class object.
-    #________________________________________________________
+    remove("json")
     
-    args <- c(
-      list(
-        'counts' = counts),
-      dots,
-      list(
-        'metadata'  = metadata, 
-        'taxonomy'  = taxonomy, 
-        'sequences' = sequences, 
-        'tree'      = phylogeny, 
-        'id'        = info$id, 
-        'date'      = info$date, 
-        'comment'   = info$comment ))
+  } else if (format == "text") {
     
-    args <- args[!duplicated(names(args))]
-    biom <- do.call(rbiom$new, args)
+    #___________________#
+    # TSV file format   #
+    #___________________#
     
+    mtx       <- read_biom_tsv(fp)
+    counts    <- parse_tsv_counts(mtx)
+    info      <- list(id = fpath$id, type = 'OTU table')
+    taxonomy  <- if (!hasName(dots, 'taxonomy')) parse_tsv_taxonomy(mtx)
+    metadata  <- if (!hasName(dots, 'metadata')) data.frame(row.names=colnames(counts))
+    sequences <- NULL
+    phylogeny <- NULL
     
-    #________________________________________________________
-    # Attach as_rbiom() call to provenance tracking
-    #________________________________________________________
-    # cl <- match.call()
-    # cl[[1]] <- as.name("as_rbiom")
-    # for (i in seq_along(cl)[-1]) {
-    #   val <- eval.parent(cl[[i]])
-    #   if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
-    #     cl[i] <- list(val)
-    # }
-    
-    biom
-  })
+  } else {
+    cli_abort("`src` data type not recognized: {src}")
+  }
+  
+  
+  #________________________________________________________
+  # Assemble everything as an rbiom class object.
+  #________________________________________________________
+  
+  args <- c(
+    list(
+      'counts' = counts),
+    dots,
+    list(
+      'metadata'  = metadata, 
+      'taxonomy'  = taxonomy, 
+      'sequences' = sequences, 
+      'tree'      = phylogeny, 
+      'id'        = info$id, 
+      'date'      = info$date, 
+      'comment'   = info$comment ))
+  
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  
+  #________________________________________________________
+  # Attach as_rbiom() call to provenance tracking
+  #________________________________________________________
+  # cl <- match.call()
+  # cl[[1]] <- as.name("as_rbiom")
+  # for (i in seq_along(cl)[-1]) {
+  #   val <- eval.parent(cl[[i]])
+  #   if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
+  #     cl[i] <- list(val)
+  # }
   
   
   return (biom)

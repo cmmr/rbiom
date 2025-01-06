@@ -4,18 +4,27 @@ test_that("read_biom", {
   
   f <- expect_silent(write_biom(hmp5, tempfile(), 'json'))
   g <- expect_silent(write_biom(min5, tempfile(), 'json'))
-  expect_silent(read_biom(src = f, debug = TRUE))
-  expect_silent(read_biom(src = g, debug = TRUE))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
   unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
   g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
-  expect_silent(read_biom(src = f, debug = TRUE))
-  expect_silent(read_biom(src = g, debug = TRUE))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
   unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(fileext = '.gz'), 'tab'))
   g <- expect_silent(write_biom(min5, tempfile(fileext = '.gz'), 'tab'))
+  
+  res <- capture.output(read_biom(src = f))
+  cat('output:', paste0(res, collapse = '\n'))
+  res <- rlang::catch_cnd(capture.output(read_biom(src = f)))
+  cat('cnd:', res$message)
+  op <- options(warn = 2)
+  read_biom(src = f, debug = TRUE)
+  options(op)
+  
   expect_silent(read_biom(src = f, debug = TRUE))
   expect_silent(read_biom(src = g, debug = TRUE))
   unlink(c(f, g))
