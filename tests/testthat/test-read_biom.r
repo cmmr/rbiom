@@ -2,6 +2,8 @@ test_that("read_biom", {
   
   skip_on_cran()
   
+  withr::local_options(list(warn = 2))
+  
   f <- expect_silent(write_biom(hmp5, tempfile(), 'json'))
   g <- expect_silent(write_biom(min5, tempfile(), 'json'))
   expect_silent(read_biom(src = f))

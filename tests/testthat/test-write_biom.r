@@ -1,5 +1,7 @@
 test_that(desc = "write_biom", code = {
   
+  withr::local_options(list(warn = 2))
+  
   tfile <- tempfile(fileext = '.biom')
   
   expect_silent(write_biom(hmp5, tfile, format = "tab"))
