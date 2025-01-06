@@ -48,7 +48,10 @@ read_biom <- function (src, ...) {
   
   dots <- list(...)
   
-  cnd <- rlang::catch_cnd({
+  tryCatch(
+    error   = function (e) stop(e),
+    warning = function (w) if (isTRUE(debug)) stop(w) else warning(w),
+    expr    = {
     
     if (is.logical(dots$tree) || identical(dots$tree, 'auto')) {
       details <- "`tree` must be a newick string, phylo object, or NULL."
@@ -151,21 +154,15 @@ read_biom <- function (src, ...) {
     #________________________________________________________
     # Attach as_rbiom() call to provenance tracking
     #________________________________________________________
-    cl <- match.call()
-    cl[[1]] <- as.name("as_rbiom")
-    for (i in seq_along(cl)[-1]) {
-      val <- eval.parent(cl[[i]])
-      if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
-        cl[i] <- list(val)
-    }
+    # cl <- match.call()
+    # cl[[1]] <- as.name("as_rbiom")
+    # for (i in seq_along(cl)[-1]) {
+    #   val <- eval.parent(cl[[i]])
+    #   if (all(nchar(val) <= 200)) # Don't dump huge JSON strings
+    #     cl[i] <- list(val)
+    # }
     
   })
-  
-  if (inherits(cnd, 'condition')) {
-    if (identical(dots$warn, 2L))
-      class(cnd) <- sub('warning', 'error', class(cnd))
-    rlang::cnd_signal(cnd)
-  }
   
   
   return (biom)
