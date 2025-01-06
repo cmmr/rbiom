@@ -63,8 +63,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{other}{Sum all non-itemized taxa into an "Other" taxa. When
 \code{FALSE}, only returns taxa matched by the \code{taxa}

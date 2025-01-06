@@ -17,8 +17,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, ...)
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
-Default: \code{"PCoA"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}

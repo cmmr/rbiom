@@ -13,7 +13,7 @@
 #' @inherit documentation_default
 #' 
 #' @param file  Path to the output file. File names ending in \code{.gz} or 
-#'        \code{.bz2} will be compressed accordingly. \cr\cr
+#'        \code{.bz2} will be compressed accordingly.
 #'        Setting `file=NULL` for `write_fasta()`, `write_tree()`, and 
 #'        `write_biom(format='json')`, and returns a string of the output which 
 #'        would have been written. For `write_biom(format='tab')`, `file=NULL`

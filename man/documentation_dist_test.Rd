@@ -13,8 +13,7 @@ statistics should be calculated. Required.}
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
 }
-Default: \code{"adonis2"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"adonis2"}}
 }
 \description{
 documentation_dist_test

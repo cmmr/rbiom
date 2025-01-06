@@ -33,8 +33,8 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
-Multiple/abbreviated values allowed.}
+provided via \verb{tree=}. Multiple/abbreviated values allowed.
+Default: \code{"Bray-Curtis"}}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
@@ -43,13 +43,11 @@ Multiple/abbreviated values allowed.}
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
-Default: \code{"PCoA"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE} \cr\cr
-Multiple values allowed.}
+Multiple values allowed. Default: \code{TRUE}}
 
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
@@ -73,8 +71,7 @@ computing UniFrac distances. Default: \code{biom$tree}}
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
 }
-Default: \code{"adonis2"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"adonis2"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
@@ -115,8 +112,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
 \code{\link[=pcoa]{pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
@@ -125,9 +121,9 @@ Abbreviations are allowed.}
 A data.frame with columns \code{.sample}, \code{.weighted},
 \code{.bdiv}, \code{.ord}, \code{.x}, \code{.y}, and (optionally)
 \code{.z}. Any columns given by \code{md}, \code{split.by}, and
-\code{stat.by} are included as well.\cr
+\code{stat.by} are included as well.
 If \code{stat.by} is given, then \code{$stats} and
-\code{$stats$code)} are set.\cr
+\code{$stats$code)} are set.
 If \code{rank} is given, then \code{$taxa_coords},
 \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
 }

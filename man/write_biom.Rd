@@ -29,7 +29,7 @@ write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
 Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
 
 \item{file}{Path to the output file. File names ending in \code{.gz} or
-\code{.bz2} will be compressed accordingly. \cr\cr
+\code{.bz2} will be compressed accordingly.
 Setting \code{file=NULL} for \code{write_fasta()}, \code{write_tree()}, and
 \code{write_biom(format='json')}, and returns a string of the output which
 would have been written. For \code{write_biom(format='tab')}, \code{file=NULL}
@@ -58,8 +58,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 }
 \value{
 The normalized filepath that was written to (invisibly), unless

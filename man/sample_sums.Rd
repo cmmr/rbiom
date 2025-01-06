@@ -33,8 +33,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{FUN}{The function to apply to each column of \code{taxa_matrix()}.}
 

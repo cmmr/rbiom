@@ -20,8 +20,7 @@ categorical or numeric. Required.}
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
 }
-Default: \code{"adonis2"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"adonis2"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
@@ -42,7 +41,7 @@ divided by the standard deviation of permutations (also known
 as z-values). Evaluated from permuted values without observed
 statistic. }
 \item{\emph{.p.val} - }{ Probability calculated by \code{test}. }
-}\cr
+}
 R commands for reproducing the results are in \code{$code}.
 }
 \description{

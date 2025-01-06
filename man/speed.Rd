@@ -30,8 +30,6 @@ rarefy(biom, clone = FALSE)
 biom$metadata \%<>\% subset(...)
 biom$counts \%<>\% rarefy_cols()
 }\if{html}{\out{</div>}}
-
-\cr
 }
 
 \section{Drop Components}{
@@ -65,8 +63,6 @@ provide it to just the functions that use it. For example:
 biom$tree <- NULL
 dm <- bdiv_distmat(biom, 'unifrac', tree = tree)
 }\if{html}{\out{</div>}}
-
-\cr
 }
 }
 
@@ -82,8 +78,6 @@ specified in bytes by an R option or environment variable.
 Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 3)    # 1 GB
 }\if{html}{\out{</div>}}
 
-\cr
-
 You can also specify a cache directory where results can be preserved from
 one R session to the next.
 
@@ -91,14 +85,11 @@ one R session to the next.
 Sys.setenv(RBIOM_CACHE_DIR="~/rbiom_cache")
 }\if{html}{\out{</div>}}
 
-\cr
-
 Other quick notes about caching:
 \itemize{
 \item Setting the cache directory to \code{"FALSE"} will disable caching.
 \item R options will override environment variables.
 \item The key hash algorithm can be set with \code{options(rbiom.cache_hash=rlang::hash)}.
-\cr
 }
 }
 
@@ -113,8 +104,6 @@ can be slow. Instead, set the \code{layers} parameter to use other options.
 adiv_corrplot(biom, layers = "tc") # trend, confidence
 bdiv_ord_plot(biom, layers = "e")  # ellipse
 }\if{html}{\out{</div>}}
-
-\cr
 }
 
 \keyword{internal}

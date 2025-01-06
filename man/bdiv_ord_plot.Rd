@@ -35,8 +35,8 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
-Multiple/abbreviated values allowed.}
+provided via \verb{tree=}. Multiple/abbreviated values allowed.
+Default: \code{"Bray-Curtis"}}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
@@ -45,13 +45,11 @@ Multiple/abbreviated values allowed.}
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
-Default: \code{"PCoA"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE} \cr\cr
-Multiple values allowed.}
+Multiple values allowed. Default: \code{TRUE}}
 
 \item{layers}{One or more of
 \code{c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")}.
@@ -94,8 +92,7 @@ computing UniFrac distances. Default: \code{biom$tree}}
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
 }
-Default: \code{"adonis2"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"adonis2"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
@@ -135,8 +132,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
@@ -149,11 +145,11 @@ have their size set to \code{2}. Points can also be controlled with
 the \code{pt.} prefix.}
 }
 \value{
-A \code{ggplot2} plot. \cr
+A \code{ggplot2} plot.
 The computed sample coordinates and ggplot command
-are available as \code{$data} and \code{$code} respectively. \cr
+are available as \code{$data} and \code{$code} respectively.
 If \code{stat.by} is given, then \code{$stats} and
-\code{$stats$code} are set. \cr
+\code{$stats$code} are set.
 If \code{rank} is given, then \code{$data$taxa_coords},
 \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
 }

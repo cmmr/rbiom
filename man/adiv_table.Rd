@@ -13,8 +13,8 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Default: \code{"Shannon"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed.
+Default: \code{"Shannon"}}
 
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
@@ -25,8 +25,8 @@ useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}
 }
 \value{
-A data frame of alpha diversity values. \cr
-Each combination of sample/depth/\code{adiv} has its own row. \cr
+A data frame of alpha diversity values.
+Each combination of sample/depth/\code{adiv} has its own row.
 Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv},
 and \bold{.diversity}, followed by any metadata fields requested by
 \code{md}.

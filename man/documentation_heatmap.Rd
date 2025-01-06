@@ -83,7 +83,7 @@ no title, or any character string. Default: \code{TRUE}}
 \item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points and ggplot
+A \code{ggplot2} plot. The computed data points and ggplot
 command are available as \verb{$data} and \verb{$code},
 respectively.
 }

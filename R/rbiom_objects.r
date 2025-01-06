@@ -1,18 +1,18 @@
 #' Working with rbiom Objects.
 #' 
-#' \cr
+#' @description
 #' Rbiom objects make it easy to access and manipulate your BIOM data, ensuring 
 #' all the disparate components remain in sync. These objects behave largely 
 #' like lists, in that you can access and assign to them using the `$` 
 #' operator. The sections below list all the fields which can be read and/or 
 #' written, and the helper functions for common tasks like rarefying and 
 #' subsetting. To create an rbiom object, see [as_rbiom()].
-#' \cr\cr
+#' 
 #' Use `$clone()` to create a copy of an rbiom object. This is necessary 
 #' because rbiom objects are **passed by reference**. The usual `<-` assignment 
 #' operator will simply create a second reference to the same object - it will 
 #' not create a second object. See [speed ups][speed] for more details.
-#' \cr\cr
+#' 
 #' 
 #' 
 #' @name rbiom_objects
@@ -38,7 +38,6 @@
 #' | `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
 #' | `$date`                  | Date from BIOM file.                                   |
 #' 
-#' \cr
 #' 
 #' 
 #' @section Writable Fields:
@@ -58,7 +57,6 @@
 #' | `$id`, `$comment` | String with dataset's title or comment.                 |
 #' | `$date`           | Date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string.     |
 #' 
-#' \cr
 #' 
 #' 
 #' @section Transformations:
@@ -74,7 +72,6 @@
 #' | [mutate()]                       | Create, modify, and delete metadata fields.      |
 #' | [rarefy()]                       | Sub-sample OTU counts to an even sampling depth. |
 #' 
-#' \cr
 #' 
 #' 
 #' @examples

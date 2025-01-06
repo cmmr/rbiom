@@ -33,8 +33,8 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Default: \code{"Shannon"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed.
+Default: \code{"Shannon"}}
 
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
@@ -112,7 +112,7 @@ layer. For instance, \code{p.size = 2} ensures only the points have their
 size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,
+A \code{ggplot2} plot. The computed data points, ggplot2 command,
 stats table, and stats table commands are available as \verb{$data},
 \verb{$code}, \verb{$stats}, and \verb{$stats$code}, respectively.
 }

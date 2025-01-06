@@ -4,19 +4,17 @@
 \alias{rbiom_objects}
 \title{Working with rbiom Objects.}
 \description{
-\cr
 Rbiom objects make it easy to access and manipulate your BIOM data, ensuring
 all the disparate components remain in sync. These objects behave largely
 like lists, in that you can access and assign to them using the \code{$}
 operator. The sections below list all the fields which can be read and/or
 written, and the helper functions for common tasks like rarefying and
 subsetting. To create an rbiom object, see \code{\link[=as_rbiom]{as_rbiom()}}.
-\cr\cr
+
 Use \verb{$clone()} to create a copy of an rbiom object. This is necessary
 because rbiom objects are \strong{passed by reference}. The usual \verb{<-} assignment
 operator will simply create a second reference to the same object - it will
 not create a second object. See \link[=speed]{speed ups} for more details.
-\cr\cr
 }
 \section{Readable Fields}{
 
@@ -35,9 +33,6 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
    \verb{$depth} \tab Rarefaction depth, or \code{NULL} if unrarefied. \cr
    \verb{$date} \tab Date from BIOM file. \cr
 }
-
-
-\cr
 }
 
 \section{Writable Fields}{
@@ -56,9 +51,6 @@ validation checks and inter-component synchronization.\tabular{ll}{
    \verb{$id}, \verb{$comment} \tab String with dataset's title or comment. \cr
    \verb{$date} \tab Date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string. \cr
 }
-
-
-\cr
 }
 
 \section{Transformations}{
@@ -73,9 +65,6 @@ All functions return an rbiom object.\tabular{ll}{
    \code{\link[=mutate]{mutate()}} \tab Create, modify, and delete metadata fields. \cr
    \code{\link[=rarefy]{rarefy()}} \tab Sub-sample OTU counts to an even sampling depth. \cr
 }
-
-
-\cr
 }
 
 \examples{

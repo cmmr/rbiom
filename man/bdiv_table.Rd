@@ -50,13 +50,12 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
-Multiple/abbreviated values allowed.}
+provided via \verb{tree=}. Multiple/abbreviated values allowed.
+Default: \code{"Bray-Curtis"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE} \cr\cr
-Multiple values allowed.}
+Multiple values allowed. Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when

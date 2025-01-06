@@ -33,8 +33,8 @@ categorical. Default: \code{NULL}}
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Default: \code{"Shannon"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed.
+Default: \code{"Shannon"}}
 
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}

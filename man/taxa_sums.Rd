@@ -68,8 +68,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{transform}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is

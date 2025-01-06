@@ -43,8 +43,8 @@ argument in \code{\link[=stats_table]{stats_table()}}. Required.}
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
-Multiple/abbreviated values allowed.}
+provided via \verb{tree=}. Multiple/abbreviated values allowed.
+Default: \code{"Bray-Curtis"}}
 
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
@@ -54,8 +54,7 @@ Default: \code{"tc"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE} \cr\cr
-Multiple values allowed.}
+Multiple values allowed. Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -136,7 +135,7 @@ layer. For instance, \code{p.size = 2} ensures only the points have their
 size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,
+A \code{ggplot2} plot. The computed data points, ggplot2 command,
 stats table, and stats table commands are available as \verb{$data},
 \verb{$code}, \verb{$stats}, and \verb{$stats$code}, respectively.
 }

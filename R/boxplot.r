@@ -30,7 +30,7 @@
 #'        \bold{dot} layer have their size set to `2`.
 #'        
 #' 
-#' @return A `ggplot2` plot. \cr The computed data points, ggplot2 command, 
+#' @return A `ggplot2` plot. The computed data points, ggplot2 command, 
 #'         stats table, and stats table commands are available as `$data`, 
 #'         `$code`, `$stats`, and `$stats$code`, respectively.
 #' 

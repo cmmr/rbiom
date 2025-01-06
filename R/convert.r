@@ -19,23 +19,23 @@
 #' 
 #' @export
 #' @examples
-#'     
+#' \dontrun{
 #'     library(rbiom)
 #'     
-#'     hmp5 <- hmp50[1:5]
-#'     print(hmp5)
-#'       
+#'     print(hmp50)
+#'     
 #'     # Requires 'SummarizedExperiment' Bioconductor R package
 #'     if (nzchar(system.file(package = "SummarizedExperiment"))) {
-#'       se <- convert_to_SE(hmp5)
+#'       se <- convert_to_SE(hmp50)
 #'       print(se)
 #'     }
-#'       
+#'     
 #'     # Requires 'TreeSummarizedExperiment' Bioconductor R package
 #'     if (nzchar(system.file(package = "TreeSummarizedExperiment"))) {
-#'       tse <- convert_to_TSE(hmp5)
+#'       tse <- convert_to_TSE(hmp50)
 #'       print(tse)
 #'     }
+#' }
 
 convert_to_SE <- function (biom, ...) {
   

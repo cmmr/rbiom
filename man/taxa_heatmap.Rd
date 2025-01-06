@@ -67,8 +67,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
@@ -156,7 +155,7 @@ Default: \code{"auto"}.}
 \item{...}{Additional arguments to pass on to ggplot2::theme().}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points and ggplot
+A \code{ggplot2} plot. The computed data points and ggplot
 command are available as \verb{$data} and \verb{$code},
 respectively.
 }

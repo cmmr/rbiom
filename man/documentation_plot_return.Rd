@@ -4,7 +4,7 @@
 \alias{documentation_plot_return}
 \title{documentation_plot_return}
 \value{
-A \code{ggplot2} plot. \cr The computed data points and ggplot
+A \code{ggplot2} plot. The computed data points and ggplot
 command are available as \verb{$data} and \verb{$code},
 respectively.
 }

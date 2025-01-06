@@ -74,8 +74,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{other}{Sum all non-itemized taxa into an "Other" taxa. When
 \code{FALSE}, only returns taxa matched by the \code{taxa}
@@ -154,7 +153,7 @@ layer. For instance, \code{p.size = 2} ensures only the points have their
 size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,
+A \code{ggplot2} plot. The computed data points, ggplot2 command,
 stats table, and stats table commands are available as \verb{$data},
 \verb{$code}, \verb{$stats}, and \verb{$stats$code}, respectively.
 }

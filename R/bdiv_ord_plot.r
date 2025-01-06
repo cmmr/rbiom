@@ -23,11 +23,11 @@
 #'        the \code{pt.} prefix.
 #'           
 #'        
-#' @return A \code{ggplot2} plot. \cr
+#' @return A \code{ggplot2} plot.
 #'         The computed sample coordinates and ggplot command 
-#'         are available as \code{$data} and \code{$code} respectively. \cr
+#'         are available as \code{$data} and \code{$code} respectively.
 #'         If \code{stat.by} is given, then \code{$stats} and 
-#'         \code{$stats$code} are set. \cr
+#'         \code{$stats$code} are set.
 #'         If \code{rank} is given, then \code{$data$taxa_coords}, 
 #'         \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
 #' 

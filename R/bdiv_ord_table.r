@@ -17,9 +17,9 @@
 #' @return A data.frame with columns \code{.sample}, \code{.weighted}, 
 #'         \code{.bdiv}, \code{.ord}, \code{.x}, \code{.y}, and (optionally) 
 #'         \code{.z}. Any columns given by \code{md}, \code{split.by}, and 
-#'         \code{stat.by} are included as well.\cr
+#'         \code{stat.by} are included as well.
 #'         If \code{stat.by} is given, then \code{$stats} and 
-#'         \code{$stats$code)} are set.\cr
+#'         \code{$stats$code)} are set.
 #'         If \code{rank} is given, then \code{$taxa_coords}, 
 #'         \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
 #'         

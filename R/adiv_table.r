@@ -5,8 +5,8 @@
 #' 
 #' @family alpha_diversity
 #'        
-#' @return A data frame of alpha diversity values. \cr
-#'         Each combination of sample/depth/\code{adiv} has its own row. \cr
+#' @return A data frame of alpha diversity values.
+#'         Each combination of sample/depth/\code{adiv} has its own row.
 #'         Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv}, 
 #'         and \bold{.diversity}, followed by any metadata fields requested by 
 #'         \code{md}.

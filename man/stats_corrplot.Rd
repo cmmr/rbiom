@@ -109,7 +109,7 @@ layer. For instance, \code{p.size = 2} ensures only the points have their
 size set to \code{2}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points, ggplot2 command,
+A \code{ggplot2} plot. The computed data points, ggplot2 command,
 stats table, and stats table commands are available as \verb{$data},
 \verb{$code}, \verb{$stats}, and \verb{$stats$code}, respectively.
 }

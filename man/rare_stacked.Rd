@@ -29,7 +29,7 @@ rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 \item{labels}{Show sample names under each bar. Default: \code{TRUE}.}
 
 \item{y.transform}{Y-axis transformation. Options are \code{"log10"} or
-\code{"none"}.  Default: \code{"log10"}.\cr\cr
+\code{"none"}.  Default: \code{"log10"}.
 Use \code{xaxis.transform} or \code{yaxis.transform} to pass custom values
 directly to ggplot2's \verb{scale_*} functions.}
 
@@ -40,7 +40,7 @@ passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
 has its color set to \code{"black"}.}
 }
 \value{
-A \code{ggplot2} plot. \cr The computed data points and ggplot
+A \code{ggplot2} plot. The computed data points and ggplot
 command are available as \verb{$data} and \verb{$code},
 respectively.
 }

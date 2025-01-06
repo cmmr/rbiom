@@ -19,15 +19,15 @@ to include all metadata fields. Default: \code{'.all'}}
 \item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Default: \code{"Shannon"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed.
+Default: \code{"Shannon"}}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
 \code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
 phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Default: \code{"Bray-Curtis"} \cr\cr
-Multiple/abbreviated values allowed.}
+provided via \verb{tree=}. Multiple/abbreviated values allowed.
+Default: \code{"Bray-Curtis"}}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -42,13 +42,11 @@ Default: \code{6}.}
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
 }
-Default: \code{"PCoA"} \cr\cr
-Multiple/abbreviated values allowed.}
+Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
-Default: \code{TRUE} \cr\cr
-Multiple values allowed.}
+Multiple values allowed. Default: \code{TRUE}}
 
 \item{delta}{For numeric metadata, report the absolute difference in values
 for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
@@ -77,8 +75,7 @@ taxa names. Options are:
 \item{\code{"drop"} - }{ Excludes them from the result. }
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
-Default: \code{"singly"} \cr\cr
-Abbreviations are allowed.}
+Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{other}{Sum all non-itemized taxa into an "Other" taxa. When
 \code{FALSE}, only returns taxa matched by the \code{taxa}
@@ -109,7 +106,7 @@ a non-linear axis. Options are:
 }
 These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
-observations. Default: \code{"sqrt"}\cr\cr
+observations. Default: \code{"sqrt"}
 Use \code{xaxis.transform} or \code{yaxis.transform} to pass custom values
 directly to ggplot2's \verb{scale_*} functions.}
 

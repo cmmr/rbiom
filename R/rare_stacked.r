@@ -18,7 +18,7 @@
 #' @param labels   Show sample names under each bar. Default: `TRUE`.
 #'        
 #' @param y.transform   Y-axis transformation. Options are `"log10"` or 
-#'        `"none"`.  Default: `"log10"`.\cr\cr
+#'        `"none"`.  Default: `"log10"`.
 #'        Use `xaxis.transform` or `yaxis.transform` to pass custom values 
 #'        directly to ggplot2's `scale_*` functions.
 #'        

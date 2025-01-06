@@ -20,15 +20,16 @@
 #' @param adiv   Alpha diversity metric(s) to use. Options are: `"OTUs"`, 
 #'        `"Shannon"`, `"Chao1"`, `"Simpson"`, and/or 
 #'        `"InvSimpson"`. Set `adiv=".all"` to use all metrics.
-#'        Default: `"Shannon"` \cr\cr
 #'        Multiple/abbreviated values allowed.
+#'        Default: `"Shannon"`
 #' 
 #' @param bdiv  Beta diversity distance algorithm(s) to use. Options are:
 #'        `"Bray-Curtis"`, `"Manhattan"`, `"Euclidean"`, 
 #'        `"Jaccard"`, and `"UniFrac"`. For `"UniFrac"`, a 
 #'        phylogenetic tree must be present in `biom` or explicitly 
-#'        provided via `tree=`. Default: `"Bray-Curtis"` \cr\cr
-#'        Multiple/abbreviated values allowed.
+#'        provided via `tree=`. Multiple/abbreviated values allowed. 
+#'        Default: `"Bray-Curtis"`
+#'       
 #' 
 #' @param taxa   Which taxa to display. An integer value will show the top n
 #'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
@@ -43,13 +44,13 @@
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
 #'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
 #'        }
-#'        Default: `"PCoA"` \cr\cr
-#'        Multiple/abbreviated values allowed.
+#'        Multiple/abbreviated values allowed. Default: `"PCoA"`
+#'        
 #'     
 #' @param weighted  Take relative abundances into account. When 
 #'        `weighted=FALSE`, only presence/absence is considered.
-#'        Default: `TRUE` \cr\cr
-#'        Multiple values allowed.
+#'        Multiple values allowed. Default: `TRUE`
+#'       
 #' 
 #' @param delta  For numeric metadata, report the absolute difference in values 
 #'        for the two samples, for instance `2` instead of `"10 vs 12"`. 
@@ -78,8 +79,8 @@
 #'          \item{`"drop"` - }{ Excludes them from the result. }
 #'          \item{`"asis"` - }{ To not check/modify any taxa names. }
 #'        }
-#'        Default: `"singly"` \cr\cr
-#'        Abbreviations are allowed.
+#'        Abbreviations are allowed. Default: `"singly"`
+#'       
 #'        
 #' @param other  Sum all non-itemized taxa into an "Other" taxa. When 
 #'        `FALSE`, only returns taxa matched by the `taxa` 
@@ -110,7 +111,7 @@
 #'        }
 #'        These methods allow visualization of both high- and low-abundance
 #'        taxa simultaneously, without complaint about 'zero' count
-#'        observations. Default: `"sqrt"`\cr\cr
+#'        observations. Default: `"sqrt"`
 #'        Use `xaxis.transform` or `yaxis.transform` to pass custom values 
 #'        directly to ggplot2's `scale_*` functions.
 #'        
@@ -506,8 +507,8 @@ NULL
 #'            \item{`"mrpp"` - }{ Multiple response permutation procedure; [vegan::mrpp()]. }
 #'            \item{`"none"` - }{ Don't run any statistics. }
 #'        }
-#'        Default: `"adonis2"` \cr\cr
-#'        Abbreviations are allowed.
+#'        Abbreviations are allowed. Default: `"adonis2"`
+#'       
 #'        
 NULL
 
@@ -520,7 +521,7 @@ NULL
 #' @name documentation_plot_return
 #' @keywords internal
 #' 
-#' @return A `ggplot2` plot. \cr The computed data points and ggplot 
+#' @return A `ggplot2` plot. The computed data points and ggplot 
 #'         command are available as `$data` and `$code`, 
 #'         respectively.
 #' 

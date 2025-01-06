@@ -20,7 +20,7 @@
 #'                as z-values). Evaluated from permuted values without observed 
 #'                statistic. }
 #'          \item{\emph{.p.val} - }{ Probability calculated by \code{test}. }
-#'        }\cr
+#'        }
 #'         R commands for reproducing the results are in \code{$code}.
 #'         
 #' @export
