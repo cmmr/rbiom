@@ -126,13 +126,14 @@ as_filepath <- function (src) {
     
   if (is_url(src)) {
     
-    id      <- src
+    id      <- if (nchar(src) > 100) basename(src) else src
     path    <- tempfile()
     cleanup <- function () unlink(path)
     if (!eq(0L, x <- try(download.file(url = src, path, quiet=TRUE), silent=TRUE)))
       cli_abort("Cannot retrieve URL {.url {src}}: {x}")
     
     format <- file_type(src = path, filename = src)
+    
     
   } else {
     
@@ -148,13 +149,14 @@ as_filepath <- function (src) {
       class(format) <- NULL
       
     } else {
-      id      <- normalizePath(src, winslash = '/')
-      path    <- src
+      path    <- normalizePath(src, winslash = '/')
+      id      <- if (nchar(path) > 100) basename(path) else path
       cleanup <- function () NULL
     }
   }
   
   result <- list(id = id, path = path, format = format, cleanup = cleanup)
+  
   
   return (result)
 }
