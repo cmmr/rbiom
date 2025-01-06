@@ -50,7 +50,13 @@ read_biom <- function (src, ...) {
   
   biom <- tryCatch(
     error   = function (e) stop(e),
-    # warning = function (w) if (isTRUE(dots$debug)) stop(w) else warning(w),
+    warning = function (w) {
+      if (isTRUE(dots$debug)) {
+        cat(file = stderr(), 'Warning:', w$message)
+        cat(file = stdout(), 'Warning:', w$message)
+      }
+      warning (w)
+    },
     expr    = {
     
     if (is.logical(dots$tree) || identical(dots$tree, 'auto')) {
