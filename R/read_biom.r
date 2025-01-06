@@ -48,7 +48,7 @@ read_biom <- function (src, ...) {
   
   dots <- list(...)
   
-  tryCatch(
+  biom <- tryCatch(
     error   = function (e) stop(e),
     warning = function (w) if (isTRUE(debug)) stop(w) else warning(w),
     expr    = {
@@ -162,6 +162,7 @@ read_biom <- function (src, ...) {
     #     cl[i] <- list(val)
     # }
     
+    biom
   })
   
   
