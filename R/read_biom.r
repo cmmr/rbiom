@@ -162,7 +162,8 @@ read_biom <- function (src, ...) {
   })
   
   if (inherits(cnd, 'condition')) {
-    class(cnd) <- sub('warning', 'error', class(cnd))
+    if (identical(dots$warn, 2L))
+      class(cnd) <- sub('warning', 'error', class(cnd))
     rlang::cnd_signal(cnd)
   }
   

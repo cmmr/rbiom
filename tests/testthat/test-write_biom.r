@@ -3,17 +3,17 @@ test_that(desc = "write_biom", code = {
   tfile <- tempfile(fileext = '.biom')
   
   expect_silent(write_biom(hmp5, tfile, format = "tab"))
-  expect_silent(read_biom(tfile))
+  expect_silent(read_biom(tfile, warn = 2L))
   expect_error(write_biom(hmp5, tfile))
   unlink(tfile)
   
   expect_silent(write_biom(hmp5, tfile, format = "json"))
-  expect_silent(read_biom(tfile))
+  expect_silent(read_biom(tfile, warn = 2L))
   expect_silent(readChar(tfile, nchars = file.size(tfile)))
   unlink(tfile)
   
   expect_silent(write_biom(hmp5, tfile, format = "hdf5"))
-  expect_silent(read_biom(tfile))
+  expect_silent(read_biom(tfile, warn = 2L))
   unlink(tfile)
   
   skip_on_cran()
