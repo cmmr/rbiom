@@ -4,8 +4,8 @@ test_that("read_biom", {
   
   f <- expect_silent(write_biom(hmp5, tempfile(), 'json'))
   g <- expect_silent(write_biom(min5, tempfile(), 'json'))
-  expect_silent(read_biom(src = f))
-  expect_silent(read_biom(src = g))
+  expect_silent(read_biom(src = f, debug = TRUE))
+  expect_silent(read_biom(src = g, debug = TRUE))
   unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
@@ -16,8 +16,8 @@ test_that("read_biom", {
   
   f <- expect_silent(write_biom(hmp5, tempfile(fileext = '.gz'), 'tab'))
   g <- expect_silent(write_biom(min5, tempfile(fileext = '.gz'), 'tab'))
-  expect_silent(read_biom(src = f))
-  expect_silent(read_biom(src = g))
+  expect_silent(read_biom(src = f, debug = TRUE))
+  expect_silent(read_biom(src = g, debug = TRUE))
   unlink(c(f, g))
   
   expect_error(read_biom_hdf5(tempfile()))
