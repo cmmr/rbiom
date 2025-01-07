@@ -13,15 +13,25 @@
 There were no ERRORs or WARNINGs.
 
 
-There was 1 NOTE:
+There were 2 NOTEs:
 
 
 * checking installed package size ... NOTE
-  installed size is  6.5Mb
+  installed size is  6.3Mb
   sub-directories of 1Mb or more:
     libs   3.9Mb
 
   Including Rcpp and RcppParallel sometimes results in compiled libraries of this size.
+
+
+* Maintainer: 'Daniel P. Smith <dansmith01@gmail.com>'
+  
+  New maintainer:
+    Daniel P. Smith <dansmith01@gmail.com>
+  Old maintainer(s):
+    Daniel P. Smith <dansmith@orst.edu>
+
+  Updating my current email address.
 
 
 ## Downstream dependencies
