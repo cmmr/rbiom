@@ -21,7 +21,6 @@ importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "as", "formalArgs")
 importFrom("pillar", "tbl_sum", "glimpse")
 importFrom("plyr", ".", "ddply", "ldply", "llply")
-
 importFrom("stats", "as.formula", "median", "na.omit", "p.adjust", "sd", "setNames", "t.test", "var")
 importFrom("readr", "read_delim")
 importFrom("readxl", "read_excel")
@@ -29,6 +28,7 @@ importFrom("readxl", "read_excel")
 importFrom("slam", 
            "simple_triplet_matrix", "as.simple_triplet_matrix", "is.simple_triplet_matrix",
            "col_sums", "row_sums", "rollup")
+
 importFrom("tidyplots", "tidyplot")
 
 importFrom("utils",
@@ -56,8 +56,6 @@ export(`bdiv_table`)
 export(`bdply`)
 export(`biom_merge`)
 export(`blply`)
-export(`convert_to_TSE`)
-export(`convert_to_SE`)
 export(`distmat_ord_table`)
 export(`distmat_stats`)
 export(`plot_heatmap`)
