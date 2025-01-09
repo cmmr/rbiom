@@ -79,3 +79,4 @@ taxa_stacked(biom, rank = "Phylum")
 taxa_table(biom, 'Phylum')
 ```
  
+ 
