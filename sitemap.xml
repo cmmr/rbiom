@@ -14,7 +14,6 @@
 <url><loc>https://cmmr.github.io/rbiom/authors.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/index.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/news/index.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/paper.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_boxplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_corrplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_matrix.html</loc></url>
@@ -33,9 +32,7 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/bdiv_stats.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/bdiv_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/bdply.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/reference/biom_file_format.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/biom_merge.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/reference/convert_to_SE.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/distmat_ord_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/distmat_stats.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/documentation_biom.rbiom.html</loc></url>
@@ -64,6 +61,7 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/rbiom-deprecated.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rbiom-package.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rbiom_objects.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/read_biom.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/read_fasta.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/read_tree.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/reexports.html</loc></url>

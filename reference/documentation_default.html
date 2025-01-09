@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,8 +81,8 @@ to include all metadata fields. Default: <code>'.all'</code></p></dd>
 <dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
 <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
 <code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
-Default: <code>"Shannon"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+Multiple/abbreviated values allowed.
+Default: <code>"Shannon"</code></p></dd>
 
 
 <dt id="arg-bdiv">bdiv<a class="anchor" aria-label="anchor" href="#arg-bdiv"></a></dt>
@@ -90,8 +90,8 @@ Multiple/abbreviated values allowed.</p></dd>
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
 <code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
 phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+provided via <code>tree=</code>. Multiple/abbreviated values allowed.
+Default: <code>"Bray-Curtis"</code></p></dd>
 
 
 <dt id="arg-taxa">taxa<a class="anchor" aria-label="anchor" href="#arg-taxa"></a></dt>
@@ -116,15 +116,13 @@ Default: <code>6</code>.</p></dd>
 <dd><p>t-distributed stochastic neighbor embedding; <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne::tsne()</a></code>.</p></dd>
 
 
-</dl><p>Default: <code>"PCoA"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+</dl><p>Multiple/abbreviated values allowed. Default: <code>"PCoA"</code></p></dd>
 
 
 <dt id="arg-weighted">weighted<a class="anchor" aria-label="anchor" href="#arg-weighted"></a></dt>
 <dd><p>Take relative abundances into account. When
 <code>weighted=FALSE</code>, only presence/absence is considered.
-Default: <code>TRUE</code> <br><br>
-Multiple values allowed.</p></dd>
+Multiple values allowed. Default: <code>TRUE</code></p></dd>
 
 
 <dt id="arg-delta">delta<a class="anchor" aria-label="anchor" href="#arg-delta"></a></dt>
@@ -167,8 +165,7 @@ taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
 <dd><p>To not check/modify any taxa names.</p></dd>
 
 
-</dl><p>Default: <code>"singly"</code> <br><br>
-Abbreviations are allowed.</p></dd>
+</dl><p>Abbreviations are allowed. Default: <code>"singly"</code></p></dd>
 
 
 <dt id="arg-other">other<a class="anchor" aria-label="anchor" href="#arg-other"></a></dt>
@@ -182,7 +179,7 @@ Default: <code>FALSE</code></p></dd>
 
 <dt id="arg-sparse">sparse<a class="anchor" aria-label="anchor" href="#arg-sparse"></a></dt>
 <dd><p>If <code>TRUE</code>, returns a
-<code>simple_triplet_matrix::simple_triplet_matrix()</code>, otherwise returns a
+<code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code>, otherwise returns a
 normal R matrix object. Default: <code>FALSE</code></p></dd>
 
 
@@ -211,7 +208,7 @@ a non-linear axis. Options are:</p><dl><dt><code>"sqrt"</code> - </dt>
 
 </dl><p>These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
-observations. Default: <code>"sqrt"</code><br><br>
+observations. Default: <code>"sqrt"</code>
 Use <code>xaxis.transform</code> or <code>yaxis.transform</code> to pass custom values
 directly to ggplot2's <code>scale_*</code> functions.</p></dd>
 
@@ -411,6 +408,11 @@ be prefixed with <code>'=='</code> or <code>'!='</code> to assign them to <code>
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Random seed for permutations. Default: <code>0</code></p></dd>
+
+
+<dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
+<dd><p>The number of CPUs to use. Set to <code>-1</code> to use all available, or
+to <code>0</code> to not use threaded computing. Default: <code>-1</code></p></dd>
 
 
 <dt id="arg-permutations">permutations<a class="anchor" aria-label="anchor" href="#arg-permutations"></a></dt>

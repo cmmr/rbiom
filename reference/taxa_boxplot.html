@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,8 +137,7 @@ taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
 <dd><p>To not check/modify any taxa names.</p></dd>
 
 
-</dl><p>Default: <code>"singly"</code> <br><br>
-Abbreviations are allowed.</p></dd>
+</dl><p>Abbreviations are allowed. Default: <code>"singly"</code></p></dd>
 
 
 <dt id="arg-other">other<a class="anchor" aria-label="anchor" href="#arg-other"></a></dt>
@@ -291,7 +290,7 @@ a non-linear axis. Options are:</p><dl><dt><code>"sqrt"</code> - </dt>
 
 </dl><p>These methods allow visualization of both high- and low-abundance
 taxa simultaneously, without complaint about 'zero' count
-observations. Default: <code>"sqrt"</code><br><br>
+observations. Default: <code>"sqrt"</code>
 Use <code>xaxis.transform</code> or <code>yaxis.transform</code> to pass custom values
 directly to ggplot2's <code>scale_*</code> functions.</p></dd>
 
@@ -310,7 +309,7 @@ layer. For instance, <code>d.size = 2</code> ensures only the points on the
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>ggplot2</code> plot. <br> The computed data points, ggplot2 command,
+    <p>A <code>ggplot2</code> plot. The computed data points, ggplot2 command,
 stats table, and stats table commands are available as <code>$data</code>,
 <code>$code</code>, <code>$stats</code>, and <code>$stats$code</code>, respectively.</p>
     </div>

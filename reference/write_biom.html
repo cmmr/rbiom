@@ -43,7 +43,7 @@ Tab-separated values.
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,7 +131,7 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>Path to the output file. File names ending in <code>.gz</code> or
-<code>.bz2</code> will be compressed accordingly. <br><br>
+<code>.bz2</code> will be compressed accordingly.
 Setting <code>file=NULL</code> for <code>write_fasta()</code>, <code>write_tree()</code>, and
 <code>write_biom(format='json')</code>, and returns a string of the output which
 would have been written. For <code>write_biom(format='tab')</code>, <code>file=NULL</code>
@@ -176,8 +176,7 @@ taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
 <dd><p>To not check/modify any taxa names.</p></dd>
 
 
-</dl><p>Default: <code>"singly"</code> <br><br>
-Abbreviations are allowed.</p></dd>
+</dl><p>Abbreviations are allowed. Default: <code>"singly"</code></p></dd>
 
 </dl></div>
     <div class="section level2">

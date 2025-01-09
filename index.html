@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,28 +136,6 @@
 <span><span class="co">#&gt; # ℹ 284 more rows</span></span></code></pre></div>
 </div>
 </div>
-<div class="section level2">
-<h2 id="parallel-processing">Parallel Processing<a class="anchor" aria-label="anchor" href="#parallel-processing"></a>
-</h2>
-<p>Computation of beta diversity metrics (UniFrac, Bray-Curtis, etc) will use all available CPU cores by default. To limit the number of cores used, you can set the numThreads option:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html" class="external-link">setThreadOptions</a></span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="building-from-source">Building from source<a class="anchor" aria-label="anchor" href="#building-from-source"></a>
-</h2>
-<p>rbiom requires the following system libraries which can be installed through your operating system’s package manager.</p>
-<ul>
-<li>deb (Debian, Ubuntu): <code>libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libgdal-dev</code>
-</li>
-<li>rpm (Fedora, CentOS, RHEL): <code>udunits2-devel openssl-devel libxml2-devel libcurl-devel gdal-devel</code>
-</li>
-<li>csw (Solaris): <code>libssl_dev openssl@1.1 libxml2_dev gdal_dev</code>
-</li>
-<li>brew (OSX): <code>udunits</code>
-</li>
-</ul>
-</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
@@ -196,8 +174,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=rbiom" class="external-link"><img src="https://img.shields.io/badge/CRAN-2.0.1-blue.svg" alt="cran"></a></li>
-<li><a href="https://anaconda.org/conda-forge/r-rbiom" class="external-link"><img src="https://img.shields.io/badge/Conda-2.0.1-blue.svg" alt="conda"></a></li>
+<li><a href="https://cran.r-project.org/package=rbiom" class="external-link"><img src="https://img.shields.io/badge/CRAN-2.0.3-blue.svg" alt="cran"></a></li>
+<li><a href="https://anaconda.org/conda-forge/r-rbiom" class="external-link"><img src="https://img.shields.io/badge/Conda-2.0.3-blue.svg" alt="conda"></a></li>
 <li><a href="https://cranlogs.r-pkg.org/" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/rbiom" alt="downloads"></a></li>
 <li><a href="https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg" alt="dev"></a></li>
 <li><a href="https://app.codecov.io/gh/cmmr/rbiom" class="external-link"><img src="https://codecov.io/gh/cmmr/rbiom/graph/badge.svg" alt="covr"></a></li>

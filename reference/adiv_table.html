@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,8 +70,8 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
 <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
 <code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
-Default: <code>"Shannon"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+Multiple/abbreviated values allowed.
+Default: <code>"Shannon"</code></p></dd>
 
 
 <dt id="arg-md">md<a class="anchor" aria-label="anchor" href="#arg-md"></a></dt>
@@ -88,8 +88,8 @@ regression statistics. Default: <code>"none"</code></p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of alpha diversity values. <br>
-Each combination of sample/depth/<code>adiv</code> has its own row. <br>
+    <p>A data frame of alpha diversity values.
+Each combination of sample/depth/<code>adiv</code> has its own row.
 Column names are <b>.sample</b>, <b>.depth</b>, <b>.adiv</b>,
 and <b>.diversity</b>, followed by any metadata fields requested by
 <code>md</code>.</p>

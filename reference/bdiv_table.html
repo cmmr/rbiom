@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,8 @@
 <span>  delta <span class="op">=</span> <span class="st">".all"</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">0</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bdiv_matrix</span><span class="op">(</span></span>
@@ -77,7 +78,8 @@
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">0</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bdiv_distmat</span><span class="op">(</span></span>
@@ -87,7 +89,8 @@
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  transform <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -105,15 +108,14 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
 <code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
 phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+provided via <code>tree=</code>. Multiple/abbreviated values allowed.
+Default: <code>"Bray-Curtis"</code></p></dd>
 
 
 <dt id="arg-weighted">weighted<a class="anchor" aria-label="anchor" href="#arg-weighted"></a></dt>
 <dd><p>Take relative abundances into account. When
 <code>weighted=FALSE</code>, only presence/absence is considered.
-Default: <code>TRUE</code> <br><br>
-Multiple values allowed.</p></dd>
+Multiple values allowed. Default: <code>TRUE</code></p></dd>
 
 
 <dt id="arg-tree">tree<a class="anchor" aria-label="anchor" href="#arg-tree"></a></dt>
@@ -155,6 +157,11 @@ See <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank(
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Random seed for permutations. Default: <code>0</code></p></dd>
+
+
+<dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
+<dd><p>The number of CPUs to use. Set to <code>-1</code> to use all available, or
+to <code>0</code> to not use threaded computing. Default: <code>-1</code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -249,7 +256,7 @@ parameters. <code>stat.by = '==Sex'</code> is equivalent to
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP20 0.6810017 0.4183059 0.0000000 0.1490926</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP21 0.7170374 0.3896741 0.1490926 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cmd")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bdiv_matrix(biom, \"unifrac\")"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bdiv_matrix(biom, \"unifrac\", cpus = -1)"</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># All-vs-all distance matrix</span></span></span>
 <span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">bdiv_distmat</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>

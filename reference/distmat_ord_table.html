@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,8 +80,7 @@
 <dd><p>t-distributed stochastic neighbor embedding; <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne::tsne()</a></code>.</p></dd>
 
 
-</dl><p>Default: <code>"PCoA"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+</dl><p>Multiple/abbreviated values allowed. Default: <code>"PCoA"</code></p></dd>
 
 
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
@@ -112,7 +111,7 @@ Multiple/abbreviated values allowed.</p></dd>
 <span class="r-in"><span>    <span class="va">dm</span>  <span class="op">&lt;-</span> <span class="fu"><a href="bdiv_table.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">"bray"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">ord</span> <span class="op">&lt;-</span> <span class="fu">distmat_ord_table</span><span class="op">(</span><span class="va">dm</span>, <span class="st">"PCoA"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ord</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Ordination: ape::pcoa(D = dm)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Ordination: pcoa(D = dm)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble:   6 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .ord  .sample     .x       .y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

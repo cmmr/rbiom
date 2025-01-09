@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,8 +92,8 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
 <code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
 phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Default: <code>"Bray-Curtis"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+provided via <code>tree=</code>. Multiple/abbreviated values allowed.
+Default: <code>"Bray-Curtis"</code></p></dd>
 
 
 <dt id="arg-ord">ord<a class="anchor" aria-label="anchor" href="#arg-ord"></a></dt>
@@ -110,15 +110,13 @@ Multiple/abbreviated values allowed.</p></dd>
 <dd><p>t-distributed stochastic neighbor embedding; <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne::tsne()</a></code>.</p></dd>
 
 
-</dl><p>Default: <code>"PCoA"</code> <br><br>
-Multiple/abbreviated values allowed.</p></dd>
+</dl><p>Multiple/abbreviated values allowed. Default: <code>"PCoA"</code></p></dd>
 
 
 <dt id="arg-weighted">weighted<a class="anchor" aria-label="anchor" href="#arg-weighted"></a></dt>
 <dd><p>Take relative abundances into account. When
 <code>weighted=FALSE</code>, only presence/absence is considered.
-Default: <code>TRUE</code> <br><br>
-Multiple values allowed.</p></dd>
+Multiple values allowed. Default: <code>TRUE</code></p></dd>
 
 
 <dt id="arg-layers">layers<a class="anchor" aria-label="anchor" href="#arg-layers"></a></dt>
@@ -187,8 +185,7 @@ computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 <dd><p>Don't run any statistics.</p></dd>
 
 
-</dl><p>Default: <code>"adonis2"</code> <br><br>
-Abbreviations are allowed.</p></dd>
+</dl><p>Abbreviations are allowed. Default: <code>"adonis2"</code></p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -248,8 +245,7 @@ taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
 <dd><p>To not check/modify any taxa names.</p></dd>
 
 
-</dl><p>Default: <code>"singly"</code> <br><br>
-Abbreviations are allowed.</p></dd>
+</dl><p>Abbreviations are allowed. Default: <code>"singly"</code></p></dd>
 
 
 <dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
@@ -268,11 +264,11 @@ the <code>pt.</code> prefix.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>ggplot2</code> plot. <br>
+    <p>A <code>ggplot2</code> plot.
 The computed sample coordinates and ggplot command
-are available as <code>$data</code> and <code>$code</code> respectively. <br>
+are available as <code>$data</code> and <code>$code</code> respectively.
 If <code>stat.by</code> is given, then <code>$stats</code> and
-<code>$stats$code</code> are set. <br>
+<code>$stats$code</code> are set.
 If <code>rank</code> is given, then <code>$data$taxa_coords</code>,
 <code>$taxa_stats</code>, and <code>$taxa_stats$code</code> are set.</p>
     </div>

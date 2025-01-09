@@ -9,7 +9,7 @@ tricks to speed up operations on rbiom objects."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,6 @@ off.</p>
 <span><span class="co"># Or:</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="../reference/rarefy_cols.html">rarefy_cols</a></span><span class="op">(</span><span class="op">)</span></span></code></pre><p></p></div>
-<p><br></p>
     </div>
     <div class="section level2">
     <h2 id="drop-components">Drop Components<a class="anchor" aria-label="anchor" href="#drop-components"></a></h2>
@@ -106,7 +105,6 @@ provide it to just the functions that use it. For example:</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="va">biom</span><span class="op">$</span><span class="va">tree</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_table.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span>, tree <span class="op">=</span> <span class="va">tree</span><span class="op">)</span></span></code></pre><p></p></div>
-<p><br></p>
 </div>
 
     </div>
@@ -120,16 +118,13 @@ provide it to just the functions that use it. For example:</p>
 specified in bytes by an R option or environment variable.</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>rbiom.cache_size<span class="op">=</span><span class="fl">200</span> <span class="op">*</span> <span class="fl">1024</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># 200 MB</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>RBIOM_CACHE_SIZE<span class="op">=</span><span class="fl">1024</span> <span class="op">^</span> <span class="fl">3</span><span class="op">)</span>    <span class="co"># 1 GB</span></span></code></pre><p></p></div>
-<p><br></p>
 <p>You can also specify a cache directory where results can be preserved from
 one R session to the next.</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>rbiom.cache_dir<span class="op">=</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/userdir.html" class="external-link">R_user_dir</a></span><span class="op">(</span><span class="st">"rbiom"</span>, <span class="st">"cache"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>RBIOM_CACHE_DIR<span class="op">=</span><span class="st">"~/rbiom_cache"</span><span class="op">)</span></span></code></pre><p></p></div>
-<p><br></p>
 <p>Other quick notes about caching:</p><ul><li><p>Setting the cache directory to <code>"FALSE"</code> will disable caching.</p></li>
 <li><p>R options will override environment variables.</p></li>
-<li><p>The key hash algorithm can be set with <code>options(rbiom.cache_hash=rlang::hash)</code>.
-<br></p></li>
+<li><p>The key hash algorithm can be set with <code>options(rbiom.cache_hash=rlang::hash)</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="summary-layers">Summary Layers<a class="anchor" aria-label="anchor" href="#summary-layers"></a></h2>
@@ -142,7 +137,6 @@ can be slow. Instead, set the <code>layers</code> parameter to use other options
 <p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"bl"</span><span class="op">)</span>  <span class="co"># bar, linerange</span></span>
 <span><span class="fu"><a href="../reference/adiv_corrplot.html">adiv_corrplot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"tc"</span><span class="op">)</span> <span class="co"># trend, confidence</span></span>
 <span><span class="fu"><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"e"</span><span class="op">)</span>  <span class="co"># ellipse</span></span></code></pre><p></p></div>
-<p><br></p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
