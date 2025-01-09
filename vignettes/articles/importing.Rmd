@@ -35,6 +35,12 @@ mtx
 biom <- as_rbiom(biom = mtx)
 biom
 
+```
+
+
+## Converting from phyloseq
+
+```r
 
 # convert from phyloseq to rbiom ----------------
 file <- system.file("extdata", "rich_sparse_otu_table.biom", package="phyloseq")
@@ -43,6 +49,7 @@ phy
 
 biom <- as_rbiom(biom = phy)
 biom
+
 ```
 
 
