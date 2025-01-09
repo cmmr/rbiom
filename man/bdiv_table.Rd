@@ -17,7 +17,8 @@ bdiv_table(
   delta = ".all",
   transform = "none",
   ties = "random",
-  seed = 0
+  seed = 0,
+  cpus = -1
 )
 
 bdiv_matrix(
@@ -29,7 +30,8 @@ bdiv_matrix(
   between = NULL,
   transform = "none",
   ties = "random",
-  seed = 0
+  seed = 0,
+  cpus = -1
 )
 
 bdiv_distmat(
@@ -39,7 +41,8 @@ bdiv_distmat(
   tree = NULL,
   within = NULL,
   between = NULL,
-  transform = "none"
+  transform = "none",
+  cpus = -1
 )
 }
 \arguments{
@@ -83,6 +86,9 @@ Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{-1} to use all available, or
+to \code{0} to not use threaded computing. Default: \code{-1}}
 }
 \value{
 \describe{

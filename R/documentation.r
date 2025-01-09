@@ -240,6 +240,9 @@
 #'        
 #' @param seed  Random seed for permutations. Default: `0`
 #'        
+#' @param cpus  The number of CPUs to use. Set to `-1` to use all available, or 
+#'        to `0` to not use threaded computing. Default: `-1`
+#'        
 #' @param permutations  Number of random permutations to use. 
 #'        Default: `999`
 #' 

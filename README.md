@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![cran](https://img.shields.io/badge/CRAN-2.0.2-blue.svg)](https://cran.r-project.org/package=rbiom)
-[![conda](https://img.shields.io/badge/Conda-2.0.2-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![cran](https://img.shields.io/badge/CRAN-2.0.3-blue.svg)](https://cran.r-project.org/package=rbiom)
+[![conda](https://img.shields.io/badge/Conda-2.0.3-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
 [![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
 [![dev](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
 [![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
@@ -100,25 +100,3 @@ taxa_table(biom, 'Phylum')
 #> 10 Phylum HMP02   Proteobacteria         97    24    23 Buccal mucosa Male  
 #> # ℹ 284 more rows
 ```
-
-## Parallel Processing
-
-Computation of beta diversity metrics (UniFrac, Bray-Curtis, etc) will
-use all available CPU cores by default. To limit the number of cores
-used, you can set the numThreads option:
-
-``` r
-RcppParallel::setThreadOptions(numThreads = 4)
-```
-
-## Building from source
-
-rbiom requires the following system libraries which can be installed
-through your operating system’s package manager.
-
-- deb (Debian, Ubuntu):
-  `libudunits2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libgdal-dev`
-- rpm (Fedora, CentOS, RHEL):
-  `udunits2-devel openssl-devel libxml2-devel libcurl-devel gdal-devel`
-- csw (Solaris): `libssl_dev openssl@1.1 libxml2_dev gdal_dev`
-- brew (OSX): `udunits`

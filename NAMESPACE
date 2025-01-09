@@ -1,8 +1,6 @@
 useDynLib(rbiom, .registration = TRUE)
 
 
-import("RcppParallel")
-
 importFrom("ape", "pcoa")
 importFrom("broom", "glance")
 importFrom("emmeans", "emmeans", "emtrends", "eff_size")

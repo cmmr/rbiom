@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.2
-Date: 2025-01-07
+Version: 2.0.2.9000
+Date: 2025-01-08
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -28,10 +28,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/Needs/website: rmarkdown
 Config/testthat/edition: 3
-Config/testthat/parallel: true
+Config/testthat/parallel: false
 LinkingTo: 
     Rcpp,
-    RcppParallel
+    RcppThread
 Imports:
     cluster,
     methods,
@@ -50,7 +50,6 @@ Imports:
     magrittr,
     pillar,
     plyr,
-    RcppParallel,
     readr,
     readxl,
     slam,

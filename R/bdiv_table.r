@@ -46,7 +46,7 @@
 bdiv_table <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
     md = ".all", within = NULL, between = NULL, delta = '.all', 
-    transform = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0, cpus = -1 ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -94,15 +94,16 @@ bdiv_table <- function (
         # Compute the distance matrix
         #________________________________________________________
         mtx <- bdiv_matrix(
-          biom     = biom, 
-          bdiv     = b, 
-          weighted = w, 
-          tree     = tree, 
-          within   = within, 
-          between  = between, 
-          transform    = transform, 
-          ties     = ties, 
-          seed     = seed )
+          biom      = biom, 
+          bdiv      = b, 
+          weighted  = w, 
+          tree      = tree, 
+          within    = within, 
+          between   = between, 
+          transform = transform, 
+          ties      = ties, 
+          seed      = seed, 
+          cpus      = cpus )
         
         
         #________________________________________________________
@@ -218,7 +219,7 @@ bdiv_table <- function (
 bdiv_matrix <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
     within = NULL, between = NULL, 
-    transform = "none", ties = "random", seed = 0 ) {
+    transform = "none", ties = "random", seed = 0, cpus = -1 ) {
   
   #________________________________________________________
   # Take care not to cache filepath to tree.
@@ -258,6 +259,7 @@ bdiv_matrix <- function (
   validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
   validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
   validate_var_range('seed', n = 1, int = TRUE)
+  validate_var_range('cpus', n = 1, int = TRUE, range = c(-1, 256))
   
   if (!is.null(tree)) {
     biom <- biom$clone()
@@ -321,11 +323,20 @@ bdiv_matrix <- function (
   if (bdiv == "UniFrac") {
     
     tree      <- biom$tree
-    distances <- par_unifrac(counts, pairs - 1L, tree, ifelse(weighted, 1L, 0L))
+    distances <- parallel_unifrac(counts, pairs - 1L, tree, weighted, cpus)
     
   } else {
-    counts    <- t(as.matrix(counts))
-    distances <- par_beta_div(counts, pairs - 1L, tolower(bdiv), ifelse(weighted, 1L, 0L))
+    
+    bdiv_func  <- switch(
+      EXPR = bdiv,
+      'Jaccard'     = if (weighted) bdiv_jaccard_w    else bdiv_jaccard_u, 
+      'Bray-Curtis' = if (weighted) bdiv_braycurtis_w else bdiv_braycurtis_u, 
+      'Manhattan'   = if (weighted) bdiv_manhattan_w  else bdiv_manhattan_u, 
+      'Euclidean'   = if (weighted) bdiv_euclidean_w  else bdiv_euclidean_u )
+    
+    vec_counts <- as.vector(as.matrix(counts))
+    vec_pairs  <- as.vector(t(pairs) - 1L)
+    distances  <- bdiv_func(vec_counts, nrow(counts), vec_pairs, nrow(pairs), cpus)
   }
   
   
@@ -374,14 +385,15 @@ bdiv_matrix <- function (
 #' @export
 bdiv_distmat <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
-    within = NULL, between = NULL, transform = "none" ) {
+    within = NULL, between = NULL, transform = "none", cpus = -1 ) {
   
   stats::as.dist(bdiv_matrix(
-    biom     = biom, 
-    bdiv     = bdiv, 
-    weighted = weighted, 
-    tree     = tree, 
-    within   = within, 
-    between  = between, 
-    transform    = transform ))
+    biom      = biom, 
+    bdiv      = bdiv, 
+    weighted  = weighted, 
+    tree      = tree, 
+    within    = within, 
+    between   = between, 
+    transform = transform,
+    cpus      = cpus ))
 }

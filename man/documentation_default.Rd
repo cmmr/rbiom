@@ -235,6 +235,9 @@ be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 
 \item{seed}{Random seed for permutations. Default: \code{0}}
 
+\item{cpus}{The number of CPUs to use. Set to \code{-1} to use all available, or
+to \code{0} to not use threaded computing. Default: \code{-1}}
+
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
 
