@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![cran](https://img.shields.io/badge/CRAN-2.0.4-blue.svg)](https://cran.r-project.org/package=rbiom)
-[![conda](https://img.shields.io/badge/Conda-2.0.4-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![cran](https://img.shields.io/badge/CRAN-2.0.5-blue.svg)](https://cran.r-project.org/package=rbiom)
+[![conda](https://img.shields.io/badge/Conda-2.0.5-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
 [![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
 [![dev](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
 [![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
@@ -88,15 +88,15 @@ taxa_table(biom, 'Phylum')
 #> # A tibble: 294 × 8
 #>    .rank  .sample .taxa          .abundance   Age   BMI `Body Site`   Sex   
 #>    <fct>  <chr>   <fct>               <dbl> <dbl> <dbl> <fct>         <fct> 
-#>  1 Phylum HMP01   Firmicutes            854    22    20 Buccal mucosa Female
-#>  2 Phylum HMP01   Bacteroidetes         192    22    20 Buccal mucosa Female
-#>  3 Phylum HMP01   Actinobacteria         13    22    20 Buccal mucosa Female
-#>  4 Phylum HMP01   Proteobacteria         74    22    20 Buccal mucosa Female
-#>  5 Phylum HMP01   Fusobacteria           37    22    20 Buccal mucosa Female
+#>  1 Phylum HMP01   Firmicutes            850    22    20 Buccal mucosa Female
+#>  2 Phylum HMP01   Bacteroidetes         201    22    20 Buccal mucosa Female
+#>  3 Phylum HMP01   Actinobacteria         14    22    20 Buccal mucosa Female
+#>  4 Phylum HMP01   Proteobacteria         78    22    20 Buccal mucosa Female
+#>  5 Phylum HMP01   Fusobacteria           32    22    20 Buccal mucosa Female
 #>  6 Phylum HMP01   Tenericutes             0    22    20 Buccal mucosa Female
-#>  7 Phylum HMP02   Firmicutes            808    24    23 Buccal mucosa Male  
-#>  8 Phylum HMP02   Bacteroidetes         186    24    23 Buccal mucosa Male  
-#>  9 Phylum HMP02   Actinobacteria         53    24    23 Buccal mucosa Male  
+#>  7 Phylum HMP02   Firmicutes            804    24    23 Buccal mucosa Male  
+#>  8 Phylum HMP02   Bacteroidetes         183    24    23 Buccal mucosa Male  
+#>  9 Phylum HMP02   Actinobacteria         56    24    23 Buccal mucosa Male  
 #> 10 Phylum HMP02   Proteobacteria         97    24    23 Buccal mucosa Male  
 #> # ℹ 284 more rows
 ```
