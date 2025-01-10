@@ -118,7 +118,6 @@ NULL
 rbiom <- R6::R6Class(
   
   classname  = "rbiom", 
-  parent_env = rlang::ns_env('rbiom'), 
   lock_class = TRUE,
   
   private = list(

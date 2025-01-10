@@ -6,6 +6,7 @@
 ^vignettes/articles$
 
 ^\.gitignore$
+^\.RData$
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^NEWS\.md$
