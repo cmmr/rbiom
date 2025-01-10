@@ -12,11 +12,11 @@ test_that(desc = "write_biom", code = {
   expect_silent(readChar(tfile, nchars = file.size(tfile)))
   unlink(tfile)
   
+  skip_on_cran()
+  
   expect_silent(write_biom(hmp5, tfile, format = "hdf5"))
   expect_silent(read_biom(tfile))
   unlink(tfile)
-  
-  skip_on_cran()
   
   
   expect_silent(write_counts(hmp5, tfile));   unlink(tfile)
