@@ -24,7 +24,6 @@ jobs:
           - {os: macos-latest,   r: 'release'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: windows-latest, r: 'devel', http-user-agent: 'release'}
-          - {os: macos-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
 
     env:
