@@ -109,13 +109,13 @@ bdiv_table <- function (
         #________________________________________________________
         # Convert to long form
         #________________________________________________________
+        lt <- as.vector(lower.tri(mtx))
         tibble(
-          '.sample1'  = rownames(mtx)[row(mtx)],
-          '.sample2'  = colnames(mtx)[col(mtx)],
+          '.sample1'  = colnames(mtx)[col(mtx)][lt],
+          '.sample2'  = rownames(mtx)[row(mtx)][lt],
           '.weighted' = w,
           '.bdiv'     = b,
-          '.distance' = as.numeric(mtx) ) %>%
-          dplyr::filter(.data$.sample1 < .data$.sample2) %>%
+          '.distance' = as.vector(mtx)[lt] ) %>%
           dplyr::filter(!is.na(.data$.distance))
         
       }))
@@ -186,11 +186,11 @@ bdiv_table <- function (
       bdiv %<>% paste("Distance")
       
       if (eq(params$transform, 'rank')) { paste0("Ranked ", w, "\n", bdiv) }
-      else                          { paste(w, bdiv)                   }
+      else                              { paste(w, bdiv)                   }
       
     } else {
       if (eq(params$transform, 'rank')) { "Ranked Beta Dissimilarity" }
-      else                          { "Beta Dissimilarity"        }
+      else                              { "Beta Dissimilarity"        }
     }
     
   })
