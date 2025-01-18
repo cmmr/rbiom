@@ -407,12 +407,13 @@ be prefixed with <code>'=='</code> or <code>'!='</code> to assign them to <code>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>Random seed for permutations. Default: <code>0</code></p></dd>
+<dd><p>Random seed for permutations. Must be a non-negative integer.
+Default: <code>0</code></p></dd>
 
 
 <dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
-<dd><p>The number of CPUs to use. Set to <code>-1</code> to use all available, or
-to <code>0</code> to not use threaded computing. Default: <code>-1</code></p></dd>
+<dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
+or to <code>1</code> to disable parallel processing. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-permutations">permutations<a class="anchor" aria-label="anchor" href="#arg-permutations"></a></dt>

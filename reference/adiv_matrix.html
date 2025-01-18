@@ -54,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, transform <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">"Shannon"</span>, transform <span class="op">=</span> <span class="st">"none"</span>, cpus <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -66,18 +66,32 @@
 Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can also be given here.</p></dd>
 
 
+<dt id="arg-adiv">adiv<a class="anchor" aria-label="anchor" href="#arg-adiv"></a></dt>
+<dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
+<code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
+<code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
+Multiple/abbreviated values allowed.
+Default: <code>"Shannon"</code></p></dd>
+
+
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
 <dd><p>Transformation to apply. Options are:
 <code>c("none", "rank", "log", "log1p", "sqrt", "percent")</code>. <code>"rank"</code> is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: <code>"none"</code></p></dd>
 
+
+<dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
+<dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
+or to <code>1</code> to disable parallel processing. Default: <code>NULL</code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric matrix with samples as rows and columns named
-<b>Depth</b>, <b>OTUs</b>, <b>Shannon</b>, <b>Chao1</b>,
-<b>Simpson</b>, and <b>InvSimpson</b>.</p>
+    <p>A numeric matrix with samples as rows. The first column is
+<b>Depth</b>. Remaining columns are the alpha diversity metric names
+given by <code>adiv</code>: one or more of <b>OTUs</b>, <b>Shannon</b>,
+<b>Chao1</b>, <b>Simpson</b>, and <b>InvSimpson</b>.</p>
     </div>
 
     <div class="section level2">
@@ -86,15 +100,15 @@ regression statistics. Default: <code>"none"</code></p></dd>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span><span class="va">hmp50</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Depth  Shannon</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP01  1660 1.741152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP02  1371 2.587403</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP03  1353 2.950982</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP04  1895 3.255785</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP05  3939 1.462650</span>
+<span class="r-in"><span>    <span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">".all"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Depth OTUs  Shannon     Chao1   Simpson InvSimpson</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP01  1660   49 1.741152  59.08333 0.5668413   2.308623</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP02  1371   75 2.587403 104.38889 0.8133915   5.358813</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP03  1353   75 2.950982  90.04167 0.8936622   9.403990</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP04  1895   83 3.255785  93.32143 0.9323644  14.785121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP05  3939   67 1.462650 127.75000 0.5252254   2.106262</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cmd")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_matrix(biom)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_matrix(biom, \".all\")"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
