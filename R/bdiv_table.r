@@ -418,5 +418,5 @@ bdiv_distmat <- function (
 
 
 pthreads <- function () {
-  .Call(DLL$pthreads)
+  .Call(C_pthreads)
 }

@@ -1,4 +1,4 @@
-useDynLib(rbiom, C_alpha_div, C_beta_div, C_pthreads, C_rarefy, C_read_tree, C_unifrac)
+useDynLib(rbiom, C_alpha_div, C_beta_div, C_pthreads, C_rarefy, C_read_tree, C_unifrac, .registration = TRUE)
 
 
 importFrom("ape", "pcoa")
@@ -20,7 +20,11 @@ importFrom("methods", "as", "formalArgs")
 importFrom("parallelly", "availableCores")
 importFrom("pillar", "tbl_sum", "glimpse")
 importFrom("plyr", ".", "ddply", "ldply", "llply")
-importFrom("stats", "as.formula", "median", "na.omit", "p.adjust", "sd", "setNames", "t.test", "var")
+
+importFrom("stats", 
+           "as.formula", "median", "na.omit", "p.adjust", "runif", 
+           "sd", "setNames", "t.test", "var")
+
 importFrom("readr", "read_delim")
 importFrom("readxl", "read_excel")
 
