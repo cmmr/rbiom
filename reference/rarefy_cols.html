@@ -11,7 +11,7 @@ sums or column sums equal 1."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,18 +136,18 @@ matrix, set this seed value to a different number each time.</p></dd>
 <span class="r-in"><span>    <span class="va">mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, nrow<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">mtx</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3] [,4] [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   18    9    4   16   14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    1   17   20    7    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    6   10    8   19    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   15   12   11    2   13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    6   19    7   17   18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]   20   11   15   13   16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   12    2    4    1   14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]    5    8    3    9   10</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 61 50 46 53</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 67 75 33 35</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu">rescale_rows</span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 1 1</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 40 48 43 44 35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43 40 29 40 58</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="fu">rescale_cols</span><span class="op">(</span><span class="va">mtx</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1 1 1 1</span>
 <span class="r-in"><span></span></span>

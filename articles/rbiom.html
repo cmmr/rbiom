@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -318,11 +318,11 @@ samples in the abundance table.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 6</span></span></span>
 <span><span class="co">#&gt;   .sample `Years Old`   BMI `Body Site`   group Obese</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP01            22    20 Buccal mucosa B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP02            24    23 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP03            28    26 Saliva        B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP04            25    23 Saliva        A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP05            27    24 Buccal mucosa B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename()</a></code></p>
 </div>
@@ -339,8 +339,8 @@ entire rbiom object.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> HMP10            22    20 Anterior nares B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> HMP15            25    21 Anterior nares A     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares A     TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> HMP16            24    19 Anterior nares A     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> HMP25            33    32 Anterior nares B     TRUE </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> HMP31            31    20 Anterior nares A     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more rows</span></span></span>
 <span><span class="va">biom</span></span>
@@ -352,7 +352,7 @@ entire rbiom object.</p>
 <span><span class="co">#&gt; (<span style="color: #808080; font-style: italic;">&lt;https://hmpdacc.org&gt;</span>).</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      10 Samples: HMP10, HMP15, HMP16, ..., and HMP48</span></span>
-<span><span class="co">#&gt;     123 OTUs:    Unc01yki, Unc53100, LtbAci52, ...</span></span>
+<span><span class="co">#&gt;     162 OTUs:    Unc01yki, Unc53100, LtbAci52, ...</span></span>
 <span><span class="co">#&gt;       7 Ranks:   .otu, Kingdom, Phylum, ..., and Genus</span></span>
 <span><span class="co">#&gt;       6 Fields:  .sample, Years Old, BMI, ..., and Obese</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>
@@ -375,19 +375,19 @@ tibble data.frame with one computed value per row. Alternatively,
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 9</span></span></span>
 <span><span class="co">#&gt;   .rank  .sample .taxa      .abundance `Years Old`   BMI `Body Site` group Obese</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Phylum HMP10   Actinobac…        697          22    20 Anterior n… B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Phylum HMP10   Firmicutes        475          22    20 Anterior n… B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Phylum HMP10   Proteobac…          3          22    20 Anterior n… B     FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Phylum HMP10   Bacteroid…          8          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Phylum HMP10   Actinobac…        685          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Phylum HMP10   Firmicutes        483          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Phylum HMP10   Proteobac…          5          22    20 Anterior n… B     FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Phylum HMP10   Bacteroid…          9          22    20 Anterior n… B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Phylum HMP10   Cyanobact…          0          22    20 Anterior n… B     FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 55 more rows</span></span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/taxa_matrix.html">taxa_matrix</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                     HMP10 HMP15 HMP16 HMP25 HMP31 HMP32 HMP34 HMP40</span></span>
-<span><span class="co">#&gt; Actinobacteria        697   865   643   412   691   606  1042   867</span></span>
-<span><span class="co">#&gt; Bacteroidetes           8     3     2     1    72    11     8     0</span></span>
-<span><span class="co">#&gt; Cyanobacteria           0     0     1     0     0    25     0     0</span></span>
-<span><span class="co">#&gt; Deinococcus Thermus     0     0     0     0     0     1     0     1</span></span></code></pre></div>
+<span><span class="co">#&gt; Actinobacteria        685   851   649   453   658   616  1040   896</span></span>
+<span><span class="co">#&gt; Bacteroidetes           9     4     2     0    84    12    14     1</span></span>
+<span><span class="co">#&gt; Cyanobacteria           0     0     3     0     0    26     0     0</span></span>
+<span><span class="co">#&gt; Deinococcus Thermus     0     0     0     0     0     0     0     1</span></span></code></pre></div>
 <p>Functions for taxa abundance (like the above
 <code><a href="../reference/taxa_matrix.html">taxa_table()</a></code>) are prefixed by <code>taxa_</code>.
 Similarly, <code>adiv_</code> is used for alpha diversity and

@@ -17,7 +17,7 @@ All CPU intensive operations are encoded in C with multi-thread support."></head
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ available in the local compute environment. If you wish to limit the number
 of simultaneous threads, set <code>RcppParallel</code>'s <code>numThreads</code> option.
 For instance:</p>
 <div class="sourceCode"><pre><code><span></span>
-<span>    <span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RcppParallel/man/setThreadOptions.html" class="external-link">setThreadOptions</a></span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu">RcppParallel</span><span class="fu">::</span><span class="fu">setThreadOptions</span><span class="op">(</span>numThreads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 
     </div>
     <div class="section level2">
