@@ -85,7 +85,8 @@ regression statistics. Default: \code{"none"}}
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Default: \code{0}}
+\item{seed}{Random seed for permutations. Must be a non-negative integer.
+Default: \code{0}}
 
 \item{sparse}{If \code{TRUE}, returns a
 \code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a

@@ -4,7 +4,7 @@
 \alias{rarefy}
 \title{Rarefy OTU counts.}
 \usage{
-rarefy(biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE)
+rarefy(biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE, cpus = NULL)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -28,6 +28,9 @@ data, set the seed to a different number each time.}
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.

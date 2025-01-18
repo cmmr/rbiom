@@ -133,7 +133,8 @@ regression statistics. Default: \code{"none"}}
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Default: \code{0}}
+\item{seed}{Random seed for permutations. Must be a non-negative integer.
+Default: \code{0}}
 
 \item{alt}{Alternative hypothesis direction. Options are \code{'!='}
 (two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}

@@ -58,7 +58,7 @@ Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::d
     blply(hmp50, "Sex", `$`, 'n_samples') \%>\% unlist()
     
     bdply(hmp50, c("Body Site", "Sex"), function (b) {
-      adm <- adiv_matrix(b)[,c("Shannon", "Simpson")]
+      adm <- adiv_matrix(b, '.all')[,c("Shannon", "Simpson")]
       apply(adm, 2L, mean)
     })
     

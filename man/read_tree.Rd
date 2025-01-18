@@ -24,11 +24,13 @@ New Hampshire format.
     
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
     tree <- read_tree(infile)
+    print(tree)
     
     tree <- read_tree("
-        (t9:0.99,((t5:0.87,t2:0.89):0.51,(((t10:0.16,(t7:0.83,t4:0.96)
-        :0.94):0.69,(t6:0.92,(t3:0.62,t1:0.85):0.54):0.23):0.74,t8:0.1
+        (A:0.99,((B:0.87,C:0.89):0.51,(((D:0.16,(E:0.83,F:0.96)
+        :0.94):0.69,(G:0.92,(H:0.62,I:0.85):0.54):0.23):0.74,J:0.1
         2):0.43):0.67);")
+    plot(tree)
 
 }
 \seealso{

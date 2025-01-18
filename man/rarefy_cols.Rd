@@ -6,7 +6,7 @@
 \alias{rescale_rows}
 \title{Transform a counts matrix.}
 \usage{
-rarefy_cols(mtx, depth = 0.1, n = NULL, seed = 0)
+rarefy_cols(mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL)
 
 rescale_cols(mtx)
 
@@ -26,9 +26,12 @@ percentage of samples is dropped. If \code{0}, all samples are kept. If
 \code{NULL}, \code{depth} is used instead.
 Default: \code{NULL}}
 
-\item{seed}{An integer to use for seeding the random number generator. If
-you need to create different random rarefactions of the same
-matrix, set this seed value to a different number each time.}
+\item{seed}{A positive integer to use for seeding the random number
+generator. If you need to create different random rarefactions of the
+same matrix, set this seed value to a different number each time.}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 }
 \value{
 The rarefied or rescaled matrix.

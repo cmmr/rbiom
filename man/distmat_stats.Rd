@@ -22,7 +22,8 @@ categorical or numeric. Required.}
 }
 Abbreviations are allowed. Default: \code{"adonis2"}}
 
-\item{seed}{Random seed for permutations. Default: \code{0}}
+\item{seed}{Random seed for permutations. Must be a non-negative integer.
+Default: \code{0}}
 
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}

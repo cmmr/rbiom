@@ -48,7 +48,7 @@ Default: \verb{quote=FALSE, sep="\\t"}}
 \code{depth=0} disables rarefaction. Default: \verb{depth=0.1, n=NULL}}
 
 \item{seed}{Random seed to use in rarefying. See \code{\link[=rarefy_cols]{rarefy_cols()}} function
-for details. Default: \code{0}}
+for details. Must be a non-negative integer. Default: \code{0}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:

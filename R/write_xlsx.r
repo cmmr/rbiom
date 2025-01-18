@@ -109,7 +109,7 @@ write_xlsx <- function (biom, file, depth = 0.1, n = NULL, seed = 0, unc = 'sing
   openxlsx::addWorksheet(wb, 'Alpha Diversity')
   if (!is.null(rare)) {
     openxlsx::writeData(wb, 'Alpha Diversity', {
-      adiv_matrix(rare) %>% tibble::as_tibble(rownames = ".otu")
+      adiv_matrix(rare, '.all') %>% tibble::as_tibble(rownames = ".otu")
     })
   }
   

@@ -18,7 +18,7 @@ bdiv_table(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = -1
+  cpus = NULL
 )
 
 bdiv_matrix(
@@ -31,7 +31,7 @@ bdiv_matrix(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = -1
+  cpus = NULL
 )
 
 bdiv_distmat(
@@ -42,7 +42,7 @@ bdiv_distmat(
   within = NULL,
   between = NULL,
   transform = "none",
-  cpus = -1
+  cpus = NULL
 )
 }
 \arguments{
@@ -85,10 +85,11 @@ regression statistics. Default: \code{"none"}}
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Default: \code{0}}
+\item{seed}{Random seed for permutations. Must be a non-negative integer.
+Default: \code{0}}
 
-\item{cpus}{The number of CPUs to use. Set to \code{-1} to use all available, or
-to \code{0} to not use threaded computing. Default: \code{-1}}
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 }
 \value{
 \describe{

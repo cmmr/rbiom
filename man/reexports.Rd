@@ -4,6 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{.}
+\alias{availableCores}
 \alias{ddply}
 \alias{ldply}
 \alias{llply}
@@ -33,6 +34,8 @@ below to see their documentation.
   \item{dplyr}{\code{\link[dplyr:mutate-joins]{left_join}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{relocate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:slice]{slice_head}}, \code{\link[dplyr:slice]{slice_max}}, \code{\link[dplyr:slice]{slice_min}}, \code{\link[dplyr:slice]{slice_sample}}, \code{\link[dplyr:slice]{slice_tail}}}
 
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
+
+  \item{parallelly}{\code{\link[parallelly]{availableCores}}}
 
   \item{pillar}{\code{\link[pillar]{glimpse}}}
 
