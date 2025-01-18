@@ -2,6 +2,9 @@
 plyr::`.`
 
 #' @export
+parallelly::availableCores
+
+#' @export
 plyr::ddply
 
 #' @export

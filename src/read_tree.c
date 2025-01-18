@@ -1,32 +1,36 @@
-#include <Rcpp.h>
-#include <stdio.h>      /* printf */
-#include <stdlib.h>     /* atof */
-#include <string.h>     /* strncpy */
-using namespace Rcpp;
+#include <R.h>
+#include <Rinternals.h>
+#include <stdio.h>      // printf
+#include <stdlib.h>     // strtod
+#include <string.h>     // strlen, strncpy
+#include <stdbool.h>    // bool
 
 
-List rcpp_read_tree(const char*);
+SEXP _read_tree(SEXP sexp_tree);
 void readtree2(
-    const char     *tree, 
-    unsigned int    x1, 
-    unsigned int    x2, 
-    unsigned int    parent,
-    unsigned int    *eIdx, 
-    unsigned int    *nIdx, 
-    unsigned int    *lIdx, 
-    NumericMatrix   edge, 
-    NumericVector   eLen,
-    CharacterVector nLab, 
-    CharacterVector lLab);
+    const char   *tree, 
+    unsigned int  x1, 
+    unsigned int  x2, 
+    unsigned int  parent,
+    unsigned int *eIdx, 
+    unsigned int *nIdx, 
+    unsigned int *lIdx, 
+    int          *edge_mtx, 
+    double       *eLen,
+    unsigned int  nEdges,
+    unsigned int  nLeafs,
+    SEXP          nLab, 
+    SEXP          lLab);
 char* extractname(
     const char   *tree, 
-    unsigned int x1, 
-    unsigned int x2);
+    unsigned int  x1, 
+    unsigned int  x2);
 
 
 
-// [[Rcpp::export]]
-List rcpp_read_tree(const char* tree) {
+SEXP C_read_tree(SEXP sexp_tree) {
+  
+  const char *tree = CHAR(asChar(sexp_tree));
   
   // Start and End positions of the newick string
   unsigned int x1 = 0; 
@@ -56,32 +60,34 @@ List rcpp_read_tree(const char* tree) {
   
   
   // Convert the result into a phylo-compatible data structure for R
-  NumericMatrix   retEdges(nEdges, 2);
-  NumericVector   retEdgeLengths(nEdges);
-  CharacterVector retNodeLabels(nNodes);
-  CharacterVector retLeafLabels(nLeafs);
+  SEXP retEdges       = PROTECT(allocMatrix(INTSXP,  nEdges, 2));
+  SEXP retEdgeLengths = PROTECT(allocVector(REALSXP, nEdges));
+  SEXP retNodeLabels  = PROTECT(allocVector(STRSXP,  nNodes));
+  SEXP retLeafLabels  = PROTECT(allocVector(STRSXP,  nLeafs));
   
   // Track next open indices in output vectors using "global" counters
   unsigned int eIdx = 0;
   unsigned int nIdx = 0;
   unsigned int lIdx = 0;
   
+  int    *edge_mtx = INTEGER(retEdges);
+  double *eLen     = REAL(retEdgeLengths);
+  
   
   // Start recursing at the highest level of parentheses; i.e. the whole tree
-  readtree2(tree, x1, x2, 0, &eIdx, &nIdx, &lIdx, retEdges, retEdgeLengths, retNodeLabels, retLeafLabels);
+  readtree2(tree, x1, x2, 0, &eIdx, &nIdx, &lIdx, edge_mtx, eLen, nEdges, nLeafs, retNodeLabels, retLeafLabels);
+  
+  SEXP result = PROTECT(allocVector(VECSXP, 5));
+  SET_VECTOR_ELT(result, 0, retEdges);
+  SET_VECTOR_ELT(result, 1, ScalarInteger(nNodes));
+  SET_VECTOR_ELT(result, 2, retLeafLabels);
+  SET_VECTOR_ELT(result, 3, retEdgeLengths);
+  SET_VECTOR_ELT(result, 4, retNodeLabels);
   
   
-  List ret = List::create(
-    Named("edge")        = retEdges,
-    Named("Nnode")       = nNodes,
-    Named("tip.label")   = retLeafLabels,
-    Named("edge.length") = retEdgeLengths,
-    Named("node.label")  = retNodeLabels
-  );
-  ret.attr("class") = "phylo";
-  ret.attr("order") = "cladewise";
+  UNPROTECT(5);
   
-  return ret;
+  return result;
 }
 
 
@@ -92,22 +98,19 @@ List rcpp_read_tree(const char* tree) {
 
 
 void readtree2(
-    const char     *tree, 
-    unsigned int    x1, 
-    unsigned int    x2, 
-    unsigned int    parent,
-    unsigned int    *eIdx, 
-    unsigned int    *nIdx, 
-    unsigned int    *lIdx, 
-    NumericMatrix   edge, 
-    NumericVector   eLen,
-    CharacterVector nLab, 
-    CharacterVector lLab) {
-  
-  
-  // if ((*eIdx) % 1000 == 0) {
-  //   Rcpp::checkUserInterrupt();
-  // }
+    const char   *tree, 
+    unsigned int  x1, 
+    unsigned int  x2, 
+    unsigned int  parent,
+    unsigned int *eIdx, 
+    unsigned int *nIdx, 
+    unsigned int *lIdx, 
+    int          *edge_mtx, 
+    double       *eLen,
+    unsigned int  nEdges,
+    unsigned int  nLeafs,
+    SEXP          nLab, 
+    SEXP          lLab) {
   
   
   unsigned int i;
@@ -129,10 +132,8 @@ void readtree2(
     if (tree[i] == ':') {
       
       if ((*eIdx) > 0) {
-        char* strLength = new char[x2 - i + 1];
-        strncpy(strLength, tree + i + 1, x2 - i);
-        strLength[x2 - i]  = '\0';
-        eLen[(*eIdx) - 1] = atof(strLength);
+        char *junk_ptr;
+        eLen[(*eIdx) - 1] = strtod(tree + i + 1, &junk_ptr);
       }
       
       x2 = i - 1;
@@ -142,11 +143,12 @@ void readtree2(
     if (tree[i] == ')') {
       
       if (i < x2)
-        nLab[(*nIdx)] = extractname(tree, i + 1, x2);
+        SET_STRING_ELT(nLab, (*nIdx), mkChar(extractname(tree, i + 1, x2)));
       
-      if ((*eIdx) > 0) {  
-        edge((*eIdx) - 1, 0) = parent  + lLab.size();
-        edge((*eIdx) - 1, 1) = (*nIdx) + lLab.size() + 1;
+      if ((*eIdx) > 0) {
+        int eRow = (*eIdx) - 1;
+        edge_mtx[eRow + 0]      = parent  + nLeafs;
+        edge_mtx[eRow + nEdges] = (*nIdx) + nLeafs + 1;
       }
       (*nIdx)++;
       (*eIdx)++;
@@ -164,11 +166,12 @@ void readtree2(
   if (i <= x1) {
     
     if (x1 <= x2)
-      lLab[(*lIdx)] = extractname(tree, x1, x2);
+      SET_STRING_ELT(lLab, (*lIdx), mkChar(extractname(tree, x1, x2)));
     
     if (*eIdx > 0) {
-      edge((*eIdx) - 1, 0) = parent + lLab.size();
-      edge((*eIdx) - 1, 1) = (*lIdx) + 1;
+      int eRow = (*eIdx) - 1;
+      edge_mtx[eRow + 0]      = parent + nLeafs;
+      edge_mtx[eRow + nEdges] = (*lIdx) + 1;
     }
     (*lIdx)++;
     (*eIdx)++;
@@ -194,12 +197,12 @@ void readtree2(
     } else if (tree[i] == ')') {
       level--;
     } else if (tree[i] == ',' && level == 0) {
-      readtree2(tree, x1, i - 1, parent, eIdx, nIdx, lIdx, edge, eLen, nLab, lLab);
+      readtree2(tree, x1, i - 1, parent, eIdx, nIdx, lIdx, edge_mtx, eLen, nEdges, nLeafs, nLab, lLab);
       x1 = i + 1;
     }
     
   }
-  readtree2(tree, x1, x2, parent, eIdx, nIdx, lIdx, edge, eLen, nLab, lLab);
+  readtree2(tree, x1, x2, parent, eIdx, nIdx, lIdx, edge_mtx, eLen, nEdges, nLeafs, nLab, lLab);
   
   return;
 }
@@ -216,7 +219,7 @@ char* extractname(const char *tree, unsigned int x1, unsigned int x2) {
     x2--;
   }
   
-  char* nodeName = new char[x2 - x1 + 2];
+  char* nodeName = (char*) malloc(x2 - x1 + 2);
   strncpy(nodeName, tree + x1, x2 - x1 + 1);
   nodeName[x2 - x1 + 1] = '\0';
   

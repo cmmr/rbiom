@@ -59,8 +59,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
   params <- list2env(params)
   with(params, {
     test <- match.arg(tolower(test), c("adonis2", "mrpp", "none"))
-    validate_var_range('seed', n = 1, int = TRUE)
-    stopifnot(is_scalar_integerish(seed) && !is.na(seed))
+    validate_seed()
     stopifnot(is_scalar_integerish(permutations) && !is.na(permutations))
     stopifnot(!is.null(names(groups)))
     stopifnot(inherits(dm, 'dist'))
@@ -74,9 +73,13 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
   stats <- with(params, {
     
     grouping <- groups[attr(dm, 'Labels')]
+    
+    
+    # Preserve current .Random.seed
+    oldseed <- if (exists(".Random.seed")) .Random.seed else NULL
     set.seed(seed)
     
-    test %>%
+    result <- test %>%
       switch(
         adonis2 = vegan::adonis2(formula = dm ~ grouping, permutations = permutations),
         mrpp    = vegan::mrpp(dat = dm, grouping = grouping, permutations = permutations) ) %>%
@@ -88,6 +91,10 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
         warning = function (w) data.frame(.stat=NA, .z=NA, .p.val=NA) ) %>%
       data.frame(row.names = NULL, .n = attr(dm, 'Size'), .) %>%
       as_rbiom_tbl()
+    
+    if (!is.null(oldseed)) .Random.seed <- oldseed
+    
+    return (result)
   })
   
   

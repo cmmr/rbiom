@@ -29,8 +29,8 @@
 #'        `depth=0` disables rarefaction. Default: `depth=0.1, n=NULL`
 #'                   
 #' @param seed   Random seed to use in rarefying. See [rarefy_cols()] function
-#'        for details. Default: `0`
-#'                   
+#'        for details. Must be a non-negative integer. Default: `0`
+#' 
 #' @param quote,sep,...   Parameters passed on to [write.table()].
 #'        Default: `quote=FALSE, sep="\t"`
 #' 

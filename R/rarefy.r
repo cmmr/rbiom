@@ -36,10 +36,10 @@
 #'     biom <- rarefy(hmp50)
 #'     sample_sums(biom) %>% head()
 #' 
-rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
+rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE, cpus = NULL) {
   biom <- as_rbiom(biom)
   if (isTRUE(clone)) biom <- biom$clone()
-  biom$counts <- rarefy_cols(mtx = biom$counts, depth = depth, n = n, seed = seed)
+  biom$counts <- rarefy_cols(mtx = biom$counts, depth = depth, n = n, seed = seed, cpus = cpus)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -68,9 +68,9 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #'        `NULL`, `depth` is used instead.
 #'        Default: `NULL`
 #'     
-#' @param seed   An integer to use for seeding the random number generator. If
-#'        you need to create different random rarefactions of the same 
-#'        matrix, set this seed value to a different number each time.
+#' @param seed   A positive integer to use for seeding the random number 
+#'        generator. If you need to create different random rarefactions of the 
+#'        same matrix, set this seed value to a different number each time.
 #'     
 #' @return The rarefied or rescaled matrix.
 #' 
@@ -95,7 +95,7 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE) {
 #'     colSums(mtx)
 #'     colSums(rescale_cols(mtx))
 #'
-rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
+rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
   
   params <- eval_envir(environment())
   
@@ -111,6 +111,9 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
   #________________________________________________________
   # Sanity checks.
   #________________________________________________________
+  validate_seed()
+  validate_cpus()
+  
   mtx <- as.simple_triplet_matrix(mtx)
   
   if (!(is.numeric(depth) && length(depth) == 1 && !is.na(depth)))
@@ -127,8 +130,6 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
       cli_abort(c('x' = "{.var n} must between -1 and 1, or an integer, not {n}."))
   }
   
-  if (!is_scalar_integerish(seed) || is_na(seed))
-    cli_abort(c('x' = "{.var seed} must be a single integer, not {.type {seed}}."))
   
   
   
@@ -137,25 +138,42 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0) {
   #________________________________________________________
   if (all(mtx$v %% 1 == 0)) {
     
+    target <- depth
+    n_otus <- as.integer(tabulate(mtx$j)) # unique otus per sample
+    depths <- as.integer(col_sums(mtx))   # observations per sample
     
-    # Set depth according to number/pct of samples to keep/drop.
+    
+    # Set target depth according to number/pct of samples to keep/drop.
     if (!is.null(n)) {
       if (n == 0)     n <- mtx$ncol     # Keep all
       if (abs(n) < 1) n <- n * mtx$ncol # Keep/drop percentage
       if (n < -1)     n <- mtx$ncol + n # Drop n
       n     <- max(1, floor(n))         # Keep at least one
-      depth <- unname(head(tail(sort(col_sums(mtx)), n), 1))
+      target <- unname(head(tail(sort(depths), n), 1))
     }
     
     
     # Depth is given as minimum percent of obs. to keep.
-    if (depth < 1) {
-      sums  <- col_sums(mtx)
-      depth <- (sum(sums) * depth) / length(sums)
-      depth <- min(sums[sums >= depth])
+    if (target < 1) {
+      target <- (sum(depths) * target) / length(depths)
+      target <- min(depths[depths >= target])
     }
     
-    mtx <- rcpp_rarefy(mtx, depth, seed)
+    # Random INTs generated here, as it's discouraged in C API code.
+    oldseed <- if (exists(".Random.seed")) .Random.seed else NULL
+    set.seed(seed)
+    rand_ints <- as.integer(runif(max(depths)) * .Machine$integer.max)
+    if (!is.null(oldseed)) .Random.seed <- oldseed
+    
+    reordr    <- order(mtx$j, mtx$j)
+    values    <- as.integer(mtx$v[reordr])
+    target    <- as.integer(target)
+    n_threads <- as.integer(cpus)
+    
+    values <- .Call(C_rarefy, values, n_otus, depths, target, rand_ints, n_threads)
+    
+    mtx$v  <- values[rev(order(-reordr))]
+    mtx    <- mtx[row_sums(mtx) > 0, col_sums(mtx) > 0]
     
   }
   

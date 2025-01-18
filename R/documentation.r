@@ -238,10 +238,11 @@
 #'        be prefixed with `'=='` or `'!='` to assign them to `within` or 
 #'        `between`, respectively. Default: `NULL`
 #'        
-#' @param seed  Random seed for permutations. Default: `0`
+#' @param seed  Random seed for permutations. Must be a non-negative integer. 
+#'              Default: `0`
 #'        
-#' @param cpus  The number of CPUs to use. Set to `-1` to use all available, or 
-#'        to `0` to not use threaded computing. Default: `-1`
+#' @param cpus  The number of CPUs to use. Set to `NULL` to use all available, 
+#'        or to `1` to disable parallel processing. Default: `NULL`
 #'        
 #' @param permutations  Number of random permutations to use. 
 #'        Default: `999`

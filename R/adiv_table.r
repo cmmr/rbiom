@@ -23,7 +23,7 @@
 #'     adiv_table(biom, adiv = ".all", md = NULL)
 
 adiv_table <- function (
-    biom, adiv = "Shannon", md = ".all", transform = "none" ) {
+    biom, adiv = "Shannon", md = ".all", transform = "none", cpus = NULL ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -50,8 +50,7 @@ adiv_table <- function (
   #________________________________________________________
   # Compute adiv values
   #________________________________________________________
-  mtx <- adiv_matrix(biom = biom, transform = transform)
-  mtx <- mtx[, unique(c('Depth', adiv))]
+  mtx <- adiv_matrix(biom = biom, adiv = adiv, transform = transform)
   tbl <- tibble(
     '.sample'    = rownames(mtx)[row(mtx)] %>% factor(levels = rownames(mtx)),
     '.depth'     = unname(mtx[,'Depth'][row(mtx)]),
@@ -109,9 +108,10 @@ adiv_table <- function (
 #' 
 #' @inherit documentation_default
 #'        
-#' @return A numeric matrix with samples as rows and columns named 
-#'         \bold{Depth}, \bold{OTUs}, \bold{Shannon}, \bold{Chao1}, 
-#'         \bold{Simpson}, and \bold{InvSimpson}.
+#' @return A numeric matrix with samples as rows. The first column is 
+#'         \bold{Depth}. Remaining columns are the alpha diversity metric names 
+#'         given by `adiv`: one or more of \bold{OTUs}, \bold{Shannon}, 
+#'         \bold{Chao1}, \bold{Simpson}, and \bold{InvSimpson}.
 #'     
 #' @export
 #' @examples
@@ -119,9 +119,9 @@ adiv_table <- function (
 #'     
 #'     biom <- slice_head(hmp50, n = 5)
 #'     
-#'     adiv_matrix(biom)
+#'     adiv_matrix(biom, adiv = ".all")
 
-adiv_matrix <- function (biom, transform = "none") {
+adiv_matrix <- function (biom, adiv = "Shannon", transform = "none", cpus = NULL) {
   
   biom <- as_rbiom(biom)
   
@@ -141,39 +141,54 @@ adiv_matrix <- function (biom, transform = "none") {
   #________________________________________________________
   # Check for valid arguments.
   #________________________________________________________
+  validate_adiv(max = Inf)
   validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt"))
+  validate_cpus()
   
   
   
   #________________________________________________________
   # We want a numeric matrix of samples x adiv metrics
   #________________________________________________________
-  mtx <- biom$counts
-  df  <- rcpp_alpha_div(mtx)
+  
+  mtx <- matrix(
+    data     = NA_real_, 
+    nrow     = biom$n_samples, 
+    ncol     = length(adiv) + 1,
+    dimnames = list(biom$samples, c('Depth', adiv)))
+  
+  otu_mtx   <- as.matrix(biom$counts)
+  depths    <- col_sums(otu_mtx)
+  n_threads <- as.integer(cpus)
+  storage.mode(otu_mtx) <- 'double'
+  storage.mode(depths)  <- 'double'
   
   
+  for (metric in adiv) {
+    
+    result <- switch(
+      EXPR = metric,
+      'OTUs'       = col_sums(otu_mtx > 0), 
+      'Shannon'    = .Call(C_alpha_div, otu_mtx, depths, 1L, n_threads), 
+      'Chao1'      = .Call(C_alpha_div, otu_mtx, depths, 2L, n_threads), 
+      'Simpson'    = .Call(C_alpha_div, otu_mtx, depths, 3L, n_threads), 
+      'InvSimpson' = .Call(C_alpha_div, otu_mtx, depths, 4L, n_threads) )
+    
+    if (transform != 'none')
+      result <- switch(
+        EXPR = transform,
+        'rank'    = base::rank(result), 
+        'log'     = base::log(result), 
+        'log1p'   = base::log1p(result), 
+        'sqrt'    = base::sqrt(result), 
+        'percent' = tryCatch(
+          expr  = result / sum(result), 
+          error = function (e) { warning(e); NA_real_ } ))
+    
+    mtx[,metric] <- result
+  }
   
-  #________________________________________________________
-  # Optionally transform the computed diversity values.
-  #________________________________________________________
-  if (transform != "none") # "rank", "log", "log1p", "sqrt", "percent"
-    for (i in c('OTUs', 'Shannon', 'Chao1', 'Simpson', 'InvSimpson')) {
-      if (transform == "percent") {
-        df[[i]] <- tryCatch(df[[i]] / sum(df[[i]]), error = function (e) { warning(e); df[[i]] })
-      } else {
-        df[[i]] <- do.call(`::`, list('base', transform))(df[[i]])
-      }
-    }
-  
-  
-  
-  #________________________________________________________
-  # Move sample names from df$.sample to rownames(df).
-  #________________________________________________________
-  rownames(df) <- df[['.sample']]
-  mtx <- as.matrix(df[,-1,drop=FALSE])
-  
-  
+  mtx[,'Depth'] <- depths
   
   attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)

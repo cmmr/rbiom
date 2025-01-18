@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.8
-Date: 2025-01-11
+Version: 2.0.9
+Date: 2025-01-17
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -17,7 +17,7 @@ Description:
     Read/write all 'BIOM' formats. Compute rarefaction, alpha diversity, and 
     beta diversity (including 'UniFrac'). Summarize counts by taxonomic level. 
     Subset based on metadata. Generate visualizations and statistical analyses. 
-    CPU intensive operations are coded in C++ for speed.
+    CPU intensive operations are coded in C for speed.
 URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
 License: MIT + file LICENSE
@@ -28,10 +28,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/Needs/website: rmarkdown, phyloseq, npregfast
 Config/testthat/edition: 3
-Config/testthat/parallel: false
-LinkingTo: 
-    Rcpp,
-    RcppThread
 Imports:
     cluster,
     methods,
@@ -48,6 +44,7 @@ Imports:
     ggtext,
     jsonlite,
     magrittr,
+    parallelly,
     pillar,
     plyr,
     readr,

@@ -1,6 +1,7 @@
 
 # library(testthat)
 
+hmp50  <- as_rbiom(system.file(package = 'rbiom', 'extdata', 'hmp50.bz2'))
 rare50 <- rarefy(hmp50)
 min50  <- as_rbiom(list(counts = hmp50$counts))
 

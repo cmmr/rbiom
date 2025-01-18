@@ -227,17 +227,17 @@ bdiv_corrplot <- function (
     # Compute beta diversity.
     #________________________________________________________
     df <- bdiv_table(
-      biom     = biom,
-      bdiv     = bdiv,
-      weighted = weighted,
-      tree     = tree, 
-      md       = c(x, stat.by, facet.by),
-      within   = within,
-      between  = between, 
-      transform    = transform, 
-      ties     = ties, 
-      seed     = seed,
-      delta    = x ) %>%
+      biom      = biom,
+      bdiv      = bdiv,
+      weighted  = weighted,
+      tree      = tree, 
+      md        = c(x, stat.by, facet.by),
+      within    = within,
+      between   = between, 
+      transform = transform, 
+      ties      = ties, 
+      seed      = seed,
+      delta     = x ) %>%
       within({
         .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
         .bdiv <- factor(.bdiv, levels = unique(.bdiv))
@@ -401,16 +401,16 @@ taxa_corrplot <- function (
     # Compute taxa abundance.
     #________________________________________________________
     df <- taxa_table(
-      biom    = biom, 
-      rank    = rank, 
-      taxa    = taxa, 
-      lineage = lineage, 
-      md      = c(x, stat.by, facet.by),
-      unc     = unc, 
-      other   = other,
-      transform   = transform, 
-      ties    = ties, 
-      seed    = seed )
+      biom      = biom, 
+      rank      = rank, 
+      taxa      = taxa, 
+      lineage   = lineage, 
+      md        = c(x, stat.by, facet.by),
+      unc       = unc, 
+      other     = other,
+      transform = transform, 
+      ties      = ties, 
+      seed      = seed )
     
     remove("biom", "rank", "taxa", "lineage", "unc", "other")
     remove("transform", "ties", "seed")

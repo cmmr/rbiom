@@ -1,4 +1,15 @@
 
+validate_cpus <- function (
+    var = "cpus", range = c(1, 256), env = parent.frame(), evar = var, 
+    n = 1, int = TRUE, null_ok = TRUE, if_null = availableCores(), ...) {
+  validate_var_range(var, range, env, evar, n, int, null_ok, if_null = if_null, ...)
+}
+
+validate_seed <- function (
+    var = "seed", range = c(0, Inf), env = parent.frame(), evar = var, 
+    n = 1, int = TRUE, ...) {
+  validate_var_range(var, range, env, evar, n, int, ...)
+}
 
 validate_adiv <- function (var = "adiv", env = parent.frame(), ...) {
   choices <- c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
@@ -234,7 +245,7 @@ validate_var_choices <- function (
 
 validate_var_range <- function (
     var, range = c(-Inf, Inf), env = parent.frame(), evar = var, 
-    n = NA, int = FALSE, null_ok = FALSE, na_ok = FALSE, dne_ok = FALSE ) {
+    n = NA, int = FALSE, null_ok = FALSE, na_ok = FALSE, dne_ok = FALSE, if_null = NULL ) {
   
   if (!hasName(env, var)) {
     if (dne_ok) return (invisible(NULL))
@@ -242,7 +253,7 @@ validate_var_range <- function (
   }
   
   x <- get(var, pos = env, inherits = FALSE)
-  if (is.null(x) && null_ok) return (invisible(NULL))
+  if (is.null(x) && null_ok) return (if_null)
   
   if (!na_ok && anyNA(x))     stop ("`", evar, "` cannot be NA.")
   if (!null_ok && is.null(x)) stop ("`", evar, "` cannot be NULL.")

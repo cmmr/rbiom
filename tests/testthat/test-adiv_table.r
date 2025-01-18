@@ -1,6 +1,6 @@
 
 test_that("adiv_matrix", {
-  df <- as.data.frame(adiv_matrix(min5))
+  df <- as.data.frame(adiv_matrix(min5, adiv = '.all'))
   expect_equal(df$Depth, c(1660, 1371, 1353, 1895, 3939))
   expect_equal(df$OTUs,  c(49, 75, 75, 83, 67))
   expect_equal(round(df$Shannon, 3), c(1.741, 2.587, 2.951, 3.256, 1.463))
@@ -10,8 +10,8 @@ test_that("adiv_matrix", {
 })
 
 test_that("adiv_table", {
-  df <- adiv_table(min5, trans = "rank")
-  df <- adiv_table(min5, trans = "rank") # tests caching
+  df <- adiv_table(min5, adiv = 'Shannon', trans = "rank")
+  df <- adiv_table(min5, adiv = 'Shannon', trans = "rank") # tests caching
   expect_equal(as.character(df$.sample), min5$samples)
   expect_equal(df$.depth, c(1660, 1371, 1353, 1895, 3939))
   expect_equal(df$.adiv, factor(rep('Shannon', 5)))

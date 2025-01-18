@@ -170,7 +170,7 @@ taxa_matrix <- function (
   validate_bool("sparse")
   validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
   validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
-  validate_var_range('seed', n = 1, int = TRUE)
+  validate_seed()
   
   
   #________________________________________________________
@@ -253,8 +253,13 @@ taxa_matrix <- function (
   if (eq(transform, "rank")) {
     
     mtx %<>% as.matrix() # need those zeroes
+    
+    # Preserve current .Random.seed
+    oldseed <- if (exists(".Random.seed")) .Random.seed else NULL
     set.seed(seed)
     mtx[] <- base::rank(mtx, ties.method = ties)
+    if (!is.null(oldseed)) .Random.seed <- oldseed
+    
     mtx %<>% as.simple_triplet_matrix()
     
   } else if (transform %in% c("log", "log1p", "sqrt")) {
