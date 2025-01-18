@@ -1,4 +1,4 @@
-useDynLib(rbiom, C_alpha_div, C_beta_div, C_pthreads, C_rarefy, C_read_tree, C_unifrac, .registration = TRUE)
+useDynLib(rbiom, C_alpha_div, C_beta_div, C_pthreads, C_rarefy, C_read_tree, C_unifrac)
 
 
 importFrom("ape", "pcoa")
