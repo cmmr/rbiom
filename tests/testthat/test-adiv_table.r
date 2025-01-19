@@ -1,6 +1,6 @@
 
 test_that("adiv_matrix", {
-  df <- as.data.frame(adiv_matrix(min5, adiv = '.all'))
+  df <- as.data.frame(adiv_matrix(min5))
   expect_equal(df$Depth, c(1660, 1371, 1353, 1895, 3939))
   expect_equal(df$OTUs,  c(49, 75, 75, 83, 67))
   expect_equal(round(df$Shannon, 3), c(1.741, 2.587, 2.951, 3.256, 1.463))

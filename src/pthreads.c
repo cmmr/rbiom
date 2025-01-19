@@ -12,7 +12,7 @@
 //======================================================
 // R interface. Returns if pthreads are available.
 //======================================================
-SEXP C_pthreads() {
+SEXP C_pthreads(void) {
 #ifdef HAVE_PTHREAD
   return ScalarLogical(1);
 #else

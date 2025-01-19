@@ -4,7 +4,7 @@
 \alias{adiv_matrix}
 \title{Create a matrix of samples x alpha diversity metrics.}
 \usage{
-adiv_matrix(biom, adiv = "Shannon", transform = "none", cpus = NULL)
+adiv_matrix(biom, adiv = ".all", transform = "none", cpus = NULL)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -14,7 +14,7 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
 \code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
 Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+Default: \code{".all"}}
 
 \item{transform}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
@@ -38,5 +38,5 @@ Create a matrix of samples x alpha diversity metrics.
     
     biom <- slice_head(hmp50, n = 5)
     
-    adiv_matrix(biom, adiv = ".all")
+    adiv_matrix(biom)
 }

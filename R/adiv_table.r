@@ -20,7 +20,7 @@
 #'     adiv_table(biom)
 #'     
 #'     biom <- rarefy(biom)
-#'     adiv_table(biom, adiv = ".all", md = NULL)
+#'     adiv_table(biom, md = NULL)
 
 adiv_table <- function (
     biom, adiv = "Shannon", md = ".all", transform = "none", cpus = NULL ) {
@@ -107,6 +107,12 @@ adiv_table <- function (
 #' Create a matrix of samples x alpha diversity metrics.
 #' 
 #' @inherit documentation_default
+#' 
+#' @param adiv   Alpha diversity metric(s) to use. Options are: `"OTUs"`, 
+#'        `"Shannon"`, `"Chao1"`, `"Simpson"`, and/or 
+#'        `"InvSimpson"`. Set `adiv=".all"` to use all metrics.
+#'        Multiple/abbreviated values allowed.
+#'        Default: `".all"`
 #'        
 #' @return A numeric matrix with samples as rows. The first column is 
 #'         \bold{Depth}. Remaining columns are the alpha diversity metric names 
@@ -119,9 +125,9 @@ adiv_table <- function (
 #'     
 #'     biom <- slice_head(hmp50, n = 5)
 #'     
-#'     adiv_matrix(biom, adiv = ".all")
+#'     adiv_matrix(biom)
 
-adiv_matrix <- function (biom, adiv = "Shannon", transform = "none", cpus = NULL) {
+adiv_matrix <- function (biom, adiv = ".all", transform = "none", cpus = NULL) {
   
   biom <- as_rbiom(biom)
   
@@ -151,44 +157,36 @@ adiv_matrix <- function (biom, adiv = "Shannon", transform = "none", cpus = NULL
   # We want a numeric matrix of samples x adiv metrics
   #________________________________________________________
   
-  mtx <- matrix(
-    data     = NA_real_, 
-    nrow     = biom$n_samples, 
-    ncol     = length(adiv) + 1,
-    dimnames = list(biom$samples, c('Depth', adiv)))
+  otu_mtx <- as.matrix(biom$counts)
   
-  otu_mtx   <- as.matrix(biom$counts)
-  depths    <- col_sums(otu_mtx)
+  algorithms <- 0L
+  if ('Shannon' %in% adiv)                           algorithms = algorithms + 1L
+  if ('Chao1'   %in% adiv)                           algorithms = algorithms + 2L
+  if ('Simpson' %in% adiv || 'InvSimpson' %in% adiv) algorithms = algorithms + 4L
+  storage.mode(algorithms) <- 'integer'
+  
   n_threads <- as.integer(cpus)
   storage.mode(otu_mtx) <- 'double'
-  storage.mode(depths)  <- 'double'
   
+  mtx <- matrix(
+    data     = .Call(C_alpha_div, otu_mtx, algorithms, n_threads), 
+    nrow     = biom$n_samples, 
+    ncol     = 6,
+    dimnames = list(biom$samples, c('Depth', 'OTUs', 'Shannon', 'Chao1', 'Simpson', 'InvSimpson')) )
   
-  for (metric in adiv) {
-    
-    result <- switch(
-      EXPR = metric,
-      'OTUs'       = col_sums(otu_mtx > 0), 
-      'Shannon'    = .Call(C_alpha_div, otu_mtx, depths, 1L, n_threads), 
-      'Chao1'      = .Call(C_alpha_div, otu_mtx, depths, 2L, n_threads), 
-      'Simpson'    = .Call(C_alpha_div, otu_mtx, depths, 3L, n_threads), 
-      'InvSimpson' = .Call(C_alpha_div, otu_mtx, depths, 4L, n_threads) )
-    
-    if (transform != 'none')
-      result <- switch(
+  mtx <- mtx[,c('Depth', adiv), drop=FALSE]
+  
+  if (transform != 'none')
+    for (metric in adiv)
+      mtx[,metric] <- switch(
         EXPR = transform,
-        'rank'    = base::rank(result), 
-        'log'     = base::log(result), 
-        'log1p'   = base::log1p(result), 
-        'sqrt'    = base::sqrt(result), 
+        'rank'    = base::rank(mtx[,metric]), 
+        'log'     = base::log(mtx[,metric]), 
+        'log1p'   = base::log1p(mtx[,metric]), 
+        'sqrt'    = base::sqrt(mtx[,metric]), 
         'percent' = tryCatch(
-          expr  = result / sum(result), 
+          expr  = mtx[,metric] / sum(mtx[,metric]), 
           error = function (e) { warning(e); NA_real_ } ))
-    
-    mtx[,metric] <- result
-  }
-  
-  mtx[,'Depth'] <- depths
   
   attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)

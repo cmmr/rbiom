@@ -51,7 +51,7 @@ Calculate the alpha diversity of each sample.
     adiv_table(biom)
     
     biom <- rarefy(biom)
-    adiv_table(biom, adiv = ".all", md = NULL)
+    adiv_table(biom, md = NULL)
 }
 \seealso{
 Other alpha_diversity: 
