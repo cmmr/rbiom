@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">"Shannon"</span>, transform <span class="op">=</span> <span class="st">"none"</span>, cpus <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">".all"</span>, transform <span class="op">=</span> <span class="st">"none"</span>, cpus <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,7 +71,7 @@ Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can al
 <code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
 <code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
 Multiple/abbreviated values allowed.
-Default: <code>"Shannon"</code></p></dd>
+Default: <code>".all"</code></p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
@@ -100,7 +100,7 @@ given by <code>adiv</code>: one or more of <b>OTUs</b>, <b>Shannon</b>,
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span><span class="va">hmp50</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="st">".all"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Depth OTUs  Shannon     Chao1   Simpson InvSimpson</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01  1660   49 1.741152  59.08333 0.5668413   2.308623</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP02  1371   75 2.587403 104.38889 0.8133915   5.358813</span>
@@ -108,7 +108,7 @@ given by <code>adiv</code>: one or more of <b>OTUs</b>, <b>Shannon</b>,
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP04  1895   83 3.255785  93.32143 0.9323644  14.785121</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP05  3939   67 1.462650 127.75000 0.5252254   2.106262</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cmd")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_matrix(biom, \".all\")"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_matrix(biom)"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
