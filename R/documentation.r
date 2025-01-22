@@ -50,6 +50,9 @@
 #' @param weighted  Take relative abundances into account. When 
 #'        `weighted=FALSE`, only presence/absence is considered.
 #'        Multiple values allowed. Default: `TRUE`
+#'     
+#' @param normalized  Only changes the "Weighted UniFrac" calculation.
+#'        Divides result by the total branch weights. Default: `TRUE`
 #'       
 #' 
 #' @param delta  For numeric metadata, report the absolute difference in values 

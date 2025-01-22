@@ -1,6 +1,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <string.h> // memset, memcpy
+#include "get.h"
 
 // Detect if pthread is available.
 #if defined __has_include
@@ -13,15 +14,16 @@
 
 
 typedef struct {
+  int *samples;
   int *values;
-  int *n_otus;
-  int *depths;
-  int  target;
   int  n_samples;
+  int *indices;
+  int  n_indices;
+  int  target;
   int *rand_ints;
   int  n_threads;
+  int  thread_i;
   int *result;
-  int  remainder;
 } rarefy_t;
 
 
@@ -34,40 +36,58 @@ void *rarefy_worker(void *arg) {
   
   rarefy_t setup = *((rarefy_t *) arg);
   
+  int *samples   = setup.samples;
   int *values    = setup.values;
-  int *n_otus    = setup.n_otus;
-  int *depths    = setup.depths;
-  int  target    = setup.target;
   int  n_samples = setup.n_samples;
+  int *indices   = setup.indices;
+  int  n_indices = setup.n_indices;
+  int  target    = setup.target;
   int *rand_ints = setup.rand_ints;
   int  n_threads = setup.n_threads;
+  int  thread_i  = setup.thread_i;
   int *result    = setup.result;
-  int  remainder = setup.remainder;
   
   //======================================================
-  // Loop over each sample
+  // `indices` orders the values by sample, then otu.
+  // Reduces scanning; consistent seeded randomness.
   //======================================================
   
   int start, end = 0;
   
-  for (int sample_i = 0; sample_i < n_samples; sample_i++) {
+  for (int sample = thread_i; sample < n_samples; sample += n_threads) {
     
-    int n     = n_otus[sample_i];
-    int depth = depths[sample_i];
+    //======================================================
+    // Seek to the beginning of this sample's values
+    //======================================================
     
-    start = end;
-    end   = start + n;
+    for (start = end; start < n_indices; start++) {
+      int idx = indices[start] - 1;
+      if (samples[idx] - 1 == sample) break;
+    }
     
-    if (sample_i % n_threads != remainder) continue;
+    if (start == n_indices) continue; // sample has no values
+    
+    
+    
+    //======================================================
+    // Seek to end, summing depth along the way.
+    //======================================================
+    
+    int depth = 0;
+    
+    for (end = start; end < n_indices; end++) {
+      int idx = indices[end] - 1;
+      if (samples[idx] - 1 != sample) break;
+      depth += values[idx];
+    }
+    
     
     
     //======================================================
     // Insufficient sequences - leave as all zeroes.
     //======================================================
     
-    if (depth < target) {
-      continue;
-    }
+    if (depth < target) continue;
     
     
     //======================================================
@@ -75,30 +95,36 @@ void *rarefy_worker(void *arg) {
     //======================================================
     
     if (depth == target) {
-      memcpy(result + start, values + start, n * sizeof(int));
+      for (int i = start; i < end; i++) {
+        int idx = indices[i] - 1;
+        result[idx] = values[idx];
+      }
       continue;
     }
     
     
     //======================================================
-    // Knuth algorithm for removing (target - depth) seqs.
+    // Knuth algorithm for choosing target seqs from depth.
     //======================================================
     
-    int value = values[start], pos = start, kept = 0;
+    int tried = 0, kept = 0;
     
-    for (int tried = 0; tried < depth && kept < target; ++tried) {
+    for (int i = start; i < end && kept < target; i++) {
       
-      int not_tried  = depth - tried;
-      int still_need = target - kept;
+      int idx  = indices[i] - 1;
+      int seqs = values[idx];
       
-      if (rand_ints[tried] % not_tried < still_need) {
-        result[pos]++; // retain this observation
-        kept++;
-      }
-      
-      if (--value == 0) {
-        pos++; // move to next OTU
-        value = values[pos];
+      for (int seq = 0; seq < seqs && kept < target; seq++) {
+        
+        int not_tried  = depth - tried;
+        int still_need = target - kept;
+        
+        if (rand_ints[tried] % not_tried < still_need) {
+          result[idx]++; // retain this observation
+          kept++;
+        }
+        
+        tried++;
       }
     }
     
@@ -114,27 +140,36 @@ void *rarefy_worker(void *arg) {
 // R interface. Assigns samples to worker threads.
 //======================================================
 SEXP C_rarefy(
-    SEXP sexp_values,    SEXP sexp_n_otus, 
-    SEXP sexp_depths,    SEXP sexp_target, 
-    SEXP sexp_rand_ints, SEXP sexp_n_threads) {
+    SEXP sexp_otu_slam_mtx, SEXP sexp_indices, 
+    SEXP sexp_target,       SEXP sexp_rand_ints, 
+    SEXP sexp_n_threads ) {
   
-  int n_threads = asInteger(sexp_n_threads);
-  int n_values  = length(sexp_values);
+  int *samples      = INTEGER(  get(sexp_otu_slam_mtx, "j"));
+  int *values       = INTEGER(  get(sexp_otu_slam_mtx, "v"));
+  int  n_samples    = asInteger(get(sexp_otu_slam_mtx, "ncol"));
+  
+  int *indices      = INTEGER(sexp_indices);
+  int  n_indices    = length(sexp_indices);
+  
+  int  target       = asInteger(sexp_target);
+  int *rand_ints    = INTEGER(sexp_rand_ints);
+  int  n_threads    = asInteger(sexp_n_threads);
   
   
   // allocate the return vector
-  SEXP sexp_result = PROTECT(allocVector(INTSXP, n_values));
+  SEXP sexp_result = PROTECT(allocVector(INTSXP, n_indices));
   int *result      = INTEGER(sexp_result);
-  memset(result, 0, n_values * sizeof(int));
+  memset(result, 0, n_indices * sizeof(int));
   
   // common values for all the threads
   rarefy_t setup;
-  setup.values    = INTEGER(sexp_values);
-  setup.n_otus    = INTEGER(sexp_n_otus);
-  setup.depths    = INTEGER(sexp_depths);
-  setup.target    = asInteger(sexp_target);
-  setup.rand_ints = INTEGER(sexp_rand_ints);
-  setup.n_samples = length(sexp_n_otus);
+  setup.samples   = samples;
+  setup.values    = values;
+  setup.n_samples = n_samples;
+  setup.indices   = indices;
+  setup.n_indices = n_indices;
+  setup.target    = target;
+  setup.rand_ints = rand_ints;
   setup.n_threads = n_threads;
   setup.result    = result;
   
@@ -149,7 +184,7 @@ SEXP C_rarefy(
       
       for (int i = 0; i < n_threads; i++) {
         memcpy(args + i, &setup, sizeof(rarefy_t));
-        args[i].remainder = i;
+        args[i].thread_i = i;
         pthread_create(&tids[i], NULL, rarefy_worker, &args[i]);
       }
       
@@ -169,7 +204,7 @@ SEXP C_rarefy(
   
   // Run WITHOUT multithreading
   setup.n_threads = 1;
-  setup.remainder = 0;
+  setup.thread_i  = 0;
   rarefy_worker(&setup);
   
   UNPROTECT(1);

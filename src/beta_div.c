@@ -2,6 +2,7 @@
 #include <Rinternals.h>
 #include <stdlib.h> // calloc, free
 #include <math.h>   // sqrt
+#include "pair.h"
 
 // Detect if pthread is available.
 #if defined __has_include
@@ -14,12 +15,12 @@
 
 
 typedef struct {
-  double **pair_otu_mtx;
-  int      n_otus;
-  int      n_pairs;
-  int      n_threads;
-  int      thread_i;
-  double  *result;
+  dbl_ptr_pair_t *col_pairs;
+  int             n_otus;
+  int             n_pairs;
+  int             n_threads;
+  int             thread_i;
+  double         *result;
 } bdiv_t;
 
 
@@ -33,18 +34,18 @@ void *bdiv_braycurtis_w(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
     
     double diffs = 0;
     double sums  = 0;
@@ -64,6 +65,7 @@ void *bdiv_braycurtis_w(void *arg) {
     // value to return
     result[pair] = diffs / sums;
   }
+  
   return NULL;
 }
 
@@ -78,18 +80,18 @@ void *bdiv_braycurtis_u(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
 
     double  x_nz = 0;
     double  y_nz = 0;
@@ -110,6 +112,7 @@ void *bdiv_braycurtis_u(void *arg) {
     // value to return
     result[pair] = (x_nz + y_nz - 2 * xy_nz) / (x_nz + y_nz);
   }
+  
   return NULL;
 }
 
@@ -123,18 +126,18 @@ void *bdiv_euclidean_w(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
 
     double distance = 0;
 
@@ -151,6 +154,7 @@ void *bdiv_euclidean_w(void *arg) {
     // value to return
     result[pair] = sqrt(distance);
   }
+  
   return NULL;
 }
 
@@ -164,18 +168,18 @@ void *bdiv_euclidean_u(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
 
     double  x_nz = 0;
     double  y_nz = 0;
@@ -196,6 +200,7 @@ void *bdiv_euclidean_u(void *arg) {
     // value to return
     result[pair] = sqrt(x_nz + y_nz - 2 * xy_nz);
   }
+  
   return NULL;
 }
 
@@ -209,18 +214,18 @@ void *bdiv_manhattan_w(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
 
     double distance = 0;
 
@@ -238,6 +243,7 @@ void *bdiv_manhattan_w(void *arg) {
     // value to return
     result[pair] = distance;
   }
+  
   return NULL;
 }
 
@@ -251,18 +257,18 @@ void *bdiv_manhattan_u(void *arg) {
   
   bdiv_t setup = *((bdiv_t *) arg);
   
-  double **pair_otu_mtx = setup.pair_otu_mtx;
-  int      n_otus       = setup.n_otus;
-  int      n_pairs      = setup.n_pairs;
-  int      n_threads    = setup.n_threads;
-  int      thread_i     = setup.thread_i;
-  double  *result       = setup.result;
+  dbl_ptr_pair_t *col_pairs = setup.col_pairs;
+  int             n_otus    = setup.n_otus;
+  int             n_pairs   = setup.n_pairs;
+  int             n_threads = setup.n_threads;
+  int             thread_i  = setup.thread_i;
+  double         *result    = setup.result;
   
   for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
     
     // pointers to each sample's column in otu_mtx
-    double *sample_1_otus = pair_otu_mtx[0 * n_pairs + pair];
-    double *sample_2_otus = pair_otu_mtx[1 * n_pairs + pair];
+    double *sample_1_otus = col_pairs[pair].A;
+    double *sample_2_otus = col_pairs[pair].B;
 
     double  x_nz = 0;
     double  y_nz = 0;
@@ -283,6 +289,7 @@ void *bdiv_manhattan_u(void *arg) {
     // value to return
     result[pair] = x_nz + y_nz - 2 * xy_nz;
   }
+  
   return NULL;
 }
 
@@ -309,6 +316,7 @@ void *bdiv_jaccard_w(void *arg) {
     
     result[pair] = 2 * distance / (1 + distance);
   }
+  
   return NULL;
 }
 
@@ -335,6 +343,7 @@ void *bdiv_jaccard_u(void *arg) {
     
     result[pair] = 2 * distance / (1 + distance);
   }
+  
   return NULL;
 }
 
@@ -344,16 +353,16 @@ void *bdiv_jaccard_u(void *arg) {
 // R interface. Dispatches threads to bdiv algorithms.
 //======================================================
 SEXP C_beta_div(
-    SEXP sexp_otu_mtx, SEXP sexp_pair_mtx,  
+    SEXP sexp_otu_mtx,  SEXP sexp_pair_mtx,  
     SEXP sexp_algoritm, SEXP sexp_n_threads ) {
   
-  double *otu_mtx   = REAL(sexp_otu_mtx);
-  int    *pair_mtx  = INTEGER(sexp_pair_mtx);
-  int     algoritm  = asInteger(sexp_algoritm);
-  int     n_threads = asInteger(sexp_n_threads);
+  double     *otu_mtx   = REAL(sexp_otu_mtx);
+  int_pair_t *pairs     = (int_pair_t *)INTEGER(sexp_pair_mtx);
+  int         algoritm  = asInteger(sexp_algoritm);
+  int         n_threads = asInteger(sexp_n_threads);
   
-  int     n_otus    = nrows(sexp_otu_mtx);
-  int     n_pairs   = nrows(sexp_pair_mtx);
+  int         n_otus    = nrows(sexp_otu_mtx);
+  int         n_pairs   = ncols(sexp_pair_mtx);
   
   
   // allocate the return vector
@@ -375,21 +384,20 @@ SEXP C_beta_div(
   }
   
   // pre-compute pointers to each sample's column in otu_mtx
-  double **pair_otu_mtx = calloc(n_pairs * 2, sizeof(double *));
-  for (int i = 0; i < n_pairs * 2; i++) {
-    int sample = pair_mtx[i];
-    int offset = (sample - 1) * n_otus;
-    pair_otu_mtx[i] = otu_mtx + offset;
+  dbl_ptr_pair_t *col_pairs = calloc(n_pairs, sizeof(dbl_ptr_pair_t));
+  for (int pair = 0; pair < n_pairs; pair++) {
+    col_pairs[pair].A = &otu_mtx[(pairs[pair].A - 1) * n_otus];
+    col_pairs[pair].B = &otu_mtx[(pairs[pair].B - 1) * n_otus];
   }
   
   
   // common values for all the threads
   bdiv_t setup;
-  setup.pair_otu_mtx = pair_otu_mtx;
-  setup.n_otus       = n_otus;
-  setup.n_pairs      = n_pairs;
-  setup.n_threads    = n_threads;
-  setup.result       = result;
+  setup.col_pairs = col_pairs;
+  setup.n_otus    = n_otus;
+  setup.n_pairs   = n_pairs;
+  setup.n_threads = n_threads;
+  setup.result    = result;
   
   
   // Run WITH multithreading
@@ -412,7 +420,7 @@ SEXP C_beta_div(
       
       free(tids);
       free(args);
-      free(pair_otu_mtx);
+      free(col_pairs);
       
       UNPROTECT(1);
       
@@ -426,7 +434,7 @@ SEXP C_beta_div(
   setup.thread_i  = 0;
   bdiv_func(&setup);
   
-  free(pair_otu_mtx);
+  free(col_pairs);
   
   UNPROTECT(1);
   

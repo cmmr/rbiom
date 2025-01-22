@@ -139,7 +139,6 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
   if (all(mtx$v %% 1 == 0)) {
     
     target <- depth
-    n_otus <- as.integer(tabulate(mtx$j)) # unique otus per sample
     depths <- as.integer(col_sums(mtx))   # observations per sample
     
     
@@ -153,7 +152,7 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
     }
     
     
-    # Depth is given as minimum percent of obs. to keep.
+    # Depth is given as minimum percent of samples to keep.
     if (target < 1) {
       target <- (sum(depths) * target) / length(depths)
       target <- min(depths[depths >= target])
@@ -165,15 +164,16 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
     rand_ints <- as.integer(runif(max(depths)) * .Machine$integer.max)
     if (!is.null(oldseed)) .Random.seed <- oldseed
     
-    reordr    <- order(mtx$j, mtx$j)
-    values    <- as.integer(mtx$v[reordr])
+    storage.mode(mtx$i) <- 'integer'
+    storage.mode(mtx$j) <- 'integer'
+    storage.mode(mtx$v) <- 'integer'
+    
+    indices   <- order(mtx$j, mtx$i)
     target    <- as.integer(target)
     n_threads <- as.integer(cpus)
     
-    values <- .Call(C_rarefy, values, n_otus, depths, target, rand_ints, n_threads)
-    
-    mtx$v  <- values[rev(order(-reordr))]
-    mtx    <- mtx[row_sums(mtx) > 0, col_sums(mtx) > 0]
+    mtx$v <- .Call(C_rarefy, mtx, indices, target, rand_ints, n_threads)
+    mtx   <- mtx[row_sums(mtx) > 0, col_sums(mtx) > 0]
     
   }
   

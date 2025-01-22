@@ -510,7 +510,8 @@ relevel <- function (tbl) {
       lvls <- lvls[!is.na(lvls)]
       if (length(f <- which(lvls != trimws(lvls))) > 0) {
         field <- names(tbl)[[i]]
-        cli_warn("Whitespace trimmed from {.field {field}} column {qty(length(f))} value{?s} {.val {lvls[f]}}.")
+        cli_warn(
+          c('i' = "Whitespace trimmed from {.field {field}} column {qty(length(f))} value{?s} {.val {lvls[f]}}.") )
         levels(tbl[[i]]) %<>% trimws()
       }
     }

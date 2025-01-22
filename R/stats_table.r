@@ -221,6 +221,7 @@ adiv_stats <- function (
 #'       
 #'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))[,1:7]
 #'     
+#'     biom <- subset(biom, `Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
 #'     bdiv_stats(biom, stat.by = "Body Site", split.by = "==Sex")[,1:6]
 
 bdiv_stats <- function (

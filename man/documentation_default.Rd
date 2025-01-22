@@ -48,6 +48,9 @@ Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 \code{weighted=FALSE}, only presence/absence is considered.
 Multiple values allowed. Default: \code{TRUE}}
 
+\item{normalized}{Only changes the "Weighted UniFrac" calculation.
+Divides result by the total branch weights. Default: \code{TRUE}}
+
 \item{delta}{For numeric metadata, report the absolute difference in values
 for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
 Default: \code{TRUE}}

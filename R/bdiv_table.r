@@ -44,7 +44,7 @@
 #'
 
 bdiv_table <- function (
-    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
+    biom, bdiv = "Bray-Curtis", weighted = TRUE, normalized = TRUE, tree = NULL, 
     md = ".all", within = NULL, between = NULL, delta = '.all', 
     transform = "none", ties = "random", seed = 0, cpus = NULL ) {
   
@@ -94,16 +94,17 @@ bdiv_table <- function (
         # Compute the distance matrix
         #________________________________________________________
         mtx <- bdiv_matrix(
-          biom      = biom, 
-          bdiv      = b, 
-          weighted  = w, 
-          tree      = tree, 
-          within    = within, 
-          between   = between, 
-          transform = transform, 
-          ties      = ties, 
-          seed      = seed, 
-          cpus      = cpus )
+          biom       = biom, 
+          bdiv       = b, 
+          weighted   = w, 
+          normalized = normalized,
+          tree       = tree, 
+          within     = within, 
+          between    = between, 
+          transform  = transform, 
+          ties       = ties, 
+          seed       = seed, 
+          cpus       = cpus )
         
         
         #________________________________________________________
@@ -217,7 +218,7 @@ bdiv_table <- function (
 #' @rdname bdiv_table
 #' @export
 bdiv_matrix <- function (
-    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
+    biom, bdiv = "Bray-Curtis", weighted = TRUE, normalized = TRUE, tree = NULL, 
     within = NULL, between = NULL, 
     transform = "none", ties = "random", seed = 0, cpus = NULL ) {
   
@@ -256,6 +257,7 @@ bdiv_matrix <- function (
   #________________________________________________________
   validate_bdiv()
   validate_bool("weighted")
+  validate_bool("normalized")
   validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
   validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
   validate_seed()
@@ -272,7 +274,7 @@ bdiv_matrix <- function (
   # Order the sparse matrix's values by sample, then by taxa
   #________________________________________________________
   otu_slam_mtx <- biom$counts
-  phylo_tree    <- biom$tree
+  phylo_tree   <- biom$tree
   
   if (bdiv == "UniFrac") {
     
@@ -280,6 +282,9 @@ bdiv_matrix <- function (
       cli_abort(c(x = "Phylogenetic tree required for UniFrac."))
     
     otu_slam_mtx <- otu_slam_mtx[as.character(phylo_tree$tip.label),]
+    
+    if (all(phylo_tree$edge.length < .Machine$double.eps))
+      phylo_tree$edge.length <- rep(1, length(phylo_tree$edge.length))
   }
   
   ord <- order(otu_slam_mtx$j, otu_slam_mtx$i)
@@ -311,7 +316,7 @@ bdiv_matrix <- function (
     if (!is.matrix(x))
       x <- matrix(x, nrow = 1)
     
-    return (x)
+    return (t(x))
   })
   
   
@@ -320,24 +325,22 @@ bdiv_matrix <- function (
   # Run dissimilarity algorithms implemented in C.
   #________________________________________________________
   
+  
+  otu_mtx   <- as.matrix(otu_slam_mtx)
   n_threads <- as.integer(cpus)
-  storage.mode(pair_mtx) <- 'integer'
+  storage.mode(otu_mtx)    <- 'double'
+  storage.mode(pair_mtx)   <- 'integer'
+  storage.mode(weighted)   <- 'integer'
+  storage.mode(normalized) <- 'integer'
   
   if (bdiv == "UniFrac") {
-    
-    storage.mode(otu_slam_mtx$i) <- 'integer'
-    storage.mode(otu_slam_mtx$j) <- 'integer'
-    storage.mode(otu_slam_mtx$v) <- 'double'
     
     storage.mode(phylo_tree$edge)        <- 'integer'
     storage.mode(phylo_tree$edge.length) <- 'double'
     
-    distances <- .Call(C_unifrac, otu_slam_mtx, phylo_tree, pair_mtx, weighted, n_threads)
+    distances <- .Call(C_unifrac, otu_mtx, phylo_tree, pair_mtx, weighted, normalized, n_threads)
     
   } else {
-    
-    otu_mtx <- as.matrix(otu_slam_mtx)
-    storage.mode(otu_mtx) <- 'double'
     
     algorithm <- switch(
       EXPR = bdiv,
@@ -346,7 +349,7 @@ bdiv_matrix <- function (
       'Manhattan'   = if (weighted) 5L else 6L, 
       'Jaccard'     = if (weighted) 7L else 8L )
     
-    distances  <- .Call(C_beta_div, otu_mtx, pair_mtx, algorithm, n_threads)
+    distances <- .Call(C_beta_div, otu_mtx, pair_mtx, algorithm, n_threads)
   }
   
   
@@ -376,8 +379,8 @@ bdiv_matrix <- function (
   #________________________________________________________
   n   <- length(sids)
   mtx <- matrix(data = rep(as.numeric(NA), n * n), nrow = n)
-  mtx[pair_mtx]          <- distances
-  mtx[pair_mtx[,c(2,1)]] <- distances
+  mtx[t(pair_mtx)]          <- distances
+  mtx[t(pair_mtx)[,c(2,1)]] <- distances
   mtx[cbind(1:n,1:n)] <- rep(0, n)
   dimnames(mtx)       <- list(sids, sids)
   
@@ -401,18 +404,19 @@ bdiv_matrix <- function (
 #' @rdname bdiv_table
 #' @export
 bdiv_distmat <- function (
-    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, 
+    biom, bdiv = "Bray-Curtis", weighted = TRUE, normalized = TRUE, tree = NULL, 
     within = NULL, between = NULL, transform = "none", cpus = NULL ) {
   
   stats::as.dist(bdiv_matrix(
-    biom      = biom, 
-    bdiv      = bdiv, 
-    weighted  = weighted, 
-    tree      = tree, 
-    within    = within, 
-    between   = between, 
-    transform = transform,
-    cpus      = cpus ))
+    biom       = biom, 
+    bdiv       = bdiv, 
+    weighted   = weighted, 
+    normalized = normalized,
+    tree       = tree, 
+    within     = within, 
+    between    = between, 
+    transform  = transform,
+    cpus       = cpus ))
 }
 
 

@@ -10,6 +10,7 @@ bdiv_table(
   biom,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
+  normalized = TRUE,
   tree = NULL,
   md = ".all",
   within = NULL,
@@ -25,6 +26,7 @@ bdiv_matrix(
   biom,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
+  normalized = TRUE,
   tree = NULL,
   within = NULL,
   between = NULL,
@@ -38,6 +40,7 @@ bdiv_distmat(
   biom,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
+  normalized = TRUE,
   tree = NULL,
   within = NULL,
   between = NULL,
@@ -59,6 +62,9 @@ Default: \code{"Bray-Curtis"}}
 \item{weighted}{Take relative abundances into account. When
 \code{weighted=FALSE}, only presence/absence is considered.
 Multiple values allowed. Default: \code{TRUE}}
+
+\item{normalized}{Only changes the "Weighted UniFrac" calculation.
+Divides result by the total branch weights. Default: \code{TRUE}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when

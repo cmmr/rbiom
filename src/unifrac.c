@@ -1,7 +1,9 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <stdlib.h> // calloc, free
-#include <string.h> // strcmp, memset, memcpy
+#include <string.h> // memcpy
+#include "get.h"
+#include "pair.h"
 
 // Detect if pthread is available.
 #if defined __has_include
@@ -13,211 +15,189 @@
 
 
 typedef struct {
-  int    *otus;
-  int    *samples;
-  double *values;
-  int     n_otus;
-  int     n_samples;
-  int    *pair_mtx;
-  int    *edge_mtx;
-  double *edge_lengths;
-  int     weighted;
-  int     n_values;
-  int     n_pairs;
-  int     n_edges;
-  double *sample_depths;
-  int    *child_at;
-  int    *edge_to_leaves;
-  double *sample_edge_wt;
-  int     n_threads;
-  int     thread_i;
-  double *result;
+  int    edge;
+  int    parent;
+  double length;
+} node_t;
+
+
+typedef struct {
+  double      *otu_mtx;
+  int          n_otus;
+  int          n_samples;
+  int          n_edges;
+  double      *edge_lengths;
+  int_pair_t  *pairs;
+  int          n_pairs;
+  int          weighted;
+  int          normalized;
+  double      *weight_mtx;
+  node_t      *nodes;
+  double      *sample_norms;
+  int          n_threads;
+  int          thread_i;
+  double      *result;
 } unifrac_t;
 
 
+
 //======================================================
-// Trace the path from each leaf to the root node.
+// Find the tree's edge weights for each sample.
 //======================================================
 
-void *calc_edge_to_leaves(void *arg) {
-  
+void *unifrac_weight_mtx(void *arg) {
+
   unifrac_t setup = *((unifrac_t *) arg);
   
-  int  n_otus         = setup.n_otus;
-  int  n_edges        = setup.n_edges;
-  int *child_at       = setup.child_at;
-  int *edge_mtx       = setup.edge_mtx;
-  int *edge_to_leaves = setup.edge_to_leaves;
-  int  n_threads      = setup.n_threads;
-  int  thread_i       = setup.thread_i;
+  double      *otu_mtx      = setup.otu_mtx;
+  int          n_otus       = setup.n_otus;
+  int          n_samples    = setup.n_samples;
+  int          n_edges      = setup.n_edges;
+  int          weighted     = setup.weighted;
+  double      *weight_mtx   = setup.weight_mtx;
+  node_t      *nodes        = setup.nodes;
+  double      *sample_norms = setup.sample_norms;
+  int          n_threads    = setup.n_threads;
+  int          thread_i     = setup.thread_i;
   
-  // IntegerMatrix edge2leaves = IntegerMatrix(nTreeEdges, nOTUs);
-  // RcppThread::parallelFor(1, nOTUs + 1, [&] (int leaf) {
-  //   int node = leaf;
-  //   do {
-  //     edge2leaves(childAt[node], leaf - 1) = 1;
-  //     node = treeEdge(childAt[node], 0);
-  //   } while (childAt[node] != -1);
-  // }, nThreads);
-  
-  for (int leaf = thread_i; leaf < n_otus; leaf += n_threads) {
+  for (int sample = thread_i; sample < n_samples; sample += n_threads) {
     
-    int node = leaf;
-    int edge = child_at[node];
-    do {
-      edge_to_leaves[edge * n_otus + leaf] = 1;
-      node = edge_mtx[0 * n_edges + edge] - 1;
-      edge = child_at[node];
-    } while (edge != -1);
+    // initialize calloc()ed memory to zeroes
+    for (int edge = 0; edge < n_edges; edge++) {
+      weight_mtx[sample * n_edges + edge] = 0;
+    }
     
+    double sample_depth  = 0; // for relative abundance calculation
+    sample_norms[sample] = 0; // denominator of normalization step
+    
+    if (weighted) {            
+      for (int otu = 0; otu < n_otus; otu++) {
+        sample_depth += otu_mtx[sample * n_otus + otu];
+      }
+    }
+    
+    for (int otu = 0; otu < n_otus; otu++) {
+      
+      double abundance = otu_mtx[sample * n_otus + otu];
+      if (abundance == 0) continue; // OTU not present in sample
+      
+      int node = otu; // start at OTU tip/leaf in tree
+      while (node > -1) { // traverse until we hit the tree's root
+        
+        int    edge   = nodes[node].edge;
+        double length = nodes[node].length;
+        int    idx    = sample * n_edges + edge;
+        
+        if (weighted) {
+          
+          // relative abundance, weighted by branch length
+          double relative_abundance = abundance / sample_depth;
+          double weighted_abundance = length * relative_abundance;
+          weight_mtx[idx]      += weighted_abundance;
+          sample_norms[sample] += weighted_abundance;
+          
+        } else {
+          
+          if (weight_mtx[idx]) break; // already traversed
+          
+          weight_mtx[idx] = 1;
+        }
+        
+        node = nodes[node].parent; // proceed on up the tree
+      }
+      
+    }
   }
+  
   
   return NULL;
 }
 
 
+
 //======================================================
-// Map samples to their branch weights.
+// Second pass, now with weight_mtx.
 //======================================================
 
-void *calc_sample_edge_wt(void *arg) {
+void *unifrac_result(void *arg) {
   
   unifrac_t setup = *((unifrac_t *) arg);
   
-  int    *otus           = setup.otus;
-  int    *samples        = setup.samples;
-  double *values         = setup.values;
-  double *sample_depths  = setup.sample_depths;
-  double *edge_lengths   = setup.edge_lengths;
-  int    *edge_to_leaves = setup.edge_to_leaves;
-  double *sample_edge_wt = setup.sample_edge_wt;
-  int     n_edges        = setup.n_edges;
-  int     n_otus         = setup.n_otus;
-  int     n_samples      = setup.n_samples;
-  int     n_values       = setup.n_values;
-  int     weighted       = setup.weighted;
-  int     n_threads      = setup.n_threads;
-  int     thread_i       = setup.thread_i;
+  int          n_edges      = setup.n_edges;
+  double      *edge_lengths = setup.edge_lengths;
+  int_pair_t  *pairs        = setup.pairs;
+  int          n_pairs      = setup.n_pairs;
+  int          weighted     = setup.weighted;
+  int          normalized   = setup.normalized;
+  double      *weight_mtx   = setup.weight_mtx;
+  double      *sample_norms = setup.sample_norms;
+  int          n_threads    = setup.n_threads;
+  int          thread_i     = setup.thread_i;
+  double      *result       = setup.result;
   
-  if (weighted) {
   
-    for (int i = thread_i; i < n_values; i += n_threads) {
-      
-      int    otu          = otus[i]    - 1;
-      int    sample       = samples[i] - 1;
-      double value        = values[i];
-      double sample_depth = sample_depths[sample];
-      
-      double wt = 0;
-      for (int edge = 0; edge < n_edges; edge++) {
-        if (edge_to_leaves[edge * n_otus + otu] == 0) continue;
-        wt = edge_lengths[edge] * (value / sample_depth);
-        sample_edge_wt[edge * n_samples + sample] += wt;
-      }
-    }
-    
-  } else {
-    
-    for (int i = thread_i; i < n_values; i += n_threads) {
-      
-      int otu    = otus[i]    - 1;
-      int sample = samples[i] - 1;
-    
-      for (int edge = 0; edge < n_edges; edge++) {
-        if (edge_to_leaves[edge * n_otus + otu] == 0) continue;
-        sample_edge_wt[edge * n_samples + sample] = edge_lengths[edge];
-      }
-    }
-    
-  }
-  
-  return NULL;
-}
-
-
-//======================================================
-// Compute pairwise distances.
-//======================================================
-
-void *calc_result(void *arg) {
-  
-  unifrac_t setup = *((unifrac_t *) arg);
-  
-  int     weighted       = setup.weighted;
-  int     thread_i       = setup.thread_i;
-  int     n_threads      = setup.n_threads;
-  int     n_pairs        = setup.n_pairs;
-  int    *pair_mtx       = setup.pair_mtx;
-  int     n_edges        = setup.n_edges;
-  double *sample_edge_wt = setup.sample_edge_wt;
-  int     n_samples      = setup.n_samples;
-  double *result         = setup.result;
-  
+  //======================================================
+  // WEIGHTED UniFrac
+  //======================================================
   if (weighted) {
     
     for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
       
-      int sample1 = pair_mtx[0 * n_pairs + pair] - 1;
-      int sample2 = pair_mtx[1 * n_pairs + pair] - 1;
+      int sample_1 = pairs[pair].A - 1;
+      int sample_2 = pairs[pair].B - 1;
       
-      double amt_diff = 0;
+      double sum = 0;
+      
       for (int edge = 0; edge < n_edges; edge++) {
-        double x = sample_edge_wt[edge * n_samples + sample1];
-        double y = sample_edge_wt[edge * n_samples + sample2];
-        amt_diff += (x >= y) ? (x - y) : (y - x);
+        
+        double weight_1 = weight_mtx[sample_1 * n_edges + edge];
+        double weight_2 = weight_mtx[sample_2 * n_edges + edge];
+        
+        if (weight_1 > weight_2) { sum += weight_1 - weight_2; }
+        else                     { sum += weight_2 - weight_1; }
+        
       }
-      result[pair] = amt_diff;
+      
+      if (normalized) {
+        sum /= sample_norms[sample_1] + sample_norms[sample_2];
+      }
+      
+      result[pair] = sum;
     }
     
-  } else {
+  }
+  
+  
+  //======================================================
+  // UNWEIGHTED UniFrac
+  //======================================================
+  else {
     
     for (int pair = thread_i; pair < n_pairs; pair += n_threads) {
       
-      int sample1 = pair_mtx[0 * n_pairs + pair] - 1;
-      int sample2 = pair_mtx[1 * n_pairs + pair] - 1;
+      int sample_1 = pairs[pair].A - 1;
+      int sample_2 = pairs[pair].B - 1;
       
-      double amt_diff = 0, amt_total = 0;
+      double distinct = 0, shared = 0;
+      
       for (int edge = 0; edge < n_edges; edge++) {
-        double x = sample_edge_wt[edge * n_samples + sample1];
-        double y = sample_edge_wt[edge * n_samples + sample2];
-        amt_diff  += (x && y) ? (0) : (x + y);
-        amt_total += (x && y) ? (x) : (x + y);
+        
+        double length   = edge_lengths[edge];
+        double weight_1 = weight_mtx[sample_1 * n_edges + edge];
+        double weight_2 = weight_mtx[sample_2 * n_edges + edge];
+        
+        if      (weight_1 && weight_2) { shared   += length; }
+        else if (weight_1 || weight_2) { distinct += length; }
       }
-      result[pair] = amt_diff / amt_total;
+      
+      
+      result[pair] = distinct / (distinct + shared);
     }
     
   }
-    
   
   return NULL;
 }
-
-
-
-//======================================================
-// Extract list elements by name.
-//======================================================
-SEXP get(SEXP sexp_list, const char *str) {
-  
-  SEXP names = getAttrib(sexp_list, R_NamesSymbol);
-  
-  for (int i = 0; i < length(sexp_list); i++) {
-    if (strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
-      return VECTOR_ELT(sexp_list, i);
-    }
-  }
-    
-  return R_NilValue;
-}
-
-
-int any_null (void *a, void *b, void *c, void *d) {
-  return(a == NULL || b == NULL || c == NULL || d == NULL);
-}
-void *free_4 (void *a, void *b, void *c, void *d) {
-  free(a); free(b); free(c); free(d); return NULL;
-}
-
 
 
 
@@ -225,92 +205,76 @@ void *free_4 (void *a, void *b, void *c, void *d) {
 // R interface. Dispatches threads on compute methods.
 //======================================================
 SEXP C_unifrac(
-    SEXP sexp_otu_slam_mtx, SEXP sexp_phylo_tree,
-    SEXP sexp_pair_mtx, SEXP sexp_weighted, SEXP sexp_n_threads) {
+    SEXP sexp_otu_mtx,  SEXP sexp_phylo_tree, SEXP sexp_pair_mtx, 
+    SEXP sexp_weighted, SEXP sexp_normalized, SEXP sexp_n_threads ) {
   
-  int    *otus         = INTEGER(  get(sexp_otu_slam_mtx, "i"));
-  int    *samples      = INTEGER(  get(sexp_otu_slam_mtx, "j"));
-  double *values       = REAL(     get(sexp_otu_slam_mtx, "v"));
-  int     n_values     = length(   get(sexp_otu_slam_mtx, "v"));
-  int     n_otus       = asInteger(get(sexp_otu_slam_mtx, "nrow"));
-  int     n_samples    = asInteger(get(sexp_otu_slam_mtx, "ncol"));
+  double     *otu_mtx      = REAL( sexp_otu_mtx);
+  int         n_otus       = nrows(sexp_otu_mtx);
+  int         n_samples    = ncols(sexp_otu_mtx);
   
-  int    *edge_mtx     = INTEGER(  get(sexp_phylo_tree, "edge"));
-  int     n_edges      = nrows(    get(sexp_phylo_tree, "edge"));
-  double *edge_lengths = REAL(     get(sexp_phylo_tree, "edge.length"));
+  int        *edge_mtx     = INTEGER(get(sexp_phylo_tree, "edge"));
+  int         n_edges      = nrows(  get(sexp_phylo_tree, "edge"));
+  double     *edge_lengths = REAL(   get(sexp_phylo_tree, "edge.length"));
   
-  int    *pair_mtx     = INTEGER(  sexp_pair_mtx);
-  int     n_pairs      = nrows(    sexp_pair_mtx);
-  int     weighted     = asLogical(sexp_weighted);
-  int     n_threads    = asInteger(sexp_n_threads);
+  int_pair_t *pairs        = (int_pair_t *)INTEGER(sexp_pair_mtx);
+  int         n_pairs      = ncols(sexp_pair_mtx);
+  
+  int         weighted     = asInteger(sexp_weighted);
+  int         normalized   = asInteger(sexp_normalized);
+  int         n_threads    = asInteger(sexp_n_threads);
   
   
   // allocate the return vector
   SEXP sexp_result = PROTECT(allocVector(REALSXP, n_pairs));
   double *result   = REAL(sexp_result);
   
-  // intermediary values
-  double *sample_depths  = calloc(n_samples,           sizeof(double));
-  int    *child_at       = calloc(n_edges + 1,         sizeof(int));
-  int    *edge_to_leaves = calloc(n_edges * n_otus,    sizeof(int));
-  double *sample_edge_wt = calloc(n_edges * n_samples, sizeof(double));
   
-  if (any_null(sample_depths, child_at, edge_to_leaves, sample_edge_wt)) {
-    free_4(sample_depths, child_at, edge_to_leaves, sample_edge_wt);
+  // intermediary values
+  double  *weight_mtx   = calloc(n_samples * n_edges, sizeof(double));
+  double  *sample_norms = calloc(n_samples,           sizeof(double));
+  node_t  *nodes        = calloc(n_edges,             sizeof(node_t));
+  
+  if (weight_mtx == NULL || sample_norms == NULL || nodes == NULL) {
+    free(weight_mtx); free(sample_norms); free(nodes);
     error("Unable to allocate memory for UniFrac calculation.");
     return R_NilValue;
   }
   
   
+  // sort edge data by child node
+  for (int edge = 0; edge < n_edges; edge++) {
+    
+    int    parent = edge_mtx[0 * n_edges + edge] - 2;
+    int    child  = edge_mtx[1 * n_edges + edge] - 1;
+    double length = edge_lengths[edge];
+    
+    if (child  > n_otus) child--;
+    if (parent < n_otus) parent = -1;
+    
+    nodes[child].edge   = edge;
+    nodes[child].parent = parent;
+    nodes[child].length = length;
+  }
+  
+  
   // common values for all the threads
   unifrac_t setup;
-  setup.otus           = otus;
-  setup.samples        = samples;
-  setup.values         = values;
-  setup.n_otus         = n_otus;
-  setup.n_samples      = n_samples;
-  setup.pair_mtx       = pair_mtx;
-  setup.edge_mtx       = edge_mtx;
-  setup.edge_lengths   = edge_lengths;
-  setup.weighted       = weighted;
-  setup.n_threads      = n_threads;
-  setup.n_values       = n_values;
-  setup.n_pairs        = n_pairs;
-  setup.n_edges        = n_edges;
-  setup.sample_depths  = sample_depths;
-  setup.child_at       = child_at;
-  setup.edge_to_leaves = edge_to_leaves;
-  setup.sample_edge_wt = sample_edge_wt;
-  setup.result         = result;
   
+  setup.otu_mtx      = otu_mtx;
+  setup.n_otus       = n_otus;
+  setup.n_samples    = n_samples;
+  setup.n_edges      = n_edges;
+  setup.edge_lengths = edge_lengths;
+  setup.pairs        = pairs;
+  setup.n_pairs      = n_pairs;
+  setup.weighted     = weighted;
+  setup.normalized   = normalized;
+  setup.weight_mtx   = weight_mtx;
+  setup.nodes        = nodes;
+  setup.sample_norms = sample_norms;
+  setup.n_threads    = n_threads;
+  setup.result       = result;
   
-  
-  
-  //======================================================
-  // Count the number of sequences in each sample.
-  //======================================================
-  
-  memset(sample_depths, 0, n_samples * sizeof(double));
-  for (int i = 0; i < n_values; i++) {
-    sample_depths[samples[i] - 1] += values[i];
-  }
-  
-  
-  
-  //======================================================
-  // Index where a given node is the child. Root node = -1
-  //======================================================
-  
-  // IntegerVector childAt = IntegerVector(max(treeEdge) + 1, -1);
-  // for (int i = 0; i < nTreeEdges; i++) {
-  //   childAt[treeEdge(i, 1)] = i;
-  // }
-  
-  for (int edge = 0; edge <= n_edges; edge++) { child_at[edge] = -1; }
-  for (int edge = 0; edge <  n_edges; edge++) { 
-    int node = edge_mtx[1 * n_edges + edge] - 1;
-    child_at[node] = edge;
-  }
   
   
   // Run WITH multithreading
@@ -322,8 +286,7 @@ SEXP C_unifrac(
       unifrac_t *args = calloc(n_threads, sizeof(unifrac_t));
       
       if (tids == NULL || args == NULL) {
-        free_4(sample_depths, child_at, edge_to_leaves, sample_edge_wt);
-        free(tids); free(args);
+        free(weight_mtx); free(sample_norms); free(nodes); free(tids); free(args);
         error("Unable to allocate memory for multithreaded UniFrac calculation.");
         return R_NilValue;
       }
@@ -333,17 +296,14 @@ SEXP C_unifrac(
       for (i = 0; i < n; i++) memcpy(args + i, &setup, sizeof(unifrac_t));
       for (i = 0; i < n; i++) args[i].thread_i = i;
       
-      for (i = 0; i < n; i++) pthread_create(&tids[i], NULL, calc_edge_to_leaves, &args[i]);
+      for (i = 0; i < n; i++) pthread_create(&tids[i], NULL, unifrac_weight_mtx, &args[i]);
       for (i = 0; i < n; i++) pthread_join(   tids[i], NULL);
       
-      for (i = 0; i < n; i++) pthread_create(&tids[i], NULL, calc_sample_edge_wt, &args[i]);
-      for (i = 0; i < n; i++) pthread_join(   tids[i], NULL);
-      
-      for (i = 0; i < n; i++) pthread_create(&tids[i], NULL, calc_result, &args[i]);
+      for (i = 0; i < n; i++) pthread_create(&tids[i], NULL, unifrac_result, &args[i]);
       for (i = 0; i < n; i++) pthread_join(   tids[i], NULL);
       
       
-      free_4(sample_depths, child_at, edge_to_leaves, sample_edge_wt);
+      free(weight_mtx); free(sample_norms); free(nodes);
       free(tids); free(args);
       
       UNPROTECT(1);
@@ -356,11 +316,10 @@ SEXP C_unifrac(
   // Run WITHOUT multithreading
   setup.n_threads = 1;
   setup.thread_i  = 0;
-  calc_edge_to_leaves(&setup);
-  calc_sample_edge_wt(&setup);
-  calc_result(&setup);
+  unifrac_weight_mtx(&setup);
+  unifrac_result(&setup);
   
-  free_4(sample_depths, child_at, edge_to_leaves, sample_edge_wt);
+  free(weight_mtx); free(sample_norms); free(nodes);
   
   UNPROTECT(1);
   
@@ -368,3 +327,106 @@ SEXP C_unifrac(
 }
 
 
+/*
+ 
+#====================================
+# Example output from phyloseq
+#====================================
+
+# library(phyloseq)
+# data(esophagus)
+#
+# > UniFrac(esophagus, weighted=FALSE)
+#           B         C
+# C 0.5175550          
+# D 0.5182284 0.5422394
+#
+# > UniFrac(esophagus, weighted=TRUE, normalized=FALSE)
+#           B         C
+# C 0.1050480          
+# D 0.1401124 0.1422409
+#
+# > UniFrac(esophagus, weighted=TRUE, normalized=TRUE)
+#           B         C
+# C 0.2035424          
+# D 0.2603371 0.2477016
+
+
+
+#====================================
+# Simple Implementation in R
+#====================================
+
+unifrac_r <- function (biom) {
+  
+  biom <- rbiom::as_rbiom(biom)
+  
+  otu_mtx   <- as.matrix(biom$counts)
+  n_samples <- biom$n_samples
+  n_otus    <- biom$n_otus
+  edges     <- biom$tree$edge
+  lengths   <- biom$tree$edge.length
+  n_edges   <- nrow(edges)
+  
+  
+  m <- array(0, c(n_samples, n_edges))
+  
+  for (sample in seq_len(n_samples)) {
+    
+    sample_depth <- 0
+    for (otu in seq_len(n_otus)) {
+      abundance    <- otu_mtx[otu,sample]
+      sample_depth <- sample_depth + abundance
+    }
+    
+    for (otu in seq_len(n_otus)) {
+      
+      abundance <- otu_mtx[otu,sample]
+      if (abundance == 0) next
+      
+      abundance <- abundance / sample_depth
+      
+      edge <- which(edges[,2] == otu)
+      while (length(edge) == 1) {
+        
+        len <- lengths[edge]
+        m[sample,edge] <- m[sample,edge] + (len * abundance)
+        
+        parent <- edges[edge,1]
+        edge   <- which(edges[,2] == parent)
+      }
+        
+    }
+    
+  }
+  
+  pairs   <- t(combn(seq_len(n_samples), 2))
+  n_pairs <- nrow(pairs)
+  
+  print('Unweighted:')
+  for (p in seq_len(n_pairs)) {
+    i <- m[pairs[p,1],]
+    j <- m[pairs[p,2],]
+    print(sum(lengths[xor(i,j)]) / sum(lengths[i | j]))
+  }
+  
+  print('\n')
+  print('Weighted Non-Normalized:')
+  for (p in seq_len(n_pairs)) {
+    i <- m[pairs[p,1],]
+    j <- m[pairs[p,2],]
+    print(sum(abs(i - j)))
+  }
+  
+  print('\n')
+  print('Weighted Normalized:')
+  for (p in seq_len(n_pairs)) {
+    i <- m[pairs[p,1],]
+    j <- m[pairs[p,2],]
+    print(sum(abs(i - j)) / sum(i + j))
+  }
+        
+}
+
+*/
+ 

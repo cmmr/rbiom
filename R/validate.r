@@ -1,7 +1,7 @@
 
 validate_cpus <- function (
     var = "cpus", range = c(1, 256), env = parent.frame(), evar = var, 
-    n = 1, int = TRUE, null_ok = TRUE, if_null = availableCores(), ...) {
+    n = 1, int = TRUE, null_ok = TRUE, if_null = availableCores()[[1]], ...) {
   validate_var_range(var, range, env, evar, n, int, null_ok, if_null = if_null, ...)
 }
 
@@ -253,7 +253,12 @@ validate_var_range <- function (
   }
   
   x <- get(var, pos = env, inherits = FALSE)
-  if (is.null(x) && null_ok) return (if_null)
+  
+  if (is.null(x) && null_ok) {
+    if (!is.null(if_null))
+      assign(var, if_null, pos = env)
+    return (invisible(NULL))
+  }
   
   if (!na_ok && anyNA(x))     stop ("`", evar, "` cannot be NA.")
   if (!null_ok && is.null(x)) stop ("`", evar, "` cannot be NULL.")
