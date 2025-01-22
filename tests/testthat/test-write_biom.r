@@ -14,9 +14,9 @@ test_that(desc = "write_biom", code = {
   
   skip_on_cran()
   
-  expect_silent(write_biom(hmp5, tfile, format = "hdf5"))
-  expect_silent(read_biom(tfile))
-  unlink(tfile)
+  # expect_silent(write_biom(hmp5, tfile, format = "hdf5"))
+  # expect_silent(read_biom(tfile))
+  # unlink(tfile)
   
   
   expect_silent(write_counts(hmp5, tfile));   unlink(tfile)

@@ -9,9 +9,10 @@ ENV <- environment()
 .onLoad <- function(libname, pkgname) { # nocov start
   
   
-  # Add imports of imports to our namespace (avoiding NOTE about 20+ imports).
   
-  
+  # Add imports of imports to our namespace.
+  # Triggers NOTE about 20+ imports if they're in Imports.
+  #
   # ggplot2 -> cli, glue, rlang, tibble
   # ggplot2 -> scales -> R6::R6Class
   # ggplot2 -> scales -> labeling::extended
@@ -20,8 +21,7 @@ ENV <- environment()
   #________________________________________________________
   include <- function (pkg, ...) {
     
-    if (!nzchar(system.file(package = pkg)))
-      stop("Please install the `", pkg, "` R package.")
+    require_package(pkg, reason = 'to run rbiom')
     
     for (i in c(...))
       assign(i, getFromNamespace(x = i, ns = pkg), ENV)
@@ -36,6 +36,26 @@ ENV <- environment()
     "is_true", "is_false", "is_logical", "is_scalar_logical", 
     "is_character", "is_scalar_character", "is_string", 
     "is_integerish", "is_scalar_integerish", "is_double", "is_scalar_double" ))
+  
+  
+  # rhdf5 is an undeclared Suggests (fails CRAN checks).
+  #________________________________________________________
+  rhdf5_funcs <- c(
+    "h5createFile", "h5createGroup", "H5Dclose", "H5Dopen", "H5Fclose", "H5Fis_hdf5", 
+    "H5Fopen", "h5ls", "h5readAttributes", "h5writeAttribute", "h5writeDataset" )
+  
+  if (nzchar(system.file(package = 'rhdf5'))) {
+    
+    for (i in rhdf5_funcs)
+      assign(i, getFromNamespace(x = i, ns = 'rhdf5'), ENV)
+    
+  } else {
+    
+    f <- function (...)
+      package_missing('rhdf5', 'to read/write HDF5 files.')
+    
+    for (i in rhdf5_funcs) assign(i, f, ENV)
+  }
   
   
   lapply(FUN = cmd_wrap, pkg="ggplot2", {c(

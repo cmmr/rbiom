@@ -76,7 +76,7 @@ read_biom <- function (src, ...) {
     #___________________#
     
     require_package('rhdf5', 'to read HDF5 formatted BIOM files')
-    if (!rhdf5::H5Fis_hdf5(fp))
+    if (!H5Fis_hdf5(fp))
       cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
     
     h5        <- read_biom_hdf5(fp)
@@ -87,7 +87,7 @@ read_biom <- function (src, ...) {
     metadata  <- if (!hasName(dots, 'metadata'))  parse_hdf5_metadata(h5)
     phylogeny <- if (!hasName(dots, 'tree'))      parse_hdf5_tree(h5)
     
-    rhdf5::H5Fclose(h5)
+    H5Fclose(h5)
     remove("h5")
     
   } else if (format == "json") {
@@ -228,19 +228,19 @@ read_biom_json <- function (fp) {
 
 read_biom_hdf5 <- function (fp) {
   
-  h5 <- try(rhdf5::H5Fopen(fp, 'H5F_ACC_RDONLY'), silent=TRUE)
+  h5 <- try(H5Fopen(fp, 'H5F_ACC_RDONLY'), silent=TRUE)
   if (inherits(h5, "try-error")) {
-    try(rhdf5::H5Fclose(h5), silent=TRUE)
+    try(H5Fclose(h5), silent=TRUE)
     stop(sprintf("Unable to parse HDF5 file. %s", as.character(h5)))
   }
   
-  entries  <- with(rhdf5::h5ls(h5), paste(sep="/", group, name))
+  entries  <- with(h5ls(h5), paste(sep="/", group, name))
   expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", 
                  "/observation/ids", "/observation/matrix/data", "/sample/ids" )
   
   missing <- setdiff(expected, entries)
   if (length(missing) > 0) {
-    try(rhdf5::H5Fclose(h5), silent=TRUE)
+    try(H5Fclose(h5), silent=TRUE)
     stop(sprintf("BIOM file requires: %s", paste(collapse=",", missing)))
   }
   
@@ -312,7 +312,7 @@ parse_json_info <- function (json) {
 }
 
 parse_hdf5_info <- function (h5) {
-  attrs <- rhdf5::h5readAttributes(h5, "/")
+  attrs <- h5readAttributes(h5, "/")
   for (i in names(attrs)) {
     attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
   }

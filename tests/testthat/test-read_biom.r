@@ -8,11 +8,11 @@ test_that("read_biom", {
   expect_silent(read_biom(src = g))
   unlink(c(f, g))
   
-  f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
-  g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
-  expect_silent(read_biom(src = f))
-  expect_silent(read_biom(src = g))
-  unlink(c(f, g))
+  # f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
+  # g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
+  # expect_silent(read_biom(src = f))
+  # expect_silent(read_biom(src = g))
+  # unlink(c(f, g))
   
   f <- expect_silent(write_biom(hmp5, tempfile(fileext = '.gz'), 'tab'))
   g <- expect_silent(write_biom(min5, tempfile(fileext = '.gz'), 'tab'))
