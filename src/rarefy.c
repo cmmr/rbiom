@@ -182,6 +182,12 @@ SEXP C_rarefy(
       pthread_t *tids = calloc(n_threads, sizeof(pthread_t));
       rarefy_t  *args = calloc(n_threads, sizeof(rarefy_t));
       
+      if (tids == NULL || args == NULL) {
+        free(tids); free(args);
+        error("Unable to allocate memory for multithreaded rarefaction.");
+        return R_NilValue;
+      }
+      
       for (int i = 0; i < n_threads; i++) {
         memcpy(args + i, &setup, sizeof(rarefy_t));
         args[i].thread_i = i;
