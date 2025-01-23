@@ -69,6 +69,8 @@ test_that("bdiv_table", {
   expect_equal(
     object   = round(bdiv_table(hmp5, 'euc', trans = 'sqrt')$.distance), 
     expected = c(24, 29, 31, 41, 17, 22, 47, 20, 49, 50) )
+  
+  expect_no_error(pthreads())
 })
 
 test_that("bdiv_distmat", {

@@ -203,13 +203,16 @@ boxplot_stats <- function (params) {
         # Drop x categories that are absent from this facet
         if (isTRUE(params$.free_x)) {
           
-          xcats <- dplyr::left_join(
-              x  = z[,facet.by,FALSE],
-              y  = ggdata[,c(xcol, facet.by),FALSE], 
-              by = facet.by ) %>% 
-            dplyr::pull(xcol) %>% 
-            unique() %>% 
-            intersect(x = levels(ggdata[[xcol]]))
+          # xcats <- dplyr::left_join(
+          #     x  = z[,facet.by,FALSE],
+          #     y  = ggdata[,c(xcol, facet.by),FALSE],
+          #     by = facet.by ) %>%
+          #   dplyr::pull(xcol) %>%
+          #   unique() %>%
+          #   intersect(x = levels(ggdata[[xcol]]))
+          
+          xcats <- c(as.character(z[['.cat1']]), as.character(z[['.cat2']]))
+          xcats <- intersect(levels(ggdata[[xcol]]), xcats)
           
           z[['.cat1']] %<>% factor(levels = xcats)
           z[['.cat2']] %<>% factor(levels = xcats)
@@ -310,13 +313,16 @@ boxplot_stats <- function (params) {
             # Drop x categories that are absent from this facet
             if (isTRUE(params$.free_x)) {
               
-              xcats <- dplyr::left_join(
-                x  = z[,facet.by,FALSE],
-                y  = ggdata[,c(xcol, facet.by),FALSE], 
-                by = facet.by ) %>% 
-                dplyr::pull(xcol) %>% 
-                unique() %>% 
-                intersect(x = levels(ggdata[[xcol]]))
+              # xcats <- dplyr::left_join(
+              #   x  = z[,facet.by,FALSE],
+              #   y  = ggdata[,c(xcol, facet.by),FALSE],
+              #   by = facet.by ) %>%
+              #   dplyr::pull(xcol) %>%
+              #   unique() %>%
+              #   intersect(x = levels(ggdata[[xcol]]))
+              
+              xcats <- as.character(z[[xcol]])
+              xcats <- intersect(levels(ggdata[[xcol]]), xcats)
               
               z[[xcol]] %<>% factor(levels = xcats)
             }
