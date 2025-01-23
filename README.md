@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![cran](https://img.shields.io/badge/CRAN-2.0.12-blue.svg)](https://cran.r-project.org/package=rbiom)
-[![conda](https://img.shields.io/badge/Conda-2.0.12-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
+[![cran](https://img.shields.io/badge/CRAN-2.0.13-blue.svg)](https://cran.r-project.org/package=rbiom)
+[![conda](https://img.shields.io/badge/Conda-2.0.13-blue.svg)](https://anaconda.org/conda-forge/r-rbiom)
 [![downloads](http://cranlogs.r-pkg.org/badges/grand-total/rbiom)](https://cranlogs.r-pkg.org/)
 [![dev](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cmmr/rbiom/actions/workflows/R-CMD-check.yaml)
 [![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)

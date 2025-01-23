@@ -174,7 +174,7 @@ stats_emmeans <- function (
       
       model <- stats_fit_model(data, fit, stat.by = FALSE, regr = TRUE)
       
-      gof <- broom::glance(model)
+      gof <- stats_glance(model)
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
@@ -335,7 +335,7 @@ stats_emmeans <- function (
       pdata <- subset(data, .stat.by %in% pair)
       model <- stats_fit_model(pdata, fit, TRUE)
       
-      gof <- broom::glance(model)
+      gof <- stats_glance(model)
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
@@ -489,7 +489,7 @@ stats_emtrends <- function (
       
       model <- stats_fit_model(data, fit, stat.by = FALSE)
       
-      gof <- broom::glance(model)
+      gof <- stats_glance(model)
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
@@ -583,7 +583,7 @@ stats_emtrends <- function (
       pdata <- subset(data, .stat.by %in% pair)
       model <- stats_fit_model(pdata, fit, stat.by = TRUE)
       
-      gof <- broom::glance(model)
+      gof <- stats_glance(model)
       
       # Find pseudo-minimum p-value
       if (p_slice <- is.null(at)) {
@@ -702,5 +702,59 @@ stats_emtrends <- function (
   stats <- stats_finalize(stats, df, regr, resp, stat.by, split.by, fit, p.adj)
   
   return (stats)
+}
+
+
+
+# Copied from broom package (https://github.com/tidymodels/broom)
+stats_glance <- function (model) {
+  
+  x <- model
+  s <- summary(x)
+  
+  if (inherits(x, 'gam')) { # broom:::glance.gam
+    
+    tbl <- tibble(
+      df            = sum(x$edf), 
+      logLik        = as.numeric(stats::logLik(x)), 
+      AIC           = stats::AIC(x), 
+      BIC           = stats::BIC(x), 
+      deviance      = stats::deviance(x), 
+      df.residual   = stats::df.residual(x), 
+      nobs          = stats::nobs(x), 
+      adj.r.squared = s$r.sq, 
+      npar          = s$np )
+    
+  } else { # broom:::glance.lm
+    
+    tbl <- tibble(
+      r.squared     = s$r.squared, 
+      adj.r.squared = s$adj.r.squared, 
+      sigma         = s$sigma, 
+      statistic     = NA_real_, 
+      p.value       = NA_real_, 
+      df            = NA_real_, 
+      logLik        = as.numeric(stats::logLik(x)), 
+      AIC           = stats::AIC(x), 
+      BIC           = stats::BIC(x), 
+      deviance      = stats::deviance(x), 
+      df.residual   = stats::df.residual(x), 
+      nobs          = stats::nobs(x) )
+    
+    
+    # check whether the model was fitted with only an intercept, in which
+    # case don't compute the fstatistic related columns
+    if (!identical(row.names(s$coefficients), "(Intercept)")) {
+      
+      fs <- s$fstatistic
+      
+      tbl$statistic <- fs[['value']]
+      tbl$p.value   <- stats::pf(fs[['value']], fs[['numdf']], fs[['dendf']], lower.tail = FALSE)
+      tbl$df        <- fs[['numdf']]
+    }
+    
+  }
+  
+  return (tbl)
 }
 

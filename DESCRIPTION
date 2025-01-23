@@ -1,8 +1,8 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.0.12
-Date: 2025-01-22
+Version: 2.0.13
+Date: 2025-01-23
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -29,41 +29,38 @@ RoxygenNote: 7.3.2
 Config/Needs/website: rmarkdown, phyloseq, npregfast
 Config/testthat/edition: 3
 Imports:
-    cluster,
     methods,
     mgcv,
     stats,
     utils,
     ape,
-    broom,
     dplyr,
     emmeans,
     fillpattern,
+    ggbeeswarm,
     ggnewscale,
     ggplot2,
+    ggrepel,
     ggtext,
     jsonlite,
     magrittr,
     parallelly,
+    patchwork,
     pillar,
     plyr,
     readr,
     readxl,
     slam,
-    tidyplots,
     vegan
 Suggests:
     cli,
     crayon,
-    ggbeeswarm,
     ggdensity,
-    ggrepel,
     glue,
     labeling,
     lifecycle,
     openxlsx,
     optparse,
-    patchwork,
     pkgconfig,
     prettycode,
     R6,

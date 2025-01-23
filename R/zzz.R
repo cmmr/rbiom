@@ -17,7 +17,6 @@ ENV <- environment()
   # ggplot2 -> scales -> R6::R6Class
   # ggplot2 -> scales -> labeling::extended
   # ggplot2 -> scales -> lifecycle::deprecate_warn
-  # tidyplots -> ggbeeswarm, ggrepel, patchwork
   #________________________________________________________
   include <- function (pkg, ...) {
     

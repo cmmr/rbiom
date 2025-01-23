@@ -1,5 +1,5 @@
 
-# rbiom 2.0.12
+# rbiom 2.0.13
 
 * Major release with significant new features.
 * Plotting added.

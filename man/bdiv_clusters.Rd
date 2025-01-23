@@ -2,12 +2,13 @@
 % Please edit documentation in R/clustering.r
 \name{bdiv_clusters}
 \alias{bdiv_clusters}
-\title{Define sample PAM clusters from beta diversity.}
+\title{Cluster samples by beta diversity k-means.}
 \usage{
 bdiv_clusters(
   biom,
   bdiv = "Bray-Curtis",
   weighted = TRUE,
+  normalized = TRUE,
   tree = NULL,
   k = 5,
   ...
@@ -28,19 +29,22 @@ Default: \code{"Bray-Curtis"}}
 \code{weighted=FALSE}, only presence/absence is considered.
 Multiple values allowed. Default: \code{TRUE}}
 
+\item{normalized}{Only changes the "Weighted UniFrac" calculation.
+Divides result by the total branch weights. Default: \code{TRUE}}
+
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{k}{Number of clusters. Default: \code{5L}}
 
-\item{...}{Passed on to \code{cluster::pam()}.}
+\item{...}{Passed on to \code{stats::kmeans()}.}
 }
 \value{
 A numeric factor assigning samples to clusters.
 }
 \description{
-Define sample PAM clusters from beta diversity.
+Cluster samples by beta diversity k-means.
 }
 \examples{
     library(rbiom)

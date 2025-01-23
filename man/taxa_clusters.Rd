@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.r
 \name{taxa_clusters}
 \alias{taxa_clusters}
-\title{Define sample kmeans clusters from taxa abundances.}
+\title{Cluster samples by taxa abundances k-means.}
 \usage{
 taxa_clusters(biom, rank = ".otu", k = 5, ...)
 }
@@ -25,7 +25,7 @@ see all options for a given rbiom object. Default: \code{.otu}.}
 A numeric factor assigning samples to clusters.
 }
 \description{
-Define sample kmeans clusters from taxa abundances.
+Cluster samples by taxa abundances k-means.
 }
 \examples{
     library(rbiom)
