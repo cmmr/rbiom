@@ -8,12 +8,6 @@ test_that("read_biom", {
   expect_silent(read_biom(src = g))
   unlink(c(f, g))
   
-  f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
-  g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
-  expect_silent(read_biom(src = f))
-  expect_silent(read_biom(src = g))
-  unlink(c(f, g))
-  
   f <- expect_silent(write_biom(hmp5, tempfile(fileext = '.gz'), 'tab'))
   g <- expect_silent(write_biom(min5, tempfile(fileext = '.gz'), 'tab'))
   expect_silent(read_biom(src = f))
@@ -41,4 +35,12 @@ test_that("read_biom", {
   
   expect_null(parse_json_sequences(list(rows = list(list(metadata=list())))))
   expect_null(parse_hdf5_sequences(list(observation = list(list(metadata=list())))))
+  
+  
+  skip_if_not_installed('rhdf5')
+  f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
+  g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
+  expect_silent(read_biom(src = f))
+  expect_silent(read_biom(src = g))
+  unlink(c(f, g))
 })
