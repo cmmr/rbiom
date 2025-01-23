@@ -18,8 +18,8 @@ test_that("convert_to_TSE", {
   skip_on_cran()
   skip_if_not_installed('TreeSummarizedExperiment')
   
-  rowTree      <- getFromNamespace('TreeSummarizedExperiment', 'rowTree')
-  referenceSeq <- getFromNamespace('TreeSummarizedExperiment', 'referenceSeq')
+  rowTree      <- getFromNamespace('rowTree',      'TreeSummarizedExperiment')
+  referenceSeq <- getFromNamespace('referenceSeq', 'TreeSummarizedExperiment')
   
   x <- suppressMessages(convert_to_TSE(hmp5))
   
