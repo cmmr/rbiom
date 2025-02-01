@@ -181,9 +181,7 @@ withr::with_dir(project_dir, {
 biom <- rbiom::hmp50
 
 # A phyloseq object
-physeq <- phyloseq::import_biom(
-  BIOMfilename = rbiom::write_biom(biom, file = NULL), 
-  treefilename = rbiom::write_tree(biom, file = NULL) )
+physeq <- rbiom::convert_to_phyloseq(biom)
 ```
 
 <br>

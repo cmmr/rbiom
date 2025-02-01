@@ -1,31 +1,23 @@
 
-#  |NOTE|  This little bit of code requires a large dependency base:
-#  |NOTE|  
-#  |NOTE|  Biobase, BiocGenerics, BiocParallel, Biostrings, DelayedArray, GenomeInfoDb, 
-#  |NOTE|  GenomeInfoDbData, GenomicRanges, IRanges, Matrix, MatrixGenerics, S4Arrays, S4Vectors, 
-#  |NOTE|  SingleCellExperiment, SparseArray, SummarizedExperiment, TreeSummarizedExperiment, 
-#  |NOTE|  UCSC.utils, XVector, matrixStats, tidytree
-#  |NOTE|  
-#  |NOTE|  Therefore, it is not listed in Imports or Suggests.
-
-
-#' Convert an rbiom object to a SummarizedExperiment object.
+#' Convert biom data to an external package class.
 #'
 #' Requires the relevant Bioconductor R package to be installed:
 #' \describe{
+#'   \item{`convert_to_phyloseq` - }{ [phyloseq](https://bioconductor.org/packages/phyloseq/) }
 #'   \item{`convert_to_SE` - }{ [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/) }
 #'   \item{`convert_to_TSE` - }{ [TreeSummarizedExperiment](https://bioconductor.org/packages/TreeSummarizedExperiment/) }
 #' }
 #'
 #' A SummarizedExperiment object includes counts, metadata, and taxonomy.
 #'
-#' TreeSummarizedExperiment additionally includes the tree and sequences.
+#' phyloseq and TreeSummarizedExperiment additionally includes the tree and sequences.
 #'
+#' @name convert_to
 #' @inherit documentation_default
 #'
 #' @param ...  Not Used.
 #'
-#' @return A SummarizedExperiment or TreeSummarizedExperiment object.
+#' @return A phyloseq, SummarizedExperiment, or TreeSummarizedExperiment object.
 #'
 #' @export
 #' @examples
@@ -33,6 +25,12 @@
 #'     library(rbiom)
 #'
 #'     print(hmp50)
+#'
+#'     # Requires 'phyloseq', a Bioconductor R package
+#'     if (nzchar(system.file(package = "phyloseq"))) {
+#'       physeq <- convert_to_phyloseq(hmp50)
+#'       print(physeq)
+#'     }
 #'
 #'     # Requires 'SummarizedExperiment', a Bioconductor R package
 #'     if (nzchar(system.file(package = "SummarizedExperiment"))) {
@@ -64,7 +62,7 @@ convert_to_SE <- function (biom, ...) {
 
 
 
-#' @rdname convert_to_SE
+#' @rdname convert_to
 #' @export
 
 convert_to_TSE <- function (biom, ...) {
@@ -84,6 +82,32 @@ convert_to_TSE <- function (biom, ...) {
     rowTree      = biom$tree,
     referenceSeq = DNAStringSet(biom$sequences) )
   
+}
+
+
+
+#' @rdname convert_to
+#' @export
+
+convert_to_phyloseq <- function (biom, ...) {
+  
+  require_package('phyloseq', 'to use convert_to_phyloseq()')
+  
+  dots <- list(...)
+  biom <- as_rbiom(biom)
+  
+  import_biom <- getFromNamespace('import_biom', 'phyloseq')
+  
+  BIOMfilename   <- write_biom(biom, file = tempfile())
+  treefilename   <- if (!is.null(biom$tree))      write_tree(biom,  file = tempfile())
+  refseqfilename <- if (!is.null(biom$sequences)) write_fasta(biom, file = tempfile())
+  
+  on.exit(unlink(c(BIOMfilename, treefilename, refseqfilename)), add = TRUE)
+  
+  import_biom(
+    BIOMfilename   = BIOMfilename, 
+    treefilename   = treefilename, 
+    refseqfilename = refseqfilename )
 }
 
 
