@@ -9,7 +9,7 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,9 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."></head><body>
     <li><h6 class="dropdown-header" data-toc-skip>Plotting</h6></li>
     <li><a class="dropdown-item" href="../articles/plots.html">Plot Types</a></li>
     <li><a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/convert.html">QIIME 2, mothur, and BioConductor</a></li>
+    <li><a class="dropdown-item" href="../articles/unifrac.html">UniFrac Equations</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -46,7 +49,7 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Convert a variety of data types to an rbiom object.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.0.13/R/as_rbiom.r" class="external-link"><code>R/as_rbiom.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/as_rbiom.r" class="external-link"><code>R/as_rbiom.r</code></a></small>
       <div class="d-none name"><code>as_rbiom.Rd</code></div>
     </div>
 
@@ -83,7 +86,9 @@ For example:</p><dl><dt><em>file</em> - </dt>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Properties to overwrite in biom: <code>metadata</code>, <code>taxonomy</code>, <code>tree</code>, etc (see details).</p></dd>
+<dd><p>Properties to overwrite in biom: <code>metadata</code>, <code>taxonomy</code>,
+<code>tree</code>, etc (see details). Setting <code>underscores</code> here will pass it to
+<code><a href="read_tree.html">read_tree()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -127,7 +132,7 @@ For example:</p><dl><dt><em>file</em> - </dt>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       3 Fields:  .sample, treatment, and days </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 2.6k - 4.3k reads/sample ────────────────── 2025-01-24 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 2.6k - 4.3k reads/sample ────────────────── 2025-02-01 ──</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

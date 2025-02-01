@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,9 @@
     <li><h6 class="dropdown-header" data-toc-skip>Plotting</h6></li>
     <li><a class="dropdown-item" href="../articles/plots.html">Plot Types</a></li>
     <li><a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/convert.html">QIIME 2, mothur, and BioConductor</a></li>
+    <li><a class="dropdown-item" href="../articles/unifrac.html">UniFrac Equations</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -72,7 +75,7 @@
       <h1>Plot Types</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.0.13/vignettes/articles/plots.Rmd" class="external-link"><code>vignettes/articles/plots.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/vignettes/articles/plots.Rmd" class="external-link"><code>vignettes/articles/plots.Rmd</code></a></small>
       <div class="d-none name"><code>plots.Rmd</code></div>
     </div>
 
@@ -288,7 +291,9 @@ common use cases below operate on a biom object.</p>
 <span><span class="va">bdiv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_heatmap.html">bdiv_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Body Site"</span><span class="op">)</span>, asp <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
 <span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Body Site"</span><span class="op">)</span>, asp <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">bdiv</span>, <span class="va">taxa</span>, ncol <span class="op">=</span> <span class="fl">1</span>, guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">bdiv</span>, <span class="va">taxa</span>, ncol <span class="op">=</span> <span class="fl">1</span>, guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in plot_theme(plot): The `underscores` theme element is not</span></span>
+<span><span class="co">#&gt; defined in the element hierarchy.</span></span></code></pre></div>
 <p><img src="plots_files/figure-html/unnamed-chunk-8-1.png" width="768"></p>
 </div>
 </div>

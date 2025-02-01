@@ -13,7 +13,7 @@ New Hampshire format."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,9 @@ New Hampshire format."></head><body>
     <li><h6 class="dropdown-header" data-toc-skip>Plotting</h6></li>
     <li><a class="dropdown-item" href="../articles/plots.html">Plot Types</a></li>
     <li><a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/convert.html">QIIME 2, mothur, and BioConductor</a></li>
+    <li><a class="dropdown-item" href="../articles/unifrac.html">UniFrac Equations</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -50,7 +53,7 @@ New Hampshire format."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Read a newick formatted phylogenetic tree.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.0.13/R/read_tree.r" class="external-link"><code>R/read_tree.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/read_tree.r" class="external-link"><code>R/read_tree.r</code></a></small>
       <div class="d-none name"><code>read_tree.Rd</code></div>
     </div>
 
@@ -63,7 +66,7 @@ New Hampshire format.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_tree</span><span class="op">(</span><span class="va">src</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_tree</span><span class="op">(</span><span class="va">src</span>, underscores <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -73,6 +76,12 @@ New Hampshire format.</p>
 <dl><dt id="arg-src">src<a class="anchor" aria-label="anchor" href="#arg-src"></a></dt>
 <dd><p>Input data as either a file path, URL, or Newick string.
 Compressed (gzip or bzip2) files are also supported.</p></dd>
+
+
+<dt id="arg-underscores">underscores<a class="anchor" aria-label="anchor" href="#arg-underscores"></a></dt>
+<dd><p>When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default <code>FALSE</code></p></dd>
 
 </dl></div>
     <div class="section level2">

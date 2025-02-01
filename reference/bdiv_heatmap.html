@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,9 @@
     <li><h6 class="dropdown-header" data-toc-skip>Plotting</h6></li>
     <li><a class="dropdown-item" href="../articles/plots.html">Plot Types</a></li>
     <li><a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/convert.html">QIIME 2, mothur, and BioConductor</a></li>
+    <li><a class="dropdown-item" href="../articles/unifrac.html">UniFrac Equations</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -44,7 +47,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Display beta diversities in an all vs all grid.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.0.13/R/bdiv_heatmap.r" class="external-link"><code>R/bdiv_heatmap.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/bdiv_heatmap.r" class="external-link"><code>R/bdiv_heatmap.r</code></a></small>
       <div class="d-none name"><code>bdiv_heatmap.Rd</code></div>
     </div>
 
@@ -72,6 +75,7 @@
 <span>  legend <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  underscores <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -205,6 +209,12 @@ Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>
 Default: <code>"auto"</code>.</p></dd>
 
 
+<dt id="arg-underscores">underscores<a class="anchor" aria-label="anchor" href="#arg-underscores"></a></dt>
+<dd><p>When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default <code>FALSE</code></p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to pass on to ggplot2::theme().
 For example, <code>labs.subtitle = "Plot subtitle"</code>.</p></dd>
@@ -314,9 +324,12 @@ https://cmmr.github.io/rbiom .</p>
 <span class="r-in"><span>    <span class="va">hmp10</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, tracks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"Age"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The `underscores` theme element is not defined in the element hierarchy.</span>
 <span class="r-plt img"><img src="bdiv_heatmap-1.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">bdiv_heatmap</span><span class="op">(</span><span class="va">hmp10</span>, bdiv<span class="op">=</span><span class="st">"uni"</span>, weighted<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>,<span class="cn">FALSE</span><span class="op">)</span>, tracks<span class="op">=</span><span class="st">"sex"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The `underscores` theme element is not defined in the element hierarchy.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The `underscores` theme element is not defined in the element hierarchy.</span>
 <span class="r-plt img"><img src="bdiv_heatmap-2.png" alt="" width="768" height="384"></span>
 </code></pre></div>
     </div>

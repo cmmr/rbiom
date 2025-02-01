@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   articles/aes: aes.html
   articles/bdiv_cmp: bdiv_cmp.html
+  articles/convert: convert.html
   articles/diversity: diversity.html
   articles/importing: importing.html
   articles/plots: plots.html
@@ -11,7 +12,8 @@ articles:
   articles/regression: regression.html
   articles/scales: scales.html
   articles/statistics: statistics.html
-last_built: 2025-01-24T21:28Z
+  articles/unifrac: unifrac.html
+last_built: 2025-02-01T19:49Z
 urls:
   reference: https://cmmr.github.io/rbiom/reference
   article: https://cmmr.github.io/rbiom/articles

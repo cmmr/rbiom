@@ -9,7 +9,7 @@ p.adj) only only have an effect when rank is not NULL."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,9 @@ p.adj) only only have an effect when rank is not NULL."></head><body>
     <li><h6 class="dropdown-header" data-toc-skip>Plotting</h6></li>
     <li><a class="dropdown-item" href="../articles/plots.html">Plot Types</a></li>
     <li><a class="dropdown-item" href="../articles/aes.html">Mapping Metadata to Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/convert.html">QIIME 2, mothur, and BioConductor</a></li>
+    <li><a class="dropdown-item" href="../articles/unifrac.html">UniFrac Equations</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -46,7 +49,7 @@ p.adj) only only have an effect when rank is not NULL."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Calculate PCoA and other ordinations, including taxa biplots and statistics.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.0.13/R/bdiv_ord_table.r" class="external-link"><code>R/bdiv_ord_table.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/bdiv_ord_table.r" class="external-link"><code>R/bdiv_ord_table.r</code></a></small>
       <div class="d-none name"><code>bdiv_ord_table.Rd</code></div>
     </div>
 
@@ -75,6 +78,7 @@ p.adj) only only have an effect when rank is not NULL."></head><body>
 <span>  p.top <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  p.adj <span class="op">=</span> <span class="st">"fdr"</span>,</span>
 <span>  unc <span class="op">=</span> <span class="st">"singly"</span>,</span>
+<span>  underscores <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -220,6 +224,12 @@ taxa names. Options are:</p><dl><dt><code>"singly"</code> - </dt>
 
 
 </dl><p>Abbreviations are allowed. Default: <code>"singly"</code></p></dd>
+
+
+<dt id="arg-underscores">underscores<a class="anchor" aria-label="anchor" href="#arg-underscores"></a></dt>
+<dd><p>When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default <code>FALSE</code></p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
