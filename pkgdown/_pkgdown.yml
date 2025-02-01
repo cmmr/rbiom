@@ -39,20 +39,10 @@ navbar:
     - text: "Mapping Metadata to Aesthetics"
       href: articles/aes.html
     - text: -------
-    - text: "Compatibility"
-    - menu:
-      - text: "mothur"
-        href: articles/mothur.html
-      - text: "QIIME 2"
-        href: articles/qiime2.html
-      - text: "phyloseq"
-        href: articles/phyloseq.html
-      - text: "BioConductor"
-        href: articles/bioc.html
-    - text: "Methodology"
-    - menu:
-      - text: "UniFrac"
-        href: articles/unifrac.html
+    - text: "QIIME 2, mothur, and BioConductor"
+      href: articles/convert.html
+    - text: "UniFrac Equations"
+      href: articles/unifrac.html
 
 
 reference:

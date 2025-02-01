@@ -23,18 +23,18 @@ test_that("as_rbiom.phyloseq", {
 test_that("as_rbiom.SummarizedExperiment", {
   skip_on_cran()
   
-  setClass('SimpleAssays', slots = c(data = 'list'))
-  setClass('SummarizedExperiment', slots = c(assays = 'SimpleAssays', colData = 'NULL', elementMetadata = 'NULL', NAMES = 'NULL' ))
-  expect_s3_class(as_rbiom(new('SummarizedExperiment', assays = new('SimpleAssays', data = list(as.matrix(hmp5$counts))))), 'rbiom')
+  setClass('SimpleAssaysZZ', slots = c(data = 'list'))
+  setClass('SummarizedExperiment', slots = c(assays = 'SimpleAssaysZZ', colData = 'NULL', elementMetadata = 'NULL', NAMES = 'NULL' ))
+  expect_s3_class(as_rbiom(new('SummarizedExperiment', assays = new('SimpleAssaysZZ', data = list(as.matrix(hmp5$counts))))), 'rbiom')
 })
 
 test_that("as_rbiom.TreeSummarizedExperiment", {
   skip_on_cran()
   
-  setClass('SimpleAssays', slots = c(data = 'list'))
-  setClass('PartitioningByEnd', slots = c(NAMES = 'NULL'))
-  setClass('CompressedGRangesList', slots = c(elementMetadata = 'NULL', partitioning = 'PartitioningByEnd'))
+  setClass('SimpleAssaysZZ', slots = c(data = 'list'))
+  setClass('PartitioningByEndZZ', slots = c(NAMES = 'NULL'))
+  setClass('CompressedGRangesListZZ', slots = c(elementMetadata = 'NULL', partitioning = 'PartitioningByEndZZ'))
   setClass('TreeSummarizedExperiment', slots = c(
-    assays = 'SimpleAssays', colData = 'NULL', rowRanges = 'CompressedGRangesList', rowTree = 'NULL', referenceSeq = 'NULL' ))
-  expect_s3_class(as_rbiom(new('TreeSummarizedExperiment', assays = new('SimpleAssays', data = list(as.matrix(hmp5$counts))))), 'rbiom')
+    assays = 'SimpleAssaysZZ', colData = 'NULL', rowRanges = 'CompressedGRangesListZZ', rowTree = 'NULL', referenceSeq = 'NULL' ))
+  expect_s3_class(as_rbiom(new('TreeSummarizedExperiment', assays = new('SimpleAssaysZZ', data = list(as.matrix(hmp5$counts))))), 'rbiom')
 })

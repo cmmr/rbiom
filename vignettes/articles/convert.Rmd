@@ -1,0 +1,249 @@
+---
+title: "QIIME 2, mothur, and BioConductor"
+---
+
+
+<br>
+
+## QIIME 2
+
+<br>
+
+### rbiom `r knitr::asis_output("\U27A1")` QIIME 2
+
+In R, export QIIME 2-compatible files.
+
+```r
+library(rbiom)
+
+project_dir <- tempdir()   # where to save the files
+
+withr::with_dir(project_dir, {
+  write_counts(  hmp50, 'hmp50_counts.tsv',   compat = 'qiime2')
+  write_taxonomy(hmp50, 'hmp50_taxonomy.tsv', compat = 'qiime2')
+  write_metadata(hmp50, 'hmp50_metadata.tsv', compat = 'qiime2')
+  write_tree(    hmp50, 'hmp50_tree.tre')
+})
+
+```
+
+On the command line, convert files to QIIME 2 format (.qza).
+
+```bash
+# Convert classic BIOM table to HDF5
+biom convert -i hmp50_counts.tsv -o hmp50_counts.hdf5 --to-hdf5
+
+# Import counts
+qiime tools import \
+  --input-path hmp50_counts.hdf5 \
+  --type 'FeatureTable[Frequency]' \
+  --input-format BIOMV210Format \
+  --output-path hmp50-counts.qza
+
+# Import taxonomy
+qiime tools import \
+ --input-path hmp50_taxonomy.tsv \
+ --type FeatureData[Taxonomy] \
+ --output-path hmp50-taxonomy.qza
+
+# Import phylogenetic tree
+qiime tools import \
+  --input-path hmp50_tree.tre \
+  --type 'Phylogeny[Rooted]' \
+  --output-path hmp50-tree.qza
+
+# Example: browsing metadata
+qiime metadata tabulate \
+  --m-input-file hmp50_metadata.tsv \
+  --o-visualization hmp50-metadata-browser.qzv
+
+# Example: running weighted unifrac
+qiime diversity-lib weighted-unifrac \
+  --i-table hmp50.qza \
+  --i-phylogeny hmp50-tree.qza \
+  --o-distance-matrix weighted-unifrac-dm.qza
+```
+
+> The `'hmp50-metadata-browser.qzv'` file can be uploaded to https://view.qiime2.org/ to view its contents.
+
+
+<br>
+
+### QIIME 2 `r knitr::asis_output("\U27A1")` rbiom
+
+On the command line, export data files from QIIME 2.
+
+```bash
+# Export a feature table, taxonomy, and tree
+qiime tools export --input-path hmp50-counts.qza   --output-path .
+qiime tools export --input-path hmp50-taxonomy.qza --output-path .
+qiime tools export --input-path hmp50-tree.qza     --output-path .
+```
+
+> *These commands create files named `'feature-table.biom'`, 
+`'taxonomy.tsv'`, and `'tree.nwk'`.*
+
+In R, import the data files into rbiom.
+
+```r
+# project_dir = directory with relevant files
+
+withr::with_dir(project_dir, {
+
+  biom <- as_rbiom(
+    biom     = 'feature-table.biom', 
+    metadata = 'hmp50_metadata.tsv', 
+    taxonomy = 'taxonomy.tsv', 
+    tree     = 'tree.nwk' )
+  
+})
+```
+
+
+
+<br>
+
+## mothur
+
+<br>
+
+### rbiom `r knitr::asis_output("\U27A1")` mothur
+
+In R, export mothur-compatible files.
+
+```r
+library(rbiom)
+
+project_dir <- tempdir()   # where to save the files
+
+withr::with_dir(project_dir, {
+  write_counts(  hmp50, 'hmp50.count_table', compat = 'mothur')
+  write_metadata(hmp50, 'hmp50.metadata',    compat = 'mothur')
+  write_taxonomy(hmp50, 'hmp50.taxonomy',    compat = 'mothur')
+  write_tree(    hmp50, 'hmp50.tree')
+})
+```
+
+At the mothur command prompt, import the BIOM data.
+
+```bash
+mothur > make.shared(count=hmp50.count_table, label=asv)
+mothur > unifrac.unweighted(tree=hmp50.tree, count=hmp50.count_table)
+```
+
+> *The `make.shared()` command creates files named `'hmp50.asv.list'` and `'hmp50.asv.shared'`.*
+
+
+
+<br>
+
+### mothur `r knitr::asis_output("\U27A1")` rbiom
+
+At the mothur command prompt, export a biom file.
+
+```bash
+mothur > make.biom( \
+  shared=hmp50.asv.shared, \
+  constaxonomy=hmp50.taxonomy, \
+  metadata=hmp50.metadata, \
+  output=simple )
+```
+
+> *The `make.biom()` command creates a file named `'hmp50.asv.asv.biom'`.*
+
+In R, import the biom file with rbiom.
+
+```r
+# project_dir = directory with relevant files
+
+withr::with_dir(project_dir, {
+
+  biom <- as_rbiom('hmp50.asv.asv.biom')
+
+  # Optionally add a tree
+  biom$tree <- 'hmp50.tree'
+  
+})
+```
+
+
+
+<br>
+
+## BioConductor R Packages
+
+<br>
+
+### rbiom `r knitr::asis_output("\U27A1")` phyloseq
+
+```r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A phyloseq object
+physeq <- phyloseq::import_biom(
+  BIOMfilename = rbiom::write_biom(biom, file = NULL), 
+  treefilename = rbiom::write_tree(biom, file = NULL) )
+```
+
+<br>
+
+### phyloseq `r knitr::asis_output("\U27A1")` rbiom
+
+```r
+# A phyloseq object
+data(enterotype, package = 'phyloseq')
+physeq <- enterotype
+
+# An rbiom object
+biom <- rbiom::as_rbiom(physeq)
+```
+
+
+
+<br>
+
+### rbiom `r knitr::asis_output("\U27A1")` SummarizedExperiment
+
+```r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A SummarizedExperiment object
+se <- rbiom::convert_to_SE(biom)
+```
+
+<br>
+
+### SummarizedExperiment `r knitr::asis_output("\U27A1")` rbiom
+
+```r
+# `se` is a SummarizedExperiment object
+
+# Convert to rbiom object
+biom <- rbiom::as_rbiom(se)
+```
+
+
+<br>
+
+### rbiom `r knitr::asis_output("\U27A1")` TreeSummarizedExperiment
+
+```r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A TreeSummarizedExperiment object
+tse <- rbiom::convert_to_TSE(biom)
+```
+
+<br>
+
+### TreeSummarizedExperiment `r knitr::asis_output("\U27A1")` rbiom
+
+```r
+# `tse` is a TreeSummarizedExperiment object
+
+# Convert to rbiom object
+biom <- rbiom::as_rbiom(tse)
+```
