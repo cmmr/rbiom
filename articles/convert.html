@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -238,9 +238,7 @@
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
 <span><span class="co"># A phyloseq object</span></span>
-<span><span class="va">physeq</span> <span class="op">&lt;-</span> <span class="fu">phyloseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/import_biom.html" class="external-link">import_biom</a></span><span class="op">(</span></span>
-<span>  BIOMfilename <span class="op">=</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/write_biom.html">write_biom</a></span><span class="op">(</span><span class="va">biom</span>, file <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, </span>
-<span>  treefilename <span class="op">=</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/write_biom.html">write_tree</a></span><span class="op">(</span><span class="va">biom</span>, file <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">)</span></span></code></pre></div>
+<span><span class="va">physeq</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/convert_to.html">convert_to_phyloseq</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div class="section level3">
@@ -263,7 +261,7 @@
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
 <span><span class="co"># A SummarizedExperiment object</span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/convert_to_SE.html">convert_to_SE</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/convert_to.html">convert_to_SE</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div class="section level3">
@@ -284,7 +282,7 @@
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
 <span><span class="co"># A TreeSummarizedExperiment object</span></span>
-<span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/convert_to_SE.html">convert_to_TSE</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="fu"><a href="../reference/convert_to.html">convert_to_TSE</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div class="section level3">
