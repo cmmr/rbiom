@@ -139,9 +139,7 @@ variant of the UniFrac algorithm.</p>
 <div class="section level2">
 <h2 id="input-data">Input Data<a class="anchor" aria-label="anchor" href="#input-data"></a>
 </h2>
-<details><summary>
-Show/Hide Code
-</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">json</span> <span class="op">&lt;-</span> <span class="st">'{"id":"","comment":"","date":"2025-01-29T22:14:00Z","format":"1.0.0","type":"OTU table","format_url":"http://biom-format.org","generated_by":"rbiom 2.0.13","matrix_type":"sparse","matrix_element_type":"int","shape":[5,2],"phylogeny":"(((OTU_1:0.8,OTU_2:0.5):0.4,OTU_3:0.9):0.2,(OTU_4:0.7,OTU_5:0.3):0.6);","rows":{"1":{"id":"OTU_1"},"2":{"id":"OTU_2"},"3":{"id":"OTU_3"},"4":{"id":"OTU_4"},"5":{"id":"OTU_5"}},"columns":[{"id":"Sample_1"},{"id":"Sample_2"}],"data":[[2,0,9],[3,0,3],[4,0,3],[0,1,1],[1,1,4],[2,1,2],[3,1,8]]}'</span></span>
 <span></span>
@@ -152,7 +150,7 @@ Show/Hide Code
 <span><span class="va">L</span> <span class="op">&lt;-</span> <span class="va">phy</span><span class="op">$</span><span class="va">edge.length</span></span>
 <span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">9</span>,<span class="fl">6</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>,<span class="fl">5</span>,<span class="fl">1</span>,<span class="fl">4</span>,<span class="fl">2</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-</details><ul>
+<ul>
 <li>An OTU matrix with two samples and five OTUs.</li>
 <li>A phylogenetic tree for those five OTUs.</li>
 </ul>
@@ -279,7 +277,7 @@ for Sample_2.</p>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p><img src="unifrac_files/figure-html/definitions-1.png" width="75%" style="display: block; margin: auto;"></p>
 <p><br></p>
-<table class="table def_table">
+<table class="table def_table center">
 <tr>
 <td>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n = 8</annotation></semantics></math>
