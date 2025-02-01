@@ -4,11 +4,15 @@
 \alias{read_tree}
 \title{Read a newick formatted phylogenetic tree.}
 \usage{
-read_tree(src)
+read_tree(src, underscores = FALSE)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or Newick string.
 Compressed (gzip or bzip2) files are also supported.}
+
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
 }
 \value{
 A \code{phylo} class object representing the tree.

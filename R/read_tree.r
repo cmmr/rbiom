@@ -6,6 +6,8 @@
 #' New Hampshire format.
 #' 
 #' @family phylogeny
+#' 
+#' @inherit documentation_default
 #'
 #' @param src   Input data as either a file path, URL, or Newick string. 
 #'        Compressed (gzip or bzip2) files are also supported.
@@ -26,12 +28,13 @@
 #'         2):0.43):0.67);")
 #'     plot(tree)
 #'
-read_tree <- function (src) {
+read_tree <- function (src, underscores = FALSE) {
   
   stopifnot(is_scalar_character(src) && !is_na(src))
   
   src <- trimws(src)
   stopifnot(isTRUE(nchar(src) > 0))
+  stopifnot(isTRUE(underscores) || isFALSE(underscores))
   
   
   #________________________________________________________
@@ -76,7 +79,7 @@ read_tree <- function (src) {
   # Parse the Newick string into a phylo object
   #________________________________________________________
   
-  tree        <- .Call(C_read_tree, text)
+  tree        <- .Call(C_read_tree, text, underscores)
   names(tree) <- c('edge', 'Nnode', 'tip.label', 'edge.length', 'node.label')
   attr(tree, 'class') <- 'phylo'
   attr(tree, 'order') <- 'cladewise'
@@ -94,13 +97,16 @@ read_tree <- function (src) {
 
 #' Create a subtree by specifying tips to keep.
 #' 
-#' @name tree_subset
-#' 
 #' @family phylogeny
 #' 
+#' @inherit documentation_default
+#' 
 #' @param tree  A phylo object, as returned from [read_tree()].
+#' 
 #' @param tips  A character, numeric, or logical vector of tips to keep.
+#' 
 #' @return A \code{phylo} object for the subtree.
+#' 
 #' @export
 #' @examples
 #'     library(rbiom)
@@ -112,9 +118,9 @@ read_tree <- function (src) {
 #'     subtree <- tree_subset(tree, tips = head(tree$tip.label))
 #'     subtree
 #'
-tree_subset <- function (tree, tips) {
+tree_subset <- function (tree, tips, underscores = FALSE) {
   
-  validate_tree()
+  validate_tree(underscores = underscores)
   params <- eval_envir(environment())
   
   

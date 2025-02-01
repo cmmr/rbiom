@@ -228,7 +228,7 @@ read_biom_json <- function (fp) {
 
 read_biom_hdf5 <- function (fp) {
   
-  h5 <- try(H5Fopen(fp, 'H5F_ACC_RDONLY'), silent=TRUE)
+  h5 <- try(H5Fopen(fp, 'H5F_ACC_RDONLY', native = TRUE), silent=TRUE)
   if (inherits(h5, "try-error")) {
     try(H5Fclose(h5), silent=TRUE)
     stop(sprintf("Unable to parse HDF5 file. %s", as.character(h5)))

@@ -3,6 +3,7 @@
 ^\.github$
 ^conda$
 ^pkgdown$
+^tmp$
 ^vignettes/articles$
 
 ^\.gitignore$

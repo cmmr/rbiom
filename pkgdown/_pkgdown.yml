@@ -38,11 +38,26 @@ navbar:
       href: articles/plots.html
     - text: "Mapping Metadata to Aesthetics"
       href: articles/aes.html
+    - text: -------
+    - text: "Compatibility"
+    - menu:
+      - text: "mothur"
+        href: articles/mothur.html
+      - text: "QIIME 2"
+        href: articles/qiime2.html
+      - text: "phyloseq"
+        href: articles/phyloseq.html
+      - text: "BioConductor"
+        href: articles/bioc.html
+    - text: "Methodology"
+    - menu:
+      - text: "UniFrac"
+        href: articles/unifrac.html
 
 
 reference:
 - title: Input / Output
-  desc: Get data into and out of R objects.
+  desc: Get data into and out of R objects. See also the articles on transferring data between rbiom, [mothur], [QIIME 2][qiime2], and [phyloseq].
   contents:
   - as_rbiom
   - starts_with("read_")

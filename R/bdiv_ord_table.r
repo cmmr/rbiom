@@ -40,10 +40,10 @@ bdiv_ord_table <- function (
     biom, bdiv = "Bray-Curtis", ord = "PCoA", weighted = TRUE, md = NULL, k = 2, 
     stat.by = NULL, split.by = NULL, tree = NULL, 
     test = "adonis2", seed = 0, permutations = 999, rank = NULL, taxa = 6, 
-    p.top = Inf, p.adj = 'fdr', unc = "singly", ...) {
+    p.top = Inf, p.adj = 'fdr', unc = "singly", underscores = FALSE, ...) {
   
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE)
+  validate_tree(null_ok = TRUE, underscores = underscores)
   
 
   #________________________________________________________

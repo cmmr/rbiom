@@ -1,0 +1,65 @@
+---
+title: "rbiom and mothur"
+---
+
+
+<br>
+
+## Convert from rbiom to mothur
+
+### Export mothur-compatible files
+
+```r
+library(rbiom)
+
+project_dir <- tempdir()   # where to save the files
+
+withr::with_dir(project_dir, {
+  write_counts(  hmp50, 'hmp50.count_table', compat = 'mothur')
+  write_metadata(hmp50, 'hmp50.metadata',    compat = 'mothur')
+  write_taxonomy(hmp50, 'hmp50.taxonomy',    compat = 'mothur')
+  write_tree(    hmp50, 'hmp50.tree')
+})
+```
+
+### Read files using mothur
+
+```bash
+mothur > unifrac.unweighted(tree=hmp50.tree, count=hmp50.count_table)
+mothur > make.shared(count=hmp50.count_table, label=asv)
+```
+
+The `make.shared()` command creates files named `'hmp50.asv.list'` and `'hmp50.asv.shared'`.
+
+
+<br>
+
+## Convert from mothur to rbiom
+
+### Export a BIOM file from mothur
+
+```bash
+mothur > make.biom( \
+  shared=hmp50.asv.shared, \
+  constaxonomy=hmp50.taxonomy, \
+  metadata=hmp50.metadata, \
+  output=simple )
+```
+
+The `make.biom()` command creates a file named `'hmp50.asv.asv.biom'`.
+
+
+### Import the BIOM file into rbiom
+
+```r
+# project_dir = directory with relevant files
+
+withr::with_dir(project_dir, {
+
+  biom <- as_rbiom('hmp50.asv.asv.biom')
+
+  # Optionally add a tree
+  biom$tree <- 'hmp50.tree'
+  
+})
+```

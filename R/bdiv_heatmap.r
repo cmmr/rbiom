@@ -86,10 +86,11 @@ bdiv_heatmap <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, tracks = NULL, 
     grid = "devon", label = TRUE, label_size = NULL, rescale = "none", 
     clust = "complete", trees = TRUE, asp = 1, tree_height = 10, 
-    track_height = 10, legend = "right", title = TRUE, xlab.angle = "auto", ...) {
+    track_height = 10, legend = "right", title = TRUE, xlab.angle = "auto", 
+    underscores = FALSE, ...) {
   
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE)
+  validate_tree(null_ok = TRUE, underscores = underscores)
   
   
   #________________________________________________________

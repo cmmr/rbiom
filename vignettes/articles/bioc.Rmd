@@ -1,0 +1,33 @@
+---
+title: "rbiom and BioConductor"
+---
+
+
+<br>
+
+## Convert from rbiom to (Tree)SummarizedExperiment
+
+```r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A SummarizedExperiment object
+se <- rbiom::convert_to_SE(biom)
+
+# A TreeSummarizedExperiment object
+tse <- rbiom::convert_to_TSE(biom)
+```
+
+
+<br>
+
+## Convert from (Tree)SummarizedExperiment to rbiom
+
+```r
+# `se` is a SummarizedExperiment object
+# `tse` is a TreeSummarizedExperiment object
+
+# Convert to rbiom objects
+biom1 <- rbiom::as_rbiom(se)
+biom2 <- rbiom::as_rbiom(tse)
+```

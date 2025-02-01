@@ -43,15 +43,17 @@ validate_unc <- function (var = "unc", env = parent.frame(), ...) {
 
 
 
-validate_tree <- function (var = "tree", env = parent.frame(), evar = var, null_ok = FALSE) {
+validate_tree <- function (var = "tree", env = parent.frame(), evar = var, null_ok = FALSE, underscores = FALSE) {
   
   x <- get(var, pos = env, inherits = FALSE)
+  
+  validate_bool('underscores')
   
   if (is.null(x) && null_ok) return (invisible(NULL))
   if (inherits(x, 'phylo'))  return (invisible(NULL))
   
   if (is_scalar_character(x)) {
-    x <- read_tree(x)
+    x <- read_tree(x, underscores = underscores)
     assign(var, x, pos = env)
     return (invisible(NULL))
   }

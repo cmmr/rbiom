@@ -220,13 +220,14 @@ bdiv_table <- function (
 bdiv_matrix <- function (
     biom, bdiv = "Bray-Curtis", weighted = TRUE, normalized = TRUE, tree = NULL, 
     within = NULL, between = NULL, 
-    transform = "none", ties = "random", seed = 0, cpus = NULL ) {
+    transform = "none", ties = "random", seed = 0, cpus = NULL,
+    underscores = FALSE ) {
   
   #________________________________________________________
   # Take care not to cache filepath to tree.
   #________________________________________________________
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE)
+  validate_tree(null_ok = TRUE, underscores = underscores)
   
   params <- eval_envir(environment())
   cmd    <- sprintf("bdiv_matrix(%s)", as.args(params, fun = bdiv_matrix))

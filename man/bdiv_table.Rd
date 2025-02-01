@@ -33,7 +33,8 @@ bdiv_matrix(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = NULL,
+  underscores = FALSE
 )
 
 bdiv_distmat(
@@ -96,6 +97,10 @@ Default: \code{0}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. Default: \code{NULL}}
+
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
 }
 \value{
 \describe{

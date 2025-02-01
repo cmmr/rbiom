@@ -44,10 +44,11 @@ bdiv_ord_plot <- function (
     biom, bdiv = "Bray-Curtis", ord = "PCoA", weighted = TRUE, layers = "petm", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
-    rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, ...) {
+    rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, 
+    underscores = FALSE, ...) {
   
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE)
+  validate_tree(null_ok = TRUE, underscores = underscores)
   
   
   #________________________________________________________

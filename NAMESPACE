@@ -158,6 +158,9 @@ export(`write.xlsx`)
 
 
 S3method(as_rbiom,     rbiom)
+S3method(as_rbiom,     phyloseq)
+S3method(as_rbiom,     SummarizedExperiment)
+S3method(as_rbiom,     TreeSummarizedExperiment)
 S3method(as_rbiom,     default)
 S3method("[",          rbiom)
 S3method(as.list,      rbiom)

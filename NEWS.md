@@ -1,4 +1,9 @@
 
+# rbiom 2.0.13.9000
+
+* Option `underscores` allows keeping underscores in tree IDs.
+
+
 # rbiom 2.0.13
 
 * Major release with significant new features.

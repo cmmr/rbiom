@@ -16,7 +16,9 @@
 #'          \item{\emph{list} - }{ With `counts` and optionally `metadata`, `taxonomy`, `tree`, etc (see details). }
 #'        }
 #' 
-#' @param ...   Properties to overwrite in biom: `metadata`, `taxonomy`, `tree`, etc (see details).
+#' @param ...   Properties to overwrite in biom: `metadata`, `taxonomy`, 
+#'        `tree`, etc (see details). Setting `underscores` here will pass it to 
+#'        `read_tree()`.
 #'
 #' @export
 #' @examples
@@ -64,6 +66,71 @@ as_rbiom.rbiom <- function (biom, ...) {
 
 
 #' @export
+as_rbiom.phyloseq <- function (biom, ...) {
+  
+  dots <- list(...)
+  
+  args <- list(
+    counts    = as.simple_triplet_matrix(biom@otu_table), 
+    metadata  = if (!is.null(biom@sam_data))  data.frame(biom@sam_data), 
+    taxonomy  = if (!is.null(biom@tax_table)) data.frame(biom@tax_table), 
+    sequences = if (!is.null(biom@refseq))    as.vector(biom@refseq), 
+    tree      = if (!is.null(biom@phy_tree))  biom@phy_tree, 
+    id        = "Imported phyloseq Data" )
+  
+  args <- c(dots, args)
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  return (biom)
+}
+
+
+
+#' @export
+as_rbiom.SummarizedExperiment <- function (biom, ...) {
+
+  dots <- list(...)
+  
+  args <- list(
+    counts    = as.simple_triplet_matrix(biom@assays@data[[1]]), 
+    metadata  = if (!is.null(biom@colData))         data.frame(biom@colData), 
+    taxonomy  = if (!is.null(biom@elementMetadata)) data.frame(biom@elementMetadata, row.names = biom@NAMES),
+    id        = "Imported SummarizedExperiment Data" )
+  
+  args <- c(dots, args)
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  return (biom)
+}
+
+
+
+#' @export
+as_rbiom.TreeSummarizedExperiment <- function (biom, ...) {
+  
+  dots <- list(...)
+  
+  args <- list(
+    id        = "Imported TreeSummarizedExperiment Data", 
+    counts    = as.simple_triplet_matrix(biom@assays@data[[1]]), 
+    metadata  = if (!is.null(biom@colData))      data.frame(biom@colData),
+    tree      = if (!is.null(biom@rowTree))      biom@rowTree[[1]],
+    sequences = if (!is.null(biom@referenceSeq)) as.character(biom@referenceSeq),
+    taxonomy  = if (!is.null(biom@rowRanges@elementMetadata))
+      data.frame(biom@rowRanges@elementMetadata, row.names = biom@rowRanges@partitioning@NAMES) )
+  
+  args <- c(dots, args)
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  return (biom)
+}
+
+
+
+#' @export
 as_rbiom.default <- function (biom, ...) {
   
   #________________________________________________________
@@ -89,29 +156,6 @@ as_rbiom.default <- function (biom, ...) {
   #________________________________________________________
   if (is_scalar_character(biom) && !is.na(biom))
     return (read_biom(src = biom, ...))
-  
-  
-  #________________________________________________________
-  # Convert from phyloseq.
-  #________________________________________________________
-  if (inherits(biom, 'phyloseq')) {
-    
-    dots <- list(...)
-    
-    args <- list(
-      counts    = as.simple_triplet_matrix(biom@otu_table), 
-      metadata  = if (!is.null(biom@sam_data))  data.frame(biom@sam_data), 
-      taxonomy  = if (!is.null(biom@tax_table)) data.frame(biom@tax_table), 
-      sequences = if (!is.null(biom@refseq))    as.vector(biom@refseq), 
-      tree      = if (!is.null(biom@phy_tree))  biom@phy_tree, 
-      id        = "Imported PhyloSeq Data" )
-    
-    args <- c(dots, args)
-    args <- args[!duplicated(names(args))]
-    biom <- do.call(rbiom$new, args)
-    
-    return (biom)
-  }
   
   
   cli_abort(c(

@@ -16,7 +16,9 @@ For example:
 \item{\emph{list} - }{ With \code{counts} and optionally \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details). }
 }}
 
-\item{...}{Properties to overwrite in biom: \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details).}
+\item{...}{Properties to overwrite in biom: \code{metadata}, \code{taxonomy},
+\code{tree}, etc (see details). Setting \code{underscores} here will pass it to
+\code{read_tree()}.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.

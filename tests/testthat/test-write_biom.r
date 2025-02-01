@@ -15,12 +15,19 @@ test_that(desc = "write_biom", code = {
   skip_on_cran()
   
   
-  expect_silent(write_counts(hmp5, tfile));   unlink(tfile)
+  expect_silent(write_counts(  hmp5, tfile)); unlink(tfile)
   expect_silent(write_metadata(hmp5, tfile)); unlink(tfile)
   expect_silent(write_taxonomy(hmp5, tfile)); unlink(tfile)
-  expect_silent(write_fasta(hmp5, tfile));    unlink(tfile)
-  expect_error(write_fasta(min5, tfile))
-  expect_error(write_tree(min5, tfile))
+  expect_silent(write_fasta(   hmp5, tfile)); unlink(tfile)
+  expect_error(write_fasta(    min5, tfile))
+  expect_error(write_tree(     min5, tfile))
+  
+  expect_silent(write_counts(  hmp5, tfile, 'mothur')); unlink(tfile)
+  expect_silent(write_metadata(hmp5, tfile, 'mothur')); unlink(tfile)
+  expect_silent(write_taxonomy(hmp5, tfile, 'mothur')); unlink(tfile)
+  expect_silent(write_counts(  hmp5, tfile, 'qiime2')); unlink(tfile)
+  expect_silent(write_metadata(hmp5, tfile, 'qiime2')); unlink(tfile)
+  expect_silent(write_taxonomy(hmp5, tfile, 'qiime2')); unlink(tfile)
   
   gzfile <- tempfile(fileext = '.gz')
   bzfile <- tempfile(fileext = '.bz2')

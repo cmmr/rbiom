@@ -22,6 +22,7 @@ bdiv_heatmap(
   legend = "right",
   title = TRUE,
   xlab.angle = "auto",
+  underscores = FALSE,
   ...
 )
 }
@@ -114,6 +115,10 @@ no title, or any character string. Default: \code{TRUE}}
 \item{xlab.angle}{Angle of the labels at the bottom of the plot.
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
+
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
 For example, \code{labs.subtitle = "Plot subtitle"}.}

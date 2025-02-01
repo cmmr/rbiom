@@ -1,0 +1,488 @@
+---
+title: "UniFrac Algorithms"
+output:
+  html_document:
+    theme: darkly
+    code_folding: "hide"
+---
+
+```{css, echo=FALSE}
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.otu_matrix {
+  width: 60%; 
+  border: 1px solid; 
+  border-collapse: separate; 
+  padding: 10px; 
+  font-size: 14pt;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.def_table {
+  font-size: 12pt;
+  margin-left: auto;
+  margin-right: auto;
+}
+.def_table td {
+  padding: 10px; 
+}
+
+.level2 {
+  margin-top: 40px;
+}
+
+.level1 {
+  margin-top: 50px;
+}
+
+```
+
+
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>" )
+```
+
+
+# Introduction
+
+Catherine Lozupone and Rob Knight [originally described](https://doi.org/10.1128/AEM.71.12.8228-8235.2005) the unique fraction (UniFrac) algorithm in 2005. After 20 years of widespread adoption, software packages often generate different UniFrac distances for the same dataset, much to the frustration and confusion of their users.
+
+Here I'll review the current set of algorithms out there, which software packages use them, and explain in detail how to calculate each variant of the UniFrac algorithm.
+
+
+<br>
+
+# Input Data
+
+
+```{r input_data}
+
+json <- '{"id":"","comment":"","date":"2025-01-29T22:14:00Z","format":"1.0.0","type":"OTU table","format_url":"http://biom-format.org","generated_by":"rbiom 2.0.13","matrix_type":"sparse","matrix_element_type":"int","shape":[5,2],"phylogeny":"(((OTU_1:0.8,OTU_2:0.5):0.4,OTU_3:0.9):0.2,(OTU_4:0.7,OTU_5:0.3):0.6);","rows":{"1":{"id":"OTU_1"},"2":{"id":"OTU_2"},"3":{"id":"OTU_3"},"4":{"id":"OTU_4"},"5":{"id":"OTU_5"}},"columns":[{"id":"Sample_1"},{"id":"Sample_2"}],"data":[[2,0,9],[3,0,3],[4,0,3],[0,1,1],[1,1,4],[2,1,2],[3,1,8]]}'
+
+biom <- rbiom::as_rbiom(json, underscores = TRUE)
+mtx  <- t(as.matrix(biom))
+phy  <- biom$tree
+
+L <- phy$edge.length
+A <- c(9,0,0,0,9,6,3,3)
+B <- c(7,5,1,4,2,8,8,0)
+```
+
+* An OTU matrix with two samples and five OTUs.
+* A phylogenetic tree for those five OTUs.
+
+```{r input_data_mtx, results='asis'}
+knitr::kable(mtx, format="html", table.attr='class="otu_matrix"', align='c')
+```
+
+<br>
+
+```{r input_data_tree, fig.asp = 0.5, fig.align = 'center', out.width = "75%", fig.width = 6}
+par(xpd = NA)
+plot(
+  x          = phy, 
+  direction  = 'downwards', 
+  srt        = 90, 
+  adj        = 0.5, 
+  no.margin  = TRUE,
+  underscore = TRUE,
+  x.lim      = c(0.5, 5.5) )
+
+ape::edgelabels(phy$edge.length, bg = 'white', frame = 'none', adj = -0.4)
+```
+
+
+<br>
+
+# Definitions
+
+The branch indices (green circles) are used for ordering the $L$, $A$, and $B$ arrays. Values for $L$ are drawn from the input phylogenetic tree. Values for $A$ and $B$ are the total number of OTU observations descending from that branch; $A$ for Sample_1, and $B$ for Sample_2.
+
+```{r definitions, fig.asp = 0.5, fig.align = 'center', out.width = "75%", fig.width = 6}
+local({
+  
+  phy$edge.length <- c(1, 1, 1, 1, 2, 1, 2, 2)
+  
+  par(xpd = NA)
+  plot(
+    x               = phy, 
+    direction       = 'downwards', 
+    srt             = 90, 
+    adj             = 0.5, 
+    no.margin       = TRUE,
+    underscore      = TRUE,
+    x.lim           = c(.8, 6) )
+  
+  ape::edgelabels(1:8, frame = 'circle')
+  
+  ape::edgelabels(paste('A =', A), bg = 'white', frame = 'none', adj = c(-0.4, -1.2))
+  ape::edgelabels(paste('B =', B), bg = 'white', frame = 'none', adj = c(-0.4,  0.0))
+  ape::edgelabels(paste('L =', L), bg = 'white', frame = 'none', adj = c(-0.3,  1.2))
+})
+```
+
+<br>
+
+<table class='def_table'>
+<tr><td> $n = 8$         </td><td> Number of branches               </td></tr>
+<tr><td> $A = \{`r A`\}$ </td><td> Branch **weights** for Sample_1. </td></tr>
+<tr><td> $B = \{`r B`\}$ </td><td> Branch **weights** for Sample_2. </td></tr>
+<tr><td> $A_T = 15$      </td><td> Total OTU counts for Sample_1.   </td></tr>
+<tr><td> $B_T = 15$      </td><td> Total OTU counts for Sample_2.   </td></tr>
+<tr><td> $L = \{`r L`\}$ </td><td> The branch **lengths**.          </td></tr>
+</table>
+
+
+<br>
+
+# Unweighted
+
+* [Lozupone et al, 2005](https://doi.org/10.1128/AEM.71.12.8228-8235.2005): Unweighted UniFrac
+* R Package [rbiom](https://cran.r-project.org/package=rbiom): `bdiv_matrix(weighted=FALSE)`
+* R Package [phyloseq](https://doi.org/doi:10.18129/B9.bioc.phyloseq): `UniFrac(weighted=FALSE)`
+* R Package [abdiv](https://doi.org/10.32614/CRAN.package.abdiv): `unweighted_unifrac()`
+* [qiime2](https://qiime2.org/) `qiime diversity beta-phylogenetic --p-metric unweighted_unifrac`
+* [mothur](https://mothur.org/): `unifrac.unweighted()`
+
+
+First, transform A and B into presence (1) and absence (0) indicators.
+
+<table class='center' style='width:75%'><tr><td>
+
+\begin{align*}
+A  &= \{`r A`\} \\
+A' &= \{`r as.numeric(A > 0)`\}
+\end{align*}
+
+</td><td>
+
+\begin{align*}
+B  &= \{`r B`\} \\
+B' &= \{`r as.numeric(B > 0)`\}
+\end{align*}
+
+</td></tr></table>
+
+
+Then apply the formula:
+
+\begin{align*}
+U &= \displaystyle \frac{\sum_{i = 1}^{n} L_i(|A'_i - B'_i|)}{\sum_{i = 1}^{n} L_i(max(A'_i,B'_i))}  \\ \\
+U &= \displaystyle \frac{L_1(|A'_1-B'_1|) + L_2(|A'_2-B'_2|) + \cdots + L_n(|A'_n-B'_n|)}{L_1(max(A'_1,B'_1)) + L_2(max(A'_2,B'_2)) + \cdots + L_n(max(A'_n,B'_n))}  \\ \\
+U &= \displaystyle \frac{0.2(|1-1|) + 0.4(|0-1|) + \cdots + 0.3(|1-0|)}{0.2(max(1,1)) + 0.4(max(0,1)) + \cdots + 0.3(max(1,0))}  \\ \\
+U &= \displaystyle \frac{0.2(0) + 0.4(1) + 0.8(1) + 0.5(1) + 0.9(0) + 0.6(0) + 0.7(0) + 0.3(1)}{0.2(1) + 0.4(1) + 0.8(1) + 0.5(1) + 0.9(1) + 0.6(1) + 0.7(1) + 0.3(1)}  \\ \\
+U &= \displaystyle \frac{0.4 + 0.8 + 0.5 + 0.3}{0.2 + 0.4 + 0.8 + 0.5 + 0.9 + 0.6 + 0.7 + 0.3}  \\ \\
+U &= \displaystyle \frac{2}{4.4}  \\ \\
+U &= 0.4545455
+\end{align*}
+
+
+# Weighted
+
+* [Lozupone et al, 2007](https://doi.org/10.1128/AEM.01996-06): Raw Weighted UniFrac
+* R Package [rbiom](https://cran.r-project.org/package=rbiom): `bdiv_matrix(weighted=TRUE, normalized=FALSE)`
+* R Package [phyloseq](https://doi.org/doi:10.18129/B9.bioc.phyloseq): `UniFrac(weighted=TRUE, normalized=FALSE)`
+* R Package [abdiv](https://doi.org/10.32614/CRAN.package.abdiv): `weighted_unifrac()`
+* [qiime2](https://qiime2.org/) `qiime diversity beta-phylogenetic --p-metric weighted_unifrac`
+
+\begin{align*}
+W &= \sum_{i = 1}^{n} L_i|\frac{A_i}{A_T} - \frac{B_i}{B_T}|  \\ \\
+W &= L_1|\frac{A_1}{A_T} - \frac{B_1}{B_T}| + L_2|\frac{A_2}{A_T} - \frac{B_2}{B_T}| + \cdots + L_n|\frac{A_n}{A_T} - \frac{B_n}{B_T}|  \\ \\
+W &= 0.2|\frac{9}{15} - \frac{7}{15}| + 0.4|\frac{0}{15} - \frac{5}{15}| + \cdots + 0.3|\frac{3}{15} - \frac{0}{15}|  \\ \\
+W &= 0.02\overline{6} + 0.1\overline{3} + 0.05\overline{3} + 0.1\overline{3} + 0.42 + 0.08 + 0.2\overline{3} + 0.06  \\ \\
+W &= 1.14
+\end{align*}
+
+
+# Normalized Weighted
+
+* [Lozupone et al, 2007](https://doi.org/10.1128/AEM.01996-06): Normalized Weighted UniFrac
+* R Package [rbiom](https://cran.r-project.org/package=rbiom): `bdiv_matrix(weighted=TRUE, normalized=TRUE)`
+* R Package [phyloseq](https://doi.org/doi:10.18129/B9.bioc.phyloseq): `UniFrac(weighted=TRUE, normalized=TRUE)`
+* R Package [abdiv](https://doi.org/10.32614/CRAN.package.abdiv): `weighted_normalized_unifrac()`
+* [qiime2](https://qiime2.org/) `qiime diversity beta-phylogenetic --p-metric weighted_normalized_unifrac`
+* [mothur](https://mothur.org/): `unifrac.weighted()`
+
+\begin{align*}
+
+N &= \displaystyle \frac
+  {\sum_{i = 1}^{n} L_i|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
+  {\sum_{i = 1}^{n} L_i(\frac{A_i}{A_T} + \frac{B_i}{B_T})}
+  \\ \\
+  
+N &= \displaystyle \frac
+  {L_1|\frac{A_1}{A_T} - \frac{B_1}{B_T}| + L_2|\frac{A_2}{A_T} - \frac{B_2}{B_T}| + \cdots + L_n|\frac{A_n}{A_T} - \frac{B_n}{B_T}|}
+  {L_1(\frac{A_1}{A_T} + \frac{B_1}{B_T}) + L_2(\frac{A_2}{A_T} + \frac{B_2}{B_T}) + \cdots + L_n(\frac{A_n}{A_T} + \frac{B_n}{B_T})}
+  \\ \\
+  
+N &= \displaystyle \frac
+  {0.2|\frac{9}{15} - \frac{7}{15}| + 0.4|\frac{0}{15} - \frac{5}{15}| + \cdots + 0.3|\frac{3}{15} - \frac{0}{15}|}
+  {0.2(\frac{9}{15} + \frac{7}{15}) + 0.4(\frac{0}{15} + \frac{5}{15}) + \cdots + 0.3(\frac{3}{15} + \frac{0}{15})}
+  \\ \\
+  
+N &= \displaystyle \frac
+  {0.02\overline{6} + 0.1\overline{3} + 0.05\overline{3} + 0.1\overline{3} + 0.42 + 0.08 + 0.2\overline{3} + 0.06}
+  {0.21\overline{3} + 0.1\overline{3} + 0.05\overline{3} + 0.1\overline{3} + 0.66 + 0.56 + 0.51\overline{3} + 0.06}
+  \\ \\
+  
+N &= \displaystyle \frac{1.14}{2.326667}  \\ \\
+N &= 0.4899713
+\end{align*}
+
+
+
+# Generalized
+
+* [Chen et al. 2012](https://doi.org/10.1093/bioinformatics/bts342): Generalized UniFrac
+* R Package [GUniFrac](https://cran.r-project.org/web/packages/GUniFrac/index.html): `GUniFrac(alpha=0.5)`
+* R Package [abdiv](https://doi.org/10.32614/CRAN.package.abdiv): `generalized_unifrac(alpha = 0.5)`
+* [qiime2](https://qiime2.org/) `qiime diversity beta-phylogenetic --p-metric generalized_unifrac -a 0.5`
+
+\begin{align*}
+
+G &= \displaystyle \frac
+  {\sum_{i = 1}^{n} L_i(\frac{A_i}{A_T} + \frac{B_i}{B_T})^{0.5}
+    |\displaystyle \frac
+      {\frac{A_i}{A_T} - \frac{B_i}{B_T}}
+      {\frac{A_i}{A_T} + \frac{B_i}{B_T}} |}
+  {\sum_{i = 1}^{n} L_i(\frac{A_i}{A_T} + \frac{B_i}{B_T})^{0.5}}  \\ \\
+
+G &= \displaystyle \frac
+  {
+    L_1(\frac{A_1}{A_T} + \frac{B_1}{B_T})^{0.5}
+      |\displaystyle \frac
+        {\frac{A_1}{A_T} - \frac{B_1}{B_T}}
+        {\frac{A_1}{A_T} + \frac{B_1}{B_T}}| + 
+    \cdots + 
+    L_n(\frac{A_n}{A_T} + \frac{B_n}{B_T})^{0.5}
+      |\displaystyle \frac
+        {\frac{A_n}{A_T} - \frac{B_n}{B_T}}
+        {\frac{A_n}{A_T} + \frac{B_n}{B_T}}|
+  }{
+    L_1(\frac{A_1}{A_T} + \frac{B_1}{B_T})^{0.5} + 
+    \cdots + 
+    L_n(\frac{A_n}{A_T} + \frac{B_n}{B_T})^{0.5}
+  }  
+  \\ \\
+
+G &= \displaystyle \frac
+  {
+    0.2(\frac{9}{15} + \frac{7}{15})^{0.5}
+      |\displaystyle \frac
+        {\frac{9}{15} - \frac{7}{15}}
+        {\frac{9}{15} + \frac{7}{15}}| + 
+    \cdots + 
+    0.3(\frac{3}{15} + \frac{0}{15})^{0.5}
+      |\displaystyle \frac
+        {\frac{3}{15} - \frac{0}{15}}
+        {\frac{3}{15} + \frac{0}{15}}|
+  }{
+    0.2(\frac{9}{15} + \frac{7}{15})^{0.5} + 
+    \cdots + 
+    0.3(\frac{3}{15} + \frac{0}{15})^{0.5}
+  }  
+  \\ \\
+  
+G &\approx \displaystyle \frac
+  {0.03 + 0.23 + 0.21 + 0.26 + 0.49 + 0.08 + 0.27 + 0.13}
+  {0.21 + 0.23 + 0.21 + 0.26 + 0.77 + 0.58 + 0.60+ 0.13}
+  \\ \\
+  
+G &= \displaystyle \frac{1.701419}{2.986235}  \\ \\
+G &= 0.569754
+
+\end{align*}
+
+
+
+# Variance Adjusted Weighted
+
+* [Chang et al, 2011](https://doi.org/10.1186/1471-2105-12-118): Variance Adjusted Weighted (VAW) UniFrac
+* R Package [abdiv](https://doi.org/10.32614/CRAN.package.abdiv): `variance_adjusted_unifrac()`
+* [qiime2](https://qiime2.org/) `qiime diversity beta-phylogenetic --p-metric weighted_normalized_unifrac --p-variance-adjusted`
+
+\begin{align*}
+
+V &= \displaystyle \frac
+  {\sum_{i = 1}^{n} L_i\displaystyle \frac
+    {|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
+    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }
+  {\sum_{i = 1}^{n} L_i\displaystyle \frac
+    {\frac{A_i}{A_T} + \frac{B_i}{B_T}}
+    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }  \\ \\
+
+\end{align*}
+
+
+
+<!--
+
+# Variant W3
+
+\begin{align*}
+
+W3 &= \displaystyle \frac
+  {\sum_{i = 1}^{n} L_i|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
+  {\sum_{i = 1}^{n} L_i(A_i + B_i)}
+  \\ \\
+  
+W3 &= \displaystyle \frac
+  {L_1|\frac{A_1}{A_T} - \frac{B_1}{B_T}| + L_2|\frac{A_2}{A_T} - \frac{B_2}{B_T}| + \cdots + L_n|\frac{A_n}{A_T} - \frac{B_n}{B_T}|}
+  {L_1(A_1 + B_1) + L_2(A_2 + B_2) + \cdots + L_n(A_n + B_n)}
+  \\ \\
+  
+W3 &= \displaystyle \frac
+  {0.2|\frac{9}{15} - \frac{7}{15}| + 0.4|\frac{0}{15} - \frac{5}{15}| + \cdots + 0.3|\frac{3}{15} - \frac{0}{15}|}
+  {0.2(9 + 7) + 0.4(0 + 5) + \cdots + 0.3(3 + 0)}
+  \\ \\
+  
+W3 &= \displaystyle \frac
+  {0.02\overline{6} + 0.1\overline{3} + 0.05\overline{3} + 0.1\overline{3} + 0.42 + 0.08 + 0.2\overline{3} + 0.06}
+  {3.2 + 2 + 0.8 + 2 + 9.9 + 8.4 + 7.7 + 0.9}
+  \\ \\
+  
+W3 &= \displaystyle \frac{1.14}{34.9}  \\ \\
+W3 &= 0.03266476
+\end{align*}
+
+
+
+# Variant W4
+
+\begin{align*}
+
+W4 &= \displaystyle \frac
+  {\sum_{i = 1}^{n} L_i|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
+  {\sum_{i = 1}^{n} L_i}
+  \\ \\
+  
+W4 &= \displaystyle \frac
+  {L_1|\frac{A_1}{A_T} - \frac{B_1}{B_T}| + L_2|\frac{A_2}{A_T} - \frac{B_2}{B_T}| + \cdots + L_n|\frac{A_n}{A_T} - \frac{B_n}{B_T}|}
+  {L_1 + L_2 + \cdots + L_n}
+  \\ \\
+  
+W4 &= \displaystyle \frac
+  {0.2|\frac{9}{15} - \frac{7}{15}| + 0.4|\frac{0}{15} - \frac{5}{15}| + \cdots + 0.3|\frac{3}{15} - \frac{0}{15}|}
+  {0.2 + 0.4 + \cdots + 0.3}
+  \\ \\
+  
+W4 &= \displaystyle \frac
+  {0.02\overline{6} + 0.1\overline{3} + 0.05\overline{3} + 0.1\overline{3} + 0.42 + 0.08 + 0.2\overline{3} + 0.06}
+  {0.2 + 0.4 + 0.8 + 0.5 + 0.9 + 0.6 + 0.7 + 0.3}
+  \\ \\
+  
+W4 &= \displaystyle \frac{1.14}{4.4}  \\ \\
+W4 &= 0.2590909
+\end{align*}
+
+-->
+
+
+
+
+<!---
+
+# Software Testing
+
+## Files
+
+```{r files, eval=FALSE}
+tmp <- normalizePath(tempdir(), winslash = '/')
+cat(tmp) # C:/Users/Daniel/AppData/Local/Temp/RtmpcNccFS
+
+biom_fp <- file.path(tmp, 'ex.biom')
+tree_fp <- file.path(tmp, 'ex.tree')
+mothur_shared <- file.path(tmp, 'ex.shared')
+mothur_counts <- file.path(tmp, 'ex.counts')
+
+cat(
+  file = biom_fp, sep = '',
+  '#OTU ID\tSample_1\tSample_2\n',
+  sprintf('OTU_%i\t%i\t%i\n', 1:5, c(0,0,9,3,3), c(1,4,2,8,0))  )
+
+cat(
+  file = tree_fp, 
+  '(((OTU_1:0.8,OTU_2:0.5):0.4,OTU_3:0.9):0.2,(OTU_4:0.7,OTU_5:0.3):0.6);\n' )
+
+cat(
+  file = mothur_shared, sep = '',
+  'label\tGroup\tnumOtus\tOTU_1\tOTU_2\tOTU_3\tOTU_4\tOTU_5\n',
+  '1\tSample_1\t5\t0\t0\t9\t3\t3\n',
+  '1\tSample_2\t5\t1\t4\t2\t8\t0\n' )
+
+cat(
+  file = mothur_counts, sep = '',
+  'Representative_Sequence\ttotal\tSample_1\tSample_2\n',
+  'OTU_1\t1\t0\t1\n',
+  'OTU_2\t4\t0\t4\n',
+  'OTU_3\t11\t9\t2\n',
+  'OTU_4\t11\t3\t8\n',
+  'OTU_5\t3\t3\t0\n' )
+```
+
+
+
+
+
+```{r phyloseq, eval=FALSE}
+packageDate('phyloseq') # 2021-11-29
+
+mtx <- read.table(biom_fp, sep = '\t', row.names = 1, header = TRUE, comment.char = '')
+
+physeq <- phyloseq::merge_phyloseq(
+  phyloseq::otu_table(mtx, taxa_are_rows = TRUE), 
+  phyloseq::read_tree(tree_fp) )
+
+phyloseq::UniFrac(physeq, weighted=FALSE, normalized=TRUE)  # 0.4545455
+phyloseq::UniFrac(physeq, weighted=FALSE, normalized=FALSE) # 0.4545455
+phyloseq::UniFrac(physeq, weighted=TRUE,  normalized=FALSE) # 1.14
+phyloseq::UniFrac(physeq, weighted=TRUE,  normalized=TRUE)  # 0.4899713
+```
+
+
+```{r abdiv, eval=FALSE}
+x <- as.vector(mtx['Sample_1',])
+y <- as.vector(mtx['Sample_2',])
+
+abdiv::unweighted_unifrac(x, y, phy)          # 0.4545455
+abdiv::weighted_unifrac(x, y, phy)            # 1.14
+abdiv::weighted_normalized_unifrac(x, y, phy) # 0.4899713
+abdiv::variance_adjusted_unifrac(x, y, phy)   # 0.5383505
+abdiv::generalized_unifrac(x, y, phy)         # 0.569754
+abdiv::information_unifrac(x, y, phy)         # 0.1444812
+abdiv::phylosor(x, y, phy)                    # 0.2941176
+```
+
+
+```{bash qiime2, eval=FALSE}
+docker pull quay.io/qiime2/amplicon:2024.10
+docker run -t -i -v /c/Users/Daniel/AppData/Local/Temp/RtmpUFKImC:/data quay.io/qiime2/amplicon:2024.10
+
+biom convert -i ex.biom -o ex.hdf5 --to-hdf5
+
+# `qiime diversity beta-phylogenetic` uses `ssu` under the hood
+
+ssu -i ex.hdf5 -t ex.tree -m unweighted            -o uu.dm # 0.4545454382896423
+ssu -i ex.hdf5 -t ex.tree -m weighted_normalized   -o wn.dm # 0.4899713099002838
+ssu -i ex.hdf5 -t ex.tree -m weighted_unnormalized -o wu.dm # 1.139999985694885
+ssu -i ex.hdf5 -t ex.tree -m generalized -a 0.5    -o gu.dm # 0.5697539448738098
+```
+
+
+```{powershell mothur, eval=FALSE}
+# Using https://github.com/mothur/mothur/releases/download/v1.48.2/Mothur.win.zip
+.\mothur.exe
+
+unifrac.unweighted(tree=ex.tree, count=ex.counts) # 0.454545
+unifrac.weighted(tree=ex.tree, count=ex.counts)   # 0.489971
+```
+
+
+--->

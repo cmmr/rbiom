@@ -22,6 +22,7 @@ bdiv_ord_table(
   p.top = Inf,
   p.adj = "fdr",
   unc = "singly",
+  underscores = FALSE,
   ...
 )
 }
@@ -114,6 +115,10 @@ taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Abbreviations are allowed. Default: \code{"singly"}}
+
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
 
 \item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
 \code{\link[ape:pcoa]{ape::pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}

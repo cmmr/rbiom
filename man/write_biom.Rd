@@ -12,15 +12,15 @@
 \usage{
 write_biom(biom, file, format = "json")
 
-write_metadata(biom, file, quote = FALSE, sep = "\\t", ...)
+write_metadata(biom, file, compat = NULL, quote = FALSE, sep = "\\t", ...)
 
-write_counts(biom, file, quote = FALSE, sep = "\\t", ...)
+write_counts(biom, file, compat = NULL, quote = FALSE, sep = "\\t", ...)
 
-write_taxonomy(biom, file, quote = FALSE, sep = "\\t", ...)
+write_taxonomy(biom, file, compat = NULL, quote = FALSE, sep = "\\t", ...)
 
-write_fasta(biom, file = NULL)
+write_fasta(biom, file = NULL, compat = NULL)
 
-write_tree(biom, file = NULL)
+write_tree(biom, file = NULL, compat = NULL)
 
 write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
 }
@@ -40,6 +40,9 @@ corresponding to classic tabular format, BIOM format version 1.0 and
 biom version 2.1, respectively. NOTE: to write HDF5 formatted BIOM
 files, the BioConductor R package \code{rhdf5} must be installed.
 Default: \code{"json"}}
+
+\item{compat}{Format data for compatibility with specific third-party
+software. Options are \verb{'mothur}, \code{qiime2}, or \code{NULL}. Default: \code{NULL}}
 
 \item{quote, sep, ...}{Parameters passed on to \code{\link[=write.table]{write.table()}}.
 Default: \verb{quote=FALSE, sep="\\t"}}

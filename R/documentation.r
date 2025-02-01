@@ -13,6 +13,10 @@
 #' @param tree  A `phylo` object representing the phylogenetic
 #'        relationships of the taxa in `biom`. Only required when 
 #'        computing UniFrac distances. Default: `biom$tree`
+#'
+#' @param underscores   When parsing the tree, should underscores be kept as 
+#'        is? By default they will be converted to spaces (unless the entire ID
+#'        is quoted). Default `FALSE`
 #'     
 #' @param md  Dataset field(s) to include in the output data frame, or `'.all'` 
 #'        to include all metadata fields. Default: `'.all'`

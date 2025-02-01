@@ -25,10 +25,10 @@ import_table <- function (src) {
   # Read json/text/excel data into a data frame.
   #________________________________________________________
   tbl <- if (format == 'excel') {
-    read_excel(path = path) # from tidyverse pkg
+    readxl::read_excel(path = path)
   
   } else if (format == 'json') {
-    as_tibble(read_json(path = path, simplifyVector = TRUE))
+    as_tibble(jsonlite::read_json(path = path, simplifyVector = TRUE))
     
   } else if (format == 'text') {
     
@@ -38,6 +38,7 @@ import_table <- function (src) {
       file           = path,  
       trim_ws        = TRUE, 
       name_repair    = trimws,
+      comment        = '#q2:', # QIIME 2 numeric or categorical
       show_col_types = FALSE )
   
     
@@ -409,6 +410,25 @@ import_taxonomy <- function (value, otus) {
     
     value <- value[sort(unname(keep)),,drop=FALSE]
     remove("keep")
+  }
+  
+  
+  #________________________________________________________
+  # Drop 'Confidence' column (from qiime2).
+  #________________________________________________________
+  if (identical(tail(colnames(value), 1), 'Confidence'))
+    value <- value[,seq_len(ncol(value) - 1)]
+  
+  
+  #________________________________________________________
+  # Split semicolon-separated values into columns.
+  #________________________________________________________
+  if (ncol(value) == 2) {
+    ssv <- paste0(collapse = '', as.character(value[[2]]), '\n')
+    ssv <- readr::read_delim(file = ssv, delim = ';', quote = '', col_names = FALSE, col_types = 'f')
+    colnames(ssv) <- default_taxa_ranks(ncol(ssv))
+    value <- dplyr::bind_cols(value[,'.otu'], ssv)
+    remove('ssv')
   }
   
   

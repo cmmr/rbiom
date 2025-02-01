@@ -136,6 +136,7 @@ rbiom <- R6::R6Class(
     .pkg_version  = packageVersion("rbiom"),
     .hash         = NULL,
     .tree_hash    = NULL,
+    underscores   = FALSE,
     
     
     
@@ -159,12 +160,12 @@ rbiom <- R6::R6Class(
     #________________________________________________________
     initialize = function (
       counts, metadata = NULL, taxonomy = NULL, tree = NULL, 
-      sequences = NULL, id = "", comment = "", ...) {
+      sequences = NULL, id = "", comment = "", underscores = FALSE, ...) {
       
         rb_init(
         self, private,
         counts, metadata, taxonomy, tree, 
-        sequences, id, comment, ...)
+        sequences, id, comment, underscores, ...)
       },
     
     
@@ -330,12 +331,15 @@ rb__sync <- function (self, private, sids, otus) {
 rb_init <- function(
     self, private,
     counts, metadata, taxonomy, tree, 
-    sequences, id, comment, ...) {
+    sequences, id, comment, underscores, ...) {
   
   if (!is.null(private$.counts))
     cli_abort(c('x' = "Cannot re-initialize an rbiom object."))
   
   dots <- list(...)
+  
+  validate_bool('underscores')
+  private$underscores <- underscores
   
   #________________________________________________________
   # Use active bindings to load components.
@@ -526,7 +530,7 @@ rb_tree <- function (self, private, value) {
   
   if (!is.null(value)) {
     
-    validate_tree("value")
+    validate_tree("value", underscores = private$underscores)
     
     otus <- private$.counts$dimnames[[1]]
     tips <- value$tip.label <- trimws(value$tip.label)

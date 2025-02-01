@@ -13,6 +13,10 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
+
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
 

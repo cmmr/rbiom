@@ -24,6 +24,7 @@ bdiv_ord_plot(
   p.adj = "fdr",
   unc = "singly",
   caption = TRUE,
+  underscores = FALSE,
   ...
 )
 }
@@ -137,6 +138,10 @@ Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
+
+\item{underscores}{When parsing the tree, should underscores be kept as
+is? By default they will be converted to spaces (unless the entire ID
+is quoted). Default \code{FALSE}}
 
 \item{...}{Parameters for layer geoms (e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}).
 Prefixing parameter names with a layer name ensures that a particular
