@@ -1,22 +1,26 @@
 ---
 title: "UniFrac Algorithms"
-output:
-  html_document:
-    theme: darkly
-    code_folding: "hide"
 ---
 
 ```{css, echo=FALSE}
+
+.sourceCode { display: none; }
+
+img {
+  background-color: #fff;
+  border: 2px gray solid;
+}
+
 .center {
   margin-left: auto;
   margin-right: auto;
 }
 
 .otu_matrix {
-  width: 60%; 
-  border: 1px solid; 
-  border-collapse: separate; 
-  padding: 10px; 
+  width: 80%; 
+  border-width: 0;
+  border-collapse: separate;
+  padding: 10px;
   font-size: 14pt;
   margin-left: auto;
   margin-right: auto;
@@ -61,7 +65,6 @@ Here I'll review the current set of algorithms out there, which software package
 
 # Input Data
 
-
 ```{r input_data}
 
 json <- '{"id":"","comment":"","date":"2025-01-29T22:14:00Z","format":"1.0.0","type":"OTU table","format_url":"http://biom-format.org","generated_by":"rbiom 2.0.13","matrix_type":"sparse","matrix_element_type":"int","shape":[5,2],"phylogeny":"(((OTU_1:0.8,OTU_2:0.5):0.4,OTU_3:0.9):0.2,(OTU_4:0.7,OTU_5:0.3):0.6);","rows":{"1":{"id":"OTU_1"},"2":{"id":"OTU_2"},"3":{"id":"OTU_3"},"4":{"id":"OTU_4"},"5":{"id":"OTU_5"}},"columns":[{"id":"Sample_1"},{"id":"Sample_2"}],"data":[[2,0,9],[3,0,3],[4,0,3],[0,1,1],[1,1,4],[2,1,2],[3,1,8]]}'
@@ -79,7 +82,7 @@ B <- c(7,5,1,4,2,8,8,0)
 * A phylogenetic tree for those five OTUs.
 
 ```{r input_data_mtx, results='asis'}
-knitr::kable(mtx, format="html", table.attr='class="otu_matrix"', align='c')
+knitr::kable(mtx, format="html", table.attr='class="otu_matrix" cellspacing="0"', align='c')
 ```
 
 <br>
@@ -130,7 +133,7 @@ local({
 
 <br>
 
-<table class='def_table'>
+<table class='def_table center'>
 <tr><td> $n = 8$         </td><td> Number of branches               </td></tr>
 <tr><td> $A = \{`r A`\}$ </td><td> Branch **weights** for Sample_1. </td></tr>
 <tr><td> $B = \{`r B`\}$ </td><td> Branch **weights** for Sample_2. </td></tr>

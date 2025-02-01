@@ -3,11 +3,7 @@ title: "QIIME 2, mothur, and BioConductor"
 ---
 
 
-<br>
-
 ## QIIME 2
-
-<br>
 
 ### rbiom `r knitr::asis_output("\U27A1")` QIIME 2
 
@@ -67,8 +63,6 @@ qiime diversity-lib weighted-unifrac \
 > The `'hmp50-metadata-browser.qzv'` file can be uploaded to https://view.qiime2.org/ to view its contents.
 
 
-<br>
-
 ### QIIME 2 `r knitr::asis_output("\U27A1")` rbiom
 
 On the command line, export data files from QIIME 2.
@@ -100,12 +94,7 @@ withr::with_dir(project_dir, {
 ```
 
 
-
-<br>
-
 ## mothur
-
-<br>
 
 ### rbiom `r knitr::asis_output("\U27A1")` mothur
 
@@ -134,8 +123,6 @@ mothur > unifrac.unweighted(tree=hmp50.tree, count=hmp50.count_table)
 > *The `make.shared()` command creates files named `'hmp50.asv.list'` and `'hmp50.asv.shared'`.*
 
 
-
-<br>
 
 ### mothur `r knitr::asis_output("\U27A1")` rbiom
 
@@ -167,12 +154,7 @@ withr::with_dir(project_dir, {
 ```
 
 
-
-<br>
-
 ## BioConductor R Packages
-
-<br>
 
 ### rbiom `r knitr::asis_output("\U27A1")` phyloseq
 
@@ -183,8 +165,6 @@ biom <- rbiom::hmp50
 # A phyloseq object
 physeq <- rbiom::convert_to_phyloseq(biom)
 ```
-
-<br>
 
 ### phyloseq `r knitr::asis_output("\U27A1")` rbiom
 
@@ -198,9 +178,6 @@ biom <- rbiom::as_rbiom(physeq)
 ```
 
 
-
-<br>
-
 ### rbiom `r knitr::asis_output("\U27A1")` SummarizedExperiment
 
 ```r
@@ -210,8 +187,6 @@ biom <- rbiom::hmp50
 # A SummarizedExperiment object
 se <- rbiom::convert_to_SE(biom)
 ```
-
-<br>
 
 ### SummarizedExperiment `r knitr::asis_output("\U27A1")` rbiom
 
@@ -223,8 +198,6 @@ biom <- rbiom::as_rbiom(se)
 ```
 
 
-<br>
-
 ### rbiom `r knitr::asis_output("\U27A1")` TreeSummarizedExperiment
 
 ```r
@@ -234,8 +207,6 @@ biom <- rbiom::hmp50
 # A TreeSummarizedExperiment object
 tse <- rbiom::convert_to_TSE(biom)
 ```
-
-<br>
 
 ### TreeSummarizedExperiment `r knitr::asis_output("\U27A1")` rbiom
 
