@@ -82,16 +82,24 @@
     
     
 <style type="text/css">
+
+.sourceCode { display: none; }
+
+img {
+  background-color: #fff;
+  border: 2px gray solid;
+}
+
 .center {
   margin-left: auto;
   margin-right: auto;
 }
 
 .otu_matrix {
-  width: 60%; 
-  border: 1px solid; 
-  border-collapse: separate; 
-  padding: 10px; 
+  width: 80%; 
+  border-width: 0;
+  border-collapse: separate;
+  padding: 10px;
   font-size: 14pt;
   margin-left: auto;
   margin-right: auto;
@@ -131,7 +139,9 @@ variant of the UniFrac algorithm.</p>
 <div class="section level2">
 <h2 id="input-data">Input Data<a class="anchor" aria-label="anchor" href="#input-data"></a>
 </h2>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<details><summary>
+Show/Hide Code
+</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">json</span> <span class="op">&lt;-</span> <span class="st">'{"id":"","comment":"","date":"2025-01-29T22:14:00Z","format":"1.0.0","type":"OTU table","format_url":"http://biom-format.org","generated_by":"rbiom 2.0.13","matrix_type":"sparse","matrix_element_type":"int","shape":[5,2],"phylogeny":"(((OTU_1:0.8,OTU_2:0.5):0.4,OTU_3:0.9):0.2,(OTU_4:0.7,OTU_5:0.3):0.6);","rows":{"1":{"id":"OTU_1"},"2":{"id":"OTU_2"},"3":{"id":"OTU_3"},"4":{"id":"OTU_4"},"5":{"id":"OTU_5"}},"columns":[{"id":"Sample_1"},{"id":"Sample_2"}],"data":[[2,0,9],[3,0,3],[4,0,3],[0,1,1],[1,1,4],[2,1,2],[3,1,8]]}'</span></span>
 <span></span>
@@ -142,13 +152,13 @@ variant of the UniFrac algorithm.</p>
 <span><span class="va">L</span> <span class="op">&lt;-</span> <span class="va">phy</span><span class="op">$</span><span class="va">edge.length</span></span>
 <span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">9</span>,<span class="fl">6</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>,<span class="fl">5</span>,<span class="fl">1</span>,<span class="fl">4</span>,<span class="fl">2</span>,<span class="fl">8</span>,<span class="fl">8</span>,<span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<ul>
+</details><ul>
 <li>An OTU matrix with two samples and five OTUs.</li>
 <li>A phylogenetic tree for those five OTUs.</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">mtx</span>, format<span class="op">=</span><span class="st">"html"</span>, table.attr<span class="op">=</span><span class="st">'class="otu_matrix"'</span>, align<span class="op">=</span><span class="st">'c'</span><span class="op">)</span></span></code></pre></div>
-<table class="table otu_matrix">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">mtx</span>, format<span class="op">=</span><span class="st">"html"</span>, table.attr<span class="op">=</span><span class="st">'class="otu_matrix" cellspacing="0"'</span>, align<span class="op">=</span><span class="st">'c'</span><span class="op">)</span></span></code></pre></div>
+<table class="table otu_matrix" cellspacing="0">
 <thead><tr>
 <th style="text-align:left;">
 </th>
