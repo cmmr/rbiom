@@ -12,17 +12,14 @@ In R, export QIIME 2-compatible files.
 ```r
 library(rbiom)
 
-project_dir <- tempdir()   # where to save the files
+# where to save the files
+project_dir <- tempdir()
 
-withr::with_dir(project_dir, {
-  write_counts(  hmp50, 'hmp50_counts.tsv',   compat = 'qiime2')
-  write_taxonomy(hmp50, 'hmp50_taxonomy.tsv', compat = 'qiime2')
-  write_metadata(hmp50, 'hmp50_metadata.tsv', compat = 'qiime2')
-  write_tree(    hmp50, 'hmp50_tree.tre')
-})
-
+write_qiime2(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
 ```
+> `write_qiime2()` creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
 
+<br>
 On the command line, convert files to QIIME 2 format (.qza).
 
 ```bash
@@ -44,23 +41,23 @@ qiime tools import \
 
 # Import phylogenetic tree
 qiime tools import \
-  --input-path hmp50_tree.tre \
+  --input-path hmp50_tree.nwk \
   --type 'Phylogeny[Rooted]' \
   --output-path hmp50-tree.qza
+```
 
-# Example: browsing metadata
+Examples: browsing metadata and running unifrac
+```bash
+qiime diversity-lib weighted-unifrac \
+  --i-table hmp50-counts.qza \
+  --i-phylogeny hmp50-tree.qza \
+  --o-distance-matrix weighted-unifrac-dm.qza
+  
 qiime metadata tabulate \
   --m-input-file hmp50_metadata.tsv \
   --o-visualization hmp50-metadata-browser.qzv
-
-# Example: running weighted unifrac
-qiime diversity-lib weighted-unifrac \
-  --i-table hmp50.qza \
-  --i-phylogeny hmp50-tree.qza \
-  --o-distance-matrix weighted-unifrac-dm.qza
+# View .qza files with https://view.qiime2.org
 ```
-
-> The `'hmp50-metadata-browser.qzv'` file can be uploaded to https://view.qiime2.org/ to view its contents.
 
 
 ### QIIME 2 `r knitr::asis_output("\U27A1")` rbiom
@@ -73,10 +70,9 @@ qiime tools export --input-path hmp50-counts.qza   --output-path .
 qiime tools export --input-path hmp50-taxonomy.qza --output-path .
 qiime tools export --input-path hmp50-tree.qza     --output-path .
 ```
+> These commands create files named `'feature-table.biom'`, `'taxonomy.tsv'`, and `'tree.nwk'`.
 
-> *These commands create files named `'feature-table.biom'`, 
-`'taxonomy.tsv'`, and `'tree.nwk'`.*
-
+<br>
 In R, import the data files into rbiom.
 
 ```r
@@ -103,25 +99,21 @@ In R, export mothur-compatible files.
 ```r
 library(rbiom)
 
-project_dir <- tempdir()   # where to save the files
+# where to save the files
+project_dir <- tempdir()
 
-withr::with_dir(project_dir, {
-  write_counts(  hmp50, 'hmp50.count_table', compat = 'mothur')
-  write_metadata(hmp50, 'hmp50.metadata',    compat = 'mothur')
-  write_taxonomy(hmp50, 'hmp50.taxonomy',    compat = 'mothur')
-  write_tree(    hmp50, 'hmp50.tree')
-})
+write_mothur(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
 ```
+> `write_mothur()` creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
 
+<br>
 At the mothur command prompt, import the BIOM data.
 
 ```bash
-mothur > make.shared(count=hmp50.count_table, label=asv)
-mothur > unifrac.unweighted(tree=hmp50.tree, count=hmp50.count_table)
+mothur > make.shared(count=hmp50_counts.tsv, label=asv)
+mothur > unifrac.unweighted(tree=hmp50_tree.nwk, count=hmp50_counts.tsv)
 ```
-
-> *The `make.shared()` command creates files named `'hmp50.asv.list'` and `'hmp50.asv.shared'`.*
-
+> The `make.shared()` command creates files named `'hmp50_counts.asv.list'` and `'hmp50_counts.asv.shared'`.
 
 
 ### mothur `r knitr::asis_output("\U27A1")` rbiom
@@ -130,13 +122,13 @@ At the mothur command prompt, export a biom file.
 
 ```bash
 mothur > make.biom( \
-  shared=hmp50.asv.shared, \
-  constaxonomy=hmp50.taxonomy, \
-  metadata=hmp50.metadata, \
+  shared=hmp50_counts.asv.shared, \
+  constaxonomy=hmp50_taxonomy.tsv, \
+  metadata=hmp50_metadata.tsv, \
   output=simple )
 ```
 
-> *The `make.biom()` command creates a file named `'hmp50.asv.asv.biom'`.*
+> The `make.biom()` command creates a file named `'hmp50_counts.asv.asv.biom'`.
 
 In R, import the biom file with rbiom.
 
@@ -145,10 +137,11 @@ In R, import the biom file with rbiom.
 
 withr::with_dir(project_dir, {
 
-  biom <- as_rbiom('hmp50.asv.asv.biom')
+  biom <- as_rbiom('hmp50_counts.asv.asv.biom')
 
-  # Optionally add a tree
-  biom$tree <- 'hmp50.tree'
+  # Optionally add a tree and/or sequences
+  biom$tree <- 'hmp50_tree.nwk'
+  biom$seqs <- 'hmp50_seqs.fna'
   
 })
 ```
