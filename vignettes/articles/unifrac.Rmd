@@ -4,8 +4,8 @@ title: "UniFrac Algorithms"
 
 ```{css, echo=FALSE}
 
-.sourceCode      { display: none;   }
-.MathJax_Display { font-size: 18px; }
+.sourceCode           { display: none;   }
+math[display="block"] { font-size: 22px; }
 
 img {
   background-color: #fff;
