@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,14 +126,8 @@ img {
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Catherine Lozupone and Rob Knight <a href="https://doi.org/10.1128/AEM.71.12.8228-8235.2005" class="external-link">originally
-described</a> the unique fraction (UniFrac) algorithm in 2005. After 20
-years of widespread adoption, software packages often generate different
-UniFrac distances for the same dataset, much to the frustration and
-confusion of their users.</p>
-<p>Here I’ll review the current set of algorithms out there, which
-software packages use them, and explain in detail how to calculate each
-variant of the UniFrac algorithm.</p>
+<p>Here I’ll review the different UniFrac algorithms and explain how to
+calculate them.</p>
 <p><br></p>
 </div>
 <div class="section level2">
@@ -337,7 +331,7 @@ The branch <strong>lengths</strong>.
 <a href="https://doi.org/10.1128/AEM.71.12.8228-8235.2005" class="external-link">Lozupone
 et al, 2005</a>: Unweighted UniFrac</li>
 <li>R Package <a href="https://cran.r-project.org/package=rbiom" class="external-link">rbiom</a>:
-<code>bdiv_matrix(weighted=FALSE)</code>
+<code>bdiv_matrix(bdiv = "unifrac", weighted=FALSE)</code>
 </li>
 <li>R Package <a href="https://doi.org/doi:10.18129/B9.bioc.phyloseq" class="external-link">phyloseq</a>:
 <code>UniFrac(weighted=FALSE)</code>
@@ -357,13 +351,13 @@ et al, 2005</a>: Unweighted UniFrac</li>
 <p>First, transform A and B into presence (1) and absence (0)
 indicators.</p>
 <table class="table center" style="width:75%"><tr>
-<td>
+<td style="border-width:0">
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>A</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>9</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>9</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>3</mn><mo stretchy="false" form="postfix">}</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>A</mi><mi>′</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
 A  &amp;= \{9, 0, 0, 0, 9, 6, 3, 3\} \\
 A' &amp;= \{1, 0, 0, 0, 1, 1, 1, 1\}
 \end{align*}</annotation></semantics></math></p>
 </td>
-<td>
+<td style="border-width:0">
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>B</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>7</mn><mo>,</mo><mn>5</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>8</mn><mo>,</mo><mn>8</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">}</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>B</mi><mi>′</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">}</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
 B  &amp;= \{7, 5, 1, 4, 2, 8, 8, 0\} \\
 B' &amp;= \{1, 1, 1, 1, 1, 1, 1, 0\}
@@ -389,7 +383,7 @@ U &amp;= 0.4545455
 <a href="https://doi.org/10.1128/AEM.01996-06" class="external-link">Lozupone et al,
 2007</a>: Raw Weighted UniFrac</li>
 <li>R Package <a href="https://cran.r-project.org/package=rbiom" class="external-link">rbiom</a>:
-<code>bdiv_matrix(weighted=TRUE, normalized=FALSE)</code>
+<code>bdiv_matrix(bdiv = "unifrac", weighted=TRUE, normalized=FALSE)</code>
 </li>
 <li>R Package <a href="https://doi.org/doi:10.18129/B9.bioc.phyloseq" class="external-link">phyloseq</a>:
 <code>UniFrac(weighted=TRUE, normalized=FALSE)</code>
@@ -411,14 +405,14 @@ W &amp;= 1.14
 \end{align*}</annotation></semantics></math></p>
 </div>
 <div class="section level2">
-<h2 id="normalized-weighted">Normalized Weighted<a class="anchor" aria-label="anchor" href="#normalized-weighted"></a>
+<h2 id="normalized">Normalized<a class="anchor" aria-label="anchor" href="#normalized"></a>
 </h2>
 <ul>
 <li>
 <a href="https://doi.org/10.1128/AEM.01996-06" class="external-link">Lozupone et al,
 2007</a>: Normalized Weighted UniFrac</li>
 <li>R Package <a href="https://cran.r-project.org/package=rbiom" class="external-link">rbiom</a>:
-<code>bdiv_matrix(weighted=TRUE, normalized=TRUE)</code>
+<code>bdiv_matrix(bdiv = "unifrac", weighted=TRUE, normalized=TRUE)</code>
 </li>
 <li>R Package <a href="https://doi.org/doi:10.18129/B9.bioc.phyloseq" class="external-link">phyloseq</a>:
 <code>UniFrac(weighted=TRUE, normalized=TRUE)</code>
@@ -535,7 +529,7 @@ G &amp;= 0.569754
 \end{align*}</annotation></semantics></math></p>
 </div>
 <div class="section level2">
-<h2 id="variance-adjusted-weighted">Variance Adjusted Weighted<a class="anchor" aria-label="anchor" href="#variance-adjusted-weighted"></a>
+<h2 id="variance-adjusted">Variance Adjusted<a class="anchor" aria-label="anchor" href="#variance-adjusted"></a>
 </h2>
 <ul>
 <li>

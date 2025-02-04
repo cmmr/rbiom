@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.13.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,15 +91,17 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># where to save the files</span></span>
+<span><span class="co"># where to save the files</span></span>
+<span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_counts</a></span><span class="op">(</span>  <span class="va">hmp50</span>, <span class="st">'hmp50_counts.tsv'</span>,   compat <span class="op">=</span> <span class="st">'qiime2'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'hmp50_taxonomy.tsv'</span>, compat <span class="op">=</span> <span class="st">'qiime2'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_metadata</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'hmp50_metadata.tsv'</span>, compat <span class="op">=</span> <span class="st">'qiime2'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_tree</a></span><span class="op">(</span>    <span class="va">hmp50</span>, <span class="st">'hmp50_tree.tre'</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>On the command line, convert files to QIIME 2 format (.qza).</p>
+<span><span class="fu">write_qiime2</span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hmp50</span>, dir <span class="op">=</span> <span class="va">project_dir</span>, prefix <span class="op">=</span> <span class="st">'hmp50_'</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><code>write_qiime2()</code> creates files named
+<code>'hmp50_counts.tsv'</code>, <code>'hmp50_metadata.tsv'</code>,
+<code>'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'</code>, and
+<code>'hmp50_seqs.fna'</code>.</p>
+</blockquote>
+<p><br> On the command line, convert files to QIIME 2 format (.qza).</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Convert classic BIOM table to HDF5</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">biom</span> convert <span class="at">-i</span> hmp50_counts.tsv <span class="at">-o</span> hmp50_counts.hdf5 <span class="at">--to-hdf5</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
@@ -118,40 +120,34 @@
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co"># Import phylogenetic tree</span></span>
 <span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="ex">qiime</span> tools import <span class="dt">\</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">--input-path</span> hmp50_tree.tre <span class="dt">\</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">--input-path</span> hmp50_tree.nwk <span class="dt">\</span></span>
 <span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  <span class="at">--type</span> <span class="st">'Phylogeny[Rooted]'</span> <span class="dt">\</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="at">--output-path</span> hmp50-tree.qza</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co"># Example: browsing metadata</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="ex">qiime</span> metadata tabulate <span class="dt">\</span></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  <span class="at">--m-input-file</span> hmp50_metadata.tsv <span class="dt">\</span></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  <span class="at">--o-visualization</span> hmp50-metadata-browser.qzv</span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co"># Example: running weighted unifrac</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="ex">qiime</span> diversity-lib weighted-unifrac <span class="dt">\</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>  <span class="at">--i-table</span> hmp50.qza <span class="dt">\</span></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  <span class="at">--i-phylogeny</span> hmp50-tree.qza <span class="dt">\</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  <span class="at">--o-distance-matrix</span> weighted-unifrac-dm.qza</span></code></pre></div>
-<blockquote>
-<p>The <code>'hmp50-metadata-browser.qzv'</code> file can be uploaded to
-<a href="https://view.qiime2.org/" class="external-link uri">https://view.qiime2.org/</a> to view its contents.</p>
-</blockquote>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="at">--output-path</span> hmp50-tree.qza</span></code></pre></div>
+<p>Examples: browsing metadata and running unifrac</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">qiime</span> diversity-lib weighted-unifrac <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">--i-table</span> hmp50-counts.qza <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">--i-phylogeny</span> hmp50-tree.qza <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">--o-distance-matrix</span> weighted-unifrac-dm.qza</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  </span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">qiime</span> metadata tabulate <span class="dt">\</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">--m-input-file</span> hmp50_metadata.tsv <span class="dt">\</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">--o-visualization</span> hmp50-metadata-browser.qzv</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># View .qza files with https://view.qiime2.org</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="qiime-2-rbiom">QIIME 2 ➡ rbiom<a class="anchor" aria-label="anchor" href="#qiime-2-rbiom"></a>
 </h3>
 <p>On the command line, export data files from QIIME 2.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Export a feature table, taxonomy, and tree</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-counts.qza   <span class="at">--output-path</span> .</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-taxonomy.qza <span class="at">--output-path</span> .</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-tree.qza     <span class="at">--output-path</span> .</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Export a feature table, taxonomy, and tree</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-counts.qza   <span class="at">--output-path</span> .</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-taxonomy.qza <span class="at">--output-path</span> .</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="ex">qiime</span> tools export <span class="at">--input-path</span> hmp50-tree.qza     <span class="at">--output-path</span> .</span></code></pre></div>
 <blockquote>
-<p><em>These commands create files named
-<code>'feature-table.biom'</code>, <code>'taxonomy.tsv'</code>, and
-<code>'tree.nwk'</code>.</em></p>
+<p>These commands create files named <code>'feature-table.biom'</code>,
+<code>'taxonomy.tsv'</code>, and <code>'tree.nwk'</code>.</p>
 </blockquote>
-<p>In R, import the data files into rbiom.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p><br> In R, import the data files into rbiom.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># project_dir = directory with relevant files</span></span>
 <span></span>
 <span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="op">{</span></span>
@@ -172,49 +168,52 @@
 <h3 id="rbiom-mothur">rbiom ➡ mothur<a class="anchor" aria-label="anchor" href="#rbiom-mothur"></a>
 </h3>
 <p>In R, export mothur-compatible files.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># where to save the files</span></span>
+<span><span class="co"># where to save the files</span></span>
+<span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_counts</a></span><span class="op">(</span>  <span class="va">hmp50</span>, <span class="st">'hmp50.count_table'</span>, compat <span class="op">=</span> <span class="st">'mothur'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_metadata</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'hmp50.metadata'</span>,    compat <span class="op">=</span> <span class="st">'mothur'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_taxonomy</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="st">'hmp50.taxonomy'</span>,    compat <span class="op">=</span> <span class="st">'mothur'</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/write_biom.html">write_tree</a></span><span class="op">(</span>    <span class="va">hmp50</span>, <span class="st">'hmp50.tree'</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>At the mothur command prompt, import the BIOM data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> make.shared<span class="er">(</span><span class="va">count</span><span class="op">=</span>hmp50.count_table, <span class="va">label</span><span class="op">=</span>asv<span class="kw">)</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> unifrac.unweighted<span class="er">(</span><span class="va">tree</span><span class="op">=</span>hmp50.tree, <span class="va">count</span><span class="op">=</span>hmp50.count_table<span class="kw">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/export.html">write_mothur</a></span><span class="op">(</span>biom <span class="op">=</span> <span class="va">hmp50</span>, dir <span class="op">=</span> <span class="va">project_dir</span>, prefix <span class="op">=</span> <span class="st">'hmp50_'</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
-<p><em>The <code>make.shared()</code> command creates files named
-<code>'hmp50.asv.list'</code> and
-<code>'hmp50.asv.shared'</code>.</em></p>
+<p><code><a href="../reference/export.html">write_mothur()</a></code> creates files named
+<code>'hmp50_counts.tsv'</code>, <code>'hmp50_metadata.tsv'</code>,
+<code>'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'</code>, and
+<code>'hmp50_seqs.fna'</code>.</p>
+</blockquote>
+<p><br> At the mothur command prompt, import the BIOM data.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> make.shared<span class="er">(</span><span class="va">count</span><span class="op">=</span>hmp50_counts.tsv, <span class="va">label</span><span class="op">=</span>asv<span class="kw">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> unifrac.unweighted<span class="er">(</span><span class="va">tree</span><span class="op">=</span>hmp50_tree.nwk, <span class="va">count</span><span class="op">=</span>hmp50_counts.tsv<span class="kw">)</span></span></code></pre></div>
+<blockquote>
+<p>The <code>make.shared()</code> command creates files named
+<code>'hmp50_counts.asv.list'</code> and
+<code>'hmp50_counts.asv.shared'</code>.</p>
 </blockquote>
 </div>
 <div class="section level3">
 <h3 id="mothur-rbiom">mothur ➡ rbiom<a class="anchor" aria-label="anchor" href="#mothur-rbiom"></a>
 </h3>
 <p>At the mothur command prompt, export a biom file.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> make.biom<span class="er">(</span> <span class="dt">\</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="va">shared</span><span class="op">=</span>hmp50.asv.shared, <span class="dt">\</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="va">constaxonomy</span><span class="op">=</span>hmp50.taxonomy, <span class="dt">\</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="va">metadata</span><span class="op">=</span>hmp50.metadata, <span class="dt">\</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="va">output</span><span class="op">=</span>simple <span class="kw">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">mothur</span> <span class="op">&gt;</span> make.biom<span class="er">(</span> <span class="dt">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="va">shared</span><span class="op">=</span>hmp50_counts.asv.shared, <span class="dt">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="va">constaxonomy</span><span class="op">=</span>hmp50_taxonomy.tsv, <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="va">metadata</span><span class="op">=</span>hmp50_metadata.tsv, <span class="dt">\</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="va">output</span><span class="op">=</span>simple <span class="kw">)</span></span></code></pre></div>
 <blockquote>
-<p><em>The <code>make.biom()</code> command creates a file named
-<code>'hmp50.asv.asv.biom'</code>.</em></p>
+<p>The <code>make.biom()</code> command creates a file named
+<code>'hmp50_counts.asv.asv.biom'</code>.</p>
 </blockquote>
 <p>In R, import the biom file with rbiom.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># project_dir = directory with relevant files</span></span>
 <span></span>
 <span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="op">{</span></span>
 <span></span>
-<span>  <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="st">'hmp50.asv.asv.biom'</span><span class="op">)</span></span>
+<span>  <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rbiom.html">as_rbiom</a></span><span class="op">(</span><span class="st">'hmp50_counts.asv.asv.biom'</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># Optionally add a tree</span></span>
-<span>  <span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">'hmp50.tree'</span></span>
+<span>  <span class="co"># Optionally add a tree and/or sequences</span></span>
+<span>  <span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="st">'hmp50_tree.nwk'</span></span>
+<span>  <span class="va">biom</span><span class="op">$</span><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="st">'hmp50_seqs.fna'</span></span>
 <span>  </span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -225,7 +224,7 @@
 <div class="section level3">
 <h3 id="rbiom-phyloseq">rbiom ➡ phyloseq<a class="anchor" aria-label="anchor" href="#rbiom-phyloseq"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># An rbiom object</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
@@ -235,7 +234,7 @@
 <div class="section level3">
 <h3 id="phyloseq-rbiom">phyloseq ➡ rbiom<a class="anchor" aria-label="anchor" href="#phyloseq-rbiom"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A phyloseq object</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">enterotype</span>, package <span class="op">=</span> <span class="st">'phyloseq'</span><span class="op">)</span></span>
 <span><span class="va">physeq</span> <span class="op">&lt;-</span> <span class="va">enterotype</span></span>
@@ -246,7 +245,7 @@
 <div class="section level3">
 <h3 id="rbiom-summarizedexperiment">rbiom ➡ SummarizedExperiment<a class="anchor" aria-label="anchor" href="#rbiom-summarizedexperiment"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># An rbiom object</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
@@ -256,7 +255,7 @@
 <div class="section level3">
 <h3 id="summarizedexperiment-rbiom">SummarizedExperiment ➡ rbiom<a class="anchor" aria-label="anchor" href="#summarizedexperiment-rbiom"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># `se` is a SummarizedExperiment object</span></span>
 <span></span>
 <span><span class="co"># Convert to rbiom object</span></span>
@@ -265,7 +264,7 @@
 <div class="section level3">
 <h3 id="rbiom-treesummarizedexperiment">rbiom ➡ TreeSummarizedExperiment<a class="anchor" aria-label="anchor" href="#rbiom-treesummarizedexperiment"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># An rbiom object</span></span>
 <span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">rbiom</span><span class="fu">::</span><span class="va"><a href="../reference/hmp50.html">hmp50</a></span></span>
 <span></span>
@@ -275,7 +274,7 @@
 <div class="section level3">
 <h3 id="treesummarizedexperiment-rbiom">TreeSummarizedExperiment ➡ rbiom<a class="anchor" aria-label="anchor" href="#treesummarizedexperiment-rbiom"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># `tse` is a TreeSummarizedExperiment object</span></span>
 <span></span>
 <span><span class="co"># Convert to rbiom object</span></span>
