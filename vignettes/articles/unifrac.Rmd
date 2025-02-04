@@ -4,7 +4,8 @@ title: "UniFrac Algorithms"
 
 ```{css, echo=FALSE}
 
-.sourceCode { display: none; }
+.sourceCode      { display: none;   }
+.MathJax_Display { font-size: 18px; }
 
 img {
   background-color: #fff;
@@ -56,7 +57,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Here I'll review the different UniFrac algorithms and explain how to calculate them.
+The different UniFrac algorithms are listed below, along with examples for calculating them.
 
 
 <br>
