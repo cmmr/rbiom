@@ -17,7 +17,7 @@ project_dir <- tempdir()
 
 write_qiime2(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
 ```
-> `write_qiime2()` creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
+> This command creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
 
 <br>
 On the command line, convert files to QIIME 2 format (.qza).
@@ -46,7 +46,7 @@ qiime tools import \
   --output-path hmp50-tree.qza
 ```
 
-Examples: browsing metadata and running unifrac
+Examples: running unifrac and browsing metadata
 ```bash
 qiime diversity-lib weighted-unifrac \
   --i-table hmp50-counts.qza \
@@ -56,7 +56,7 @@ qiime diversity-lib weighted-unifrac \
 qiime metadata tabulate \
   --m-input-file hmp50_metadata.tsv \
   --o-visualization hmp50-metadata-browser.qzv
-# View .qza files with https://view.qiime2.org
+# View .qzv files with https://view.qiime2.org
 ```
 
 
@@ -104,7 +104,7 @@ project_dir <- tempdir()
 
 write_mothur(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
 ```
-> `write_mothur()` creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
+> This command creates files named `'hmp50_counts.tsv'`, `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and `'hmp50_seqs.fna'`.
 
 <br>
 At the mothur command prompt, import the BIOM data.
