@@ -3,9 +3,12 @@
 \name{export}
 \alias{export}
 \alias{write_mothur}
+\alias{write_qiime2}
 \title{Export data to QIIME 2 or mothur.}
 \usage{
 write_mothur(biom, dir = tempfile(), prefix = "biom_")
+
+write_qiime2(biom, dir = tempfile(), prefix = "biom_")
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
