@@ -615,11 +615,11 @@ write_mothur <- function (biom, dir = tempfile(), prefix = 'biom_') {
   if (ncol(biom$metadata) > 1)
     write_wrapper(file.path(dir, paste0(prefix, 'metadata.tsv')), function (con) {
       
-      tbl <- as_rbiom(biom)$metadata %>%
-        dplyr::rename(group = .sample) %>%
-        dplyr::mutate(group = as.character(group))
+      tbl <- as_rbiom(biom)$metadata
       
       colnames(tbl) %<>% gsub('[\\s\\t\\n]+', '_', ., perl = TRUE)
+      colnames(tbl)[[1]] <- 'group'
+      tbl[[1]] %<>% as.character()
       
       for (i in seq_len(ncol(tbl)))
         if (is.factor(tbl[[i]])) {
@@ -636,6 +636,9 @@ write_mothur <- function (biom, dir = tempfile(), prefix = 'biom_') {
 }
 
 
+
+#' @rdname export
+#' @export
 
 write_qiime2 <- function (biom, dir = tempfile(), prefix = 'biom_') {
   
