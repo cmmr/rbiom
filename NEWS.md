@@ -1,6 +1,7 @@
 
-# rbiom 2.0.13.9000
+# rbiom 2.0.14
 
+* `unifrac()` no longer normalizes weighted values, for back-compatibility.
 * Option `underscores` allows keeping underscores in tree IDs.
 
 

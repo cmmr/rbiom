@@ -441,10 +441,16 @@ tips <- function (x) {
 #' @rdname rbiom-deprecated
 #' @section \code{unifrac}:
 #' Use [bdiv_distmat()] or [bdiv_table()] instead.
+#' For `weighted=TRUE`, returns non-normalized values.
 #' @export
 unifrac <- function (biom, weighted=TRUE, tree=NULL) {
   lifecycle::deprecate_soft("2.0.0", "unifrac()", "bdiv_distmat()")
-  bdiv_distmat(biom = biom, bdiv = "unifrac", weighted = weighted, tree = tree)
+  bdiv_distmat(
+    biom       = biom, 
+    bdiv       = "unifrac", 
+    weighted   = weighted, 
+    tree       = tree, 
+    normalized = FALSE )
 }
 
 
