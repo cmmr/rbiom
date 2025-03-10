@@ -348,6 +348,7 @@ Use \code{tree$tip.label} instead.
 \section{\code{unifrac}}{
 
 Use \code{\link[=bdiv_distmat]{bdiv_distmat()}} or \code{\link[=bdiv_table]{bdiv_table()}} instead.
+For \code{weighted=TRUE}, returns non-normalized values.
 }
 
 \section{\code{write.biom}}{
