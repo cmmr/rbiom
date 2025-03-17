@@ -1,3 +1,8 @@
+# rbiom 2.1.1.9001
+
+* Restore `rline` functionality in `rare_corrplot()`.
+
+
 # rbiom 2.1.1
 
 * `unifrac()` no longer normalizes weighted values, for back-compatibility.

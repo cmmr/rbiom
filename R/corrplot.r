@@ -65,7 +65,7 @@
 #'       layers   = "trend" )
 
 stats_corrplot <- function (
-    df, x, y = attr(df, 'response'), layers = "tc", 
+    df, x, y = attr(df, 'response'), layers = "tc", rline = TRUE, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
     p.top = Inf, alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
@@ -326,14 +326,14 @@ rare_corrplot <- function (
       
       plyr::ldply(rLvls, .id = ".depth", function (rLvl) {
         adiv_table(
-          biom  = rarefy(biom, depth = rLvl),
-          adiv  = adiv,
-          md    = c(stat.by, facet.by), 
+          biom      = rarefy(biom, depth = rLvl),
+          adiv      = adiv,
+          md        = c(stat.by, facet.by), 
           transform = transform )
       })
       
     })
-    remove("rline", "biom", "adiv", "transform")
+    remove("biom", "adiv", "transform")
     
     
     #________________________________________________________
