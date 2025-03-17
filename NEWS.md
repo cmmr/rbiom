@@ -1,4 +1,4 @@
-# rbiom 2.1.1.9001
+# rbiom 2.1.1.9002
 
 * Restore `rline` functionality in `rare_corrplot()`.
 

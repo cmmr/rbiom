@@ -9,7 +9,6 @@ stats_corrplot(
   x,
   y = attr(df, "response"),
   layers = "tc",
-  rline = TRUE,
   stat.by = NULL,
   facet.by = NULL,
   colors = TRUE,
@@ -42,11 +41,6 @@ Default: \code{attr(df, 'response')}}
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.
 Default: \code{"tc"}}
-
-\item{rline}{Where to draw a horizontal line on the plot, intended to show
-a particular rarefaction depth. Set to \code{TRUE} to show an
-auto-selected rarefaction depth or \code{FALSE} to not show a line.
-Default: \code{NULL}}
 
 \item{stat.by}{Dataset field with the statistical groups. Must be
 categorical. Default: \code{NULL}}

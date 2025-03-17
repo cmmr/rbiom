@@ -65,7 +65,7 @@
 #'       layers   = "trend" )
 
 stats_corrplot <- function (
-    df, x, y = attr(df, 'response'), layers = "tc", rline = TRUE, 
+    df, x, y = attr(df, 'response'), layers = "tc", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
     p.top = Inf, alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
@@ -108,6 +108,11 @@ stats_corrplot <- function (
     validate_var_range('mu',    n = 1)
     
     validate_bool('caption')
+    
+    if (!is.null(.dots$rline)) {
+      rline <- .dots$rline
+      .dots$rline <- NULL
+    }
     
   })
   
