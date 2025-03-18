@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.1.1.9002
+Version: 2.1.2
 Date: 2025-03-17
 Authors@R: c(
     person(

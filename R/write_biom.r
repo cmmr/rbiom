@@ -187,7 +187,7 @@ write_biom_json <- function (biom, file) {
           dat[['sequence']] <- biom$sequences[[otu]]
         
         list(id=otu, metadata=dat)
-      }),
+      }) |> setNames(NULL),
       
       
       # Sample IDs and Metadata
@@ -197,7 +197,7 @@ write_biom_json <- function (biom, file) {
         list(
           id       = row[[1]], 
           metadata = if (length(row) > 1) row[-1] else NULL )
-      }),
+      }) |> setNames(NULL),
       
       
       # Read counts
@@ -207,7 +207,9 @@ write_biom_json <- function (biom, file) {
         SIMPLIFY = FALSE, 
         biom$counts$i - 1, 
         biom$counts$j - 1, 
-        biom$counts$v )
+        biom$counts$v
+      ) |> setNames(NULL)
+      
     ))
   
   

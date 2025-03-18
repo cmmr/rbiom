@@ -1,5 +1,6 @@
-# rbiom 2.1.1.9002
+# rbiom 2.1.2
 
+* Fix for `write_biom(format='json')` where `{...}` should be `[...]`.
 * Restore `rline` functionality in `rare_corrplot()`.
 
 
