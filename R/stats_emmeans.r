@@ -121,6 +121,7 @@ stats_emmeans <- function (
   
   func     <- NULL
   pairwise <- NULL
+  .pairs   <- P('graphics::pairs')
   
   if (is.null(regr) && is.null(stat.by)) {
     
@@ -280,7 +281,7 @@ stats_emmeans <- function (
         as.data.frame()
       
       emm %>% 
-        pairs(simple = '.stat.by') %>%
+        .pairs(simple = '.stat.by') %>%
         as.data.frame() %>% 
         with(tibble(
           !!stat.by   := contrast, 
@@ -360,7 +361,7 @@ stats_emmeans <- function (
         as.data.frame()
       
       stats <- emm %>% 
-        pairs(simple = '.stat.by') %>%
+        .pairs(simple = '.stat.by') %>%
         as.data.frame() %>% 
         with(tibble(
           !!regr      := .regr, 
@@ -481,6 +482,7 @@ stats_emtrends <- function (
   
   func     <- NULL
   pairwise <- NULL
+  .pairs   <- P('graphics::pairs')
   
   if (is.null(stat.by)) {
     
@@ -609,7 +611,7 @@ stats_emtrends <- function (
         as.data.frame()
       
       stats <- emt %>% 
-        pairs() %>%
+        .pairs() %>%
         as.data.frame() %>% 
         with(tibble(
           !!regr      := at, 

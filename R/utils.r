@@ -86,7 +86,7 @@ eval_envir <- function (env, ...) {
           'regr', 'resp' ))))
     
     if (nzchar(invalid)) {
-      fn <- attr(rlang::caller_fn(), 'fn') %||% "function"
+      fn <- attr(rlang::caller_fn(), 'display') %||% "function"
       cli_abort(c(x = "{fn} does not accept parameter(s): {invalid}"))
     }
     
@@ -125,18 +125,21 @@ as_rbiom_tbl <- function (df) {
 # Explicitly define the code to be displayed in cmd
 #____________________________________________________________________
 as.cmd <- function (expr, env=NULL) {
+  
   if (is_null(env)) {
     expr <- substitute(expr)
-    cmd  <- capture.output(expr)
   } else {
     expr <- do.call(substitute, list(expr=substitute(expr), env=env))
-    cmd  <- capture.output(expr)
   }
   
-  if (length(cmd) > 1)
-    cmd <- paste(trimws(cmd), collapse = " ")
+  res <- eval(expr)
+  cmd <- capture.output(expr)
   
-  structure(eval(expr), 'display' = cmd)
+  if (length(cmd) > 1) cmd <- paste(trimws(cmd), collapse = " ")
+  
+  attr(res, 'display') <- cmd
+  
+  return (res)
 }
 
 
@@ -190,20 +193,20 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
     
     display <- attr(val, 'display', exact = TRUE)
     
-    val <- if (is_null(val))          { "NULL"
-    } else if (!is_null(display))     { display
-    } else if (is_character(val))     { double_quote(val) 
-    } else if (is_logical(val))       { as.character(val) %>% setNames(names(val))
-    } else if (is.numeric(val))       { as.character(val) %>% setNames(names(val))
-    } else if (inherits(val, 'quosures'))   { as.character(val)
-    } else if (inherits(val, 'rbiom'))      { "biom"
-    } else if (is.data.frame(val))    { "data"
-    } else if (inherits(val, 'formula'))    { format(val)
-    } else if (is.function(val))      { fun_toString(val)
-    } else if (inherits(val, 'uneval'))     { aes_toString(val)
-    } else if (is.factor(val))        { as.character(val) %>% setNames(names(val))
-    } else if (is_list(val))          { paste0("list(", as.args(val), ")")
-    } else                            { capture.output(val) }
+    val <- if (is_null(val))              { "NULL"
+    } else if (!is_null(display))         { display
+    } else if (is_character(val))         { double_quote(val) 
+    } else if (is_logical(val))           { as.character(val) %>% setNames(names(val))
+    } else if (is.numeric(val))           { as.character(val) %>% setNames(names(val))
+    } else if (inherits(val, 'quosures')) { as.character(val)
+    } else if (inherits(val, 'rbiom'))    { "biom"
+    } else if (is.data.frame(val))        { "data"
+    } else if (inherits(val, 'formula'))  { format(val)
+    } else if (is.function(val))          { fun_toString(val)
+    } else if (inherits(val, 'uneval'))   { aes_toString(val)
+    } else if (is.factor(val))            { as.character(val) %>% setNames(names(val))
+    } else if (is_list(val))              { paste0("list(", as.args(val), ")")
+    } else                                { capture.output(val) }
     
     
     if (isTRUE(is_character(val) && !is_null(names(val))))
@@ -248,7 +251,7 @@ fun_toString <- function (x) {
   chr <- paste0(capture.output(x), collapse = "")
   if (nchar(chr) < 50) return (chr)
   
-  return ("_Custom_Function")
+  return ("Custom_Function")
 }
 
 
@@ -373,7 +376,7 @@ loglabels <- function (values) {
   list(
     'breaks'       = as.cmd(10 ** (0:hi),                    env = list(hi = hi)),
     'minor_breaks' = as.cmd(as.vector(2:9 %o% 10 ** (0:hi)), env = list(hi = hi - 1)),
-    'labels'       = label_number(scale_cut = cut_si("")) )
+    'labels'       = scales::label_number(scale_cut = scales::cut_si("")) )
 }
 
 # siunit <- function (x) {

@@ -189,6 +189,17 @@ taxa_stacked <- function (
   
   
   #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .element_blank <- P('ggplot2::element_blank')
+  .element_text  <- P('ggplot2::element_text')
+  .unit          <- P('grid::unit')
+  .label_number  <- P('scales::label_number')
+  .cut_si        <- P('scales::cut_si')
+  
+  
+  
+  #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
   init_layers(params, do_init = "stack")
@@ -242,7 +253,7 @@ taxa_stacked <- function (
           no   = "Labeled by {label.by} and ordered by {order.by}." )
       }
     )))
-  set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+  set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
   
   
   #________________________________________________________
@@ -268,8 +279,8 @@ taxa_stacked <- function (
     set_layer(
       params = params, 
       layer  = 'theme', 
-      'panel.grid'  = element_blank(),
-      'plot.margin' = as.cmd(unit(c(1,1,1,1), "lines")) )
+      'panel.grid'  = .element_blank(),
+      'plot.margin' = .unit(c(1,1,1,1), "lines") )
     
     
   } else {
@@ -284,13 +295,13 @@ taxa_stacked <- function (
       layer  = 'yaxis', 
       'expand' = c(0, 0, 0.02, 0),
       'breaks' = with(params, base::pretty(.ggdata[[.ycol]])),
-      'labels' = label_number(scale_cut = cut_si("")) )
+      'labels' = .label_number(scale_cut = .cut_si("")) )
     
     set_layer(
       params = params, 
       layer  = 'theme',
-      'panel.grid.major.x' = element_blank(),
-      'panel.grid.minor.y' = element_blank() )
+      'panel.grid.major.x' = .element_blank(),
+      'panel.grid.minor.y' = .element_blank() )
   }
   
   
@@ -321,9 +332,9 @@ taxa_stacked <- function (
   remove("legend_title")
   
   if (isTRUE(params$xlab.angle == 30)) {
-    set_layer(params, 'theme', 'axis.text.x' = element_text(angle=-30, vjust=1, hjust=0))
+    set_layer(params, 'theme', 'axis.text.x' = .element_text(angle=-30, vjust=1, hjust=0))
   } else {
-    set_layer(params, 'theme', 'axis.text.x' = element_text(angle=-90, vjust=0.3, hjust=0))
+    set_layer(params, 'theme', 'axis.text.x' = .element_text(angle=-90, vjust=0.3, hjust=0))
   }
     
   

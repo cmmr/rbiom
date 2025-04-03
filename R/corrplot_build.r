@@ -234,7 +234,8 @@ corrplot_build <- function (params) {
   #________________________________________________________
   # Theming specific to a numeric x-axis.
   #________________________________________________________
-  set_layer(params, 'theme', panel.grid.minor.x = element_blank())
+  .element_blank <- P('ggplot2::element_blank')
+  set_layer(params, 'theme', panel.grid.minor.x = .element_blank())
   
   
   

@@ -199,6 +199,16 @@ bdiv_ord_plot <- function (
   }
   
   
+  #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .element_blank    <- P('ggplot2::element_blank')
+  .element_rect     <- P('ggplot2::element_rect')
+  .element_markdown <- P('ggtext::element_markdown')
+  .arrow            <- P('grid::arrow')
+  .unit             <- P('grid::unit')
+  .alpha            <- P('scales::alpha')
+  
   
   #________________________________________________________
   # Default aes and non-aes parameters
@@ -246,7 +256,7 @@ bdiv_ord_plot <- function (
       'alpha'        = 0.4,
       'color'        = "darkgray", 
       'linewidth'    = 0.75, 
-      'arrow'        = arrow(ends="first", length=unit(.5,"cm")),
+      'arrow'        = .arrow(ends="first", length=.unit(.5,"cm")),
       'mapping|xend' = ".xend",
       'mapping|yend' = ".yend" )
   
@@ -255,7 +265,7 @@ bdiv_ord_plot <- function (
       params = params, 
       layer  = 'taxon', 
       'show.legend'        = FALSE,
-      'fill'               = alpha(c("white"), 0.8),
+      'fill'               = .alpha(c("white"), 0.8),
       'box.padding'        = 1,
       'segment.curvature'  = -0.1, 
       'segment.linetype'   = 8, 
@@ -268,12 +278,12 @@ bdiv_ord_plot <- function (
   set_layer(
     params = params, 
     layer  = 'theme', 
-    'axis.text'        = element_blank(),
-    'axis.ticks'       = element_blank(),
-    'panel.border'     = element_rect(color = "black", fill = FALSE, linewidth = 1),
-    'panel.grid.major' = element_blank(),
-    'panel.grid.minor' = element_blank(),
-    'panel.background' = element_rect(fill = "white"))
+    'axis.text'        = .element_blank(),
+    'axis.ticks'       = .element_blank(),
+    'panel.border'     = .element_rect(color = "black", fill = FALSE, linewidth = 1),
+    'panel.grid.major' = .element_blank(),
+    'panel.grid.minor' = .element_blank(),
+    'panel.background' = .element_rect(fill = "white"))
   
   
   #________________________________________________________
@@ -365,6 +375,10 @@ ordination_facets <- function (params) {
   sample_stats <- params$.plot_attrs$stats
   taxa_coords  <- attr(ggdata, 'taxa_coords',  exact = TRUE)
   ranks        <- params$rank
+  
+  .element_blank    <- P('ggplot2::element_blank')
+  .element_text     <- P('ggplot2::element_text')
+  .element_markdown <- P('ggtext::element_markdown')
   
   
   #________________________________________________________
@@ -464,7 +478,7 @@ ordination_facets <- function (params) {
     
     if (length(unique(stats_text)) == 1) {
       set_layer(params, 'labs',  subtitle = stats_text[[1]])
-      set_layer(params, 'theme', plot.subtitle = element_markdown(size = 11))
+      set_layer(params, 'theme', plot.subtitle = .element_markdown(size = 11))
       
     } else {
       df[['.facet']] <- bool_switch(
@@ -485,7 +499,7 @@ ordination_facets <- function (params) {
           params$test,
           params$permutations ))
       
-      set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+      set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     }
     
   }
@@ -532,8 +546,8 @@ ordination_facets <- function (params) {
     set_layer(
       params = params, 
       layer  = 'theme',
-      'strip.background' = element_blank(),
-      'strip.text'       = element_markdown(hjust=0) )
+      'strip.background' = .element_blank(),
+      'strip.text'       = .element_markdown(hjust=0) )
     
     if (!is.null(taxa_coords <- attr(df, 'taxa_coords', exact = TRUE))) {
       taxa_coords[['.facet']] %<>% factor(levels = levels(df[['.facet']]))

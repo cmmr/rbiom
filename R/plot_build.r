@@ -13,17 +13,31 @@ plot_build <- function (params) {
   stopifnot(inherits(ggdata, 'data.frame'))
   
   
+  #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .ggplot        <- P('ggplot2::ggplot')
+  .geom_text     <- P('ggplot2::geom_text')
+  .theme_void    <- P('ggplot2::theme_void')
+  .element_blank <- P('ggplot2::element_blank')
+  .trans_new     <- P('scales::trans_new')
+  .label_number  <- P('scales::label_number')
+  .cut_si        <- P('scales::cut_si')
+  
+  
   #______________________________________________________________
   # Return a placeholder plot if no data is present
   #______________________________________________________________
   if (nrow(ggdata) == 0) {
-    p <- ggplot() + 
-      geom_text(mapping = aes(x=1,y=1), label="No Data to Display") + 
-      theme_void()
+    
+    p <- .ggplot() + 
+      .geom_text(mapping = aes(x=1,y=1), label="No Data to Display") + 
+      .theme_void()
     p$plot_env <- emptyenv()
     attr(p, 'facet.nrow')  <- 1
     attr(p, 'facet.ncol')  <- 1
     attr(p, 'facet.count') <- 1
+    
     return (p)
   }
   
@@ -39,16 +53,17 @@ plot_build <- function (params) {
   #________________________________________________________
   # Theme arguments
   #________________________________________________________
-  set_layer(params, 'theme', text=element_text('size' = 14))
+  .element_text <- P('ggplot2::element_text')
+  set_layer(params, 'theme', text=.element_text('size' = 14))
   
   
   #______________________________________________________________
   # Suppress vertical gridlines (horizontal if flipped).
   #______________________________________________________________
   if (isTRUE(params$flip)) {
-    set_layer(params, 'theme', panel.grid.major.y = element_blank())
+    set_layer(params, 'theme', panel.grid.major.y = .element_blank())
   } else {
-    set_layer(params, 'theme', panel.grid.major.x = element_blank())
+    set_layer(params, 'theme', panel.grid.major.x = .element_blank())
   }
   
   
@@ -78,7 +93,7 @@ plot_build <- function (params) {
     # Change 10000 to 10k for log scales.
     #______________________________________________________________
     if (isTRUE(xy_transform %in% c("log", "log10", "log1p")))
-      set_layer(params, layer, labels = label_number(scale_cut = cut_si("")))
+      set_layer(params, layer, labels = .label_number(scale_cut = .cut_si("")))
     
     
     
@@ -87,25 +102,25 @@ plot_build <- function (params) {
     #______________________________________________________________
     if (eq(xy_transform, "log1p") && isTRUE(params$stripe)) {
       
-      params$layers[[layer]][['transform']] <- trans_new(
+      params$layers[[layer]][['transform']] <- .trans_new(
         name      = paste0(axis, "_log1p"), 
         transform = function (y) { y[is.finite(y)] <- base::log1p(y[is.finite(y)]); return (y); }, 
-        inverse   = as.cmd(base::expm1) )
+        inverse   = P('base::expm1') )
     
     } else if (eq(xy_transform, "sqrt")) {
       
       if (isTRUE(params$stripe)) {
         
-        params$layers[[layer]][['transform']] <- trans_new(
+        params$layers[[layer]][['transform']] <- .trans_new(
           name      = paste0(axis, "_sqrt"), 
           transform = function (y) { y[is.finite(y)] <- base::sqrt(y[is.finite(y)]); return (y); }, 
           inverse   = function (y) ifelse(y<0, 0, y^2) )
         
       } else {
         
-        params$layers[[layer]][['transform']] <- trans_new(
+        params$layers[[layer]][['transform']] <- .trans_new(
           name      = paste0(axis, "_sqrt"), 
-          transform = as.cmd(base::sqrt), 
+          transform = P('base::sqrt'), 
           inverse   = function (y) ifelse(y<0, 0, y^2) )
       }  
       
@@ -260,7 +275,7 @@ plot_build <- function (params) {
     
     fun  <- layers[[layer]][['fun']]
     args <- layers[[layer]][['args']]
-    fn   <- attr(fun, 'fn', exact = TRUE)
+    fn   <- attr(fun, 'display')
     
     
     # Skip theme() unless it has arguments
@@ -272,7 +287,7 @@ plot_build <- function (params) {
     
     # Show ggplot() layer as "ggplot(data)", rest more verbosely
     #______________________________________________________________
-    if (fn == "ggplot") {
+    if (identical(fn, "ggplot")) {
       
       args[['data']] <- structure(ggdata, display = "data")
       p    <- do.call(fun, args) 

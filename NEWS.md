@@ -1,3 +1,8 @@
+# rbiom 2.1.3
+
+* Satisfy new R CMD check for not changing built-in function attributes. #28
+
+
 # rbiom 2.1.2
 
 * Fix for `write_biom(format='json')` where `{...}` should be `[...]`.

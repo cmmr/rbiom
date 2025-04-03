@@ -122,9 +122,11 @@ corrplot_stats <- function (params) {
   
   
   if (isTRUE(params$caption)) {
-
+    
+    .element_text <- P('ggplot2::element_text')
+    
     # element_markdown
-    set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+    set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     set_layer(params, 'labs', .overwrite = TRUE, caption = local({
       
       curr <- params$layers$labs$caption
@@ -184,7 +186,7 @@ corrplot_stats <- function (params) {
   #       fm %<>% paste(sep = " + ", capture.output(as.symbol(i)))
   #     args[['formula']] <- structure(fm, display = fm)
   #
-  #     str <- sprintf("%s(%s)", attr(fun, "fn", exact = TRUE), as.args(args, fun = fun))
+  #     str <- sprintf("%s(%s)", attr(fun, 'display'), as.args(args, fun = fun))
   #
   #     # Ensure that nothing in the formula is interpreted as markdown syntax.
   #     entities <- c(

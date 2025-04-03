@@ -130,7 +130,7 @@ dendro <- function (hc, bounds=c(0, 1), side = "top") {
   #________________________________________________________
   # geom_segments
   #________________________________________________________
-  fn <- function (i, prev_ht = NULL) {
+  func <- function (i, prev_ht = NULL) {
     
     if (i < 0) {
       x <- which(hc[['order']] == abs(i))
@@ -138,8 +138,8 @@ dendro <- function (hc, bounds=c(0, 1), side = "top") {
     }
     
     ht   <- hc[['height']][[i]]
-    df1  <- fn(hc[['merge']][i,1], ht)
-    df2  <- fn(hc[['merge']][i,2], ht)
+    df1  <- func(hc[['merge']][i,1], ht)
+    df2  <- func(hc[['merge']][i,2], ht)
     x    <- (df1[1,'x'] + df1[1,'xend']) / 2
     xend <- (df2[1,'x'] + df2[1,'xend']) / 2
     
@@ -157,7 +157,7 @@ dendro <- function (hc, bounds=c(0, 1), side = "top") {
     return (rbind(df, rbind(df1, df2)))
   }
   
-  df <- fn(nrow(hc[['merge']]))
+  df <- func(nrow(hc[['merge']]))
   
   if (side %in% c("bottom", "right")) {
     df[['yend']] <- 1 - df[['yend']]

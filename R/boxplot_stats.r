@@ -357,7 +357,9 @@ boxplot_stats <- function (params) {
   
   if (isTRUE(params$caption)) {
     
-    set_layer(params, 'theme', plot.caption = element_text(size = 9, face = "italic"))
+    .element_text <- P('ggplot2::element_text')
+    
+    set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     set_layer(params, 'labs',  caption      = local({
       
       test <- switch(

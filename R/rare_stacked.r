@@ -120,6 +120,15 @@ rare_stacked <- function (
   })
   
   
+  #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .element_blank <- P('ggplot2::element_blank')
+  .element_text  <- P('ggplot2::element_text')
+  .label_number  <- P('scales::label_number')
+  .cut_si        <- P('scales::cut_si')
+  
+  
   
   #________________________________________________________
   # Initialize the `layers` object.
@@ -136,17 +145,17 @@ rare_stacked <- function (
   remove("xmin", "xmax", "ymin", "ymax")
   
   set_layer(params, 'yaxis', expand = c(0,0))
-  set_layer(params, 'theme', panel.grid.major.x = element_blank())
+  set_layer(params, 'theme', panel.grid.major.x = .element_blank())
   
   if (is.null(params$y.transform)) {
-    set_layer(params, 'yaxis', labels = label_number(scale_cut = cut_si("")))
+    set_layer(params, 'yaxis', labels = .label_number(scale_cut = .cut_si("")))
   } else if (params$y.transform == 'log10') {
     set_layer(params, 'yaxis', c(loglabels(params$.ss), transform = 'log10'))
   }
   
   if (isTRUE(labels)) {
     set_layer(params, 'point', mapping     = list(x = ".x"), y = 1, alpha = 0)
-    set_layer(params, 'theme', axis.text.x = element_text(angle=-30, vjust=1, hjust=0) )
+    set_layer(params, 'theme', axis.text.x = .element_text(angle=-30, vjust=1, hjust=0) )
     set_layer(params, 'labs',  x = NULL)
   }
   
@@ -182,7 +191,7 @@ rare_stacked <- function (
         return (paste0(samples_retained, "\n", reads_retained))
       }))
       
-      set_layer(params, 'theme', plot.subtitle = element_text(size=10)) 
+      set_layer(params, 'theme', plot.subtitle = .element_text(size=10)) 
     }
       
     remove("rline", "ss")

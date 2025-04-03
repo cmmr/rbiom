@@ -76,6 +76,7 @@ read_biom <- function (src, ...) {
     #___________________#
     
     require_package('rhdf5', 'to read HDF5 formatted BIOM files')
+    
     if (!H5Fis_hdf5(fp))
       cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
     

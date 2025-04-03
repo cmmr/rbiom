@@ -151,15 +151,38 @@ plot_heatmap <- function (
   
   
   #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .ggplot             <- P('ggplot2::ggplot')
+  .coord_fixed        <- P('ggplot2::coord_fixed')
+  .labs               <- P('ggplot2::labs')
+  .geom_raster        <- P('ggplot2::geom_raster')
+  .scale_x_discrete   <- P('ggplot2::scale_x_discrete')
+  .scale_y_discrete   <- P('ggplot2::scale_y_discrete')
+  .annotate           <- P('ggplot2::annotate')
+  .geom_segment       <- P('ggplot2::geom_segment')
+  .geom_tile          <- P('ggplot2::geom_tile')
+  .element_text       <- P('ggplot2::element_text')
+  .theme              <- P('ggplot2::theme')
+  .theme_void         <- P('ggplot2::theme_void')
+  .new_scale_fill     <- P('ggnewscale::new_scale_fill')
+  .element_rect       <- P('ggplot2::element_rect')
+  .margin             <- P('ggplot2::margin')
+  .scale_x_continuous <- P('ggplot2::scale_x_continuous')
+  .scale_y_continuous <- P('ggplot2::scale_y_continuous')
+  .unit               <- P('grid::unit')
+  
+  
+  #________________________________________________________
   # Setting legend = "bottom" tiggers a bunch of presets
   #________________________________________________________
   if (eq(legend, "bottom")) {
     legend <- list(nrow = 2, title.position = "top")
     theme_args[['legend.box']]        %<>% if.null("horizontal")
     theme_args[['legend.position']]   %<>% if.null("bottom")
-    theme_args[['legend.background']] %<>% if.null(element_rect(color = "black"))
-    theme_args[['legend.margin']]     %<>% if.null(margin(6,12,6,12,"points"))
-    theme_args[['legend.box.margin']] %<>% if.null(margin(6,6,6,6,"points"))
+    theme_args[['legend.background']] %<>% if.null(.element_rect(color = "black"))
+    theme_args[['legend.margin']]     %<>% if.null(.margin(6,12,6,12,"points"))
+    theme_args[['legend.box.margin']] %<>% if.null(.margin(6,6,6,6,"points"))
   }
   
   
@@ -236,10 +259,12 @@ plot_heatmap <- function (
     n_left <- sum(sapply(tracks, function (x) is.list(x) && eq(x[['side']], 'left')))
     n_top  <- length(tracks) - n_left
   }
+  .c   <- P('base::c')
+  .rep <- P('base::rep')
   if (isTRUE(n_left > 0)) label_size_x <- .c(.rep(10, n_left), .rep(label_size_x, ncol(mtx)))
   if (isTRUE(n_top  > 0)) label_size_y <- .c(.rep(10, n_top),  .rep(label_size_y, nrow(mtx)))
-  label_size_x <- unit(label_size_x, "points")
-  label_size_y <- unit(label_size_y, "points")
+  label_size_x <- .unit(label_size_x, "points")
+  label_size_y <- .unit(label_size_y, "points")
   
   
   
@@ -425,11 +450,11 @@ plot_heatmap <- function (
   # Assemble the layers for the ggplot
   #________________________________________________________
   gglayers <- list()
-  gglayers %<>% ggpush(ggplot(df))
-  gglayers %<>% ggpush(coord_fixed(ratio=asp))
+  gglayers %<>% ggpush(.ggplot(df))
+  gglayers %<>% ggpush(.coord_fixed(ratio=asp))
   
   if (!is.null(title))
-    gglayers %<>% ggpush(labs(title=title))
+    gglayers %<>% ggpush(.labs(title=title))
   
   
   #________________________________________________________
@@ -438,22 +463,22 @@ plot_heatmap <- function (
   if (length(all_tracks) == 0) {
     
     x <- y <- fill <- NULL # for CRAN check only
-    gglayers %<>% ggpush(geom_raster(aes(x=x, y=y, fill=fill)))
+    gglayers %<>% ggpush(.geom_raster(aes(x=x, y=y, fill=fill)))
     remove("x", "y", "fill")
     
     if (isFALSE(label_cols))
-      gglayers %<>% ggpush(scale_x_discrete(breaks = NULL))
+      gglayers %<>% ggpush(.scale_x_discrete(breaks = NULL))
     
     if (isTRUE(label_rows)) {
-      gglayers %<>% ggpush(scale_y_discrete(position = 'right'))
+      gglayers %<>% ggpush(.scale_y_discrete(position = 'right'))
     } else {
-      gglayers %<>% ggpush(scale_y_discrete(breaks = NULL))
+      gglayers %<>% ggpush(.scale_y_discrete(breaks = NULL))
     }
     
   } else {
     
     x <- y <- fill <- NULL # for CRAN check only
-    gglayers %<>% ggpush(geom_raster(aes(x=as.numeric(x), y=as.numeric(y), fill=fill)))
+    gglayers %<>% ggpush(.geom_raster(aes(x=as.numeric(x), y=as.numeric(y), fill=fill)))
     remove("x", "y", "fill")
     
     
@@ -543,8 +568,8 @@ plot_heatmap <- function (
     if (!is_null(xlabels)) x_args %<>% c(list(labels = xlabels, breaks = xbreaks))
     if (!is_null(ylabels)) y_args %<>% c(list(labels = ylabels, breaks = ybreaks, position = "right"))
     
-    gglayers %<>% ggpush(do.call(scale_x_continuous, x_args))
-    gglayers %<>% ggpush(do.call(scale_y_continuous, y_args))
+    gglayers %<>% ggpush(do.call(.scale_x_continuous, x_args))
+    gglayers %<>% ggpush(do.call(.scale_y_continuous, y_args))
     
     remove("xlabels", "xbreaks", "ylabels", "ybreaks", "x_args", "y_args")
     
@@ -555,7 +580,7 @@ plot_heatmap <- function (
   #________________________________________________________
   # Outline around the main grid
   #________________________________________________________
-  gglayers %<>% ggpush(annotate(
+  gglayers %<>% ggpush(.annotate(
     geom      = "rect", 
     xmin      = 0.5, 
     xmax      = ncol(mtx) + 0.5, 
@@ -594,7 +619,7 @@ plot_heatmap <- function (
     
     xend <- yend <- NULL # for CRAN check only
     
-    gglayers %<>% ggpush(geom_segment( 
+    gglayers %<>% ggpush(.geom_segment( 
       data    = ~ attr(., 'trees', exact = TRUE),
       mapping = aes(x=x, y=y, xend=xend, yend=yend),
       .indent = 4 ))
@@ -609,10 +634,10 @@ plot_heatmap <- function (
     attr(gglayers[[1]][['data']], track[['id']]) <- as_rbiom_tbl(track[['data']])
     data <- as.formula(sprintf("~attr(., '%s', exact = TRUE)", track[['id']]))
     
-    gglayers %<>% ggpush(new_scale_fill())
-    gglayers %<>% ggpush(geom_tile(data = data, mapping = track[['mapping']], .indent = 4))
+    gglayers %<>% ggpush(.new_scale_fill())
+    gglayers %<>% ggpush(.geom_tile(data = data, mapping = track[['mapping']], .indent = 4))
     gglayers %<>% ggpush(do.call(layer[['fun']], c(layer[['args']], .indent = 4)))
-    gglayers %<>% ggpush(do.call(annotate, c(list(geom = "rect", color = "black", fill = NA, linewidth = 0.2), track[['outline']])))
+    gglayers %<>% ggpush(do.call(.annotate, c(list(geom = "rect", color = "black", fill = NA, linewidth = 0.2), track[['outline']])))
   }
   
   
@@ -623,19 +648,19 @@ plot_heatmap <- function (
   args <- within(args, {
     
     if (!exists('axis.text.y') && (isTRUE(label_rows) || isTRUE(n_top > 0)))
-      axis.text.y <- suppressWarnings(element_text(size=label_size_y, hjust=0))
+      axis.text.y <- suppressWarnings(.element_text(size=label_size_y, hjust=0))
     
     if (!exists('axis.text.x') && (isTRUE(label_cols) || isTRUE(n_left > 0)))
       axis.text.x <- suppressWarnings(switch(
         EXPR = paste0("x", tolower(xlab.angle)),
-        x0   = element_text(size=label_size_x),
-        x90  = element_text(size=label_size_x, angle=-90, vjust=0.3, hjust=0),
-               element_text(size=label_size_x, angle=-30, vjust=1.0, hjust=0) ))
+        x0   = .element_text(size=label_size_x),
+        x90  = .element_text(size=label_size_x, angle=-90, vjust=0.3, hjust=0),
+               .element_text(size=label_size_x, angle=-30, vjust=1.0, hjust=0) ))
   })
   
   
-  gglayers %<>% ggpush(theme_void())
-  gglayers %<>% ggpush(do.call(theme, c(args, .indent = 4)))
+  gglayers %<>% ggpush(.theme_void())
+  gglayers %<>% ggpush(do.call(.theme, c(args, .indent = 4)))
   
   remove("args")
   p <- ggbuild(gglayers)
@@ -661,6 +686,12 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
   guide   <- as.list(args[['guide']])
   binned  <- !is_null(args[['bins']])
   numeric <- is_null(args[['values']]) || is.numeric(args[['values']])
+  
+  .unit           <- P('grid::unit')
+  .element_text   <- P('ggplot2::element_text')
+  .guide_colorbar <- P('ggplot2::guide_colorbar')
+  .guide_legend   <- P('ggplot2::guide_legend')
+  
   
   # fn_args gets passed on to scale_*, e.g. scale_fill_gradient
   fn_args <- list()
@@ -688,9 +719,9 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
     guide[['order']]          %<>% if.null(guide_order)
     guide[['direction']]      %<>% if.null('horizontal')
     guide[['title.position']] %<>% if.null('top')
-    guide[['barheight']]      %<>% if.null(unit(21.5, "points"))
-    guide[['label.theme']]    %<>% if.null(element_text(size = unit(8, "points")))
-    fn_args[['guide']] <- do.call(guide_colorbar, guide)
+    guide[['barheight']]      %<>% if.null(.unit(21.5, "points"))
+    guide[['label.theme']]    %<>% if.null(.element_text(size = .unit(8, "points")))
+    fn_args[['guide']] <- do.call(.guide_colorbar, guide)
   
   } else {
     
@@ -700,12 +731,13 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
     
     guide[['order']] %<>% if.null(guide_order)
     guide[['ncol']]  %<>% if.null(2)
-    fn_args[['guide']] <- do.call(guide_legend, guide)
+    fn_args[['guide']] <- do.call(.guide_legend, guide)
   }
   
+  fun <- P(paste0('ggplot2::', fn))
   
   
-  return (list(fn = fn, fun = eval(parse(text=fn)), args = fn_args))
+  return (list(fn = fn, fun = fun, args = fn_args))
 }
 
 

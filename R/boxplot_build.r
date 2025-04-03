@@ -84,6 +84,14 @@ boxplot_build <- function (params) {
   })
   
   
+  #________________________________________________________
+  # Provenance-tracked ggplot2 functions.
+  #________________________________________________________
+  .position_dodge       <- P('ggplot2::position_dodge')
+  .position_jitter      <- P('ggplot2::position_jitter')
+  .position_jitterdodge <- P('ggplot2::position_jitterdodge')
+  
+  
   
   #________________________________________________________
   # Convert user's `layers` spec to layers environment.
@@ -119,10 +127,10 @@ boxplot_build <- function (params) {
   patterned <- !is.null(params$patterns)
   dotted    <- has_layer(params, c('dot', 'strip')) %>% any()
   
-  dodge  <- as.cmd(position_dodge(width = 0.8))
-  jitter <- as.cmd(position_jitter(width = 0.25, height = 0, seed = 0))
-  jdodge <- as.cmd(position_jitterdodge(
-    dodge.width = 0.8, jitter.width = 0.05, jitter.height = 0, seed = 0) )
+  dodge  <- .position_dodge(width = 0.8)
+  jitter <- .position_jitter(width = 0.25, height = 0, seed = 0)
+  jdodge <- .position_jitterdodge(
+    dodge.width = 0.8, jitter.width = 0.05, jitter.height = 0, seed = 0)
   
   
   
