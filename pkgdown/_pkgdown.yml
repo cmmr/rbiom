@@ -48,9 +48,7 @@ navbar:
 reference:
 - title: Input / Output
   desc: >
-    Get data into and out of R objects. See also the [article][convert] on 
-    transferring data between rbiom, mothur, QIIME 2, phyloseq, and other 
-    BioConductor packages.
+    Get data into and out of R objects.
   contents:
   - as_rbiom
   - starts_with("read_")
