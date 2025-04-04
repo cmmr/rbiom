@@ -76,7 +76,9 @@ read_biom <- function (src, ...) {
     #___________________#
     
     require_package('rhdf5', 'to read HDF5 formatted BIOM files')
-    
+    H5Fclose   <- getFromNamespace('H5Fclose',   'rhdf5')
+    H5Fis_hdf5 <- getFromNamespace('H5Fis_hdf5', 'rhdf5')
+        
     if (!H5Fis_hdf5(fp))
       cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
     
@@ -229,6 +231,10 @@ read_biom_json <- function (fp) {
 
 read_biom_hdf5 <- function (fp) {
   
+  H5Fclose <- getFromNamespace('H5Fclose', 'rhdf5')
+  H5Fopen  <- getFromNamespace('H5Fopen',  'rhdf5')
+  h5ls     <- getFromNamespace('h5ls',     'rhdf5')
+  
   h5 <- try(H5Fopen(fp, 'H5F_ACC_RDONLY', native = TRUE), silent=TRUE)
   if (inherits(h5, "try-error")) {
     try(H5Fclose(h5), silent=TRUE)
@@ -313,6 +319,9 @@ parse_json_info <- function (json) {
 }
 
 parse_hdf5_info <- function (h5) {
+  
+  h5readAttributes <- getFromNamespace('h5readAttributes', 'rhdf5')
+  
   attrs <- h5readAttributes(h5, "/")
   for (i in names(attrs)) {
     attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))

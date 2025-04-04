@@ -1,4 +1,4 @@
-# rbiom 2.1.3
+# rbiom 2.1.4
 
 * Satisfy new R CMD check for not changing built-in function attributes. #28
 

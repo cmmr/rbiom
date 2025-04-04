@@ -237,7 +237,18 @@ write_biom_json <- function (biom, file) {
 
 write_biom_hdf5 <- function (biom, file) {
   
+  # rhdf5 is an undeclared Suggests (fails CRAN checks).
   require_package('rhdf5', 'to write HDF5 formatted BIOM files')
+  
+  h5createFile     <- getFromNamespace('h5createFile',     'rhdf5')
+  h5createGroup    <- getFromNamespace('h5createGroup',    'rhdf5')
+  H5Dclose         <- getFromNamespace('H5Dclose',         'rhdf5')
+  H5Dopen          <- getFromNamespace('H5Dopen',          'rhdf5')
+  H5Fclose         <- getFromNamespace('H5Fclose',         'rhdf5')
+  H5Fopen          <- getFromNamespace('H5Fopen',          'rhdf5')
+  h5writeAttribute <- getFromNamespace('h5writeAttribute', 'rhdf5')
+  h5writeDataset   <- getFromNamespace('h5writeDataset',   'rhdf5')
+  
   
   res <- try(h5createFile(file), silent = TRUE)
   if (!isTRUE(res))

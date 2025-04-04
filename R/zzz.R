@@ -35,25 +35,6 @@ ENV <- environment()
     "is_scalar_integerish", "is_double", "is_scalar_double" ))
   
   
-  
-  #________________________________________________________
-  # rhdf5 is an undeclared Suggests (fails CRAN checks).
-  #________________________________________________________
-  if (nzchar(system.file(package = 'rhdf5'))) {
-    delayedAssign('h5createFile',     getFromNamespace('h5createFile',     'rhdf5'), ENV, ENV)
-    delayedAssign('h5createGroup',    getFromNamespace('h5createGroup',    'rhdf5'), ENV, ENV)
-    delayedAssign('H5Dclose',         getFromNamespace('H5Dclose',         'rhdf5'), ENV, ENV)
-    delayedAssign('H5Dopen',          getFromNamespace('H5Dopen',          'rhdf5'), ENV, ENV)
-    delayedAssign('H5Fclose',         getFromNamespace('H5Fclose',         'rhdf5'), ENV, ENV)
-    delayedAssign('H5Fis_hdf5',       getFromNamespace('H5Fis_hdf5',       'rhdf5'), ENV, ENV)
-    delayedAssign('H5Fopen',          getFromNamespace('H5Fopen',          'rhdf5'), ENV, ENV)
-    delayedAssign('h5ls',             getFromNamespace('h5ls',             'rhdf5'), ENV, ENV)
-    delayedAssign('h5readAttributes', getFromNamespace('h5readAttributes', 'rhdf5'), ENV, ENV)
-    delayedAssign('h5writeAttribute', getFromNamespace('h5writeAttribute', 'rhdf5'), ENV, ENV)
-    delayedAssign('h5writeDataset',   getFromNamespace('h5writeDataset',   'rhdf5'), ENV, ENV)
-  }
-  
-  
   #________________________________________________________
   # Trigger/catch the once-per-session ggbeeswarm warning.
   #________________________________________________________

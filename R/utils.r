@@ -372,11 +372,14 @@ ply_cols <- function (cols) {
 #____________________________________________________________________
 loglabels <- function (values) {
   
-  hi <- ceiling(log10(max(force(values))))
+  hi             <- ceiling(log10(max(force(values))))
+  .label_number  <- P('scales::label_number')
+  .cut_si        <- P('scales::cut_si')
+  
   list(
     'breaks'       = as.cmd(10 ** (0:hi),                    env = list(hi = hi)),
     'minor_breaks' = as.cmd(as.vector(2:9 %o% 10 ** (0:hi)), env = list(hi = hi - 1)),
-    'labels'       = scales::label_number(scale_cut = scales::cut_si("")) )
+    'labels'       = .label_number(scale_cut = .cut_si("")) )
 }
 
 # siunit <- function (x) {
@@ -392,6 +395,8 @@ loglabels <- function (values) {
 #     return (as.character(scientific(n)))
 #   })
 # }
+
+
 
 #____________________________________________________________________
 # Easily create list(x = ".x", label = ".label")
