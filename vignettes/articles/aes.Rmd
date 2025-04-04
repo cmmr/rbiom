@@ -124,6 +124,7 @@ Options are `"brick"`, `"chevron"`, `"fish"`, `"grid"`, `"herringbone"`,
 ```{r patterns-basic, echo = FALSE}
 
 grid::grid.newpage()
+grid::grid.rect(gp = grid::gpar(fill = 'white'))
 
 invisible(mapply(
   p = c(
@@ -146,6 +147,7 @@ width/style, tile size/rotation, and more.
 ```{r patterns-modded, echo = FALSE}
 
 grid::grid.newpage()
+grid::grid.rect(gp = grid::gpar(fill = 'white'))
 
 invisible(mapply(
   p = c(
@@ -202,8 +204,9 @@ ggplot2::ggplot(data.frame(shape = c(0:17, 65, 90, 97, 122))) +
   ggplot2::facet_wrap(~shape, nrow = 2) +
   ggplot2::theme_void() +
   ggplot2::theme(
-    panel.spacing = ggplot2::unit(10, "pt"),
-    strip.text    = ggplot2::element_text(
+    plot.background = ggplot2::element_rect(fill = "white"),
+    panel.spacing   = ggplot2::unit(10, "pt"),
+    strip.text      = ggplot2::element_text(
       size   = 11, 
       face   = "bold",
       margin = ggplot2::margin(4,0,4,0, "pt") ))
