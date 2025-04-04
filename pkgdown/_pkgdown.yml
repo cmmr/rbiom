@@ -47,7 +47,10 @@ navbar:
 
 reference:
 - title: Input / Output
-  desc: Get data into and out of R objects. See also the articles on transferring data between rbiom, [mothur], [QIIME 2][qiime2], and [phyloseq].
+  desc: >
+    Get data into and out of R objects. See also the [article][convert] on 
+    transferring data between rbiom, mothur, QIIME 2, phyloseq, and other 
+    BioConductor packages.
   contents:
   - as_rbiom
   - starts_with("read_")
@@ -78,29 +81,39 @@ reference:
   - rarefy
   
 - title: Taxa Abundance
-  desc: Map OTUs to higher order taxonomic ranks, and compare those abundances to metadata.
+  desc: >
+    Map OTUs to higher order taxonomic ranks, and compare those abundances to 
+    metadata.
   contents:
   - starts_with("taxa_")
   
 - title: Alpha Diversity
-  desc: Examine the diversity of OTUs present in each individual sample, and how that diversity correlates with metadata.
+  desc: >
+    Examine the diversity of OTUs present in each individual sample, and how 
+    that diversity correlates with metadata.
   contents:
   - starts_with("adiv_")
   - sample_sums
   
 - title: Beta Diversity
-  desc: See how similiar samples are to each other, and what metadata/taxa influence clustering.
+  desc: >
+    See how similiar samples are to each other, and what metadata/taxa 
+    influence clustering.
   contents:
   - starts_with("bdiv_")
   
 - title: Rarefaction
-  desc: Improve signal-to-noise in analyses by ensuring all samples have an equal number of observations.
+  desc: >
+    Improve signal-to-noise in analyses by ensuring all samples have an equal 
+    number of observations.
   contents:
   - starts_with("rare_")
   - rarefy
   
 - title: Low Level Functions
-  desc: Most functions operate on rbiom objects. These let you use arbitrary data.frames, distance matrices, matrices, and phylo objects.
+  desc: >
+    Most functions operate on rbiom objects. These let you use arbitrary 
+    data.frames, distance matrices, matrices, and phylo objects.
   contents:
   - starts_with("distmat_")
   - starts_with("rescale_")
@@ -115,7 +128,8 @@ reference:
   - biom_merge
   
 - title: Datasets
-  desc: Example datasets included with rbiom.
+  desc: >
+    Example datasets included with rbiom.
   contents:
   - hmp50
   - gems

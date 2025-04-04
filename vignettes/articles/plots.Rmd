@@ -6,8 +6,10 @@ title: "Plot Types"
 library(rbiom)
 
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
+  collapse   = TRUE,
+  comment    = "#>",
+  fig.width  = 10, 
+  fig.height = 6,
   R.options = list(
     pillar.print_min = 5,
     pillar.print_max = 5 ))
@@ -175,9 +177,11 @@ biom <- hmp50 %>% subset(`Body Site` %in% c("Saliva", "Buccal mucosa")) %>% rare
 patchwork::wrap_plots(lapply(
   c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow"), 
   FUN = function (layer) {
-  bdiv_ord_plot(biom, layers = layer, stat.by = "Body Site", test = "none") + 
-    ggplot2::ggtitle(layer) +
-    ggplot2::theme(legend.position = "none")
+    suppressWarnings({
+      bdiv_ord_plot(biom, layers = layer, stat.by = "Body Site", test = "none") + 
+        ggplot2::ggtitle(layer) +
+        ggplot2::theme(legend.position = "none")
+    })
   }))
 ```
 

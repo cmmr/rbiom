@@ -6,12 +6,13 @@ title: "Mapping Metadata to Aesthetics"
 library(rbiom)
 
 pals <- sapply(simplify = FALSE, names(rbiom:::PALETTES), function (i) {
-  sprintf("<td align='right' style='padding-left:20px; padding-right:0'>%s</td><td>%s</td>", i, 
+  sprintf("<td align='right' style='padding-left:20px; padding-right:3px'>%s</td><td>%s</td>", i, 
     paste0(collapse = '', "<span style='color:#", rbiom:::PALETTES[[i]], "'>&#9608;</span>") )})
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
+  comment  = "#>",
+  dev      = 'ragg_png',
   R.options = list(
     pillar.print_min = 5,
     pillar.print_max = 5 ))
@@ -25,7 +26,7 @@ knitr::opts_chunk$set(
 ## Automatic colors
 
 All `stat.by` needs is the name of the metadata field you'd like to color by.
-In these cases, rbiom will select an appropriate color-blind safe palette to use.
+In these cases, rbiom will select an appropriate palette to use.
 
 ``` r
 stat.by = "Sex"
@@ -37,7 +38,7 @@ stat.by = "Sex"
 
 You can map your metadata values to any color you'd like using the syntax 
 in the following examples. You can use hexadecimal codes or any of the 657 
-named R colors (type `colors()` for the list).
+named R `colors()`.
 
 ``` r
 stat.by = "Sex", colors = c("cyan", "#FFC83D")
@@ -196,18 +197,14 @@ stat.by = "Sex", shapes = c('Stool' = 7, 'Saliva' = 8)
 ggplot2::ggplot(data.frame(shape = c(0:17, 65, 90, 97, 122))) + 
   ggplot2::geom_point(
     mapping = ggplot2::aes(x = 1, y = 1, shape = shape),
-    size    = 8,
-    color   = "white" ) + 
+    size    = 8 ) + 
   ggplot2::scale_shape_identity() +
   ggplot2::facet_wrap(~shape, nrow = 2) +
   ggplot2::theme_void() +
   ggplot2::theme(
-    panel.spacing    = ggplot2::unit(10, "pt"),
-    panel.background = ggplot2::element_rect(fill = "#222222", colour = NA),
-    strip.background = ggplot2::element_rect(fill = "#222222", colour = NA),
-    strip.text       = ggplot2::element_text(
+    panel.spacing = ggplot2::unit(10, "pt"),
+    strip.text    = ggplot2::element_text(
       size   = 11, 
-      color  = "white",
       face   = "bold",
       margin = ggplot2::margin(4,0,4,0, "pt") ))
 ```
@@ -219,7 +216,7 @@ ggplot2::ggplot(data.frame(shape = c(0:17, 65, 90, 97, 122))) +
 Faceting allows you to split your dataset into multiple sub-plots by one or 
 more categorical metadata fields. For example:
 
-```{r facets, fig.asp = 0.4, fig.align = 'center', out.width = "75%", fig.width = 6}
+```{r facets, fig.asp = 0.5}
 biom <- rarefy(hmp50)
 
 adiv_boxplot(biom, stat.by = "Body Site", facet.by = "Sex")
@@ -232,11 +229,11 @@ Plotting functions often allow you to specify multiple ranks, taxa, metrics,
 etc which are automatically assigned their own facet dimension. You can still
 add your own facets to these plots.
 
-```{r auto_facets1, fig.asp = 0.3, fig.align = 'center', out.width = "75%", fig.width = 5}
-adiv_boxplot(biom, bdiv = c("Bray-Curtis", "Euclidean"))
+```{r auto_facets1, fig.asp = 0.5}
+adiv_boxplot(biom, adiv = c("Shannon", "Chao1"))
 ```
 
-```{r auto_facets2, fig.asp = 0.55, fig.align = 'center', out.width = "75%", fig.width = 5}
-adiv_boxplot(biom, bdiv = c("Bray-Curtis", "Euclidean"), facet.by = "Sex")
+```{r auto_facets2, fig.asp = 0.5}
+adiv_boxplot(biom, adiv = c("Shannon", "Chao1"), facet.by = "Sex")
 ```
 

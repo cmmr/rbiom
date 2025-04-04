@@ -307,7 +307,7 @@ adiv_corrplot(
   check   = TRUE )       # display diagnostic plots
 ```
 
-Here, the diagnostic plots look pretty good, so we can confidently say that children have different Shannon diversity index values, depending on whether they live in Bangladesh vs Kenya, and that this difference is most significant at around 1.35 years old.
+Here, the diagnostic plots look pretty good, so we can confidently say that children have different Shannon diversity index values, depending on whether they live in Bangladesh vs Kenya, and that this difference is most significant at around 1.25 years old.
 
 
 
@@ -320,7 +320,7 @@ We'll set `layers = "tcrp"` to show the residuals on this main plot. This will h
 ```{r, fig.asp = 0.8}
 taxa_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
-  layers  = "tcrp",      # show residuals on the main plot
+  layers  = "tcrp",      # trendlines, conf. intervals, residuals, & points
   x       = "age",       # x-axis variable
   taxa    = 1,           # select the most abundant taxa
   rank    = "Genus",     # at the genus level
@@ -352,7 +352,7 @@ taxa_corrplot(
   rank    = "Genus",     # at the genus level
   stat.by = "country",   # statistical groups
   fit     = "gam",       # smoothed trendline
-  trans   = "rank",      # rank-transform the abundances
+  trans   = "rank",      # rank-transform the abundances   <====
   t.size  = 2,           # make the trendline thicker
   check   = TRUE )       # display diagnostic plots
 ```
@@ -363,7 +363,7 @@ taxa_corrplot(
 
 Like the last two corrplot functions, `bdiv_corrplot()` combines `bdiv_table()` and `stats_corrplot()` to generate a beta diversity correlation plot from an rbiom object.
 
-Beta diversity correlation plots are more conceptually complex, so let's quickly reveal what we'll be plotting.
+Beta diversity correlation plots are more conceptually complex, so let's quickly review what we'll be plotting.
 
 * x-axis: the difference in a numeric metadata field between two samples.
 * y-axis: the difference in overall microbiome composition.
@@ -384,7 +384,7 @@ Here, the main plot tells us:
 
 * In Bangladesh, the closer two children are in age to each other, the more similar their microbiomes will be. Therefore, you could infer that age is an important factor driving microbiome structure for this population.
 * Kenyan children's microbiomes are more consistently structured, compared to children in Bangladesh. Additionally, the age effect is much less pronounced.
-* Children about 1 year apart in age have much more similar microbiome if they live in Kenya, compared to Bangalesh (p = 7e-143).
+* Children about 1 year apart in age have much more similar microbiome if they live in Kenya, compared to Bangladesh (p = 6.2e-153).
 
 The diagnostic plots here indicate less than optimal distributions of residuals, with the "Normal Q-Q" plot showing that many more points lie above the trendline than below it. The main plot's trendlines don't spend much time between y = 0.75 and 0.83, hence the sparsity of points between x = 0.75 and 0.83 on the "Residuals vs Fitted" and "Scale-Location" plots.
 
@@ -400,7 +400,7 @@ bdiv_corrplot(
   stat.by = "country",   # statistical groups 
   within  = "country",   # don't compare samples from different countries
   fit     = "gam",       # smoothed trendline
-  trans   = "rank",      # rank-transform the abundances
+  trans   = "rank",      # rank-transform the abundances   <====
   check   = TRUE )       # display diagnostic plots
 ```
 
