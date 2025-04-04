@@ -580,7 +580,7 @@ combines the steps of generating a table of alpha diversity values
 <p>Here, the diagnostic plots look pretty good, so we can confidently
 say that children have different Shannon diversity index values,
 depending on whether they live in Bangladesh vs Kenya, and that this
-difference is most significant at around 1.35 years old.</p>
+difference is most significant at around 1.25 years old.</p>
 </div>
 <div class="section level2">
 <h2 id="taxa-abundance">Taxa Abundance<a class="anchor" aria-label="anchor" href="#taxa-abundance"></a>
@@ -594,7 +594,7 @@ Fitted” diagnostic plot.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span></span>
 <span>  biom    <span class="op">=</span> <span class="va">hbk</span>,         <span class="co"># healthy controls from Bangladesh and Kenya</span></span>
-<span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># show residuals on the main plot</span></span>
+<span>  layers  <span class="op">=</span> <span class="st">"tcrp"</span>,      <span class="co"># trendlines, conf. intervals, residuals, &amp; points</span></span>
 <span>  x       <span class="op">=</span> <span class="st">"age"</span>,       <span class="co"># x-axis variable</span></span>
 <span>  taxa    <span class="op">=</span> <span class="fl">1</span>,           <span class="co"># select the most abundant taxa</span></span>
 <span>  rank    <span class="op">=</span> <span class="st">"Genus"</span>,     <span class="co"># at the genus level</span></span>
@@ -637,7 +637,7 @@ data.</p>
 <span>  rank    <span class="op">=</span> <span class="st">"Genus"</span>,     <span class="co"># at the genus level</span></span>
 <span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups</span></span>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
-<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
+<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances   &lt;====</span></span>
 <span>  t.size  <span class="op">=</span> <span class="fl">2</span>,           <span class="co"># make the trendline thicker</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
 <p><img src="regression_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
@@ -650,7 +650,7 @@ data.</p>
 combines <code><a href="../reference/bdiv_table.html">bdiv_table()</a></code> and <code><a href="../reference/stats_corrplot.html">stats_corrplot()</a></code> to
 generate a beta diversity correlation plot from an rbiom object.</p>
 <p>Beta diversity correlation plots are more conceptually complex, so
-let’s quickly reveal what we’ll be plotting.</p>
+let’s quickly review what we’ll be plotting.</p>
 <ul>
 <li>x-axis: the difference in a numeric metadata field between two
 samples.</li>
@@ -681,7 +681,7 @@ population.</li>
 compared to children in Bangladesh. Additionally, the age effect is much
 less pronounced.</li>
 <li>Children about 1 year apart in age have much more similar microbiome
-if they live in Kenya, compared to Bangalesh (p = 7e-143).</li>
+if they live in Kenya, compared to Bangladesh (p = 6.2e-153).</li>
 </ul>
 <p>The diagnostic plots here indicate less than optimal distributions of
 residuals, with the “Normal Q-Q” plot showing that many more points lie
@@ -701,7 +701,7 @@ could help make the residuals more normally distributed.</p>
 <span>  stat.by <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># statistical groups </span></span>
 <span>  within  <span class="op">=</span> <span class="st">"country"</span>,   <span class="co"># don't compare samples from different countries</span></span>
 <span>  fit     <span class="op">=</span> <span class="st">"gam"</span>,       <span class="co"># smoothed trendline</span></span>
-<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances</span></span>
+<span>  trans   <span class="op">=</span> <span class="st">"rank"</span>,      <span class="co"># rank-transform the abundances   &lt;====</span></span>
 <span>  check   <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span>       <span class="co"># display diagnostic plots</span></span></code></pre></div>
 <p><img src="regression_files/figure-html/unnamed-chunk-18-1.png" width="768"></p>
 <p>After rank-transforming:</p>

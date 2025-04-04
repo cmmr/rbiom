@@ -89,7 +89,7 @@
 </h3>
 <p>All <code>stat.by</code> needs is the name of the metadata field
 you’d like to color by. In these cases, rbiom will select an appropriate
-color-blind safe palette to use.</p>
+palette to use.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stat.by</span> <span class="op">=</span> <span class="st">"Sex"</span></span></code></pre></div>
 </div>
@@ -98,7 +98,7 @@ color-blind safe palette to use.</p>
 </h3>
 <p>You can map your metadata values to any color you’d like using the
 syntax in the following examples. You can use hexadecimal codes or any
-of the 657 named R colors (type <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">colors()</a></code> for the list).</p>
+of the 657 named R <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">colors()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Sex"</span>, colors <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"cyan"</span>, <span class="st">"#FFC83D"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Sex"</span>, colors <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Male'</span> <span class="ot">=</span> <span class="st">"cyan"</span>, <span class="st">'Female'</span> <span class="ot">=</span> <span class="st">"#FFC83D"</span>)</span></code></pre></div>
 </div>
@@ -132,13 +132,13 @@ Colorblind People</em>. <a href="https://jfly.uni-koeln.de/color/" class="extern
 </h4>
 <table class="table">
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 bright
 </td>
 <td>
 <span style="color:#4477AA">█</span><span style="color:#EE6677">█</span><span style="color:#228833">█</span><span style="color:#CCBB44">█</span><span style="color:#66CCEE">█</span><span style="color:#AA3377">█</span><span style="color:#BBBBBB">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 tableau
 </td>
 <td>
@@ -146,13 +146,13 @@ tableau
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 vibrant
 </td>
 <td>
 <span style="color:#EE7733">█</span><span style="color:#0077BB">█</span><span style="color:#33BBEE">█</span><span style="color:#EE3377">█</span><span style="color:#CC3311">█</span><span style="color:#009988">█</span><span style="color:#BBBBBB">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 classic
 </td>
 <td>
@@ -160,13 +160,13 @@ classic
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 okabe
 </td>
 <td>
 <span style="color:#E69F00">█</span><span style="color:#56B4E9">█</span><span style="color:#009E73">█</span><span style="color:#F0E442">█</span><span style="color:#0072B2">█</span><span style="color:#D55E00">█</span><span style="color:#CC79A7">█</span><span style="color:#999999">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 carto
 </td>
 <td>
@@ -174,13 +174,13 @@ carto
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 r4
 </td>
 <td>
 <span style="color:#DF536B">█</span><span style="color:#61D04F">█</span><span style="color:#2297E6">█</span><span style="color:#28E2E5">█</span><span style="color:#CD0BBC">█</span><span style="color:#F5C710">█</span><span style="color:#9E9E9E">█</span><span style="color:#000000">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 tol
 </td>
 <td>
@@ -188,13 +188,13 @@ tol
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 light
 </td>
 <td>
 <span style="color:#77AADD">█</span><span style="color:#EE8866">█</span><span style="color:#EEDD88">█</span><span style="color:#FFAABB">█</span><span style="color:#99DDFF">█</span><span style="color:#44BB99">█</span><span style="color:#BBCC33">█</span><span style="color:#AAAA00">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 tableau20
 </td>
 <td>
@@ -202,13 +202,13 @@ tableau20
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 muted
 </td>
 <td>
 <span style="color:#CC6677">█</span><span style="color:#332288">█</span><span style="color:#DDCC77">█</span><span style="color:#117733">█</span><span style="color:#88CCEE">█</span><span style="color:#882255">█</span><span style="color:#44AA99">█</span><span style="color:#999933">█</span><span style="color:#AA4499">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 kelly
 </td>
 <td>
@@ -216,13 +216,13 @@ kelly
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 fishy
 </td>
 <td>
 <span style="color:#6388B4">█</span><span style="color:#FFAE34">█</span><span style="color:#EF6F6A">█</span><span style="color:#8CC2CA">█</span><span style="color:#C3BC3F">█</span><span style="color:#55AD89">█</span><span style="color:#BB7693">█</span><span style="color:#BAA094">█</span><span style="color:#767676">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 alphabet
 </td>
 <td>
@@ -230,7 +230,7 @@ alphabet
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 polychrome
 </td>
 <td colspan="3">
@@ -244,19 +244,19 @@ polychrome
 </h4>
 <table class="table">
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 acton
 </td>
 <td>
 <span style="color:#2D204C">█</span><span style="color:#4F3D69">█</span><span style="color:#765985">█</span><span style="color:#9E6592">█</span><span style="color:#C36C99">█</span><span style="color:#D48CB1">█</span><span style="color:#D3A5C4">█</span><span style="color:#D9C5D8">█</span><span style="color:#E5E5F0">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 devon
 </td>
 <td>
 <span style="color:#2B194C">█</span><span style="color:#27386B">█</span><span style="color:#26588D">█</span><span style="color:#3C6FB9">█</span><span style="color:#788BD9">█</span><span style="color:#ACA6ED">█</span><span style="color:#C7C3F3">█</span><span style="color:#E3E0F8">█</span><span style="color:#FFFFFF">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 oslo
 </td>
 <td>
@@ -264,19 +264,19 @@ oslo
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 bam
 </td>
 <td>
 <span style="color:#65024B">█</span><span style="color:#A4428B">█</span><span style="color:#D07EBB">█</span><span style="color:#ECC5E1">█</span><span style="color:#F6F1F0">█</span><span style="color:#D7E7C0">█</span><span style="color:#8CB464">█</span><span style="color:#4B802E">█</span><span style="color:#0D4C00">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 grays
 </td>
 <td>
 <span style="color:#FFFFFF">█</span><span style="color:#F0F0F0">█</span><span style="color:#D9D9D9">█</span><span style="color:#BDBDBD">█</span><span style="color:#969696">█</span><span style="color:#737373">█</span><span style="color:#525252">█</span><span style="color:#252525">█</span><span style="color:#000000">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 purples
 </td>
 <td>
@@ -284,19 +284,19 @@ purples
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 bamako
 </td>
 <td>
 <span style="color:#003F4C">█</span><span style="color:#144C40">█</span><span style="color:#2A5933">█</span><span style="color:#426A25">█</span><span style="color:#5F7D13">█</span><span style="color:#868D02">█</span><span style="color:#B8A525">█</span><span style="color:#E3C960">█</span><span style="color:#FFE599">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 greens
 </td>
 <td>
 <span style="color:#F7FCF5">█</span><span style="color:#E5F5E0">█</span><span style="color:#C7E9C0">█</span><span style="color:#A1D99B">█</span><span style="color:#74C476">█</span><span style="color:#41AB5D">█</span><span style="color:#238B45">█</span><span style="color:#006D2C">█</span><span style="color:#00441B">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 reds
 </td>
 <td>
@@ -304,19 +304,19 @@ reds
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 batlow
 </td>
 <td>
 <span style="color:#001959">█</span><span style="color:#0E395F">█</span><span style="color:#215A5F">█</span><span style="color:#4C724C">█</span><span style="color:#7F8033">█</span><span style="color:#BF9038">█</span><span style="color:#F39E71">█</span><span style="color:#FDB3B4">█</span><span style="color:#F9CCF9">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 hawaii
 </td>
 <td>
 <span style="color:#8C0172">█</span><span style="color:#922C54">█</span><span style="color:#964C3E">█</span><span style="color:#9A6D27">█</span><span style="color:#9B951B">█</span><span style="color:#89BB48">█</span><span style="color:#6BD38C">█</span><span style="color:#66E7D2">█</span><span style="color:#B2F2FD">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 roma
 </td>
 <td>
@@ -324,19 +324,19 @@ roma
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 berlin
 </td>
 <td>
 <span style="color:#9EB0FF">█</span><span style="color:#519FD2">█</span><span style="color:#276785">█</span><span style="color:#13303E">█</span><span style="color:#180C09">█</span><span style="color:#3F1200">█</span><span style="color:#7A321B">█</span><span style="color:#BB6C60">█</span><span style="color:#FFACAC">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 imola
 </td>
 <td>
 <span style="color:#1933B2">█</span><span style="color:#2547A7">█</span><span style="color:#305D9D">█</span><span style="color:#3E708D">█</span><span style="color:#52857F">█</span><span style="color:#70A377">█</span><span style="color:#91C36D">█</span><span style="color:#BDE566">█</span><span style="color:#FFFF66">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 tofino
 </td>
 <td>
@@ -344,19 +344,19 @@ tofino
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 bilbao
 </td>
 <td>
 <span style="color:#FFFFFF">█</span><span style="color:#D2D2D2">█</span><span style="color:#C0BAA5">█</span><span style="color:#B3A779">█</span><span style="color:#AB8B66">█</span><span style="color:#A16C59">█</span><span style="color:#974C4B">█</span><span style="color:#722626">█</span><span style="color:#4C0000">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 lajolla
 </td>
 <td>
 <span style="color:#FFFFCC">█</span><span style="color:#F9E98D">█</span><span style="color:#F2C559">█</span><span style="color:#E99D52">█</span><span style="color:#E0744F">█</span><span style="color:#C24C4A">█</span><span style="color:#873E39">█</span><span style="color:#4B2B1A">█</span><span style="color:#191900">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 tokyo
 </td>
 <td>
@@ -364,19 +364,19 @@ tokyo
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 broc
 </td>
 <td>
 <span style="color:#2C194C">█</span><span style="color:#284B7D">█</span><span style="color:#5D83A9">█</span><span style="color:#A8BED1">█</span><span style="color:#EDF1EC">█</span><span style="color:#D8D8AB">█</span><span style="color:#9E9E65">█</span><span style="color:#5E5D2F">█</span><span style="color:#262600">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 lapaz
 </td>
 <td>
 <span style="color:#190C65">█</span><span style="color:#213682">█</span><span style="color:#2B5A99">█</span><span style="color:#3E7CA5">█</span><span style="color:#6598A4">█</span><span style="color:#96A493">█</span><span style="color:#C5AC8A">█</span><span style="color:#F8D0B7">█</span><span style="color:#FFF2F2">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 turku
 </td>
 <td>
@@ -384,19 +384,19 @@ turku
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 buda
 </td>
 <td>
 <span style="color:#B200B2">█</span><span style="color:#B22D9B">█</span><span style="color:#BA4C90">█</span><span style="color:#C56986">█</span><span style="color:#CC847E">█</span><span style="color:#D39F77">█</span><span style="color:#DABD70">█</span><span style="color:#E3DA68">█</span><span style="color:#FFFF66">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 lisbon
 </td>
 <td>
 <span style="color:#E5E5FF">█</span><span style="color:#90A6CC">█</span><span style="color:#406A97">█</span><span style="color:#15334F">█</span><span style="color:#161919">█</span><span style="color:#433F27">█</span><span style="color:#7F784C">█</span><span style="color:#C0B986">█</span><span style="color:#FFFFD8">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 vanimo
 </td>
 <td>
@@ -404,19 +404,19 @@ vanimo
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 cork
 </td>
 <td>
 <span style="color:#2C194C">█</span><span style="color:#284A7D">█</span><span style="color:#5A82A8">█</span><span style="color:#A5BAD0">█</span><span style="color:#E5EDEC">█</span><span style="color:#ADCFB1">█</span><span style="color:#6BA870">█</span><span style="color:#3F772D">█</span><span style="color:#434C01">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 nuuk
 </td>
 <td>
 <span style="color:#04598C">█</span><span style="color:#2A6380">█</span><span style="color:#527684">█</span><span style="color:#7F9092">█</span><span style="color:#A4A699">█</span><span style="color:#B7B790">█</span><span style="color:#C4C482">█</span><span style="color:#DDDD86">█</span><span style="color:#FEFEB2">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 vik
 </td>
 <td>
@@ -424,13 +424,13 @@ vik
 </td>
 </tr>
 <tr>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 davos
 </td>
 <td>
 <span style="color:#2C194C">█</span><span style="color:#264477">█</span><span style="color:#3469AF">█</span><span style="color:#5984BF">█</span><span style="color:#7C9AB4">█</span><span style="color:#A1B3AA">█</span><span style="color:#C7CD9E">█</span><span style="color:#E6E6BF">█</span><span style="color:#FFFFFF">█</span>
 </td>
-<td align="right" style="padding-left:20px; padding-right:0">
+<td align="right" style="padding-left:20px; padding-right:3px">
 oranges
 </td>
 <td>
@@ -497,10 +497,10 @@ one or more categorical metadata fields. For example:</p>
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/facets-1.png" width="75%" style="display: block; margin: auto;"></p>
+<p><img src="aes_files/figure-html/facets-1.png" width="768"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Sex"</span>, facet.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/facets-2.png" width="75%" style="display: block; margin: auto;"></p>
+<p><img src="aes_files/figure-html/facets-2.png" width="768"></p>
 <div class="section level3">
 <h3 id="auto-generated-facets">Auto-generated facets<a class="anchor" aria-label="anchor" href="#auto-generated-facets"></a>
 </h3>
@@ -508,11 +508,11 @@ one or more categorical metadata fields. For example:</p>
 metrics, etc which are automatically assigned their own facet dimension.
 You can still add your own facets to these plots.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, bdiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Bray-Curtis"</span>, <span class="st">"Euclidean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/auto_facets1-1.png" width="75%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Chao1"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="aes_files/figure-html/auto_facets1-1.png" width="768"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, bdiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Bray-Curtis"</span>, <span class="st">"Euclidean"</span><span class="op">)</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/auto_facets2-1.png" width="75%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Chao1"</span><span class="op">)</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="aes_files/figure-html/auto_facets2-1.png" width="768"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -148,7 +148,7 @@ Metadata to Aesthetics</a> for details.</p>
 elements beyond box-and-whisker.</p>
 <p>You can assign one or more of the following options to a box plot’s
 <code>layers</code> parameter.</p>
-<p><img src="plots_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
 <p>Unambiguous abbreviations are also accepted. For instance,
 <code>layers = c("box", "dot")</code> is equivalent to
 <code>layers = c("x", "d")</code> and <code>layers = "xd"</code>. Note
@@ -176,7 +176,7 @@ that the single letter abbreviation for “box” is “x” (“bar” is “b�
 <span>    <span class="va">p</span> <span class="op">+</span> </span>
 <span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, caption <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plots_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="statistics">Statistics<a class="anchor" aria-label="anchor" href="#statistics"></a>
@@ -209,7 +209,7 @@ Aesthetics</a> for details.</p>
 </h3>
 <p>You can assign one or more of the following options to a correlation
 plot’s <code>layers</code> parameter.</p>
-<p><img src="plots_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
 <p>Unambiguous abbreviations are also accepted. For instance,
 <code>layers = c("trend", "point")</code> is equivalent to
 <code>layers = c("t", "p")</code> and <code>layers = "tp"</code>.</p>
@@ -235,7 +235,7 @@ plot’s <code>layers</code> parameter.</p>
 <span>  guides <span class="op">=</span> <span class="st">"collect"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">adiv</span>, <span class="va">bdiv</span>, <span class="va">taxa</span><span class="op">)</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">p</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plots_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -247,7 +247,7 @@ plot’s <code>layers</code> parameter.</p>
 <p>You can assign one or more of the following options to a ordination
 plot’s <code>layers</code> parameter.</p>
 <pre><code><span><span class="co">#&gt; Warning in MASS::cov.trob(data[, vars]): Probable convergence failure</span></span></code></pre>
-<p><img src="plots_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 <p>Unambiguous abbreviations are also accepted. For instance,
 <code>layers = c("point", "ellipse")</code> is equivalent to
 <code>layers = c("p", "e")</code> and <code>layers = "pe"</code>.</p>
@@ -267,7 +267,7 @@ the taxa.</p>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, layers <span class="op">=</span> <span class="st">"emt"</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plots_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -294,7 +294,7 @@ common use cases below operate on a biom object.</p>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">bdiv</span>, <span class="va">taxa</span>, ncol <span class="op">=</span> <span class="fl">1</span>, guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in plot_theme(plot): The `underscores` theme element is not</span></span>
 <span><span class="co">#&gt; defined in the element hierarchy.</span></span></code></pre></div>
-<p><img src="plots_files/figure-html/unnamed-chunk-8-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-8-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -307,7 +307,7 @@ Both have their own advantages.</p>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span>, taxa <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plots_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
+<p><img src="plots_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
