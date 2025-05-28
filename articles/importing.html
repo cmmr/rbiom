@@ -8,7 +8,7 @@
 <title>Importing Datasets • rbiom</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Noto_Sans-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Noto_Sans-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -75,7 +75,7 @@
       <h1>Importing Datasets</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/vignettes/articles/importing.Rmd" class="external-link"><code>vignettes/articles/importing.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.2.0/vignettes/articles/importing.Rmd" class="external-link"><code>vignettes/articles/importing.Rmd</code></a></small>
       <div class="d-none name"><code>importing.Rmd</code></div>
     </div>
 
@@ -124,7 +124,7 @@ R package.</li>
 <span><span class="co">#&gt;       1 Fields:  .sample</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
 <span><span class="co"># convert from phyloseq to rbiom ----------------</span></span>
@@ -147,7 +147,7 @@ R package.</li>
 <span><span class="co">#&gt;       5 Fields:  .sample, BarcodeSequence, ...</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 <p>Now we have <code>biom</code>, an rbiom-class object that can be used
 with this package’s functions. If you loaded your data from a BIOM file
@@ -197,7 +197,7 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
 <span><span class="co"># or in a single step ---------------------------</span></span>
@@ -212,7 +212,7 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 <div class="section level3">
 <h3 id="setting-categorical-variables">Setting categorical variables<a class="anchor" aria-label="anchor" href="#setting-categorical-variables"></a>
@@ -252,7 +252,7 @@ object directly, or a newick file/string.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -286,7 +286,7 @@ OTU.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-04-04 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-05-28 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -300,7 +300,7 @@ OTU.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
