@@ -122,9 +122,9 @@ plot_heatmap <- function (
     return (readRDS(cache_file))
   
     
-  theme_args <- params$.dots
   
   
+  theme_args <- params$.dots[setdiff(names(params$.dots), "underscores")]
   #________________________________________________________
   # Sanity Checks.
   #________________________________________________________
