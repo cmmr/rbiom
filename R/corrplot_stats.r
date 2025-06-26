@@ -95,17 +95,28 @@ corrplot_stats <- function (params) {
           tibble(!!.xcol := df[[.xcol]][[1]])
         }) %>% as_tibble()
   })
-  
-  
-  set_layer(
-    params = params,
-    layer  = 'stats_label',
-    'mapping|label' = ".label",
-    'mapping|hjust' = ".hjust",
-    'mapping|vjust' = ".vjust",
-    'size'          = 4,
-    'label.size'    = NA )
-  
+
+  if ("linewidth" %in% names(ggplot2::GeomLabel$default_aes)) {
+    set_layer(
+      params = params,
+      layer  = 'stats_label',
+      'mapping|label' = ".label",
+      'mapping|hjust' = ".hjust",
+      'mapping|vjust' = ".vjust",
+      'size'          = 4,
+      'linewidth'     = NA )
+
+  } else {
+    set_layer(
+      params = params,
+      layer  = 'stats_label',
+      'mapping|label' = ".label",
+      'mapping|hjust' = ".hjust",
+      'mapping|vjust' = ".vjust",
+      'size'          = 4,
+      'label.size'    = NA )
+  }
+
   set_layer(
     params = params,
     layer  = 'yaxis',
