@@ -143,9 +143,9 @@ bdiv_heatmap <- function (
         })
     
     p <- patchwork::wrap_plots(plots)
-    
-    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-    
+
+    attr(p, 'input_data') <- lapply(plots, attr, which = 'input_data', exact = TRUE)
+
     attr(p, 'code') <- paste(collapse = "\n\n", local({
       
       cmds <- sapply(seq_along(plots), function (i) {
