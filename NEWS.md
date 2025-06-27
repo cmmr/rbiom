@@ -1,3 +1,8 @@
+# rbiom 2.2.1
+
+* Compatibility fixes for ggplot2 4.0.0 #30
+
+
 # rbiom 2.2.0
 
 * Satisfy new R CMD check: no setting attributes on built-in functions. #28

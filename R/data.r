@@ -8,7 +8,7 @@
 #'   \item{Age - }{21 - 40}
 #'   \item{BMI - }{19 - 32}
 #' }
-#' @source \url{https://portal.hmpdacc.org}
+#' @source \doi{10.1101/gr.096651.109}
 "hmp50"
 
 

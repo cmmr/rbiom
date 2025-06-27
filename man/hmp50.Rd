@@ -15,7 +15,7 @@ Includes metadata, taxonomy, phylogeny, and sequences.
 }
 }
 \source{
-\url{https://portal.hmpdacc.org}
+\doi{10.1101/gr.096651.109}
 }
 \usage{
 hmp50
