@@ -91,6 +91,7 @@ bdiv_heatmap <- function (
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE, underscores = underscores)
+  remove('underscores')
   
   
   #________________________________________________________
@@ -142,25 +143,8 @@ bdiv_heatmap <- function (
           do.call(bdiv_heatmap, args)
         })
     
-    p <- patchwork::wrap_plots(plots)
-    
-    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-    
-    attr(p, 'code') <- paste(collapse = "\n\n", local({
-      
-      cmds <- sapply(seq_along(plots), function (i) {
-        sub(
-          x           = attr(plots[[i]], 'code', exact = TRUE), 
-          pattern     = "ggplot(data)", 
-          replacement = sprintf("p%i <- ggplot(data[[%i]])", i, i),
-          fixed       = TRUE )
-      })
-      c(cmds, sprintf("patchwork::wrap_plots(%s)", paste0(collapse = ", ", "p", seq_along(plots))))
-      
-    })) %>% add_class('rbiom_code')
-    
-    
-    attr(p, 'cmd') <- current_cmd('bdiv_heatmap')
+    cmd <- current_cmd('bdiv_heatmap')
+    p   <- plot_wrap(plots, cmd)
     
     set_cache_value(cache_file, p)
     return (p)

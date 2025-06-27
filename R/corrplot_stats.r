@@ -103,8 +103,14 @@ corrplot_stats <- function (params) {
     'mapping|label' = ".label",
     'mapping|hjust' = ".hjust",
     'mapping|vjust' = ".vjust",
-    'size'          = 4,
-    'label.size'    = NA )
+    'size'          = 4 )
+  
+  if ("linewidth" %in% names(ggplot2::GeomLabel$default_aes)) {
+    set_layer(params, 'stats_label', 'linewidth' = NA)
+  } else {
+    set_layer(params, 'stats_label', 'label.size' = NA)
+  }
+  
   
   set_layer(
     params = params,

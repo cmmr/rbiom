@@ -95,7 +95,12 @@ ggbuild <- function (gglayers) {
       p   <- gglayer
       cmd <- attr(gglayer, 'display')
     } else {
-      p   <- ggplot2::`%+%`(p, gglayer)
+      add_gg <- get0("add_gg", asNamespace("ggplot2"))
+      if (is.function(add_gg)) {
+        p <- add_gg(p, gglayer)
+      } else {
+        p <- ggplot2::`%+%`(p, gglayer)
+      }
       cmd <- sprintf("%s +\n  %s", cmd, attr(gglayer, 'display'))
     }
   }

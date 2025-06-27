@@ -73,22 +73,8 @@ taxa_stacked <- function (
       do.call(taxa_stacked, fun_params(taxa_stacked, params))
     })
     
-    p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
-      add_class('rbiom_plot')
-    
-    attr(p, 'data') <- lapply(plots, attr, which = 'data', exact = TRUE)
-    
-    attr(p, 'code') <- paste(collapse = "\n\n", local({
-      cmds <- sapply(seq_along(ranks), function (i) {
-        sub(
-          x           = attr(plots[[i]], 'code', exact = TRUE), 
-          pattern     = "ggplot(data)", 
-          replacement = sprintf("p%i <- ggplot(data[[%s]])", i, single_quote(ranks[[i]])),
-          fixed       = TRUE )
-      })
-      c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(ranks))))
-      
-    })) %>% add_class('rbiom_code')
+    cmd <- current_cmd('taxa_stacked')
+    p   <- plot_wrap(plots, cmd, ncol = 1)
     
     set_cache_value(cache_file, p)
     return (p)

@@ -64,7 +64,8 @@ adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
 ![](man/figures/README-bdiv-2.png)<!-- -->
 
 ``` r
-taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
+subset(biom, `Body Site` == 'Buccal mucosa') %>% 
+  taxa_corrplot("Age", taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')
 ```
 
 ![](man/figures/README-bdiv-3.png)<!-- -->
@@ -72,7 +73,7 @@ taxa_corrplot(biom, x = "Age", layers = "ptc", taxa = 2, stat.by = "bod")
 #### Summarize counts by taxonomic rank.
 
 ``` r
-taxa_heatmap(biom, taxa = 30, tracks = c("body", "age"))
+taxa_heatmap(biom, taxa = 10, tracks = c("body", "age"))
 ```
 
 ![](man/figures/README-taxa-1.png)<!-- -->

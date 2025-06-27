@@ -195,6 +195,7 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
     
     val <- if (is_null(val))              { "NULL"
     } else if (!is_null(display))         { display
+    } else if (inherits(val, 'AsIs'))     { as.character(val)
     } else if (is_character(val))         { double_quote(val) 
     } else if (is_logical(val))           { as.character(val) %>% setNames(names(val))
     } else if (is.numeric(val))           { as.character(val) %>% setNames(names(val))

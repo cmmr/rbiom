@@ -49,6 +49,7 @@ bdiv_ord_plot <- function (
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE, underscores = underscores)
+  remove('underscores')
   
   
   #________________________________________________________

@@ -2,6 +2,7 @@
 ^\.git$
 ^\.github$
 ^conda$
+^joss$
 ^pkgdown$
 ^tmp$
 ^vignettes/articles$
@@ -14,7 +15,6 @@
 ^rbiom\.Rproj$
 ^build\.r
 ^install\.sh
-^paper.*
 ^report.*
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
@@ -23,3 +23,4 @@
 ^src/.*\.so
 ^src/.*\.dll
 ^revdep$
+^LICENSE\.md$

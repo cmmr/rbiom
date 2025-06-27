@@ -50,29 +50,10 @@ rare_multiplot <- function (
   
   plots <- list(corrplot = corrplot, stacked = stacked)
   
-  
-  p <- patchwork::wrap_plots(plots, ncol = 1) %>% 
-    add_class('rbiom_plot')
+  cmd <- current_cmd('rare_multiplot')
+  p   <- plot_wrap(plots, cmd, ncol = 1)
   
   attr(p, 'stats') <- attr(corrplot, 'stats', exact = TRUE)
-  attr(p, 'data')  <- lapply(plots, attr, which = 'data', exact = TRUE)
-  
-  attr(p, 'code') <- paste(collapse = "\n\n", local({
-    
-    cmds <- sapply(seq_along(plots), function (i) {
-      sub(
-        x           = attr(plots[[i]], 'code'), 
-        pattern     = "ggplot(data", 
-        replacement = sprintf("p%i <- ggplot(data[[%s]]", i, single_quote(names(plots)[[i]])),
-        fixed       = TRUE )
-    })
-    c(cmds, sprintf("patchwork::wrap_plots(%s, ncol = 1)", paste0(collapse = ", ", "p", seq_along(plots))))
-    
-  })) %>% add_class('rbiom_code')
-  
-  
-  
-  attr(p, 'cmd') <-  current_cmd('rare_multiplot')
   
   return (p)
 }
