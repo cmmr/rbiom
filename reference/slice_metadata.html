@@ -47,7 +47,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Subset to a specific number of samples.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.2.0/R/s3_methods.r" class="external-link"><code>R/s3_methods.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/s3_methods.r" class="external-link"><code>R/s3_methods.r</code></a></small>
       <div class="d-none name"><code>slice_metadata.Rd</code></div>
     </div>
 
@@ -221,11 +221,11 @@ length as the input. Weights are automatically standardised to sum to 1.</p></dd
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="va">hmp50</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">metadata</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample   Age   BMI `Body Site`   Sex   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP11      24    23 Buccal mucosa Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP12      35    26 Stool         Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP38      26    25 Mid vagina    Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample   Age   BMI `Body Site`    Sex   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP06      32    25 Saliva         Male  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP44      38    19 Mid vagina     Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP15      25    21 Anterior nares Female</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

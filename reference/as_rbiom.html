@@ -49,7 +49,7 @@ Use b &amp;lt;- a$clone() to create copies, not b &amp;lt;- a."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Convert a variety of data types to an rbiom object.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.2.0/R/as_rbiom.r" class="external-link"><code>R/as_rbiom.r</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/R/as_rbiom.r" class="external-link"><code>R/as_rbiom.r</code></a></small>
       <div class="d-none name"><code>as_rbiom.Rd</code></div>
     </div>
 
@@ -107,12 +107,12 @@ For example:</p><dl><dt><em>file</em> - </dt>
 <span class="r-in"><span>      dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"OTU"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">mtx</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Sample1 Sample2 Sample3 Sample4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU1     320     878     631     635</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU2     945     647       3     690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU3     662     786     677     588</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU4     474     921     728     165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU5     339     648     478      41</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU6     807     417     150     462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU1     339     648     478      41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU2     807     417     150     462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU3     878     631     635     168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU4     647       3     690     289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU5     786     677     588     333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU6     921     728     165     402</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># and some sample metadata ----------------------</span></span></span>
 <span class="r-in"><span>    <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -132,7 +132,7 @@ For example:</p><dl><dt><em>file</em> - </dt>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>       3 Fields:  .sample, treatment, and days </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 2.6k - 4.3k reads/sample ────────────────── 2025-05-28 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 1.7k - 4.4k reads/sample ────────────────── 2025-06-27 ──</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
