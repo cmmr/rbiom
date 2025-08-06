@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Read/Write, Analyze, and Visualize BIOM Data • rbiom</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Noto_Sans-0.4.10/font.css" rel="stylesheet">
@@ -15,6 +20,7 @@
 <meta property="og:title" content="Read/Write, Analyze, and Visualize BIOM Data">
 <meta name="description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Read/write all BIOM formats. Compute rarefaction, alpha diversity, and beta diversity (including UniFrac). Summarize counts by taxonomic level. Subset based on metadata. Generate visualizations and statistical analyses. CPU intensive operations are coded in C for speed.">
 <meta property="og:description" content="A toolkit for working with Biological Observation Matrix (BIOM) files. Read/write all BIOM formats. Compute rarefaction, alpha diversity, and beta diversity (including UniFrac). Summarize counts by taxonomic level. Subset based on metadata. Generate visualizations and statistical analyses. CPU intensive operations are coded in C for speed.">
+<meta property="og:image" content="https://cmmr.github.io/rbiom/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -69,23 +75,23 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="rbiom">rbiom<a class="anchor" aria-label="anchor" href="#rbiom"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="rbiom-">rbiom <a class="anchor" aria-label="anchor" href="#rbiom-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
-<p>This package is a toolkit for working with Biological Observation Matrix (BIOM) files. Features include reading/writing all ‘BIOM’ formats, rarefaction, alpha diversity, beta diversity (including ‘UniFrac’), summarizing counts by taxonomic level, subsetting, visualizations, and statistical analysis. All CPU intensive operations are written in C.</p>
-<p>Reference material is available online at <a href="https://cmmr.github.io/rbiom/index.html" class="uri">https://cmmr.github.io/rbiom/index.html</a></p>
-<p>Source code can be found at <a href="https://github.com/cmmr/rbiom" class="external-link uri">https://github.com/cmmr/rbiom</a></p>
+<p><code>rbiom</code> is designed for microbiome researchers, providing visualizations and statistical analyses from Biological Observation Matrix (BIOM) files.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>The latest stable version can be installed from CRAN.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"rbiom"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'rbiom'</span><span class="op">)</span></span></code></pre></div>
 <p>The development version is available on GitHub.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"cmmr/rbiom"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'pak'</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">'cmmr/rbiom'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -96,31 +102,31 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"rbiom"</span>, <span class="st">"extdata"</span>, <span class="st">"hmp50.bz2"</span><span class="op">)</span></span>
+<span><span class="va">infile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">'rbiom'</span>, <span class="st">'extdata'</span>, <span class="st">'hmp50.bz2'</span><span class="op">)</span></span>
 <span><span class="va">biom</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">infile</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="explore-associations-with-metadata">Explore associations with metadata.<a class="anchor" aria-label="anchor" href="#explore-associations-with-metadata"></a>
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">'Body Site'</span>, facet.by <span class="op">=</span> <span class="st">'Sex'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bdiv-1.png"><!-- --></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">"Sex"</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"otu"</span>, <span class="st">"shan"</span><span class="op">)</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">'Sex'</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'otu'</span>, <span class="st">'shan'</span><span class="op">)</span>, stat.by <span class="op">=</span> <span class="st">'Body Site'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bdiv-2.png"><!-- --></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/subset.html">subset</a></span><span class="op">(</span><span class="va">biom</span>, <span class="va">`Body Site`</span> <span class="op">==</span> <span class="st">'Buccal mucosa'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span><span class="st">"Age"</span>, taxa <span class="op">=</span> <span class="fl">2</span>, layers <span class="op">=</span> <span class="st">'ptc'</span>, fit <span class="op">=</span> <span class="st">'lm'</span>, test <span class="op">=</span> <span class="st">'emtrends'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span><span class="st">'Age'</span>, taxa <span class="op">=</span> <span class="fl">2</span>, layers <span class="op">=</span> <span class="st">'ptc'</span>, fit <span class="op">=</span> <span class="st">'lm'</span>, test <span class="op">=</span> <span class="st">'emtrends'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bdiv-3.png"><!-- --></p>
 </div>
 <div class="section level4">
 <h4 id="summarize-counts-by-taxonomic-rank">Summarize counts by taxonomic rank.<a class="anchor" aria-label="anchor" href="#summarize-counts-by-taxonomic-rank"></a>
 </h4>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">10</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">10</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'body'</span>, <span class="st">'age'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-taxa-1.png"><!-- --></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">"Phylum"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">'Phylum'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-taxa-2.png"><!-- --></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Phylum'</span><span class="op">)</span></span>
@@ -139,6 +145,33 @@
 <span><span class="co">#&gt; 10 Phylum HMP02   Proteobacteria         96    24    23 Buccal mucosa Male  </span></span>
 <span><span class="co">#&gt; # ℹ 284 more rows</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>The online manual for <code>rbiom</code> is available at <a href="https://cmmr.github.io/rbiom/" class="uri">https://cmmr.github.io/rbiom/</a>. It includes a getting started guide, articles that explore specific use cases, and reference pages for each function.</p>
+</div>
+<div class="section level2">
+<h2 id="community-guidelines">Community guidelines<a class="anchor" aria-label="anchor" href="#community-guidelines"></a>
+</h2>
+<div class="section level3">
+<h3 id="support">Support<a class="anchor" aria-label="anchor" href="#support"></a>
+</h3>
+<p>Bug reports, feature requests, and general questions can be submitted at <a href="https://github.com/cmmr/rbiom/issues" class="external-link uri">https://github.com/cmmr/rbiom/issues</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h3>
+<p>Pull requests are welcome. Please ensure contributed code is covered by tests and documentation (add additional tests and documentation as needed) and that it passes all automated tests.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="automated-tests">Automated tests<a class="anchor" aria-label="anchor" href="#automated-tests"></a>
+</h2>
+<p>The following commands will check if <code>rbiom</code> passes the bundled testing suite.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'testthat'</span><span class="op">)</span></span>
+<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_check</a></span><span class="op">(</span><span class="st">'rbiom'</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

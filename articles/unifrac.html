@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>UniFrac Algorithms • rbiom</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Noto_Sans-0.4.10/font.css" rel="stylesheet">
@@ -71,11 +76,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>UniFrac Algorithms</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>UniFrac Algorithms</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.2.1/vignettes/articles/unifrac.Rmd" class="external-link"><code>vignettes/articles/unifrac.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/vignettes/articles/unifrac.Rmd" class="external-link"><code>vignettes/articles/unifrac.Rmd</code></a></small>
       <div class="d-none name"><code>unifrac.Rmd</code></div>
     </div>
 
@@ -544,15 +548,15 @@ G &amp;= 0.569754
 <code>qiime diversity beta-phylogenetic --p-metric weighted_normalized_unifrac --p-variance-adjusted</code>
 </li>
 </ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>V</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>L</mi><mi>i</mi></msub><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>A</mi><mi>i</mi></msub><msub><mi>A</mi><mi>T</mi></msub></mfrac><mo>−</mo><mfrac><msub><mi>B</mi><mi>i</mi></msub><msub><mi>B</mi><mi>T</mi></msub></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo>−</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mrow><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>L</mi><mi>i</mi></msub><mfrac><mrow><mfrac><msub><mi>A</mi><mi>i</mi></msub><msub><mi>A</mi><mi>T</mi></msub></mfrac><mo>+</mo><mfrac><msub><mi>B</mi><mi>i</mi></msub><msub><mi>B</mi><mi>T</mi></msub></mfrac></mrow><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo>−</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>V</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>L</mi><mi>i</mi></msub><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>A</mi><mi>i</mi></msub><msub><mi>A</mi><mi>T</mi></msub></mfrac><mo>−</mo><mfrac><msub><mi>B</mi><mi>i</mi></msub><msub><mi>B</mi><mi>T</mi></msub></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msqrt><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo>−</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>L</mi><mi>i</mi></msub><mfrac><mrow><mfrac><msub><mi>A</mi><mi>i</mi></msub><msub><mi>A</mi><mi>T</mi></msub></mfrac><mo>+</mo><mfrac><msub><mi>B</mi><mi>i</mi></msub><msub><mi>B</mi><mi>T</mi></msub></mfrac></mrow><msqrt><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>+</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>A</mi><mi>T</mi></msub><mo>+</mo><msub><mi>B</mi><mi>T</mi></msub><mo>−</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><msub><mi>B</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
 
 V &amp;= \displaystyle \frac
   {\sum_{i = 1}^{n} L_i\displaystyle \frac
     {|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
-    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }
+    {\sqrt{(A_i + B_i)(A_T + B_T - A_i - B_i)}} }
   {\sum_{i = 1}^{n} L_i\displaystyle \frac
     {\frac{A_i}{A_T} + \frac{B_i}{B_T}}
-    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }  \\ \\
+    {\sqrt{(A_i + B_i)(A_T + B_T - A_i - B_i)}} }  \\ \\
 
 \end{align*}</annotation></semantics></math></p>
 <!--

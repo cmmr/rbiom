@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Importing Datasets • rbiom</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Noto_Sans-0.4.10/font.css" rel="stylesheet">
@@ -71,11 +76,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Importing Datasets</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Importing Datasets</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/v2.2.1/vignettes/articles/importing.Rmd" class="external-link"><code>vignettes/articles/importing.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/vignettes/articles/importing.Rmd" class="external-link"><code>vignettes/articles/importing.Rmd</code></a></small>
       <div class="d-none name"><code>importing.Rmd</code></div>
     </div>
 
@@ -124,7 +128,7 @@ R package.</li>
 <span><span class="co">#&gt;       1 Fields:  .sample</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
 <span><span class="co"># convert from phyloseq to rbiom ----------------</span></span>
@@ -147,7 +151,7 @@ R package.</li>
 <span><span class="co">#&gt;       5 Fields:  .sample, BarcodeSequence, ...</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 3 - 7 reads/sample ──────────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 <p>Now we have <code>biom</code>, an rbiom-class object that can be used
 with this package’s functions. If you loaded your data from a BIOM file
@@ -197,7 +201,7 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
 <span><span class="co"># or in a single step ---------------------------</span></span>
@@ -212,7 +216,7 @@ sample.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 <div class="section level3">
 <h3 id="setting-categorical-variables">Setting categorical variables<a class="anchor" aria-label="anchor" href="#setting-categorical-variables"></a>
@@ -252,7 +256,7 @@ object directly, or a newick file/string.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -286,7 +290,7 @@ OTU.</p>
 <span><span class="co">#&gt;       4 Fields:  .sample, state, age, and treatment</span></span>
 <span><span class="co">#&gt;         Tree:    <span style="font-style: italic;">&lt;present&gt;</span></span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-06-30 ──</span></span></span>
+<span><span class="co">#&gt; <span style="color: #808080;">── 1.4k - 3.3k reads/sample ────────────────── 2025-08-06 ──</span></span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
