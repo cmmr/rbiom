@@ -316,10 +316,10 @@ G &= 0.569754
 V &= \displaystyle \frac
   {\sum_{i = 1}^{n} L_i\displaystyle \frac
     {|\frac{A_i}{A_T} - \frac{B_i}{B_T}|}
-    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }
+    {\sqrt{(A_i + B_i)(A_T + B_T - A_i - B_i)}} }
   {\sum_{i = 1}^{n} L_i\displaystyle \frac
     {\frac{A_i}{A_T} + \frac{B_i}{B_T}}
-    {(A_T + B_T)(A_T + B_T - A_i - B_i)} }  \\ \\
+    {\sqrt{(A_i + B_i)(A_T + B_T - A_i - B_i)}} }  \\ \\
 
 \end{align*}
 

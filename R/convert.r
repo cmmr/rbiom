@@ -4,11 +4,12 @@
 #' Requires the relevant Bioconductor R package to be installed:
 #' \describe{
 #'   \item{`convert_to_phyloseq` - }{ [phyloseq](https://bioconductor.org/packages/phyloseq/) }
+#'   \item{`convert_to_animalcules` - }{ [animalcules](https://bioconductor.org/packages/animalcules/) }
 #'   \item{`convert_to_SE` - }{ [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/) }
 #'   \item{`convert_to_TSE` - }{ [TreeSummarizedExperiment](https://bioconductor.org/packages/TreeSummarizedExperiment/) }
 #' }
 #'
-#' A SummarizedExperiment object includes counts, metadata, and taxonomy.
+#' animalcules and SummarizedExperiment objects includes counts, metadata, and taxonomy.
 #'
 #' phyloseq and TreeSummarizedExperiment additionally includes the tree and sequences.
 #'
@@ -17,7 +18,7 @@
 #'
 #' @param ...  Not Used.
 #'
-#' @return A phyloseq, SummarizedExperiment, or TreeSummarizedExperiment object.
+#' @return A phyloseq, animalcules (MultiAssayExperiment), SummarizedExperiment, or TreeSummarizedExperiment object.
 #'
 #' @export
 #' @examples
@@ -46,12 +47,12 @@
 #' }
 
 convert_to_SE <- function (biom, ...) {
-
+  
   require_package('SummarizedExperiment', 'to use convert_to_SE()')
- 
+  
   dots <- list(...)
   biom <- as_rbiom(biom)
- 
+  
   SummarizedExperiment <- getFromNamespace('SummarizedExperiment', 'SummarizedExperiment')
   SummarizedExperiment(
     assays  = list('OTU table' = as.matrix(biom$counts)),
@@ -108,6 +109,47 @@ convert_to_phyloseq <- function (biom, ...) {
     BIOMfilename   = BIOMfilename, 
     treefilename   = treefilename, 
     refseqfilename = refseqfilename )
+}
+
+
+
+#' @rdname convert_to
+#' @export
+
+convert_to_animalcules <- function (biom, ...) {
+  
+  require_package('S4Vectors',            'to use convert_to_animalcules()')
+  require_package('SummarizedExperiment', 'to use convert_to_animalcules()')
+  require_package('MultiAssayExperiment', 'to use convert_to_animalcules()')
+  
+  dots <- list(...)
+  biom <- as_rbiom(biom)
+  
+  DataFrame            <- getFromNamespace('DataFrame',  'S4Vectors')
+  SimpleList           <- getFromNamespace('SimpleList', 'S4Vectors')
+  SummarizedExperiment <- getFromNamespace('SummarizedExperiment', 'SummarizedExperiment')
+  MultiAssayExperiment <- getFromNamespace('MultiAssayExperiment', 'MultiAssayExperiment')
+  
+  assays <- SimpleList('MGX' = as.matrix(biom$counts))
+  
+  colData <- biom$metadata %>%
+    tibble::column_to_rownames(".sample") %>%
+    dplyr::mutate_if(is.factor, as.character) %>%
+    DataFrame()
+  
+  rowData <- biom$taxonomy %>%
+    tibble::column_to_rownames(".otu") %>%
+    dplyr::mutate_all(as.character) %>%
+    DataFrame()
+  
+  se <- SummarizedExperiment(
+    assays  = assays,
+    colData = colData,
+    rowData = rowData )
+  
+  MultiAssayExperiment(
+    experiments = SimpleList('MicrobeGenetics' = se),
+    colData     = colData )
 }
 
 

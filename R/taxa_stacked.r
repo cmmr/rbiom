@@ -27,6 +27,9 @@
 #'        with a layer name ensures that a particular parameter is passed to, 
 #'        and only to, that layer.
 #' 
+#' @details
+#' If `biom` is rarefied, then relative abundance will be shown on the y-axis.
+#' Otherwise, raw abundance will be displayed.
 #' 
 #' @export
 #' @examples

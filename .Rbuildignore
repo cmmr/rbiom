@@ -3,6 +3,7 @@
 ^\.github$
 ^conda$
 ^joss$
+^logo$
 ^pkgdown$
 ^tmp$
 ^vignettes/articles$

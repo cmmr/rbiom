@@ -100,6 +100,10 @@ respectively.
 \description{
 Display taxa abundances as a stacked bar graph.
 }
+\details{
+If \code{biom} is rarefied, then relative abundance will be shown on the y-axis.
+Otherwise, raw abundance will be displayed.
+}
 \examples{
     library(rbiom)
     

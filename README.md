@@ -1,7 +1,7 @@
 
-<!-- Run `devtools::build_readme(); pkgdown::build_home()` after editing.  -->
+<!-- Run `devtools::build_readme()` after editing.  -->
 
-# rbiom
+# rbiom <img src="man/figures/logo.png" align="right" width="120" alt="ecodive logo" />
 
 <!-- badges: start -->
 
@@ -12,30 +12,23 @@
 [![covr](https://codecov.io/gh/cmmr/rbiom/graph/badge.svg)](https://app.codecov.io/gh/cmmr/rbiom)
 <!-- badges: end -->
 
-This package is a toolkit for working with Biological Observation Matrix
-(BIOM) files. Features include reading/writing all ‘BIOM’ formats,
-rarefaction, alpha diversity, beta diversity (including ‘UniFrac’),
-summarizing counts by taxonomic level, subsetting, visualizations, and
-statistical analysis. All CPU intensive operations are written in C.
-
-Reference material is available online at
-<https://cmmr.github.io/rbiom/index.html>
-
-Source code can be found at <https://github.com/cmmr/rbiom>
+`rbiom` is designed for microbiome researchers, providing visualizations
+and statistical analyses from Biological Observation Matrix (BIOM)
+files.
 
 ## Installation
 
 The latest stable version can be installed from CRAN.
 
 ``` r
-install.packages("pak")
-pak::pak("rbiom")
+install.packages('rbiom')
 ```
 
 The development version is available on GitHub.
 
 ``` r
-pak::pak("cmmr/rbiom")
+install.packages('pak')
+pak::pak('cmmr/rbiom')
 ```
 
 ## Usage
@@ -45,27 +38,27 @@ pak::pak("cmmr/rbiom")
 ``` r
 library(rbiom)
 
-infile <- system.file(package = "rbiom", "extdata", "hmp50.bz2")
+infile <- system.file(package = 'rbiom', 'extdata', 'hmp50.bz2')
 biom   <- rarefy(infile)
 ```
 
 #### Explore associations with metadata.
 
 ``` r
-bdiv_ord_plot(biom, stat.by = "Body Site", facet.by = "Sex")
+bdiv_ord_plot(biom, stat.by = 'Body Site', facet.by = 'Sex')
 ```
 
 ![](man/figures/README-bdiv-1.png)<!-- -->
 
 ``` r
-adiv_boxplot(biom, x = "Sex", adiv = c("otu", "shan"), stat.by = "Body Site")
+adiv_boxplot(biom, x = 'Sex', adiv = c('otu', 'shan'), stat.by = 'Body Site')
 ```
 
 ![](man/figures/README-bdiv-2.png)<!-- -->
 
 ``` r
 subset(biom, `Body Site` == 'Buccal mucosa') %>% 
-  taxa_corrplot("Age", taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')
+  taxa_corrplot('Age', taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')
 ```
 
 ![](man/figures/README-bdiv-3.png)<!-- -->
@@ -73,13 +66,13 @@ subset(biom, `Body Site` == 'Buccal mucosa') %>%
 #### Summarize counts by taxonomic rank.
 
 ``` r
-taxa_heatmap(biom, taxa = 10, tracks = c("body", "age"))
+taxa_heatmap(biom, taxa = 10, tracks = c('body', 'age'))
 ```
 
 ![](man/figures/README-taxa-1.png)<!-- -->
 
 ``` r
-taxa_stacked(biom, rank = "Phylum")
+taxa_stacked(biom, rank = 'Phylum')
 ```
 
 ![](man/figures/README-taxa-2.png)<!-- -->
@@ -100,4 +93,34 @@ taxa_table(biom, 'Phylum')
 #>  9 Phylum HMP02   Actinobacteria         52    24    23 Buccal mucosa Male  
 #> 10 Phylum HMP02   Proteobacteria         96    24    23 Buccal mucosa Male  
 #> # ℹ 284 more rows
+```
+
+## Documentation
+
+The online manual for `rbiom` is available at
+<https://cmmr.github.io/rbiom/>. It includes a getting started guide,
+articles that explore specific use cases, and reference pages for each
+function.
+
+## Community guidelines
+
+### Support
+
+Bug reports, feature requests, and general questions can be submitted at
+<https://github.com/cmmr/rbiom/issues>.
+
+### Contributing
+
+Pull requests are welcome. Please ensure contributed code is covered by
+tests and documentation (add additional tests and documentation as
+needed) and that it passes all automated tests.
+
+## Automated tests
+
+The following commands will check if `rbiom` passes the bundled testing
+suite.
+
+``` r
+install.packages('testthat')
+testthat::test_check('rbiom')
 ```

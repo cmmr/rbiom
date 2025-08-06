@@ -5,6 +5,7 @@
 \alias{convert_to_SE}
 \alias{convert_to_TSE}
 \alias{convert_to_phyloseq}
+\alias{convert_to_animalcules}
 \title{Convert biom data to an external package class.}
 \usage{
 convert_to_SE(biom, ...)
@@ -12,6 +13,8 @@ convert_to_SE(biom, ...)
 convert_to_TSE(biom, ...)
 
 convert_to_phyloseq(biom, ...)
+
+convert_to_animalcules(biom, ...)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
@@ -20,18 +23,19 @@ Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here
 \item{...}{Not Used.}
 }
 \value{
-A phyloseq, SummarizedExperiment, or TreeSummarizedExperiment object.
+A phyloseq, animalcules (MultiAssayExperiment), SummarizedExperiment, or TreeSummarizedExperiment object.
 }
 \description{
 Requires the relevant Bioconductor R package to be installed:
 \describe{
 \item{\code{convert_to_phyloseq} - }{ \href{https://bioconductor.org/packages/phyloseq/}{phyloseq} }
+\item{\code{convert_to_animalcules} - }{ \href{https://bioconductor.org/packages/animalcules/}{animalcules} }
 \item{\code{convert_to_SE} - }{ \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} }
 \item{\code{convert_to_TSE} - }{ \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment} }
 }
 }
 \details{
-A SummarizedExperiment object includes counts, metadata, and taxonomy.
+animalcules and SummarizedExperiment objects includes counts, metadata, and taxonomy.
 
 phyloseq and TreeSummarizedExperiment additionally includes the tree and sequences.
 }

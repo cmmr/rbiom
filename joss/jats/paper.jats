@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.2 20190208//EN"
+                  "JATS-publishing1.dtd">
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" dtd-version="1.2" article-type="other">
+<front>
+<journal-meta>
+<journal-id></journal-id>
+<journal-title-group>
+<journal-title>Journal of Open Source Software</journal-title>
+<abbrev-journal-title>JOSS</abbrev-journal-title>
+</journal-title-group>
+<issn publication-format="electronic">2475-9066</issn>
+<publisher>
+<publisher-name>Open Journals</publisher-name>
+</publisher>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="publisher-id">0</article-id>
+<article-id pub-id-type="doi">N/A</article-id>
+<title-group>
+<article-title>rbiom: An R package for microbiome
+analysis</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author" corresp="yes">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-2479-2044</contrib-id>
+<name>
+<surname>Smith</surname>
+<given-names>Daniel P</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+<xref ref-type="corresp" rid="cor-1"><sup>*</sup></xref>
+</contrib>
+<contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-4046-6898</contrib-id>
+<name>
+<surname>Petrosino</surname>
+<given-names>Joseph F</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<aff id="aff-1">
+<institution-wrap>
+<institution>Alkek Center for Metagenomics and Microbiome Research,
+Department of Molecular Virology and Microbiology, Baylor College of
+Medicine, Houston, Texas, USA</institution>
+<institution-id institution-id-type="ROR">02pttbw34</institution-id>
+</institution-wrap>
+</aff>
+</contrib-group>
+<author-notes>
+<corresp id="cor-1">* E-mail: <email></email></corresp>
+</author-notes>
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2025-07-03">
+<day>3</day>
+<month>7</month>
+<year>2025</year>
+</pub-date>
+<volume>¿VOL?</volume>
+<issue>¿ISSUE?</issue>
+<fpage>¿PAGE?</fpage>
+<permissions>
+<copyright-statement>Authors of papers retain copyright and release the
+work under a Creative Commons Attribution 4.0 International License (CC
+BY 4.0)</copyright-statement>
+<copyright-year>1970</copyright-year>
+<copyright-holder>The article authors</copyright-holder>
+<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+<license-p>Authors of papers retain copyright and release the work under
+a Creative Commons Attribution 4.0 International License (CC BY
+4.0)</license-p>
+</license>
+</permissions>
+<kwd-group kwd-group-type="author">
+<kwd>bioinformatics</kwd>
+<kwd>bacteria</kwd>
+<kwd>ecology</kwd>
+<kwd>metadata</kwd>
+<kwd>statistics</kwd>
+<kwd>visualization</kwd>
+<kwd>regression</kwd>
+<kwd>correlation</kwd>
+<kwd>heatmap</kwd>
+<kwd>ordination</kwd>
+<kwd>community</kwd>
+<kwd>reproducible</kwd>
+<kwd>unifrac</kwd>
+</kwd-group>
+</article-meta>
+</front>
+<body>
+<sec id="summary">
+  <title>Summary</title>
+  <p>Microbes live all around us, on us, and even inside us. Their
+  impacts can be as personal as protecting or predisposing us to
+  disease, or as global as regulating planetary biogeochemical cycles.
+  Modern DNA sequencing technology allows studies to characterize
+  thousands of microbial communities at a time. The bottleneck is no
+  longer generating data, but rather analyzing and interpreting the
+  results.</p>
+  <p><monospace>rbiom</monospace> is an R package for analyzing
+  microbial community datasets. Its features include:</p>
+  <list list-type="order">
+    <list-item>
+      <p><bold>Preprocessing</bold> - Merges, subsets, and rarefies data
+      from multiple sources.</p>
+    </list-item>
+    <list-item>
+      <p><bold>Calculation</bold> - Diversity, similarity, and abundance
+      metrics using fast multithreaded C code.</p>
+    </list-item>
+    <list-item>
+      <p><bold>Statistics</bold> - Identifies significant correlations
+      with sample metadata.</p>
+    </list-item>
+    <list-item>
+      <p><bold>Visualization</bold> - Customizable box plots,
+      ordinations, heatmaps, and stacked bar charts.</p>
+    </list-item>
+  </list>
+</sec>
+<sec id="statement-of-need">
+  <title>Statement of Need</title>
+  <p>Working with microbiome datasets is challenging. Analyses must
+  integrate observed counts, sample metadata, taxonomic mappings, and
+  phylogenetic trees into data structures compatible with statistical
+  testing and visualization. <monospace>rbiom</monospace> makes it
+  simple to turn these complex datasets into informative figures,
+  bringing together the speed of C with the powerful statistics and
+  elegant graphics of R.</p>
+</sec>
+<sec id="state-of-the-field">
+  <title>State of the Field</title>
+  <sec id="current-tools">
+    <title>Current Tools</title>
+    <p>Wen et al.
+    (<xref alt="2023" rid="ref-WenU003A2023" ref-type="bibr">2023</xref>)
+    provides an excellent review of R packages for microbiome analysis.
+    The list below includes those mentioned by Wen et al as and others
+    that are actively maintained.</p>
+    <p><bold>R Packages</bold></p>
+    <list list-type="bullet">
+      <list-item>
+        <p><monospace>ampvis2</monospace>
+        (<xref alt="Andersen et al., 2018" rid="ref-ampvis2" ref-type="bibr">Andersen
+        et al., 2018</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>animalcules</monospace>
+        (<xref alt="Zhao et al., 2021" rid="ref-animalcules" ref-type="bibr">Zhao
+        et al., 2021</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>mia</monospace>
+        (<xref alt="Borman et al., 2025" rid="ref-mia" ref-type="bibr">Borman
+        et al., 2025</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>microbiome</monospace>
+        (<xref alt="Lahti &amp; Shetty, 2012-2019" rid="ref-microbiome" ref-type="bibr">Lahti
+        &amp; Shetty, 2012-2019</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>MicrobiomeAnalystR</monospace>
+        (<xref alt="Dhariwal et al., 2017" rid="ref-MicrobiomeAnalystR" ref-type="bibr">Dhariwal
+        et al., 2017</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>MicrobiomeStat</monospace>
+        (<xref alt="Yang et al., 2025" rid="ref-MicrobiomeStat" ref-type="bibr">Yang
+        et al., 2025</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>MicrobiotaProcess</monospace>
+        (<xref alt="Xu et al., 2023" rid="ref-MicrobiotaProcess" ref-type="bibr">Xu
+        et al., 2023</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>Microeco</monospace>
+        (<xref alt="C. Liu et al., 2020" rid="ref-microeco" ref-type="bibr">C.
+        Liu et al., 2020</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>microViz</monospace>
+        (<xref alt="Barnett et al., 2021" rid="ref-microViz" ref-type="bibr">Barnett
+        et al., 2021</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>phyloseq</monospace>
+        (<xref alt="McMurdie &amp; Holmes, 2013" rid="ref-phyloseq" ref-type="bibr">McMurdie
+        &amp; Holmes, 2013</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>phylosmith</monospace>
+        (<xref alt="Smith, 2019" rid="ref-phylosmith" ref-type="bibr">Smith,
+        2019</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>Tidytacos</monospace>
+        (<xref alt="Tidytacos?" rid="ref-Tidytacos" ref-type="bibr"><bold>Tidytacos?</bold></xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>vegan</monospace>
+        (<xref alt="Oksanen et al., 2025" rid="ref-vegan" ref-type="bibr">Oksanen
+        et al., 2025</xref>)</p>
+      </list-item>
+    </list>
+    <p><bold>Command-line Tools</bold></p>
+    <list list-type="bullet">
+      <list-item>
+        <p><monospace>EasyAmplicon</monospace>
+        (<xref alt="Y. Liu et al., 2023" rid="ref-EasyAmplicon" ref-type="bibr">Y.
+        Liu et al., 2023</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>mothur</monospace>
+        (<xref alt="Schloss et al., 2009" rid="ref-mothur" ref-type="bibr">Schloss
+        et al., 2009</xref>)</p>
+      </list-item>
+      <list-item>
+        <p><monospace>QIIME2</monospace>
+        (<xref alt="Bolyen et al., 2019" rid="ref-QIIME2" ref-type="bibr">Bolyen
+        et al., 2019</xref>)</p>
+      </list-item>
+    </list>
+  </sec>
+  <sec id="advancement">
+    <title>Advancement</title>
+    <p><monospace>rbiom</monospace>’s speed and usability sets it apart
+    from this crowd.</p>
+    <sec id="speed">
+      <title>Speed</title>
+      <p>The R packages listed above rely on
+      <monospace>GUniFrac</monospace>
+      (<xref alt="Chen et al., 2023" rid="ref-GUniFrac" ref-type="bibr">Chen
+      et al., 2023</xref>), <monospace>vegan</monospace>,
+      <monospace>phyloseq</monospace>, and/or
+      <monospace>ampvis2</monospace> for calculating beta diversity
+      metrics, namely bray-curtis, euclidean, manhattan, jaccard, and
+      UniFrac. The speed of these O(n^2) operations determines how many
+      samples can be cross-compared in a feasible amount of time. The
+      exception is <monospace>mia</monospace>, which uses
+      <monospace>rbiom</monospace> for UniFrac calculations.</p>
+      <p>Benchmarks show that <monospace>rbiom</monospace> calculates
+      UniFrac dissimilarities 10 times faster than
+      <monospace>GUniFrac</monospace>, 50 times faster than
+      <monospace>phyloseq</monospace>, and 400 times faster than
+      <monospace>ampvis2</monospace><xref ref-type="fn" rid="fn1">1</xref>.
+      Additionally, <monospace>rbiom</monospace> calculates bray-curtis,
+      euclidean, manhattan, and jaccard metrics four times faster than
+      <monospace>vegan</monospace><xref ref-type="fn" rid="fn2">2</xref>.</p>
+      <p><monospace>rbiom</monospace> has managed these improvements by
+      implementing many central algorithms in C and ensuring full
+      utilization of multi-CPU core systems. This brings the speed of
+      <monospace>rbiom</monospace> in line with compiled tools such as
+      <monospace>mothur</monospace> and
+      <monospace>QIIME2</monospace>.</p>
+    </sec>
+    <sec id="usability">
+      <title>Usability</title>
+      <p><monospace>rbiom</monospace> can import data from a variety of
+      sources - BIOM files, R data frames, phyloseq objects, and more.
+      It can export to all these formats as well.</p>
+      <p>Pre-built binaries are available from CRAN and Anaconda, making
+      installation easy on Windows, MacOS, and Linux. As much effort has
+      been put into documentation as the code itself. Users will find
+      that all functions are clearly documented with examples.</p>
+      <p>These programs offer a plethora of features and are fast even
+      on large datasets, however, they come with a steep learning curve
+      that may be discouraging to new users. Additionally, as
+      command-line programs, it is cumbersome to interact with them from
+      R.</p>
+      <p><monospace>rbiom</monospace> sets itself apart from in two
+      ways. First, it uses compiled C code to speed up calculations,
+      thereby enabling processing of much larger datasets.</p>
+      <p>but it is the first to</p>
+      <p>Several packages are currently available for working with
+      microbiome datasets.</p>
+      <p><monospace>QIIME2</monospace>
+      (<xref alt="Bolyen et al., 2019" rid="ref-QIIME2" ref-type="bibr">Bolyen
+      et al., 2019</xref>), <monospace>mothur</monospace>
+      (<xref alt="Schloss et al., 2009" rid="ref-mothur" ref-type="bibr">Schloss
+      et al., 2009</xref>), and <monospace>Phyloseq</monospace>
+      (<xref alt="McMurdie &amp; Holmes, 2013" rid="ref-phyloseq" ref-type="bibr">McMurdie
+      &amp; Holmes, 2013</xref>) offer overlapping functionality with
+      <monospace>rbiom</monospace>, but with important distinctions.
+      <monospace>QIIME2</monospace> and <monospace>mothur</monospace>
+      are designed for command-line interaction, making them difficult
+      to integrate into R projects. <monospace>Phyloseq</monospace> has
+      been a staple of R bioinformatics for a decade, but is
+      frustratingly slow for studies with thousands of samples.</p>
+      <p>This package is designed for users of all experience levels.
+      Novice R users will appreciate that a couple commands will produce
+      publication-ready figures. Advanced R users can use
+      <monospace>rbiom</monospace> to complement their existing
+      pipelines with faster and more flexible functions.</p>
+    </sec>
+  </sec>
+</sec>
+<sec id="implementation">
+  <title>Implementation</title>
+  <p><monospace>rbiom</monospace> is an R package for working with
+  abundance datasets, such as OTU or ASV counts from 16S amplicon
+  sequencing. It enables importing/exporting all BIOM formats,
+  subsetting, rarefying, manipulation of metadata/taxonomy/phylogeny,
+  computation of alpha and beta diversity metrics, and summarizing
+  counts per taxonomic rank. Computationally intensive tasks (including
+  UniFrac
+  (<xref alt="Lozupone &amp; Knight, 2005" rid="ref-UniFrac" ref-type="bibr">Lozupone
+  &amp; Knight, 2005</xref>)) have been implemented with multithreaded C
+  to greatly reduce calculation time.</p>
+  <p>Visualization is a key component of <monospace>rbiom</monospace>.
+  Rarefaction curves, taxa abundances, alpha diversity, and beta
+  diversity can all be plotted in a variety of graphical formats,
+  including correlation, heatmap, ordination, stacked bar, and box
+  plots. In <monospace>rbiom</monospace>, box plots can be any
+  combination of box, bar, violin, dot, strip, and/or range layers. Each
+  plot includes provenance and modification history as attributes, as
+  well as the <monospace>ggplot2</monospace>
+  (<xref alt="Wickham, 2016" rid="ref-ggplot2" ref-type="bibr">Wickham,
+  2016</xref>) call used to render it to encourage downstream user
+  customization.</p>
+  <p>Correlations between sample metadata and microbiome structure can
+  be identified by mapping one or more metadata variables of interest to
+  a plot’s axes, facets, and/or aesthetics. These mappings can
+  optionally define color/shape/pattern assignments, category ordering,
+  or subsetting parameters. When metadata is associated with a axis or
+  aesthetic, <monospace>rbiom</monospace> will automatically run the
+  appropriate statistical test, correct for multiple comparisons, and
+  display significant differences on the plot, captioning it with a
+  brief methodology.</p>
+  <p>Currently, <monospace>rbiom</monospace> can perform four types of
+  significance testing. On correlation plots with a numeric metadata
+  variable on the x-axis (e.g., Age, BMI), linear regression will be
+  computed with R’s <monospace>lm</monospace> linear model function. For
+  plots with two categories (e.g. Male vs Female), a Mann-Whitney test
+  (<xref alt="Mann &amp; Whitney, 1947" rid="ref-MannU003A1947" ref-type="bibr">Mann
+  &amp; Whitney, 1947</xref>) is run with R’s
+  <monospace>wilcox.test</monospace>. When three or more categories are
+  compared, the Kruskal-Wallis rank sum test
+  (<xref alt="Kruskal &amp; Wallis, 1952" rid="ref-KruskalU003A1952" ref-type="bibr">Kruskal
+  &amp; Wallis, 1952</xref>) is used instead via R’s
+  <monospace>kruskal.test</monospace> function. P-values for ordinations
+  are derived using the <monospace>adonis2</monospace> function from the
+  <monospace>vegan</monospace> R package
+  (<xref alt="Oksanen et al., 2025" rid="ref-vegan" ref-type="bibr">Oksanen
+  et al., 2025</xref>), which randomly re-categorizes samples 1,000
+  times to estimate the significance of the observed clustering.
+  P-values are corrected for multiple comparisons using the method
+  described by
+  (<xref alt="Benjamini &amp; Hochberg, 1995" rid="ref-BenjaminiU003A1995" ref-type="bibr">Benjamini
+  &amp; Hochberg, 1995</xref>) via R’s <monospace>p.adjust</monospace>
+  function to control for the false discovery rate.</p>
+</sec>
+<sec id="usage">
+  <title>Usage</title>
+  <sec id="installation">
+    <title>Installation</title>
+    <p><monospace>rbiom</monospace> can be installed using R’s default
+    package manager.</p>
+    <code language="r script">install.packages('rbiom')</code>
+    <p>It can also be installed directly to a Conda environment.</p>
+    <code language="bash">conda install conda-forge::r-rbiom</code>
+  </sec>
+  <sec id="tutorials">
+    <title>Tutorials</title>
+    <p>Documentation and examples are available on the
+    <ext-link ext-link-type="uri" xlink:href="https://cmmr.github.io/rbiom/"><monospace>rbiom</monospace>
+    website</ext-link> and in R with:</p>
+    <code language="r script">help(package = 'rbiom')</code>
+  </sec>
+  <sec id="example-analysis">
+    <title>Example Analysis</title>
+    <p>Import the bundled <monospace>hmp50.bz2</monospace> biological
+    observation matrix (BIOM) file.</p>
+    <code language="r script">library(rbiom)
+infile &lt;- system.file(package = &quot;rbiom&quot;, &quot;extdata&quot;, &quot;hmp50.bz2&quot;)
+biom   &lt;- as_rbiom(infile)
+biom
+#&gt; ══ Human Microbiome Project - 50 Sample Demo ══════
+#&gt; 
+#&gt; Oral, nasal, vaginal, and fecal samples from a
+#&gt; diverse set of healthy volunteers. Source: Human
+#&gt; Microbiome Project (&lt;https://hmpdacc.org&gt;).
+#&gt; 
+#&gt;      50 Samples: HMP01, HMP02, HMP03, ... 
+#&gt;     490 OTUs:    Unc01yki, Unc53100, ... 
+#&gt;       7 Ranks:   .otu, Kingdom, Phylum, ... 
+#&gt;       5 Fields:  .sample, Age, BMI, ... 
+#&gt;         Tree:    &lt;present&gt;
+#&gt; 
+#&gt; ── 182 - 22k reads/sample ─────────── 2023-09-22 ──</code>
+    <p>Rarefy abundance counts and explore associations with
+    metadata..</p>
+    <code language="r script">biom &lt;- rarefy(biom)
+bdiv_ord_plot(biom, stat.by = &quot;Body Site&quot;, facet.by = &quot;Sex&quot;)</code>
+    <fig>
+      <caption><p>A beta diversity ordination plot. Samples cluster
+      significantly by body site (p = 0.001) and are characterized by
+      different bacterial genera.</p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="bdiv_ord_plot.png" />
+    </fig>
+    <code language="r script">adiv_boxplot(biom, x = &quot;Sex&quot;, adiv = c(&quot;otu&quot;, &quot;shan&quot;), stat.by = &quot;Body Site&quot;)</code>
+    <fig>
+      <caption><p>An alpha diversity box plot. Observed OTUs and shannon
+      diversity indices vary significantly by body site for both males
+      (p = 2e-04) and females (p = 0.003).</p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="adiv_boxplot.png" />
+    </fig>
+    <code language="r script">subset(biom, `Body Site` == 'Buccal mucosa') %&gt;% 
+  taxa_corrplot(&quot;Age&quot;, taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')</code>
+    <fig>
+      <caption><p>A taxa correlation plot. The two most abundant buccal
+      mucosa-associated genera show weak correlations with
+      age.</p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="taxa_corrplot.png" />
+    </fig>
+    <code language="r script">taxa_heatmap(biom, taxa = 10, tracks = c(&quot;body&quot;, &quot;age&quot;))</code>
+    <fig>
+      <caption><p>A taxa heatmap plot. The 10 most abundant genera are
+      primarily found on a single specific body site.</p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="taxa_heatmap.png" />
+    </fig>
+    <code language="r script">taxa_stacked(biom, rank = &quot;Phylum&quot;)</code>
+    <fig>
+      <caption><p>A taxa stacked bar plot. This dataset contains
+      well-defined phylum-level ecotypes.</p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="taxa_stacked.png" />
+    </fig>
+  </sec>
+</sec>
+</body>
+<back>
+<ref-list>
+  <title>Acknowledgements</title>
+  <ref id="ref-MicrobiomeStat">
+    <element-citation publication-type="software">
+      <person-group person-group-type="author">
+        <name><surname>Yang</surname><given-names>Chen</given-names></name>
+        <name><surname>Chen</surname><given-names>Jun</given-names></name>
+        <name><surname>Zhang</surname><given-names>Xianyang</given-names></name>
+        <name><surname>Zhou</surname><given-names>Huijuan</given-names></name>
+      </person-group>
+      <article-title>Comprehensive statistical and visualization methods for microbiome and multi-omics data</article-title>
+      <publisher-name>Zenodo</publisher-name>
+      <year iso-8601-date="2025">2025</year>
+      <pub-id pub-id-type="doi">10.5281/zenodo.14881492</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-MicrobiotaProcess">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Xu</surname><given-names>Shuangbin</given-names></name>
+        <name><surname>Zhan</surname><given-names>Li</given-names></name>
+        <name><surname>Tang</surname><given-names>Wenli</given-names></name>
+        <name><surname>Wang</surname><given-names>Qianwen</given-names></name>
+        <name><surname>Dai</surname><given-names>Zehan</given-names></name>
+        <name><surname>Zhou</surname><given-names>Lang</given-names></name>
+        <name><surname>Feng</surname><given-names>Tingze</given-names></name>
+        <name><surname>Chen</surname><given-names>Meijun</given-names></name>
+        <name><surname>Wu</surname><given-names>Tianzhi</given-names></name>
+        <name><surname>Hu</surname><given-names>Erqiang</given-names></name>
+        <name><surname>Yu</surname><given-names>Guangchuang</given-names></name>
+      </person-group>
+      <article-title>MicrobiotaProcess: A comprehensive r package for deep mining microbiome</article-title>
+      <source>The Innovation</source>
+      <year iso-8601-date="2023">2023</year>
+      <volume>4</volume>
+      <issue>2</issue>
+      <pub-id pub-id-type="doi">10.1016/j.xinn.2023.100388</pub-id>
+      <fpage>100388</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-GUniFrac">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <name><surname>Chen</surname><given-names>Jun</given-names></name>
+        <name><surname>Zhang</surname><given-names>Xianyang</given-names></name>
+        <name><surname>Yang</surname><given-names>Lu</given-names></name>
+        <name><surname>Zhang</surname><given-names>Lujun</given-names></name>
+      </person-group>
+      <source>GUniFrac: Generalized UniFrac distances, distance-based multivariate methods and feature-based univariate methods for microbiome data analysis</source>
+      <year iso-8601-date="2023">2023</year>
+      <pub-id pub-id-type="doi">10.32614/CRAN.package.GUniFrac</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-ampvis2">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Andersen</surname><given-names>Kasper S.</given-names></name>
+        <name><surname>Kirkegaard</surname><given-names>Rasmus H.</given-names></name>
+        <name><surname>Karst</surname><given-names>Soren M.</given-names></name>
+        <name><surname>Albertsen</surname><given-names>Mads</given-names></name>
+      </person-group>
+      <article-title>ampvis2: An r package to analyse and visualise 16S rRNA amplicon data</article-title>
+      <source>bioRxiv</source>
+      <year iso-8601-date="2018">2018</year>
+      <uri>https://doi.org/10.1101/299537</uri>
+    </element-citation>
+  </ref>
+  <ref id="ref-phylosmith">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Smith</surname><given-names>Schuyler D.</given-names></name>
+      </person-group>
+      <article-title>Phylosmith: An r-package for reproducible and efficient microbiome analysis with phyloseq-objects</article-title>
+      <source>Journal of Open Source Software</source>
+      <year iso-8601-date="2019">2019</year>
+      <volume>4</volume>
+      <issue>38</issue>
+      <pub-id pub-id-type="doi">10.21105/joss.01442</pub-id>
+      <fpage>1442</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-phyloseq">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>McMurdie</surname><given-names>Paul J</given-names></name>
+        <name><surname>Holmes</surname><given-names>Susan</given-names></name>
+      </person-group>
+      <article-title>Phyloseq: An r package for reproducible interactive analysis and graphics of microbiome census data</article-title>
+      <source>PloS one</source>
+      <year iso-8601-date="2013">2013</year>
+      <volume>8</volume>
+      <issue>4</issue>
+      <pub-id pub-id-type="doi">10.1371/journal.pone.0061217</pub-id>
+      <fpage>e61217</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-QIIME2">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Bolyen</surname><given-names>Evan</given-names></name>
+        <name><surname>Rideout</surname><given-names>Jai Ram</given-names></name>
+        <name><surname>Dillon</surname><given-names>Matthew R.</given-names></name>
+        <name><surname>Bokulich</surname><given-names>Nicholas A.</given-names></name>
+        <name><surname>Abnet</surname><given-names>Christian C.</given-names></name>
+        <name><surname>Al-Ghalith</surname><given-names>Gabriel A.</given-names></name>
+        <name><surname>Alexander</surname><given-names>Harriet</given-names></name>
+        <name><surname>Alm</surname><given-names>Eric J.</given-names></name>
+        <name><surname>Arumugam</surname><given-names>Manimozhiyan</given-names></name>
+        <name><surname>Asnicar</surname><given-names>Francesco</given-names></name>
+        <name><surname>Bai</surname><given-names>Yang</given-names></name>
+        <name><surname>Bisanz</surname><given-names>Jordan E.</given-names></name>
+        <name><surname>Bittinger</surname><given-names>Kyle</given-names></name>
+        <name><surname>Brejnrod</surname><given-names>Asker</given-names></name>
+        <name><surname>Brislawn</surname><given-names>Colin J.</given-names></name>
+        <name><surname>Brown</surname><given-names>C. Titus</given-names></name>
+        <name><surname>Callahan</surname><given-names>Benjamin J.</given-names></name>
+        <name><surname>Caraballo-Rodríguez</surname><given-names>Andrés Mauricio</given-names></name>
+        <name><surname>Chase</surname><given-names>John</given-names></name>
+        <name><surname>Cope</surname><given-names>Emily K.</given-names></name>
+        <name><surname>Da Silva</surname><given-names>Ricardo</given-names></name>
+        <name><surname>Diener</surname><given-names>Christian</given-names></name>
+        <name><surname>Dorrestein</surname><given-names>Pieter C.</given-names></name>
+        <name><surname>Douglas</surname><given-names>Gavin M.</given-names></name>
+        <name><surname>Durall</surname><given-names>Daniel M.</given-names></name>
+        <name><surname>Duvallet</surname><given-names>Claire</given-names></name>
+        <name><surname>Edwardson</surname><given-names>Christian F.</given-names></name>
+        <name><surname>Ernst</surname><given-names>Madeleine</given-names></name>
+        <name><surname>Estaki</surname><given-names>Mehrbod</given-names></name>
+        <name><surname>Fouquier</surname><given-names>Jennifer</given-names></name>
+        <name><surname>Gauglitz</surname><given-names>Julia M.</given-names></name>
+        <name><surname>Gibbons</surname><given-names>Sean M.</given-names></name>
+        <name><surname>Gibson</surname><given-names>Deanna L.</given-names></name>
+        <name><surname>Gonzalez</surname><given-names>Antonio</given-names></name>
+        <name><surname>Gorlick</surname><given-names>Kestrel</given-names></name>
+        <name><surname>Guo</surname><given-names>Jiarong</given-names></name>
+        <name><surname>Hillmann</surname><given-names>Benjamin</given-names></name>
+        <name><surname>Holmes</surname><given-names>Susan</given-names></name>
+        <name><surname>Holste</surname><given-names>Hannes</given-names></name>
+        <name><surname>Huttenhower</surname><given-names>Curtis</given-names></name>
+        <name><surname>Huttley</surname><given-names>Gavin A.</given-names></name>
+        <name><surname>Janssen</surname><given-names>Stefan</given-names></name>
+        <name><surname>Jarmusch</surname><given-names>Alan K.</given-names></name>
+        <name><surname>Jiang</surname><given-names>Lingjing</given-names></name>
+        <name><surname>Kaehler</surname><given-names>Benjamin D.</given-names></name>
+        <name><surname>Kang</surname><given-names>Kyo Bin</given-names></name>
+        <name><surname>Keefe</surname><given-names>Christopher R.</given-names></name>
+        <name><surname>Keim</surname><given-names>Paul</given-names></name>
+        <name><surname>Kelley</surname><given-names>Scott T.</given-names></name>
+        <name><surname>Knights</surname><given-names>Dan</given-names></name>
+        <name><surname>Koester</surname><given-names>Irina</given-names></name>
+        <name><surname>Kosciolek</surname><given-names>Tomasz</given-names></name>
+        <name><surname>Kreps</surname><given-names>Jorden</given-names></name>
+        <name><surname>Langille</surname><given-names>Morgan G. I.</given-names></name>
+        <name><surname>Lee</surname><given-names>Joslynn</given-names></name>
+        <name><surname>Ley</surname><given-names>Ruth</given-names></name>
+        <name><surname>Liu</surname><given-names>Yong-Xin</given-names></name>
+        <name><surname>Loftfield</surname><given-names>Erikka</given-names></name>
+        <name><surname>Lozupone</surname><given-names>Catherine</given-names></name>
+        <name><surname>Maher</surname><given-names>Massoud</given-names></name>
+        <name><surname>Marotz</surname><given-names>Clarisse</given-names></name>
+        <name><surname>Martin</surname><given-names>Bryan D.</given-names></name>
+        <name><surname>McDonald</surname><given-names>Daniel</given-names></name>
+        <name><surname>McIver</surname><given-names>Lauren J.</given-names></name>
+        <name><surname>Melnik</surname><given-names>Alexey V.</given-names></name>
+        <name><surname>Metcalf</surname><given-names>Jessica L.</given-names></name>
+        <name><surname>Morgan</surname><given-names>Sydney C.</given-names></name>
+        <name><surname>Morton</surname><given-names>Jamie T.</given-names></name>
+        <name><surname>Naimey</surname><given-names>Ahmad Turan</given-names></name>
+        <name><surname>Navas-Molina</surname><given-names>Jose A.</given-names></name>
+        <name><surname>Nothias</surname><given-names>Louis Felix</given-names></name>
+        <name><surname>Orchanian</surname><given-names>Stephanie B.</given-names></name>
+        <name><surname>Pearson</surname><given-names>Talima</given-names></name>
+        <name><surname>Peoples</surname><given-names>Samuel L.</given-names></name>
+        <name><surname>Petras</surname><given-names>Daniel</given-names></name>
+        <name><surname>Preuss</surname><given-names>Mary Lai</given-names></name>
+        <name><surname>Pruesse</surname><given-names>Elmar</given-names></name>
+        <name><surname>Rasmussen</surname><given-names>Lasse Buur</given-names></name>
+        <name><surname>Rivers</surname><given-names>Adam</given-names></name>
+        <name><surname>Robeson</surname><given-names>Michael S.</given-names></name>
+        <name><surname>Rosenthal</surname><given-names>Patrick</given-names></name>
+        <name><surname>Segata</surname><given-names>Nicola</given-names></name>
+        <name><surname>Shaffer</surname><given-names>Michael</given-names></name>
+        <name><surname>Shiffer</surname><given-names>Arron</given-names></name>
+        <name><surname>Sinha</surname><given-names>Rashmi</given-names></name>
+        <name><surname>Song</surname><given-names>Se Jin</given-names></name>
+        <name><surname>Spear</surname><given-names>John R.</given-names></name>
+        <name><surname>Swafford</surname><given-names>Austin D.</given-names></name>
+        <name><surname>Thompson</surname><given-names>Luke R.</given-names></name>
+        <name><surname>Torres</surname><given-names>Pedro J.</given-names></name>
+        <name><surname>Trinh</surname><given-names>Pauline</given-names></name>
+        <name><surname>Tripathi</surname><given-names>Anupriya</given-names></name>
+        <name><surname>Turnbaugh</surname><given-names>Peter J.</given-names></name>
+        <name><surname>Ul-Hasan</surname><given-names>Sabah</given-names></name>
+        <name><surname>Hooft</surname><given-names>Justin J. J. van der</given-names></name>
+        <name><surname>Vargas</surname><given-names>Fernando</given-names></name>
+        <name><surname>Vázquez-Baeza</surname><given-names>Yoshiki</given-names></name>
+        <name><surname>Vogtmann</surname><given-names>Emily</given-names></name>
+        <name><surname>Hippel</surname><given-names>Max von</given-names></name>
+        <name><surname>Walters</surname><given-names>William</given-names></name>
+        <name><surname>Wan</surname><given-names>Yunhu</given-names></name>
+        <name><surname>Wang</surname><given-names>Mingxun</given-names></name>
+        <name><surname>Warren</surname><given-names>Jonathan</given-names></name>
+        <name><surname>Weber</surname><given-names>Kyle C.</given-names></name>
+        <name><surname>Williamson</surname><given-names>Charles H. D.</given-names></name>
+        <name><surname>Willis</surname><given-names>Amy D.</given-names></name>
+        <name><surname>Xu</surname><given-names>Zhenjiang Zech</given-names></name>
+        <name><surname>Zaneveld</surname><given-names>Jesse R.</given-names></name>
+        <name><surname>Zhang</surname><given-names>Yilong</given-names></name>
+        <name><surname>Zhu</surname><given-names>Qiyun</given-names></name>
+        <name><surname>Knight</surname><given-names>Rob</given-names></name>
+        <name><surname>Caporaso</surname><given-names>J. Gregory</given-names></name>
+      </person-group>
+      <article-title>Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2</article-title>
+      <source>Nature biotechnology</source>
+      <year iso-8601-date="2019">2019</year>
+      <volume>37</volume>
+      <issue>8</issue>
+      <pub-id pub-id-type="doi">10.1038/s41587-019-0209-9</pub-id>
+      <fpage>852</fpage>
+      <lpage>857</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-mothur">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Schloss</surname><given-names>Patrick D</given-names></name>
+        <name><surname>Westcott</surname><given-names>Sarah L</given-names></name>
+        <name><surname>Ryabin</surname><given-names>Thomas</given-names></name>
+        <name><surname>Hall</surname><given-names>Justine R</given-names></name>
+        <name><surname>Hartmann</surname><given-names>Martin</given-names></name>
+        <name><surname>Hollister</surname><given-names>Emily B</given-names></name>
+        <name><surname>Lesniewski</surname><given-names>Ryan A</given-names></name>
+        <name><surname>Oakley</surname><given-names>Brian B</given-names></name>
+        <name><surname>Parks</surname><given-names>Donovan H</given-names></name>
+        <name><surname>Robinson</surname><given-names>Courtney J</given-names></name>
+        <name><surname>others</surname></name>
+      </person-group>
+      <article-title>Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities</article-title>
+      <source>Applied and environmental microbiology</source>
+      <publisher-name>Am Soc Microbiol</publisher-name>
+      <year iso-8601-date="2009">2009</year>
+      <volume>75</volume>
+      <issue>23</issue>
+      <pub-id pub-id-type="doi">10.1128/AEM.01541-09</pub-id>
+      <fpage>7537</fpage>
+      <lpage>7541</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-ggplot2">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <name><surname>Wickham</surname><given-names>Hadley</given-names></name>
+      </person-group>
+      <source>ggplot2: Elegant graphics for data analysis</source>
+      <publisher-name>Springer-Verlag New York</publisher-name>
+      <year iso-8601-date="2016">2016</year>
+      <isbn>978-3-319-24277-4</isbn>
+      <uri>https://ggplot2.tidyverse.org</uri>
+    </element-citation>
+  </ref>
+  <ref id="ref-UniFrac">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Lozupone</surname><given-names>Catherine</given-names></name>
+        <name><surname>Knight</surname><given-names>Rob</given-names></name>
+      </person-group>
+      <article-title>UniFrac: A new phylogenetic method for comparing microbial communities</article-title>
+      <source>Applied and environmental microbiology</source>
+      <year iso-8601-date="2005">2005</year>
+      <volume>71</volume>
+      <issue>12</issue>
+      <pub-id pub-id-type="doi">10.1128/AEM.71.12.8228-8235.2005</pub-id>
+      <fpage>8228</fpage>
+      <lpage>8235</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-MannU003A1947">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Mann</surname><given-names>H. B.</given-names></name>
+        <name><surname>Whitney</surname><given-names>D. R.</given-names></name>
+      </person-group>
+      <article-title>On a test of whether one of two random variables is stochastically larger than the other</article-title>
+      <source>The Annals of Mathematical Statistics</source>
+      <year iso-8601-date="1947">1947</year>
+      <volume>18</volume>
+      <issue>1</issue>
+      <pub-id pub-id-type="doi">10.1214/aoms/1177730491</pub-id>
+      <fpage>50</fpage>
+      <lpage>60</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-KruskalU003A1952">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Kruskal</surname><given-names>William H</given-names></name>
+        <name><surname>Wallis</surname><given-names>W Allen</given-names></name>
+      </person-group>
+      <article-title>Use of ranks in one-criterion variance analysis</article-title>
+      <source>Journal of the American statistical Association</source>
+      <year iso-8601-date="1952">1952</year>
+      <volume>47</volume>
+      <issue>260</issue>
+      <pub-id pub-id-type="doi">10.1080/01621459.1952.10483441</pub-id>
+      <fpage>583</fpage>
+      <lpage>621</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-BenjaminiU003A1995">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Benjamini</surname><given-names>Yoav</given-names></name>
+        <name><surname>Hochberg</surname><given-names>Yosef</given-names></name>
+      </person-group>
+      <article-title>Controlling the false discovery rate: A practical and powerful approach to multiple testing</article-title>
+      <source>Journal of the Royal statistical society</source>
+      <year iso-8601-date="1995">1995</year>
+      <volume>57</volume>
+      <issue>1</issue>
+      <pub-id pub-id-type="doi">10.1111/j.2517-6161.1995.tb02031.x</pub-id>
+      <fpage>289</fpage>
+      <lpage>300</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-vegan">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <name><surname>Oksanen</surname><given-names>Jari</given-names></name>
+        <name><surname>Simpson</surname><given-names>Gavin L.</given-names></name>
+        <name><surname>Blanchet</surname><given-names>F. Guillaume</given-names></name>
+        <name><surname>Kindt</surname><given-names>Roeland</given-names></name>
+        <name><surname>Legendre</surname><given-names>Pierre</given-names></name>
+        <name><surname>Minchin</surname><given-names>Peter R.</given-names></name>
+        <name><surname>O’Hara</surname><given-names>R. B.</given-names></name>
+        <name><surname>Solymos</surname><given-names>Peter</given-names></name>
+        <name><surname>Stevens</surname><given-names>M. Henry H.</given-names></name>
+        <name><surname>Szoecs</surname><given-names>Eduard</given-names></name>
+        <name><surname>Wagner</surname><given-names>Helene</given-names></name>
+        <name><surname>Barbour</surname><given-names>Matt</given-names></name>
+        <name><surname>Bedward</surname><given-names>Michael</given-names></name>
+        <name><surname>Bolker</surname><given-names>Ben</given-names></name>
+        <name><surname>Borcard</surname><given-names>Daniel</given-names></name>
+        <name><surname>Carvalho</surname><given-names>Gustavo</given-names></name>
+        <name><surname>Chirico</surname><given-names>Michael</given-names></name>
+        <name><surname>De Caceres</surname><given-names>Miquel</given-names></name>
+        <name><surname>Durand</surname><given-names>Sebastien</given-names></name>
+        <name><surname>Evangelista</surname><given-names>Heloisa Beatriz Antoniazi</given-names></name>
+        <name><surname>FitzJohn</surname><given-names>Rich</given-names></name>
+        <name><surname>Friendly</surname><given-names>Michael</given-names></name>
+        <name><surname>Furneaux</surname><given-names>Brendan</given-names></name>
+        <name><surname>Hannigan</surname><given-names>Geoffrey</given-names></name>
+        <name><surname>Hill</surname><given-names>Mark O.</given-names></name>
+        <name><surname>Lahti</surname><given-names>Leo</given-names></name>
+        <name><surname>McGlinn</surname><given-names>Dan</given-names></name>
+        <name><surname>Ouellette</surname><given-names>Marie-Helene</given-names></name>
+        <name><surname>Ribeiro Cunha</surname><given-names>Eduardo</given-names></name>
+        <name><surname>Smith</surname><given-names>Tyler</given-names></name>
+        <name><surname>Stier</surname><given-names>Adrian</given-names></name>
+        <name><surname>Ter Braak</surname><given-names>Cajo J. F.</given-names></name>
+        <name><surname>Weedon</surname><given-names>James</given-names></name>
+        <name><surname>Borman</surname><given-names>Tuomas</given-names></name>
+      </person-group>
+      <source>Vegan: Community ecology package</source>
+      <year iso-8601-date="2025">2025</year>
+      <uri>https://CRAN.R-project.org/package=vegan</uri>
+      <pub-id pub-id-type="doi">10.32614/CRAN.package.vegan</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-microbiome">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <name><surname>Lahti</surname><given-names>Leo</given-names></name>
+        <name><surname>Shetty</surname><given-names>Sudarshan</given-names></name>
+      </person-group>
+      <source>Microbiome r package</source>
+      <uri>https://bioconductor.org/packages/microbiome/</uri>
+      <pub-id pub-id-type="doi">10.18129/B9.bioc.microbiome</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-microViz">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Barnett</surname><given-names>David JM</given-names></name>
+        <name><surname>Arts</surname><given-names>Ilja CW</given-names></name>
+        <name><surname>Penders</surname><given-names>John</given-names></name>
+      </person-group>
+      <article-title>microViz: An R package for microbiome data visualization and statistics</article-title>
+      <source>Journal of Open Source Software</source>
+      <year iso-8601-date="2021">2021</year>
+      <volume>6</volume>
+      <issue>63</issue>
+      <pub-id pub-id-type="doi">10.21105/joss.03201</pub-id>
+      <fpage>3201</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-mia">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <name><surname>Borman</surname><given-names>Tuomas</given-names></name>
+        <name><surname>Ernst</surname><given-names>Felix G. M.</given-names></name>
+        <name><surname>Shetty</surname><given-names>Sudarshan A.</given-names></name>
+        <name><surname>Lahti</surname><given-names>Leo</given-names></name>
+      </person-group>
+      <source>Mia: Microbiome analysis</source>
+      <year iso-8601-date="2025">2025</year>
+      <uri>https://github.com/microbiome/mia</uri>
+      <pub-id pub-id-type="doi">10.18129/B9.bioc.mia</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-MicrobiomeAnalystR">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Dhariwal</surname><given-names>Achal</given-names></name>
+        <name><surname>Chong</surname><given-names>Jasmine</given-names></name>
+        <name><surname>Habib</surname><given-names>Salam</given-names></name>
+        <name><surname>King</surname><given-names>Irah L.</given-names></name>
+        <name><surname>Agellon</surname><given-names>Luis B.</given-names></name>
+        <name><surname>Xia</surname><given-names>Jianguo</given-names></name>
+      </person-group>
+      <article-title>MicrobiomeAnalyst: A web-based tool for comprehensive statistical, visual and meta-analysis of microbiome data</article-title>
+      <source>Nucleic Acids Research</source>
+      <year iso-8601-date="2017">2017</year>
+      <volume>45</volume>
+      <issue>W1</issue>
+      <pub-id pub-id-type="doi">10.1093/nar/gkx295</pub-id>
+      <fpage>W180</fpage>
+      <lpage>W188</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-animalcules">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Zhao</surname><given-names>Yue</given-names></name>
+        <name><surname>Federico</surname><given-names>Anthony</given-names></name>
+        <name><surname>Faits</surname><given-names>Tyler</given-names></name>
+        <name><surname>Manimaran</surname><given-names>Solaiappan</given-names></name>
+        <name><surname>Segrè</surname><given-names>Daniel</given-names></name>
+        <name><surname>Monti</surname><given-names>Stefano</given-names></name>
+        <name><surname>Johnson</surname><given-names>W. Evan</given-names></name>
+      </person-group>
+      <article-title>Animalcules: Interactive microbiome analytics and visualization in r</article-title>
+      <source>Microbiome</source>
+      <year iso-8601-date="2021">2021</year>
+      <volume>9</volume>
+      <issue>1</issue>
+      <pub-id pub-id-type="doi">10.1186/s40168-021-01013-0</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-microeco">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Liu</surname><given-names>Chi</given-names></name>
+        <name><surname>Cui</surname><given-names>Yaoming</given-names></name>
+        <name><surname>Li</surname><given-names>Xiangzhen</given-names></name>
+        <name><surname>Yao</surname><given-names>Minjie</given-names></name>
+      </person-group>
+      <article-title>Microeco: An r package for data mining in microbial community ecology</article-title>
+      <source>FEMS Microbiology Ecology</source>
+      <year iso-8601-date="2020">2020</year>
+      <volume>97</volume>
+      <issue>2</issue>
+      <pub-id pub-id-type="doi">10.1093/femsec/fiaa255</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-EasyAmplicon">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Liu</surname><given-names>Yong‐Xin</given-names></name>
+        <name><surname>Chen</surname><given-names>Lei</given-names></name>
+        <name><surname>Ma</surname><given-names>Tengfei</given-names></name>
+        <name><surname>Li</surname><given-names>Xiaofang</given-names></name>
+        <name><surname>Zheng</surname><given-names>Maosheng</given-names></name>
+        <name><surname>Zhou</surname><given-names>Xin</given-names></name>
+        <name><surname>Chen</surname><given-names>Liang</given-names></name>
+        <name><surname>Qian</surname><given-names>Xubo</given-names></name>
+        <name><surname>Xi</surname><given-names>Jiao</given-names></name>
+        <name><surname>Lu</surname><given-names>Hongye</given-names></name>
+        <name><surname>Cao</surname><given-names>Huiluo</given-names></name>
+        <name><surname>Ma</surname><given-names>Xiaoya</given-names></name>
+        <name><surname>Bian</surname><given-names>Bian</given-names></name>
+        <name><surname>Zhang</surname><given-names>Pengfan</given-names></name>
+        <name><surname>Wu</surname><given-names>Jiqiu</given-names></name>
+        <name><surname>Gan</surname><given-names>Ren‐You</given-names></name>
+        <name><surname>Jia</surname><given-names>Baolei</given-names></name>
+        <name><surname>Sun</surname><given-names>Linyang</given-names></name>
+        <name><surname>Ju</surname><given-names>Zhicheng</given-names></name>
+        <name><surname>Gao</surname><given-names>Yunyun</given-names></name>
+        <name><surname>Wen</surname><given-names>Tao</given-names></name>
+        <name><surname>Chen</surname><given-names>Tong</given-names></name>
+      </person-group>
+      <article-title>EasyAmplicon: An easy‐to‐use, open‐source, reproducible, and community‐based pipeline for amplicon data analysis in microbiome research</article-title>
+      <source>iMeta</source>
+      <year iso-8601-date="2023">2023</year>
+      <volume>2</volume>
+      <issue>1</issue>
+      <pub-id pub-id-type="doi">10.1002/imt2.83</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-WenU003A2023">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Wen</surname><given-names>Tao</given-names></name>
+        <name><surname>Niu</surname><given-names>Guoqing</given-names></name>
+        <name><surname>Chen</surname><given-names>Tong</given-names></name>
+        <name><surname>Shen</surname><given-names>Qirong</given-names></name>
+        <name><surname>Yuan</surname><given-names>Jun</given-names></name>
+        <name><surname>Liu</surname><given-names>Yong-Xin</given-names></name>
+      </person-group>
+      <article-title>The best practice for microbiome analysis using r</article-title>
+      <source>Protein &amp; Cell</source>
+      <year iso-8601-date="2023">2023</year>
+      <volume>14</volume>
+      <issue>10</issue>
+      <pub-id pub-id-type="doi">10.1093/procel/pwad024</pub-id>
+      <fpage>713</fpage>
+      <lpage>725</lpage>
+    </element-citation>
+  </ref>
+</ref-list>
+<fn-group>
+  <fn id="fn1">
+    <label>1</label><p>Based on 100 replications of a 50-sample dataset
+    (<monospace>rbiom::HMP50</monospace>) on six CPU cores.</p>
+  </fn>
+  <fn id="fn2">
+    <label>2</label><p>Based on 100 replications of a 1006-sample
+    dataset (<monospace>rbiom::GEMS</monospace>) on six CPU cores.</p>
+  </fn>
+</fn-group>
+</back>
+</article>

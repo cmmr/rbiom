@@ -108,6 +108,13 @@ as_rbiom.SummarizedExperiment <- function (biom, ...) {
 
 
 #' @export
+as_rbiom.MultiAssayExperiment <- function (biom, ...) {
+  as_rbiom(biom@ExperimentList[[1]], ...)
+}
+
+
+
+#' @export
 as_rbiom.TreeSummarizedExperiment <- function (biom, ...) {
   
   dots <- list(...)

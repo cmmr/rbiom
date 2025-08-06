@@ -1,0 +1,133 @@
+---
+title: 'rbiom: An R package for microbiome analysis'
+authors:
+  - name: Daniel P Smith
+    orcid: 0000-0002-2479-2044
+    corresponding: true
+    affiliation: 1
+  - name: Joseph F Petrosino
+    orcid: 0000-0002-4046-6898
+    affiliation: 1
+affiliations:
+ - name: Alkek Center for Metagenomics and Microbiome Research, Department of Molecular Virology and Microbiology, Baylor College of Medicine, Houston, Texas, USA
+   index: 1
+   ror: 02pttbw34
+date: 21 April 2023
+bibliography: paper.bib
+---
+
+# Summary
+
+Microbes live all around us, on us, and even inside our bodies. Their influence on health and disease is profound, and only beginning to be fully understood. Studying microbial populations is becoming easier with modern DNA sequencing technology; examining trends across thousands of samples today is common. The bottleneck is longer collecting data, but rather analyzing and interpreting the results.
+
+`rbiom` is an R package for working with abundance datasets, such as OTU or ASV counts from 16S amplicon sequencing. It enables importing/exporting all BIOM formats, subsetting, rarefying, manipulation of metadata/taxonomy/phylogeny, computation of alpha and beta diversity metrics, and summarizing counts per taxonomic rank. Computationally intensive tasks (including UniFrac [@unifrac]) have been implemented with multithreaded C++ to greatly reduce calculation time.
+
+Visualization is a key component of `rbiom`. Rarefaction curves, taxa abundances, alpha diversity, and beta diversity can all be plotted in a variety of graphical formats, including correlation, heatmap, ordination, stacked bar, and box plots. In `rbiom`, box plots can be any combination of box, bar, violin, dot, strip, and/or range layers. Each plot includes provenance and modification history as attributes, as well as the `ggplot2` [@ggplot2] call used to render it to encourage downstream user customization.
+
+Correlations between sample metadata and microbiome structure can be identified by mapping one or more metadata variables of interest to a plot's axes, facets, and/or aesthetics. These mappings can optionally define color/shape/pattern assignments, category ordering, or subsetting parameters. When metadata is associated with a axis or aesthetic, `rbiom` will automatically run the appropriate statistical test, correct for multiple comparisons, and display significant differences on the plot, captioning it with a brief methodology. 
+
+Currently, `rbiom` can perform four types of significance testing. On correlation plots with a numeric metadata variable on the x-axis (e.g., Age, BMI), linear regression will be computed with R's `lm` linear model function. For plots with two categories (e.g. Male vs Female), a Mann-Whitney test [@Mann1947] is run with R's `wilcox.test`. When three or more categories are compared, the Kruskal-Wallis rank sum test [@Kruskal1952] is used instead via R's `kruskal.test` function. P-values for ordinations are derived using the `adonis2` function from the `vegan` R package [@vegan], which randomly re-categorizes samples 1,000 times to estimate the significance of the observed clustering. P-values are corrected for multiple comparisons using the method described by @Benjamini1995 via R's `p.adjust` function to control for the false discovery rate. 
+
+`QIIME2` [@qiime2], `mothur` [@mothur], and `Phyloseq` [@phyloseq] offer overlapping functionality with rbiom, but with important distinctions. The first two are designed for command-line interaction, making them difficult to integrate into R projects. `Phyloseq` has been a staple of R bioinformatics for a decade, but is frustratingly slow for studies with thousands of samples.
+
+This package is designed for users of all experience levels. Novice R users will appreciate that a couple commands will produce publication-ready figures. Advanced R users can use `rbiom` to complement their existing pipelines with faster and more flexible functions. `rbiom` is cross-platform compatible and available from CRAN and conda-forge. The latest development version is on GitHub.
+
+
+# References
+
+@article{phyloseq,
+  title={phyloseq: an R package for reproducible interactive analysis and graphics of microbiome census data},
+  author={McMurdie, Paul J and Holmes, Susan},
+  doi={10.1371/journal.pone.0061217},
+  journal={PloS one},
+  volume={8},
+  number={4},
+  pages={e61217},
+  year={2013}
+}
+
+@article{qiime2,
+  title={Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2},
+  author={Bolyen, Evan and Rideout, Jai Ram and Dillon, Matthew R and Bokulich, Nicholas A and Abnet, Christian C and Al-Ghalith, Gabriel A and Alexander, Harriet and Alm, Eric J and Arumugam, Manimozhiyan and Asnicar, Francesco and others},
+  journal={Nature biotechnology},
+  doi={10.1038/s41587-019-0209-9},
+  volume={37},
+  number={8},
+  pages={852-857},
+  year={2019}
+}
+
+@article{mothur,
+  title={Introducing mothur: open-source, platform-independent, community-supported software for describing and comparing microbial communities},
+  author={Schloss, Patrick D and Westcott, Sarah L and Ryabin, Thomas and Hall, Justine R and Hartmann, Martin and Hollister, Emily B and Lesniewski, Ryan A and Oakley, Brian B and Parks, Donovan H and Robinson, Courtney J and others},
+  journal={Applied and environmental microbiology},
+	doi={10.1128/AEM.01541-09},
+  volume={75},
+  number={23},
+  pages={7537-7541},
+  year={2009},
+  publisher={Am Soc Microbiol}
+}
+
+@book{ggplot2,
+  author={Hadley Wickham},
+  title={ggplot2: Elegant Graphics for Data Analysis},
+  publisher={Springer-Verlag New York},
+  year={2016},
+  isbn={978-3-319-24277-4},
+  url={https://ggplot2.tidyverse.org}
+}
+
+@article{unifrac,
+  title={UniFrac: a new phylogenetic method for comparing microbial communities},
+  author={Lozupone, Catherine and Knight, Rob},
+  journal={Applied and environmental microbiology},
+  doi={10.1128/AEM.71.12.8228-8235.2005},
+  volume={71},
+  number={12},
+  pages={8228-8235},
+  year={2005}
+}
+
+@article{Mann1947,
+  title={Controlling the false discovery rate: A practical and powerful approach to multiple testing},
+  author={Mann, H and Whitney, D},
+  journal={Annals of Mathematical Statistics},
+  doi={10.1214/aoms/1177730491},
+  volume={18},
+  number={1},
+  pages={50-60},
+  year={1947}
+}
+
+@article{Kruskal1952,
+  title={Use of ranks in one-criterion variance analysis},
+  author={Kruskal, William H and Wallis, W Allen},
+  journal={Journal of the American statistical Association},
+  doi={10.1080/01621459.1952.10483441},
+  volume={47},
+  number={260},
+  pages={583-621},
+  year={1952}
+}
+
+@article{Benjamini1995,
+  title={Controlling the false discovery rate: a practical and powerful approach to multiple testing},
+  author={Benjamini, Yoav and Hochberg, Yosef},
+  journal={Journal of the Royal statistical society},
+  doi={10.1111/j.2517-6161.1995.tb02031.x},
+  volume={57},
+  number={1},
+  pages={289-300},
+  year={1995}
+}
+
+
+@misc{vegan,
+  title = {vegan: Community Ecology Package},
+  author = {Jari Oksanen and Gavin L. Simpson and F. Guillaume Blanchet and Roeland Kindt and Pierre Legendre and Peter R. Minchin and R.B. O'Hara and Peter Solymos and M. Henry H. Stevens and Eduard Szoecs and Helene Wagner and Matt Barbour and Michael Bedward and Ben Bolker and Daniel Borcard and Gustavo Carvalho and Michael Chirico and Miquel {De Caceres} and Sebastien Durand and Heloisa Beatriz Antoniazi Evangelista and Rich FitzJohn and Michael Friendly and Brendan Furneaux and Geoffrey Hannigan and Mark O. Hill and Leo Lahti and Dan McGlinn and Marie-Helene Ouellette and Eduardo {Ribeiro Cunha} and Tyler Smith and Adrian Stier and Cajo J.F. {Ter Braak} and James Weedon},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  url = {https://github.com/vegandevs/vegan},
+}
