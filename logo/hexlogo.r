@@ -1,6 +1,7 @@
 
 library(ggplot2)
 library(ggpattern)
+library(shadowtext)
 library(magick)
 library(magrittr)
 
@@ -18,13 +19,15 @@ ggplot() +
   theme_void() +
   theme(rect = element_rect(fill = 'transparent')) +
   annotate(
-    geom   = 'text', 
-    label  = 'rbiom',
-    family = 'Milky Moringa',
-    color  = 'white',
-    size   = 36,
-    x      = 0, 
-    y      = 490 ) +
+    geom      = 'shadowtext', 
+    label     = 'rbiom',
+    family    = 'Milky Moringa',
+    color     = 'white',
+    bg.colour = 'black',
+    bg.r      = 0.03,
+    size      = 36,
+    x         = 0, 
+    y         = 490 ) +
   annotation_raster(
     raster = image_read('logo/shadowed_cells.png'),
     xmin = -957, xmax = 957,
@@ -42,14 +45,14 @@ ggsave(
 
 
 # pkgdown website sets logo width to 120px
-magick::image_read('logo/rbiom.png') %>%
+image_read('logo/rbiom.png') %>%
   image_trim() %>%
   image_resize('120x') %>%
   image_write('man/figures/logo.png')
 
 
 # height = 200px (150pt) for joss paper
-magick::image_read('logo/rbiom.png') %>%
+image_read('logo/rbiom.png') %>%
   image_trim() %>%
   image_resize('x200') %>%
   image_write('joss/figures/logo.png')
