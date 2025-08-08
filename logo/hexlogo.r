@@ -1,9 +1,7 @@
-
 library(ggplot2)
 library(ggpattern)
 library(shadowtext)
 library(magick)
-library(magrittr)
 
 ggplot() + 
   geom_polygon_pattern(
@@ -11,48 +9,42 @@ ggplot() +
       x = 1150 * sqrt(3)/2 * c(0, 1, 1, 0, -1, -1), 
       y = 1150 * .5 * c(2, 1, -1, -2, -1, 1) ),
     pattern          = 'image',
-    pattern_type     = 'expand',
+    pattern_type     = 'tile',
     pattern_filename = 'logo/bg.jpg',
-    color            = '#000000',
-    linewidth        = 5 ) + 
+    color            = '#0078a5',
+    linewidth        = NA ) + 
   coord_fixed(ratio = 1) +
   theme_void() +
   theme(rect = element_rect(fill = 'transparent')) +
   annotate(
-    geom      = 'shadowtext', 
-    label     = 'rbiom',
-    family    = 'Milky Moringa',
-    color     = 'white',
+    geom      = 'shadowtext',
     bg.colour = 'black',
     bg.r      = 0.03,
-    size      = 36,
-    x         = 0, 
-    y         = 490 ) +
+    label     = 'rbiom',
+    family    = 'Boogie Boys',
+    size      = 42, 
+    y         = 600,
+    color     = 'white',
+    x         = 0 ) +
   annotation_raster(
-    raster = image_read('logo/shadowed_cells.png'),
+    raster = image_read('logo/cartoon.png'),
     xmin = -957, xmax = 957,
-    ymin = -854, ymax = 314 )
+    ymin = -804, ymax = 364 )
+
+
 
 ggsave(
   path     = 'logo',
   filename = 'rbiom.png', 
   device   = 'png',
-  width    = 2200, 
-  height   = 2200, 
-  dpi      = 320,
+  width    = 2300, 
+  height   = 2300, 
+  dpi      = 400,
   units    = 'px',
   bg       = 'transparent' )
 
 
-# pkgdown website sets logo width to 120px
-image_read('logo/rbiom.png') %>%
-  image_trim() %>%
-  image_resize('120x') %>%
+image_read('logo/rbiom.png') |>
+  image_trim() |>
+  image_resize('x200') |>
   image_write('man/figures/logo.png')
-
-
-# height = 200px (150pt) for joss paper
-image_read('logo/rbiom.png') %>%
-  image_trim() %>%
-  image_resize('x200') %>%
-  image_write('joss/figures/logo.png')

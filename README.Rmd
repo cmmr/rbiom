@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# rbiom <img src="man/figures/logo.png" align="right" width="120" alt="ecodive logo" />
+# rbiom <img src="man/figures/logo.png" align="right" width="174" height="200" alt="rbiom logo" />
 
 <!-- badges: start -->
 [![cran](https://www.r-pkg.org/badges/version/rbiom)](https://CRAN.R-project.org/package=rbiom)

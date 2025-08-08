@@ -1,7 +1,7 @@
 
 <!-- Run `devtools::build_readme()` after editing.  -->
 
-# rbiom <img src="man/figures/logo.png" align="right" width="120" alt="ecodive logo" />
+# rbiom <img src="man/figures/logo.png" align="right" width="174" height="200" alt="rbiom logo" />
 
 <!-- badges: start -->
 

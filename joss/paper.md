@@ -27,7 +27,7 @@ tags:
   - reproducible
   - unifrac
 output: pdf_document
-date: 03 July 2025
+date: 06 August 2025
 bibliography: paper.bib
 ---
 
@@ -47,7 +47,7 @@ Rbiom is an R package for analyzing microbial community datasets. Its features
 include:
 
 1. **Preprocessing** - Merges, subsets, and rarefies data from multiple sources.
-2. **Calculation** - Diversity, similarity, and abundance metrics using fast C code.
+2. **Calculation** - Diversity, similarity, and abundance metrics.
 3. **Statistics** - Identifies significant correlations with sample metadata.
 4. **Visualization** - Customizable box plots, ordinations, heatmaps, and stacked bar charts.
 
@@ -58,8 +58,7 @@ Working with microbiome datasets is challenging. Analyses must integrate
 observed counts, sample metadata, taxonomic mappings, and phylogenetic trees
 into data structures compatible with statistical testing and visualization.
 Rbiom makes it simple to turn these complex datasets into informative figures,
-bringing together the speed of C with the powerful statistics and elegant
-graphics of R.
+using the powerful statistics and elegant graphics of R.
 
 
 # State of the Field
@@ -67,7 +66,7 @@ graphics of R.
 ## Current Tools
 
 @Wen:2023 provides an excellent review of R packages for microbiome analysis.
-The list below includes those mentioned by Wen et al as and others that are
+The list below includes those mentioned by Wen et al as well as others that are
 actively maintained.
 
 **R Packages**
@@ -95,7 +94,20 @@ actively maintained.
 
 ## Advancement
 
-Rbiom's speed and usability sets it apart from this crowd.
+Rbiom's usability, features, and speed sets it apart from this crowd.
+
+
+### Usability
+
+`rbiom` can import data from a variety of sources - BIOM files, R data frames, phyloseq objects, and more. It can export to all these formats as well.
+
+
+Pre-built binaries are available from CRAN and Anaconda, making installation easy on Windows, MacOS, and Linux. As much effort has been put into documentation as the code itself. Users will find that all functions are clearly documented with examples.
+
+
+These programs offer a plethora of features and are fast even on large datasets, however, they come with a steep learning curve that may be discouraging to new users. Additionally, as command-line programs, it is cumbersome to interact with them from R.
+
+`rbiom` sets itself apart from in two ways. First, it uses compiled C code to speed up calculations, thereby enabling processing of much larger datasets.
 
 
 ### Speed
@@ -114,19 +126,6 @@ manhattan, and jaccard metrics four times faster than vegan[^2].
 rbiom has managed these improvements by implementing many central algorithms
 in C and ensuring full utilization of multi-CPU core systems. This brings the
 speed of rbiom in line with compiled tools such as mothur and QIIME2.
-
-
-### Usability
-
-`rbiom` can import data from a variety of sources - BIOM files, R data frames, phyloseq objects, and more. It can export to all these formats as well.
-
-
-Pre-built binaries are available from CRAN and Anaconda, making installation easy on Windows, MacOS, and Linux. As much effort has been put into documentation as the code itself. Users will find that all functions are clearly documented with examples.
-
-
-These programs offer a plethora of features and are fast even on large datasets, however, they come with a steep learning curve that may be discouraging to new users. Additionally, as command-line programs, it is cumbersome to interact with them from R.
-
-`rbiom` sets itself apart from in two ways. First, it uses compiled C code to speed up calculations, thereby enabling processing of much larger datasets.
 
 
 
