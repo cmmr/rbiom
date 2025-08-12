@@ -342,7 +342,7 @@ write_biom_hdf5 <- function (biom, file) {
   #________________________________________________________
   if (ncol(biom$taxonomy) > 1) {
     h5path      <- 'observation/metadata/taxonomy'
-    x           <- t(as.matrix(biom$taxonomy[,-1]))
+    x           <- as.matrix(biom$taxonomy[,-1])
     dimnames(x) <- list(NULL, NULL)
     h5writeDataset(x, h5, h5path)
   }

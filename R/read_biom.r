@@ -487,7 +487,7 @@ parse_json_taxonomy <- function (json) {
 parse_hdf5_taxonomy <- function (h5) {
   
   if ("taxonomy" %in% names(h5$observation$metadata)) {
-    taxa_table           <- t(h5$observation$metadata$taxonomy)
+    taxa_table           <- h5$observation$metadata$taxonomy
     rownames(taxa_table) <- as.character(h5$observation$ids)
     colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
     
