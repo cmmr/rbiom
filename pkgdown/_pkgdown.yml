@@ -76,7 +76,6 @@ reference:
   - subset.rbiom
   - na.omit.rbiom
   - slice.rbiom
-  - rarefy
   
 - title: Taxa Abundance
   desc: >

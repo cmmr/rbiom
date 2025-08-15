@@ -38,6 +38,14 @@ test_that("read_biom", {
   
   
   skip_if_not_installed('rhdf5')
+  
+  # https://github.com/biocore/biom-format/blob/master/examples/rich_sparse_otu_table_hdf5.biom
+  x <- expect_silent(read_biom(test_path('inputs/biom.hdf5')))
+  expect_identical(x$samples, paste0('Sample', 1:6))
+  expect_identical(x$otus,    paste0('GG_OTU_', 1:5))
+  expect_identical(x$ranks,   c('.otu', 'Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'))
+  expect_identical(x$fields,  c('.sample', 'BODY_SITE', 'BarcodeSequence', 'Description', 'LinkerPrimerSequence'))
+  
   f <- expect_silent(write_biom(hmp5, tempfile(), 'hdf5'))
   g <- expect_silent(write_biom(min5, tempfile(), 'hdf5'))
   expect_silent(read_biom(src = f))
