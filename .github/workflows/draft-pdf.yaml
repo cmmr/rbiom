@@ -3,9 +3,9 @@ name: Draft PDF
 on:
   push:
     paths:
-      - joss/paper.md
-      - joss/paper.bib
-      - joss/figures/**
+      - paper/paper.md
+      - paper/paper.bib
+      - paper/figures/**
       - .github/workflows/draft-pdf.yml
 
 jobs:
@@ -21,16 +21,16 @@ jobs:
         uses: openjournals/openjournals-draft-action@master
         with:
           journal: joss
-          paper-path: joss/paper.md
+          paper-path: paper/paper.md
       
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: paper
-          path: joss/paper.pdf
+          path: paper/paper.pdf
       
       - name: Commit PDF to repository
         uses: EndBug/add-and-commit@v9
         with:
           message: '(auto) Paper PDF Draft'
-          add: 'joss/paper.pdf'
+          add: 'paper/paper.pdf'
