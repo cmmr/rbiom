@@ -9,7 +9,7 @@ tricks to speed up operations on rbiom objects."><meta property="og:image" conte
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@ off.</p>
 <span></span>
 <span><span class="co"># Or:</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="../reference/subset.html">subset</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="../reference/rarefy_cols.html">rarefy_cols</a></span><span class="op">(</span><span class="op">)</span></span></code></pre><p></p></div>
+<span><span class="va">biom</span><span class="op">$</span><span class="va">counts</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span> <span class="fu"><a href="../reference/matrix_ops.html">rarefy_cols</a></span><span class="op">(</span><span class="op">)</span></span></code></pre><p></p></div>
     </div>
     <div class="section level2">
     <h2 id="drop-components">Drop Components<a class="anchor" aria-label="anchor" href="#drop-components"></a></h2>
@@ -106,7 +106,7 @@ from the rbiom object with:</p>
 provide it to just the functions that use it. For example:</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="va">biom</span><span class="op">$</span><span class="va">tree</span></span>
 <span><span class="va">biom</span><span class="op">$</span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
-<span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_table.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span>, tree <span class="op">=</span> <span class="va">tree</span><span class="op">)</span></span></code></pre><p></p></div>
+<span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bdiv_table.html">bdiv_distmat</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span>, tree <span class="op">=</span> <span class="va">tree</span><span class="op">)</span></span></code></pre><p></p></div>
 </div>
 
     </div>
@@ -150,7 +150,7 @@ can be slow. Instead, set the <code>layers</code> parameter to use other options
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

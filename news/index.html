@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,31 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="3.0.0" id="rbiom-300">rbiom 3.0.0<a class="anchor" aria-label="anchor" href="#rbiom-300"></a></h2>
+<div class="section level3">
+<h3 id="announcements-3-0-0">Announcements<a class="anchor" aria-label="anchor" href="#announcements-3-0-0"></a></h3>
+<p>The code for <code>rbiom</code>’s very fast implementations of diversity metrics, rarefaction, and tree importing has been spun off into its own dependency-free package, <a href="https://github.com/cmmr/ecodive" class="external-link"><code>ecodive</code></a>, to encourage adoption by other R packages. This also means <code>rbiom</code> will be easier to install going forward as it will no longer need to be compiled.</p>
+</div>
+<div class="section level3">
+<h3 id="breaking-changes-3-0-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-3-0-0"></a></h3>
+<ul><li>
+<code>weighted</code> and <code>normalized</code> arguments are no longer used by any functions.</li>
+<li>Diversity metric names will now be all lowercase in returned matrices, tables, etc.</li>
+</ul><p>The following functions have been deprecated since <code>rbiom</code> v2.0 and are now removed completely. They are generally functions which have been renamed for improved organization.</p>
+<p><code>alpha.div</code>, <code>as.percent</code>, <code>beta.div</code>, <code>comments</code>, <code>comments&lt;-</code>, <code>counts</code>, <code>counts&lt;-</code>, <code>depth</code>, <code>depths_barplot</code>, <code>has.phylogeny</code>, <code>has.sequences</code>, <code>id</code>, <code>id&lt;-</code>, <code>info</code>, <code>is.rarefied</code>, <code>metadata</code>, <code>metadata&lt;-</code>, <code>nsamples</code>, <code>ntaxa</code>, <code>phylogeny</code>, <code>phylogeny&lt;-</code>, <code>rarefy</code>, <code>read.biom</code>, <code>read_biom</code>, <code>read.fasta</code>, <code>read.tree</code>, <code>repair</code>, <code>sample.names</code>, <code>sample.names&lt;-</code>, <code>sample_subset</code>, <code>sample.sums</code>, <code>sequences</code>, <code>sequences&lt;-</code>, <code>subtree</code>, <code>taxa.means</code>, <code>taxa.names</code>, <code>taxa.names&lt;-</code>, <code>taxa.ranks</code>, <code>taxa.ranks&lt;-</code>, <code>taxa.rollup</code>, <code>taxa.sums</code>, <code>taxonomy</code>, <code>taxonomy&lt;-</code>, <code>tips</code>, <code>top.taxa</code>, <code>top_taxa</code>, <code>unifrac</code>, <code>write.biom</code>, <code>write.fasta</code>, <code>write.tree</code>, <code>write.xlsx</code></p>
+</div>
+<div class="section level3">
+<h3 id="additions-3-0-0">Additions<a class="anchor" aria-label="anchor" href="#additions-3-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/adiv_table.html">adiv_vector()</a></code> returns a simple named vector of alpha diversity values.</li>
+<li>Replaced <code>rhdf5</code> dependency with <code>h5lite</code>.</li>
+<li>Updated list of alpha diversity metrics: <code>c("ace", "berger", "brillouin", "chao1", "faith", "fisher", "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick", "observed", "shannon", "squares")</code>
+</li>
+<li>Updated list of beta diversity metrics: <code>c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev", "chord", "clark", "sorensen", "divergence", "euclidean", "generalized_unifrac", "gower", "hamming", "hellinger", "horn", "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita", "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai", "psym_chisq", "soergel", "squared_chisq", "squared_chord", "squared_euclidean", "topsoe", "unweighted_unifrac", "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")</code>
+</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.1" id="rbiom-221">rbiom 2.2.1<a class="anchor" aria-label="anchor" href="#rbiom-221"></a></h2><p class="text-muted">CRAN release: 2025-06-27</p>
 <ul><li>Compatibility fixes for ggplot2 4.0.0 <a href="https://github.com/cmmr/rbiom/issues/30" class="external-link">#30</a></li>
 </ul></div>
@@ -65,7 +90,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.1" id="rbiom-211">rbiom 2.1.1<a class="anchor" aria-label="anchor" href="#rbiom-211"></a></h2><p class="text-muted">CRAN release: 2025-03-10</p>
 <ul><li>
-<code><a href="../reference/rbiom-deprecated.html">unifrac()</a></code> no longer normalizes weighted values, for back-compatibility.</li>
+<code>unifrac()</code> no longer normalizes weighted values, for back-compatibility.</li>
 <li>Option <code>underscores</code> allows keeping underscores in tree IDs.</li>
 </ul></div>
     <div class="section level2">
@@ -101,7 +126,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

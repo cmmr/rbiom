@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,9 +58,32 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adiv_table</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  adiv <span class="op">=</span> <span class="st">"Shannon"</span>,</span>
+<span>  adiv <span class="op">=</span> <span class="st">"shannon"</span>,</span>
 <span>  md <span class="op">=</span> <span class="st">".all"</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">adiv_matrix</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observed"</span>, <span class="st">"shannon"</span>, <span class="st">"simpson"</span><span class="op">)</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">adiv_vector</span><span class="op">(</span></span>
+<span>  <span class="va">biom</span>,</span>
+<span>  adiv <span class="op">=</span> <span class="st">"shannon"</span>,</span>
+<span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -70,21 +93,26 @@
 
 
 <dl><dt id="arg-biom">biom<a class="anchor" aria-label="anchor" href="#arg-biom"></a></dt>
-<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, such as from <code><a href="as_rbiom.html">as_rbiom()</a></code>.
-Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can also be given here.</p></dd>
+<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, or any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt id="arg-adiv">adiv<a class="anchor" aria-label="anchor" href="#arg-adiv"></a></dt>
-<dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
-<code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
-<code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
-Multiple/abbreviated values allowed.
-Default: <code>"Shannon"</code></p></dd>
+<dd><p>Alpha diversity metric(s) to use. Options are:
+<code>c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")</code>.
+For <code>"faith"</code>, a phylogenetic tree must be present in <code>biom</code> or
+explicitly provided via <code>tree=</code>. Set <code>adiv=".all"</code> to use all metrics.
+Multiple/abbreviated values allowed. Default: <code>"shannon"</code></p></dd>
 
 
 <dt id="arg-md">md<a class="anchor" aria-label="anchor" href="#arg-md"></a></dt>
 <dd><p>Dataset field(s) to include in the output data frame, or <code>'.all'</code>
 to include all metadata fields. Default: <code>'.all'</code></p></dd>
+
+
+<dt id="arg-tree">tree<a class="anchor" aria-label="anchor" href="#arg-tree"></a></dt>
+<dd><p>A <code>phylo</code> object representing the phylogenetic
+relationships of the taxa in <code>biom</code>. Only required when
+computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
@@ -94,6 +122,17 @@ useful for correcting for non-normally distributions before applying
 regression statistics. Default: <code>"none"</code></p></dd>
 
 
+<dt id="arg-ties">ties<a class="anchor" aria-label="anchor" href="#arg-ties"></a></dt>
+<dd><p>When <code>transform="rank"</code>, how to rank identical values.
+Options are: <code>c("average", "first", "last", "random", "max", "min")</code>.
+See <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank()</a></code> for details. Default: <code>"random"</code></p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>Random seed for permutations. Must be a non-negative integer.
+Default: <code>0</code></p></dd>
+
+
 <dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
 <dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
 or to <code>1</code> to disable parallel processing. Default: <code>NULL</code></p></dd>
@@ -101,56 +140,70 @@ or to <code>1</code> to disable parallel processing. Default: <code>NULL</code><
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of alpha diversity values.
-Each combination of sample/depth/<code>adiv</code> has its own row.
+
+<dl><dt><code>adiv_vector()</code> - </dt>
+<dd><p>A named numeric vector.</p></dd>
+
+<dt><code>adiv_matrix()</code> - </dt>
+<dd><p>A matrix of samples x metric.
+The first column, 'depth', is never transformed.</p></dd>
+
+<dt><code>adiv_table()</code> - </dt>
+<dd><p>A tibble data.frame of alpha diversity values.
+Each combination of sample/<code>adiv</code> has its own row.
 Column names are <b>.sample</b>, <b>.depth</b>, <b>.adiv</b>,
 and <b>.diversity</b>, followed by any metadata fields requested by
-<code>md</code>.</p>
-    </div>
+<code>md</code>.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other alpha_diversity:
-<code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
-<code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
-<code><a href="adiv_stats.html">adiv_stats</a>()</code></p></div>
+    <div class="dont-index"><p><code><a href="sample_sums.html">sample_sums()</a></code> for sample depths.</p>
+<p>Other alpha_diversity:
+<code><a href="adiv_boxplot.html">adiv_boxplot()</a></code>,
+<code><a href="adiv_corrplot.html">adiv_corrplot()</a></code>,
+<code><a href="adiv_stats.html">adiv_stats()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span> </span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="co"># Subset to 10 samples.</span></span></span>
-<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="va">hmp50</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="va">hmp50</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_table</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .sample .depth .adiv   .diversity   Age   BMI `Body Site`    Sex   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> HMP01     <span style="text-decoration: underline;">1</span>660 Shannon       1.74    22    20 Buccal mucosa  Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> HMP02     <span style="text-decoration: underline;">1</span>371 Shannon       2.59    24    23 Buccal mucosa  Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> HMP03     <span style="text-decoration: underline;">1</span>353 Shannon       2.95    28    26 Saliva         Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> HMP04     <span style="text-decoration: underline;">1</span>895 Shannon       3.26    25    23 Saliva         Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> HMP05     <span style="text-decoration: underline;">3</span>939 Shannon       1.46    27    24 Buccal mucosa  Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> HMP06     <span style="text-decoration: underline;">4</span>150 Shannon       3.09    32    25 Saliva         Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> HMP07     <span style="text-decoration: underline;">3</span>283 Shannon       1.23    26    22 Buccal mucosa  Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> HMP08     <span style="text-decoration: underline;">1</span>695 Shannon       2.51    27    26 Saliva         Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> HMP09     <span style="text-decoration: underline;">2</span>069 Shannon       3.60    33    32 Saliva         Male  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> HMP10     <span style="text-decoration: underline;">2</span>509 Shannon       1.75    22    20 Anterior nares Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample .depth .adiv   .diversity   Age   BMI `Body Site`   Sex   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP01     <span style="text-decoration: underline;">1</span>660 shannon       1.74    22    20 Buccal mucosa Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP02     <span style="text-decoration: underline;">1</span>371 shannon       2.59    24    23 Buccal mucosa Male  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP03     <span style="text-decoration: underline;">1</span>353 shannon       2.95    28    26 Saliva        Male  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP04     <span style="text-decoration: underline;">1</span>895 shannon       3.26    25    23 Saliva        Male  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> HMP05     <span style="text-decoration: underline;">3</span>939 shannon       1.46    27    24 Buccal mucosa Female</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">adiv_table</span><span class="op">(</span><span class="va">biom</span>, md <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .sample .depth .adiv   .diversity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> HMP01     <span style="text-decoration: underline;">1</span>353 Shannon       1.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> HMP02     <span style="text-decoration: underline;">1</span>353 Shannon       2.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> HMP03     <span style="text-decoration: underline;">1</span>353 Shannon       2.95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> HMP04     <span style="text-decoration: underline;">1</span>353 Shannon       3.23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> HMP05     <span style="text-decoration: underline;">1</span>353 Shannon       1.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> HMP06     <span style="text-decoration: underline;">1</span>353 Shannon       3.09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> HMP07     <span style="text-decoration: underline;">1</span>353 Shannon       1.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> HMP08     <span style="text-decoration: underline;">1</span>353 Shannon       2.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> HMP09     <span style="text-decoration: underline;">1</span>353 Shannon       3.61</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> HMP10     <span style="text-decoration: underline;">1</span>353 Shannon       1.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample .depth .adiv   .diversity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP01     <span style="text-decoration: underline;">1</span>353 shannon       1.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP02     <span style="text-decoration: underline;">1</span>353 shannon       2.59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP03     <span style="text-decoration: underline;">1</span>353 shannon       2.95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP04     <span style="text-decoration: underline;">1</span>353 shannon       3.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> HMP05     <span style="text-decoration: underline;">1</span>353 shannon       1.43</span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">adiv_vector</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'faith'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="fu">adiv_matrix</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       depth observed  shannon   simpson</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP01  1353       49 1.745200 0.5724740</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP02  1353       75 2.587377 0.8125427</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP03  1353       75 2.950982 0.8936622</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP04  1353       73 3.235844 0.9315730</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP05  1353       44 1.430414 0.5248395</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cmd")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_matrix(biom, c(\"observed\", \"shannon\", \"simpson\"))"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -162,7 +215,7 @@ and <b>.diversity</b>, followed by any metadata fields requested by
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

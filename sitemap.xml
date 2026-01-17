@@ -4,7 +4,6 @@
 <url><loc>https://cmmr.github.io/rbiom/LICENSE.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/aes.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/bdiv_cmp.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/articles/benchmarks.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/convert.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/diversity.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/importing.html</loc></url>
@@ -14,13 +13,11 @@
 <url><loc>https://cmmr.github.io/rbiom/articles/regression.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/scales.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/articles/statistics.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/articles/unifrac.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/authors.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/index.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/news/index.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_boxplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_corrplot.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/reference/adiv_matrix.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_stats.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/adiv_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/as.list.rbiom.html</loc></url>
@@ -56,6 +53,7 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/glimpse.rbiom.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/hmp50.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/index.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/matrix_ops.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/modify_metadata.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/plot_heatmap.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/pull.rbiom.html</loc></url>
@@ -63,8 +61,6 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/rare_multiplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rare_stacked.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rarefy.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/reference/rarefy_cols.html</loc></url>
-<url><loc>https://cmmr.github.io/rbiom/reference/rbiom-deprecated.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rbiom-package.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/rbiom_objects.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/read_biom.html</loc></url>

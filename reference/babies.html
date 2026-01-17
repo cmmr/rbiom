@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,38 @@ Includes metadata and taxonomy.</p><dl><dt>Subject ID - </dt>
     <h2 id="source">Source<a class="anchor" aria-label="anchor" href="#source"></a></h2>
     <p><a href="https://www.nature.com/articles/s41467-018-04641-7" class="external-link">https://www.nature.com/articles/s41467-018-04641-7</a> and <a href="https://doi.org/10.1038/s41467-017-01973-8" class="external-link">doi:10.1038/s41467-017-01973-8</a></p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other Built-In Datasets:
+<code><a href="gems.html">gems</a></code>,
+<code><a href="hmp50.html">hmp50</a></code></p></div>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">babies</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">DailyBaby</span><span style="color: #808080;"> ═══════════════════════════════════════════════</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Longitudinal stool microbiome from 12 infants (Muinck &amp;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Trosvik, 2018</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (<span style="color: #808080; font-style: italic;">&lt;https://www.nature.com/articles/s41467-018-04641-7&gt;</span>)).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Retrieved from MicrobiomeHD</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (<span style="color: #808080; font-style: italic;">&lt;https://doi.org/10.1038/s41467-017-01973-8&gt;</span>).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    2684 Samples: SRR7044380, SRR7058817, SRR7039319, ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     506 OTUs:    ASV085, ASV022, ASV251, ..., and ASV607 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       8 Ranks:   .otu, Kingdom, Phylum, ..., and Species </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>      10 Fields:  .sample, Subject ID, Sex, ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 500 reads/sample ────────────────────────── 2018-06-08 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">babies</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Age</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `Age`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -105,7 +136,7 @@ Includes metadata and taxonomy.</p><dl><dt>Subject ID - </dt>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,41 @@ Includes metadata and taxonomy.</p><dl><dt>diarrhea - </dt>
     <p><a href="https://doi.org/10.1186/gb-2014-15-6-r76" class="external-link">doi:10.1186/gb-2014-15-6-r76</a>
  and <a href="https://doi.org/10.1093/nar/gkx1027" class="external-link">doi:10.1093/nar/gkx1027</a></p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other Built-In Datasets:
+<code><a href="babies.html">babies</a></code>,
+<code><a href="hmp50.html">hmp50</a></code></p></div>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gems</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">══ </span><span style="color: #BBBBBB;">Global Enteric Multicenter Study</span><span style="color: #808080;"> ════════════════════════</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Stool samples collected from 1006 participants under the</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> age of 5 from Bangladesh, Gambia, Kenya, and Mali. Includes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 492 healthy controls and 514 moderate-to-severe diarrhea</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (MSD) cases. Original study by Pop et al, 2014</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (<span style="color: #808080; font-style: italic;">&lt;https://doi.org/10.1186/gb-2014-15-6-r76&gt;</span>); dataset</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> retrieved from MicrobiomeDB</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (<span style="color: #808080; font-style: italic;">&lt;https://doi.org/10.1093/nar/gkx1027&gt;</span>).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    1006 Samples: SRS608640, SRS608279, SRS607780, ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     767 OTUs:    OTU001, OTU002, OTU003, ..., and OTU767 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       8 Ranks:   .otu, Kingdom, Phylum, ..., and Species </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       4 Fields:  .sample, diarrhea, age, and country </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>         Tree:    <span style="font-style: italic;">&lt;absent&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #808080;">── 116 - 11k reads/sample ──────────────────── 2021-03-15 ──</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">gems</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">country</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bangladesh     Gambia      Kenya       Mali </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        215        272        307        212 </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -88,7 +122,7 @@ Includes metadata and taxonomy.</p><dl><dt>diarrhea - </dt>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

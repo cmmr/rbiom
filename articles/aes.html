@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -467,10 +467,10 @@ main grid.</p>
 <code>"hexagon"</code>, <code>"octagon"</code>, <code>"rain"</code>,
 <code>"saw"</code>, <code>"shingle"</code>, <code>"rshingle"</code>,
 <code>"stripe"</code>, and <code>"wave"</code>.</p>
-<p><img src="aes_files/figure-html/patterns-basic-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/patterns-basic-1.png" class="r-plt" alt="" width="768"></p>
 <p>Pattern names can optionally be suffixed with modifiers to change the
 line width/style, tile size/rotation, and more.</p>
-<p><img src="aes_files/figure-html/patterns-modded-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/patterns-modded-1.png" class="r-plt" alt="" width="768"></p>
 <p>You can allow rbiom to choose a set of patterns, or you can
 explicitly define the mappings.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Body Site"</span>, patterns <span class="ot">=</span> <span class="cn">TRUE</span></span>
@@ -490,7 +490,7 @@ may used as well.</p>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Body Site"</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Sex"</span>, shapes <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>stat.by <span class="ot">=</span> <span class="st">"Sex"</span>, shapes <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Stool'</span> <span class="ot">=</span> <span class="dv">7</span>, <span class="st">'Saliva'</span> <span class="ot">=</span> <span class="dv">8</span>)</span></code></pre></div>
-<p><img src="aes_files/figure-html/shapes-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/shapes-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 <div class="section level2">
 <h2 id="facets">Facets<a class="anchor" aria-label="anchor" href="#facets"></a>
@@ -501,10 +501,10 @@ one or more categorical metadata fields. For example:</p>
 <code class="sourceCode R"><span><span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rarefy.html">rarefy</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/facets-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/facets-1.png" class="r-plt" alt="" width="768"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Sex"</span>, facet.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/facets-2.png" width="768"></p>
+<p><img src="aes_files/figure-html/facets-2.png" class="r-plt" alt="" width="768"></p>
 <div class="section level3">
 <h3 id="auto-generated-facets">Auto-generated facets<a class="anchor" aria-label="anchor" href="#auto-generated-facets"></a>
 </h3>
@@ -513,10 +513,10 @@ metrics, etc which are automatically assigned their own facet dimension.
 You can still add your own facets to these plots.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Chao1"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/auto_facets1-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/auto_facets1-1.png" class="r-plt" alt="" width="768"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Shannon"</span>, <span class="st">"Chao1"</span><span class="op">)</span>, facet.by <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="aes_files/figure-html/auto_facets2-1.png" width="768"></p>
+<p><img src="aes_files/figure-html/auto_facets2-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -530,7 +530,7 @@ You can still add your own facets to these plots.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,9 +58,9 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bdiv_table</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  normalized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bdiv <span class="op">=</span> <span class="st">"bray"</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  md <span class="op">=</span> <span class="st">".all"</span>,</span>
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -69,33 +69,38 @@
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bdiv_matrix</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  normalized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bdiv <span class="op">=</span> <span class="st">"bray"</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  cpus <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  underscores <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bdiv_distmat</span><span class="op">(</span></span>
 <span>  <span class="va">biom</span>,</span>
-<span>  bdiv <span class="op">=</span> <span class="st">"Bray-Curtis"</span>,</span>
-<span>  weighted <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  normalized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bdiv <span class="op">=</span> <span class="st">"bray"</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  tree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  within <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  between <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ties <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cpus <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -105,28 +110,28 @@
 
 
 <dl><dt id="arg-biom">biom<a class="anchor" aria-label="anchor" href="#arg-biom"></a></dt>
-<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, such as from <code><a href="as_rbiom.html">as_rbiom()</a></code>.
-Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can also be given here.</p></dd>
+<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, or any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt id="arg-bdiv">bdiv<a class="anchor" aria-label="anchor" href="#arg-bdiv"></a></dt>
 <dd><p>Beta diversity distance algorithm(s) to use. Options are:
-<code>"Bray-Curtis"</code>, <code>"Manhattan"</code>, <code>"Euclidean"</code>,
-<code>"Jaccard"</code>, and <code>"UniFrac"</code>. For <code>"UniFrac"</code>, a
-phylogenetic tree must be present in <code>biom</code> or explicitly
-provided via <code>tree=</code>. Multiple/abbreviated values allowed.
-Default: <code>"Bray-Curtis"</code></p></dd>
+<code>c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")</code>.
+For the UniFrac family, a phylogenetic tree must be present in <code>biom</code>
+or explicitly provided via <code>tree=</code>. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: <code>"bray"</code></p></dd>
 
 
 <dt id="arg-weighted">weighted<a class="anchor" aria-label="anchor" href="#arg-weighted"></a></dt>
-<dd><p>Take relative abundances into account. When
-<code>weighted=FALSE</code>, only presence/absence is considered.
-Multiple values allowed. Default: <code>TRUE</code></p></dd>
+<dd><p>(Deprecated - weighting is now inherent in bdiv metric name.)
+Take relative abundances into account. When <code>weighted=FALSE</code>, only
+presence/absence is considered. Multiple values allowed. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-normalized">normalized<a class="anchor" aria-label="anchor" href="#arg-normalized"></a></dt>
-<dd><p>Only changes the "Weighted UniFrac" calculation.
-Divides result by the total branch weights. Default: <code>TRUE</code></p></dd>
+<dd><p>(Deprecated - normalization is now inherent in bdiv metric
+name.) Only changes the "Weighted UniFrac" calculation. Divides result by
+the total branch weights. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-tree">tree<a class="anchor" aria-label="anchor" href="#arg-tree"></a></dt>
@@ -171,15 +176,19 @@ See <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank(
 Default: <code>0</code></p></dd>
 
 
+<dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
+<dd><p>The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting <code>alpha=1</code> is equivalent to Normalized UniFrac. Default: <code>0.5</code></p></dd>
+
+
 <dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
 <dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
 or to <code>1</code> to disable parallel processing. Default: <code>NULL</code></p></dd>
 
 
-<dt id="arg-underscores">underscores<a class="anchor" aria-label="anchor" href="#arg-underscores"></a></dt>
-<dd><p>When parsing the tree, should underscores be kept as
-is? By default they will be converted to spaces (unless the entire ID
-is quoted). Default <code>FALSE</code></p></dd>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Not used.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -192,7 +201,7 @@ is quoted). Default <code>FALSE</code></p></dd>
 <dd><p>A dist-class distance matrix.</p></dd>
 
 <dt><code>bdiv_table()</code> - </dt>
-<dd><p>A tibble data.frame with columns names .sample1, .sample2, .weighted,
+<dd><p>A tibble data.frame with columns named .sample1, .sample2,
 .bdiv, .distance, and any fields requested by <code>md</code>. Numeric metadata
 fields will be returned as <code>abs(x - y)</code>; categorical metadata fields as
 <code>"x"</code>, <code>"y"</code>, or <code>"x vs y"</code>.</p></dd>
@@ -217,14 +226,14 @@ parameters. <code>stat.by = '==Sex'</code> is equivalent to
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other beta_diversity:
-<code><a href="bdiv_boxplot.html">bdiv_boxplot</a>()</code>,
-<code><a href="bdiv_clusters.html">bdiv_clusters</a>()</code>,
-<code><a href="bdiv_corrplot.html">bdiv_corrplot</a>()</code>,
-<code><a href="bdiv_heatmap.html">bdiv_heatmap</a>()</code>,
-<code><a href="bdiv_ord_plot.html">bdiv_ord_plot</a>()</code>,
-<code><a href="bdiv_ord_table.html">bdiv_ord_table</a>()</code>,
-<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
-<code><a href="distmat_stats.html">distmat_stats</a>()</code></p></div>
+<code><a href="bdiv_boxplot.html">bdiv_boxplot()</a></code>,
+<code><a href="bdiv_clusters.html">bdiv_clusters()</a></code>,
+<code><a href="bdiv_corrplot.html">bdiv_corrplot()</a></code>,
+<code><a href="bdiv_heatmap.html">bdiv_heatmap()</a></code>,
+<code><a href="bdiv_ord_plot.html">bdiv_ord_plot()</a></code>,
+<code><a href="bdiv_ord_table.html">bdiv_ord_table()</a></code>,
+<code><a href="bdiv_stats.html">bdiv_stats()</a></code>,
+<code><a href="distmat_stats.html">distmat_stats()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -236,53 +245,53 @@ parameters. <code>stat.by = '==Sex'</code> is equivalent to
 <span class="r-in"><span>    <span class="va">biom</span><span class="op">$</span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">biom</span><span class="op">$</span><span class="va">counts</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HMP18"</span>, <span class="st">"HMP19"</span>, <span class="st">"HMP20"</span>, <span class="st">"HMP21"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Return in long format with metadata</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span>, md <span class="op">=</span> <span class="st">".all"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .weighted .bdiv   .distance   Age   BMI `Body Site`    Sex  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP18    HMP19    TRUE      UniFrac     0.735     0     3 Saliva vs Sto… Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP18    HMP20    TRUE      UniFrac     0.765     1     2 Saliva vs Sto… Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP18    HMP21    TRUE      UniFrac     0.771     4     2 Saliva vs Sto… Male </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP19    HMP20    TRUE      UniFrac     0.433     1     5 Stool          Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> HMP19    HMP21    TRUE      UniFrac     0.387     4     1 Stool          Fema…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> HMP20    HMP21    TRUE      UniFrac     0.150     5     4 Stool          Fema…</span>
+<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span>, md <span class="op">=</span> <span class="st">".all"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .bdiv     .distance   Age   BMI `Body Site`     Sex         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP18    HMP19    w_unifrac     0.665     0     3 Saliva vs Stool Female vs M…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP18    HMP20    w_unifrac     0.681     1     2 Saliva vs Stool Female vs M…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP18    HMP21    w_unifrac     0.717     4     2 Saliva vs Stool Male        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP19    HMP20    w_unifrac     0.418     1     5 Stool           Female      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> HMP19    HMP21    w_unifrac     0.390     4     1 Stool           Female vs M…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> HMP20    HMP21    w_unifrac     0.149     5     4 Stool           Female vs M…</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Only look at distances among the stool samples</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span>, md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"==Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .weighted .bdiv   .distance `Body Site` Sex           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP19    HMP20    TRUE      UniFrac     0.433 Stool       Female        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP19    HMP21    TRUE      UniFrac     0.387 Stool       Female vs Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP20    HMP21    TRUE      UniFrac     0.150 Stool       Female vs Male</span>
+<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span>, md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"==Body Site"</span>, <span class="st">"Sex"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .bdiv     .distance `Body Site` Sex           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP19    HMP20    w_unifrac     0.418 Stool       Female        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP19    HMP21    w_unifrac     0.390 Stool       Female vs Male</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP20    HMP21    w_unifrac     0.149 Stool       Female vs Male</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># Or between males and females</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span>, md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"!=Sex"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .weighted .bdiv   .distance `Body Site`     Sex           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP18    HMP19    TRUE      UniFrac     0.735 Saliva vs Stool Female vs Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP18    HMP20    TRUE      UniFrac     0.765 Saliva vs Stool Female vs Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP19    HMP21    TRUE      UniFrac     0.387 Stool           Female vs Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP20    HMP21    TRUE      UniFrac     0.150 Stool           Female vs Male</span>
+<span class="r-in"><span>    <span class="fu">bdiv_table</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span>, md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Body Site"</span>, <span class="st">"!=Sex"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .sample1 .sample2 .bdiv     .distance `Body Site`     Sex           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> HMP18    HMP19    w_unifrac     0.665 Saliva vs Stool Female vs Male</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> HMP18    HMP20    w_unifrac     0.681 Saliva vs Stool Female vs Male</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> HMP19    HMP21    w_unifrac     0.390 Stool           Female vs Male</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> HMP20    HMP21    w_unifrac     0.149 Stool           Female vs Male</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># All-vs-all matrix</span></span></span>
-<span class="r-in"><span>    <span class="fu">bdiv_matrix</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">bdiv_matrix</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           HMP18     HMP19     HMP20     HMP21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP18 0.0000000 0.7353910 0.7649262 0.7705909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP19 0.7353910 0.0000000 0.4332007 0.3874131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP20 0.7649262 0.4332007 0.0000000 0.1503528</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP21 0.7705909 0.3874131 0.1503528 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP18 0.0000000 0.6651627 0.6810017 0.7170374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP19 0.6651627 0.0000000 0.4183059 0.3896741</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP20 0.6810017 0.4183059 0.0000000 0.1490926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP21 0.7170374 0.3896741 0.1490926 0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cmd")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bdiv_matrix(biom, \"unifrac\")"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bdiv_matrix(biom, \"w_unifrac\")"</span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># All-vs-all distance matrix</span></span></span>
-<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">bdiv_distmat</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'unifrac'</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu">bdiv_distmat</span><span class="op">(</span><span class="va">biom</span>, <span class="st">'w_unifrac'</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">dm</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           HMP18     HMP19     HMP20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP19 0.7353910                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP20 0.7649262 0.4332007          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> HMP21 0.7705909 0.3874131 0.1503528</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP19 0.6651627                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP20 0.6810017 0.4183059          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> HMP21 0.7170374 0.3896741 0.1490926</span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">dm</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="bdiv_table-1.png" alt="" width="768" height="384"></span>
 <span class="r-in"><span></span></span>
@@ -297,7 +306,7 @@ parameters. <code>stat.by = '==Sex'</code> is equivalent to
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

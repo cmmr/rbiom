@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +53,7 @@
 
       <div class="section-desc"><p>Get data into and out of R objects.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -65,37 +64,43 @@
 
         </dt>
         <dd>Convert a variety of data types to an rbiom object.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_biom.html">read_biom()</a></code>
 
         </dt>
         <dd>Parse counts, metadata, taxonomy, and phylogeny from a BIOM file.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_fasta.html">read_fasta()</a></code>
 
         </dt>
         <dd>Parse a fasta file into a named character vector.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_tree.html">read_tree()</a></code>
 
         </dt>
         <dd>Read a newick formatted phylogenetic tree.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="export.html">write_mothur()</a></code> <code><a href="export.html">write_qiime2()</a></code>
 
         </dt>
         <dd>Export data to QIIME 2 or mothur.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="write_biom.html">write_biom()</a></code> <code><a href="write_biom.html">write_metadata()</a></code> <code><a href="write_biom.html">write_counts()</a></code> <code><a href="write_biom.html">write_taxonomy()</a></code> <code><a href="write_biom.html">write_fasta()</a></code> <code><a href="write_biom.html">write_tree()</a></code> <code><a href="write_biom.html">write_xlsx()</a></code>
 
         </dt>
         <dd>Save an rbiom object to a file.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="convert_to.html">convert_to_SE()</a></code> <code><a href="convert_to.html">convert_to_TSE()</a></code> <code><a href="convert_to.html">convert_to_phyloseq()</a></code> <code><a href="convert_to.html">convert_to_animalcules()</a></code>
 
@@ -106,8 +111,7 @@
 
       <div class="section-desc"><p>The <a href="rbiom_objects.html">rbiom object</a> itself includes many methods, including <code>$counts</code>, <code>$metadata</code>, <code>$taxonomy</code>, $samples, $n_samples and more.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -118,13 +122,15 @@
 
         </dt>
         <dd>Working with rbiom Objects.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="as.list.rbiom.html">as.list(<i>&lt;rbiom&gt;</i>)</a></code>
 
         </dt>
         <dd>Convert an rbiom object to a base R list.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="as.matrix.rbiom.html">as.matrix(<i>&lt;rbiom&gt;</i>)</a></code>
 
@@ -135,8 +141,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -147,19 +152,22 @@
 
         </dt>
         <dd>Map sample names to metadata field values.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="with.html">with(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="with.html">within(<i>&lt;rbiom&gt;</i>)</a></code>
 
         </dt>
         <dd>Evaluate expressions on metadata.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="modify_metadata.html">mutate(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="modify_metadata.html">rename(<i>&lt;rbiom&gt;</i>)</a></code>
 
         </dt>
         <dd>Create, modify, and delete metadata fields.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="glimpse.rbiom.html">glimpse(<i>&lt;rbiom&gt;</i>)</a></code>
 
@@ -170,8 +178,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -182,7 +189,8 @@
 
         </dt>
         <dd>Subset an rbiom object by sample names, OTU names, metadata, or taxonomy.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="slice_metadata.html">slice(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice_metadata.html">slice_head(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice_metadata.html">slice_tail(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice_metadata.html">slice_min(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice_metadata.html">slice_max(<i>&lt;rbiom&gt;</i>)</a></code> <code><a href="slice_metadata.html">slice_sample(<i>&lt;rbiom&gt;</i>)</a></code>
 
@@ -193,8 +201,7 @@
 
       <div class="section-desc"><p>Map OTUs to higher order taxonomic ranks, and compare those abundances to metadata.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -205,49 +212,57 @@
 
         </dt>
         <dd>Visualize BIOM data with boxplots.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_clusters.html">taxa_clusters()</a></code>
 
         </dt>
         <dd>Cluster samples by taxa abundances k-means.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code>
 
         </dt>
         <dd>Visualize taxa abundance with scatterplots and trendlines.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_heatmap.html">taxa_heatmap()</a></code>
 
         </dt>
         <dd>Display taxa abundances as a heatmap.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_map.html">taxa_map()</a></code>
 
         </dt>
         <dd>Map OTUs names to taxa names at a given rank.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_matrix.html">taxa_table()</a></code> <code><a href="taxa_matrix.html">taxa_matrix()</a></code>
 
         </dt>
         <dd>Taxa abundances per sample.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_stacked.html">taxa_stacked()</a></code>
 
         </dt>
         <dd>Display taxa abundances as a stacked bar graph.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_stats.html">taxa_stats()</a></code>
 
         </dt>
         <dd>Test taxa abundances for associations with metadata.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="taxa_sums.html">taxa_sums()</a></code> <code><a href="taxa_sums.html">taxa_means()</a></code> <code><a href="taxa_sums.html">taxa_apply()</a></code>
 
@@ -258,8 +273,7 @@
 
       <div class="section-desc"><p>Examine the diversity of OTUs present in each individual sample, and how that diversity correlates with metadata.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -270,31 +284,29 @@
 
         </dt>
         <dd>Visualize alpha diversity with boxplots.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="adiv_corrplot.html">adiv_corrplot()</a></code>
 
         </dt>
         <dd>Visualize alpha diversity with scatterplots and trendlines.</dd>
-      </dl><dl><dt>
 
-          <code><a href="adiv_matrix.html">adiv_matrix()</a></code>
-
-        </dt>
-        <dd>Create a matrix of samples x alpha diversity metrics.</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="adiv_stats.html">adiv_stats()</a></code>
 
         </dt>
         <dd>Test alpha diversity for associations with metadata.</dd>
-      </dl><dl><dt>
 
-          <code><a href="adiv_table.html">adiv_table()</a></code>
+        <dt>
+
+          <code><a href="adiv_table.html">adiv_table()</a></code> <code><a href="adiv_table.html">adiv_matrix()</a></code> <code><a href="adiv_table.html">adiv_vector()</a></code>
 
         </dt>
         <dd>Calculate the alpha diversity of each sample.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="sample_sums.html">sample_sums()</a></code> <code><a href="sample_sums.html">sample_apply()</a></code>
 
@@ -305,8 +317,7 @@
 
       <div class="section-desc"><p>See how similiar samples are to each other, and what metadata/taxa influence clustering.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -317,43 +328,50 @@
 
         </dt>
         <dd>Visualize BIOM data with boxplots.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_clusters.html">bdiv_clusters()</a></code>
 
         </dt>
         <dd>Cluster samples by beta diversity k-means.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_corrplot.html">bdiv_corrplot()</a></code>
 
         </dt>
         <dd>Visualize beta diversity with scatterplots and trendlines.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_heatmap.html">bdiv_heatmap()</a></code>
 
         </dt>
         <dd>Display beta diversities in an all vs all grid.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_ord_plot.html">bdiv_ord_plot()</a></code>
 
         </dt>
         <dd>Ordinate samples and taxa on a 2D plane based on beta diversity distances.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_ord_table.html">bdiv_ord_table()</a></code>
 
         </dt>
         <dd>Calculate PCoA and other ordinations, including taxa biplots and statistics.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_stats.html">bdiv_stats()</a></code>
 
         </dt>
         <dd>Test beta diversity for associations with metadata.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bdiv_table.html">bdiv_table()</a></code> <code><a href="bdiv_table.html">bdiv_matrix()</a></code> <code><a href="bdiv_table.html">bdiv_distmat()</a></code>
 
@@ -364,8 +382,7 @@
 
       <div class="section-desc"><p>Improve signal-to-noise in analyses by ensuring all samples have an equal number of observations.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -376,19 +393,22 @@
 
         </dt>
         <dd>Visualize rarefaction curves with scatterplots and trendlines.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rare_multiplot.html">rare_multiplot()</a></code>
 
         </dt>
         <dd>Combines rare_corrplot and rare_stacked into a single figure.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rare_stacked.html">rare_stacked()</a></code>
 
         </dt>
         <dd>Visualize the number of observations per sample.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rarefy.html">rarefy()</a></code>
 
@@ -399,8 +419,7 @@
 
       <div class="section-desc"><p>Most functions operate on rbiom objects. These let you use arbitrary data.frames, distance matrices, matrices, and phylo objects.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -411,43 +430,50 @@
 
         </dt>
         <dd>Run ordinations on a distance matrix.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="distmat_stats.html">distmat_stats()</a></code>
 
         </dt>
         <dd>Run statistics on a distance matrix vs a categorical or numeric variable.</dd>
-      </dl><dl><dt>
 
-          <code><a href="rarefy_cols.html">rarefy_cols()</a></code> <code><a href="rarefy_cols.html">rescale_cols()</a></code> <code><a href="rarefy_cols.html">rescale_rows()</a></code>
+        <dt>
+
+          <code><a href="matrix_ops.html">mtx_rarefy()</a></code> <code><a href="matrix_ops.html">mtx_percent()</a></code> <code><a href="matrix_ops.html">mtx_rescale()</a></code> <code><a href="matrix_ops.html">rarefy_cols()</a></code> <code><a href="matrix_ops.html">rescale_rows()</a></code> <code><a href="matrix_ops.html">rescale_cols()</a></code>
 
         </dt>
         <dd>Transform a counts matrix.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="stats_boxplot.html">stats_boxplot()</a></code>
 
         </dt>
         <dd>Visualize categorical metadata effects on numeric values.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="stats_corrplot.html">stats_corrplot()</a></code>
 
         </dt>
         <dd>Visualize regression with scatterplots and trendlines.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="stats_table.html">stats_table()</a></code>
 
         </dt>
         <dd>Run non-parametric statistics on a data.frame.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="tree_subset.html">tree_subset()</a></code>
 
         </dt>
         <dd>Create a subtree by specifying tips to keep.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot_heatmap.html">plot_heatmap()</a></code>
 
@@ -458,8 +484,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -470,7 +495,8 @@
 
         </dt>
         <dd>Apply a function to each subset of an rbiom object.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="biom_merge.html">biom_merge()</a></code>
 
@@ -481,8 +507,7 @@
 
       <div class="section-desc"><p>Example datasets included with rbiom.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -493,13 +518,15 @@
 
         </dt>
         <dd>Human Microbiome Project - demo dataset (n = 50)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="gems.html">gems</a></code>
 
         </dt>
         <dd>Global Enteric Multicenter Study (n = 1,006)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="babies.html">babies</a></code>
 
@@ -515,7 +542,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

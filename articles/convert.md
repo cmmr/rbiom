@@ -1,0 +1,214 @@
+# QIIME 2, mothur, and BioConductor
+
+## QIIME 2
+
+### rbiom ➡ QIIME 2
+
+In R, export QIIME 2-compatible files.
+
+``` r
+library(rbiom)
+
+# where to save the files
+project_dir <- tempdir()
+
+write_qiime2(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
+```
+
+> This command creates files named `'hmp50_counts.tsv'`,
+> `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and
+> `'hmp50_seqs.fna'`.
+
+  
+On the command line, convert files to QIIME 2 format (.qza).
+
+``` bash
+# Convert classic BIOM table to HDF5
+biom convert -i hmp50_counts.tsv -o hmp50_counts.hdf5 --to-hdf5
+
+# Import counts
+qiime tools import \
+  --input-path hmp50_counts.hdf5 \
+  --type 'FeatureTable[Frequency]' \
+  --input-format BIOMV210Format \
+  --output-path hmp50-counts.qza
+
+# Import taxonomy
+qiime tools import \
+ --input-path hmp50_taxonomy.tsv \
+ --type FeatureData[Taxonomy] \
+ --output-path hmp50-taxonomy.qza
+
+# Import phylogenetic tree
+qiime tools import \
+  --input-path hmp50_tree.nwk \
+  --type 'Phylogeny[Rooted]' \
+  --output-path hmp50-tree.qza
+```
+
+Examples: running unifrac and browsing metadata
+
+``` bash
+qiime diversity-lib weighted-unifrac \
+  --i-table hmp50-counts.qza \
+  --i-phylogeny hmp50-tree.qza \
+  --o-distance-matrix weighted-unifrac-dm.qza
+  
+qiime metadata tabulate \
+  --m-input-file hmp50_metadata.tsv \
+  --o-visualization hmp50-metadata-browser.qzv
+# View .qzv files with https://view.qiime2.org
+```
+
+### QIIME 2 ➡ rbiom
+
+On the command line, export data files from QIIME 2.
+
+``` bash
+# Export a feature table, taxonomy, and tree
+qiime tools export --input-path hmp50-counts.qza   --output-path .
+qiime tools export --input-path hmp50-taxonomy.qza --output-path .
+qiime tools export --input-path hmp50-tree.qza     --output-path .
+```
+
+> These commands create files named `'feature-table.biom'`,
+> `'taxonomy.tsv'`, and `'tree.nwk'`.
+
+  
+In R, import the data files into rbiom.
+
+``` r
+# project_dir = directory with relevant files
+
+withr::with_dir(project_dir, {
+
+  biom <- as_rbiom(
+    biom     = 'feature-table.biom', 
+    metadata = 'hmp50_metadata.tsv', 
+    taxonomy = 'taxonomy.tsv', 
+    tree     = 'tree.nwk' )
+  
+})
+```
+
+## mothur
+
+### rbiom ➡ mothur
+
+In R, export mothur-compatible files.
+
+``` r
+library(rbiom)
+
+# where to save the files
+project_dir <- tempdir()
+
+write_mothur(biom = hmp50, dir = project_dir, prefix = 'hmp50_')
+```
+
+> This command creates files named `'hmp50_counts.tsv'`,
+> `'hmp50_metadata.tsv'`, `'hmp50_taxonomy.tsv', 'hmp50_tree.nwk'`, and
+> `'hmp50_seqs.fna'`.
+
+  
+At the mothur command prompt, import the BIOM data.
+
+``` bash
+mothur > make.shared(count=hmp50_counts.tsv, label=asv)
+mothur > unifrac.unweighted(tree=hmp50_tree.nwk, count=hmp50_counts.tsv)
+```
+
+> The `make.shared()` command creates files named
+> `'hmp50_counts.asv.list'` and `'hmp50_counts.asv.shared'`.
+
+### mothur ➡ rbiom
+
+At the mothur command prompt, export a biom file.
+
+``` bash
+mothur > make.biom( \
+  shared=hmp50_counts.asv.shared, \
+  constaxonomy=hmp50_taxonomy.tsv, \
+  metadata=hmp50_metadata.tsv, \
+  output=simple )
+```
+
+> The `make.biom()` command creates a file named
+> `'hmp50_counts.asv.asv.biom'`.
+
+In R, import the biom file with rbiom.
+
+``` r
+# project_dir = directory with relevant files
+
+withr::with_dir(project_dir, {
+
+  biom <- as_rbiom('hmp50_counts.asv.asv.biom')
+
+  # Optionally add a tree and/or sequences
+  biom$tree <- 'hmp50_tree.nwk'
+  biom$seqs <- 'hmp50_seqs.fna'
+  
+})
+```
+
+## BioConductor R Packages
+
+### rbiom ➡ phyloseq
+
+``` r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A phyloseq object
+physeq <- rbiom::convert_to_phyloseq(biom)
+```
+
+### phyloseq ➡ rbiom
+
+``` r
+# A phyloseq object
+data(enterotype, package = 'phyloseq')
+physeq <- enterotype
+
+# An rbiom object
+biom <- rbiom::as_rbiom(physeq)
+```
+
+### rbiom ➡ SummarizedExperiment
+
+``` r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A SummarizedExperiment object
+se <- rbiom::convert_to_SE(biom)
+```
+
+### SummarizedExperiment ➡ rbiom
+
+``` r
+# `se` is a SummarizedExperiment object
+
+# Convert to rbiom object
+biom <- rbiom::as_rbiom(se)
+```
+
+### rbiom ➡ TreeSummarizedExperiment
+
+``` r
+# An rbiom object
+biom <- rbiom::hmp50
+
+# A TreeSummarizedExperiment object
+tse <- rbiom::convert_to_TSE(biom)
+```
+
+### TreeSummarizedExperiment ➡ rbiom
+
+``` r
+# `tse` is a TreeSummarizedExperiment object
+
+# Convert to rbiom object
+biom <- rbiom::as_rbiom(tse)
+```

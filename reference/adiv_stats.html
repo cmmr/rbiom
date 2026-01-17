@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,8 +78,7 @@
 
 
 <dl><dt id="arg-biom">biom<a class="anchor" aria-label="anchor" href="#arg-biom"></a></dt>
-<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, such as from <code><a href="as_rbiom.html">as_rbiom()</a></code>.
-Any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code> can also be given here.</p></dd>
+<dd><p>An <a href="rbiom_objects.html">rbiom object</a>, or any value accepted by <code><a href="as_rbiom.html">as_rbiom()</a></code>.</p></dd>
 
 
 <dt id="arg-regr">regr<a class="anchor" aria-label="anchor" href="#arg-regr"></a></dt>
@@ -93,11 +92,11 @@ categorical. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-adiv">adiv<a class="anchor" aria-label="anchor" href="#arg-adiv"></a></dt>
-<dd><p>Alpha diversity metric(s) to use. Options are: <code>"OTUs"</code>,
-<code>"Shannon"</code>, <code>"Chao1"</code>, <code>"Simpson"</code>, and/or
-<code>"InvSimpson"</code>. Set <code>adiv=".all"</code> to use all metrics.
-Multiple/abbreviated values allowed.
-Default: <code>"Shannon"</code></p></dd>
+<dd><p>Alpha diversity metric(s) to use. Options are:
+<code>c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")</code>.
+For <code>"faith"</code>, a phylogenetic tree must be present in <code>biom</code> or
+explicitly provided via <code>tree=</code>. Set <code>adiv=".all"</code> to use all metrics.
+Multiple/abbreviated values allowed. Default: <code>"shannon"</code></p></dd>
 
 
 <dt id="arg-split-by">split.by<a class="anchor" aria-label="anchor" href="#arg-split-by"></a></dt>
@@ -157,14 +156,14 @@ the statistics.</p><table class="table table"><tr><td><strong>Field</strong></td
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other alpha_diversity:
-<code><a href="adiv_boxplot.html">adiv_boxplot</a>()</code>,
-<code><a href="adiv_corrplot.html">adiv_corrplot</a>()</code>,
-<code><a href="adiv_table.html">adiv_table</a>()</code></p>
+<code><a href="adiv_boxplot.html">adiv_boxplot()</a></code>,
+<code><a href="adiv_corrplot.html">adiv_corrplot()</a></code>,
+<code><a href="adiv_table.html">adiv_table()</a></code></p>
 <p>Other stats_tables:
-<code><a href="bdiv_stats.html">bdiv_stats</a>()</code>,
-<code><a href="distmat_stats.html">distmat_stats</a>()</code>,
-<code><a href="stats_table.html">stats_table</a>()</code>,
-<code><a href="taxa_stats.html">taxa_stats</a>()</code></p></div>
+<code><a href="bdiv_stats.html">bdiv_stats()</a></code>,
+<code><a href="distmat_stats.html">distmat_stats()</a></code>,
+<code><a href="stats_table.html">stats_table()</a></code>,
+<code><a href="taxa_stats.html">taxa_stats()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -178,17 +177,17 @@ the statistics.</p><table class="table table"><tr><td><strong>Field</strong></td
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sex           .mean.diff .h1    .p.val  .adj.p .effect.size</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female - Male     -<span style="color: #BB0000;">0.767</span> != 0  0.009<span style="text-decoration: underline;">49</span> 0.009<span style="text-decoration: underline;">49</span>       -<span style="color: #BB0000;">0.793</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Female - Male     -<span style="color: #BB0000;">0.770</span> != 0  0.009<span style="text-decoration: underline;">32</span> 0.009<span style="text-decoration: underline;">32</span>       -<span style="color: #BB0000;">0.795</span></span>
 <span class="r-in"><span>      </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Sex"</span>, split.by <span class="op">=</span> <span class="st">"Body Site"</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Model:    gam(.diversity ~ Sex, method = "REML")</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `Body Site`    Sex           .mean.diff .h1   .p.val .adj.p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Buccal mucosa  Female - Male    -<span style="color: #BB0000;">0.560</span>  != 0   0.230  0.441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Saliva         Female - Male    -<span style="color: #BB0000;">0.242</span>  != 0   0.231  0.441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Stool          Female - Male    -<span style="color: #BB0000;">0.192</span>  != 0   0.331  0.441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Anterior nares Female - Male    -<span style="color: #BB0000;">0.068</span><span style="color: #BB0000; text-decoration: underline;">6</span> != 0   0.739  0.739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Saliva         Female - Male    -<span style="color: #BB0000;">0.257</span>  != 0   0.193  0.461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Buccal mucosa  Female - Male    -<span style="color: #BB0000;">0.544</span>  != 0   0.248  0.461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Stool          Female - Male    -<span style="color: #BB0000;">0.197</span>  != 0   0.346  0.461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Anterior nares Female - Male    -<span style="color: #BB0000;">0.067</span><span style="color: #BB0000; text-decoration: underline;">1</span> != 0   0.736  0.736</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Mid vagina     <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="fu">adiv_stats</span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">"Body Site"</span>, test <span class="op">=</span> <span class="st">"kruskal"</span><span class="op">)</span></span></span>
@@ -196,7 +195,7 @@ the statistics.</p><table class="table table"><tr><td><strong>Field</strong></td
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .stat .h1         .p.val       .adj.p    .n   .df</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  38.8 &gt; 0   0.000<span style="text-decoration: underline;">000</span>076<span style="text-decoration: underline;">7</span> 0.000<span style="text-decoration: underline;">000</span>076<span style="text-decoration: underline;">7</span>    49     4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  38.9 &gt; 0   0.000<span style="text-decoration: underline;">000</span>073<span style="text-decoration: underline;">6</span> 0.000<span style="text-decoration: underline;">000</span>073<span style="text-decoration: underline;">6</span>    49     4</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -208,7 +207,7 @@ the statistics.</p><table class="table table"><tr><td><strong>Field</strong></td
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
