@@ -23,4 +23,14 @@ hmp50
 \description{
 Human Microbiome Project - demo dataset (n = 50)
 }
+\examples{
+hmp50
+hmp50$metadata
+}
+\seealso{
+Other Built-In Datasets: 
+\code{\link{babies}},
+\code{\link{gems}}
+}
+\concept{Built-In Datasets}
 \keyword{datasets}

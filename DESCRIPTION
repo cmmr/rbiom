@@ -1,8 +1,7 @@
 Package: rbiom
 Type: Package
-Title: Read/Write, Analyze, and Visualize 'BIOM' Data
-Version: 2.2.1
-Date: 2025-08-06
+Title: Integrated Analysis and Visualization of Microbiome Data
+Version: 3.0.0
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -16,16 +15,14 @@ Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Read/write all 'BIOM' formats. Compute rarefaction, alpha diversity, and 
     beta diversity (including 'UniFrac'). Summarize counts by taxonomic level. 
-    Subset based on metadata. Generate visualizations and statistical analyses. 
-    CPU intensive operations are coded in C for speed.
+    Subset based on metadata. Generate visualizations and statistical analyses.
 URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Depends: R (>= 4.2.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/Needs/website: rmarkdown, phyloseq, npregfast, withr
 Config/testthat/edition: 3
 Imports:
@@ -35,6 +32,7 @@ Imports:
     utils,
     ape,
     dplyr,
+    ecodive,
     emmeans,
     fillpattern,
     ggbeeswarm,
@@ -44,21 +42,21 @@ Imports:
     ggtext,
     jsonlite,
     magrittr,
-    parallelly,
     patchwork,
     pillar,
     plyr,
     readr,
     readxl,
-    slam,
     vegan
 Suggests:
     cli,
     crayon,
     ggdensity,
     glue,
+    h5lite,
     labeling,
     lifecycle,
+    Matrix,
     openxlsx,
     optparse,
     pkgconfig,
@@ -70,3 +68,6 @@ Suggests:
     tibble,
     tsne,
     uwot
+Remotes:
+  github::cmmr/ecodive,
+  github::cmmr/h5lite

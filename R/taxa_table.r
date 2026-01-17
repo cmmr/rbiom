@@ -192,11 +192,16 @@ taxa_matrix <- function (
     expr  = local({
       
       counts <- biom$counts
-      if (eq(transform, 'percent')) counts <- rescale_cols(counts)
-      mtx <- rollup(counts[names(map),], 1L, map, sum)
+      counts <- counts[names(map), , drop = FALSE]
+      if (eq(transform, 'percent')) counts %<>% mtx_percent()
+      
+      if (!is.factor(map)) map <- factor(map)
+      projection <- as(map, "sparseMatrix")
+      
+      mtx <- projection %*% counts
       mtx <- mtx[order(tolower(rownames(mtx))), colnames(counts), drop=FALSE]
       
-      stopifnot(inherits(mtx, "simple_triplet_matrix"))
+      stopifnot(inherits(mtx, "sparseMatrix"))
       
       return (mtx)
     }))
@@ -209,7 +214,7 @@ taxa_matrix <- function (
   if (!is_null(taxa)) {
     
     if (is.numeric(taxa) && length(taxa) == 1) {
-      rel <- sort(slam::row_means(t(t(mtx) / col_sums(mtx))), decreasing = TRUE)
+      rel <- sort(rowMeans(t(t(mtx) / colSums(mtx))), decreasing = TRUE)
       if (taxa >= 1) { taxa <- head(names(rel), taxa) 
       } else         { taxa <- names(rel)[rel >= taxa] }
       
@@ -235,9 +240,9 @@ taxa_matrix <- function (
         other <- "Other"
       
       mtx <- mtx[setdiff(rownames(mtx), taxa),,drop=FALSE] %>% 
-        col_sums() %>%
+        colSums() %>%
         matrix(., nrow = 1, dimnames = list(other, names(.))) %>%
-        as.simple_triplet_matrix() %>%
+        as("sparseMatrix") %>%
         rbind(mtx[taxa,,drop=FALSE], .)
       
       taxa <- c(taxa, other)
@@ -259,11 +264,11 @@ taxa_matrix <- function (
     set.seed(seed)
     mtx[] <- base::rank(mtx, ties.method = ties)
     if (!is.null(oldseed)) .Random.seed <- oldseed
-    
-    mtx %<>% as.simple_triplet_matrix()
+
+    mtx %<>% as("sparseMatrix")
     
   } else if (transform %in% c("log", "log1p", "sqrt")) {
-    mtx$v <- do.call(`::`, list('base', transform))(mtx$v)
+    mtx@x <- do.call(`::`, list('base', transform))(mtx@x)
   }
   
   
@@ -341,9 +346,9 @@ taxa_apply <- function (biom, FUN, rank = -1, sort = NULL, lineage = FALSE, unc 
   
   mtx <- taxa_matrix(biom = biom, rank = rank, lineage = lineage, sparse = TRUE, unc = unc, transform = transform)
   
-  res <- if (identical(FUN, base::sum))  { slam::row_sums(mtx)
-  } else if (identical(FUN, base::mean)) { slam::row_means(mtx)
-  } else { slam::rowapply_simple_triplet_matrix(mtx, FUN, ...) }
+  res <- if (identical(FUN, base::sum))  { rowSums(mtx)
+  } else if (identical(FUN, base::mean)) { rowMeans(mtx)
+  } else { apply(mtx, 1, FUN, ...) }
   
   if (is.numeric(res) && !is.null(sort))
     res <- base::sort(res, decreasing = (sort == 'desc'))

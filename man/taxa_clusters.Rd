@@ -7,8 +7,7 @@
 taxa_clusters(biom, rank = ".otu", k = 5, ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rank}{Which taxa rank to use. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer can also be

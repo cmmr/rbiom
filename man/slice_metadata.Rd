@@ -126,9 +126,9 @@ Subset to a specific number of samples.
 }
 \seealso{
 Other transformations: 
+\code{\link{matrix_ops}},
 \code{\link{modify_metadata}},
 \code{\link{rarefy}()},
-\code{\link{rarefy_cols}()},
 \code{\link{subset}()},
 \code{\link{with}()}
 }

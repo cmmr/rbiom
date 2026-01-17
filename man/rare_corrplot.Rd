@@ -23,18 +23,18 @@ rare_corrplot(
   mu = 0,
   caption = TRUE,
   check = FALSE,
+  cpus = NULL,
   ...
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
-\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are:
+\code{c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")}.
+For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
+explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
+Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
@@ -106,6 +106,9 @@ Default: \code{TRUE}}
 \item{check}{Generate additional plots to aid in assessing data normality.
 Default: \code{FALSE}}
 
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
+
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that
 layer. For instance, \code{p.size = 2} ensures only the points have their
@@ -144,8 +147,6 @@ letters instead of shapes on the plot. Character strings may used as well.
 Other rarefaction: 
 \code{\link{rare_multiplot}()},
 \code{\link{rare_stacked}()},
-\code{\link{rarefy}()},
-\code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
 
 Other visualization: 

@@ -1,3 +1,43 @@
+# rbiom 3.0.0
+
+## Announcements
+
+The code for `rbiom`'s very fast implementations of diversity metrics,
+rarefaction, and tree importing has been spun off into its own dependency-free
+package, [`ecodive`](https://github.com/cmmr/ecodive), to encourage adoption by
+other R packages. This also means `rbiom` will be easier to install going
+forward as it will no longer need to be compiled.
+
+
+## Breaking Changes
+
+* `weighted` and `normalized` arguments are no longer used by any functions.
+* Diversity metric names will now be all lowercase in returned matrices, tables, etc.
+
+The following functions have been deprecated since `rbiom` v2.0 and are now
+removed completely. They are generally functions which have been renamed for
+improved organization.
+
+`alpha.div`, `as.percent`, `beta.div`, `comments`, `comments<-`, `counts`,
+`counts<-`, `depth`, `depths_barplot`, `has.phylogeny`, `has.sequences`, `id`,
+`id<-`, `info`, `is.rarefied`, `metadata`, `metadata<-`, `nsamples`, `ntaxa`,
+`phylogeny`, `phylogeny<-`, `rarefy`, `read.biom`, `read_biom`, `read.fasta`,
+`read.tree`, `repair`, `sample.names`, `sample.names<-`, `sample_subset`,
+`sample.sums`, `sequences`, `sequences<-`, `subtree`, `taxa.means`,
+`taxa.names`, `taxa.names<-`, `taxa.ranks`, `taxa.ranks<-`, `taxa.rollup`,
+`taxa.sums`, `taxonomy`, `taxonomy<-`, `tips`, `top.taxa`, `top_taxa`,
+`unifrac`, `write.biom`, `write.fasta`, `write.tree`, `write.xlsx`
+
+
+## Additions
+
+* `adiv_vector()` returns a simple named vector of alpha diversity values.
+* Replaced `rhdf5` dependency with `h5lite`.
+* Updated list of alpha diversity metrics: `c("ace", "berger", "brillouin", "chao1", "faith", "fisher", "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick", "observed", "shannon", "squares")`
+* Updated list of beta diversity metrics: `c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev", "chord", "clark", "sorensen", "divergence", "euclidean", "generalized_unifrac", "gower", "hamming", "hellinger", "horn", "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita", "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai", "psym_chisq", "soergel", "squared_chisq", "squared_chord", "squared_euclidean", "topsoe", "unweighted_unifrac", "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")`
+
+
+
 # rbiom 2.2.1
 
 * Compatibility fixes for ggplot2 4.0.0 #30

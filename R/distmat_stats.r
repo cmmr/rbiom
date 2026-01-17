@@ -30,7 +30,7 @@
 #'     hmp10        <- hmp50$clone()
 #'     hmp10$counts <- hmp10$counts[,1:10]
 #'     
-#'     dm <- bdiv_distmat(hmp10, 'unifrac')
+#'     dm <- bdiv_distmat(hmp10, 'w_unifrac')
 #'     
 #'     distmat_stats(dm, groups = pull(hmp10, 'Body Site'))
 #'     

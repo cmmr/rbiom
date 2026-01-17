@@ -24,9 +24,10 @@ ENV <- environment()
       assign(fn, getFromNamespace(x = fn, ns = pkg), ENV)
   }
   
-  include("cli",     "cli_text", "cli_abort", "cli_warn", "qty")
-  include("glue",    "glue", "single_quote", "double_quote")
-  include("tibble",  "tibble", "as_tibble")
+  include("cli",    "cli_text", "cli_abort", "cli_warn", "qty")
+  include("glue",   "glue", "single_quote", "double_quote")
+  include("Matrix", "colMeans", "colSums", "Matrix", "rowMeans", "rowSums", "sparseMatrix", "t")
+  include("tibble", "tibble", "as_tibble")
   include("rlang", c(
     "%||%", ":=", ".data", "hash", "env_bind", "is_empty", "env_has", 
     "env_names", "is_na", "is_null", "is_bare_environment", "is_list", 

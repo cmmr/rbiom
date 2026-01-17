@@ -48,7 +48,7 @@ test_that(desc = "write_biom", code = {
   unlink(c(gzfile, bzfile))
   
   
-  skip_if_not_installed('rhdf5')
+  skip_if_not_installed('h5lite')
   expect_silent(write_biom(hmp5, tfile, format = "hdf5"))
   expect_silent(read_biom(tfile))
   unlink(tfile)

@@ -42,9 +42,9 @@ an rbiom object.
 }
 \seealso{
 Other transformations: 
+\code{\link{matrix_ops}},
 \code{\link{modify_metadata}},
 \code{\link{rarefy}()},
-\code{\link{rarefy_cols}()},
 \code{\link{slice_metadata}},
 \code{\link{subset}()}
 }

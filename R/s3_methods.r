@@ -391,8 +391,18 @@ subset.rbiom <- function (x, subset, clone = TRUE, ...) {
 #' @rdname subset
 #' @export
 `[.rbiom` <- function (x, i, j, ..., clone = TRUE, drop = FALSE) {
-  biom        <- if (isTRUE(clone)) x$clone() else x
-  biom$counts <- if (nargs() == 2) biom$counts[,i,drop] else biom$counts[i,j,drop]
+  biom <- if (isTRUE(clone)) x$clone() else x
+  
+  if (missing(j) && nargs() == 2) {
+    # Called as biom[samples]
+    biom$counts <- biom$counts[, i, drop = drop]
+  } else {
+    # Called as biom[otus, samples], biom[otus, ], or biom[, samples]
+    if      (missing(i)) { biom$counts <- biom$counts[ , j, drop = drop] }
+    else if (missing(j)) { biom$counts <- biom$counts[i,  , drop = drop] }
+    else                 { biom$counts <- biom$counts[i, j, drop = drop] }
+  }
+  
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
 
@@ -532,5 +542,3 @@ slice_sample.rbiom <- function (.data, n, prop, by = NULL, weight_by = NULL, rep
   suppressWarnings(biom$metadata <- df)
   if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
 }
-
-

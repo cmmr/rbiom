@@ -96,5 +96,5 @@ set_cache_value <- function (cache_file, result) {
   }
   
   
-  return (NULL)
+  return (invisible(result))
 }

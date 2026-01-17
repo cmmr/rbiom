@@ -1,8 +1,8 @@
 #' @export
-plyr::`.`
+ecodive::n_cpus
 
 #' @export
-parallelly::availableCores
+plyr::`.`
 
 #' @export
 plyr::ddply

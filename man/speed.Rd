@@ -61,7 +61,7 @@ provide it to just the functions that use it. For example:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{tree <- biom$tree
 biom$tree <- NULL
-dm <- bdiv_distmat(biom, 'unifrac', tree = tree)
+dm <- bdiv_distmat(biom, 'w_unifrac', tree = tree)
 }\if{html}{\out{</div>}}
 }
 }

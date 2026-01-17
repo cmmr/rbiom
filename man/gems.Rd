@@ -22,4 +22,14 @@ gems
 \description{
 Global Enteric Multicenter Study (n = 1,006)
 }
+\examples{
+gems
+table(gems$metadata$country)
+}
+\seealso{
+Other Built-In Datasets: 
+\code{\link{babies}},
+\code{\link{hmp50}}
+}
+\concept{Built-In Datasets}
 \keyword{datasets}

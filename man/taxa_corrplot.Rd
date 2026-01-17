@@ -33,8 +33,7 @@ taxa_corrplot(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{Dataset field with the x-axis values. Equivalent to the \code{regr}
 argument in \code{\link[=stats_table]{stats_table()}}. Required.}

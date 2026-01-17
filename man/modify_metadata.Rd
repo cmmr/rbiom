@@ -44,8 +44,8 @@ field) and delete fields (by setting their value to NULL).
 }
 \seealso{
 Other transformations: 
+\code{\link{matrix_ops}},
 \code{\link{rarefy}()},
-\code{\link{rarefy_cols}()},
 \code{\link{slice_metadata}},
 \code{\link{subset}()},
 \code{\link{with}()}

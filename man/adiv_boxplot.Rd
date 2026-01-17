@@ -28,17 +28,16 @@ adiv_boxplot(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. Or
 \code{NULL}, which groups all samples into a single category.}
 
-\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
-\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are:
+\code{c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")}.
+For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
+explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
+Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
 \item{layers}{One or more of
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
@@ -168,7 +167,7 @@ letters instead of shapes on the plot. Character strings may used as well.
     
     adiv_boxplot(biom, x="Sex", stat.by="Body Site", adiv=c("otu", "shan"), layers = "bld")
     
-    adiv_boxplot(biom, x="body", stat.by="sex", adiv=".all", flip=TRUE, layers="p")
+    adiv_boxplot(biom, x="body", stat.by="sex", adiv=c('sha', 'sim'), flip=TRUE, layers="p")
     
     
     # Each plot object includes additional information.

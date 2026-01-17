@@ -1,13 +1,13 @@
-useDynLib(rbiom, C_alpha_div, C_beta_div, C_pthreads, C_rarefy, C_read_tree, C_unifrac)
-  
+
 importFrom("ape", "pcoa")
-importFrom("emmeans", "emmeans", "emtrends", "eff_size")
 
 importFrom("dplyr", 
            ".data", "any_of", "mutate", "pull", "rename", "select", 
            "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
            "filter", "relocate", "across", "everything", "left_join")
 
+importFrom("ecodive", "n_cpus")
+importFrom("emmeans", "emmeans", "emtrends", "eff_size")
 importFrom("fillpattern", "fill_pattern", "scale_fill_pattern")
 importFrom("ggbeeswarm", "geom_beeswarm", "geom_quasirandom")
 importFrom("ggnewscale", "new_scale_fill")
@@ -18,32 +18,28 @@ importFrom("jsonlite", "base64_enc", "read_json", "toJSON")
 importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "as", "formalArgs")
 importFrom("patchwork", "free", "inset_element", "wrap_plots")
-importFrom("parallelly", "availableCores")
 importFrom("pillar", "tbl_sum", "glimpse")
 importFrom("plyr", ".", "ddply", "ldply", "llply")
+importFrom("readr", "read_delim")
+importFrom("readxl", "read_excel")
 
 importFrom("stats", 
            "as.formula", "median", "na.omit", "p.adjust", "runif", 
            "sd", "setNames", "t.test", "var")
-
-importFrom("readr", "read_delim")
-importFrom("readxl", "read_excel")
-
-importFrom("slam", 
-           "simple_triplet_matrix", "as.simple_triplet_matrix", "is.simple_triplet_matrix",
-           "col_sums", "row_sums", "rollup")
 
 importFrom("utils",
            "capture.output", "combn", "download.file", "getFromNamespace", "hasName", 
            "head", "object.size", "packageVersion", "read.table", "str", "tail", 
            "write.csv", "write.table")
 
+importFrom("vegan", "adonis2", "metaMDS", "mrpp", "permustats")
 
 export(`adiv_boxplot`)
 export(`adiv_corrplot`)
 export(`adiv_matrix`)
 export(`adiv_stats`)
 export(`adiv_table`)
+export(`adiv_vector`)
 export(`as_rbiom`)
 export(`bdiv_boxplot`)
 export(`bdiv_clusters`)
@@ -64,17 +60,17 @@ export(`convert_to_SE`)
 export(`convert_to_TSE`)
 export(`distmat_ord_table`)
 export(`distmat_stats`)
+export(`mtx_rarefy`)
+export(`mtx_percent`)
+export(`mtx_rescale`)
 export(`plot_heatmap`)
 export(`rare_corrplot`)
 export(`rare_multiplot`)
 export(`rare_stacked`)
 export(`rarefy`)
-export(`rarefy_cols`)
 export(`read_biom`)
 export(`read_fasta`)
 export(`read_tree`)
-export(`rescale_cols`)
-export(`rescale_rows`)
 export(`sample_apply`)
 export(`sample_sums`)
 export(`stats_boxplot`)
@@ -88,7 +84,6 @@ export(`taxa_corrplot`)
 export(`taxa_heatmap`)
 export(`taxa_map`)
 export(`taxa_matrix`)
-export(`taxa_max`)
 export(`taxa_means`)
 export(`taxa_stacked`)
 export(`taxa_stats`)
@@ -106,59 +101,16 @@ export(`write_tree`)
 export(`write_xlsx`)
 
 
-# Deprecated functions
-export(`alpha.div`)
-export(`as.percent`)
-export(`beta.div`)
-export(`comments`)
-export(`comments<-`)
-export(`counts`)
-export(`counts<-`)
-export(`depth`)
-export(`depths_barplot`)
-export(`has.phylogeny`)
-export(`has.sequences`)
-export(`id`)
-export(`id<-`)
-export(`info`)
-export(`is.rarefied`)
-export(`metadata`)
-export(`metadata<-`)
-export(`nsamples`)
-export(`ntaxa`)
-export(`phylogeny`)
-export(`phylogeny<-`)
-export(`rarefy`)
-export(`read.biom`)
-export(`read_biom`)
-export(`read.fasta`)
-export(`read.tree`)
-export(`repair`)
-export(`sample.names`)
-export(`sample.names<-`)
-export(`sample_subset`)
-export(`sample.sums`)
-export(`sequences`)
-export(`sequences<-`)
-export(`subtree`)
-export(`taxa.means`)
-export(`taxa.names`)
-export(`taxa.names<-`)
-export(`taxa.ranks`)
-export(`taxa.ranks<-`)
-export(`taxa.rollup`)
-export(`taxa.sums`)
-export(`taxonomy`)
-export(`taxonomy<-`)
-export(`tips`)
-export(`top.taxa`)
-export(`top_taxa`)
-export(`unifrac`)
-export(`write.biom`)
-export(`write.fasta`)
-export(`write.tree`)
-export(`write.xlsx`)
+# Datasets
+export(babies)
+export(gems)
+export(hmp50)
 
+
+# Deprecated functions
+export(`rarefy_cols`)
+export(`rescale_cols`)
+export(`rescale_rows`)
 
 
 S3method(as_rbiom,     rbiom)
@@ -189,20 +141,17 @@ S3method("$",          rbiom_tbl)
 S3method("$",          rbiom_plot)
 S3method(print,        rbiom_code)
 
-# Deprecated S3 functions
-S3method(select, rbiom)
-
 # Re-exports
 export(".")
 export("%>%")
 export("%<>%")
-export("availableCores")
 export("ddply")
 export("glimpse")
 export("left_join")
 export("ldply")
 export("llply")
 export("mutate")
+export("n_cpus")
 export("na.omit")
 export("pull")
 export("relocate")

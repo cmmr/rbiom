@@ -7,9 +7,9 @@
 bdiv_corrplot(
   biom,
   x,
-  bdiv = "Bray-Curtis",
+  bdiv = "bray",
   layers = "tc",
-  weighted = TRUE,
+  weighted = NULL,
   tree = NULL,
   within = NULL,
   between = NULL,
@@ -29,22 +29,23 @@ bdiv_corrplot(
   mu = 0,
   caption = TRUE,
   check = FALSE,
+  alpha = 0.5,
+  cpus = NULL,
   ...
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{Dataset field with the x-axis values. Equivalent to the \code{regr}
 argument in \code{\link[=stats_table]{stats_table()}}. Required.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Multiple/abbreviated values allowed.
-Default: \code{"Bray-Curtis"}}
+\code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
+For the UniFrac family, a phylogenetic tree must be present in \code{biom}
+or explicitly provided via \verb{tree=}. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: \code{"bray"}}
 
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
@@ -52,9 +53,9 @@ letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.
 Default: \code{"tc"}}
 
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+\item{weighted}{(Deprecated - weighting is now inherent in bdiv metric name.)
+Take relative abundances into account. When \code{weighted=FALSE}, only
+presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -129,6 +130,13 @@ Default: \code{TRUE}}
 
 \item{check}{Generate additional plots to aid in assessing data normality.
 Default: \code{FALSE}}
+
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that

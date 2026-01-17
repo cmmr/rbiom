@@ -115,6 +115,7 @@ reference:
   - starts_with("distmat_")
   - starts_with("rescale_")
   - starts_with("stats_")
+  - starts_with("mtx_")
   - rarefy_cols
   - tree_subset
   - plot_heatmap

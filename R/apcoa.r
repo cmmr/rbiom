@@ -21,7 +21,7 @@
 # #'     
 # #'     biom <- rarefy(hmp50)
 # #'     
-# #'     dm   <- bdiv_distmat(biom, 'unifrac')
+# #'     dm   <- bdiv_distmat(biom, 'w_unifrac')
 # #'     reg_pcoa <- pcoa(dm)[['vectors']]
 # #'     adj_pcoa <- apcoa(dm, biom$metadata[,'Sex'])
 # #'     

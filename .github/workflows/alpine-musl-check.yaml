@@ -1,0 +1,60 @@
+name: Alpine Musl Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - R/**
+      - src/**
+      - tests/**
+      - .Rbuildignore
+      - .github/workflows/alpine-musl-check.yaml
+
+jobs:
+  alpine-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Alpine Musl Check (Docker)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e RCMDCHECK_ERROR_ON=warning \
+            -e NOT_CRAN=true \
+            -e _R_CHECK_CRAN_INCOMING_=false \
+            rhub/r-minimal \
+            sh -c '
+              set -e # Fail immediately if setup commands fail
+
+              echo "--- Installing System Dependencies ---"
+              apk add --no-cache gcc g++ gfortran musl-dev R-dev linux-headers curl-dev libxml2-dev pandoc qpdf checkbashisms
+
+              echo "--- Installing pak ---"
+              R -q -e "install.packages(\"pak\", repos=\"https://r-lib.github.io/p/pak/stable/source/linux-musl/x86_64\")"
+
+              echo "--- Installing R Dependencies ---"
+              R -q -e "pak::local_install_dev_deps()"
+              R -q -e "pak::pak(\"rcmdcheck\")"
+
+              echo "--- Running R CMD check ---"
+              # Capture exit status instead of failing immediately (due to set -e)
+              if R -q -e "rcmdcheck::rcmdcheck(args = c(\"--no-manual\", \"--as-cran\", \"--no-vignettes\", \"--ignore-vignettes\"), build_args = \"--no-build-vignettes\")"; then
+                STATUS=0
+                echo "✅ Check Succeeded"
+              else
+                STATUS=1
+                echo "❌ Check Failed"
+              fi
+
+              echo "--- Dumping install logs (00install.out) ---"
+              # Always run this, regardless of check status
+              find . -name "00install.out" -exec cat {} + || true
+
+              # Exit with the saved status code
+              exit $STATUS
+            '

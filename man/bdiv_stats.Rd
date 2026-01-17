@@ -8,8 +8,8 @@ bdiv_stats(
   biom,
   regr = NULL,
   stat.by = NULL,
-  bdiv = "Bray-Curtis",
-  weighted = TRUE,
+  bdiv = "bray",
+  weighted = NULL,
   tree = NULL,
   within = NULL,
   between = NULL,
@@ -21,12 +21,13 @@ bdiv_stats(
   level = 0.95,
   alt = "!=",
   mu = 0,
-  p.adj = "fdr"
+  p.adj = "fdr",
+  alpha = 0.5,
+  cpus = NULL
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{regr}{Dataset field with the x-axis (independent; predictive)
 values. Must be numeric. Default: \code{NULL}}
@@ -35,15 +36,15 @@ values. Must be numeric. Default: \code{NULL}}
 categorical. Default: \code{NULL}}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Multiple/abbreviated values allowed.
-Default: \code{"Bray-Curtis"}}
+\code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
+For the UniFrac family, a phylogenetic tree must be present in \code{biom}
+or explicitly provided via \verb{tree=}. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: \code{"bray"}}
 
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+\item{weighted}{(Deprecated - weighting is now inherent in bdiv metric name.)
+Take relative abundances into account. When \code{weighted=FALSE}, only
+presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -84,6 +85,13 @@ Default: \code{0.95}}
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
+
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 }
 \value{
 A tibble data.frame with fields from the table below. This tibble
@@ -121,7 +129,7 @@ A convenience wrapper for \code{\link[=bdiv_table]{bdiv_table()}} + \code{\link[
     
     biom <- rarefy(hmp50)
       
-    bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))[,1:7]
+    bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "w_unifrac"))[,1:7]
     
     biom <- subset(biom, `Body Site` \%in\% c('Saliva', 'Stool', 'Buccal mucosa'))
     bdiv_stats(biom, stat.by = "Body Site", split.by = "==Sex")[,1:6]

@@ -27,7 +27,7 @@ write_xlsx <- function (biom, file, depth = 0.1, n = NULL, seed = 0, unc = 'sing
   #________________________________________________________
   # Bypass some sheets for non-integer data.
   #________________________________________________________
-  if (all(full$counts$v %% 1 == 0)) {
+  if (all(full$counts@x %% 1 == 0)) {
     
     rare <- full$clone()
     
@@ -49,11 +49,11 @@ write_xlsx <- function (biom, file, depth = 0.1, n = NULL, seed = 0, unc = 'sing
       if ('Reads Per Step' %in% names(attributes(full))) {
         rps <- attr(full, 'Reads Per Step', exact = TRUE)
       } else {
-        rps <- data.frame(Mapped=col_sums(full$counts))
+        rps <- data.frame(Mapped=colSums(full$counts))
       }
       
       rps <- data.frame(rps[order(rownames(rps)),,drop=FALSE])
-      rps[['Rarefied']] <- col_sums(rare$counts)[rownames(rps)]
+      rps[['Rarefied']] <- colSums(rare$counts)[rownames(rps)]
       rps[which(is.na(rps[['Rarefied']])), 'Rarefied'] <- 0
       
       df <- tibble::as_tibble(rps, rownames = '.sample')
@@ -104,7 +104,7 @@ write_xlsx <- function (biom, file, depth = 0.1, n = NULL, seed = 0, unc = 'sing
   
   
   #________________________________________________________
-  # "Alpha Diversity": .otu, Depth, OTUs, Shannon, ...
+  # "Alpha Diversity": .otu, depth, observed, shannon, ...
   #________________________________________________________
   openxlsx::addWorksheet(wb, 'Alpha Diversity')
   if (!is.null(rare)) {

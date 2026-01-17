@@ -5,8 +5,7 @@
 #' @name documentation_default
 #' @keywords internal
 #' 
-#' @param biom   An [rbiom object][rbiom_objects], such as from [as_rbiom()]. 
-#'        Any value accepted by [as_rbiom()] can also be given here.
+#' @param biom   An [rbiom object][rbiom_objects], or any value accepted by [as_rbiom()].
 #' 
 #' @param mtx   A matrix-like object.
 #'        
@@ -21,20 +20,28 @@
 #' @param md  Dataset field(s) to include in the output data frame, or `'.all'` 
 #'        to include all metadata fields. Default: `'.all'`
 #' 
-#' @param adiv   Alpha diversity metric(s) to use. Options are: `"OTUs"`, 
-#'        `"Shannon"`, `"Chao1"`, `"Simpson"`, and/or 
-#'        `"InvSimpson"`. Set `adiv=".all"` to use all metrics.
-#'        Multiple/abbreviated values allowed.
-#'        Default: `"Shannon"`
+#' @param adiv   Alpha diversity metric(s) to use. Options are: 
+#'        `c("ace", "berger", "brillouin", "chao1", "faith", "fisher", 
+#'        "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick", 
+#'        "observed", "shannon", "squares")`. 
+#'        For `"faith"`, a phylogenetic tree must be present in `biom` or 
+#'        explicitly provided via `tree=`. Set `adiv=".all"` to use all metrics.
+#'        Multiple/abbreviated values allowed. Default: `"shannon"`
 #' 
 #' @param bdiv  Beta diversity distance algorithm(s) to use. Options are:
-#'        `"Bray-Curtis"`, `"Manhattan"`, `"Euclidean"`, 
-#'        `"Jaccard"`, and `"UniFrac"`. For `"UniFrac"`, a 
-#'        phylogenetic tree must be present in `biom` or explicitly 
-#'        provided via `tree=`. Multiple/abbreviated values allowed. 
-#'        Default: `"Bray-Curtis"`
+#'        `c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev", 
+#'        "chord", "clark", "sorensen", "divergence", "euclidean", 
+#'        "generalized_unifrac", "gower", "hamming", "hellinger", "horn", 
+#'        "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita", 
+#'        "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai", 
+#'        "psym_chisq", "soergel", "squared_chisq", "squared_chord", 
+#'        "squared_euclidean", "topsoe", "unweighted_unifrac", 
+#'        "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")`. 
+#'        For the UniFrac family, a phylogenetic tree must be present in `biom`
+#'        or explicitly provided via `tree=`. Supports partial matching. 
+#'        Multiple values are allowed for functions which return a table or 
+#'        plot. Default: `"bray"`
 #'       
-#' 
 #' @param taxa   Which taxa to display. An integer value will show the top n
 #'        most abundant taxa. A value 0 <= n < 1 will show any taxa with that 
 #'        mean abundance or greater (e.g. `0.1` implies >= 10%). A 
@@ -51,12 +58,13 @@
 #'        Multiple/abbreviated values allowed. Default: `"PCoA"`
 #'        
 #'     
-#' @param weighted  Take relative abundances into account. When 
-#'        `weighted=FALSE`, only presence/absence is considered.
-#'        Multiple values allowed. Default: `TRUE`
+#' @param weighted  (Deprecated - weighting is now inherent in bdiv metric name.)
+#'   Take relative abundances into account. When `weighted=FALSE`, only
+#'   presence/absence is considered. Multiple values allowed. Default: `NULL`
 #'     
-#' @param normalized  Only changes the "Weighted UniFrac" calculation.
-#'        Divides result by the total branch weights. Default: `TRUE`
+#' @param normalized  (Deprecated - normalization is now inherent in bdiv metric
+#'   name.) Only changes the "Weighted UniFrac" calculation. Divides result by
+#'   the total branch weights. Default: `NULL`
 #'       
 #' 
 #' @param delta  For numeric metadata, report the absolute difference in values 
@@ -97,7 +105,7 @@
 #'        Default: `FALSE`
 #'        
 #' @param sparse  If `TRUE`, returns a 
-#'        [slam::simple_triplet_matrix()], otherwise returns a 
+#'        sparse matrix from the `Matrix` package, otherwise returns a 
 #'        normal R matrix object. Default: `FALSE`
 #'        
 #' @param p.top   Only display taxa with the most significant differences in 
@@ -245,8 +253,12 @@
 #'        be prefixed with `'=='` or `'!='` to assign them to `within` or 
 #'        `between`, respectively. Default: `NULL`
 #'        
+#' @param alpha  The alpha term to use in Generalized UniFrac. How much weight 
+#'        to give to relative abundances; a value between 0 and 1, inclusive. 
+#'        Setting `alpha=1` is equivalent to Normalized UniFrac. Default: `0.5`
+#'        
 #' @param seed  Random seed for permutations. Must be a non-negative integer. 
-#'              Default: `0`
+#'        Default: `0`
 #'        
 #' @param cpus  The number of CPUs to use. Set to `NULL` to use all available, 
 #'        or to `1` to disable parallel processing. Default: `NULL`
@@ -280,7 +292,7 @@
 #' @param ties   When `transform="rank"`, how to rank identical values.
 #'        Options are: `c("average", "first", "last", "random", "max", "min")`. 
 #'        See `rank()` for details. Default: `"random"`
-#'   
+#' 
 NULL
 
 
@@ -537,4 +549,3 @@ NULL
 #'         respectively.
 #' 
 NULL
-

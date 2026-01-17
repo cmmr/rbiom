@@ -113,7 +113,7 @@ stats_boxplot <- function (
 #'     
 #'     adiv_boxplot(biom, x="Sex", stat.by="Body Site", adiv=c("otu", "shan"), layers = "bld")
 #'     
-#'     adiv_boxplot(biom, x="body", stat.by="sex", adiv=".all", flip=TRUE, layers="p")
+#'     adiv_boxplot(biom, x="body", stat.by="sex", adiv=c('sha', 'sim'), flip=TRUE, layers="p")
 #'     
 #'     
 #'     # Each plot object includes additional information.
@@ -189,15 +189,15 @@ adiv_boxplot <- function (
 #'     
 #'     biom <- rarefy(hmp50)
 #'     
-#'     bdiv_boxplot(biom, x="==Body Site", bdiv="UniFrac", stat.by="Body Site")
+#'     bdiv_boxplot(biom, x="==Body Site", bdiv="unweighted_unifrac", stat.by="Body Site")
 
 bdiv_boxplot <- function (
-    biom, x = NULL, bdiv = "Bray-Curtis", layers = "x", 
-    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
+    biom, x = NULL, bdiv = "bray", layers = "x", 
+    weighted = NULL, tree = NULL, within = NULL, between = NULL, 
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
-    transform = "none", caption = TRUE, ... ) {
+    transform = "none", caption = TRUE, alpha = 0.5, cpus = NULL, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -207,26 +207,24 @@ bdiv_boxplot <- function (
     #________________________________________________________
     validate_var_cmp(c('x', 'stat.by', 'facet.by'))
     
+    validate_bdiv(multiple = TRUE)
     
     #________________________________________________________
     # Compute beta diversity.
     #________________________________________________________
     df <- bdiv_table(
-      biom     = biom,
-      bdiv     = bdiv,
-      weighted = weighted,
-      tree     = tree, 
-      md       = c(x, stat.by, facet.by),
-      within   = within,
-      between  = between, 
-      transform    = transform,
-      delta    = NULL ) %>%
-      within({
-        .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
-        .bdiv <- factor(.bdiv, levels = unique(.bdiv))
-        remove(".weighted") })
+      biom      = biom,
+      bdiv      = bdiv,
+      tree      = tree, 
+      md        = c(x, stat.by, facet.by),
+      within    = within,
+      between   = between, 
+      transform = transform,
+      delta     = NULL,
+      alpha     = alpha, 
+      cpus      = cpus )
     
-    remove("biom", "bdiv", "weighted", "tree", "transform")
+    remove("biom", "bdiv", "tree", "transform", "alpha", "cpus")
     
     
     #________________________________________________________

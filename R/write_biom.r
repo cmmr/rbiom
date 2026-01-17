@@ -22,8 +22,7 @@
 #' @param format  Options are \code{"tab"}, \code{"json"}, and \code{"hdf5"}, 
 #'        corresponding to classic tabular format, BIOM format version 1.0 and 
 #'        biom version 2.1, respectively. NOTE: to write HDF5 formatted BIOM 
-#'        files, the BioConductor R package \code{rhdf5} must be installed.
-#'        Default: `"json"`
+#'        files, the \code{h5lite} R package must be installed. Default: `"json"`
 #' 
 #' @param depth,n   Passed on to [rarefy_cols()]. For `write_xlsx()` only, 
 #'        `depth=0` disables rarefaction. Default: `depth=0.1, n=NULL`
@@ -56,8 +55,8 @@
 #'       hmp10        <- hmp50$clone()
 #'       hmp10$counts <- hmp10$counts[,1:10] %>% rarefy_cols()
 #'       
-#'       attr(hmp10, "Weighted UniFrac")   <- bdiv_distmat(hmp10, 'unifrac')
-#'       attr(hmp10, "Unweighted Jaccard") <- bdiv_distmat(hmp10, 'jaccard', weighted=FALSE)
+#'       attr(hmp10, "Weighted UniFrac") <- bdiv_distmat(hmp10, 'wunifrac')
+#'       attr(hmp10, "Jaccard")          <- bdiv_distmat(hmp10, 'jaccard')
 #'       
 #'       outfile <- write_xlsx(hmp10, tempfile(fileext = ".xlsx"))
 #'     }
@@ -151,6 +150,7 @@ write_biom_tsv <- function (biom, file) {
 write_biom_json <- function (biom, file) {
   
   metadata <- biom$metadata
+  dgT      <- as(biom$counts, 'TsparseMatrix')
   
   json <- toJSON(
     auto_unbox = TRUE, 
@@ -167,7 +167,7 @@ write_biom_json <- function (biom, file) {
       format_url          = "http://biom-format.org",
       generated_by        = paste("rbiom", packageVersion("rbiom")),
       matrix_type         = "sparse",
-      matrix_element_type = ifelse(all(biom$counts[['v']] %% 1 == 0), "int", "float"),
+      matrix_element_type = ifelse(all(biom$counts@x %% 1 == 0), "int", "float"),
       shape               = dim(biom$counts),
       
       
@@ -203,12 +203,12 @@ write_biom_json <- function (biom, file) {
       # Read counts
       #________________________________________________________
       data = mapply(
-        FUN      = c, 
-        SIMPLIFY = FALSE, 
-        biom$counts$i - 1, 
-        biom$counts$j - 1, 
-        biom$counts$v
-      ) |> setNames(NULL)
+          FUN      = c,
+          SIMPLIFY = FALSE,
+          dgT@i,
+          dgT@j,
+          dgT@x
+        ) |> setNames(NULL)
       
     ))
   
@@ -237,64 +237,53 @@ write_biom_json <- function (biom, file) {
 
 write_biom_hdf5 <- function (biom, file) {
   
-  # rhdf5 is an undeclared Suggests (fails CRAN checks).
-  require_package('rhdf5', 'to write HDF5 formatted BIOM files')
+  require_package('h5lite', 'to write HDF5 formatted BIOM files')
   
-  h5createFile     <- getFromNamespace('h5createFile',     'rhdf5')
-  h5createGroup    <- getFromNamespace('h5createGroup',    'rhdf5')
-  H5Dclose         <- getFromNamespace('H5Dclose',         'rhdf5')
-  H5Dopen          <- getFromNamespace('H5Dopen',          'rhdf5')
-  H5Fclose         <- getFromNamespace('H5Fclose',         'rhdf5')
-  H5Fopen          <- getFromNamespace('H5Fopen',          'rhdf5')
-  h5writeAttribute <- getFromNamespace('h5writeAttribute', 'rhdf5')
-  h5writeDataset   <- getFromNamespace('h5writeDataset',   'rhdf5')
-  
-  
-  res <- try(h5createFile(file), silent = TRUE)
-  if (!isTRUE(res))
-    cli_abort("Can't create file {.file {file}}: {res}")
-  
-  invisible(h5createGroup(file, 'observation'))
-  invisible(h5createGroup(file, 'observation/matrix'))
-  invisible(h5createGroup(file, 'observation/metadata'))
-  invisible(h5createGroup(file, 'observation/group-metadata'))
-  invisible(h5createGroup(file, 'sample'))
-  invisible(h5createGroup(file, 'sample/matrix'))
-  invisible(h5createGroup(file, 'sample/metadata'))
-  invisible(h5createGroup(file, 'sample/group-metadata'))
-  
-  h5 <- try(H5Fopen(file, 'H5F_ACC_RDWR', native = TRUE), silent = TRUE)
-  if (!inherits(h5, "H5IdComponent"))
-    cli_abort("Can't open HDF5 file {.file {file}}: {h5}")
-  
-  
-  
-  # Attributes
+  h5 <- h5lite::h5_open(file = file)
+
+
+  # Required top-level attributes:
   #________________________________________________________
-  h5writeAttribute(biom$id,                    h5, 'id')
-  h5writeAttribute("OTU table",                h5, 'type')
-  h5writeAttribute(biom$comment,               h5, 'comment')
-  h5writeAttribute("http://biom-format.org",   h5, 'format-url')
-  h5writeAttribute(as.integer(c(2,1,0)),       h5, 'format-version') #, 3)
-  h5writeAttribute(biom$date,                  h5, 'creation-date')
-  h5writeAttribute(dim(biom$counts),           h5, 'shape') #, 2)
-  h5writeAttribute(length(biom$counts[['v']]), h5, 'nnz')
-  h5writeAttribute(paste("rbiom", packageVersion("rbiom")), h5, 'generated-by')
-  
-  
+  h5$write(attr = "creation-date",  as = "ascii", data = I(biom$date))
+  h5$write(attr = "format-url",     as = "ascii", data = I("http://biom-format.org"))
+  h5$write(attr = "format-version", as = "int64", data = c(2,1,0))
+  h5$write(attr = "generated-by",   as = "ascii", data = I(paste("rbiom", packageVersion("rbiom"))))
+  h5$write(attr = "id",             as = "ascii", data = I(biom$id))
+  h5$write(attr = "nnz",            as = "int64", data = I(length(biom$counts@x)))
+  h5$write(attr = "shape",          as = "int64", data = dim(biom$counts))
+  h5$write(attr = "type",           as = "ascii", data = I("OTU table"))
+
+
+  # Optional top-level attributes:
+  #________________________________________________________
+  if (nzchar(biom$comment))
+    h5$write(attr = "comment", as = "ascii", data = I(biom$comment))
+
+
+  # Required groups:
+  #________________________________________________________
+  h5$create_group("observation/")
+  h5$create_group("observation/matrix")
+  h5$create_group("observation/metadata")
+  h5$create_group("observation/group-metadata")
+  h5$create_group("sample/")
+  h5$create_group("sample/matrix")
+  h5$create_group("sample/metadata")
+  h5$create_group("sample/group-metadata")
+
   
   # Read counts by taxa (rows)
   #________________________________________________________
-  x <- matrix(c(biom$counts$i - 1, biom$counts$j - 1, biom$counts$v), byrow=FALSE, ncol=3)
-  
+  dgT    <- as(biom$counts, 'TsparseMatrix')
+  x      <- cbind(dgT@i, dgT@j, dgT@x)
   x      <- x[order(x[,1]),,drop=FALSE]
   indptr <- cumsum(unname(table(factor(x[,1]+1, 0:nrow(biom$counts)))))
+  remove('dgT')
   
-  h5writeDataset(rownames(biom$counts), h5, 'observation/ids')
-  h5writeDataset(as.numeric(x[,3]),     h5, 'observation/matrix/data')
-  h5writeDataset(as.integer(x[,2]),     h5, 'observation/matrix/indices')
-  h5writeDataset(as.integer(indptr),    h5, 'observation/matrix/indptr')
-  
+  h5$write(name = "observation/ids",            as = "ascii",   data = rownames(biom$counts))
+  h5$write(name = "observation/matrix/data",    as = "float64", data = x[,3])
+  h5$write(name = "observation/matrix/indices", as = "int32",   data = x[,2])
+  h5$write(name = "observation/matrix/indptr",  as = "int32",   data = indptr)
   
   
   # Read counts by sample (columns)
@@ -302,11 +291,10 @@ write_biom_hdf5 <- function (biom, file) {
   x      <- x[order(x[,2]),,drop=FALSE]
   indptr <- cumsum(unname(table(factor(x[,2]+1, 0:ncol(biom$counts)))))
   
-  h5writeDataset(colnames(biom$counts), h5, 'sample/ids')
-  h5writeDataset(as.numeric(x[,3]),     h5, 'sample/matrix/data')
-  h5writeDataset(as.integer(x[,1]),     h5, 'sample/matrix/indices')
-  h5writeDataset(as.integer(indptr),    h5, 'sample/matrix/indptr')
-  
+  h5$write(name = "sample/ids",            as = "ascii",   data = colnames(biom$counts))
+  h5$write(name = "sample/matrix/data",    as = "float64", data = x[,3])
+  h5$write(name = "sample/matrix/indices", as = "int32",   data = x[,1])
+  h5$write(name = "sample/matrix/indptr",  as = "int32",   data = indptr)
   
   
   # Sample Metadata
@@ -320,60 +308,41 @@ write_biom_hdf5 <- function (biom, file) {
           'i' = "Either change the field name, or save to JSON format instead.", 
           'x' = "Metadata field {.val {field}} not encodable." ))
       
-      h5path <- sprintf("sample/metadata/%s", field)
-      values <- biom$metadata[[field]]
+      name <- sprintf("sample/metadata/%s", field)
+      data <- biom$metadata[[field]]
       
-      if (is.numeric(values)) {
-        if (all(values %% 1 == 0, na.rm=TRUE))
-          values <- as.integer(values)
-        
-      } else {
-        values <- as.character(values)
-      }
+      if (is.factor(data))
+        data <- as.character(data)
       
-      h5writeDataset(values, h5, h5path)
-      
+      h5$write(name = name, data = data)
     })
   }
-  
   
   
   # Taxonomy
   #________________________________________________________
   if (ncol(biom$taxonomy) > 1) {
-    h5path      <- 'observation/metadata/taxonomy'
-    x           <- as.matrix(biom$taxonomy[,-1])
-    dimnames(x) <- list(NULL, NULL)
-    h5writeDataset(x, h5, h5path)
+    name <- 'observation/metadata/taxonomy'
+    data <- as.matrix(biom$taxonomy[,-1])
+    h5$write(name = name, as = "ascii", data = data)
   }
-  
   
   
   # Sequences
   #________________________________________________________
   if (!is.null(biom$sequences)) {
-    h5path <- 'observation/metadata/sequences'
-    x      <- unname(biom$sequences)
-    h5writeDataset(x, h5, h5path)
+    name <- 'observation/metadata/sequences'
+    h5$write(name = name, data = biom$sequences)
   }
-  
   
   
   # Phylogenetic Tree
   #________________________________________________________
   if (!is.null(biom$tree)) {
-    
-    h5path <- 'observation/group-metadata/phylogeny'
-    x      <- write_tree(biom$tree)
-    h5writeDataset(x, h5, h5path)
-    
-    h5d <- H5Dopen(h5, h5path)
-    h5writeAttribute("newick", h5d, 'data_type')
-    H5Dclose(h5d)
+    name <- 'observation/group-metadata/phylogeny'
+    h5$write(name = name, data = I(write_tree(biom$tree)))
+    h5$write(name = name, attr = "data_type", data = "newick")
   }
-  
-  
-  H5Fclose(h5)
   
   return (invisible(file))
 }
@@ -598,7 +567,7 @@ write_mothur <- function (biom, dir = tempfile(), prefix = 'biom_') {
     as_rbiom(biom)$counts %>% 
       as.matrix() %>%
       tibble::as_tibble(rownames = "Representative_Sequence") %>%
-      dplyr::mutate('total' = as.vector(row_sums(biom$counts)), .after = 1) %>% 
+      dplyr::mutate('total' = as.vector(rowSums(biom$counts)), .after = 1) %>% 
       write.table(file=con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
   })
   
@@ -618,7 +587,7 @@ write_mothur <- function (biom, dir = tempfile(), prefix = 'biom_') {
     write_wrapper(file.path(dir, paste0(prefix, 'taxonomy.tsv')), function (con) {
       tibble::tibble(
         'OTU'      = seq_len(biom$n_otus),
-        'Size'     = row_sums(biom$counts) %>% as.vector(),
+        'Size'     = rowSums(biom$counts) %>% as.vector(),
         'Taxonomy' = apply(as.matrix(biom$taxonomy[,-1]), 1L, paste, collapse=';') %>% gsub(' ', '_', ., fixed = TRUE) ) %>%
         write.table(file=con, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
     })
@@ -732,6 +701,3 @@ write_qiime2 <- function (biom, dir = tempfile(), prefix = 'biom_') {
   
   return (invisible(dir))
 }
-
-
-

@@ -2,58 +2,106 @@
 % Please edit documentation in R/adiv_table.r
 \name{adiv_table}
 \alias{adiv_table}
+\alias{adiv_matrix}
+\alias{adiv_vector}
 \title{Calculate the alpha diversity of each sample.}
 \usage{
 adiv_table(
   biom,
-  adiv = "Shannon",
+  adiv = "shannon",
   md = ".all",
+  tree = NULL,
   transform = "none",
+  ties = "random",
+  seed = 0,
+  cpus = NULL
+)
+
+adiv_matrix(
+  biom,
+  adiv = c("observed", "shannon", "simpson"),
+  tree = NULL,
+  transform = "none",
+  ties = "random",
+  seed = 0,
+  cpus = NULL
+)
+
+adiv_vector(
+  biom,
+  adiv = "shannon",
+  tree = NULL,
+  transform = "none",
+  ties = "random",
+  seed = 0,
   cpus = NULL
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
-\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are:
+\code{c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")}.
+For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
+explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
+Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
+
+\item{tree}{A \code{phylo} object representing the phylogenetic
+relationships of the taxa in \code{biom}. Only required when
+computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{transform}{Transformation to apply. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}
 
+\item{ties}{When \code{transform="rank"}, how to rank identical values.
+Options are: \code{c("average", "first", "last", "random", "max", "min")}.
+See \code{rank()} for details. Default: \code{"random"}}
+
+\item{seed}{Random seed for permutations. Must be a non-negative integer.
+Default: \code{0}}
+
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. Default: \code{NULL}}
 }
 \value{
-A data frame of alpha diversity values.
-Each combination of sample/depth/\code{adiv} has its own row.
+\describe{
+\item{\code{adiv_vector()} - }{ A named numeric vector. }
+\item{\code{adiv_matrix()} - }{
+A matrix of samples x metric.
+The first column, 'depth', is never transformed. }
+\item{\code{adiv_table()} - }{
+A tibble data.frame of alpha diversity values.
+Each combination of sample/\code{adiv} has its own row.
 Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv},
 and \bold{.diversity}, followed by any metadata fields requested by
-\code{md}.
+\code{md}. }
+}
 }
 \description{
 Calculate the alpha diversity of each sample.
 }
 \examples{
-    library(rbiom) 
+    library(rbiom)
     
-    # Subset to 10 samples.
-    biom <- slice(hmp50, 1:10)
+    biom <- hmp50[1:5]
+    
     adiv_table(biom)
     
     biom <- rarefy(biom)
     adiv_table(biom, md = NULL)
+    
+    adiv_vector(biom, 'faith')
+    
+    adiv_matrix(biom)
 }
 \seealso{
+\code{\link[=sample_sums]{sample_sums()}} for sample depths.
+
 Other alpha_diversity: 
 \code{\link{adiv_boxplot}()},
 \code{\link{adiv_corrplot}()},

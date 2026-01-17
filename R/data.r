@@ -9,8 +9,20 @@
 #'   \item{BMI - }{19 - 32}
 #' }
 #' @source \doi{10.1101/gr.096651.109}
-"hmp50"
-
+#' @family Built-In Datasets
+#' @usage hmp50
+#' @name hmp50
+#' @examples
+#' hmp50
+#' hmp50$metadata
+#' @export
+delayedAssign(
+  x     = 'hmp50', 
+  value = local({
+    f <- system.file(package = 'rbiom', 'extdata', 'hmp50.bz2')
+    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
+  })
+)
 
 
 #' Global Enteric Multicenter Study (n = 1,006)
@@ -23,8 +35,20 @@
 #'   \item{country - }{Bangladesh, Gambia, Kenya, or Mali}
 #' }
 #' @source \doi{10.1186/gb-2014-15-6-r76} and \doi{10.1093/nar/gkx1027}
-"gems"
-
+#' @family Built-In Datasets
+#' @usage gems
+#' @name gems
+#' @examples
+#' gems
+#' table(gems$metadata$country)
+#' @export
+delayedAssign(
+  x     = 'gems', 
+  value = local({
+    f <- system.file(package = 'rbiom', 'extdata', 'gems.bz2')
+    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
+  })
+)
 
 
 #' Longitudinal Stool Samples from Infants (n = 2,684)
@@ -43,4 +67,17 @@
 #'   \item{Solid food introduced (Age) - }{116 - 247}
 #' }
 #' @source \url{https://www.nature.com/articles/s41467-018-04641-7} and \doi{10.1038/s41467-017-01973-8}
-"babies"
+#' @family Built-In Datasets
+#' @usage babies
+#' @name babies
+#' @examples
+#' babies
+#' head(babies$metadata$Age)
+#' @export
+delayedAssign(
+  x     = 'babies', 
+  value = local({
+    f <- system.file(package = 'rbiom', 'extdata', 'babies.bz2')
+    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
+  })
+)

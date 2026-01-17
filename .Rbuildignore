@@ -2,13 +2,14 @@
 ^\.git$
 ^\.github$
 ^conda$
-^joss$
 ^logo$
+^paper$
 ^pkgdown$
 ^tmp$
-^vignettes/articles$
+^vignettes$
 
 ^\.gitignore$
+^\.lintr$
 ^\.RData$
 ^\.Rproj\.user$
 ^README\.Rmd$

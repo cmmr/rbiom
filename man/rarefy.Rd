@@ -4,11 +4,18 @@
 \alias{rarefy}
 \title{Rarefy OTU counts.}
 \usage{
-rarefy(biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE, cpus = NULL)
+rarefy(
+  biom,
+  depth = 0.1,
+  n = NULL,
+  seed = 0L,
+  upsample = NULL,
+  clone = TRUE,
+  cpus = NULL
+)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{depth}{How many observations to keep per sample. When
 \verb{0 < depth < 1}, it is taken as the minimum percentage of the
@@ -25,6 +32,14 @@ Default: \code{NULL}}
 drop. If you need to create different random rarefactions of the same
 data, set the seed to a different number each time.}
 
+\item{upsample}{If the count data is in percentages, provide an integer
+value here to scale each sample's observations to integers that sum
+to this value. Generally not recommended, but can be used to
+'shoehorn' metagenomic abundance estimates into rbiom's functions
+that were designed for amplicon datasets. When invoked, \code{depth}, \code{n},
+and \code{seed} are ignored. The default, \code{NULL}, will throw an error if
+the counts are not all integers.}
+
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
@@ -37,8 +52,6 @@ An \link[=rbiom_objects]{rbiom object}.
 }
 \description{
 Sub-sample OTU observations such that all samples have an equal number.
-If called on data with non-integer abundances, values will be re-scaled to
-integers between 1 and \code{depth} such that they sum to \code{depth}.
 }
 \examples{
     library(rbiom)
@@ -50,19 +63,11 @@ integers between 1 and \code{depth} such that they sum to \code{depth}.
 
 }
 \seealso{
-Other rarefaction: 
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{rarefy_cols}()},
-\code{\link{sample_sums}()}
-
 Other transformations: 
+\code{\link{matrix_ops}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy_cols}()},
 \code{\link{slice_metadata}},
 \code{\link{subset}()},
 \code{\link{with}()}
 }
-\concept{rarefaction}
 \concept{transformations}

@@ -212,12 +212,13 @@ adiv_corrplot <- function (
 #'     bdiv_corrplot(biom, "Age", stat.by = "Sex", layers = "tcp")
 
 bdiv_corrplot <- function (
-    biom, x, bdiv = "Bray-Curtis", layers = "tc", 
-    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
+    biom, x, bdiv = "bray", layers = "tc", 
+    weighted = NULL, tree = NULL, within = NULL, between = NULL, 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
     transform = "none", ties = "random", seed = 0, 
-    alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    alt = "!=", mu = 0, caption = TRUE, check = FALSE, 
+    alpha = 0.5, cpus = NULL, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -227,6 +228,8 @@ bdiv_corrplot <- function (
     #________________________________________________________
     validate_var_cmp(c('stat.by', 'facet.by'))
     
+    validate_bdiv(multiple = TRUE)
+    
     
     #________________________________________________________
     # Compute beta diversity.
@@ -234,7 +237,6 @@ bdiv_corrplot <- function (
     df <- bdiv_table(
       biom      = biom,
       bdiv      = bdiv,
-      weighted  = weighted,
       tree      = tree, 
       md        = c(x, stat.by, facet.by),
       within    = within,
@@ -242,14 +244,12 @@ bdiv_corrplot <- function (
       transform = transform, 
       ties      = ties, 
       seed      = seed,
-      delta     = x ) %>%
-      within({
-        .bdiv <- paste(ifelse(.weighted, 'Weighted', 'Unweighted'), .bdiv)
-        .bdiv <- factor(.bdiv, levels = unique(.bdiv))
-        remove(".weighted") })
+      delta     = x,
+      alpha     = alpha,
+      cpus      = cpus )
     
-    remove("biom", "bdiv", "weighted", "tree")
-    remove("transform", "ties", "seed")
+    remove("biom", "bdiv", "tree", "transform")
+    remove("ties", "seed", "alpha", "cpus")
     
     
     #________________________________________________________
@@ -307,7 +307,8 @@ rare_corrplot <- function (
     biom, adiv = "Shannon", layers = "tc", rline = TRUE,
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
-    transform = "none", alt = "!=", mu = 0, caption = TRUE, check = FALSE, ... ) {
+    transform = "none", alt = "!=", mu = 0, caption = TRUE, 
+    check = FALSE, cpus = NULL, ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -334,11 +335,12 @@ rare_corrplot <- function (
           biom      = rarefy(biom, depth = rLvl),
           adiv      = adiv,
           md        = c(stat.by, facet.by), 
-          transform = transform )
+          transform = transform,
+          cpus      = cpus )
       })
       
     })
-    remove("biom", "adiv", "transform")
+    remove("biom", "adiv", "transform", "cpus")
     
     
     #________________________________________________________

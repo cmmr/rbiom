@@ -28,4 +28,14 @@ babies
 \description{
 Longitudinal Stool Samples from Infants (n = 2,684)
 }
+\examples{
+babies
+head(babies$metadata$Age)
+}
+\seealso{
+Other Built-In Datasets: 
+\code{\link{gems}},
+\code{\link{hmp50}}
+}
+\concept{Built-In Datasets}
 \keyword{datasets}

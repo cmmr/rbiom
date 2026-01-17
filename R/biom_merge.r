@@ -35,60 +35,91 @@
 
 biom_merge <- function (..., metadata = NA, taxonomy = NA, tree = NULL, sequences = NA, id = NA, comment = NA) { 
   
+  # --- 1. Flatten and Validate Inputs ---
   dots      <- list(...)
   biom_list <- lapply(dots, function (dot) {
-      
-    if (inherits(dot, 'rbiom'))         return (dot)
-    if (length(dot) > 1)          return (do.call(biom_merge, dot))
-    if (length(dot) < 1)          return (NULL)
-    if (inherits(dot[[1]], 'rbiom'))    return (dot[[1]])
-    if (is_scalar_character(dot)) return (read_biom(src = dot))
-    cli::cli_abort("Unknown argument to biom_merge(): {.typeof {dot}}")
-    
+    if (inherits(dot, 'rbiom'))          return (dot)
+    if (length(dot) > 1)                 return (do.call(biom_merge, dot))
+    if (length(dot) < 1)                 return (NULL)
+    if (inherits(dot[[1]], 'rbiom'))     return (dot[[1]])
+    if (rlang::is_scalar_character(dot)) return (read_biom(src = dot))
+    cli::cli_abort("Invalid argument to biom_merge(): {.typeof {dot}}")
   })
+  
   biom_list <- biom_list[sapply(biom_list, inherits, 'rbiom')]
   
   if (length(biom_list) == 0) cli::cli_abort("No BIOM datasets provided to biom_merge().")
-  if (length(biom_list) == 1) return (biom_list[[1]]) 
+  if (length(biom_list) == 1) return (biom_list[[1]])
   
+  # --- 2. Determine Global Dimensions ---
+  # Extract all count matrices
+  counts_list <- lapply(biom_list, `[[`, 'counts')
   
-  samples <- do.call(c, lapply(biom_list, function (x) { colnames(x[['counts']]) }))
-  otus    <- do.call(c, lapply(biom_list, function (x) { rownames(x[['counts']]) }))
+  # Get all unique OTU names (rows) and sample names (columns)
+  all_otus    <- unique(unlist(lapply(counts_list, rownames), use.names = FALSE))
+  all_samples <- unlist(lapply(counts_list, colnames), use.names = FALSE)
   
-  if (length(dups <- unique(samples[duplicated(samples)])) > 0)
+  # Validation: Check for duplicate samples
+  if (any(duplicated(all_samples))) {
+    dups <- unique(all_samples[duplicated(all_samples)])
     cli::cli_abort("Sample names are not unique among BIOM datasets: {.val {dups}}")
+  }
   
-  if (!any(duplicated(otus)))
+  # Validation: Warn if no OTU overlap
+  total_n_otus <- sum(vapply(counts_list, nrow, integer(1)))
+  if (length(all_otus) == total_n_otus) {
     cli::cli_warn("No overlapping OTU names. Likely incompatible datasets.")
-  
-  otus <- unique(otus)
-  
-  
-  counts <- simple_triplet_matrix(
-    i        = match(do.call(c, lapply(biom_list, function (b) { rownames(b$counts)[b$counts$i] })), otus),
-    j        = match(do.call(c, lapply(biom_list, function (b) { colnames(b$counts)[b$counts$j] })), samples),
-    v        = do.call(c, lapply(biom_list, function (b) { b$counts$v })),
-    nrow     = length(otus),
-    ncol     = length(samples),
-    dimnames = list(otus, samples) )
+  }
   
   
+  # --- 3. Efficient Matrix Merge ---
+  # Calculate column offsets for each matrix (0, ncol(m1), ncol(m1)+ncol(m2), ...)
+  # This allows us to shift 'j' indices without string matching.
+  nsamples_per_mx <- vapply(counts_list, ncol, integer(1))
+  col_offsets     <- c(0, cumsum(nsamples_per_mx)[-length(nsamples_per_mx)])
+  
+  # Extract triplets (i, j, x) and remap indices
+  triplets <- lapply(seq_along(counts_list), function(k) {
+    mtx <- counts_list[[k]]
+    sm  <- Matrix::summary(mtx) # returns 1-based i, j, x
+    
+    # Map local row indices to global row indices
+    # map[local_idx] -> global_idx
+    row_map <- match(rownames(mtx), all_otus)
+    new_i   <- row_map[sm$i]
+    
+    # Shift column indices based on previous matrices' widths
+    new_j   <- sm$j + col_offsets[k]
+    
+    list(i = new_i, j = new_j, x = sm$x)
+  })
+  
+  # Reconstruct the global sparse matrix
+  counts <- Matrix::sparseMatrix(
+    i        = unlist(lapply(triplets, `[[`, "i"), use.names = FALSE),
+    j        = unlist(lapply(triplets, `[[`, "j"), use.names = FALSE),
+    x        = unlist(lapply(triplets, `[[`, "x"), use.names = FALSE),
+    dims     = c(length(all_otus), length(all_samples)),
+    dimnames = list(all_otus, all_samples)
+  )
+  
+  
+  # --- 4. Merge Metadata and Attributes ---
   if (is.na(metadata))  metadata  <- dplyr::bind_rows(lapply(biom_list, `[[`, 'metadata'))
   if (is.na(taxonomy))  taxonomy  <- dplyr::bind_rows(lapply(biom_list, `[[`, 'taxonomy'))
   if (is.na(sequences)) sequences <- do.call(c,       lapply(biom_list, `[[`, 'sequences'))
   
   if (is.na(id)) {
-    id <- unique(do.call(c, lapply(biom_list, `[[`, 'id')))
+    id <- unique(unlist(lapply(biom_list, `[[`, 'id')))
     id <- setdiff(id, 'Untitled Dataset')
     if (length(id) != 1) id <- "Merged BIOM"
   }
   
   if (is.na(comment)) {
-    comment <- unique(do.call(c, lapply(biom_list, `[[`, 'comment')))
+    comment <- unique(unlist(lapply(biom_list, `[[`, 'comment')))
     comment <- setdiff(comment, '')
     if (length(comment) != 1) comment <- NULL
   }
-  
   
   rbiom$new(
     id        = id,
@@ -97,8 +128,6 @@ biom_merge <- function (..., metadata = NA, taxonomy = NA, tree = NULL, sequence
     metadata  = metadata, 
     taxonomy  = taxonomy,
     sequences = sequences,
-    tree      = tree )
+    tree      = tree 
+  )
 }
-
-
-

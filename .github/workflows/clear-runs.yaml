@@ -1,0 +1,45 @@
+name: Clear Completed Runs
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 3:00 AM PST every day
+    - cron: '0 11 * * *'
+
+permissions:
+  actions: write
+
+jobs:
+  delete-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all completed workflow runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "Fetching completed runs for $GH_REPO..."
+          
+          # 1. List runs with status 'completed'
+          # --json databaseId: only fetch the ID
+          # -q: use jq syntax to extract just the values
+          # --limit 100: Adjust this number if you have a huge history (max 1000)
+          run_ids=$(gh run list --status completed --limit 100 --json databaseId -q '.[].databaseId')
+          
+          # 2. Check if we found any runs
+          if [ -z "$run_ids" ]; then
+            echo "No completed runs found to delete."
+            exit 0
+          fi
+
+          echo "Found runs to delete. Processing..."
+
+          # 3. Loop through IDs and delete them
+          # We use xargs for faster parallel processing, or a loop for simplicity. 
+          # A loop is safer to debug.
+          for run_id in $run_ids; do
+            echo "Deleting Run ID: $run_id"
+            gh run delete "$run_id" --repo "$GH_REPO" || echo "Failed to delete $run_id"
+          done
+
+          echo "Cleanup complete."

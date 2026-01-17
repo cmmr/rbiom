@@ -1,7 +1,7 @@
 
 validate_cpus <- function (
     var = "cpus", range = c(1, 256), env = parent.frame(), evar = var, 
-    n = 1, int = TRUE, null_ok = TRUE, if_null = availableCores()[[1]], ...) {
+    n = 1, int = TRUE, null_ok = TRUE, if_null = ecodive::n_cpus(), ...) {
   validate_var_range(var, range, env, evar, n, int, null_ok, if_null = if_null, ...)
 }
 
@@ -11,14 +11,91 @@ validate_seed <- function (
   validate_var_range(var, range, env, evar, n, int, ...)
 }
 
-validate_adiv <- function (var = "adiv", env = parent.frame(), ...) {
-  choices <- c("OTUs", "Shannon", "Chao1", "Simpson", "InvSimpson")
-  validate_var_choices(var, choices, env, all_option = ".all", ...)
+validate_alpha <- function (var = "alpha", range = c(0, 1), env = parent.frame()) {
+  validate_var_range(var, range, env = env, n = 1)
 }
 
-validate_bdiv <- function (var = "bdiv", env = parent.frame(), ...) {
-  choices <- c("UniFrac", "Jaccard", "Bray-Curtis", "Manhattan", "Euclidean")
-  validate_var_choices(var, choices, env, all_option = ".all", ...)
+validate_adiv <- function (
+    var = "adiv", env = parent.frame(), evar = var, multiple = FALSE) {
+  
+  x <- get(var, env)
+  
+  if (identical(x, '.all')) {
+    f <- as.character(rlang::caller_call())[[1]]
+    lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
+    x <- c('observed', 'shannon', 'simpson')
+  } else {
+    x <- unique(sapply(x, function (m) {
+      ecodive::match_metric(metric = m, div = 'alpha')$id }))
+  }
+  
+  if (length(x) > 1 && !isTRUE(multiple))
+    cli_abort('`{evar}` must be a single metric name.')
+  
+  assign(var, x, env)
+}
+
+validate_bdiv <- function (
+    var = "bdiv", env = parent.frame(), evar = var, multiple = FALSE ) {
+  
+  metrics <- get(var, env)
+  
+  if (isTRUE(attr(metrics, 'validated')))
+    return (invisible())
+  
+  if (identical(metrics, '.all')) {
+    f <- as.character(rlang::caller_call())[[1]]
+    lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
+    metrics <- c('bray', 'jaccard', 'jsd')
+  }
+  
+  # Back-support for `weighted` and `normalized` parameters.
+  
+  weighted   <- TRUE
+  normalized <- TRUE
+  
+  if (with(env, { exists('weighted') && !is.null(weighted) })) {
+    f <- as.character(rlang::caller_call())[[1]]
+    lifecycle::deprecate_warn("2.3.0", sprintf("%s(weighted)", f))
+    validate_bool('weighted', env, multiple = multiple)
+    weighted <- get('weighted', env)
+    remove('weighted', pos = env)
+  }
+  if (with(env, { exists('normalized') && !is.null(normalized) })) {
+    f <- as.character(rlang::caller_call())[[1]]
+    lifecycle::deprecate_warn("2.3.0", sprintf("%s(normalized)", f))
+    validate_bool('normalized', env, multiple = multiple)
+    normalized <- get('normalized', env)
+    remove('normalized', pos = env)
+  }
+  
+  x <- c()
+  
+  for (m in metrics)
+    for (w in weighted)
+      for (n in normalized) {
+        if (startsWith('unifrac', tolower(m))) {
+          if (w) {
+            if (n) { m <- 'normalized_unifrac' }
+            else   { m <- 'weighted_unifrac'   }
+          } else {
+            m <- 'unweighted_unifrac'
+          }
+        }
+        x <- c(x, m)
+      }
+  
+  
+  metrics <- unique(sapply(metrics, function (m) {
+    ecodive::match_metric(metric = m, div = 'beta')$id }))
+  
+  if (length(metrics) > 1 && !isTRUE(multiple))
+    cli_abort('`{evar}` must be a single metric name.')
+  
+  attr(x, 'validated') <- TRUE
+  assign(var, x, env)
+  
+  return(invisible())
 }
 
 validate_ord <- function (var = "ord", env = parent.frame(), ...) {
@@ -43,7 +120,8 @@ validate_unc <- function (var = "unc", env = parent.frame(), ...) {
 
 
 
-validate_tree <- function (var = "tree", env = parent.frame(), evar = var, null_ok = FALSE, underscores = FALSE) {
+validate_tree <- function (
+    var = "tree", env = parent.frame(), evar = var, null_ok = FALSE, underscores = FALSE ) {
   
   x <- get(var, pos = env, inherits = FALSE)
   
@@ -53,7 +131,7 @@ validate_tree <- function (var = "tree", env = parent.frame(), evar = var, null_
   if (inherits(x, 'phylo'))  return (invisible(NULL))
   
   if (is_scalar_character(x)) {
-    x <- read_tree(x, underscores = underscores)
+    x <- ecodive::read_tree(x, underscores = underscores)
     assign(var, x, pos = env)
     return (invisible(NULL))
   }
@@ -119,7 +197,8 @@ validate_rank <- function (var = "rank", env = parent.frame(), evar = var, null_
 
 
 
-validate_bool <- function (var, env = parent.frame(), evar = var, max = 1, null_ok = FALSE, default = NULL) {
+validate_bool <- function (
+    var, env = parent.frame(), evar = var, multiple = FALSE, null_ok = FALSE, default = NULL) {
   
   x <- get(var, pos = env, inherits = FALSE)
   if (is.null(x) && null_ok) return (invisible(NULL))
@@ -128,7 +207,7 @@ validate_bool <- function (var, env = parent.frame(), evar = var, max = 1, null_
   if (!is_logical(x) || anyNA(x))
     stop ("`", evar, "` must be TRUE or FALSE.")
   
-  validate_var_length(evar, x, max, null_ok)
+  validate_var_length(evar, x, max = ifelse(multiple, Inf, 1), null_ok)
   assign(var, x, pos = env)
   
   return (invisible(NULL))
@@ -188,6 +267,34 @@ validate_string <- function (
   if (length(x) > 1)          stop ("`", evar, "` can't be longer than 1 value.")
   if (is_null(x) && !null_ok) stop ("`", evar, "` cannot be NULL.")
   if (anyNA(x)   && !na_ok)   stop ("`", evar, "` cannot be NA.")
+  
+  assign(var, x, pos = env)
+  return (invisible(NULL))
+}
+
+
+
+validate_margin <- function (var = 'margin', env = parent.frame(), evar = var) {
+  
+  x <- get(var, pos = env, inherits = FALSE)
+  
+  if (is.integer(x)) {
+    if (!identical(x, 1L) && !identical(x, 2L))
+      cli_abort("`{var}` must be 1L, 2L, 'rows', or 'cols', not {x}.")
+  }
+  else if (is.numeric(x)) {
+    x <- as.integer(x)
+    if (!identical(x, 1L) && !identical(x, 2L))
+      cli_abort("`{var}` must be 1L, 2L, 'rows', or 'cols', not {x}.")
+  }
+  else if (is.character(x)) {
+    if      (startsWith(tolower(x), 'r')) { x <- 1L }
+    else if (startsWith(tolower(x), 'c')) { x <- 2L }
+    else { cli_abort("`{var}` must be 1L, 2L, 'rows', or 'cols', not {x}.") }
+  }
+  else {
+    cli_abort("`{var}` must be 1L, 2L, 'rows', or 'cols', not {.type {x}}.")
+  }
   
   assign(var, x, pos = env)
   return (invisible(NULL))

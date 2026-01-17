@@ -8,9 +8,9 @@
 \usage{
 bdiv_table(
   biom,
-  bdiv = "Bray-Curtis",
-  weighted = TRUE,
-  normalized = TRUE,
+  bdiv = "bray",
+  weighted = NULL,
+  normalized = NULL,
   tree = NULL,
   md = ".all",
   within = NULL,
@@ -19,53 +19,58 @@ bdiv_table(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  alpha = 0.5,
+  cpus = NULL,
+  ...
 )
 
 bdiv_matrix(
   biom,
-  bdiv = "Bray-Curtis",
-  weighted = TRUE,
-  normalized = TRUE,
+  bdiv = "bray",
+  weighted = NULL,
+  normalized = NULL,
   tree = NULL,
   within = NULL,
   between = NULL,
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL,
-  underscores = FALSE
+  alpha = 0.5,
+  cpus = NULL
 )
 
 bdiv_distmat(
   biom,
-  bdiv = "Bray-Curtis",
-  weighted = TRUE,
-  normalized = TRUE,
+  bdiv = "bray",
+  weighted = NULL,
+  normalized = NULL,
+  alpha = 0.5,
   tree = NULL,
   within = NULL,
   between = NULL,
   transform = "none",
+  ties = "random",
+  seed = 0,
   cpus = NULL
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Multiple/abbreviated values allowed.
-Default: \code{"Bray-Curtis"}}
+\code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
+For the UniFrac family, a phylogenetic tree must be present in \code{biom}
+or explicitly provided via \verb{tree=}. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: \code{"bray"}}
 
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+\item{weighted}{(Deprecated - weighting is now inherent in bdiv metric name.)
+Take relative abundances into account. When \code{weighted=FALSE}, only
+presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 
-\item{normalized}{Only changes the "Weighted UniFrac" calculation.
-Divides result by the total branch weights. Default: \code{TRUE}}
+\item{normalized}{(Deprecated - normalization is now inherent in bdiv metric
+name.) Only changes the "Weighted UniFrac" calculation. Divides result by
+the total branch weights. Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -95,19 +100,21 @@ See \code{rank()} for details. Default: \code{"random"}}
 \item{seed}{Random seed for permutations. Must be a non-negative integer.
 Default: \code{0}}
 
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
+
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. Default: \code{NULL}}
 
-\item{underscores}{When parsing the tree, should underscores be kept as
-is? By default they will be converted to spaces (unless the entire ID
-is quoted). Default \code{FALSE}}
+\item{...}{Not used.}
 }
 \value{
 \describe{
 \item{\code{bdiv_matrix()} - }{ An R matrix of samples x samples. }
 \item{\code{bdiv_distmat()} - }{ A dist-class distance matrix. }
 \item{\code{bdiv_table()} - }{
-A tibble data.frame with columns names .sample1, .sample2, .weighted,
+A tibble data.frame with columns named .sample1, .sample2,
 .bdiv, .distance, and any fields requested by \code{md}. Numeric metadata
 fields will be returned as \code{abs(x - y)}; categorical metadata fields as
 \code{"x"}, \code{"y"}, or \code{"x vs y"}. }
@@ -139,19 +146,19 @@ parameters. \code{stat.by = '==Sex'} is equivalent to
     biom$counts <- biom$counts[,c("HMP18", "HMP19", "HMP20", "HMP21")]
     
     # Return in long format with metadata
-    bdiv_table(biom, 'unifrac', md = ".all")
+    bdiv_table(biom, 'w_unifrac', md = ".all")
     
     # Only look at distances among the stool samples
-    bdiv_table(biom, 'unifrac', md = c("==Body Site", "Sex"))
+    bdiv_table(biom, 'w_unifrac', md = c("==Body Site", "Sex"))
     
     # Or between males and females
-    bdiv_table(biom, 'unifrac', md = c("Body Site", "!=Sex"))
+    bdiv_table(biom, 'w_unifrac', md = c("Body Site", "!=Sex"))
     
     # All-vs-all matrix
-    bdiv_matrix(biom, 'unifrac')
+    bdiv_matrix(biom, 'w_unifrac')
     
     # All-vs-all distance matrix
-    dm <- bdiv_distmat(biom, 'unifrac')
+    dm <- bdiv_distmat(biom, 'w_unifrac')
     dm
     plot(hclust(dm))
 

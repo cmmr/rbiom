@@ -29,69 +29,10 @@
 #'     plot(tree)
 #'
 read_tree <- function (src, underscores = FALSE) {
-  
-  stopifnot(is_scalar_character(src) && !is_na(src))
-  
-  src <- trimws(src)
-  stopifnot(isTRUE(nchar(src) > 0))
-  stopifnot(isTRUE(underscores) || isFALSE(underscores))
-  
-  
-  #________________________________________________________
-  # Shortened src string for use in error messages.
-  #________________________________________________________
-  text <- src
-    
-  if (nchar(src) > 20)
-    src <- paste0(
-      substr(src, 1, 10), 
-      "...", 
-      substr(src, nchar(src)-10, nchar(src)) )
-  
-  
-  #________________________________________________________
-  # Get the Newick data into a string
-  #________________________________________________________
-  if (!startsWith(text, '(') && length(text) == 1)
-    if (file.exists(text) || grepl('^(http|ftp)s{0,1}://', tolower(text)))
-      text <- tryCatch(
-        error = function (e) cli_abort("Can't read file {.file {src}}: {e}"), 
-        expr  = local({
-          con <- gzfile(text)
-          on.exit(close(con))
-          paste0(collapse = "", readLines(con, warn = FALSE)) }))
-  
-  stopifnot(is_scalar_character(text) && !is_na(text))
-  
-  
-  #________________________________________________________
-  # Remove newlines, comments, and leading whitespace
-  #________________________________________________________
-  text <- gsub("[\ \t]*[\r\n]+[\ \t]*", "", text)
-  text <- gsub("\\[.*?\\]", "",             text, perl=TRUE)
-  text <- sub("^[\ \t]+",  "",              text)
-  
-  stopifnot(isTRUE(nchar(text) >= 2))
-  stopifnot(isTRUE(startsWith(text, '(')))
-  
-  
-  #________________________________________________________
-  # Parse the Newick string into a phylo object
-  #________________________________________________________
-  
-  tree        <- .Call(C_read_tree, text, underscores)
-  names(tree) <- c('edge', 'Nnode', 'tip.label', 'edge.length', 'node.label')
-  attr(tree, 'class') <- 'phylo'
-  attr(tree, 'order') <- 'cladewise'
-  
-  if (all(nchar(tree$node.label) == 0))
-    tree$node.label <- NULL
-  
-  if (all(tree$edge.length == 0))
-    tree$edge.length <- NULL
-  
-  return (tree)
+  ecodive::read_tree(newick = src, underscores = underscores)
 }
+
+
 
 
 

@@ -4,8 +4,7 @@
 \alias{documentation_default}
 \title{documentation_default}
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{mtx}{A matrix-like object.}
 
@@ -20,18 +19,18 @@ is quoted). Default \code{FALSE}}
 \item{md}{Dataset field(s) to include in the output data frame, or \code{'.all'}
 to include all metadata fields. Default: \code{'.all'}}
 
-\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
-\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are:
+\code{c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")}.
+For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
+explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
+Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Multiple/abbreviated values allowed.
-Default: \code{"Bray-Curtis"}}
+\code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
+For the UniFrac family, a phylogenetic tree must be present in \code{biom}
+or explicitly provided via \verb{tree=}. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: \code{"bray"}}
 
 \item{taxa}{Which taxa to display. An integer value will show the top n
 most abundant taxa. A value 0 <= n < 1 will show any taxa with that
@@ -48,12 +47,13 @@ Default: \code{6}.}
 }
 Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+\item{weighted}{(Deprecated - weighting is now inherent in bdiv metric name.)
+Take relative abundances into account. When \code{weighted=FALSE}, only
+presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 
-\item{normalized}{Only changes the "Weighted UniFrac" calculation.
-Divides result by the total branch weights. Default: \code{TRUE}}
+\item{normalized}{(Deprecated - normalization is now inherent in bdiv metric
+name.) Only changes the "Weighted UniFrac" calculation. Divides result by
+the total branch weights. Default: \code{NULL}}
 
 \item{delta}{For numeric metadata, report the absolute difference in values
 for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
@@ -92,7 +92,7 @@ value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
 \item{sparse}{If \code{TRUE}, returns a
-\code{\link[slam:matrix]{slam::simple_triplet_matrix()}}, otherwise returns a
+sparse matrix from the \code{Matrix} package, otherwise returns a
 normal R matrix object. Default: \code{FALSE}}
 
 \item{p.top}{Only display taxa with the most significant differences in
@@ -239,6 +239,10 @@ Default: \code{FALSE}}
 comparisons. Alternatively, dataset field names given elsewhere can
 be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 \code{between}, respectively. Default: \code{NULL}}
+
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{seed}{Random seed for permutations. Must be a non-negative integer.
 Default: \code{0}}

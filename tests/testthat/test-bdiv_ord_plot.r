@@ -7,8 +7,8 @@ test_that("bdiv_ord_plot", {
   
   expect_silent(bdiv_ord_plot(rare50, layers='sa', stat.by='Body Site', facet.by='Sex'))
   expect_silent(bdiv_ord_plot(rare50, layers='tm', taxa=c('Bacteroides', 'Prevotella')))
-  expect_silent(bdiv_ord_plot(rare50, layers='mn', bdiv='Manhattan', weighted=FALSE))
-  expect_silent(bdiv_ord_plot(rare50, layers='pt', bdiv='Jaccard',   weighted=FALSE))
+  expect_silent(bdiv_ord_plot(rare50, layers='mn', bdiv='Manhattan'))
+  expect_silent(bdiv_ord_plot(rare50, layers='pt', bdiv='Jaccard'))
   
   expect_silent(bdiv_ord_plot(rare50, rank=NULL))
   expect_silent(bdiv_ord_plot(rare50, rank=c('Phylum', 'Genus')))

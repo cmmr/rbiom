@@ -15,9 +15,7 @@ test_that("read_biom", {
   unlink(c(f, g))
   
   expect_error(read_biom_hdf5(tempfile()))
-  expect_silent(parse_hdf5_taxonomy(list(observation = list(ids = c('a', 'b', 'c')))))
   expect_error(parse_json_metadata(list(columns = list(list(metadata = c('a' = 1, 'a' = 1))))))
-  expect_silent(parse_hdf5_metadata(list(observation = list(ids = c('a', 'b', 'c')))))
   
   json <- list(matrix_type = 'dense', rows = list(list(id='t1')), columns = list(list(id='s1')), data = list(1))
   expect_silent(parse_json_counts(json))
@@ -34,10 +32,9 @@ test_that("read_biom", {
   expect_silent(parse_json_taxonomy(json))
   
   expect_null(parse_json_sequences(list(rows = list(list(metadata=list())))))
-  expect_null(parse_hdf5_sequences(list(observation = list(list(metadata=list())))))
   
   
-  skip_if_not_installed('rhdf5')
+  skip_if_not_installed('h5lite')
   
   # https://github.com/biocore/biom-format/blob/master/examples/rich_sparse_otu_table_hdf5.biom
   x <- expect_silent(read_biom(test_path('inputs/biom.hdf5')))

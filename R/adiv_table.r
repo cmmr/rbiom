@@ -5,25 +5,40 @@
 #' 
 #' @family alpha_diversity
 #'        
-#' @return A data frame of alpha diversity values.
-#'         Each combination of sample/depth/\code{adiv} has its own row.
-#'         Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv}, 
-#'         and \bold{.diversity}, followed by any metadata fields requested by 
-#'         \code{md}.
+#' @return 
+#' \describe{
+#'   \item{`adiv_vector()` - }{ A named numeric vector. }
+#'   \item{`adiv_matrix()` - }{
+#'     A matrix of samples x metric. 
+#'     The first column, 'depth', is never transformed. }
+#'   \item{`adiv_table()` - }{
+#'     A tibble data.frame of alpha diversity values.
+#'     Each combination of sample/\code{adiv} has its own row.
+#'     Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv}, 
+#'     and \bold{.diversity}, followed by any metadata fields requested by 
+#'     \code{md}. }
+#' }
+#' 
+#' @seealso [sample_sums()] for sample depths.
 #' 
 #' @export
 #' @examples
-#'     library(rbiom) 
+#'     library(rbiom)
 #'     
-#'     # Subset to 10 samples.
-#'     biom <- slice(hmp50, 1:10)
+#'     biom <- hmp50[1:5]
+#'     
 #'     adiv_table(biom)
 #'     
 #'     biom <- rarefy(biom)
 #'     adiv_table(biom, md = NULL)
+#'     
+#'     adiv_vector(biom, 'faith')
+#'     
+#'     adiv_matrix(biom)
 
 adiv_table <- function (
-    biom, adiv = "Shannon", md = ".all", transform = "none", cpus = NULL ) {
+    biom, adiv = "shannon", md = ".all", tree = NULL, transform = "none", 
+    ties = "random", seed = 0, cpus = NULL ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -41,19 +56,25 @@ adiv_table <- function (
   #________________________________________________________
   # Check for valid arguments.
   #________________________________________________________
-  validate_adiv(max = Inf)
+  validate_adiv(multiple = TRUE)
   validate_biom_field('md', null_ok = TRUE, max = Inf)
-  
-  
   
   
   #________________________________________________________
   # Compute adiv values
   #________________________________________________________
-  mtx <- adiv_matrix(biom = biom, adiv = adiv, transform = transform)
+  mtx <- adiv_matrix(
+    biom      = biom, 
+    adiv      = adiv, 
+    tree      = tree, 
+    transform = transform,
+    ties      = ties,
+    seed      = seed,
+    cpus      = cpus )
+  
   tbl <- tibble(
     '.sample'    = rownames(mtx)[row(mtx)] %>% factor(levels = rownames(mtx)),
-    '.depth'     = unname(mtx[,'Depth'][row(mtx)]),
+    '.depth'     = unname(mtx[,'depth'][row(mtx)]),
     '.adiv'      = colnames(mtx)[col(mtx)] %>% factor(levels = adiv),
     '.diversity' = as.numeric(mtx) ) %>%
     dplyr::filter(!is.na(.data$.adiv))
@@ -73,19 +94,8 @@ adiv_table <- function (
   #________________________________________________________
   # Descriptive label for y-axis.
   #________________________________________________________
-  if (length(adiv) == 1) {
-    
-    resp_label <- switch(
-      EXPR    = adiv,
-      'OTUs'  = "Observed OTUs",
-      'Depth' = "Sequencing Depth",
-      paste(adiv, "Diversity") )
-    
-  } else {
-    
-    resp_label <- "Alpha Diversity"
-  }
-  
+  if (length(adiv) == 1) { resp_label <- ecodive::match_metric(adiv)$name } 
+  else                   { resp_label <- "Alpha Diversity"                }
   
   
   
@@ -95,39 +105,18 @@ adiv_table <- function (
   attr(tbl, 'resp_label') <- resp_label
   
   
-  
   set_cache_value(cache_file, tbl)
-  
   
   return (tbl)
 }
 
 
 
-#' Create a matrix of samples x alpha diversity metrics.
-#' 
-#' @inherit documentation_default
-#' 
-#' @param adiv   Alpha diversity metric(s) to use. Options are: `"OTUs"`, 
-#'        `"Shannon"`, `"Chao1"`, `"Simpson"`, and/or 
-#'        `"InvSimpson"`. Set `adiv=".all"` to use all metrics.
-#'        Multiple/abbreviated values allowed.
-#'        Default: `".all"`
-#'        
-#' @return A numeric matrix with samples as rows. The first column is 
-#'         \bold{Depth}. Remaining columns are the alpha diversity metric names 
-#'         given by `adiv`: one or more of \bold{OTUs}, \bold{Shannon}, 
-#'         \bold{Chao1}, \bold{Simpson}, and \bold{InvSimpson}.
-#'     
+#' @rdname adiv_table
 #' @export
-#' @examples
-#'     library(rbiom)
-#'     
-#'     biom <- slice_head(hmp50, n = 5)
-#'     
-#'     adiv_matrix(biom)
-
-adiv_matrix <- function (biom, adiv = ".all", transform = "none", cpus = NULL) {
+adiv_matrix <- function (
+    biom, adiv = c('observed', 'shannon', 'simpson'), tree = NULL, 
+    transform = "none", ties = "random", seed = 0, cpus = NULL ) {
   
   biom <- as_rbiom(biom)
   
@@ -147,9 +136,7 @@ adiv_matrix <- function (biom, adiv = ".all", transform = "none", cpus = NULL) {
   #________________________________________________________
   # Check for valid arguments.
   #________________________________________________________
-  validate_adiv(max = Inf)
-  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt"))
-  validate_cpus()
+  validate_adiv(multiple = TRUE)
   
   
   
@@ -157,41 +144,104 @@ adiv_matrix <- function (biom, adiv = ".all", transform = "none", cpus = NULL) {
   # We want a numeric matrix of samples x adiv metrics
   #________________________________________________________
   
-  otu_mtx <- as.matrix(biom$counts)
-  
-  algorithms <- 0L
-  if ('Shannon' %in% adiv)                           algorithms = algorithms + 1L
-  if ('Chao1'   %in% adiv)                           algorithms = algorithms + 2L
-  if ('Simpson' %in% adiv || 'InvSimpson' %in% adiv) algorithms = algorithms + 4L
-  storage.mode(algorithms) <- 'integer'
-  
-  n_threads <- as.integer(cpus)
-  storage.mode(otu_mtx) <- 'double'
-  
   mtx <- matrix(
-    data     = .Call(C_alpha_div, otu_mtx, algorithms, n_threads), 
+    data     = NA_real_, 
     nrow     = biom$n_samples, 
-    ncol     = 6,
-    dimnames = list(biom$samples, c('Depth', 'OTUs', 'Shannon', 'Chao1', 'Simpson', 'InvSimpson')) )
+    ncol     = length(adiv) + 1,
+    dimnames = list(biom$samples, c('depth', adiv)) )
   
-  mtx <- mtx[,c('Depth', adiv), drop=FALSE]
+  mtx[,'depth'] <- colSums(biom$counts)
   
-  if (transform != 'none')
-    for (metric in adiv)
-      mtx[,metric] <- switch(
-        EXPR = transform,
-        'rank'    = base::rank(mtx[,metric]), 
-        'log'     = base::log(mtx[,metric]), 
-        'log1p'   = base::log1p(mtx[,metric]), 
-        'sqrt'    = base::sqrt(mtx[,metric]), 
-        'percent' = tryCatch(
-          expr  = mtx[,metric] / sum(mtx[,metric]), 
-          error = function (e) { warning(e); NA_real_ } ))
+  for (i in seq_along(adiv))
+    mtx[,i+1] <- adiv_vector(
+      biom      = biom, 
+      adiv      = adiv[[i]], 
+      tree      = tree, 
+      transform = transform,
+      ties      = ties,
+      seed      = seed,
+      cpus      = cpus )
   
+  
+  #________________________________________________________
+  # Return the matrix of diversity values
+  #________________________________________________________
   attr(mtx, 'cmd') <- cmd
   set_cache_value(cache_file, mtx)
-  
   return (mtx)
+}
+
+
+
+#' @rdname adiv_table
+#' @export
+adiv_vector <- function (
+    biom, adiv = "shannon", tree = NULL, transform = "none", 
+    ties = "random", seed = 0, cpus = NULL ) {
+  
+  biom <- as_rbiom(biom)
+  validate_tree(null_ok = TRUE)
+  
+  params <- eval_envir(environment())
+  cmd    <- sprintf("adiv_vector(%s)", as.args(params, fun = adiv_vector))
+  
+  
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file('adiv_vector', params)
+  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
+    return (readRDS(cache_file))
+  remove("params")
+  
+  
+  #________________________________________________________
+  # Check for valid arguments.
+  #________________________________________________________
+  validate_adiv()
+  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt"))
+  validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
+  validate_seed()
+  validate_cpus()
+  
+  
+  #________________________________________________________
+  # Run alpha diversity algorithms implemented in C.
+  #________________________________________________________
+  vec <- ecodive::alpha_div(
+    counts = biom, 
+    metric = adiv, 
+    tree   = if (is.null(tree)) biom$tree else tree,
+    cpus   = cpus )
+  
+  
+  #________________________________________________________
+  # Optionally transform the computed distance values.
+  #________________________________________________________
+  if (eq(transform, "rank")) {
+    
+    if (eq(ties, 'random')) { # Preserve current .Random.seed
+      oldseed <- if (exists(".Random.seed")) .Random.seed else NULL
+      set.seed(seed)
+      if (!is.null(oldseed)) on.exit(.Random.seed <- oldseed)
+    }
+    vec <- base::rank(vec, na.last = 'keep', ties.method = ties)
+    
+  } else if (eq(transform, "percent")) {
+    vec <- tryCatch(vec / sum(vec), error = function (e) { warning(e); vec })
+    
+  } else if (transform %in% c("log", "log1p", "sqrt")) {
+    vec <- do.call(`::`, list('base', transform))(vec)
+  }
+  
+  
+  
+  #________________________________________________________
+  # Return the diversity values
+  #________________________________________________________
+  attr(vec, 'cmd')    <- cmd
+  attr(vec, 'metric') <- adiv
+  set_cache_value(cache_file, vec)
 }
 
 
@@ -250,14 +300,12 @@ sample_apply <- function (biom, FUN, rank = -1, sort = NULL, unc = "singly", ...
   
   mtx <- taxa_matrix(biom = biom, rank = rank, sparse = TRUE, unc = unc)
   
-  res <- if (identical(FUN, base::sum))  { slam::col_sums(mtx)
-  } else if (identical(FUN, base::mean)) { slam::col_means(mtx)
-  } else { slam::colapply_simple_triplet_matrix(mtx, FUN, ...) }
+  res <- if (identical(FUN, base::sum))  { colSums(mtx)
+  } else if (identical(FUN, base::mean)) { colMeans(mtx)
+  } else { apply(mtx, 2, FUN, ...) }
   
   if (is.numeric(res) && !is.null(sort))
     res <- base::sort(res, decreasing = (sort == 'desc'))
   
   return (res)
 }
-
-

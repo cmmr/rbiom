@@ -56,7 +56,7 @@ for (i in c('infile', 'fasta', 'outfile'))
 
 library(rbiom)
 
-tree <- read_tree(src = opt$infile)
+tree <- read_tree(newick = opt$infile)
 seqs <- read_fasta(file = opt$fasta)
 tree <- tree_subset(tree = tree, tips = names(seqs))
 write_tree(biom = tree, file = opt$outfile)

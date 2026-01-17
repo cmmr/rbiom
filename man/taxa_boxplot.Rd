@@ -33,8 +33,7 @@ taxa_boxplot(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{A categorical metadata column name to use for the x-axis. Or
 \code{NULL}, which puts taxa along the x-axis. Default: \code{NULL}}

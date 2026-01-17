@@ -80,24 +80,22 @@
 #'     
 #'     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
 #'     
-#'     bdiv_heatmap(hmp10, bdiv="uni", weighted=c(TRUE,FALSE), tracks="sex")
+#'     bdiv_heatmap(hmp10, bdiv=c("u_unifrac", "n_unifrac"), tracks="sex")
 
 bdiv_heatmap <- function (
-    biom, bdiv = "Bray-Curtis", weighted = TRUE, tree = NULL, tracks = NULL, 
+    biom, bdiv = "bray", tree = NULL, tracks = NULL, 
     grid = "devon", label = TRUE, label_size = NULL, rescale = "none", 
     clust = "complete", trees = TRUE, asp = 1, tree_height = 10, 
     track_height = 10, legend = "right", title = TRUE, xlab.angle = "auto", 
-    underscores = FALSE, ...) {
+    alpha = 0.5, cpus = NULL, ...) {
   
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE, underscores = underscores)
-  remove('underscores')
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- slurp_env(...)
+  params     <- slurp_env(..., .f = 'bdiv_heatmap')
   cache_file <- get_cache_file('bdiv_heatmap', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -109,9 +107,7 @@ bdiv_heatmap <- function (
   # Validate and restructure user's arguments.
   #________________________________________________________
   with(params, {
-    
-    validate_bdiv(max = Inf)
-    validate_bool("weighted", max = Inf)
+    validate_bdiv(multiple = TRUE)
     
     # validate_biom_field('order.by', null_ok = TRUE, max = Inf)
     
@@ -120,28 +116,21 @@ bdiv_heatmap <- function (
   })
   
   
-  
   #________________________________________________________
-  # Handle multiple metrics/weightings with recursion.
+  # Handle multiple metrics with recursion.
   #________________________________________________________
-  if (length(params$bdiv) > 1 || length(params$weighted) > 1) {
+  if (length(params$bdiv) > 1) {
     
     plots <- list()
     
-    for (d in params$bdiv)
-      for (w in params$weighted)
-        plots[[length(plots) + 1]] <- local({
-          
-          args <- fun_params(bdiv_heatmap, params)
-          
-          args[['bdiv']]     <- d
-          args[['weighted']] <- w
-          
-          if (isTRUE(args[['title']]))
-            args[['title']] <- paste(ifelse(w, "Weighted", "Unweighted"), d)
-          
-          do.call(bdiv_heatmap, args)
-        })
+    for (i in seq_along(params$bdiv))
+      plots[[length(plots) + 1]] <- local({
+        
+        args <- fun_params(bdiv_heatmap, params)
+        args[['bdiv']] <- params$bdiv[[i]]
+        
+        do.call(bdiv_heatmap, args)
+      })
     
     cmd <- current_cmd('bdiv_heatmap')
     p   <- plot_wrap(plots, cmd)
@@ -163,16 +152,11 @@ bdiv_heatmap <- function (
   #________________________________________________________
   with(params, {
     
-    if (isTRUE(title))
-      title <- ifelse(
-        test = isTRUE(weighted), 
-        yes  = paste("Weighted",   bdiv, "Distance"), 
-        no   = paste("Unweighted", bdiv, "Distance") )
+    if (isTRUE(title)) title <- ecodive::match_metric(bdiv)$name
     
     if (!(is.null(title) || (is_scalar_character(title) && !is.na(title))))
       cli_abort("title must be TRUE, NULL, or a character string, not {.type {title}}: {title}.")
   })
-  
   
   
   #________________________________________________________
@@ -181,23 +165,18 @@ bdiv_heatmap <- function (
   biom_tracks(params)
   
   
-  
-  
   #________________________________________________________
   # Matrix of samples x samples.
   #________________________________________________________
   with(params, {
-    
-    mtx <- bdiv_distmat(
-        biom     = biom, 
-        bdiv     = bdiv, 
-        weighted = weighted, 
-        tree     = tree ) %>%
-      as.matrix()
-    
-    remove("biom", "bdiv", "weighted", "tree")
+    mtx <- bdiv_matrix(
+      biom  = biom, 
+      bdiv  = bdiv, 
+      tree  = tree, 
+      alpha = alpha, 
+      cpus  = cpus )
+    remove("biom", "bdiv", "tree", "alpha", "cpus")
   })
-  
   
   
   #________________________________________________________

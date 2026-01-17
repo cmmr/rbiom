@@ -41,21 +41,19 @@
 #'     bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
 #'     
 bdiv_ord_plot <- function (
-    biom, bdiv = "Bray-Curtis", ord = "PCoA", weighted = TRUE, layers = "petm", 
+    biom, bdiv = "bray", ord = "PCoA", layers = "petm", 
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, 
-    underscores = FALSE, ...) {
+    alpha = 0.5, cpus = NULL, ...) {
   
   biom <- as_rbiom(biom)
-  validate_tree(null_ok = TRUE, underscores = underscores)
-  remove('underscores')
   
   
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- slurp_env(..., .dots = TRUE)
+  params     <- slurp_env(..., .dots = TRUE, .f = 'bdiv_heatmap')
   cache_file <- get_cache_file('bdiv_ord_plot', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
@@ -70,6 +68,7 @@ bdiv_ord_plot <- function (
     if (biom$n_samples < 4)
       cli_abort("At least four samples are needed for an ordination.")
     
+    validate_bdiv(multiple = TRUE)
     validate_rank(max = Inf, null_ok = TRUE)
     
     validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
@@ -90,7 +89,6 @@ bdiv_ord_plot <- function (
       biom         = biom, 
       bdiv         = bdiv,
       ord          = ord,
-      weighted     = weighted,
       split.by     = facet.by,
       stat.by      = stat.by,
       tree         = tree,
@@ -101,7 +99,9 @@ bdiv_ord_plot <- function (
       taxa         = taxa,
       p.adj        = p.adj,
       p.top        = p.top,
-      unc          = unc )
+      unc          = unc,
+      alpha        = alpha, 
+      cpus         = cpus )
     
     .ggdata %<>% rename_cols('.sample' = ".label")
     
@@ -349,7 +349,7 @@ ordination_biplot <- function (params) {
   #________________________________________________________
   
   final_cols <- c(
-    params$facet.by, '.facet', '.weighted', '.bdiv', '.ord', 
+    params$facet.by, '.facet', '.bdiv', '.ord', 
     '.rank', '.taxa', '.x', '.y', '.x0', '.y0', '.p.val', '.adj.p', '.size' )
   
   taxa_coords %<>% keep_cols(final_cols)
@@ -410,8 +410,7 @@ ordination_facets <- function (params) {
   # Next are metrics with multiple values.
   #________________________________________________________
   var_metrics <- c()
-  df[['.weight']] <- ifelse(df[['.weighted']], "Weighted", "Unweighted")
-  for (i in c('.weight', '.bdiv', '.ord')) {
+  for (i in c('.bdiv', '.ord')) {
     df[[i]] %<>% as.character()
     if (length(unique(df[[i]])) > 1)
       var_metrics %<>% c(i)
@@ -420,7 +419,7 @@ ordination_facets <- function (params) {
   if (length(var_metrics) == 0) {
     
     # Plot Title = "Weighted UniFrac PCoA (Phylum)"
-    metric <- paste(collapse = " ", df[1, c('.weight', '.bdiv', '.ord')])
+    metric <- paste(collapse = " ", df[1, c('.bdiv', '.ord')])
     if (length(ranks) == 1) metric <- sprintf("%s (%s)", metric, ranks)
     set_layer(params, 'labs', title = metric)
     
@@ -428,7 +427,7 @@ ordination_facets <- function (params) {
   } else if (length(var_metrics) == 1) {
     
     # Plot Title = "Weighted UniFrac (Phylum)"
-    metric <- paste(collapse = " ", df[1, setdiff(c('.weight', '.bdiv', '.ord'), var_metrics)])
+    metric <- paste(collapse = " ", df[1, setdiff(c('.bdiv', '.ord'), var_metrics)])
     if (length(ranks) == 1) metric <- sprintf("%s (%s)", metric, ranks)
     set_layer(params, 'labs', title = metric)
     
@@ -447,8 +446,8 @@ ordination_facets <- function (params) {
     # Facet Title = "Female - Saliva<br>Weighted UniFrac PCoA (Phylum)"
     df[['.facet']] <- bool_switch(
       test = hasName(df, ".facet"), 
-      yes  = sprintf("%s<br>%s %s %s", df[['.facet']], df[['.weight']], df[['.bdiv']], df[['.ord']]), 
-      no   = sprintf("**%s %s %s**",                   df[['.weight']], df[['.bdiv']], df[['.ord']]) )
+      yes  = sprintf("%s<br>%s %s", df[['.facet']], df[['.bdiv']], df[['.ord']]), 
+      no   = sprintf("**%s %s**",                   df[['.bdiv']], df[['.ord']]) )
   }
   remove("var_metrics")
   
@@ -470,7 +469,7 @@ ordination_facets <- function (params) {
     
     # stats are agnostic of .ord and .rank
     stats_text <- with(
-      data = plyr::join(df, sample_stats, by = c('.weighted', '.bdiv', params$facet.by)), 
+      data = plyr::join(df, sample_stats, by = c('.bdiv', params$facet.by)), 
       expr = sprintf(
         fmt = "*p* = %s; *stat* = %s; *z* = %s",
         format(.p.val, digits=3), 
@@ -497,7 +496,7 @@ ordination_facets <- function (params) {
         layer  = 'labs', 
         'caption' = sprintf(
           fmt = "Statistics computed with %s (%i permutations).", 
-          params$test,
+          sub('adonis2', 'PERMANOVA', params$test),
           params$permutations ))
       
       set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
@@ -511,7 +510,7 @@ ordination_facets <- function (params) {
   #________________________________________________________
   if (!is_null(taxa_coords) && hasName(df, ".facet"))
     attr(df, 'taxa_coords') <- local({
-      join_cols <- c('.weighted', '.bdiv', '.ord', '.rank', params$facet.by)
+      join_cols <- c('.bdiv', '.ord', '.rank', params$facet.by)
       join_cols <- intersect(join_cols, intersect(colnames(df), colnames(taxa_coords)))
       
       plyr::join(
@@ -528,7 +527,7 @@ ordination_facets <- function (params) {
   #________________________________________________________
   # These columns are now obsolete thanks to .facet / labs.
   #________________________________________________________
-  df %<>% drop_cols('.weighted', '.bdiv', '.ord', '.rank', params$facet.by)
+  df %<>% drop_cols('.bdiv', '.ord', '.rank', params$facet.by)
   
   
   #________________________________________________________

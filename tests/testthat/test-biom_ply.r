@@ -9,26 +9,26 @@ test_that("bdply", {
   skip_on_cran()
   
   
-  iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
-  fun   <- function (b, w, d) {
-    r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+  iters <- list(tr = c('none', 'log1p'), d = c('bray', 'ham'))
+  fun   <- function (b, tr, d) {
+    r <- range(bdiv_distmat(biom = b, bdiv = d, transform = tr))
     round(data.frame(min = r[[1]], max = r[[2]]))
   }
   
   x <- bdply(hmp50, NULL, iters = iters, FUN = fun)
   expect_equal(x, as_rbiom_tbl(tibble::tibble(
-    'w'   = c(T, F, T, F),
-    'd'   = c('bray','bray','euclid','euclid'),
-    'min' = c(0, 0, 123, 3),
-    'max' = c(1, 1, 19611, 14) )))
+    'tr'  = c('none','log1p','none','log1p'),
+    'd'   = c('bray','bray','ham','ham'),
+    'min' = c(0, 0, 9, 2),
+    'max' = c(1, 1, 206, 5) )))
   
-  x <- bdply(hmp50, "Sex", iters = iters, prefix = TRUE, FUN = fun)
+  x <- bdply(hmp50, 'Sex', iters = iters, prefix = TRUE, FUN = fun)
   expect_equal(x, as_rbiom_tbl(tibble::tibble(
     'Sex' = factor(rep(c('Female', 'Male'), each = 4)),
-    '.w'  = c(T, F, T, F, T, F, T, F),
-    '.d'  = c('bray','bray','euclid','euclid','bray','bray','euclid','euclid'),
-    'min' = c(0, 0, 123, 3, 0, 0, 292, 5),
-    'max' = c(1, 1, 17185, 12, 1, 1, 11855, 14) )))
+    '.tr' = c('none', 'log1p', 'none', 'log1p', 'none', 'log1p', 'none', 'log1p'),
+    '.d'  = c('bray','bray','ham','ham','bray','bray','ham','ham'),
+    'min' = c(0, 0, 9, 2, 0, 0, 26, 3),
+    'max' = c(1, 1, 154, 5, 1, 1, 206, 5) )))
   
 })
 
@@ -48,28 +48,28 @@ test_that("blply", {
   skip_on_cran()
   
   
-  iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
-  fun   <- function (b, w, d) {
-    r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+  iters <- list(tr = c('none', 'log1p'), d = c('bray', 'ham'))
+  fun   <- function (b, tr, d) {
+    r <- range(bdiv_distmat(biom = b, bdiv = d, transform = tr))
     round(data.frame(min = r[[1]], max = r[[2]]))
   }
   
   
   x <- blply(hmp50, NULL, iters = iters, FUN = fun)
   expect_equal(unlist(x), c(
-    `1.min`=0,   `1.max`=1,     `2.min`=0, `2.max`=1, 
-    `3.min`=123, `3.max`=19611, `4.min`=3, `4.max`=14 ))
-  expect_equal(attr(x, 'split_labels')$w, c(T, F, T, F))
-  expect_equal(attr(x, 'split_labels')$d, c('bray','bray','euclid','euclid'))
+    `1.min` = 0, `1.max` = 1,   `2.min` = 0, `2.max` = 1, 
+    `3.min` = 9, `3.max` = 206, `4.min` = 2, `4.max` = 5 ))
+  expect_equal(attr(x, 'split_labels')$tr, c('none','log1p','none','log1p'))
+  expect_equal(attr(x, 'split_labels')$d, c('bray','bray','ham','ham'))
   
   x <- blply(hmp50, "Sex", iters = iters, prefix = TRUE, FUN = fun)
   expect_equal(unlist(x), c(
-    Female.1.min=0,   Female.1.max=1,     Female.2.min=0, Female.2.max=1, 
-    Female.3.min=123, Female.3.max=17185, Female.4.min=3, Female.4.max=12, 
-    Male.1.min=0,     Male.1.max=1,       Male.2.min=0,   Male.2.max=1, 
-    Male.3.min=292,   Male.3.max=11855,   Male.4.min=5,   Male.4.max=14 ))
+    Female.1.min = 0,  Female.1.max = 1,   Female.2.min = 0, Female.2.max = 1, 
+    Female.3.min = 9,  Female.3.max = 154, Female.4.min = 2, Female.4.max = 5, 
+    Male.1.min   = 0,  Male.1.max   = 1,   Male.2.min   = 0, Male.2.max   = 1, 
+    Male.3.min   = 26, Male.3.max   = 206, Male.4.min   = 3, Male.4.max   = 5 ))
   expect_equal(attr(x, 'split_labels')$Sex, factor(rep(c('Female', 'Male'), each = 4)))
-  expect_equal(attr(x, 'split_labels')$`.w`, rep(c(T, F), 4))
-  expect_equal(attr(x, 'split_labels')$`.d`, rep(c('bray','bray','euclid','euclid'), 2))
+  expect_equal(attr(x, 'split_labels')$`.tr`, rep(c('none','log1p'), 4))
+  expect_equal(attr(x, 'split_labels')$`.d`, rep(c('bray','bray','ham','ham'), 2))
   
 })

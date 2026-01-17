@@ -75,12 +75,10 @@ read_biom <- function (src, ...) {
     # HDF5 file format  #
     #___________________#
     
-    require_package('rhdf5', 'to read HDF5 formatted BIOM files')
-    H5Fclose   <- getFromNamespace('H5Fclose',   'rhdf5')
-    H5Fis_hdf5 <- getFromNamespace('H5Fis_hdf5', 'rhdf5')
+    require_package('h5lite', 'to read HDF5 formatted BIOM files')
         
-    if (!H5Fis_hdf5(fp))
-      cli_abort("HDF5 file not recognized by rhdf5: {.file {src}}")
+    if (!h5lite::h5_exists(fp))
+      cli_abort("HDF5 file not recognized by `h5lite`: {.file {src}}")
     
     h5        <- read_biom_hdf5(fp)
     counts    <- parse_hdf5_counts(h5)
@@ -90,7 +88,6 @@ read_biom <- function (src, ...) {
     metadata  <- if (!hasName(dots, 'metadata'))  parse_hdf5_metadata(h5)
     phylogeny <- if (!hasName(dots, 'tree'))      parse_hdf5_tree(h5)
     
-    H5Fclose(h5)
     remove("h5")
     
   } else if (format == "json") {
@@ -231,25 +228,17 @@ read_biom_json <- function (fp) {
 
 read_biom_hdf5 <- function (fp) {
   
-  H5Fclose <- getFromNamespace('H5Fclose', 'rhdf5')
-  H5Fopen  <- getFromNamespace('H5Fopen',  'rhdf5')
-  h5ls     <- getFromNamespace('h5ls',     'rhdf5')
+  require_package('h5lite', 'to write HDF5 formatted BIOM files')
   
-  h5 <- try(H5Fopen(fp, 'H5F_ACC_RDONLY', native = TRUE), silent=TRUE)
-  if (inherits(h5, "try-error")) {
-    try(H5Fclose(h5), silent=TRUE)
-    stop(sprintf("Unable to parse HDF5 file. %s", as.character(h5)))
-  }
+  h5 <- h5lite::h5_open(file = fp)
   
-  entries  <- with(h5ls(h5), paste(sep="/", group, name))
+  entries  <- h5$ls(full.names = TRUE)
   expected <- c( "/observation/matrix/indptr", "/observation/matrix/indices", 
                  "/observation/ids", "/observation/matrix/data", "/sample/ids" )
   
   missing <- setdiff(expected, entries)
-  if (length(missing) > 0) {
-    try(H5Fclose(h5), silent=TRUE)
-    stop(sprintf("BIOM file requires: %s", paste(collapse=",", missing)))
-  }
+  if (length(missing) > 0)
+    cli_abort(sprintf("BIOM file requires: %s", paste(collapse=",", missing)))
   
   return (h5)
 }
@@ -288,25 +277,11 @@ parse_json_metadata <- function (json) {
 }
 
 parse_hdf5_metadata <- function (h5) {
-
-  keys <- names(h5$sample$metadata)
-  vals <- lapply(keys, function (k) {
-    
-    obj_class <- typeof(h5$sample$metadata[[k]])
-    
-    if (eq(obj_class, "character")) {
-      as(h5$sample$metadata[[k]], "character")
-    } else {
-      as(h5$sample$metadata[[k]], "numeric")
-    }
-  })
-
   as.data.frame(
-    row.names        = h5$sample$ids,
+    x                = h5$read("/sample/metadata"),
+    row.names        = h5$read("/sample/ids"),
     check.names      = FALSE,
-    stringsAsFactors = FALSE,
-    setNames(vals, keys)
-  )
+    stringsAsFactors = FALSE )
 }
 
 
@@ -319,14 +294,11 @@ parse_json_info <- function (json) {
 }
 
 parse_hdf5_info <- function (h5) {
-  
-  h5readAttributes <- getFromNamespace('h5readAttributes', 'rhdf5')
-  
-  attrs <- h5readAttributes(h5, "/")
-  for (i in names(attrs)) {
-    attrs[[i]] <- as(attrs[[i]], typeof(attrs[[i]]))
+  info <- list()
+  for (attr_name in h5$attr_names("/")) {
+    info[[attr_name]] <- h5$read(name = "/", attr = attr_name)
   }
-  return (attrs)
+  return (info)
 }
 
 
@@ -344,7 +316,7 @@ parse_tsv_counts <- function (mtx) {
   if (length(mtx) == 0 || sum(mtx) == 0)
     stop("No abundance counts.")
 
-  as.simple_triplet_matrix(mtx)
+  as(mtx, "sparseMatrix")
 }
 
 parse_json_counts <- function (json) {
@@ -355,44 +327,42 @@ parse_json_counts <- function (json) {
   if (length(json$data) == 0)
     stop("BIOM file does not have any count data.")
 
-  TaxaIDs   <- sapply(json$rows,    function (x) unlist(x$id))
-  SampleIDs <- sapply(json$columns, function (x) unlist(x$id))
-
+  TaxaIDs   <- unname(sapply(json$rows,    function (x) unlist(x$id)))
+  SampleIDs <- unname(sapply(json$columns, function (x) unlist(x$id)))
+  
   if (json$matrix_type == "sparse")
-    counts <- simple_triplet_matrix(
-                    i        = sapply(json$data, function (x) x[[1]]) + 1,
-                    j        = sapply(json$data, function (x) x[[2]]) + 1,
-                    v        = sapply(json$data, function (x) x[[3]]),
-                    nrow     = length(TaxaIDs),
-                    ncol     = length(SampleIDs),
-                    dimnames = list(TaxaIDs, SampleIDs))
+    counts <- sparseMatrix(
+      i        = sapply(json$data, function (x) x[[1]]) + 1,
+      j        = sapply(json$data, function (x) x[[2]]) + 1,
+      x        = sapply(json$data, function (x) x[[3]]),
+      dims     = c(length(TaxaIDs), length(SampleIDs)),
+      dimnames = list(TaxaIDs, SampleIDs) )
 
   if (json$matrix_type == "dense")
-    counts <- as.simple_triplet_matrix(
-                    matrix(
-                      data     = unlist(json$data),
-                      byrow    = TRUE,
-                      nrow     = length(TaxaIDs),
-                      ncol     = length(SampleIDs),
-                      dimnames = list(TaxaIDs, SampleIDs)))
+    counts <- Matrix(
+      data     = unlist(json$data),
+      byrow    = TRUE,
+      nrow     = length(TaxaIDs),
+      ncol     = length(SampleIDs),
+      dimnames = list(TaxaIDs, SampleIDs),
+      sparse   = TRUE )
 
   return (counts)
 }
 
 parse_hdf5_counts <- function (h5) {
-
-  indptr <- as.numeric(h5$observation$matrix$indptr)
-
-  simple_triplet_matrix(
-        i        = unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)])))),
-        j        = as.numeric(h5$observation$matrix$indices) + 1,
-        v        = as.numeric(h5$observation$matrix$data),
-        nrow     = length(h5$observation$ids),
-        ncol     = length(h5$sample$ids),
-        dimnames = list(
-          as.character(h5$observation$ids),
-          as.character(h5$sample$ids)
-      ))
+  indptr <- h5$read("/observation/matrix/indptr")
+  
+  i      <- unlist(sapply(1:(length(indptr)-1), function (i) rep(i, diff(indptr[c(i,i+1)]))))
+  j      <- h5$read("/observation/matrix/indices") + 1L
+  x      <- h5$read("/observation/matrix/data")
+  sids   <- h5$read("/sample/ids")
+  oids   <- h5$read("/observation/ids")
+  
+  sparseMatrix(
+    i = i, j = j, x = x,
+    dims = c(length(oids), length(sids)),
+    dimnames = list(oids, sids) )
 }
 
 
@@ -479,20 +449,18 @@ parse_json_taxonomy <- function (json) {
   rownames(taxa_table) <- sapply(json$rows, function (x) unlist(x$id))
   colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
 
-  #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
-
   return (taxa_table)
 }
 
 parse_hdf5_taxonomy <- function (h5) {
   
-  if ("taxonomy" %in% names(h5$observation$metadata)) {
-    taxa_table           <- h5$observation$metadata$taxonomy
-    rownames(taxa_table) <- as.character(h5$observation$ids)
+  if (h5$exists("/observation/metadata/taxonomy")) {
+    taxa_table           <- h5$read("/observation/metadata/taxonomy")
+    rownames(taxa_table) <- h5$read("/observation/ids")
     colnames(taxa_table) <- default_taxa_ranks(ncol(taxa_table))
     
   } else {
-    ids        <- as.character(h5$observation$ids)
+    ids        <- h5$read("/observation/ids")
     taxa_table <- matrix(
       data     = character(0), 
       nrow     = length(ids), 
@@ -500,8 +468,6 @@ parse_hdf5_taxonomy <- function (h5) {
       dimnames = list(ids, character(0)) )
   }
 
-  #taxa_table <- PB.SanitizeTaxonomy(taxa_table, env=parent.frame())
-    
   return (taxa_table)
 }
 
@@ -525,17 +491,12 @@ parse_json_sequences <- function (json) {
 }
 
 parse_hdf5_sequences <- function (h5) {
-  
-  # No sequence information
-  if (!"sequences" %in% names(h5$observation$metadata))
-    return (NULL)
-  
-  ids  <- as.character(h5$observation$ids)
-  seqs <- as.character(h5$observation$metadata$sequences)
-  
-  res <- setNames(seqs, ids)
-    
-  return (res)
+  seqs <- NULL
+  if (h5$exists("/observation/metadata/sequences")) {
+    seqs        <- h5$read("/observation/metadata/sequences")
+    names(seqs) <- h5$read("/observation/ids")
+  }
+  return (seqs)
 }
 
 
@@ -546,8 +507,11 @@ parse_json_tree <- function (json) {
 }
 
 parse_hdf5_tree <- function (h5) {
-  tree <- as.character(h5$observation$`group-metadata`$phylogeny)
-  if (isTRUE(startsWith(tree, '('))) tree else NULL
+  if (h5$exists("observation/group-metadata/phylogeny")) {
+    tree <- h5$read("observation/group-metadata/phylogeny")
+    if (isTRUE(startsWith(tree, '('))) return (tree)
+  }
+  return (NULL)
 }
 
 

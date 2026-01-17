@@ -12,7 +12,7 @@
 # 
 # prev <- readRDS("outputs/bdiv_distmat.rds")
 # 
-# for (method in c("manhattan", "euclidean", "bray-curtis", "jaccard", "unifrac")) {
+# for (method in c("manhattan", "euclidean", "bray", "jaccard", "w_unifrac")) {
 #   
 #   wdm <- bdiv_distmat(biom=biom, method=method, weighted=TRUE)
 #   udm <- bdiv_distmat(biom=biom, method=method, weighted=FALSE)

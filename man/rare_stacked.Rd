@@ -14,8 +14,7 @@ rare_stacked(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
@@ -62,8 +61,6 @@ Visualize the number of observations per sample.
 Other rarefaction: 
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{rarefy}()},
-\code{\link{rarefy_cols}()},
 \code{\link{sample_sums}()}
 
 Other visualization: 

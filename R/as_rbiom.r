@@ -70,8 +70,12 @@ as_rbiom.phyloseq <- function (biom, ...) {
   
   dots <- list(...)
   
+  counts <- as(biom@otu_table@.Data, "sparseMatrix")
+  if (!biom@otu_table@taxa_are_rows)
+    counts <- t(counts) # nocov
+  
   args <- list(
-    counts    = as.simple_triplet_matrix(biom@otu_table), 
+    counts    = counts, 
     metadata  = if (!is.null(biom@sam_data))  data.frame(biom@sam_data), 
     taxonomy  = if (!is.null(biom@tax_table)) data.frame(biom@tax_table), 
     sequences = if (!is.null(biom@refseq))    as.vector(biom@refseq), 
@@ -93,7 +97,7 @@ as_rbiom.SummarizedExperiment <- function (biom, ...) {
   dots <- list(...)
   
   args <- list(
-    counts    = as.simple_triplet_matrix(biom@assays@data[[1]]), 
+    counts    = as(biom@assays@data[[1]], "sparseMatrix"), 
     metadata  = if (!is.null(biom@colData))         data.frame(biom@colData), 
     taxonomy  = if (!is.null(biom@elementMetadata)) data.frame(biom@elementMetadata, row.names = biom@NAMES),
     id        = "Imported SummarizedExperiment Data" )
@@ -121,7 +125,7 @@ as_rbiom.TreeSummarizedExperiment <- function (biom, ...) {
   
   args <- list(
     id        = "Imported TreeSummarizedExperiment Data", 
-    counts    = as.simple_triplet_matrix(biom@assays@data[[1]]), 
+    counts    = as(biom@assays@data[[1]], "sparseMatrix"), 
     metadata  = if (!is.null(biom@colData))      data.frame(biom@colData),
     tree      = if (!is.null(biom@rowTree))      biom@rowTree[[1]],
     sequences = if (!is.null(biom@referenceSeq)) as.character(biom@referenceSeq),
@@ -143,7 +147,7 @@ as_rbiom.default <- function (biom, ...) {
   #________________________________________________________
   # Starting from a matrix-type.
   #________________________________________________________
-  if (inherits(biom, c('matrix', 'simple_triplet_matrix')))
+  if (inherits(biom, c('matrix', 'Matrix')))
     return (rbiom$new(counts = biom, ...))
   
   
@@ -169,7 +173,3 @@ as_rbiom.default <- function (biom, ...) {
     'x' = "Unable to convert {.type {biom}} to {.cls rbiom/R6}.",
     'i' = "See {.fun as_rbiom} for a list of accepted data types for `biom`." ))
 }
-
-
-
-

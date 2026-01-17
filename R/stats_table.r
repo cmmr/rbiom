@@ -219,18 +219,20 @@ adiv_stats <- function (
 #'     
 #'     biom <- rarefy(hmp50)
 #'       
-#'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "unifrac"))[,1:7]
+#'     bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "w_unifrac"))[,1:7]
 #'     
 #'     biom <- subset(biom, `Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
 #'     bdiv_stats(biom, stat.by = "Body Site", split.by = "==Sex")[,1:6]
 
 bdiv_stats <- function (
-    biom, regr = NULL, stat.by = NULL, bdiv = "Bray-Curtis", 
-    weighted = TRUE, tree = NULL, within = NULL, between = NULL, 
+    biom, regr = NULL, stat.by = NULL, bdiv = "bray", 
+    weighted = NULL, tree = NULL, within = NULL, between = NULL, 
     split.by = NULL, transform = "none", 
     test = "emmeans", fit = "gam", at = NULL, 
-    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr", 
+    alpha = 0.5, cpus = NULL ) {
   
+  validate_bdiv(multiple = TRUE)
   
   #________________________________________________________
   # Compute beta diversity values
@@ -238,13 +240,14 @@ bdiv_stats <- function (
   df <- bdiv_table(
     biom      = biom, 
     bdiv      = bdiv, 
-    weighted  = weighted, 
     tree      = tree, 
     md        = c(regr, stat.by, split.by, within, between), 
     within    = within, 
     between   = between, 
     delta     = regr, 
-    transform = transform )
+    transform = transform,
+    alpha     = alpha, 
+    cpus      = cpus )
   
   if (nlevels(df$.bdiv) > 1)
     split.by %<>% c('.bdiv')

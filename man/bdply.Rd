@@ -10,8 +10,7 @@ bdply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
 blply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{vars}{A character vector of metadata fields. Each unique combination
 of values in these columns will be used to create a subsetted
@@ -58,13 +57,13 @@ Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::d
     blply(hmp50, "Sex", `$`, 'n_samples') \%>\% unlist()
     
     bdply(hmp50, c("Body Site", "Sex"), function (b) {
-      adm <- adiv_matrix(b)[,c("Shannon", "Simpson")]
+      adm <- adiv_matrix(b)[,c("shannon", "simpson")]
       apply(adm, 2L, mean)
     })
     
-    iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
-    bdply(hmp50, "Sex", iters = iters, function (b, w, d) {
-      r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+    iters <- list(d = c("bray", "euclid"))
+    bdply(hmp50, "Sex", iters = iters, function (b, d) {
+      r <- range(bdiv_distmat(biom = b, bdiv = d))
       round(data.frame(min = r[[1]], max = r[[2]]))
     })
 

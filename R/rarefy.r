@@ -2,13 +2,10 @@
 #' Rarefy OTU counts.
 #' 
 #' Sub-sample OTU observations such that all samples have an equal number.
-#' If called on data with non-integer abundances, values will be re-scaled to 
-#' integers between 1 and `depth` such that they sum to `depth`.
 #'
 #' @inherit documentation_return.biom return
 #' @inherit documentation_default
 #' 
-#' @family rarefaction
 #' @family transformations
 #' 
 #' @param depth   How many observations to keep per sample. When 
@@ -25,6 +22,14 @@
 #' @param seed   An integer seed for randomizing which observations to keep or 
 #'        drop. If you need to create different random rarefactions of the same 
 #'        data, set the seed to a different number each time.
+#'     
+#' @param upsample   If the count data is in percentages, provide an integer 
+#'        value here to scale each sample's observations to integers that sum 
+#'        to this value. Generally not recommended, but can be used to 
+#'        'shoehorn' metagenomic abundance estimates into rbiom's functions 
+#'        that were designed for amplicon datasets. When invoked, `depth`, `n`, 
+#'        and `seed` are ignored. The default, `NULL`, will throw an error if 
+#'        the counts are not all integers.
 #' 
 #' 
 #' @export
@@ -36,52 +41,80 @@
 #'     biom <- rarefy(hmp50)
 #'     sample_sums(biom) %>% head()
 #' 
-rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE, cpus = NULL) {
+rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0L, upsample = NULL, clone = TRUE, cpus = NULL) {
+  
   biom <- as_rbiom(biom)
   if (isTRUE(clone)) biom <- biom$clone()
-  biom$counts <- rarefy_cols(mtx = biom$counts, depth = depth, n = n, seed = seed, cpus = cpus)
-  if (isTRUE(clone)) { return (biom) } else { return (invisible(biom)) }
+  
+  biom$counts <- mtx_rarefy(
+      mtx      = biom$counts, 
+      margin   = 2L,
+      depth    = depth, 
+      n        = n, 
+      seed     = seed, 
+      upsample = upsample,
+      cpus     = cpus )
+  
+  if (isTRUE(clone)) { return (biom)            } 
+  else               { return (invisible(biom)) }
 }
 
 
+#' Suggest a 'good' rarefaction depth.
+#' 
+#' @noRd
+#' @keywords internal
+#'     
+#' @return An integer.
+#'
 
+rare_suggest <- function (mtx) {
+  
+  stopifnot(inherits(mtx, "sparseMatrix"))
+  
+  if (all(mtx@x %% 1 == 0)) {
+    sums  <- colSums(mtx)
+    depth <- (sum(sums) * .1) / length(sums)
+    depth <- min(sums[sums >= depth])
+  } else {
+    depth <- 10000
+  }
+  
+  return (as.integer(depth))
+}
 
 #' Transform a counts matrix.
 #' 
-#' Rarefaction subset counts so that all samples have the same number of 
-#' observations. Rescaling rows or cols scales the matrix values so that row 
-#' sums or column sums equal 1.
+#' A collection of transformations that operate directly on matrices.\cr\cr
+#' Note: `rarefy_cols()`, `rescale_rows()`, and `rescale_cols()` are deprecated.
 #'
 #' @inherit documentation_default
+#' @inherit rarefy
 #' 
-#' @family rarefaction
+#' @name matrix_ops
 #' @family transformations
+#' @concept low_level
 #'     
-#' @param depth   How many observations to keep per sample. When 
-#'        `0 < depth < 1`, it is taken as the minimum percentage of the 
-#'        dataset's observations to keep. Ignored when `n` is specified.
-#'        Default: `0.1`
+#' @param range   When rescaling, what should the minimum and maximum values 
+#'        be? Default: `c(0, 1)`
 #'
-#' @param n   The number of samples to keep. When `0 < n < 1`, it is taken as 
-#'        the percentage of samples to keep. If negative, that number or 
-#'        percentage of samples is dropped. If `0`, all samples are kept. If 
-#'        `NULL`, `depth` is used instead.
-#'        Default: `NULL`
+#' @param margin   Apply the transformation to the matrix's rows (`margin=1L`) 
+#'        or columns (`margin=2L`). Instead of `1L` and `2L`, you may also use 
+#'        `'rows'` and `'cols'`.
+#'        Default: `2L` (column-wise, aka sample-wise for otu tables)
 #'     
-#' @param seed   A positive integer to use for seeding the random number 
-#'        generator. If you need to create different random rarefactions of the 
-#'        same matrix, set this seed value to a different number each time.
-#'     
-#' @return The rarefied or rescaled matrix.
+#' @return The transformed matrix. If `mtx` was a sparse matrix from the `Matrix`
+#'         package, then the result will also be a sparse matrix, 
+#'         otherwise the result will be a base R matrix.
 #' 
 #' @examples
 #'     library(rbiom)
 #'     
-#'     # rarefy_cols --------------------------------------
+#'     # mtx_rarefy --------------------------------------
 #'     biom <- hmp50$clone()
 #'     sample_sums(biom) %>% head(10)
 #'
-#'     biom$counts %<>% rarefy_cols(depth=1000)
+#'     biom$counts %<>% mtx_rarefy(depth=1000)
 #'     sample_sums(biom) %>% head(10)
 #'     
 #'     
@@ -89,13 +122,20 @@ rarefy <- function (biom, depth = 0.1, n = NULL, seed = 0, clone = TRUE, cpus = 
 #'     mtx <- matrix(sample(1:20), nrow=4)
 #'     mtx
 #'     
-#'     rowSums(mtx)
-#'     rowSums(rescale_rows(mtx))
-#'     
 #'     colSums(mtx)
-#'     colSums(rescale_cols(mtx))
+#'     
+#'     colSums(mtx_rarefy(mtx))
+#'     
+#'     colSums(mtx_percent(mtx))
+#'     
+#'     apply(mtx_rescale(mtx), 2L, max)
 #'
-rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
+NULL
+
+
+#' @rdname matrix_ops
+#' @export
+mtx_rarefy <- function (mtx, margin = 2L, depth = 0.1, n = NULL, seed = 0L, upsample = NULL, cpus = NULL) {
   
   params <- eval_envir(environment())
   
@@ -103,18 +143,15 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  cache_file <- get_cache_file('rarefy_cols', params)
+  cache_file <- get_cache_file('mtx_rarefy', params)
   if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
     return (readRDS(cache_file))
   
   
-  #________________________________________________________
-  # Sanity checks.
-  #________________________________________________________
+  validate_margin()
   validate_seed()
+  validate_var_range('upsample', n = 1, int = TRUE, range = c(1, Inf), null_ok = TRUE)
   validate_cpus()
-  
-  mtx <- as.simple_triplet_matrix(mtx)
   
   if (!(is.numeric(depth) && length(depth) == 1 && !is.na(depth)))
     cli_abort(c('x' = "{.var depth} must be a single number, not {.type {depth}}."))
@@ -131,89 +168,78 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
   }
   
   
-  
-  
-  #________________________________________________________
-  # Integer data. Randomly select observations to keep.
-  #________________________________________________________
-  if (all(mtx$v %% 1 == 0)) {
+  # Normally we can't rarefy non-integer counts
+  if (any(mtx %% 1 != 0)) {
     
-    target <- depth
-    depths <- as.integer(col_sums(mtx))   # observations per sample
-    
-    
-    # Set target depth according to number/pct of samples to keep/drop.
-    if (!is.null(n)) {
-      if (n == 0)     n <- mtx$ncol     # Keep all
-      if (abs(n) < 1) n <- n * mtx$ncol # Keep/drop percentage
-      if (n < -1)     n <- mtx$ncol + n # Drop n
-      n     <- max(1, floor(n))         # Keep at least one
-      target <- unname(head(tail(sort(depths), n), 1))
+    if (is.null(upsample)) {
+      
+      cli_abort('Unable to rarefy non-integer counts. Set `upsample` to override.')
+      
+    } else {
+      
+      # Change percentage abundances to integer
+      # Does this, but then nudges up and down until sum() == upsample:
+      # round(t((t(counts) / rowSums(counts))) * upsample)
+      mtx <- apply(mtx, margin, function (x) {
+        
+        x        <- x / sum(x)
+        y        <- round(x * upsample)
+        maxIters <- length(x)
+        
+        while (sum(y) < upsample && maxIters > 0) {
+          i        <- which.min( ((y + 1) / upsample) - x )
+          y[i]     <- y[i] + 1
+          maxIters <- maxIters - 1
+        }
+        while (sum(y) > upsample && maxIters > 0) {
+          i        <- which.min( x - ((y - 1) / upsample) )
+          y[i]     <- y[i] - 1
+          maxIters <- maxIters - 1
+        }
+        
+        return (y)
+      })
+      
+      if (margin == 2L) mtx <- t(mtx)
+      
     }
-    
-    
-    # Depth is given as minimum percent of samples to keep.
-    if (target < 1) {
-      target <- (sum(depths) * target) / length(depths)
-      target <- min(depths[depths >= target])
-    }
-    
-    # Random INTs generated here, as it's discouraged in C API code.
-    oldseed <- if (exists(".Random.seed")) .Random.seed else NULL
-    set.seed(seed)
-    rand_ints <- as.integer(runif(max(depths)) * .Machine$integer.max)
-    if (!is.null(oldseed)) .Random.seed <- oldseed
-    
-    storage.mode(mtx$i) <- 'integer'
-    storage.mode(mtx$j) <- 'integer'
-    storage.mode(mtx$v) <- 'integer'
-    
-    indices   <- order(mtx$j, mtx$i)
-    target    <- as.integer(target)
-    n_threads <- as.integer(cpus)
-    
-    mtx$v <- .Call(C_rarefy, mtx, indices, target, rand_ints, n_threads)
-    mtx   <- mtx[row_sums(mtx) > 0, col_sums(mtx) > 0]
     
   }
   
   
-  #________________________________________________________
-  # Rescale fractional data to integers. Total = depth.
-  #________________________________________________________
+  # We have integer counts
   else {
     
-    if (!is_scalar_integerish(depth))
-      depth <- 10000
-    
-    mtx <- as.matrix(mtx)
-    
-    # Does this, but then nudges up and down until == depth:
-    # round(t((t(mtx) / colSums(mtx))) * depth)
-    
-    mtx <- apply(mtx, 2L, function (x) { 
-      x        <- x / sum(x)
-      y        <- round(x * depth)
-      maxIters <- length(x)
-      
-      while (sum(y) < depth && maxIters > 0) {
-        i        <- which.min( ((y + 1) / depth) - x )
-        y[i]     <- y[i] + 1
-        maxIters <- maxIters - 1
-      }
-      while (sum(y) > depth && maxIters > 0) {
-        i        <- which.min( x - ((y - 1) / depth) )
-        y[i]     <- y[i] - 1
-        maxIters <- maxIters - 1
-      }
-      
-      return (y)
-    })
-    
+    mtx <- ecodive::rarefy(
+      counts    = mtx, 
+      depth     = depth, 
+      n_samples = n, 
+      seed      = seed, 
+      margin    = margin,
+      cpus      = cpus )
   }
   
   
   set_cache_value(cache_file, mtx)
+  return (mtx)
+}
+
+
+
+
+#' @rdname matrix_ops
+#' @export
+mtx_percent <- function (mtx, margin = 2L) {
+  
+  validate_margin()
+  
+  sparse <- inherits(mtx, "sparseMatrix")
+  mtx    <- as.matrix(mtx)
+  
+  if (margin == 1) { mtx <- mtx / rowSums(mtx) }
+  else             { mtx <- t(t(mtx) / colSums(mtx)) }
+  
+  if (sparse) mtx <- as(mtx, "sparseMatrix")
   
   return (mtx)
 }
@@ -221,54 +247,50 @@ rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
 
 
 
-#' @rdname rarefy_cols
+#' @rdname matrix_ops
 #' @export
-rescale_cols <- function (mtx) {
+mtx_rescale <- function (mtx, margin = 2L, range = c(0, 1)) {
   
-  if (is.simple_triplet_matrix(mtx))
-    return (t(t(mtx) / col_sums(mtx)))
+  validate_margin()
+  validate_var_range('range',  n = 2)
   
-  mtx <- as.matrix(mtx)
-  t(t(mtx) / colSums(mtx))
-}
-
-
-
-#' @rdname rarefy_cols
-#' @export
-rescale_rows <- function (mtx) {
+  sparse <- inherits(mtx, "sparseMatrix")
+  mtx    <- as.matrix(mtx)
   
-  if (is.simple_triplet_matrix(mtx))
-    return (mtx / col_sums(t(mtx)))
+  if (margin == 1) { mtx <- mtx / apply(mtx, 1L, max)       }
+  else             { mtx <- t(t(mtx) / apply(mtx, 2L, max)) }
   
-  mtx <- as.matrix(mtx)
-  mtx / colSums(t(mtx))
-}
-
-
-
-
-#' Suggest a 'good' rarefaction depth.
-#' 
-#' @noRd
-#' @keywords internal
-#'     
-#' @return An integer.
-#'
-
-rare_suggest <- function (mtx) {
-  
-  stopifnot(is.simple_triplet_matrix(mtx))
-  
-  if (all(mtx$v %% 1 == 0)) {
-    sums  <- col_sums(mtx)
-    depth <- (sum(sums) * .1) / length(sums)
-    depth <- min(sums[sums >= depth])
-  } else {
-    depth <- 10000
+  if (!identical(range, c(0, 1))) {
+    lo  <- min(range)
+    hi  <- max(range)
+    mtx <- mtx * (hi - lo) + lo
   }
   
-  return (as.integer(depth))
+  if (sparse) mtx <- as(mtx, "sparseMatrix")
+  
+  return (mtx)
 }
 
 
+
+
+#' @rdname matrix_ops
+#' @export
+rarefy_cols <- function (mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
+  lifecycle::deprecate_soft("2.3.0", "rarefy_cols()", "mtx_rarefy()")
+  mtx_rarefy(mtx = mtx, margin = 2L, depth = depth, n = n, seed = seed, cpus = cpus)
+}
+
+#' @rdname matrix_ops
+#' @export
+rescale_rows <- function (mtx) {
+  lifecycle::deprecate_soft("2.3.0", "rescale_rows()", "mtx_percent(margin = 1L)")
+  mtx_percent(mtx, margin = 1L)
+}
+
+#' @rdname matrix_ops
+#' @export
+rescale_cols <- function (mtx) {
+  lifecycle::deprecate_soft("2.3.0", "rescale_cols()", "mtx_percent(margin = 2L)")
+  mtx_percent(mtx, margin = 2L)
+}

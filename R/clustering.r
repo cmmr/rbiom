@@ -46,7 +46,18 @@ taxa_clusters <- function (biom, rank = ".otu", k = 5, ...) {
 #'     
 #'     bdiv_ord_plot(biom, stat.by = "bray_cluster")
 
-bdiv_clusters <- function (biom, bdiv = "Bray-Curtis", weighted = TRUE, normalized = TRUE, tree = NULL, k = 5, ...) {
-  dm <- bdiv_distmat(biom = biom, bdiv = bdiv, weighted = weighted, normalized = TRUE, tree = tree)
+bdiv_clusters <- function (
+    biom, bdiv = "bray", weighted = NULL, normalized = NULL, 
+    tree = NULL, k = 5, alpha = 0.5, cpus = NULL, ...) {
+  
+  validate_bdiv()
+  
+  dm <- bdiv_distmat(
+    biom  = biom, 
+    bdiv  = bdiv, 
+    tree  = tree, 
+    alpha = alpha, 
+    cpus  = cpus )
+  
   factor(stats::kmeans(dm, centers = k, ...)$cluster)
 }

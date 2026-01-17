@@ -11,8 +11,7 @@ write_mothur(biom, dir = tempfile(), prefix = "biom_")
 write_qiime2(biom, dir = tempfile(), prefix = "biom_")
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{dir}{Where to save the files. If the directory doesn't exist, it will
 be created. Default: \code{tempfile()}}

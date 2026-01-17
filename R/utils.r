@@ -1,6 +1,5 @@
 
 
-
 #____________________________________________________________________
 # Ensure something's a factor with minimal levels.
 #____________________________________________________________________
@@ -35,15 +34,31 @@ current_cmd <- function (fn, indent = 0) {
 }
 
 
+eval_dots <- function (.f, ...) {
+  
+  env  <- rlang::caller_env()
+  dots <- list(...)
+  
+  # Warn users if they're still using deprecated parameters
+  for (param in c('weighted', 'normalized'))
+    if (hasName(dots, param)) {
+      lifecycle::deprecate_warn("3.0.0", sprintf('%s(%s)', .f, param))
+      dots[[param]] <- NULL
+    }
+  
+  invisible(lapply(dots, eval, envir = env))
+}
+
+
 #____________________________________________________________________
 # Collect and evaluate all the arguments.
 #____________________________________________________________________
-slurp_env <- function (..., .dots = FALSE) {
+slurp_env <- function (..., .dots = FALSE, .f = NULL) {
   
   env <- rlang::caller_env()
   
-  if (isTRUE(.dots)) { env$.dots <- lapply(list(...), eval, envir = env)
-  } else             { rlang::env_bind(env, ...) }
+  if (isTRUE(.dots)) { env$.dots <- lapply(list(...), FUN = eval, envir = env) }
+  else               { rlang::env_bind(env, ...) }
   
   rlang::env_unbind(env, '...')
   params <- lapply(as.list(env, all.names = TRUE), eval, envir = env)
@@ -83,7 +98,7 @@ eval_envir <- function (env, ...) {
           'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
           'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
           'within', 'between', 'tree', 'params',
-          'regr', 'resp' ))))
+          'regr', 'resp', 'cpus', 'alpha' ))))
     
     if (nzchar(invalid)) {
       fn <- attr(rlang::caller_fn(), 'display') %||% "function"

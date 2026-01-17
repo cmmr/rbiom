@@ -1,0 +1,24 @@
+name: Clear Workflow Cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 2:00 AM PST every day
+    - cron: '0 10 * * *'
+
+permissions:
+  actions: write
+
+jobs:
+  clear-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all caches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This tells gh explicitly which repo to use without needing a checkout
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "Clearing caches for $GH_REPO..."
+          gh cache delete --all || true
+          echo "Done."

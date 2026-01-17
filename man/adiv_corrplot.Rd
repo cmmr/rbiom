@@ -27,17 +27,16 @@ adiv_corrplot(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{x}{Dataset field with the x-axis values. Equivalent to the \code{regr}
 argument in \code{\link[=stats_table]{stats_table()}}. Required.}
 
-\item{adiv}{Alpha diversity metric(s) to use. Options are: \code{"OTUs"},
-\code{"Shannon"}, \code{"Chao1"}, \code{"Simpson"}, and/or
-\code{"InvSimpson"}. Set \code{adiv=".all"} to use all metrics.
-Multiple/abbreviated values allowed.
-Default: \code{"Shannon"}}
+\item{adiv}{Alpha diversity metric(s) to use. Options are:
+\code{c("ace", "berger", "brillouin", "chao1", "faith", "fisher",  "simpson", "inv_simpson", "margalef", "mcintosh", "menhinick",  "observed", "shannon", "squares")}.
+For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
+explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
+Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
 \item{layers}{One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single

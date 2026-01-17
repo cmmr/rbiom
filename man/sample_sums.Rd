@@ -10,8 +10,7 @@ sample_sums(biom, rank = -1, sort = NULL, unc = "singly")
 sample_apply(biom, FUN, rank = -1, sort = NULL, unc = "singly", ...)
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be
@@ -70,9 +69,7 @@ Other samples:
 Other rarefaction: 
 \code{\link{rare_corrplot}()},
 \code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{rarefy}()},
-\code{\link{rarefy_cols}()}
+\code{\link{rare_stacked}()}
 
 Other taxa_abundance: 
 \code{\link{taxa_boxplot}()},

@@ -6,8 +6,7 @@
 \usage{
 bdiv_heatmap(
   biom,
-  bdiv = "Bray-Curtis",
-  weighted = TRUE,
+  bdiv = "bray",
   tree = NULL,
   tracks = NULL,
   grid = "devon",
@@ -22,24 +21,20 @@ bdiv_heatmap(
   legend = "right",
   title = TRUE,
   xlab.angle = "auto",
-  underscores = FALSE,
+  alpha = 0.5,
+  cpus = NULL,
   ...
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
-\code{"Bray-Curtis"}, \code{"Manhattan"}, \code{"Euclidean"},
-\code{"Jaccard"}, and \code{"UniFrac"}. For \code{"UniFrac"}, a
-phylogenetic tree must be present in \code{biom} or explicitly
-provided via \verb{tree=}. Multiple/abbreviated values allowed.
-Default: \code{"Bray-Curtis"}}
-
-\item{weighted}{Take relative abundances into account. When
-\code{weighted=FALSE}, only presence/absence is considered.
-Multiple values allowed. Default: \code{TRUE}}
+\code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
+For the UniFrac family, a phylogenetic tree must be present in \code{biom}
+or explicitly provided via \verb{tree=}. Supports partial matching.
+Multiple values are allowed for functions which return a table or
+plot. Default: \code{"bray"}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
@@ -116,9 +111,12 @@ no title, or any character string. Default: \code{TRUE}}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
-\item{underscores}{When parsing the tree, should underscores be kept as
-is? By default they will be converted to spaces (unless the entire ID
-is quoted). Default \code{FALSE}}
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Default: \code{NULL}}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
 For example, \code{labs.subtitle = "Plot subtitle"}.}
@@ -192,7 +190,7 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
     
     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
     
-    bdiv_heatmap(hmp10, bdiv="uni", weighted=c(TRUE,FALSE), tracks="sex")
+    bdiv_heatmap(hmp10, bdiv=c("u_unifrac", "n_unifrac"), tracks="sex")
 }
 \seealso{
 Other beta_diversity: 

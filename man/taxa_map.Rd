@@ -14,8 +14,7 @@ taxa_map(
 )
 }
 \arguments{
-\item{biom}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.
-Any value accepted by \code{\link[=as_rbiom]{as_rbiom()}} can also be given here.}
+\item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
 \item{rank}{When \code{NULL}, the entire biom$taxonomy data.frame is returned,
 transformed as per \code{unc}. Alternatively, a single taxonomic rank

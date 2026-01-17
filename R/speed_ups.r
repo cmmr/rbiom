@@ -64,7 +64,7 @@
 #' ```r
 #' tree <- biom$tree
 #' biom$tree <- NULL
-#' dm <- bdiv_distmat(biom, 'unifrac', tree = tree)
+#' dm <- bdiv_distmat(biom, 'w_unifrac', tree = tree)
 #' ```
 #' 
 #' 

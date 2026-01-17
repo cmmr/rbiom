@@ -50,13 +50,13 @@
 #'     blply(hmp50, "Sex", `$`, 'n_samples') %>% unlist()
 #'     
 #'     bdply(hmp50, c("Body Site", "Sex"), function (b) {
-#'       adm <- adiv_matrix(b)[,c("Shannon", "Simpson")]
+#'       adm <- adiv_matrix(b)[,c("shannon", "simpson")]
 #'       apply(adm, 2L, mean)
 #'     })
 #'     
-#'     iters <- list(w = c(TRUE, FALSE), d = c("bray", "euclid"))
-#'     bdply(hmp50, "Sex", iters = iters, function (b, w, d) {
-#'       r <- range(bdiv_distmat(biom = b, bdiv = d, weighted = w))
+#'     iters <- list(d = c("bray", "euclid"))
+#'     bdply(hmp50, "Sex", iters = iters, function (b, d) {
+#'       r <- range(bdiv_distmat(biom = b, bdiv = d))
 #'       round(data.frame(min = r[[1]], max = r[[2]]))
 #'     })
 #' 
