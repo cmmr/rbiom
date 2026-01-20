@@ -358,14 +358,14 @@ rb_init <- function(
   #________________________________________________________
   private$.date <- strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="UTC")
   if (!is.null(date <- dots[['date']]))
-    if (is_scalar_character(date) && !is.na(date))
+    if (is_scalar_character(date) && !anyNA(date))
       private$.date <- date
   
   #________________________________________________________
   # Read-only hereafter.
   #________________________________________________________
   for (i in c('generated_by', 'pkg_version'))
-    if (is_scalar_character(dots[[i]]) && !is.na(dots[[i]]))
+    if (is_scalar_character(dots[[i]]) && !anyNA(dots[[i]]))
       private[[paste0('.', i)]] <- dots[[i]]
   
   return (invisible(self))
@@ -452,7 +452,7 @@ rb_comment <- function (self, private, value) {
   
   if (missing(value)) return (private$.comment)
   
-  if (is.null(value) || is.na(value)) value <- ""
+  if (is.null(value) || anyNA(value)) value <- ""
   if (!is_scalar_character(value)) cli_abort("Invalid `comment`: {.type {value}}")
   value <- trimws(value, whitespace = "[\\h\\v]")
   if (nchar(value) > 5000) {
@@ -656,7 +656,7 @@ rb_date <- function (self, private, value) {
     if (is.character(value)) { strptime(value, fmt, tz = "UTC") 
     } else                   { as.POSIXlt(value, tz = "UTC")    } })
   
-  if (!inherits(posix, 'POSIXt') || is.na(posix))
+  if (!inherits(posix, 'POSIXt') || anyNA(posix))
     cli_abort(c(
       x = "Can't parse date given as: {value}.",
       i = "Expected POSIXt object or string in {.code {fmt}} format."))
