@@ -65,12 +65,13 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, MASS
+          extra-packages: any::rcmdcheck
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          args: 'c("--no-manual", "--as-cran")'
+          upload-snapshots: true
+          build_args: 'c("--no-manual", "--as-cran")'
 
       - name: Show install log
         if: always()
