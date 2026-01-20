@@ -222,19 +222,19 @@ p-value = 8.9e-40).</p>
 <span><span class="co">#&gt;              [,1]           </span></span>
 <span><span class="co">#&gt; age          "16.8"         </span></span>
 <span><span class="co">#&gt; sex          "female - male"</span></span>
-<span><span class="co">#&gt; .mean.diff   "-7.730025"    </span></span>
+<span><span class="co">#&gt; .mean.diff   "-7.770364"    </span></span>
 <span><span class="co">#&gt; .h1          "!= 0"         </span></span>
-<span><span class="co">#&gt; .p.val       "8.875599e-40" </span></span>
-<span><span class="co">#&gt; .adj.p       "8.875599e-40" </span></span>
-<span><span class="co">#&gt; .effect.size "-1.205401"    </span></span>
-<span><span class="co">#&gt; .se          "0.5753545"    </span></span>
+<span><span class="co">#&gt; .p.val       "3.943402e-39" </span></span>
+<span><span class="co">#&gt; .adj.p       "3.943402e-39" </span></span>
+<span><span class="co">#&gt; .effect.size "-1.211754"    </span></span>
+<span><span class="co">#&gt; .se          "0.5835173"    </span></span>
 <span><span class="co">#&gt; .n           "2500"         </span></span>
-<span><span class="co">#&gt; .df          "2485"         </span></span>
-<span><span class="co">#&gt; .t.ratio     "-13.43524"    </span></span>
-<span><span class="co">#&gt; .adj.r       "0.8313946"    </span></span>
-<span><span class="co">#&gt; .aic         "16403.78"     </span></span>
-<span><span class="co">#&gt; .bic         "16497.75"     </span></span>
-<span><span class="co">#&gt; .loglik      "-8185.756"</span></span></code></pre></div>
+<span><span class="co">#&gt; .df          "2484"         </span></span>
+<span><span class="co">#&gt; .t.ratio     "-13.31642"    </span></span>
+<span><span class="co">#&gt; .adj.r       "0.8314119"    </span></span>
+<span><span class="co">#&gt; .aic         "16403.85"     </span></span>
+<span><span class="co">#&gt; .bic         "16500.31"     </span></span>
+<span><span class="co">#&gt; .loglik      "-8185.366"</span></span></code></pre></div>
 <p>Depending on the arguments given, the <em>estimate</em> term will be
 one of:</p>
 <table style="width:100%;" class="table">
@@ -405,7 +405,7 @@ range: 0-1, lower is better.</li>
 generated in the last section.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">st</span><span class="op">$</span><span class="va">.aic</span></span>
-<span><span class="co">#&gt; [1] 16403.78</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 16403.85</span></span></code></pre></div>
 <p>These values can be used to decide which <code>fit</code> argument to
 use (<code>"lm"</code>, <code>"log"</code>, or <code>"gam"</code>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -415,7 +415,7 @@ use (<code>"lm"</code>, <code>"log"</code>, or <code>"gam"</code>).</p>
 <span><span class="co">#&gt;   fit    .r.sqr    .adj.r     .aic     .bic   .loglik .fit.p</span></span>
 <span><span class="co">#&gt; 1  lm 0.7896923 0.7894395 16947.72 16976.84 -8468.858      0</span></span>
 <span><span class="co">#&gt; 2 log 0.8031003 0.8028636 16783.02 16812.14 -8386.512      0</span></span>
-<span><span class="co">#&gt; 3 gam        NA 0.8313946 16403.78 16497.75 -8185.756     NA</span></span></code></pre></div>
+<span><span class="co">#&gt; 3 gam        NA 0.8314119 16403.85 16500.31 -8185.366     NA</span></span></code></pre></div>
 <p>Based on the above table, <code>fit = "gam"</code> has the lowest
 AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best
 model of the three to use for this set of data and variables.</p>
@@ -433,7 +433,7 @@ we’re asking if <code>.mean.diff</code> is non-zero. Since
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
 <span><span class="co">#&gt;   .mean.diff .h1     .p.val</span></span>
 <span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      -<span style="color: #BB0000;">7.73</span> != 0  8.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-40</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      -<span style="color: #BB0000;">7.77</span> != 0  3.94<span style="color: #949494;">e</span><span style="color: #BB0000;">-39</span></span></span></code></pre></div>
 <p>For a more complete review of alternative hypotheses, see the
 <a href="statistics.html#hypothesis">rbiom statistics article</a>.</p>
 </div>
@@ -771,11 +771,11 @@ interest. However, you can override this by providing the
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 15</span></span></span>
 <span><span class="co">#&gt;     age sex    .mean.diff .h1     .p.val   .adj.p .effect.size   .se    .n   .df</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    12 femal…       7.23 != 0  2.46<span style="color: #949494;">e</span><span style="color: #BB0000;">-29</span> 1.23<span style="color: #949494;">e</span><span style="color: #BB0000;">-28</span>        1.13  0.635  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    11 femal…       6.02 != 0  2.75<span style="color: #949494;">e</span><span style="color: #BB0000;">-22</span> 6.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-22</span>        0.939 0.614  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    13 femal…       6.04 != 0  6.06<span style="color: #949494;">e</span><span style="color: #BB0000;">-21</span> 1.01<span style="color: #949494;">e</span><span style="color: #BB0000;">-20</span>        0.943 0.638  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    15 femal…      -<span style="color: #BB0000;">2.58</span> != 0  7.21<span style="color: #949494;">e</span><span style="color: #BB0000;">- 7</span> 9.02<span style="color: #949494;">e</span><span style="color: #BB0000;">- 7</span>       -<span style="color: #BB0000;">0.402</span> 0.519  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    14 femal…       2.00 != 0  3.14<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span> 3.14<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span>        0.311 0.553  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    12 femal…       7.26 != 0  2.34<span style="color: #949494;">e</span><span style="color: #BB0000;">-28</span> 1.17<span style="color: #949494;">e</span><span style="color: #BB0000;">-27</span>        1.13  0.649  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    11 femal…       6.03 != 0  1.16<span style="color: #949494;">e</span><span style="color: #BB0000;">-21</span> 2.90<span style="color: #949494;">e</span><span style="color: #BB0000;">-21</span>        0.940 0.625  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    13 femal…       6.10 != 0  1.85<span style="color: #949494;">e</span><span style="color: #BB0000;">-20</span> 3.09<span style="color: #949494;">e</span><span style="color: #BB0000;">-20</span>        0.951 0.652  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    15 femal…      -<span style="color: #BB0000;">2.59</span> != 0  9.01<span style="color: #949494;">e</span><span style="color: #BB0000;">- 7</span> 1.13<span style="color: #949494;">e</span><span style="color: #BB0000;">- 6</span>       -<span style="color: #BB0000;">0.404</span> 0.527  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    14 femal…       2.00 != 0  3.84<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span> 3.84<span style="color: #949494;">e</span><span style="color: #BB0000;">- 4</span>        0.311 0.562  <span style="text-decoration: underline;">2</span>500  <span style="text-decoration: underline;">2</span>484</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: .t.ratio &lt;dbl&gt;, .adj.r &lt;dbl&gt;, .aic &lt;dbl&gt;, .bic &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   .loglik &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
