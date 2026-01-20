@@ -434,7 +434,7 @@ rb_id <- function (self, private, value) {
   
   if (missing(value)) return (private$.id)
   
-  if (is.null(value) || is.na(value)) value <- "Untitled Dataset"
+  if (is.null(value) || anyNA(value)) value <- "Untitled Dataset"
   if (!is_scalar_character(value)) cli_abort("Invalid `id`: {.type {value}}")
   value <- trimws(value, whitespace = "[\\h\\v]")
   if (nchar(value) < 1)   value <- "Untitled Dataset"
