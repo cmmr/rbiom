@@ -1,3 +1,8 @@
+# rbiom 3.0.1
+
+* Re-exports `ecodive::list_metrics`, `ecodive::match_metric`, and `ggplot2::ggsave`.
+
+
 # rbiom 3.0.0
 
 ## Announcements

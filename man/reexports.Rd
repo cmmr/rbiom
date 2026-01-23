@@ -24,6 +24,9 @@
 \alias{slice_min}
 \alias{slice_max}
 \alias{slice_sample}
+\alias{list_metrics}
+\alias{match_metric}
+\alias{ggsave}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -33,7 +36,9 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr:mutate-joins]{left_join}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{relocate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:slice]{slice_head}}, \code{\link[dplyr:slice]{slice_max}}, \code{\link[dplyr:slice]{slice_min}}, \code{\link[dplyr:slice]{slice_sample}}, \code{\link[dplyr:slice]{slice_tail}}}
 
-  \item{ecodive}{\code{\link[ecodive]{n_cpus}}}
+  \item{ecodive}{\code{\link[ecodive:metrics]{list_metrics}}, \code{\link[ecodive:metrics]{match_metric}}, \code{\link[ecodive]{n_cpus}}}
+
+  \item{ggplot2}{\code{\link[ggplot2]{ggsave}}}
 
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
 

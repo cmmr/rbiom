@@ -60,3 +60,12 @@ dplyr::slice_max
 
 #' @export
 dplyr::slice_sample
+
+#' @export
+ecodive::list_metrics
+
+#' @export
+ecodive::match_metric
+
+#' @export
+ggplot2::ggsave
