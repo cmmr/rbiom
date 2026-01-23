@@ -42,7 +42,7 @@ biom
 #>       1 Fields:  .sample
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-20 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-23 ──
 #> 
 
 # convert from phyloseq to rbiom ----------------
@@ -65,7 +65,7 @@ biom
 #>       5 Fields:  .sample, BarcodeSequence, ...
 #>         Tree:    <absent>
 #> 
-#> ── 3 - 7 reads/sample ──────────────────────── 2026-01-20 ──
+#> ── 3 - 7 reads/sample ──────────────────────── 2026-01-23 ──
 #> 
 ```
 
@@ -115,7 +115,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-20 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-23 ──
 #> 
 
 # or in a single step ---------------------------
@@ -130,7 +130,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-20 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-23 ──
 #> 
 ```
 
@@ -172,7 +172,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-20 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-23 ──
 #> 
 ```
 
@@ -206,6 +206,6 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-20 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-01-23 ──
 #> 
 ```

@@ -1,5 +1,13 @@
 # Changelog
 
+## rbiom 3.0.1
+
+- Re-exports
+  [`ecodive::list_metrics`](https://cmmr.github.io/ecodive/reference/metrics.html),
+  [`ecodive::match_metric`](https://cmmr.github.io/ecodive/reference/metrics.html),
+  and
+  [`ggplot2::ggsave`](https://ggplot2.tidyverse.org/reference/ggsave.html).
+
 ## rbiom 3.0.0
 
 ### Announcements

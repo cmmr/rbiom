@@ -20,7 +20,12 @@ to see their documentation.
 
 - ecodive:
 
+  `list_metrics`, `match_metric`,
   [`n_cpus`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+
+- ggplot2:
+
+  [`ggsave`](https://ggplot2.tidyverse.org/reference/ggsave.html)
 
 - magrittr:
 
