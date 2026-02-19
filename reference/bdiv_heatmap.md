@@ -23,7 +23,7 @@ bdiv_heatmap(
   title = TRUE,
   xlab.angle = "auto",
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 ```
@@ -265,8 +265,8 @@ Other visualization:
 ``` r
     library(rbiom)
     
-    # Keep and rarefy the 10 most deeply sequenced samples.
-    hmp10 <- rarefy(hmp50, n = 10)
+    # Subset to 10 samples and rarefy them.
+    hmp10 <- rarefy(hmp50[1:10])
     
     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
 

@@ -70,8 +70,6 @@ slice_sample(
 
 - .by, by:
 
-  **\[experimental\]**
-
   \<[`tidy-select`](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html)\>
   Optionally, a selection of columns to group by for just this
   operation, functioning as an alternative to
@@ -130,7 +128,8 @@ slice_sample(
   \<[`data-masking`](https://rlang.r-lib.org/reference/args_data_masking.html)\>
   Sampling weights. This must evaluate to a vector of non-negative
   numbers the same length as the input. Weights are automatically
-  standardised to sum to 1.
+  standardised to sum to 1. See the `Details` section for more technical
+  details regarding these weights.
 
 - replace:
 
@@ -145,7 +144,9 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 ## See also
 
 Other transformations:
-[`matrix_ops`](https://cmmr.github.io/rbiom/reference/matrix_ops.md),
+[`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md),
+[`biom_relativize()`](https://cmmr.github.io/rbiom/reference/biom_relativize.md),
+[`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md),
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),

@@ -41,7 +41,7 @@ write_fasta(biom, file = NULL)
 
 write_tree(biom, file = NULL)
 
-write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
+write_xlsx(biom, file, depth = NULL, seed = 0, unc = "singly")
 ```
 
 ## Arguments
@@ -75,17 +75,16 @@ write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
   [`write.table()`](https://rdrr.io/r/utils/write.table.html). Default:
   `quote=FALSE, sep="\t"`
 
-- depth, n:
+- depth:
 
   Passed on to
-  [`rarefy_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md).
-  For `write_xlsx()` only, `depth=0` disables rarefaction. Default:
-  `depth=0.1, n=NULL`
+  [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md). For
+  `write_xlsx()` only, `depth=0` disables rarefaction. Default: `NULL`
 
 - seed:
 
   Random seed to use in rarefying. See
-  [`rarefy_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md)
   function for details. Must be a non-negative integer. Default: `0`
 
 - unc:

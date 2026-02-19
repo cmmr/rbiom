@@ -45,7 +45,9 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 ## See also
 
 Other transformations:
-[`matrix_ops`](https://cmmr.github.io/rbiom/reference/matrix_ops.md),
+[`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md),
+[`biom_relativize()`](https://cmmr.github.io/rbiom/reference/biom_relativize.md),
+[`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
 [`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),

@@ -13,7 +13,7 @@ adiv_table(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 adiv_matrix(
@@ -23,7 +23,7 @@ adiv_matrix(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 adiv_vector(
@@ -33,7 +33,7 @@ adiv_vector(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 ```
 
@@ -67,7 +67,7 @@ adiv_vector(
 
 - transform:
 
-  Transformation to apply. Options are:
+  Transformation to apply to calculated values. Options are:
   `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
   useful for correcting for non-normally distributions before applying
   regression statistics. Default: `"none"`
@@ -155,5 +155,5 @@ Other alpha_diversity:
 #> HMP04  1353       73 3.235844 0.9315730
 #> HMP05  1353       44 1.430414 0.5248395
 #> attr(,"cmd")
-#> [1] "adiv_matrix(biom, c(\"observed\", \"shannon\", \"simpson\"))"
+#> [1] "adiv_matrix(biom, c(\"observed\", \"shannon\", \"simpson\"), cpus = 4)"
 ```

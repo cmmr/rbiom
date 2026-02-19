@@ -115,7 +115,7 @@ Other biom:
 #>   Sex    d        min   max
 #>   <fct>  <chr>  <dbl> <dbl>
 #> 1 Female bray       0     1
-#> 2 Female euclid     0     1
+#> 2 Female euclid   123 17185
 #> 3 Male   bray       0     1
-#> 4 Male   euclid     0     1
+#> 4 Male   euclid   292 11855
 ```

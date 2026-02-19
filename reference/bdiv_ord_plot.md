@@ -26,7 +26,7 @@ bdiv_ord_plot(
   unc = "singly",
   caption = TRUE,
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 ```

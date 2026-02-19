@@ -80,6 +80,6 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #>       3 Fields:  .sample, treatment, and days 
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.7k reads/sample ────────────────── 2026-01-23 ──
+#> ── 1.4k - 3.7k reads/sample ────────────────── 2026-02-19 ──
 #> 
 ```

@@ -135,7 +135,7 @@ p$data
 #> # ℹ 93 more rows
 
 p$stats$code
-#> data <- adiv_table(biom, c("Shannon", "Simpson"), c("Body Site", "Sex"))
+#> data <- adiv_table(biom, c("Shannon", "Simpson"), c("Body Site", "Sex"), cpus = 4)
 #> 
 #> data %<>% dplyr::rename(
 #>   .resp    = ".diversity", 
@@ -325,7 +325,7 @@ p2$stats
 #> 1  20.6 > 0   0.0000329 0.0000329    29     2
 
 p2$stats$code
-#> data <- adiv_table(biom, "Shannon", "Body Site")
+#> data <- adiv_table(biom, "Shannon", "Body Site", cpus = 4)
 #> 
 #> data %<>% dplyr::rename(
 #>   .resp    = ".diversity", 

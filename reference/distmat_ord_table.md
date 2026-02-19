@@ -74,11 +74,11 @@ Other ordination:
 #> # A tibble:   6 × 4
 #>   .ord  .sample     .x       .y
 #>   <fct> <chr>    <dbl>    <dbl>
-#> 1 PCoA  HMP01   -0.387 -0.00895
-#> 2 PCoA  HMP02   -0.461 -0.0135 
-#> 3 PCoA  HMP03   -0.407 -0.0143 
-#> 4 PCoA  HMP04   -0.378 -0.0123 
-#> 5 PCoA  HMP05   -0.452 -0.0114 
-#> 6 PCoA  HMP06   -0.411 -0.0123 
+#> 1 PCoA  HMP01   -0.358  0.00236
+#> 2 PCoA  HMP02   -0.420  0.0104 
+#> 3 PCoA  HMP03   -0.382  0.0135 
+#> 4 PCoA  HMP04   -0.388  0.00485
+#> 5 PCoA  HMP05   -0.415 -0.0115 
+#> 6 PCoA  HMP06   -0.414 -0.00703
     
 ```

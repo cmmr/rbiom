@@ -15,11 +15,14 @@ bdiv_table(
   within = NULL,
   between = NULL,
   delta = ".all",
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 
@@ -31,11 +34,14 @@ bdiv_matrix(
   tree = NULL,
   within = NULL,
   between = NULL,
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  alpha = 0.5,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 bdiv_distmat(
@@ -43,14 +49,17 @@ bdiv_distmat(
   bdiv = "bray",
   weighted = NULL,
   normalized = NULL,
-  alpha = 0.5,
   tree = NULL,
   within = NULL,
   between = NULL,
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 ```
 
@@ -108,9 +117,41 @@ bdiv_distmat(
   For numeric metadata, report the absolute difference in values for the
   two samples, for instance `2` instead of `"10 vs 12"`. Default: `TRUE`
 
+- norm:
+
+  Normalize the incoming counts. Options are:
+
+  - `'none'`: No transformation.
+
+  - `'percent'`: Relative abundance (sample abundances sum to 1).
+
+  - `'binary'`: Unweighted presence/absence (each count is either 0 or
+    1).
+
+  - `'clr'`: Centered log ratio.
+
+  Default: `'none'`.
+
+- pseudocount:
+
+  Value added to counts to handle zeros when `norm = 'clr'`. Ignored for
+  other normalization methods. Default: `NULL` (emits a warning).
+
+- power:
+
+  Scaling factor for the magnitude of differences between communities
+  (\\p\\) when `bdiv = 'minkowski'`. Ignored for other beta diversity
+  metrics. Default: `1.5`
+
+- alpha:
+
+  The alpha term to use in Generalized UniFrac. How much weight to give
+  to relative abundances; a value between 0 and 1, inclusive. Setting
+  `alpha=1` is equivalent to Normalized UniFrac. Default: `0.5`
+
 - transform:
 
-  Transformation to apply. Options are:
+  Transformation to apply to calculated values. Options are:
   `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
   useful for correcting for non-normally distributions before applying
   regression statistics. Default: `"none"`
@@ -126,12 +167,6 @@ bdiv_distmat(
 
   Random seed for permutations. Must be a non-negative integer. Default:
   `0`
-
-- alpha:
-
-  The alpha term to use in Generalized UniFrac. How much weight to give
-  to relative abundances; a value between 0 and 1, inclusive. Setting
-  `alpha=1` is equivalent to Normalized UniFrac. Default: `0.5`
 
 - cpus:
 
@@ -232,7 +267,7 @@ Other beta_diversity:
 #> HMP20 0.6810017 0.4183059 0.0000000 0.1490926
 #> HMP21 0.7170374 0.3896741 0.1490926 0.0000000
 #> attr(,"cmd")
-#> [1] "bdiv_matrix(biom, \"w_unifrac\")"
+#> [1] "bdiv_matrix(biom, \"w_unifrac\", cpus = 4)"
     
     # All-vs-all distance matrix
     dm <- bdiv_distmat(biom, 'w_unifrac')

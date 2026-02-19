@@ -63,7 +63,7 @@ Other biom: [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
 #>       1 Fields:  .sample 
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-01-23 ──
+#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-02-19 ──
 #> 
     
     biom$tree     <- hmp50$tree
@@ -82,6 +82,6 @@ Other biom: [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
 #>       5 Fields:  .sample, Age, BMI, Body Site, and Sex 
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-01-23 ──
+#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-02-19 ──
 #> 
 ```

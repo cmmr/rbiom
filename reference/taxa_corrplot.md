@@ -185,7 +185,7 @@ taxa_corrplot(
 
 - transform:
 
-  Transformation to apply. Options are:
+  Transformation to apply to calculated values. Options are:
   `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
   useful for correcting for non-normally distributions before applying
   regression statistics. Default: `"none"`

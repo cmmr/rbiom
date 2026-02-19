@@ -1,18 +1,24 @@
-# Rarefy OTU counts.
+# Rarefy Counts to a Constant Depth
 
-Sub-sample OTU observations such that all samples have an equal number.
+This function reduces the number of observations (reads) in each sample
+to a fixed integer value (`depth`). Samples with fewer observations than
+the specified depth are discarded.
+
+Rarefaction is a common technique in microbiome analysis used to account
+for uneven sequencing effort across samples. By standardizing the
+library size, it allows for fair comparisons of alpha and beta diversity
+metrics.
 
 ## Usage
 
 ``` r
 rarefy(
   biom,
-  depth = 0.1,
-  n = NULL,
+  depth = NULL,
   seed = 0L,
-  upsample = NULL,
+  inflate = FALSE,
   clone = TRUE,
-  cpus = NULL
+  cpus = n_cpus()
 )
 ```
 
@@ -27,32 +33,36 @@ rarefy(
 
 - depth:
 
-  How many observations to keep per sample. When `0 < depth < 1`, it is
-  taken as the minimum percentage of the dataset's observations to keep.
-  Ignored when `n` is specified. Default: `0.1`
+  The number of observations to keep per sample. Must be an integer
+  greater than 0.
 
-- n:
+  - If `NULL` (the default), a depth is automatically selected that
+    retains at least 10% of the dataset's total abundance while
+    maximizing the number of samples kept. See
+    [`suggest_rarefy_depth()`](https://cmmr.github.io/rbiom/reference/suggest_rarefy_depth.md)
+    for the specific heuristic used.
 
-  The number of samples to keep. When `0 < n < 1`, it is taken as the
-  percentage of samples to keep. If negative, that number or percentage
-  of samples is dropped. If `0`, all samples are kept. If `NULL`,
-  `depth` is used instead. Default: `NULL`
+  - Samples with total counts less than `depth` will be dropped from the
+    result.
 
 - seed:
 
-  An integer seed for randomizing which observations to keep or drop. If
-  you need to create different random rarefactions of the same data, set
-  the seed to a different number each time.
+  Random seed for permutations. Must be a non-negative integer. Default:
+  `0`
 
-- upsample:
+- inflate:
 
-  If the count data is in percentages, provide an integer value here to
-  scale each sample's observations to integers that sum to this value.
-  Generally not recommended, but can be used to 'shoehorn' metagenomic
-  abundance estimates into rbiom's functions that were designed for
-  amplicon datasets. When invoked, `depth`, `n`, and `seed` are ignored.
-  The default, `NULL`, will throw an error if the counts are not all
-  integers.
+  Logical. Handling for non-integer data (e.g. relative abundances).
+
+  - `FALSE` (Default): The function will error if non-integers are
+    detected. Rarefaction requires discrete counts (integers).
+
+  - `TRUE`: The function will automatically rescale (inflate)
+    non-integers to integers using
+    [`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md)
+    before rarefying. This is useful for 'shoehorning' metagenomic
+    relative abundance data into diversity functions that strictly
+    require integers.
 
 - clone:
 
@@ -71,10 +81,20 @@ rarefy(
 An [rbiom
 object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 
+## Details
+
+Normalizes the library sizes of a dataset by randomly sub-sampling
+observations from each sample to a specific depth.
+
 ## See also
 
+[`suggest_rarefy_depth()`](https://cmmr.github.io/rbiom/reference/suggest_rarefy_depth.md)
+for details on the default depth selection.
+
 Other transformations:
-[`matrix_ops`](https://cmmr.github.io/rbiom/reference/matrix_ops.md),
+[`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md),
+[`biom_relativize()`](https://cmmr.github.io/rbiom/reference/biom_relativize.md),
+[`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md),
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
 [`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
@@ -85,12 +105,21 @@ Other transformations:
 ``` r
     library(rbiom)
     
-    sample_sums(hmp50) %>% head()
-#> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
-#>  1660  1371  1353  1895  3939  4150 
+    biom <- hmp50[1:5]
+    sample_sums(biom)
+#> HMP01 HMP02 HMP03 HMP04 HMP05 
+#>  1660  1371  1353  1895  3939 
     
-    biom <- rarefy(hmp50)
-    sample_sums(biom) %>% head()
-#> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
-#>  1183  1183  1183  1183  1183  1183 
+    # Rarefy to the lowest sample depth 
+    # (All samples are kept, but counts are reduced)
+    biom_rare <- rarefy(biom, depth = min(sample_sums(biom)))
+    sample_sums(biom_rare)
+#> HMP01 HMP02 HMP03 HMP04 HMP05 
+#>  1353  1353  1353  1353  1353 
+    
+    # Auto-select depth (may drop samples with low coverage)
+    biom_auto <- rarefy(biom)
+    sample_sums(biom_auto)
+#> HMP01 HMP02 HMP03 HMP04 HMP05 
+#>  1353  1353  1353  1353  1353 
 ```

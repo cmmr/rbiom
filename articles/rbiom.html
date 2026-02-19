@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,8 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>rbiom</h1>
+
+      <h1>rbiom</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/cmmr/rbiom/blob/master/vignettes/articles/rbiom.Rmd" class="external-link"><code>vignettes/articles/rbiom.Rmd</code></a></small>
@@ -456,7 +457,7 @@ this topic in greater detail.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Male    13.9 &gt; 0   0.003<span style="text-decoration: underline;">02</span>   0.003<span style="text-decoration: underline;">02</span>     20     3</span></span>
 <span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">stats</span><span class="op">$</span><span class="va">code</span></span>
-<span><span class="co">#&gt; data <span style="color: #00BB00;">&lt;-</span> <span style="color: #00BBBB;">adiv_table</span><span style="color: #BBBB00;">(</span>biom, <span style="color: #BBBB00;">"Shannon"</span>, <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"Body Site"</span>, <span style="color: #BBBB00;">"Sex"</span><span style="color: #BB00BB;">)</span><span style="color: #BBBB00;">)</span></span></span>
+<span><span class="co">#&gt; data <span style="color: #00BB00;">&lt;-</span> <span style="color: #00BBBB;">adiv_table</span><span style="color: #BBBB00;">(</span>biom, <span style="color: #BBBB00;">"Shannon"</span>, <span style="color: #00BBBB;">c</span><span style="color: #BB00BB;">(</span><span style="color: #BBBB00;">"Body Site"</span>, <span style="color: #BBBB00;">"Sex"</span><span style="color: #BB00BB;">)</span>, cpus = <span style="color: #BB00BB;">4</span><span style="color: #BBBB00;">)</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data <span style="color: #00BB00;">%&lt;&gt;%</span> dplyr::<span style="color: #00BBBB;">rename</span><span style="color: #BBBB00;">(</span></span></span>
 <span><span class="co">#&gt;   .resp    = <span style="color: #BBBB00;">".diversity"</span>, </span></span>

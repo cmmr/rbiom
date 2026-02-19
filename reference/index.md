@@ -2,7 +2,9 @@
 
 ## Input / Output
 
-Get data into and out of R objects.
+Read and write BIOM, FASTA, Newick, and tabular data. Includes tools to
+convert to/from other popular formats like phyloseq,
+TreeSummarizedExperiment, and QIIME 2.
 
 - [`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md) :
   Convert a variety of data types to an rbiom object.
@@ -32,9 +34,9 @@ Get data into and out of R objects.
 ## The rbiom Object
 
 The [rbiom
-object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md) itself
-includes many methods, including `$counts`, `$metadata`, `$taxonomy`,
-\$samples, \$n_samples and more.
+object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md) serves
+as the core container for data, providing user-friendly accessors for
+`$counts`, `$metadata`, `$taxonomy`, `$tree`, and `$sequences`.
 
 - [`rbiom_objects`](https://cmmr.github.io/rbiom/reference/rbiom_objects.md)
   : Working with rbiom Objects.
@@ -44,6 +46,9 @@ includes many methods, including `$counts`, `$metadata`, `$taxonomy`,
   : Convert an rbiom object to a simple count matrix.
 
 ## Sample Metadata
+
+Access and manipulate sample metadata directly from the rbiom object
+using familiar dplyr-like verbs.
 
 - [`pull(`*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/pull.rbiom.md)
   : Map sample names to metadata field values.
@@ -58,6 +63,9 @@ includes many methods, including `$counts`, `$metadata`, `$taxonomy`,
 
 ## Subsetting
 
+Filter samples based on metadata conditions or apply functions to
+subsets of the data (split-apply-combine).
+
 - [`subset(`*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/subset.md)
   [`` `[`( ``*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/subset.md)
   [`na.omit(`*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/subset.md)
@@ -71,11 +79,15 @@ includes many methods, including `$counts`, `$metadata`, `$taxonomy`,
   [`slice_max(`*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/slice_metadata.md)
   [`slice_sample(`*`<rbiom>`*`)`](https://cmmr.github.io/rbiom/reference/slice_metadata.md)
   : Subset to a specific number of samples.
+- [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
+  [`blply()`](https://cmmr.github.io/rbiom/reference/bdply.md) : Apply a
+  function to each subset of an rbiom object.
 
 ## Taxa Abundance
 
-Map OTUs to higher order taxonomic ranks, and compare those abundances
-to metadata.
+Aggregates counts to specific taxonomic ranks (e.g. Genus, Phylum) to
+test for differential abundance and generate visualizations like stacked
+bar charts, heatmaps, and boxplots.
 
 - [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md)
   : Visualize BIOM data with boxplots.
@@ -101,8 +113,9 @@ to metadata.
 
 ## Alpha Diversity
 
-Examine the diversity of OTUs present in each individual sample, and how
-that diversity correlates with metadata.
+Calculate within-sample diversity metrics (Shannon, Simpson, Richness,
+etc.) and correlate them with metadata using boxplots and statistical
+tests.
 
 - [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md)
   : Visualize alpha diversity with boxplots.
@@ -120,8 +133,9 @@ that diversity correlates with metadata.
 
 ## Beta Diversity
 
-See how similiar samples are to each other, and what metadata/taxa
-influence clustering.
+Compare samples to one another using distance metrics (Bray-Curtis,
+UniFrac, etc.) and visualize patterns with Ordinations (PCoA, NMDS) and
+clustering.
 
 - [`bdiv_boxplot()`](https://cmmr.github.io/rbiom/reference/bdiv_boxplot.md)
   : Visualize BIOM data with boxplots.
@@ -144,10 +158,10 @@ influence clustering.
   [`bdiv_distmat()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md)
   : Distance / dissimilarity between samples.
 
-## Rarefaction
+## Rarefaction Plots
 
-Improve signal-to-noise in analyses by ensuring all samples have an
-equal number of observations.
+Visualize how sequencing depth affects diversity metrics and taxa
+discovery (rarefaction curves).
 
 - [`rare_corrplot()`](https://cmmr.github.io/rbiom/reference/rare_corrplot.md)
   : Visualize rarefaction curves with scatterplots and trendlines.
@@ -155,26 +169,37 @@ equal number of observations.
   : Combines rare_corrplot and rare_stacked into a single figure.
 - [`rare_stacked()`](https://cmmr.github.io/rbiom/reference/rare_stacked.md)
   : Visualize the number of observations per sample.
+
+## Transforming Counts
+
+Normalize and transform count data, including rarefaction to a fixed
+depth, converting to relative abundance, and inflation/rescaling.
+
 - [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md) :
-  Rarefy OTU counts.
+  Rarefy Counts to a Constant Depth
+- [`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md)
+  : Inflate Relative Abundances to Integer Counts
+- [`biom_relativize()`](https://cmmr.github.io/rbiom/reference/biom_relativize.md)
+  : Relativize Counts to Proportions
+- [`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md)
+  : Rescale Counts to a Specific Range
+- [`suggest_rarefy_depth()`](https://cmmr.github.io/rbiom/reference/suggest_rarefy_depth.md)
+  : Suggest Rarefaction Depth
+- [`suggest_inflate_depths()`](https://cmmr.github.io/rbiom/reference/suggest_inflate_depths.md)
+  : Suggest Inflation Depths
+- [`biom_merge()`](https://cmmr.github.io/rbiom/reference/biom_merge.md)
+  : Combine several rbiom objects into one.
 
 ## Low Level Functions
 
-Most functions operate on rbiom objects. These let you use arbitrary
-data.frames, distance matrices, matrices, and phylo objects.
+Generic statistical and plotting functions that work on standard R data
+structures (matrices, data.frames, trees) rather than rbiom objects.
 
 - [`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md)
   : Run ordinations on a distance matrix.
 - [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md)
   : Run statistics on a distance matrix vs a categorical or numeric
   variable.
-- [`mtx_rarefy()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  [`mtx_percent()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  [`mtx_rescale()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  [`rarefy_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  [`rescale_rows()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  [`rescale_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
-  : Transform a counts matrix.
 - [`stats_boxplot()`](https://cmmr.github.io/rbiom/reference/stats_boxplot.md)
   : Visualize categorical metadata effects on numeric values.
 - [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md)
@@ -186,17 +211,9 @@ data.frames, distance matrices, matrices, and phylo objects.
 - [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md)
   : Create a heatmap with tracks and dendrograms from any matrix.
 
-## Advanced Operations
-
-- [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
-  [`blply()`](https://cmmr.github.io/rbiom/reference/bdply.md) : Apply a
-  function to each subset of an rbiom object.
-- [`biom_merge()`](https://cmmr.github.io/rbiom/reference/biom_merge.md)
-  : Combine several rbiom objects into one.
-
 ## Datasets
 
-Example datasets included with rbiom.
+Built-in microbiome datasets for testing and examples.
 
 - [`hmp50`](https://cmmr.github.io/rbiom/reference/hmp50.md) : Human
   Microbiome Project - demo dataset (n = 50)
@@ -204,3 +221,15 @@ Example datasets included with rbiom.
   Enteric Multicenter Study (n = 1,006)
 - [`babies`](https://cmmr.github.io/rbiom/reference/babies.md) :
   Longitudinal Stool Samples from Infants (n = 2,684)
+
+## Deprecated Functions
+
+Functions that have been superseded by newer alternatives.
+
+- [`mtx_rarefy()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`mtx_percent()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`mtx_rescale()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`rarefy_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`rescale_rows()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  [`rescale_cols()`](https://cmmr.github.io/rbiom/reference/matrix_ops.md)
+  : Deprecated matrix transformations

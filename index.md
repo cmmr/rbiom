@@ -1,4 +1,4 @@
-# rbiom
+# rbiom ![rbiom logo](reference/figures/logo.png)
 
 `rbiom` is designed for microbiome researchers, providing visualizations
 and statistical analyses from Biological Observation Matrix (BIOM)

@@ -62,7 +62,7 @@ Other clustering:
     
     pull(biom, 'otu_cluster')[1:10]
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>     3     3     5     5     3     5     3     5     5     1 
+#>     3     3     1     1     3     1     3     1     1     2 
 #> Levels: 1 2 3 4 5
     
     bdiv_ord_plot(biom, layers = "p", stat.by = "otu_cluster")

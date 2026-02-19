@@ -13,7 +13,7 @@ bdiv_clusters(
   tree = NULL,
   k = 5,
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 ```

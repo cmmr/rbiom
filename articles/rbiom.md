@@ -316,7 +316,7 @@ p$stats
 #> 2 Male    13.9 > 0   0.00302   0.00302     20     3
 
 p$stats$code
-#> data <- adiv_table(biom, "Shannon", c("Body Site", "Sex"))
+#> data <- adiv_table(biom, "Shannon", c("Body Site", "Sex"), cpus = 4)
 #> 
 #> data %<>% dplyr::rename(
 #>   .resp    = ".diversity", 

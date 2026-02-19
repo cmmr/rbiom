@@ -33,7 +33,10 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/bdiv_stats.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/bdiv_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/bdply.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/biom_inflate.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/biom_merge.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/biom_relativize.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/biom_rescale.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/convert_to.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/distmat_ord_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/distmat_stats.html</loc></url>
@@ -74,6 +77,8 @@
 <url><loc>https://cmmr.github.io/rbiom/reference/stats_corrplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/stats_table.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/subset.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/suggest_inflate_depths.html</loc></url>
+<url><loc>https://cmmr.github.io/rbiom/reference/suggest_rarefy_depth.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/taxa_boxplot.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/taxa_clusters.html</loc></url>
 <url><loc>https://cmmr.github.io/rbiom/reference/taxa_corrplot.html</loc></url>

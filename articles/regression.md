@@ -601,7 +601,7 @@ plyr::ldply(c(none="none", rank="rank"), .id = "trans", function (trans)
     dplyr::select(.aic, .bic, .loglik) )
 #>   trans      .aic      .bic   .loglik
 #> 1  none -3112.365 -3028.741  1567.036
-#> 2  rank  4513.687  4629.266 -2241.843
+#> 2  rank  4513.317  4628.890 -2241.659
 ```
 
 These goodness-of-fit metrics strongly favor the untransformed data.

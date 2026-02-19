@@ -380,6 +380,39 @@ documentation_default
   with `'=='` or `'!='` to assign them to `within` or `between`,
   respectively. Default: `NULL`
 
+- norm:
+
+  Normalize the incoming counts. Options are:
+
+  - `'none'`: No transformation.
+
+  - `'percent'`: Relative abundance (sample abundances sum to 1).
+
+  - `'binary'`: Unweighted presence/absence (each count is either 0 or
+    1).
+
+  - `'clr'`: Centered log ratio.
+
+  Default: `'none'`.
+
+- pairs:
+
+  Which combinations of samples should distances be calculated for? The
+  default value (`NULL`) calculates all-vs-all. Provide a numeric or
+  logical vector specifying positions in the distance matrix to
+  calculate. See examples.
+
+- power:
+
+  Scaling factor for the magnitude of differences between communities
+  (\\p\\) when `bdiv = 'minkowski'`. Ignored for other beta diversity
+  metrics. Default: `1.5`
+
+- pseudocount:
+
+  Value added to counts to handle zeros when `norm = 'clr'`. Ignored for
+  other normalization methods. Default: `NULL` (emits a warning).
+
 - alpha:
 
   The alpha term to use in Generalized UniFrac. How much weight to give
@@ -429,7 +462,7 @@ documentation_default
 
 - transform:
 
-  Transformation to apply. Options are:
+  Transformation to apply to calculated values. Options are:
   `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
   useful for correcting for non-normally distributions before applying
   regression statistics. Default: `"none"`

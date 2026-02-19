@@ -1,9 +1,6 @@
-# Transform a counts matrix.
+# Deprecated matrix transformations
 
-A collection of transformations that operate directly on matrices.  
-  
-Note: `rarefy_cols()`, `rescale_rows()`, and `rescale_cols()` are
-deprecated.
+A collection of transformations that operate directly on matrices.
 
 ## Usage
 
@@ -33,7 +30,7 @@ rescale_cols(mtx)
 
 - mtx:
 
-  A matrix-like object.
+  A numeric matrix or sparse matrix of counts.
 
 - margin:
 
@@ -43,31 +40,22 @@ rescale_cols(mtx)
 
 - depth:
 
-  How many observations to keep per sample. When `0 < depth < 1`, it is
-  taken as the minimum percentage of the dataset's observations to keep.
-  Ignored when `n` is specified. Default: `0.1`
+  How many observations to keep per sample.
 
 - n:
 
-  The number of samples to keep. When `0 < n < 1`, it is taken as the
-  percentage of samples to keep. If negative, that number or percentage
-  of samples is dropped. If `0`, all samples are kept. If `NULL`,
-  `depth` is used instead. Default: `NULL`
+  Deprecated. The number of samples to keep. This argument is ignored in
+  the current version.
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  An integer seed for randomizing which observations to keep or drop.
 
 - upsample:
 
   If the count data is in percentages, provide an integer value here to
   scale each sample's observations to integers that sum to this value.
-  Generally not recommended, but can be used to 'shoehorn' metagenomic
-  abundance estimates into rbiom's functions that were designed for
-  amplicon datasets. When invoked, `depth`, `n`, and `seed` are ignored.
-  The default, `NULL`, will throw an error if the counts are not all
-  integers.
+  Maps to `inflate` in the new syntax.
 
 - cpus:
 
@@ -81,54 +69,40 @@ rescale_cols(mtx)
 
 ## Value
 
-The transformed matrix. If `mtx` was a sparse matrix from the `Matrix`
-package, then the result will also be a sparse matrix, otherwise the
-result will be a base R matrix.
-
-## See also
-
-Other transformations:
-[`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
-[`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
-[`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
-[`with()`](https://cmmr.github.io/rbiom/reference/with.md)
+A A numeric matrix or sparse matrix, depending on the input type, with
+the same dimensions as `mtx`.
 
 ## Examples
 
 ``` r
-    library(rbiom)
+    mtx <- matrix(1:12, ncol = 3, dimnames = list(paste0("OTU", 1:4), paste0("Sample", 1:3)))
     
-    # mtx_rarefy --------------------------------------
-    biom <- hmp50$clone()
-    sample_sums(biom) %>% head(10)
-#> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>  1660  1371  1353  1895  3939  4150  3283  1695  2069  2509 
-
-    biom$counts %<>% mtx_rarefy(depth=1000)
-    sample_sums(biom) %>% head(10)
-#> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>  1000  1000  1000  1000  1000  1000  1000  1000  1000  1000 
-    
-    
-    # rescaling ----------------------------------------
-    mtx <- matrix(sample(1:20), nrow=4)
     mtx
-#>      [,1] [,2] [,3] [,4] [,5]
-#> [1,]   10    7    3    4    8
-#> [2,]   12   15    5   13   16
-#> [3,]    2   20    6   19   14
-#> [4,]   18    9   17    1   11
+#>      Sample1 Sample2 Sample3
+#> OTU1       1       5       9
+#> OTU2       2       6      10
+#> OTU3       3       7      11
+#> OTU4       4       8      12
     
-    colSums(mtx)
-#> [1] 42 51 31 37 49
+    suppressWarnings({
     
-    colSums(mtx_rarefy(mtx))
-#> [1] 31 31 31 31 31
+      mtx_rarefy(mtx)
+      
+      rarefy_cols(mtx)
+      
+      mtx_percent(mtx)
+      
+      mtx_rescale(mtx)
+      
+      rescale_rows(mtx)
+      
+      rescale_cols(mtx)
+      
+    })
+#>      Sample1   Sample2   Sample3
+#> OTU1     0.1 0.1923077 0.2142857
+#> OTU2     0.2 0.2307692 0.2380952
+#> OTU3     0.3 0.2692308 0.2619048
+#> OTU4     0.4 0.3076923 0.2857143
     
-    colSums(mtx_percent(mtx))
-#> [1] 1 1 1 1 1
-    
-    apply(mtx_rescale(mtx), 2L, max)
-#> [1] 1 1 1 1 1
 ```
