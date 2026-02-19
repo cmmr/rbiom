@@ -1,6 +1,5 @@
 
-^\.git$
-^\.github$
+^\.
 ^conda$
 ^logo$
 ^paper$
@@ -8,16 +7,13 @@
 ^tmp$
 ^vignettes$
 
-^\.gitignore$
-^\.lintr$
-^\.RData$
-^\.Rproj\.user$
 ^README\.Rmd$
 ^NEWS\.md$
 ^rbiom\.Rproj$
 ^build\.r
 ^install\.sh
 ^report.*
+^rhub_check\.r$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 

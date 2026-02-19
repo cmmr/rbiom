@@ -280,15 +280,18 @@ biom_rescale <- function(biom, range = c(0, 1), clone = TRUE) {
   # 1. Scale to 0-1 (Divide by Max per sample/column)
   maxs <- apply(biom$counts, 2, max)
   maxs[maxs == 0] <- 1
-  biom$counts <- biom$counts %*% Matrix::Diagonal(x = 1/maxs)
+  scl_counts <- biom$counts %*% Matrix::Diagonal(x = 1/maxs)
   
   # 2. Rescale to target range
   if (!identical(range, c(0, 1))) {
     lo  <- min(range)
     hi  <- max(range)
     # Note: Adding 'lo' destroys sparsity if lo != 0
-    biom$counts <- biom$counts * (hi - lo) + lo
+    scl_counts <- scl_counts * (hi - lo) + lo
   }
+  
+  colnames(scl_counts) <- colnames(biom$counts)
+  biom$counts <- scl_counts
   
   return(biom)
 }
@@ -514,21 +517,25 @@ suggest_inflate_depths <- function(biom, adjust = 1.5) {
 #'         with the same dimensions as `mtx`.
 #' 
 #' @examples
-#'     mtx <- matrix(1:24, nrow = 3)
+#'     mtx <- matrix(1:12, ncol = 3, dimnames = list(paste0("OTU", 1:4), paste0("Sample", 1:3)))
 #'     
 #'     mtx
 #'     
-#'     mtx_rarefy(mtx)
+#'     suppressWarnings({
 #'     
-#'     rarefy_cols(mtx)
-#'     
-#'     mtx_percent(mtx)
-#'     
-#'     mtx_rescale(mtx)
-#'     
-#'     rescale_rows(mtx)
-#'     
-#'     rescale_cols(mtx)
+#'       mtx_rarefy(mtx)
+#'       
+#'       rarefy_cols(mtx)
+#'       
+#'       mtx_percent(mtx)
+#'       
+#'       mtx_rescale(mtx)
+#'       
+#'       rescale_rows(mtx)
+#'       
+#'       rescale_cols(mtx)
+#'       
+#'     })
 #'     
 NULL
 

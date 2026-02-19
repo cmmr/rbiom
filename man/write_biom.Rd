@@ -42,10 +42,10 @@ files, the \code{h5lite} R package must be installed. Default: \code{"json"}}
 \item{quote, sep, ...}{Parameters passed on to \code{\link[=write.table]{write.table()}}.
 Default: \verb{quote=FALSE, sep="\\t"}}
 
-\item{depth, n}{Passed on to \code{\link[=rarefy_cols]{rarefy_cols()}}. For \code{write_xlsx()} only,
-\code{depth=0} disables rarefaction. Default: \verb{depth=0.1, n=NULL}}
+\item{depth}{Passed on to \code{\link[=rarefy]{rarefy()}}. For \code{write_xlsx()} only,
+\code{depth=0} disables rarefaction. Default: \code{NULL}}
 
-\item{seed}{Random seed to use in rarefying. See \code{\link[=rarefy_cols]{rarefy_cols()}} function
+\item{seed}{Random seed to use in rarefying. See \code{\link[=rarefy]{rarefy()}} function
 for details. Must be a non-negative integer. Default: \code{0}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous

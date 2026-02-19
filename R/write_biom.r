@@ -24,10 +24,10 @@
 #'        biom version 2.1, respectively. NOTE: to write HDF5 formatted BIOM 
 #'        files, the \code{h5lite} R package must be installed. Default: `"json"`
 #' 
-#' @param depth,n   Passed on to [rarefy_cols()]. For `write_xlsx()` only, 
-#'        `depth=0` disables rarefaction. Default: `depth=0.1, n=NULL`
+#' @param depth   Passed on to [rarefy()]. For `write_xlsx()` only, 
+#'        `depth=0` disables rarefaction. Default: `NULL`
 #'                   
-#' @param seed   Random seed to use in rarefying. See [rarefy_cols()] function
+#' @param seed   Random seed to use in rarefying. See [rarefy()] function
 #'        for details. Must be a non-negative integer. Default: `0`
 #' 
 #' @param quote,sep,...   Parameters passed on to [write.table()].

@@ -64,20 +64,24 @@ with the same dimensions as \code{mtx}.
 A collection of transformations that operate directly on matrices.
 }
 \examples{
-    mtx <- matrix(1:24, nrow = 3)
+    mtx <- matrix(1:12, ncol = 3, dimnames = list(paste0("OTU", 1:4), paste0("Sample", 1:3)))
     
     mtx
     
-    mtx_rarefy(mtx)
+    suppressWarnings({
     
-    rarefy_cols(mtx)
-    
-    mtx_percent(mtx)
-    
-    mtx_rescale(mtx)
-    
-    rescale_rows(mtx)
-    
-    rescale_cols(mtx)
+      mtx_rarefy(mtx)
+      
+      rarefy_cols(mtx)
+      
+      mtx_percent(mtx)
+      
+      mtx_rescale(mtx)
+      
+      rescale_rows(mtx)
+      
+      rescale_cols(mtx)
+      
+    })
     
 }
