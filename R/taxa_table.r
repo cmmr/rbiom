@@ -191,9 +191,9 @@ taxa_matrix <- function (
     error = function (e) stop("Unable to group by taxonomic level: ", e),
     expr  = local({
       
+      if (eq(transform, 'percent')) biom %<>% biom_relativize()
       counts <- biom$counts
       counts <- counts[names(map), , drop = FALSE]
-      if (eq(transform, 'percent')) counts %<>% mtx_percent()
       
       if (!is.factor(map)) map <- factor(map)
       projection <- as(map, "sparseMatrix")

@@ -48,7 +48,8 @@
 bdiv_table <- function (
     biom, bdiv = "bray", weighted = NULL, normalized = NULL, 
     tree = NULL, md = ".all", within = NULL, between = NULL, delta = '.all', 
-    transform = "none", ties = "random", seed = 0, alpha = 0.5, cpus = NULL, ... ) {
+    norm = "none", pseudocount = NULL, power = 1.5, alpha = 0.5,
+    transform = "none", ties = "random", seed = 0, cpus = n_cpus(), ... ) {
   
   eval_dots('bdiv_table', ...)
   
@@ -96,16 +97,19 @@ bdiv_table <- function (
       # Compute the distance matrix
       #________________________________________________________
       mtx <- bdiv_matrix(
-        biom      = biom, 
-        bdiv      = bdiv[[i]], 
-        tree      = tree, 
-        within    = within, 
-        between   = between, 
-        transform = transform, 
-        ties      = ties, 
-        seed      = seed, 
-        alpha     = alpha, 
-        cpus      = cpus )
+        biom        = biom, 
+        bdiv        = bdiv[[i]], 
+        tree        = tree, 
+        within      = within, 
+        between     = between, 
+        norm        = norm, 
+        pseudocount = pseudocount,
+        power       = power,
+        alpha       = alpha, 
+        transform   = transform, 
+        ties        = ties, 
+        seed        = seed, 
+        cpus        = cpus )
       
       
       #________________________________________________________
@@ -212,8 +216,9 @@ bdiv_table <- function (
 #' @export
 bdiv_matrix <- function (
     biom, bdiv = "bray", weighted = NULL, normalized = NULL, 
-    tree = NULL, within = NULL, between = NULL, transform = "none", 
-    ties = "random", seed = 0, alpha = 0.5, cpus = NULL ) {
+    tree = NULL, within = NULL, between = NULL, 
+    norm = "none", pseudocount = NULL, power = 1.5, alpha = 0.5,
+    transform = "none", ties = "random", seed = 0, cpus = n_cpus() ) {
   
   params <- eval_envir(environment())
   cmd    <- sprintf("bdiv_matrix(%s)", as.args(params, fun = bdiv_matrix))
@@ -222,16 +227,19 @@ bdiv_matrix <- function (
   validate_bdiv()
   
   mtx <- as.matrix(bdiv_distmat(
-    biom      = biom,
-    bdiv      = bdiv,
-    tree      = tree,
-    within    = within,
-    between   = between,
-    transform = transform,
-    ties      = ties,
-    seed      = seed,
-    alpha     = alpha, 
-    cpus      = cpus ))
+    biom        = biom,
+    bdiv        = bdiv,
+    tree        = tree,
+    within      = within,
+    between     = between,
+    norm        = norm, 
+    pseudocount = pseudocount,
+    power       = power,
+    alpha       = alpha, 
+    transform   = transform,
+    ties        = ties,
+    seed        = seed,
+    cpus        = cpus ))
   
   attr(mtx, 'cmd') <- cmd
   return (mtx)
@@ -243,9 +251,10 @@ bdiv_matrix <- function (
 #' @rdname bdiv_table
 #' @export
 bdiv_distmat <- function (
-    biom, bdiv = "bray", weighted = NULL, normalized = NULL, alpha = 0.5, 
-    tree = NULL, within = NULL, between = NULL, transform = "none", 
-    ties = "random", seed = 0, cpus = NULL ) {
+    biom, bdiv = "bray", weighted = NULL, normalized = NULL, 
+    tree = NULL, within = NULL, between = NULL,
+    norm = "none", pseudocount = NULL, power = 1.5, alpha = 0.5,
+    transform = "none", ties = "random", seed = 0, cpus = n_cpus() ) {
   
   #________________________________________________________
   # Take care not to cache filepath to tree.
@@ -318,12 +327,15 @@ bdiv_distmat <- function (
   # Run dissimilarity algorithms implemented in C.
   #________________________________________________________
   dm <- ecodive::beta_div(
-    counts = biom, 
-    metric = bdiv, 
-    alpha  = alpha, 
-    tree   = if (is.null(tree)) biom$tree else tree,
-    pairs  = pairs, 
-    cpus   = cpus )
+    counts      = biom, 
+    metric      = bdiv, 
+    norm        = norm, 
+    pseudocount = pseudocount,
+    power       = power,
+    alpha       = alpha, 
+    tree        = if (is.null(tree)) biom$tree else tree,
+    pairs       = pairs, 
+    cpus        = cpus )
   
   
   #________________________________________________________

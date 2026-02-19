@@ -48,7 +48,9 @@ navbar:
 reference:
 - title: Input / Output
   desc: >
-    Get data into and out of R objects.
+    Read and write BIOM, FASTA, Newick, and tabular data. Includes tools to 
+    convert to/from other popular formats like phyloseq, TreeSummarizedExperiment, 
+    and QIIME 2.
   contents:
   - as_rbiom
   - starts_with("read_")
@@ -57,14 +59,18 @@ reference:
   
 - title: The rbiom Object
   desc: >
-    The [rbiom object](rbiom_objects.html) itself includes many methods, 
-    including `$counts`, `$metadata`, `$taxonomy`, $samples, $n_samples and more.
+    The [rbiom object](rbiom_objects.html) serves as the core container for 
+    data, providing user-friendly accessors for `$counts`, `$metadata`, 
+    `$taxonomy`, `$tree`, and `$sequences`.
   contents:
   - rbiom_objects
   - as.list.rbiom
   - as.matrix.rbiom
   
 - title: Sample Metadata
+  desc: >
+    Access and manipulate sample metadata directly from the rbiom object using 
+    familiar dplyr-like verbs.
   contents:
   - pull.rbiom
   - with.rbiom
@@ -72,63 +78,79 @@ reference:
   - glimpse.rbiom
   
 - title: Subsetting
+  desc: >
+    Filter samples based on metadata conditions or apply functions to subsets 
+    of the data (split-apply-combine).
   contents:
   - subset.rbiom
   - na.omit.rbiom
   - slice.rbiom
+  - bdply
   
 - title: Taxa Abundance
   desc: >
-    Map OTUs to higher order taxonomic ranks, and compare those abundances to 
-    metadata.
+    Aggregates counts to specific taxonomic ranks (e.g. Genus, Phylum) to 
+    test for differential abundance and generate visualizations like stacked 
+    bar charts, heatmaps, and boxplots.
   contents:
   - starts_with("taxa_")
   
 - title: Alpha Diversity
   desc: >
-    Examine the diversity of OTUs present in each individual sample, and how 
-    that diversity correlates with metadata.
+    Calculate within-sample diversity metrics (Shannon, Simpson, Richness, etc.) 
+    and correlate them with metadata using boxplots and statistical tests.
   contents:
   - starts_with("adiv_")
   - sample_sums
   
 - title: Beta Diversity
   desc: >
-    See how similiar samples are to each other, and what metadata/taxa 
-    influence clustering.
+    Compare samples to one another using distance metrics (Bray-Curtis, UniFrac, 
+    etc.) and visualize patterns with Ordinations (PCoA, NMDS) and clustering.
   contents:
   - starts_with("bdiv_")
   
-- title: Rarefaction
+- title: Rarefaction Plots
   desc: >
-    Improve signal-to-noise in analyses by ensuring all samples have an equal 
-    number of observations.
+    Visualize how sequencing depth affects diversity metrics and taxa discovery 
+    (rarefaction curves).
   contents:
   - starts_with("rare_")
+  
+- title: Transforming Counts
+  desc: >
+    Normalize and transform count data, including rarefaction to a fixed depth, 
+    converting to relative abundance, and inflation/rescaling.
+  contents:
   - rarefy
+  - biom_inflate
+  - biom_relativize
+  - biom_rescale
+  - suggest_rarefy_depth
+  - suggest_inflate_depths
+  - biom_merge
   
 - title: Low Level Functions
   desc: >
-    Most functions operate on rbiom objects. These let you use arbitrary 
-    data.frames, distance matrices, matrices, and phylo objects.
+    Generic statistical and plotting functions that work on standard R data 
+    structures (matrices, data.frames, trees) rather than rbiom objects.
   contents:
   - starts_with("distmat_")
-  - starts_with("rescale_")
   - starts_with("stats_")
-  - starts_with("mtx_")
-  - rarefy_cols
   - tree_subset
   - plot_heatmap
   
-- title: Advanced Operations
-  contents:
-  - bdply
-  - biom_merge
-  
 - title: Datasets
   desc: >
-    Example datasets included with rbiom.
+    Built-in microbiome datasets for testing and examples.
   contents:
   - hmp50
   - gems
   - babies
+  
+- title: Deprecated Functions
+  desc: >
+    Functions that have been superseded by newer alternatives.
+  contents:
+  - has_lifecycle("deprecated")
+  - matrix_ops

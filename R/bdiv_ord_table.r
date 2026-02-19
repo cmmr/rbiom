@@ -41,7 +41,7 @@ bdiv_ord_table <- function (
     stat.by = NULL, split.by = NULL, tree = NULL, 
     test = "adonis2", seed = 0, permutations = 999, rank = NULL, taxa = 6, 
     p.top = Inf, p.adj = 'fdr', unc = "singly", 
-    alpha = 0.5, cpus = NULL, ...) {
+    alpha = 0.5, cpus = n_cpus(), ...) {
   
   biom <- as_rbiom(biom)
   
@@ -50,8 +50,7 @@ bdiv_ord_table <- function (
   # Validate and restructure user's arguments.
   #________________________________________________________
   
-  biom <- biom$clone()
-  biom$counts %<>% mtx_percent()
+  biom <- biom_relativize(biom, clone = TRUE)
   tree %<>% aa(display = "tree")
   
   validate_ord(max = Inf)

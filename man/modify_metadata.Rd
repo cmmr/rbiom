@@ -44,7 +44,9 @@ field) and delete fields (by setting their value to NULL).
 }
 \seealso{
 Other transformations: 
-\code{\link{matrix_ops}},
+\code{\link{biom_inflate}()},
+\code{\link{biom_relativize}()},
+\code{\link{biom_rescale}()},
 \code{\link{rarefy}()},
 \code{\link{slice_metadata}},
 \code{\link{subset}()},

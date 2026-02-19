@@ -230,7 +230,7 @@ bdiv_stats <- function (
     split.by = NULL, transform = "none", 
     test = "emmeans", fit = "gam", at = NULL, 
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr", 
-    alpha = 0.5, cpus = NULL ) {
+    alpha = 0.5, cpus = n_cpus() ) {
   
   validate_bdiv(multiple = TRUE)
   

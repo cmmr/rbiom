@@ -8,7 +8,7 @@
 \alias{rarefy_cols}
 \alias{rescale_rows}
 \alias{rescale_cols}
-\title{Transform a counts matrix.}
+\title{Deprecated matrix transformations}
 \usage{
 mtx_rarefy(
   mtx,
@@ -31,34 +31,24 @@ rescale_rows(mtx)
 rescale_cols(mtx)
 }
 \arguments{
-\item{mtx}{A matrix-like object.}
+\item{mtx}{A numeric matrix or sparse matrix of counts.}
 
 \item{margin}{Apply the transformation to the matrix's rows (\code{margin=1L})
 or columns (\code{margin=2L}). Instead of \code{1L} and \code{2L}, you may also use
 \code{'rows'} and \code{'cols'}.
 Default: \code{2L} (column-wise, aka sample-wise for otu tables)}
 
-\item{depth}{How many observations to keep per sample. When
-\verb{0 < depth < 1}, it is taken as the minimum percentage of the
-dataset's observations to keep. Ignored when \code{n} is specified.
-Default: \code{0.1}}
+\item{depth}{How many observations to keep per sample.}
 
-\item{n}{The number of samples to keep. When \verb{0 < n < 1}, it is taken as
-the percentage of samples to keep. If negative, that number or
-percentage of samples is dropped. If \code{0}, all samples are kept. If
-\code{NULL}, \code{depth} is used instead.
-Default: \code{NULL}}
+\item{n}{Deprecated. The number of samples to keep. This argument is
+ignored in the current version.}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{An integer seed for randomizing which observations to keep or
+drop.}
 
 \item{upsample}{If the count data is in percentages, provide an integer
 value here to scale each sample's observations to integers that sum
-to this value. Generally not recommended, but can be used to
-'shoehorn' metagenomic abundance estimates into rbiom's functions
-that were designed for amplicon datasets. When invoked, \code{depth}, \code{n},
-and \code{seed} are ignored. The default, \code{NULL}, will throw an error if
-the counts are not all integers.}
+to this value. Maps to \code{inflate} in the new syntax.}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. Default: \code{NULL}}
@@ -67,45 +57,27 @@ or to \code{1} to disable parallel processing. Default: \code{NULL}}
 be? Default: \code{c(0, 1)}}
 }
 \value{
-The transformed matrix. If \code{mtx} was a sparse matrix from the \code{Matrix}
-package, then the result will also be a sparse matrix,
-otherwise the result will be a base R matrix.
+A A numeric matrix or sparse matrix, depending on the input type,
+with the same dimensions as \code{mtx}.
 }
 \description{
-A collection of transformations that operate directly on matrices.\cr\cr
-Note: \code{rarefy_cols()}, \code{rescale_rows()}, and \code{rescale_cols()} are deprecated.
+A collection of transformations that operate directly on matrices.
 }
 \examples{
-    library(rbiom)
+    mtx <- matrix(1:24, nrow = 3)
     
-    # mtx_rarefy --------------------------------------
-    biom <- hmp50$clone()
-    sample_sums(biom) \%>\% head(10)
-
-    biom$counts \%<>\% mtx_rarefy(depth=1000)
-    sample_sums(biom) \%>\% head(10)
-    
-    
-    # rescaling ----------------------------------------
-    mtx <- matrix(sample(1:20), nrow=4)
     mtx
     
-    colSums(mtx)
+    mtx_rarefy(mtx)
     
-    colSums(mtx_rarefy(mtx))
+    rarefy_cols(mtx)
     
-    colSums(mtx_percent(mtx))
+    mtx_percent(mtx)
     
-    apply(mtx_rescale(mtx), 2L, max)
-
+    mtx_rescale(mtx)
+    
+    rescale_rows(mtx)
+    
+    rescale_cols(mtx)
+    
 }
-\seealso{
-Other transformations: 
-\code{\link{modify_metadata}},
-\code{\link{rarefy}()},
-\code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
-}
-\concept{low_level}
-\concept{transformations}

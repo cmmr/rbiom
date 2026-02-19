@@ -16,11 +16,14 @@ bdiv_table(
   within = NULL,
   between = NULL,
   delta = ".all",
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 
@@ -32,11 +35,14 @@ bdiv_matrix(
   tree = NULL,
   within = NULL,
   between = NULL,
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  alpha = 0.5,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 bdiv_distmat(
@@ -44,14 +50,17 @@ bdiv_distmat(
   bdiv = "bray",
   weighted = NULL,
   normalized = NULL,
-  alpha = 0.5,
   tree = NULL,
   within = NULL,
   between = NULL,
+  norm = "none",
+  pseudocount = NULL,
+  power = 1.5,
+  alpha = 0.5,
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -88,7 +97,29 @@ be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
 Default: \code{TRUE}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{norm}{Normalize the incoming counts. Options are:
+\itemize{
+\item \code{'none'}: No transformation.
+\item \code{'percent'}: Relative abundance (sample abundances sum to 1).
+\item \code{'binary'}: Unweighted presence/absence (each count is either 0 or 1).
+\item \code{'clr'}: Centered log ratio.
+}
+
+Default: \code{'none'}.}
+
+\item{pseudocount}{Value added to counts to handle zeros when
+\code{norm = 'clr'}. Ignored for other normalization methods.
+Default: \code{NULL} (emits a warning).}
+
+\item{power}{Scaling factor for the magnitude of differences between
+communities (\eqn{p}) when \code{bdiv = 'minkowski'}. Ignored for other
+beta diversity metrics. Default: \code{1.5}}
+
+\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
+to give to relative abundances; a value between 0 and 1, inclusive.
+Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
+
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}
@@ -99,10 +130,6 @@ See \code{rank()} for details. Default: \code{"random"}}
 
 \item{seed}{Random seed for permutations. Must be a non-negative integer.
 Default: \code{0}}
-
-\item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
-to give to relative abundances; a value between 0 and 1, inclusive.
-Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. Default: \code{NULL}}

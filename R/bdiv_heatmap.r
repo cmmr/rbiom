@@ -87,7 +87,7 @@ bdiv_heatmap <- function (
     grid = "devon", label = TRUE, label_size = NULL, rescale = "none", 
     clust = "complete", trees = TRUE, asp = 1, tree_height = 10, 
     track_height = 10, legend = "right", title = TRUE, xlab.angle = "auto", 
-    alpha = 0.5, cpus = NULL, ...) {
+    alpha = 0.5, cpus = n_cpus(), ...) {
   
   biom <- as_rbiom(biom)
   

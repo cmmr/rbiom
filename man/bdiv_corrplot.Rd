@@ -30,7 +30,7 @@ bdiv_corrplot(
   caption = TRUE,
   check = FALSE,
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 }
@@ -107,7 +107,7 @@ Default: \code{0.95}}
 p-values. Run \code{p.adjust.methods} for a list of available
 options. Default: \code{"fdr"}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}

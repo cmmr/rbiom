@@ -153,7 +153,7 @@ If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
 Default: \code{0.05}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}

@@ -240,6 +240,29 @@ comparisons. Alternatively, dataset field names given elsewhere can
 be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 \code{between}, respectively. Default: \code{NULL}}
 
+\item{norm}{Normalize the incoming counts. Options are:
+\itemize{
+\item \code{'none'}: No transformation.
+\item \code{'percent'}: Relative abundance (sample abundances sum to 1).
+\item \code{'binary'}: Unweighted presence/absence (each count is either 0 or 1).
+\item \code{'clr'}: Centered log ratio.
+}
+
+Default: \code{'none'}.}
+
+\item{pairs}{Which combinations of samples should distances be
+calculated for? The default value (\code{NULL}) calculates all-vs-all.
+Provide a numeric or logical vector specifying positions in the
+distance matrix to calculate. See examples.}
+
+\item{power}{Scaling factor for the magnitude of differences between
+communities (\eqn{p}) when \code{bdiv = 'minkowski'}. Ignored for other
+beta diversity metrics. Default: \code{1.5}}
+
+\item{pseudocount}{Value added to counts to handle zeros when
+\code{norm = 'clr'}. Ignored for other normalization methods.
+Default: \code{NULL} (emits a warning).}
+
 \item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
 to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
@@ -271,7 +294,7 @@ use cases. Default: \code{TRUE}}
 
 \item{labels}{Show sample names under each bar. Default: \code{FALSE}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}

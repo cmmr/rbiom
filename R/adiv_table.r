@@ -38,7 +38,7 @@
 
 adiv_table <- function (
     biom, adiv = "shannon", md = ".all", tree = NULL, transform = "none", 
-    ties = "random", seed = 0, cpus = NULL ) {
+    ties = "random", seed = 0, cpus = n_cpus() ) {
   
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -116,7 +116,7 @@ adiv_table <- function (
 #' @export
 adiv_matrix <- function (
     biom, adiv = c('observed', 'shannon', 'simpson'), tree = NULL, 
-    transform = "none", ties = "random", seed = 0, cpus = NULL ) {
+    transform = "none", ties = "random", seed = 0, cpus = n_cpus() ) {
   
   biom <- as_rbiom(biom)
   
@@ -177,7 +177,7 @@ adiv_matrix <- function (
 #' @export
 adiv_vector <- function (
     biom, adiv = "shannon", tree = NULL, transform = "none", 
-    ties = "random", seed = 0, cpus = NULL ) {
+    ties = "random", seed = 0, cpus = n_cpus() ) {
   
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)

@@ -23,7 +23,7 @@ bdiv_stats(
   mu = 0,
   p.adj = "fdr",
   alpha = 0.5,
-  cpus = NULL
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -58,7 +58,7 @@ be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}

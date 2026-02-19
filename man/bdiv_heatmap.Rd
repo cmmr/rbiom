@@ -22,7 +22,7 @@ bdiv_heatmap(
   title = TRUE,
   xlab.angle = "auto",
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 }

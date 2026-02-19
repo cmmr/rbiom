@@ -252,6 +252,28 @@
 #'        comparisons. Alternatively, dataset field names given elsewhere can 
 #'        be prefixed with `'=='` or `'!='` to assign them to `within` or 
 #'        `between`, respectively. Default: `NULL`
+#' 
+#' @param norm   Normalize the incoming counts. Options are:
+#'   
+#'   * `'none'`: No transformation.
+#'   * `'percent'`: Relative abundance (sample abundances sum to 1).
+#'   * `'binary'`: Unweighted presence/absence (each count is either 0 or 1).
+#'   * `'clr'`: Centered log ratio.
+#'   
+#'   Default: `'none'`.
+#' 
+#' @param pairs   Which combinations of samples should distances be 
+#'        calculated for? The default value (`NULL`) calculates all-vs-all. 
+#'        Provide a numeric or logical vector specifying positions in the 
+#'        distance matrix to calculate. See examples.
+#' 
+#' @param power   Scaling factor for the magnitude of differences between
+#'        communities (\eqn{p}) when `bdiv = 'minkowski'`. Ignored for other 
+#'        beta diversity metrics. Default: `1.5`
+#' 
+#' @param pseudocount Value added to counts to handle zeros when 
+#'        `norm = 'clr'`. Ignored for other normalization methods.
+#'        Default: `NULL` (emits a warning).
 #'        
 #' @param alpha  The alpha term to use in Generalized UniFrac. How much weight 
 #'        to give to relative abundances; a value between 0 and 1, inclusive. 
@@ -284,7 +306,7 @@
 #' 
 #' @param labels   Show sample names under each bar. Default: `FALSE`
 #' 
-#' @param transform   Transformation to apply. Options are: 
+#' @param transform   Transformation to apply to calculated values. Options are: 
 #'        `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is 
 #'        useful for correcting for non-normally distributions before applying 
 #'        regression statistics. Default: `"none"`

@@ -14,7 +14,7 @@ test_that("bdiv_table", {
   expect_equal(   # Within
     tolerance = 0.02,
     object    = round(bdiv_table(hmp5, within = 'Sex')$.distance, 2), 
-    expected  = c(0.25, 0.40, 0.59, 0.52) )
+    expected  = c(0.54, 0.4, 0.57, 0.51) )
   expect_equal(
     object   = bdiv_table(hmp5, within = 'Sex')$.distance, 
     expected = bdiv_table(hmp5, md = '==Sex')$.distance )
@@ -34,13 +34,13 @@ test_that("bdiv_table", {
   
   expect_equal(   # Transform
     object   = bdiv_table(hmp5, trans = 'rank', tree = hmp5$tree)$.distance, 
-    expected = c(4, 9, 10, 1, 2, 6, 3, 5, 7, 8) )
+    expected = c(2, 8, 10, 4, 1, 5, 6, 3, 9, 7) )
   expect_equal(
     object   = bdiv_table(hmp5, c('man', 'bray'), trans = 'rank')$.distance, 
-    expected = c(4, 9, 10, 1, 2, 6, 3, 5, 7, 8, 4, 9, 10, 1, 2, 6, 3, 5, 7, 8) )
+    expected = c(2, 5, 6, 7, 1, 4, 8, 3, 10, 9, 2, 8, 10, 4, 1, 5, 6, 3, 9, 7) )
   expect_equal(
     object   = round(bdiv_table(hmp5, 'euc', trans = 'sqrt')$.distance), 
-    expected = c(1, 1, 1, 0, 0, 1, 1, 0, 1, 1) )
+    expected = c(24, 29, 31, 41, 17, 22, 47, 20, 49, 50) )
 })
 
 test_that("bdiv_distmat", {
@@ -49,5 +49,5 @@ test_that("bdiv_distmat", {
   expect_equal(
     tolerance = 0.02,
     object    = round(as.vector(dm), 2), 
-    expected  = c(0.48, 0.69, 0.76, 0.25, 0.4, 0.59, 0.44, 0.52, 0.62, 0.64) )
+    expected  = c(0.51, 0.72, 0.75, 0.54, 0.4, 0.57, 0.64, 0.51, 0.74, 0.67) )
 })

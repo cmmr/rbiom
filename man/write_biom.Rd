@@ -22,7 +22,7 @@ write_fasta(biom, file = NULL)
 
 write_tree(biom, file = NULL)
 
-write_xlsx(biom, file, depth = 0.1, n = NULL, seed = 0, unc = "singly")
+write_xlsx(biom, file, depth = NULL, seed = 0, unc = "singly")
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}

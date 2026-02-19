@@ -197,7 +197,7 @@ bdiv_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE, 
     flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr', 
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05, 
-    transform = "none", caption = TRUE, alpha = 0.5, cpus = NULL, ... ) {
+    transform = "none", caption = TRUE, alpha = 0.5, cpus = n_cpus(), ... ) {
   
   
   p <- with(slurp_env(...), {

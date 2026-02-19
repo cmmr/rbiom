@@ -1,7 +1,7 @@
 
 #' @rdname write_biom
 #' @export
-write_xlsx <- function (biom, file, depth = 0.1, n = NULL, seed = 0, unc = 'singly') {
+write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly') {
   
   require_package('openxlsx', 'to save as an Excel file')
   

@@ -14,7 +14,7 @@ adiv_table(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 adiv_matrix(
@@ -24,7 +24,7 @@ adiv_matrix(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 
 adiv_vector(
@@ -34,7 +34,7 @@ adiv_vector(
   transform = "none",
   ties = "random",
   seed = 0,
-  cpus = NULL
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -53,7 +53,7 @@ to include all metadata fields. Default: \code{'.all'}}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{transform}{Transformation to apply. Options are:
+\item{transform}{Transformation to apply to calculated values. Options are:
 \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
 useful for correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}

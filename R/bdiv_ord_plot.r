@@ -45,7 +45,7 @@ bdiv_ord_plot <- function (
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
     rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, 
-    alpha = 0.5, cpus = NULL, ...) {
+    alpha = 0.5, cpus = n_cpus(), ...) {
   
   biom <- as_rbiom(biom)
   

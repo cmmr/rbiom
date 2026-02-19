@@ -570,8 +570,9 @@ rb_counts <- function (self, private, value) {
   #________________________________________________________
   # Coerce value to slam matrix.
   #________________________________________________________
-  mtx <- as(value, "sparseMatrix")
-  stopifnot(inherits(mtx, "sparseMatrix"))
+  mtx <- as(value, "CsparseMatrix")
+  stopifnot(inherits(mtx, "dgCMatrix"))
+  mtx <- Matrix::drop0(mtx)
   
   
   #________________________________________________________

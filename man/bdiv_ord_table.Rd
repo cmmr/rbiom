@@ -23,7 +23,7 @@ bdiv_ord_table(
   p.adj = "fdr",
   unc = "singly",
   alpha = 0.5,
-  cpus = NULL,
+  cpus = n_cpus(),
   ...
 )
 }

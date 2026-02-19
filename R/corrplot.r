@@ -218,7 +218,7 @@ bdiv_corrplot <- function (
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr", 
     transform = "none", ties = "random", seed = 0, 
     alt = "!=", mu = 0, caption = TRUE, check = FALSE, 
-    alpha = 0.5, cpus = NULL, ... ) {
+    alpha = 0.5, cpus = n_cpus(), ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -308,7 +308,7 @@ rare_corrplot <- function (
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE, 
     test = "none", fit = "log", at = NULL, level = 0.95, p.adj = "fdr", 
     transform = "none", alt = "!=", mu = 0, caption = TRUE, 
-    check = FALSE, cpus = NULL, ... ) {
+    check = FALSE, cpus = n_cpus(), ... ) {
   
   
   p <- with(slurp_env(...), {
@@ -317,7 +317,7 @@ rare_corrplot <- function (
     # Default rarefaction depth.
     #________________________________________________________
     biom <- as_rbiom(biom)
-    if (isTRUE(rline))  rline <- rare_suggest(biom$counts)
+    if (isTRUE(rline))  rline <- suggest_rarefy_depth(biom$counts)
     if (isFALSE(rline)) rline <- NULL
     validate_var_range('rline', n = 1, int = TRUE, null_ok = FALSE)
     

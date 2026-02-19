@@ -48,7 +48,7 @@ taxa_clusters <- function (biom, rank = ".otu", k = 5, ...) {
 
 bdiv_clusters <- function (
     biom, bdiv = "bray", weighted = NULL, normalized = NULL, 
-    tree = NULL, k = 5, alpha = 0.5, cpus = NULL, ...) {
+    tree = NULL, k = 5, alpha = 0.5, cpus = n_cpus(), ...) {
   
   validate_bdiv()
   
