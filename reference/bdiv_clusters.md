@@ -103,11 +103,8 @@ Other clustering:
     
     pull(biom, 'bray_cluster')[1:10]
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>     1     2     2     2     1     2     1     2     2     4 
+#>     1     5     5     5     1     5     1     5     5     4 
 #> Levels: 1 2 3 4 5
     
     bdiv_ord_plot(biom, stat.by = "bray_cluster")
-#> Too few points to calculate an ellipse
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_path()`).
 ```

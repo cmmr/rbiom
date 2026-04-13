@@ -2,13 +2,17 @@
 
 Requires the relevant Bioconductor R package to be installed:
 
-- `convert_to_phyloseq` - :
-
-  [phyloseq](https://bioconductor.org/packages/phyloseq/)
-
 - `convert_to_animalcules` - :
 
   [animalcules](https://bioconductor.org/packages/animalcules/)
+
+- `convert_to_biomformat` - :
+
+  [biomformat](https://bioconductor.org/packages/biomformat/)
+
+- `convert_to_phyloseq` - :
+
+  [phyloseq](https://bioconductor.org/packages/phyloseq/)
 
 - `convert_to_SE` - :
 
@@ -21,13 +25,15 @@ Requires the relevant Bioconductor R package to be installed:
 ## Usage
 
 ``` r
-convert_to_SE(biom, ...)
+convert_to_animalcules(biom, ...)
 
-convert_to_TSE(biom, ...)
+convert_to_biomformat(biom, ...)
 
 convert_to_phyloseq(biom, ...)
 
-convert_to_animalcules(biom, ...)
+convert_to_SE(biom, ...)
+
+convert_to_TSE(biom, ...)
 ```
 
 ## Arguments
@@ -45,15 +51,15 @@ convert_to_animalcules(biom, ...)
 
 ## Value
 
-A phyloseq, animalcules (MultiAssayExperiment), SummarizedExperiment, or
-TreeSummarizedExperiment object.
+An animalcules (MultiAssayExperiment), biomformat (biom), phyloseq,
+SummarizedExperiment, or TreeSummarizedExperiment object.
 
 ## Details
 
-animalcules and SummarizedExperiment objects includes counts, metadata,
-and taxonomy.
+animalcules, SummarizedExperiment, and biomformat objects include
+counts, metadata, and taxonomy.
 
-phyloseq and TreeSummarizedExperiment additionally includes the tree and
+phyloseq and TreeSummarizedExperiment additionally include the tree and
 sequences.
 
 ## Examples
@@ -64,10 +70,22 @@ if (FALSE) { # \dontrun{
 
     print(hmp50)
 
+    # Requires 'animalcules', a Bioconductor R package
+    if (nzchar(system.file(package = "animalcules"))) {
+      ani <- convert_to_animalcules(hmp50)
+      print(ani)
+    }
+
+    # Requires 'biomformat', a Bioconductor R package
+    if (nzchar(system.file(package = "biomformat"))) {
+      bio <- convert_to_biomformat(hmp50)
+      print(bio)
+    }
+
     # Requires 'phyloseq', a Bioconductor R package
     if (nzchar(system.file(package = "phyloseq"))) {
-      physeq <- convert_to_phyloseq(hmp50)
-      print(physeq)
+      phy <- convert_to_phyloseq(hmp50)
+      print(phy)
     }
 
     # Requires 'SummarizedExperiment', a Bioconductor R package

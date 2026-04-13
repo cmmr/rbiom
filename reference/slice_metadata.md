@@ -181,9 +181,9 @@ Other transformations:
     biom <- slice_sample(hmp50, n = 3)
     biom$metadata
 #> # A tibble: 3 × 5
-#>   .sample   Age   BMI `Body Site`   Sex   
-#> * <chr>   <dbl> <dbl> <fct>         <fct> 
-#> 1 HMP43      24    30 Mid vagina    Female
-#> 2 HMP07      26    22 Buccal mucosa Male  
-#> 3 HMP29      36    25 Saliva        Female
+#>   .sample   Age   BMI `Body Site`    Sex   
+#> * <chr>   <dbl> <dbl> <fct>          <fct> 
+#> 1 HMP42      34    19 Mid vagina     Female
+#> 2 HMP44      38    19 Mid vagina     Female
+#> 3 HMP34      40    27 Anterior nares Female
 ```

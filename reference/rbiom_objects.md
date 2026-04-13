@@ -129,16 +129,16 @@ All functions return an rbiom object.
 #> # A tibble: 50 × 6
 #>    .sample `Years Old`   BMI `Body Site`     rand Obese
 #>  * <chr>         <dbl> <dbl> <fct>          <int> <lgl>
-#>  1 HMP01            22    20 Buccal mucosa     31 FALSE
-#>  2 HMP02            24    23 Buccal mucosa     16 FALSE
-#>  3 HMP03            28    26 Saliva            30 FALSE
-#>  4 HMP04            25    23 Saliva             6 FALSE
-#>  5 HMP05            27    24 Buccal mucosa     43 FALSE
-#>  6 HMP06            32    25 Saliva             8 FALSE
-#>  7 HMP07            26    22 Buccal mucosa     22 FALSE
-#>  8 HMP08            27    26 Saliva            44 FALSE
-#>  9 HMP09            33    32 Saliva            39 TRUE 
-#> 10 HMP10            22    20 Anterior nares    50 FALSE
+#>  1 HMP01            22    20 Buccal mucosa     18 FALSE
+#>  2 HMP02            24    23 Buccal mucosa     33 FALSE
+#>  3 HMP03            28    26 Saliva            27 FALSE
+#>  4 HMP04            25    23 Saliva            25 FALSE
+#>  5 HMP05            27    24 Buccal mucosa     38 FALSE
+#>  6 HMP06            32    25 Saliva            21 FALSE
+#>  7 HMP07            26    22 Buccal mucosa     15 FALSE
+#>  8 HMP08            27    26 Saliva            41 FALSE
+#>  9 HMP09            33    32 Saliva            26 TRUE 
+#> 10 HMP10            22    20 Anterior nares    31 FALSE
 #> # ℹ 40 more rows
     
     
@@ -148,14 +148,14 @@ All functions return an rbiom object.
 #> # A tibble: 8 × 6
 #>   .sample `Years Old`   BMI `Body Site`  rand Obese
 #> * <chr>         <dbl> <dbl> <fct>       <int> <lgl>
-#> 1 HMP03            28    26 Saliva         30 FALSE
-#> 2 HMP04            25    23 Saliva          6 FALSE
-#> 3 HMP06            32    25 Saliva          8 FALSE
-#> 4 HMP08            27    26 Saliva         44 FALSE
-#> 5 HMP18            28    24 Saliva         35 FALSE
-#> 6 HMP28            23    19 Saliva         28 FALSE
-#> 7 HMP29            36    25 Saliva         24 FALSE
-#> 8 HMP30            24    21 Saliva          7 FALSE
+#> 1 HMP03            28    26 Saliva         27 FALSE
+#> 2 HMP04            25    23 Saliva         25 FALSE
+#> 3 HMP06            32    25 Saliva         21 FALSE
+#> 4 HMP08            27    26 Saliva         41 FALSE
+#> 5 HMP18            28    24 Saliva         17 FALSE
+#> 6 HMP28            23    19 Saliva         20 FALSE
+#> 7 HMP29            36    25 Saliva         47 FALSE
+#> 8 HMP30            24    21 Saliva         14 FALSE
     
     
     # Rarefy to an even sampling depth

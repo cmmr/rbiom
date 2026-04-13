@@ -55,12 +55,12 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
       dimnames = list(paste0("OTU", 1:6), paste0("Sample", 1:4)) )
     mtx
 #>      Sample1 Sample2 Sample3 Sample4
-#> OTU1      34     388     980      31
-#> OTU2     320     975     741     225
-#> OTU3     402     289      51     300
-#> OTU4     195     678     530     636
-#> OTU5     403     735     695     479
-#> OTU6      63     195     688     432
+#> OTU1      80     497      34     388
+#> OTU2     834     289     320     975
+#> OTU3     600     732     402     289
+#> OTU4     157     772     195     678
+#> OTU5       7     874     403     735
+#> OTU6     466     174      63     195
     
     # and some sample metadata ----------------------
     df <- data.frame(
@@ -80,6 +80,6 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #>       3 Fields:  .sample, treatment, and days 
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.7k reads/sample ────────────────── 2026-02-19 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-13 ──
 #> 
 ```
