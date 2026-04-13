@@ -2,19 +2,22 @@
 % Please edit documentation in R/convert.r
 \name{convert_to}
 \alias{convert_to}
+\alias{convert_to_animalcules}
+\alias{convert_to_biomformat}
+\alias{convert_to_phyloseq}
 \alias{convert_to_SE}
 \alias{convert_to_TSE}
-\alias{convert_to_phyloseq}
-\alias{convert_to_animalcules}
 \title{Convert biom data to an external package class.}
 \usage{
-convert_to_SE(biom, ...)
+convert_to_animalcules(biom, ...)
 
-convert_to_TSE(biom, ...)
+convert_to_biomformat(biom, ...)
 
 convert_to_phyloseq(biom, ...)
 
-convert_to_animalcules(biom, ...)
+convert_to_SE(biom, ...)
+
+convert_to_TSE(biom, ...)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
@@ -22,21 +25,22 @@ convert_to_animalcules(biom, ...)
 \item{...}{Not Used.}
 }
 \value{
-A phyloseq, animalcules (MultiAssayExperiment), SummarizedExperiment, or TreeSummarizedExperiment object.
+An animalcules (MultiAssayExperiment), biomformat (biom), phyloseq, SummarizedExperiment, or TreeSummarizedExperiment object.
 }
 \description{
 Requires the relevant Bioconductor R package to be installed:
 \describe{
-\item{\code{convert_to_phyloseq} - }{ \href{https://bioconductor.org/packages/phyloseq/}{phyloseq} }
 \item{\code{convert_to_animalcules} - }{ \href{https://bioconductor.org/packages/animalcules/}{animalcules} }
+\item{\code{convert_to_biomformat} - }{ \href{https://bioconductor.org/packages/biomformat/}{biomformat} }
+\item{\code{convert_to_phyloseq} - }{ \href{https://bioconductor.org/packages/phyloseq/}{phyloseq} }
 \item{\code{convert_to_SE} - }{ \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} }
 \item{\code{convert_to_TSE} - }{ \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment} }
 }
 }
 \details{
-animalcules and SummarizedExperiment objects includes counts, metadata, and taxonomy.
+animalcules, SummarizedExperiment, and biomformat objects include counts, metadata, and taxonomy.
 
-phyloseq and TreeSummarizedExperiment additionally includes the tree and sequences.
+phyloseq and TreeSummarizedExperiment additionally include the tree and sequences.
 }
 \examples{
 \dontrun{
@@ -44,10 +48,22 @@ phyloseq and TreeSummarizedExperiment additionally includes the tree and sequenc
 
     print(hmp50)
 
+    # Requires 'animalcules', a Bioconductor R package
+    if (nzchar(system.file(package = "animalcules"))) {
+      ani <- convert_to_animalcules(hmp50)
+      print(ani)
+    }
+
+    # Requires 'biomformat', a Bioconductor R package
+    if (nzchar(system.file(package = "biomformat"))) {
+      bio <- convert_to_biomformat(hmp50)
+      print(bio)
+    }
+
     # Requires 'phyloseq', a Bioconductor R package
     if (nzchar(system.file(package = "phyloseq"))) {
-      physeq <- convert_to_phyloseq(hmp50)
-      print(physeq)
+      phy <- convert_to_phyloseq(hmp50)
+      print(phy)
     }
 
     # Requires 'SummarizedExperiment', a Bioconductor R package

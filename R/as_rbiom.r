@@ -142,6 +142,37 @@ as_rbiom.TreeSummarizedExperiment <- function (biom, ...) {
 
 
 #' @export
+as_rbiom.biom <- function (biom, ...) {
+  
+  dots <- list(...)
+  
+  require_package('biomformat', 'reading this object.')
+  
+  header               <- getFromNamespace('header',               'biomformat')
+  biom_data            <- getFromNamespace('biom_data',            'biomformat')
+  observation_metadata <- getFromNamespace('observation_metadata', 'biomformat')
+  sample_metadata      <- getFromNamespace('sample_metadata',      'biomformat')
+  
+  info <- header(biom)
+  
+  args <- list(
+    id           = info[['id']], 
+    date         = info[['date']], 
+    generated_by = info[['generated_by']],
+    counts       = biom_data(biom), 
+    metadata     = sample_metadata(biom),
+    taxonomy     = observation_metadata(biom) )
+  
+  args <- c(dots, args)
+  args <- args[!duplicated(names(args))]
+  biom <- do.call(rbiom$new, args)
+  
+  return (biom)
+}
+
+
+
+#' @export
 as_rbiom.default <- function (biom, ...) {
   
   #________________________________________________________
