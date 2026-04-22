@@ -96,11 +96,16 @@ as_rbiom.SummarizedExperiment <- function (biom, ...) {
 
   dots <- list(...)
   
+  require_package('SummarizedExperiment', paste("to convert", substitute(biom)))
+  assay   <- getFromNamespace('assay',   'SummarizedExperiment')
+  colData <- getFromNamespace('colData', 'SummarizedExperiment')
+  rowData <- getFromNamespace('rowData', 'SummarizedExperiment')
+  
   args <- list(
-    counts    = as(biom@assays@data[[1]], "sparseMatrix"), 
-    metadata  = if (!is.null(biom@colData))         data.frame(biom@colData), 
-    taxonomy  = if (!is.null(biom@elementMetadata)) data.frame(biom@elementMetadata, row.names = biom@NAMES),
-    id        = "Imported SummarizedExperiment Data" )
+    id       = "Imported SummarizedExperiment Data",
+    counts    = as(assay(biom), 'sparseMatrix'), 
+    metadata  = if (!is.null(colData(biom))) data.frame(colData(biom)),
+    taxonomy  = if (!is.null(rowData(biom))) data.frame(rowData(biom)) )
   
   args <- c(dots, args)
   args <- args[!duplicated(names(args))]
@@ -121,16 +126,22 @@ as_rbiom.MultiAssayExperiment <- function (biom, ...) {
 #' @export
 as_rbiom.TreeSummarizedExperiment <- function (biom, ...) {
   
+  require_package('TreeSummarizedExperiment', paste("to convert", substitute(biom)))
+  assay        <- getFromNamespace('assay',            'SummarizedExperiment')
+  colData      <- getFromNamespace('colData',          'SummarizedExperiment')
+  rowData      <- getFromNamespace('rowData',          'SummarizedExperiment')
+  rowTree      <- getFromNamespace('rowTree',      'TreeSummarizedExperiment')
+  referenceSeq <- getFromNamespace('referenceSeq', 'TreeSummarizedExperiment')
+  
   dots <- list(...)
   
   args <- list(
     id        = "Imported TreeSummarizedExperiment Data", 
-    counts    = as(biom@assays@data[[1]], "sparseMatrix"), 
-    metadata  = if (!is.null(biom@colData))      data.frame(biom@colData),
-    tree      = if (!is.null(biom@rowTree))      biom@rowTree[[1]],
-    sequences = if (!is.null(biom@referenceSeq)) as.character(biom@referenceSeq),
-    taxonomy  = if (!is.null(biom@rowRanges@elementMetadata))
-      data.frame(biom@rowRanges@elementMetadata, row.names = biom@rowRanges@partitioning@NAMES) )
+    counts    = as(assay(biom), 'sparseMatrix'), 
+    metadata  = if (!is.null(colData(biom)))      data.frame(colData(biom)),
+    tree      = if (!is.null(rowTree(biom)))      rowTree(biom),
+    sequences = if (!is.null(referenceSeq(biom))) as.character(referenceSeq(biom)),
+    taxonomy  = if (!is.null(rowData(biom)))      data.frame(rowData(biom)) )
   
   args <- c(dots, args)
   args <- args[!duplicated(names(args))]
