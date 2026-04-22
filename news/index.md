@@ -1,5 +1,12 @@
 # Changelog
 
+## rbiom 3.1.0
+
+- Can now read and write `biom` objects from the `biomformat` package
+  (microbiome/mia#818).
+- Fixed handling of objects from the `TreeSummarizedExperiment` package
+  (microbiome/mia#822).
+
 ## rbiom 3.0.1
 
 - Re-exports
