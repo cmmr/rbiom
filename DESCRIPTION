@@ -68,6 +68,3 @@ Suggests:
     tibble,
     tsne,
     uwot
-Remotes:
-  github::cmmr/ecodive,
-  github::cmmr/h5lite

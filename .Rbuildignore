@@ -23,3 +23,5 @@
 ^revdep$
 ^LICENSE\.md$
 ^\.Rproj\.user$
+^\.positai$
+^\.claude$
