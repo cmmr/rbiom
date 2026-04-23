@@ -151,19 +151,19 @@ t(st)
 #>              [,1]           
 #> age          "16.8"         
 #> sex          "female - male"
-#> .mean.diff   "-7.770364"    
+#> .mean.diff   "-7.730025"    
 #> .h1          "!= 0"         
-#> .p.val       "3.943402e-39" 
-#> .adj.p       "3.943402e-39" 
-#> .effect.size "-1.211754"    
-#> .se          "0.5835173"    
+#> .p.val       "8.875599e-40" 
+#> .adj.p       "8.875599e-40" 
+#> .effect.size "-1.205401"    
+#> .se          "0.5753545"    
 #> .n           "2500"         
-#> .df          "2484"         
-#> .t.ratio     "-13.31642"    
-#> .adj.r       "0.8314119"    
-#> .aic         "16403.85"     
-#> .bic         "16500.31"     
-#> .loglik      "-8185.366"
+#> .df          "2485"         
+#> .t.ratio     "-13.43524"    
+#> .adj.r       "0.8313946"    
+#> .aic         "16403.78"     
+#> .bic         "16497.75"     
+#> .loglik      "-8185.756"
 ```
 
 Depending on the arguments given, the *estimate* term will be one of:
@@ -237,7 +237,7 @@ generated in the last section.
 
 ``` r
 st$.aic
-#> [1] 16403.85
+#> [1] 16403.78
 ```
 
 These values can be used to decide which `fit` argument to use (`"lm"`,
@@ -250,7 +250,7 @@ plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
 #>   fit    .r.sqr    .adj.r     .aic     .bic   .loglik .fit.p
 #> 1  lm 0.7896923 0.7894395 16947.72 16976.84 -8468.858      0
 #> 2 log 0.8031003 0.8028636 16783.02 16812.14 -8386.512      0
-#> 3 gam        NA 0.8314119 16403.85 16500.31 -8185.366     NA
+#> 3 gam        NA 0.8313946 16403.78 16497.75 -8185.756     NA
 ```
 
 Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC,
@@ -269,7 +269,7 @@ dplyr::select(st, .mean.diff:.p.val)
 #> # A tibble: 1 × 3
 #>   .mean.diff .h1     .p.val
 #>        <dbl> <fct>    <dbl>
-#> 1      -7.77 != 0  3.94e-39
+#> 1      -7.73 != 0  8.88e-40
 ```
 
 For a more complete review of alternative hypotheses, see the [rbiom
@@ -629,11 +629,11 @@ stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)
 #> # A tibble: 5 × 15
 #>     age sex    .mean.diff .h1     .p.val   .adj.p .effect.size   .se    .n   .df
 #>   <int> <fct>       <dbl> <fct>    <dbl>    <dbl>        <dbl> <dbl> <int> <int>
-#> 1    12 femal…       7.26 != 0  2.34e-28 1.17e-27        1.13  0.649  2500  2484
-#> 2    11 femal…       6.03 != 0  1.16e-21 2.90e-21        0.940 0.625  2500  2484
-#> 3    13 femal…       6.10 != 0  1.85e-20 3.09e-20        0.951 0.652  2500  2484
-#> 4    15 femal…      -2.59 != 0  9.01e- 7 1.13e- 6       -0.404 0.527  2500  2484
-#> 5    14 femal…       2.00 != 0  3.84e- 4 3.84e- 4        0.311 0.562  2500  2484
+#> 1    12 femal…       7.23 != 0  2.46e-29 1.23e-28        1.13  0.635  2500  2485
+#> 2    11 femal…       6.02 != 0  2.75e-22 6.88e-22        0.939 0.614  2500  2485
+#> 3    13 femal…       6.04 != 0  6.06e-21 1.01e-20        0.943 0.638  2500  2485
+#> 4    15 femal…      -2.58 != 0  7.21e- 7 9.02e- 7       -0.402 0.519  2500  2485
+#> 5    14 femal…       2.00 != 0  3.14e- 4 3.14e- 4        0.311 0.553  2500  2485
 #> # ℹ 5 more variables: .t.ratio <dbl>, .adj.r <dbl>, .aic <dbl>, .bic <dbl>,
 #> #   .loglik <dbl>
 ```
