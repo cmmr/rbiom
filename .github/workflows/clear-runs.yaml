@@ -1,4 +1,4 @@
-name: Clear Completed Runs
+name: Deduplicate Workflow Runs
 
 on:
   workflow_dispatch:
@@ -10,36 +10,40 @@ permissions:
   actions: write
 
 jobs:
-  delete-runs:
+  deduplicate-runs:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete all completed workflow runs
+      - name: Delete older workflow runs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          echo "Fetching completed runs for $GH_REPO..."
+          echo "Fetching runs for $GH_REPO..."
           
-          # 1. List runs with status 'completed'
-          # --json databaseId: only fetch the ID
-          # -q: use jq syntax to extract just the values
-          # --limit 100: Adjust this number if you have a huge history (max 1000)
-          run_ids=$(gh run list --status completed --limit 100 --json databaseId -q '.[].databaseId')
+          # 1. List runs (up to 1000)
+          # 2. Use jq to group them by workflowDatabaseId
+          # 3. Sort each group by databaseId (oldest to newest), then reverse (newest first)
+          # 4. Use .[1:] to drop the first item (the newest run) from the deletion list
+          # 5. Flatten the remaining arrays and extract the databaseIds to delete
           
-          # 2. Check if we found any runs
+          run_ids=$(gh run list --limit 1000 --json databaseId,workflowDatabaseId -q '
+            group_by(.workflowDatabaseId) | 
+            map(sort_by(.databaseId) | reverse | .[1:]) | 
+            flatten | 
+            .[].databaseId
+          ')
+          
           if [ -z "$run_ids" ]; then
-            echo "No completed runs found to delete."
+            echo "No duplicate runs found to delete."
             exit 0
           fi
 
-          echo "Found runs to delete. Processing..."
+          echo "Found older runs to delete. Processing..."
 
-          # 3. Loop through IDs and delete them
-          # We use xargs for faster parallel processing, or a loop for simplicity. 
-          # A loop is safer to debug.
           for run_id in $run_ids; do
             echo "Deleting Run ID: $run_id"
             gh run delete "$run_id" --repo "$GH_REPO" || echo "Failed to delete $run_id"
           done
 
           echo "Cleanup complete."
+          
