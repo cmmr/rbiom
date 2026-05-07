@@ -18,20 +18,20 @@ ups](https://cmmr.github.io/rbiom/reference/speed.md) for more details.
 
 Reading from fields will not change the rbiom object.
 
-|                          |                                                        |
-|--------------------------|--------------------------------------------------------|
-| **Accessor**             | **Content**                                            |
-| `$counts`                | Abundance of each OTU in each sample.                  |
-| `$metadata`              | Sample mappings to metadata (treatment, patient, etc). |
-| `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).  |
-| `$otus`, `$n_otus`       | OTU names.                                             |
-| `$samples`, `$n_samples` | Sample names.                                          |
-| `$fields`, `$n_fields`   | Metadata field names.                                  |
-| `$ranks`, `$n_ranks`     | Taxonomic rank names.                                  |
-| `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
-| `$id`, `$comment`        | Arbitrary strings for describing the dataset.          |
-| `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
-| `$date`                  | Date from BIOM file.                                   |
+|  |  |
+|----|----|
+| **Accessor** | **Content** |
+| `$counts` | Abundance of each OTU in each sample. |
+| `$metadata` | Sample mappings to metadata (treatment, patient, etc). |
+| `$taxonomy` | OTU mappings to taxonomic ranks (genus, phylum, etc). |
+| `$otus`, `$n_otus` | OTU names. |
+| `$samples`, `$n_samples` | Sample names. |
+| `$fields`, `$n_fields` | Metadata field names. |
+| `$ranks`, `$n_ranks` | Taxonomic rank names. |
+| `$tree`, `$sequences` | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
+| `$id`, `$comment` | Arbitrary strings for describing the dataset. |
+| `$depth` | Rarefaction depth, or `NULL` if unrarefied. |
+| `$date` | Date from BIOM file. |
 
 ## Writable Fields
 
@@ -55,15 +55,15 @@ and inter-component synchronization.
 
 All functions return an rbiom object.
 
-|                                                                 |                                                  |
-|-----------------------------------------------------------------|--------------------------------------------------|
-| **Function**                                                    | **Transformation**                               |
-| `<rbiom>$clone()`                                               | Safely duplicate an rbiom object.                |
-| [`<rbiom>[`](https://cmmr.github.io/rbiom/reference/subset.md)  | Subset to a specific set of sample names.        |
-| [`subset()`](https://cmmr.github.io/rbiom/reference/subset.md)  | Subset samples according to metadata properties. |
-| [`slice()`](https://dplyr.tidyverse.org/reference/slice.html)   | Subset to a specific number of samples.          |
-| [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) | Create, modify, and delete metadata fields.      |
-| [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md)  | Sub-sample OTU counts to an even sampling depth. |
+|  |  |
+|----|----|
+| **Function** | **Transformation** |
+| `<rbiom>$clone()` | Safely duplicate an rbiom object. |
+| [`<rbiom>[`](https://cmmr.github.io/rbiom/reference/subset.md) | Subset to a specific set of sample names. |
+| [`subset()`](https://cmmr.github.io/rbiom/reference/subset.md) | Subset samples according to metadata properties. |
+| [`slice()`](https://dplyr.tidyverse.org/reference/slice.html) | Subset to a specific number of samples. |
+| [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) | Create, modify, and delete metadata fields. |
+| [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md) | Sub-sample OTU counts to an even sampling depth. |
 
 ## Examples
 

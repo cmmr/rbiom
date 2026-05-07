@@ -16,6 +16,7 @@ R package `npregfast`. It records age, sex, and height for 2500 children
 aged 5 through 19 years.
 
 ``` r
+
 head(npregfast::children)
 #>      sex height   age
 #> 1   male 150.77 13.25
@@ -35,6 +36,7 @@ With this plot, we’re testing the hypothesis “as you get older, your
 height changes”.
 
 ``` r
+
 stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
@@ -57,6 +59,7 @@ Is the rate of growth influenced by sex? We can add `stat.by = "sex"` to
 draw separate lines for males and females.
 
 ``` r
+
 stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
@@ -88,6 +91,7 @@ Setting `fit = "gam"` will use a generalized additive model which fits
 several sub-ranges of age with independent splines.
 
 ``` r
+
 stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
@@ -113,6 +117,7 @@ Let’s set `test = "emmeans"` instead, and show the 95% confidence
 interval instead of all the data points.
 
 ``` r
+
 stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
@@ -138,6 +143,7 @@ You can also directly generate this table with the
 function.
 
 ``` r
+
 st <- stats_table(
   df       = npregfast::children,  # dataset
   regr     = 'age',                # x-axis variable
@@ -168,33 +174,33 @@ t(st)
 
 Depending on the arguments given, the *estimate* term will be one of:
 
-| **Field**   | **Description**          | `test`                                                                             | `stat.by`  |
-|-------------|--------------------------|------------------------------------------------------------------------------------|------------|
-| .mean       | Estimated marginal mean. | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html)   | `NULL`     |
-| .mean.diff  | Difference in means.     | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html)   | not `NULL` |
-| .slope      | Trendline slope.         | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | `NULL`     |
-| .slope.diff | Difference in slopes.    | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | not `NULL` |
+| **Field** | **Description** | `test` | `stat.by` |
+|----|----|----|----|
+| .mean | Estimated marginal mean. | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html) | `NULL` |
+| .mean.diff | Difference in means. | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html) | not `NULL` |
+| .slope | Trendline slope. | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | `NULL` |
+| .slope.diff | Difference in slopes. | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | not `NULL` |
 
 Other fields in this table include:
 
-| **Field**    | **Description**                                                                                      |
-|--------------|------------------------------------------------------------------------------------------------------|
-| .h1          | Alternate hypothesis.                                                                                |
-| .p.val       | Probability that null hypothesis is correct.                                                         |
-| .adj.p       | `.p.val` after adjusting for multiple comparisons.                                                   |
+| **Field** | **Description** |
+|----|----|
+| .h1 | Alternate hypothesis. |
+| .p.val | Probability that null hypothesis is correct. |
+| .adj.p | `.p.val` after adjusting for multiple comparisons. |
 | .effect.size | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
-| .lower       | Confidence interval lower bound.                                                                     |
-| .upper       | Confidence interval upper bound.                                                                     |
-| .se          | Standard error.                                                                                      |
-| .n           | Number of samples.                                                                                   |
-| .df          | Degrees of freedom.                                                                                  |
-| .t.ratio     | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se`                                                |
-| .r.sqr       | Percent of variation explained by the model.                                                         |
-| .adj.r       | `.r.sqr`, taking degrees of freedom into account.                                                    |
-| .aic         | Akaike Information Criterion (predictive models).                                                    |
-| .bic         | Bayesian Information Criterion (descriptive models).                                                 |
-| .loglik      | Log-likelihood goodness-of-fit score.                                                                |
-| .fit.p       | P-value for observing this fit by chance.                                                            |
+| .lower | Confidence interval lower bound. |
+| .upper | Confidence interval upper bound. |
+| .se | Standard error. |
+| .n | Number of samples. |
+| .df | Degrees of freedom. |
+| .t.ratio | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
+| .r.sqr | Percent of variation explained by the model. |
+| .adj.r | `.r.sqr`, taking degrees of freedom into account. |
+| .aic | Akaike Information Criterion (predictive models). |
+| .bic | Bayesian Information Criterion (descriptive models). |
+| .loglik | Log-likelihood goodness-of-fit score. |
+| .fit.p | P-value for observing this fit by chance. |
 
 ### Marginal Means
 
@@ -236,6 +242,7 @@ As an example, lets pull the AIC value from the statistics table
 generated in the last section.
 
 ``` r
+
 st$.aic
 #> [1] 16403.78
 ```
@@ -244,6 +251,7 @@ These values can be used to decide which `fit` argument to use (`"lm"`,
 `"log"`, or `"gam"`).
 
 ``` r
+
 plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
   stats_table(npregfast::children, "age", "height", "sex", fit = fit) ) %>%
   dplyr::select(fit, .r.sqr:.fit.p)
@@ -264,6 +272,7 @@ hypothesis and its outcome. Above, we’re asking if `.mean.diff` is
 non-zero. Since `.p.val` is less than 0.05 we can say that it is.
 
 ``` r
+
 dplyr::select(st, .mean.diff:.p.val)
 #> # Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")
 #> # A tibble: 1 × 3
@@ -289,6 +298,7 @@ fitted value plots, and scale-location plots. You can add these plots to
 any rbiom corrplot by setting `check = TRUE`.
 
 ``` r
+
 stats_corrplot(
   df       = npregfast::children,  # dataset
   x        = 'age',                # x-axis variable
@@ -336,6 +346,7 @@ Infant Gut Microbiota During the First Year of
 Life](https://www.nature.com/articles/s41467-018-04641-7).
 
 ``` r
+
 gems
 #> 
 #> ══ Global Enteric Multicenter Study ════════════════════════
@@ -382,6 +393,7 @@ To start, let’s select just the healthy controls from two countries,
 then rarefy those samples to an even sequencing depth.
 
 ``` r
+
 hbk <- gems %>%
   subset(diarrhea == "Control") %>%
   subset(country %in% c("Bangladesh", "Kenya")) %>%
@@ -402,6 +414,7 @@ and generating a correlation plot
 ([`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md)).
 
 ``` r
+
 adiv_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   x       = "age",       # x-axis variable
@@ -433,6 +446,7 @@ This will help in explaining an artifact on the “Residuals vs Fitted”
 diagnostic plot.
 
 ``` r
+
 taxa_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   layers  = "tcrp",      # trendlines, conf. intervals, residuals, & points
@@ -480,6 +494,7 @@ options).
 This will improve the diagnostic plots, but adds noise to the data.
 
 ``` r
+
 taxa_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   layers  = "tcrp",      # show residuals on the main plot
@@ -519,6 +534,7 @@ samples that came from the same country, and prevent `stat.by` from
 producing a “Bangladesh vs Kenya” trendline.
 
 ``` r
+
 bdiv_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   x       = "age",       # x-axis variable
@@ -557,6 +573,7 @@ with `trans = "rank"` could help make the residuals more normally
 distributed.
 
 ``` r
+
 bdiv_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   x       = "age",       # x-axis variable
@@ -594,6 +611,7 @@ potentially incurring a reviewer’s wrath, you can rescale both datasets
 to the same range and compare goodness-of-fit values on those.
 
 ``` r
+
 plyr::ldply(c(none="none", rank="rank"), .id = "trans", function (trans)
   bdiv_table(biom = hbk, within = "country", trans = trans) %>%
     dplyr::mutate(.distance = scales::rescale(.distance, to = c(0, 1))) %>%
@@ -613,6 +631,7 @@ x-axis location with the most significant term of interest. However, you
 can override this by providing the `at` parameter.
 
 ``` r
+
 stats_corrplot(npregfast::children, 'age', 'height', stat.by = 'sex', at = 12)
 ```
 
@@ -624,6 +643,7 @@ you can provide multiple `at` locations to
 or `*_stats()` functions.
 
 ``` r
+
 stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)
 #> # Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")
 #> # A tibble: 5 × 15

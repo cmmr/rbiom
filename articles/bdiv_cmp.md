@@ -1,6 +1,7 @@
 # Plot Types
 
 ``` r
+
 biom <- rarefy(hmp50)
 
 bdiv_boxplot(

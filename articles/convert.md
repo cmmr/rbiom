@@ -7,6 +7,7 @@
 In R, export QIIME 2-compatible files.
 
 ``` r
+
 library(rbiom)
 
 # where to save the files
@@ -78,6 +79,7 @@ qiime tools export --input-path hmp50-tree.qza     --output-path .
 In R, import the data files into rbiom.
 
 ``` r
+
 # project_dir = directory with relevant files
 
 withr::with_dir(project_dir, {
@@ -98,6 +100,7 @@ withr::with_dir(project_dir, {
 In R, export mothur-compatible files.
 
 ``` r
+
 library(rbiom)
 
 # where to save the files
@@ -139,6 +142,7 @@ mothur > make.biom( \
 In R, import the biom file with rbiom.
 
 ``` r
+
 # project_dir = directory with relevant files
 
 withr::with_dir(project_dir, {
@@ -157,6 +161,7 @@ withr::with_dir(project_dir, {
 ### rbiom ➡ phyloseq
 
 ``` r
+
 # An rbiom object
 biom <- rbiom::hmp50
 
@@ -167,6 +172,7 @@ physeq <- rbiom::convert_to_phyloseq(biom)
 ### phyloseq ➡ rbiom
 
 ``` r
+
 # A phyloseq object
 data(enterotype, package = 'phyloseq')
 physeq <- enterotype
@@ -178,6 +184,7 @@ biom <- rbiom::as_rbiom(physeq)
 ### rbiom ➡ SummarizedExperiment
 
 ``` r
+
 # An rbiom object
 biom <- rbiom::hmp50
 
@@ -188,6 +195,7 @@ se <- rbiom::convert_to_SE(biom)
 ### SummarizedExperiment ➡ rbiom
 
 ``` r
+
 # `se` is a SummarizedExperiment object
 
 # Convert to rbiom object
@@ -197,6 +205,7 @@ biom <- rbiom::as_rbiom(se)
 ### rbiom ➡ TreeSummarizedExperiment
 
 ``` r
+
 # An rbiom object
 biom <- rbiom::hmp50
 
@@ -207,6 +216,7 @@ tse <- rbiom::convert_to_TSE(biom)
 ### TreeSummarizedExperiment ➡ rbiom
 
 ``` r
+
 # `tse` is a TreeSummarizedExperiment object
 
 # Convert to rbiom object

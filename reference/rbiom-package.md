@@ -16,6 +16,7 @@ available in the local compute environment. If you wish to limit the
 number of simultaneous threads, set `RcppParallel`'s `numThreads`
 option. For instance:
 
+
         RcppParallel::setThreadOptions(numThreads = 4)
 
 ## See also

@@ -2,13 +2,13 @@
 
 Plotting functions in rbiom fall into five categories:
 
-| Category          | Functions                                                                                                                                                                                                                              |
-|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Box Plots         | [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md) [`bdiv_boxplot()`](https://cmmr.github.io/rbiom/reference/bdiv_boxplot.md) [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md)       |
+| Category | Functions |
+|----|----|
+| Box Plots | [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md) [`bdiv_boxplot()`](https://cmmr.github.io/rbiom/reference/bdiv_boxplot.md) [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md) |
 | Correlation Plots | [`adiv_corrplot()`](https://cmmr.github.io/rbiom/reference/adiv_corrplot.md) [`bdiv_corrplot()`](https://cmmr.github.io/rbiom/reference/bdiv_corrplot.md) [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md) |
-| Ordination Plots  | [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md)                                                                                                                                                           |
-| Heatmaps          | [`bdiv_heatmap()`](https://cmmr.github.io/rbiom/reference/bdiv_heatmap.md) [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md) [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md)       |
-| Stacked Bar Plots | [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)                                                                                                                                                             |
+| Ordination Plots | [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md) |
+| Heatmaps | [`bdiv_heatmap()`](https://cmmr.github.io/rbiom/reference/bdiv_heatmap.md) [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md) [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md) |
+| Stacked Bar Plots | [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md) |
 
 ## Box Plots
 
@@ -45,6 +45,7 @@ Unambiguous abbreviations are also accepted. For instance,
 ### Examples
 
 ``` r
+
 biom <- rarefy(hmp50, depth = 1000)
 
 adiv <- adiv_boxplot(
@@ -107,6 +108,7 @@ and `layers = "tp"`.
 ### Examples
 
 ``` r
+
 biom <- rarefy(hmp50, depth = 1000)
 
 adiv <- adiv_corrplot(biom, layers = "ts", x = "BMI")
@@ -147,6 +149,7 @@ The layers `c("mean", "taxon", "arrow")` apply to the taxa.
 ### Examples
 
 ``` r
+
 biom <- rarefy(hmp50)
 
 p1 <- bdiv_ord_plot(biom, layers = "pse", stat.by = "Body Site") +
@@ -178,6 +181,7 @@ operate on a biom object.
 ### Examples
 
 ``` r
+
 biom <- rarefy(hmp50)
 
 bdiv <- bdiv_heatmap(biom, tracks = c("Age", "Body Site"), asp = 0.4)
@@ -196,6 +200,7 @@ have their own advantages.
 ### Examples
 
 ``` r
+
 taxa_stacked(rarefy(hmp50), taxa = 10)
 ```
 

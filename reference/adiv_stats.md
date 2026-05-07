@@ -105,30 +105,30 @@ A tibble data.frame with fields from the table below. This tibble object
 provides the `$code` operator to print the R code used to generate the
 statistics.
 
-|              |                                                                                                                |
-|--------------|----------------------------------------------------------------------------------------------------------------|
-| **Field**    | **Description**                                                                                                |
-| .mean        | Estimated marginal mean. See [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html). |
-| .mean.diff   | Difference in means.                                                                                           |
-| .slope       | Trendline slope. See [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html).       |
-| .slope.diff  | Difference in slopes.                                                                                          |
-| .h1          | Alternate hypothesis.                                                                                          |
-| .p.val       | Probability that null hypothesis is correct.                                                                   |
-| .adj.p       | `.p.val` after adjusting for multiple comparisons.                                                             |
-| .effect.size | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html).           |
-| .lower       | Confidence interval lower bound.                                                                               |
-| .upper       | Confidence interval upper bound.                                                                               |
-| .se          | Standard error.                                                                                                |
-| .n           | Number of samples.                                                                                             |
-| .df          | Degrees of freedom.                                                                                            |
-| .stat        | Wilcoxon or Kruskal-Wallis rank sum statistic.                                                                 |
-| .t.ratio     | `.mean` / `.se`                                                                                                |
-| .r.sqr       | Percent of variation explained by the model.                                                                   |
-| .adj.r       | `.r.sqr`, taking degrees of freedom into account.                                                              |
-| .aic         | Akaike Information Criterion (predictive models).                                                              |
-| .bic         | Bayesian Information Criterion (descriptive models).                                                           |
-| .loglik      | Log-likelihood goodness-of-fit score.                                                                          |
-| .fit.p       | P-value for observing this fit by chance.                                                                      |
+|  |  |
+|----|----|
+| **Field** | **Description** |
+| .mean | Estimated marginal mean. See [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html). |
+| .mean.diff | Difference in means. |
+| .slope | Trendline slope. See [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html). |
+| .slope.diff | Difference in slopes. |
+| .h1 | Alternate hypothesis. |
+| .p.val | Probability that null hypothesis is correct. |
+| .adj.p | `.p.val` after adjusting for multiple comparisons. |
+| .effect.size | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
+| .lower | Confidence interval lower bound. |
+| .upper | Confidence interval upper bound. |
+| .se | Standard error. |
+| .n | Number of samples. |
+| .df | Degrees of freedom. |
+| .stat | Wilcoxon or Kruskal-Wallis rank sum statistic. |
+| .t.ratio | `.mean` / `.se` |
+| .r.sqr | Percent of variation explained by the model. |
+| .adj.r | `.r.sqr`, taking degrees of freedom into account. |
+| .aic | Akaike Information Criterion (predictive models). |
+| .bic | Bayesian Information Criterion (descriptive models). |
+| .loglik | Log-likelihood goodness-of-fit score. |
+| .fit.p | P-value for observing this fit by chance. |
 
 ## See also
 

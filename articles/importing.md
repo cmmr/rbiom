@@ -14,6 +14,7 @@ which accepts:
   [`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md)).
 
 ``` r
+
 library(rbiom)
 
 # create a simple matrix ------------------------
@@ -42,7 +43,7 @@ biom
 #>       1 Fields:  .sample
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-23 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-05-07 ──
 #> 
 
 # convert from phyloseq to rbiom ----------------
@@ -65,7 +66,7 @@ biom
 #>       5 Fields:  .sample, BarcodeSequence, ...
 #>         Tree:    <absent>
 #> 
-#> ── 3 - 7 reads/sample ──────────────────────── 2026-04-23 ──
+#> ── 3 - 7 reads/sample ──────────────────────── 2026-05-07 ──
 #> 
 ```
 
@@ -89,6 +90,7 @@ A few quick rules:
 - Sample names need to match `biom$samples`.
 
 ``` r
+
 # create example metadata -----------------------
 md <- data.frame(
   .sample   = paste0("Sample", 1:4),
@@ -115,7 +117,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-23 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-05-07 ──
 #> 
 
 # or in a single step ---------------------------
@@ -130,7 +132,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-23 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-05-07 ──
 #> 
 ```
 
@@ -141,6 +143,7 @@ Any categorical metadata variable that looks numerical, such as
 categorical variable.
 
 ``` r
+
 class(pull(biom, 'treatment'))
 #> [1] "numeric"
 
@@ -160,6 +163,7 @@ Use `$tree` to set the tree. You can specify a phylo object directly, or
 a newick file/string.
 
 ``` r
+
 # define a random tree --------------------------
 biom$tree <- "(((OTU6,(OTU5,OTU4)),OTU3),(OTU2,OTU1));"
 biom
@@ -172,7 +176,7 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-23 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-05-07 ──
 #> 
 ```
 
@@ -181,6 +185,7 @@ biom
 Use `$taxonomy` to define taxonomic clades for each OTU.
 
 ``` r
+
 # .otu must match otu_names(biom) ---------------
 map <- data.frame(
   .otu   = paste0("OTU", 1:6),
@@ -206,6 +211,6 @@ biom
 #>       4 Fields:  .sample, state, age, and treatment
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-04-23 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-05-07 ──
 #> 
 ```

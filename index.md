@@ -9,12 +9,14 @@ files.
 The latest stable version can be installed from CRAN.
 
 ``` r
+
 install.packages('rbiom')
 ```
 
 The development version is available on GitHub.
 
 ``` r
+
 install.packages('pak')
 pak::pak('cmmr/rbiom')
 ```
@@ -24,6 +26,7 @@ pak::pak('cmmr/rbiom')
 #### Import and rarefy abundance counts.
 
 ``` r
+
 library(rbiom)
 
 infile <- system.file(package = 'rbiom', 'extdata', 'hmp50.bz2')
@@ -33,18 +36,21 @@ biom   <- rarefy(infile)
 #### Explore associations with metadata.
 
 ``` r
+
 bdiv_ord_plot(biom, stat.by = 'Body Site', facet.by = 'Sex')
 ```
 
 ![](reference/figures/README-bdiv-1.png)
 
 ``` r
+
 adiv_boxplot(biom, x = 'Sex', adiv = c('otu', 'shan'), stat.by = 'Body Site')
 ```
 
 ![](reference/figures/README-bdiv-2.png)
 
 ``` r
+
 subset(biom, `Body Site` == 'Buccal mucosa') %>% 
   taxa_corrplot('Age', taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')
 ```
@@ -54,18 +60,21 @@ subset(biom, `Body Site` == 'Buccal mucosa') %>%
 #### Summarize counts by taxonomic rank.
 
 ``` r
+
 taxa_heatmap(biom, taxa = 10, tracks = c('body', 'age'))
 ```
 
 ![](reference/figures/README-taxa-1.png)
 
 ``` r
+
 taxa_stacked(biom, rank = 'Phylum')
 ```
 
 ![](reference/figures/README-taxa-2.png)
 
 ``` r
+
 taxa_table(biom, 'Phylum')
 #> # A tibble: 294 × 8
 #>    .rank  .sample .taxa          .abundance   Age   BMI `Body Site`   Sex   
@@ -109,6 +118,7 @@ The following commands will check if `rbiom` passes the bundled testing
 suite.
 
 ``` r
+
 install.packages('testthat')
 testthat::test_check('rbiom')
 ```

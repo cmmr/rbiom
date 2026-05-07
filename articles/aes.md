@@ -9,6 +9,7 @@ color by. In these cases, rbiom will select an appropriate palette to
 use.
 
 ``` r
+
 stat.by = "Sex"
 ```
 
@@ -53,16 +54,16 @@ color.by = c('Body Site' = "okabe", 'Age' = "bamako")
 
 #### Discrete palettes
 
-|            |                                      |           |                            |
-|-----------:|--------------------------------------|----------:|----------------------------|
-|     bright | ███████                              |   tableau | ██████████                 |
-|    vibrant | ███████                              |   classic | ██████████                 |
-|      okabe | ████████                             |     carto | ████████████               |
-|         r4 | ████████                             |       tol | ████████████               |
-|      light | ████████                             | tableau20 | ████████████████████       |
-|      muted | █████████                            |     kelly | █████████████████████      |
-|      fishy | █████████                            |  alphabet | ██████████████████████████ |
-| polychrome | ████████████████████████████████████ |           |                            |
+|  |  |  |  |
+|---:|----|---:|----|
+| bright | ███████ | tableau | ██████████ |
+| vibrant | ███████ | classic | ██████████ |
+| okabe | ████████ | carto | ████████████ |
+| r4 | ████████ | tol | ████████████ |
+| light | ████████ | tableau20 | ████████████████████ |
+| muted | █████████ | kelly | █████████████████████ |
+| fishy | █████████ | alphabet | ██████████████████████████ |
+| polychrome | ████████████████████████████████████ |  |  |
 
 #### Continuous palettes
 
@@ -85,6 +86,7 @@ Prefix a palette name with a dash (`-`) to reverse the color order. This
 is also helpful for assigning colors to a heatmap’s main grid.
 
 ``` r
+
 color.by = c('Age' = "-bamako")
 grid = "-imola"
 ```
@@ -137,6 +139,7 @@ Faceting allows you to split your dataset into multiple sub-plots by one
 or more categorical metadata fields. For example:
 
 ``` r
+
 biom <- rarefy(hmp50)
 
 adiv_boxplot(biom, stat.by = "Body Site", facet.by = "Sex")
@@ -145,6 +148,7 @@ adiv_boxplot(biom, stat.by = "Body Site", facet.by = "Sex")
 ![](aes_files/figure-html/facets-1.png)
 
 ``` r
+
 adiv_boxplot(biom, stat.by = "Sex", facet.by = "Body Site")
 ```
 
@@ -157,12 +161,14 @@ metrics, etc which are automatically assigned their own facet dimension.
 You can still add your own facets to these plots.
 
 ``` r
+
 adiv_boxplot(biom, adiv = c("Shannon", "Chao1"))
 ```
 
 ![](aes_files/figure-html/auto_facets1-1.png)
 
 ``` r
+
 adiv_boxplot(biom, adiv = c("Shannon", "Chao1"), facet.by = "Sex")
 ```
 

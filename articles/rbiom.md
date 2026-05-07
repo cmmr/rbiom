@@ -10,6 +10,7 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md) - see
 details. Here we’ll import a dataset from a BIOM file.
 
 ``` r
+
 library(rbiom)
 
 file <- system.file(package = "rbiom", "extdata", "hmp50.bz2")
@@ -37,20 +38,21 @@ biom
 
 The rbiom object has many helpful accessors.
 
-| Accessor                 | Content                                                |
-|--------------------------|--------------------------------------------------------|
-| `$counts`                | Abundance of each OTU in each sample.                  |
-| `$metadata`              | Sample mappings to metadata (treatment, patient, etc). |
-| `$taxonomy`              | OTU mappings to taxonomic ranks (genus, phylum, etc).  |
-| `$otus`, `$n_otus`       | OTU names.                                             |
-| `$samples`, `$n_samples` | Sample names.                                          |
-| `$fields`, `$n_fields`   | Metadata field names.                                  |
-| `$ranks`, `$n_ranks`     | Taxonomic rank names.                                  |
-| `$tree`, `$sequences`    | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
-| `$id`, `$comment`        | Arbitrary strings for describing the dataset.          |
-| `$depth`                 | Rarefaction depth, or `NULL` if unrarefied.            |
+| Accessor | Content |
+|----|----|
+| `$counts` | Abundance of each OTU in each sample. |
+| `$metadata` | Sample mappings to metadata (treatment, patient, etc). |
+| `$taxonomy` | OTU mappings to taxonomic ranks (genus, phylum, etc). |
+| `$otus`, `$n_otus` | OTU names. |
+| `$samples`, `$n_samples` | Sample names. |
+| `$fields`, `$n_fields` | Metadata field names. |
+| `$ranks`, `$n_ranks` | Taxonomic rank names. |
+| `$tree`, `$sequences` | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
+| `$id`, `$comment` | Arbitrary strings for describing the dataset. |
+| `$depth` | Rarefaction depth, or `NULL` if unrarefied. |
 
 ``` r
+
 biom$counts[1:4,1:8] %>% as.matrix()
 #>          HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08
 #> Unc01yki     0     0     0     0     0     0     0     0
@@ -81,6 +83,7 @@ create a second object. To create a copy of an rbiom object, use the
 object’s `$clone()` method.
 
 ``` r
+
 a <- as_rbiom(file)
 b <- a$clone()  # Correct
 
@@ -96,6 +99,7 @@ a$n_samples
 ```
 
 ``` r
+
 a <- as_rbiom(file)
 b <- a  # Wrong
 
@@ -137,6 +141,7 @@ observations from the remaining samples, so that all samples have the
 same “rarefaction depth”.
 
 ``` r
+
 sample_sums(biom) %>% head()
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
 #>  1660  1371  1353  1895  3939  4150
@@ -155,6 +160,7 @@ tibble data.frame). The first column, `'.sample'`, is used by rbiom to
 link sample metadata to samples in the abundance table.
 
 ``` r
+
 biom$metadata$group <- sample(c('A', 'B'), biom$n_samples, TRUE)
 biom %<>% mutate(Obese = BMI >= 30, Sex = NULL)
 biom %<>% rename('Years Old' = "Age")
@@ -179,6 +185,7 @@ Removing samples from the metadata will remove those samples from the
 entire rbiom object.
 
 ``` r
+
 biom %<>% subset(`Body Site` == "Anterior nares")
 biom$metadata
 #> # A tibble: 10 × 6
@@ -219,6 +226,7 @@ object will be a tibble data.frame with one computed value per row.
 Alternatively, `_matrix` will return a base R matrix.
 
 ``` r
+
 taxa_table(biom, rank = "Phylum")
 #> # A tibble: 60 × 9
 #>   .rank  .sample .taxa      .abundance `Years Old`   BMI `Body Site` group Obese
@@ -266,6 +274,7 @@ values.
 For example, to display an ordination colored by body site:
 
 ``` r
+
 bdiv_ord_plot(biom = hmp50, stat.by = "Body Site")
 ```
 
@@ -300,6 +309,7 @@ article](https://cmmr.github.io/rbiom/articles/statistics.md) reviews
 this topic in greater detail.
 
 ``` r
+
 p <- adiv_boxplot(hmp50, stat.by = "Body Site", facet.by = "Sex")
 p
 ```
@@ -307,6 +317,7 @@ p
 ![](rbiom_files/figure-html/unnamed-chunk-11-1.png)
 
 ``` r
+
 p$stats
 #> # Model:    kruskal.test(.diversity ~ `Body Site`)
 #> # A tibble: 2 × 7

@@ -25,14 +25,14 @@ if we only want the stats.
 
 If your data is in a data.frame (or tibble), use:
 
-|                                                                              |                                                                                |                                                                          |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+|  |  |  |
+|----|----|----|
 | [`stats_boxplot()`](https://cmmr.github.io/rbiom/reference/stats_boxplot.md) | [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md) | [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md) |
 
 Or, for a distance matrix:
 
-|                                                                              |
-|------------------------------------------------------------------------------|
+|  |
+|----|
 | [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md) |
 
 ## Statistics Table
@@ -49,6 +49,7 @@ will return a plot object `p`. You can access the plot’s associated
 statistics table with `p$stats`.
 
 ``` r
+
 p <- adiv_boxplot(
   biom     = rarefy(hmp50),           # Dataset as an rbiom object
   adiv     = c("Shannon", "Simpson"), # Alpha diversity metrics
@@ -123,6 +124,7 @@ available in `p$stats$code`. These attributes can help you reproduce and
 customize your data analysis.
 
 ``` r
+
 p$data
 #> # A tibble: 98 × 6
 #>   .sample .depth .adiv   .diversity `Body Site`   Sex   
@@ -177,30 +179,30 @@ available from the underlying statistical function.
 Below is a quick reference guide to all columns that may appear in an
 rbiom statistics table.
 
-| **Field**      | **Description**                                                                                                     |
-|----------------|---------------------------------------------------------------------------------------------------------------------|
-| `.stat`        | Wilcoxon or Kruskal-Wallis rank sum statistic.                                                                      |
-| `.mean`        | Estimated marginal mean. See [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html).      |
-| `.mean.diff`   | Difference in means.                                                                                                |
-| `.slope`       | Trendline slope. See [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html).            |
-| `.slope.diff`  | Difference in slopes.                                                                                               |
-| `.h1`          | Alternate hypothesis.                                                                                               |
-| `.p.val`       | Probability that null hypothesis is correct.                                                                        |
-| `.adj.p`       | `.p.val` after adjusting for multiple comparisons.                                                                  |
-| `.effect.size` | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html).                |
-| `.lower`       | Confidence interval lower bound.                                                                                    |
-| `.upper`       | Confidence interval upper bound.                                                                                    |
-| `.se`          | Standard error.                                                                                                     |
-| `.n`           | Number of samples.                                                                                                  |
-| `.df`          | Degrees of freedom.                                                                                                 |
-| `.t.ratio`     | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se`                                                               |
-| `.z`           | Std. effect size. See [`vegan::summary.permustats()`](https://vegandevs.github.io/vegan/reference/permustats.html). |
-| `.r.sqr`       | Percent of variation explained by the model.                                                                        |
-| `.adj.r`       | `.r.sqr`, taking degrees of freedom into account.                                                                   |
-| `.aic`         | Akaike Information Criterion (predictive models).                                                                   |
-| `.bic`         | Bayesian Information Criterion (descriptive models).                                                                |
-| `.loglik`      | Log-likelihood goodness-of-fit score.                                                                               |
-| `.fit.p`       | P-value for observing this fit by chance.                                                                           |
+| **Field** | **Description** |
+|----|----|
+| `.stat` | Wilcoxon or Kruskal-Wallis rank sum statistic. |
+| `.mean` | Estimated marginal mean. See [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html). |
+| `.mean.diff` | Difference in means. |
+| `.slope` | Trendline slope. See [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html). |
+| `.slope.diff` | Difference in slopes. |
+| `.h1` | Alternate hypothesis. |
+| `.p.val` | Probability that null hypothesis is correct. |
+| `.adj.p` | `.p.val` after adjusting for multiple comparisons. |
+| `.effect.size` | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
+| `.lower` | Confidence interval lower bound. |
+| `.upper` | Confidence interval upper bound. |
+| `.se` | Standard error. |
+| `.n` | Number of samples. |
+| `.df` | Degrees of freedom. |
+| `.t.ratio` | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
+| `.z` | Std. effect size. See [`vegan::summary.permustats()`](https://vegandevs.github.io/vegan/reference/permustats.html). |
+| `.r.sqr` | Percent of variation explained by the model. |
+| `.adj.r` | `.r.sqr`, taking degrees of freedom into account. |
+| `.aic` | Akaike Information Criterion (predictive models). |
+| `.bic` | Bayesian Information Criterion (descriptive models). |
+| `.loglik` | Log-likelihood goodness-of-fit score. |
+| `.fit.p` | P-value for observing this fit by chance. |
 
 The `.h1` field will always come immediately after the column it is
 testing against.
@@ -219,6 +221,7 @@ categorical metadata field to the `stat.by` parameter to test whether
 inter-sample distances are correlated with that variable.
 
 ``` r
+
 p <- bdiv_ord_plot(
   biom    = rarefy(hmp50), 
   stat.by = "Body Site", 
@@ -232,6 +235,7 @@ p
 ![](statistics_files/figure-html/unnamed-chunk-6-1.png)
 
 ``` r
+
 p$stats
 #> # Test:     adonis2 ~ `Body Site`. 999 permutations.
 #> # A tibble: 2 × 6
@@ -266,10 +270,10 @@ By default,
 applies the perMANOVA test. You can change this to MRPP by specifying
 `test="mrpp"`. Details on the available tests are below.
 
-| Test      | Function                                                                      | Method                                                      |
-|-----------|-------------------------------------------------------------------------------|-------------------------------------------------------------|
+| Test | Function | Method |
+|----|----|----|
 | `adonis2` | [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/adonis.html) | Permutational Multivariate Analysis of Variance (perMANOVA) |
-| `mrpp`    | [`vegan::mrpp()`](https://vegandevs.github.io/vegan/reference/mrpp.html)      | Multiple Response Permutation Procedure (MRPP)              |
+| `mrpp` | [`vegan::mrpp()`](https://vegandevs.github.io/vegan/reference/mrpp.html) | Multiple Response Permutation Procedure (MRPP) |
 
 ### Box Plots
 
@@ -281,6 +285,7 @@ statistics, or set them to different categorical metadata fields to get
 multiple group-wise statistics per plot.
 
 ``` r
+
 biom <- rarefy(hmp50) %>% 
   subset(`Body Site` %in% c('Saliva', 'Stool', 'Buccal mucosa'))
 
@@ -308,6 +313,7 @@ you can find the full statistics tables and reproducible R code in the
 plot attributes.
 
 ``` r
+
 p3$stats
 #> # Model:    wilcox.test(.diversity ~ `Body Site`)
 #> # A tibble: 3 × 9
@@ -345,10 +351,10 @@ p2$stats$code
 
 Internally, rbiom uses the non-parametric functions listed below.
 
-| Test       | Function                                                             | Method                                                   |
-|------------|----------------------------------------------------------------------|----------------------------------------------------------|
-| pairwise   | [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html)   | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
-| group-wise | [`stats::kruskal.test()`](https://rdrr.io/r/stats/kruskal.test.html) | Kruskal-Wallis Rank Sum Test                             |
+| Test | Function | Method |
+|----|----|----|
+| pairwise | [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html) | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
+| group-wise | [`stats::kruskal.test()`](https://rdrr.io/r/stats/kruskal.test.html) | Kruskal-Wallis Rank Sum Test |
 
 ### Correlation Plots
 
@@ -364,6 +370,7 @@ Depending on the arguments given to `stat.by` and `test`, you can test:
 - Do slopes vary by group?
 
 ``` r
+
 biom <- gems %>%
   subset(diarrhea == "Control") %>%
   subset(country %in% c("Bangladesh", "Kenya")) %>%
@@ -396,6 +403,7 @@ not follow this pattern; it’s common to observe high or low abundances
 more often than a “medium” abundance.
 
 ``` r
+
 library(ggplot2)
 
 patchwork::wrap_plots(
@@ -418,17 +426,18 @@ To compensate for this non-normality, rbiom uses the following
 non-parametric tests for categorical variables that are based on ranking
 or permutations.
 
-| Test                    | Function                                                                      | Used For                                                                              |
-|-------------------------|-------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Wilcoxon Rank-Sum       | [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html)            | Pairwise boxplot                                                                      |
-| Kruskal-Wallis Rank Sum | [`stats::kruskal.test()`](https://rdrr.io/r/stats/kruskal.test.html)          | Groupwise boxplot                                                                     |
-| Permutational MANOVA    | [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/adonis.html) | [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md) clusters |
+| Test | Function | Used For |
+|----|----|----|
+| Wilcoxon Rank-Sum | [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html) | Pairwise boxplot |
+| Kruskal-Wallis Rank Sum | [`stats::kruskal.test()`](https://rdrr.io/r/stats/kruskal.test.html) | Groupwise boxplot |
+| Permutational MANOVA | [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/adonis.html) | [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md) clusters |
 
 For correlation/regression analysis, rbiom provides diagnostic plots to
 determine when residual distributions are cause for concern. To enable
 this feature, set `check = TRUE`.
 
 ``` r
+
 adiv_corrplot(biom, x = "age", test = "emmeans", check = TRUE)
 ```
 
