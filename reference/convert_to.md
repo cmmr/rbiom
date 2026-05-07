@@ -1,26 +1,8 @@
-# Convert biom data to an external package class.
+# Convert biom data to an external package class
 
-Requires the relevant Bioconductor R package to be installed:
-
-- `convert_to_animalcules` - :
-
-  [animalcules](https://bioconductor.org/packages/animalcules/)
-
-- `convert_to_biomformat` - :
-
-  [biomformat](https://bioconductor.org/packages/biomformat/)
-
-- `convert_to_phyloseq` - :
-
-  [phyloseq](https://bioconductor.org/packages/phyloseq/)
-
-- `convert_to_SE` - :
-
-  [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/)
-
-- `convert_to_TSE` - :
-
-  [TreeSummarizedExperiment](https://bioconductor.org/packages/TreeSummarizedExperiment/)
+Converts your `rbiom` object into other common Bioconductor data
+structures. Each function requires the corresponding target package to
+be installed.
 
 ## Usage
 
@@ -51,16 +33,40 @@ convert_to_TSE(biom, ...)
 
 ## Value
 
-An animalcules (MultiAssayExperiment), biomformat (biom), phyloseq,
-SummarizedExperiment, or TreeSummarizedExperiment object.
+An `animalcules` (`MultiAssayExperiment` class), `biomformat` (`biom`
+class), `phyloseq`, `SummarizedExperiment`, or
+`TreeSummarizedExperiment` object.
 
 ## Details
 
-animalcules, SummarizedExperiment, and biomformat objects include
-counts, metadata, and taxonomy.
+- **`convert_to_animalcules()`**: Converts to a `MultiAssayExperiment`
+  object tailored for the
+  [animalcules](https://bioconductor.org/packages/animalcules/)
+  interactive microbiome analysis toolkit. *Includes: counts, metadata,
+  and taxonomy.*
 
-phyloseq and TreeSummarizedExperiment additionally include the tree and
-sequences.
+- **`convert_to_biomformat()`**: Converts to a `biom` object used by the
+  [biomformat](https://bioconductor.org/packages/biomformat/) package,
+  the standard Bioconductor class for reading and writing BIOM data.
+  *Includes: counts, metadata, and taxonomy.*
+
+- **`convert_to_phyloseq()`**: Converts to a `phyloseq` object for use
+  with the comprehensive
+  [phyloseq](https://bioconductor.org/packages/phyloseq/) ecosystem.
+  *Includes: counts, metadata, taxonomy, phylogenetic tree, and
+  sequences.*
+
+- **`convert_to_SE()`**: Converts to a `SummarizedExperiment` object, a
+  core
+  [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/)
+  Bioconductor container for matrix-like data and annotations.
+  *Includes: counts, metadata, and taxonomy.*
+
+- **`convert_to_TSE()`**: Converts to a `TreeSummarizedExperiment`
+  object. This extends the SE class to natively support hierarchical
+  [TreeSummarizedExperiment](https://bioconductor.org/packages/TreeSummarizedExperiment/)
+  relationships. *Includes: counts, metadata, taxonomy, phylogenetic
+  tree, and sequences.*
 
 ## Examples
 

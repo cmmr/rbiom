@@ -155,7 +155,7 @@ TreeSummarizedExperiment, and QIIME 2.
   [`convert_to_phyloseq()`](https://cmmr.github.io/rbiom/reference/convert_to.md)
   [`convert_to_SE()`](https://cmmr.github.io/rbiom/reference/convert_to.md)
   [`convert_to_TSE()`](https://cmmr.github.io/rbiom/reference/convert_to.md)
-  : Convert biom data to an external package class.
+  : Convert biom data to an external package class
 
 ## The rbiom Object
 
