@@ -7,7 +7,7 @@
 \alias{convert_to_phyloseq}
 \alias{convert_to_SE}
 \alias{convert_to_TSE}
-\title{Convert biom data to an external package class.}
+\title{Convert biom data to an external package class}
 \usage{
 convert_to_animalcules(biom, ...)
 
@@ -25,22 +25,34 @@ convert_to_TSE(biom, ...)
 \item{...}{Not Used.}
 }
 \value{
-An animalcules (MultiAssayExperiment), biomformat (biom), phyloseq, SummarizedExperiment, or TreeSummarizedExperiment object.
+An \code{animalcules} (\code{MultiAssayExperiment} class), \code{biomformat} (\code{biom} class), \code{phyloseq},
+\code{SummarizedExperiment}, or \code{TreeSummarizedExperiment} object.
 }
 \description{
-Requires the relevant Bioconductor R package to be installed:
-\describe{
-\item{\code{convert_to_animalcules} - }{ \href{https://bioconductor.org/packages/animalcules/}{animalcules} }
-\item{\code{convert_to_biomformat} - }{ \href{https://bioconductor.org/packages/biomformat/}{biomformat} }
-\item{\code{convert_to_phyloseq} - }{ \href{https://bioconductor.org/packages/phyloseq/}{phyloseq} }
-\item{\code{convert_to_SE} - }{ \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} }
-\item{\code{convert_to_TSE} - }{ \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment} }
-}
+Converts your \code{rbiom} object into other common Bioconductor data structures.
+Each function requires the corresponding target package to be installed.
 }
 \details{
-animalcules, SummarizedExperiment, and biomformat objects include counts, metadata, and taxonomy.
-
-phyloseq and TreeSummarizedExperiment additionally include the tree and sequences.
+\itemize{
+\item \strong{\code{convert_to_animalcules()}}: Converts to a \code{MultiAssayExperiment} object tailored for the
+\href{https://bioconductor.org/packages/animalcules/}{animalcules} interactive microbiome analysis toolkit.
+\emph{Includes: counts, metadata, and taxonomy.}
+\item \strong{\code{convert_to_biomformat()}}: Converts to a \code{biom} object used by the
+\href{https://bioconductor.org/packages/biomformat/}{biomformat} package, the standard Bioconductor
+class for reading and writing BIOM data.
+\emph{Includes: counts, metadata, and taxonomy.}
+\item \strong{\code{convert_to_phyloseq()}}: Converts to a \code{phyloseq} object for use with the comprehensive
+\href{https://bioconductor.org/packages/phyloseq/}{phyloseq} ecosystem.
+\emph{Includes: counts, metadata, taxonomy, phylogenetic tree, and sequences.}
+\item \strong{\code{convert_to_SE()}}: Converts to a \code{SummarizedExperiment} object, a core
+\href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} Bioconductor
+container for matrix-like data and annotations.
+\emph{Includes: counts, metadata, and taxonomy.}
+\item \strong{\code{convert_to_TSE()}}: Converts to a \code{TreeSummarizedExperiment} object. This extends the SE class
+to natively support hierarchical \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment}
+relationships.
+\emph{Includes: counts, metadata, taxonomy, phylogenetic tree, and sequences.}
+}
 }
 \examples{
 \dontrun{
