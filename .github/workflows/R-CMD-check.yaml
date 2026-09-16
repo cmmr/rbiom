@@ -63,6 +63,17 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      # R >= 4.7 on macOS links Fortran/LAPACK packages (e.g. irlba) against
+      # the flang runtime in /opt/R/flang-23, which the runner image lacks.
+      - name: Install flang toolchain
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          if R CMD config FLIBS | grep -q '/opt/R/flang-23' && [ ! -d /opt/R/flang-23 ]; then
+            curl -fsSL https://mac.r-project.org/tools/flang-23.1.0-darwin23.tar.xz | sudo tar -xJf - -C /
+            echo "SDKROOT=$(xcrun --show-sdk-path)" >> "$GITHUB_ENV"
+          fi
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
