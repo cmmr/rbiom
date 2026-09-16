@@ -1,6 +1,14 @@
 # Changelog
 
+## rbiom 3.1.1
+
+- [`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md) and
+  [`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md)
+  now accept count matrices that are triangular, diagonal, or 1x1.
+
 ## rbiom 3.1.0
+
+CRAN release: 2026-05-08
 
 - Can now read and write `biom` objects from the `biomformat` package
   (microbiome/mia#818).
