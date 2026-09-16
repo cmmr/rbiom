@@ -1,3 +1,8 @@
+# rbiom 3.1.1
+
+* `as_rbiom()` and `read_biom()` now accept count matrices that are triangular, diagonal, or 1x1.
+
+
 # rbiom 3.1.0
 
 * Can now read and write `biom` objects from the `biomformat` package (microbiome/mia#818).

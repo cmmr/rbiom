@@ -570,7 +570,8 @@ rb_counts <- function (self, private, value) {
   #________________________________________________________
   # Coerce value to slam matrix.
   #________________________________________________________
-  mtx <- as(value, "CsparseMatrix")
+  # generalMatrix: Matrix returns dtCMatrix for triangular/diagonal/1x1 input.
+  mtx <- as(as(as(value, "CsparseMatrix"), "generalMatrix"), "dMatrix")
   stopifnot(inherits(mtx, "dgCMatrix"))
   mtx <- Matrix::drop0(mtx)
   
