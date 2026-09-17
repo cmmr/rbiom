@@ -65,13 +65,21 @@ jobs:
 
       # R >= 4.7 on macOS links Fortran/LAPACK packages (e.g. irlba) against
       # the flang runtime in /opt/R/flang-23, which the runner image lacks.
-      - name: Install flang toolchain
+      # CRAN has no binaries for it yet either, so packages build from source
+      # and need CRAN's static system libraries in /opt/R/arm64 (e.g. jpeg).
+      - name: Install macOS build tools
         if: runner.os == 'macOS'
         shell: bash
         run: |
           if R CMD config FLIBS | grep -q '/opt/R/flang-23' && [ ! -d /opt/R/flang-23 ]; then
             curl -fsSL https://mac.r-project.org/tools/flang-23.1.0-darwin23.tar.xz | sudo tar -xJf - -C /
             echo "SDKROOT=$(xcrun --show-sdk-path)" >> "$GITHUB_ENV"
+
+            urls=$(SILENT_INSTALL_R=1 Rscript -e 'source("https://mac.r-project.org/bin/install.R"); cat(install.libs(c("jpeg", "libpng"), action = "list", quiet = TRUE), sep = "\n")')
+            for url in $urls; do
+              echo "Installing $url"
+              curl -fsSL "$url" | sudo tar -xJf - -C /
+            done
           fi
 
       - uses: r-lib/actions/setup-r-dependencies@v2
