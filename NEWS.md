@@ -1,6 +1,7 @@
 # rbiom 3.1.1
 
 * `as_rbiom()` and `read_biom()` now accept count matrices that are triangular, diagonal, or 1x1.
+* `taxa_matrix()` and `taxa_table()` no longer fail with "No taxa match the criteria" when `taxa` is a number and a sample has no abundance at the requested rank, e.g. with `unc = "drop"`.
 
 
 # rbiom 3.1.0

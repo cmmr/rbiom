@@ -214,7 +214,14 @@ taxa_matrix <- function (
   if (!is_null(taxa)) {
     
     if (is.numeric(taxa) && length(taxa) == 1) {
-      rel <- sort(rowMeans(t(t(mtx) / colSums(mtx))), decreasing = TRUE)
+
+      # Samples with no abundance at this rank (e.g. from unc = "drop")
+      # are left out, rather than contributing 0/0 = NaN to every mean.
+      totals <- colSums(mtx)
+      keep   <- totals > 0
+      rel    <- rowMeans(t(t(mtx[, keep, drop = FALSE]) / totals[keep]))
+      rel    <- sort(rel, decreasing = TRUE)
+
       if (taxa >= 1) { taxa <- head(names(rel), taxa) 
       } else         { taxa <- names(rel)[rel >= taxa] }
       
