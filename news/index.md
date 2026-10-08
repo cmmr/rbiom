@@ -5,6 +5,12 @@
 - [`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md) and
   [`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md)
   now accept count matrices that are triangular, diagonal, or 1x1.
+- [`taxa_matrix()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+  and
+  [`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+  no longer fail with “No taxa match the criteria” when `taxa` is a
+  number and a sample has no abundance at the requested rank, e.g. with
+  `unc = "drop"`.
 
 ## rbiom 3.1.0
 
