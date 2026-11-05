@@ -47,38 +47,38 @@ respectively.
 Visualize the number of observations per sample.
 }
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     rare_stacked(hmp50)
-    
+
     rare_stacked(hmp50, rline = 500, r.linewidth = 2, r.linetype = "twodash")
-    
+
     fig <- rare_stacked(hmp50, counts = FALSE)
     fig$code
-    
+
 }
 \seealso{
-Other rarefaction: 
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{sample_sums}()}
+Other rarefaction:
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=sample_sums]{sample_sums()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{rarefaction}
 \concept{visualization}

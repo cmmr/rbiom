@@ -10,19 +10,26 @@
 \alias{write_xlsx}
 \title{Save an rbiom object to a file.}
 \usage{
-write_biom(biom, file, format = "json")
+write_biom(biom, file, format = "json", overwrite = FALSE)
 
-write_metadata(biom, file, quote = FALSE, sep = "\\t", ...)
+write_metadata(biom, file, quote = FALSE, sep = "\\t", overwrite = FALSE, ...)
 
-write_counts(biom, file, quote = FALSE, sep = "\\t", ...)
+write_counts(biom, file, quote = FALSE, sep = "\\t", overwrite = FALSE, ...)
 
-write_taxonomy(biom, file, quote = FALSE, sep = "\\t", ...)
+write_taxonomy(biom, file, quote = FALSE, sep = "\\t", overwrite = FALSE, ...)
 
-write_fasta(biom, file = NULL)
+write_fasta(biom, file = NULL, overwrite = FALSE)
 
-write_tree(biom, file = NULL)
+write_tree(biom, file = NULL, overwrite = FALSE)
 
-write_xlsx(biom, file, depth = NULL, seed = 0, unc = "singly")
+write_xlsx(
+  biom,
+  file,
+  depth = NULL,
+  seed = 0,
+  unc = "singly",
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
@@ -30,7 +37,7 @@ write_xlsx(biom, file, depth = NULL, seed = 0, unc = "singly")
 \item{file}{Path to the output file. File names ending in \code{.gz} or
 \code{.bz2} will be compressed accordingly.
 Setting \code{file=NULL} for \code{write_fasta()}, \code{write_tree()}, and
-\code{write_biom(format='json')}, and returns a string of the output which
+\code{write_biom(format='json')} returns a string of the output which
 would have been written. For \code{write_biom(format='tab')}, \code{file=NULL}
 returns the tibble that would have been written.}
 
@@ -38,6 +45,10 @@ returns the tibble that would have been written.}
 corresponding to classic tabular format, BIOM format version 1.0 and
 biom version 2.1, respectively. NOTE: to write HDF5 formatted BIOM
 files, the \code{h5lite} R package must be installed. Default: \code{"json"}}
+
+\item{overwrite}{Replace \code{file} if it already exists? All of the writers
+refuse to overwrite an existing file unless \code{overwrite = TRUE}.
+Default: \code{FALSE}}
 
 \item{quote, sep, ...}{Parameters passed on to \code{\link[=write.table]{write.table()}}.
 Default: \verb{quote=FALSE, sep="\\t"}}
@@ -73,6 +84,18 @@ Automatically creates directories and adds compression based on file name.
 }
 }
 \details{
+Output is first written to a temporary file in the same directory and then
+moved into place, so a failed write never leaves a partial file behind.
+
+In the tabular (\code{"tab"}) format, OTU IDs, sample names and taxonomy strings
+that contain a tab, a double quote, or a line break are enclosed in double
+quotes (with embedded quotes doubled), and missing taxonomic ranks are
+written as empty strings. In the JSON format, numbers are written at full
+precision and missing values are \code{null}. In the HDF5 format, the order of
+metadata fields, logical fields, and \code{Date} fields (stored as ISO 8601
+strings) are preserved through attributes on the datasets, which other
+BIOM readers ignore.
+
 For \code{write_xlsx()}, \code{attributes(biom)} are saved as additional worksheets if
 the attribute is a data frame, matrix, or dist -class object. An attribute
 named 'Reads Per Step' is treated specially and merged with the usual 'Reads
@@ -80,18 +103,22 @@ Per Sample' tab.
 }
 \examples{
     library(rbiom)
-    
+
     write_tree(hmp50) \%>\% substr(1, 50)
-    
-    if (FALSE) {
-    
-      hmp10        <- hmp50$clone()
-      hmp10$counts <- hmp10$counts[,1:10] \%>\% rarefy_cols()
-      
-      attr(hmp10, "Weighted UniFrac") <- bdiv_distmat(hmp10, 'wunifrac')
+
+    outfile <- write_biom(hmp50, tempfile(fileext = ".biom.gz"))
+    file.size(outfile)
+    unlink(outfile)
+
+    if (requireNamespace("openxlsx", quietly = TRUE)) {
+
+      hmp10 <- rarefy(hmp50[1:10])
+
+      attr(hmp10, "Weighted UniFrac") <- bdiv_distmat(hmp10, 'weighted_unifrac')
       attr(hmp10, "Jaccard")          <- bdiv_distmat(hmp10, 'jaccard')
-      
+
       outfile <- write_xlsx(hmp10, tempfile(fileext = ".xlsx"))
+      unlink(outfile)
     }
 
 }

@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Integrated Analysis and Visualization of Microbiome Data
-Version: 3.1.1
+Version: 4.0.0
 Authors@R: c(
     person(
       "Daniel P.", "Smith",
@@ -9,20 +9,20 @@ Authors@R: c(
       role    = c("aut", "cre"),
       comment = c(ORCID = "0000-0002-2479-2044")),
     person(
-      "Alkek Center for Metagenomics and Microbiome Research", 
+      "Alkek Center for Metagenomics and Microbiome Research",
       role = c("cph", "fnd") ))
 Description:
     A toolkit for working with Biological Observation Matrix ('BIOM') files.
     Read/write all 'BIOM' formats. Compute rarefaction, alpha diversity, and
     beta diversity (including 'UniFrac'). Summarize counts by taxonomic level.
     Subset based on metadata. Generate visualizations and statistical analyses.
+    Every result records the R code needed to reproduce it.
 URL: https://cmmr.github.io/rbiom/, https://github.com/cmmr/rbiom
 BugReports: https://github.com/cmmr/rbiom/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.3.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Config/Needs/website: rmarkdown, phyloseq, npregfast, withr
 Config/testthat/edition: 3
 Imports:
@@ -30,41 +30,45 @@ Imports:
     mgcv,
     stats,
     utils,
-    ape,
-    dplyr,
-    ecodive,
-    emmeans,
-    fillpattern,
-    ggbeeswarm,
-    ggnewscale,
-    ggplot2,
-    ggrepel,
-    ggtext,
-    jsonlite,
-    magrittr,
-    patchwork,
-    pillar,
-    plyr,
-    readr,
-    readxl,
-    vegan
-Suggests:
+    grid,
     cli,
-    crayon,
-    ggdensity,
+    cluster,
+    dplyr,
+    ecodive (>= 2.3.1),
+    emmeans,
+    ggnewscale,
+    ggplot2 (>= 3.5.0),
     glue,
-    h5lite,
-    labeling,
+    jsonlite,
     lifecycle,
+    magrittr,
     Matrix,
-    openxlsx,
-    optparse,
-    pkgconfig,
-    prettycode,
+    patchwork (>= 1.2.0),
+    permute,
     R6,
     rlang,
     scales,
-    testthat,
     tibble,
+    vegan
+Suggests:
+    ape,
+    biomformat,
+    Biostrings,
+    fillpattern,
+    ggbeeswarm,
+    ggdensity,
+    ggrepel,
+    h5lite,
+    MultiAssayExperiment,
+    openxlsx,
+    optparse,
+    phyloseq,
+    prettycode,
+    readxl,
+    S4Vectors,
+    SummarizedExperiment,
+    testthat,
+    TreeSummarizedExperiment,
     tsne,
     uwot
+Config/roxygen2/version: 8.1.1

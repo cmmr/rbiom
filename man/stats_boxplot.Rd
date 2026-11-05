@@ -24,6 +24,7 @@ stats_boxplot(
   outliers = NULL,
   xlab.angle = "auto",
   p.label = 0.05,
+  strata = NULL,
   caption = TRUE,
   ...
 )
@@ -75,9 +76,14 @@ vector mapping groups to specific pattern names.
 See "Aesthetics" section below for additional information.
 Default: \code{FALSE}}
 
-\item{test}{Method for computing p-values: \code{'auto'} or \code{'none'}. \code{'auto'}
-will choose Wilcox or Kruskal-Wallis depending on the number of
-groups.}
+\item{test}{Method for computing p-values. \code{'auto'} runs pairwise
+Mann-Whitney U tests (\code{'wilcox'}) when \code{x} and \code{stat.by} are the
+same field (or \code{'emmeans'} when \code{strata} is given), and
+Kruskal-Wallis tests (\code{'kruskal'}) across the \code{stat.by} groups
+within each \code{x} category otherwise. Beta diversity boxplots use
+PERMANOVA (\code{'adonis2'}), \code{'mrpp'}, or \code{'betadisper'} on the
+samples instead. \code{'none'} skips the statistics. See
+\code{\link[=stats_table]{stats_table()}} and \code{\link[=bdiv_stats]{bdiv_stats()}}. Default: \code{'auto'}}
 
 \item{flip}{Transpose the axes, so that taxa are present as rows instead
 of columns. Default: \code{FALSE}}
@@ -91,6 +97,10 @@ Options are: \code{"ci"} (confidence interval), \code{"range"},
 \code{"mad"} (median absolute deviation).
 The center mark of \bold{crossbar} and \bold{pointrange} represents
 the mean, except for \code{"mad"} in which case it represents the median.
+Intervals are drawn as computed, including below zero, unless
+the y-axis is transformed: bounds below zero are drawn at zero
+on a \code{"sqrt"} or \code{"log1p"} axis, and bounds at or below zero
+are drawn at the smallest positive y value on a log axis.
 Default: \code{"ci"}}
 
 \item{level}{The confidence level for calculating a confidence interval.
@@ -98,7 +108,9 @@ Default: \code{0.95}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans every p-value in the returned
+table (all metrics, strata, pairs, and positions).
+Default: \code{"fdr"}}
 
 \item{p.top}{Only display taxa with the most significant differences in
 abundance. If \code{p.top} is >= 1, then the \code{p.top} most
@@ -127,13 +139,20 @@ If a numeric vector with more than one value is
 provided, they will be used as breaks for asterisk notation.
 Default: \code{0.05}}
 
+\item{strata}{Dataset field with the blocking/subject variable.
+Permutation tests permute within strata; regression models
+include a random intercept per stratum. Default: \code{NULL}}
+
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that
 layer. For instance, \code{d.size = 2} ensures only the points on the
-\bold{dot} layer have their size set to \code{2}.}
+\bold{dot} layer have their size set to \code{2}. Unprefixed parameters
+go to every layer whose function accepts them (e.g.
+\code{scales = "free"} for the facets). An argument that no layer
+accepts is an error.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points, ggplot2 command,
@@ -152,41 +171,45 @@ categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
 \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
 
-Patterns are added using the fillpattern R package. Options are \code{"brick"},
+Patterns are added using the fillpattern R package, which must be
+installed to use \code{patterns}. Options are \code{"brick"},
 \code{"chevron"}, \code{"fish"}, \code{"grid"}, \code{"herringbone"}, \code{"hexagon"}, \code{"octagon"},
 \code{"rain"}, \code{"saw"}, \code{"shingle"}, \code{"rshingle"}, \code{"stripe"}, and \code{"wave"},
 optionally abbreviated and/or suffixed with modifiers. For example,
 \code{"hex10_sm"} for the hexagon pattern rotated 10 degrees and shrunk by 2x.
-See \code{\link[fillpattern:fill_pattern]{fillpattern::fill_pattern()}} for complete documentation of options.
+See \code{fillpattern::fill_pattern()} for complete documentation of options.
 
 Shapes can be given as per base R - numbers 0 through 17 for various shapes,
 or the decimal value of an ascii character, e.g. a-z = 65:90; A-Z = 97:122 to use
 letters instead of shapes on the plot. Character strings may used as well.
+
+The \bold{dot} and \bold{strip} layers use the ggbeeswarm package when it
+is installed, and jittered points otherwise.
 }
 
 \examples{
     library(rbiom)
-    
+
     df <- adiv_table(rarefy(hmp50))
     stats_boxplot(df, x = "Body Site")
     stats_boxplot(df, x = "Sex", stat.by = "Body Site", layers = "be")
 }
 \seealso{
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{visualization}

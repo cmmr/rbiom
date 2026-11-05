@@ -4,27 +4,30 @@
 \name{rbiom-package}
 \alias{rbiom}
 \alias{rbiom-package}
-\title{rbiom: Read/Write, Transform, and Summarize BIOM Data}
+\title{rbiom: Integrated Analysis and Visualization of Microbiome Data}
 \description{
 A toolkit for working with Biological Observation Matrix (BIOM) files.
 Features include reading/writing all BIOM formats, rarefaction, alpha
 diversity, beta diversity (including UniFrac), summarizing counts by
-taxonomic level, and sample subsetting. Standalone functions for
-reading, writing, and subsetting phylogenetic trees are also provided.
-All CPU intensive operations are encoded in C with multi-thread support.
+taxonomic level, sample subsetting, statistics, and visualization.
+Standalone functions for reading, writing, and subsetting phylogenetic
+trees are also provided.
 }
+\section{Reproducibility}{
+
+
+Every rbiom object records the steps that produced it, and every table,
+statistic, and plot carries the R code needed to regenerate it. See
+\code{biom$code}, \code{table$code}, \code{stats$code}, and \code{plot$code}. The
+\link[=rbiom_objects]{rbiom objects} page has details.
+}
+
 \section{Multithreading}{
 
-Many rbiom functions support multithreading:
 
-The default behavior of these function is to run on as many cores as are
-available in the local compute environment. If you wish to limit the number
-of simultaneous threads, set \code{RcppParallel}'s \code{numThreads} option.
-For instance:
-
-\preformatted{
-    RcppParallel::setThreadOptions(numThreads = 4)
-}
+Diversity calculations are performed by the 'ecodive' package, which runs
+on all available cores by default. Use the \code{cpus} argument of individual
+functions to limit the number of threads, e.g. \code{adiv_table(biom, cpus = 1)}.
 }
 
 \seealso{
@@ -38,6 +41,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Daniel P. Smith \email{dansmith01@gmail.com} (\href{https://orcid.org/0000-0002-2479-2044}{ORCID})
+
+Authors:
+\itemize{
+  \item Daniel P. Smith \email{dansmith01@gmail.com} (\href{https://orcid.org/0000-0002-2479-2044}{ORCID})
+}
 
 Other contributors:
 \itemize{

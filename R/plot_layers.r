@@ -1,109 +1,140 @@
 #________________________________________________________
+# A plot is assembled from "layers": a named environment (`params$layers`)
+# in which each entry holds the arguments for one ggplot2 call. The
+# plot_* functions populate it with init_layers() / set_layer(), and
+# plot_build() turns it into a ggplot object plus the code that rebuilds
+# that object from `data`.
+#
+# Arguments given in `...` by the user are routed to layers by prefix
+# (`b.alpha = 0.5` goes to the bar layer) or, unprefixed, to every layer
+# whose function has an argument of that name (`scales = "free"` goes to
+# facet_wrap()). add_layer() records which ones were used so that
+# plot_build() can reject the rest with a helpful message.
+#
+# Optional packages (ggbeeswarm, ggrepel, ggdensity, fillpattern) are used
+# when installed; the dot/strip/taxon layers fall back to ggplot2 geoms.
+#________________________________________________________
+
+
+
+#________________________________________________________
+# Is an optional package available? The `rbiom.disable_pkgs` option lets
+# the tests exercise the fallbacks without uninstalling anything.
+#________________________________________________________
+pkg_available <- function (pkg) {
+  if (pkg %in% getOption('rbiom.disable_pkgs', character())) return (FALSE)
+  nzchar(system.file(package = pkg))
+}
+
+
+
+#________________________________________________________
 # Converts user's `layers` spec to `layers` environment.
 #________________________________________________________
 init_layers <- function (
     params = parent.frame(), choices = NULL, var = "layers", do_init = NULL ) {
-  
-  
+
+
   layer_names <- do_init
   if (!is_null(params$facet.by)) layer_names %<>% c('facet')
   if (!is.null(choices))         layer_names %<>% c(validate_layers(var, choices, env = params))
-  
-  
-  
+
+
+
   #________________________________________________________
   # Ignore shapes/patterns without applicable layers.
   #________________________________________________________
   if (!any(c('dot', 'strip', 'pointrange', 'point') %in% layer_names)) params$shapes   <- NULL
   if (!any(c('box', 'bar', 'violin', 'stack')       %in% layer_names)) params$patterns <- NULL
-  
-  
+
+
   #________________________________________________________
   # Resolve `colors`, `patterns`, and `shapes`.
   #________________________________________________________
-  
+
   if (is_palette(params$colors))
     params$colors <- color_palette(params$colors)
-  
+
   for (i in c('colors', 'shapes', 'patterns')) {
-    
+
     x <- params[[i]]
-    
+
     if (is.null(x)) next
     if (isFALSE(x)) { params[[i]] <- NULL; next }
-    
-    
+
+
     # Use `color.by` instead of `stat.by`
     by <- sub("s$", ".by", i)
     by <- if (hasName(params, by)) params[[by]] else params$stat.by
     if (is.null(by)) { params[[i]] <- NULL; next }
-    by <- params$.ggdata[[by]]
-    if (is.null(by)) { params[[i]] <- NULL; next }
-    
+    by_vals <- params$.ggdata[[by]]
+    if (is.null(by_vals)) { params[[i]] <- NULL; next }
+
     # Gradient colors finish up here.
-    if (!is.factor(by)) next
-    
-    
-    stat_lvls  <- levels(by)
+    if (!is.factor(by_vals)) next
+
+
+    stat_lvls  <- levels(by_vals)
     stat_nlvls <- length(stat_lvls)
-    
-    
+
+
     if (isTRUE(x))
       x <- switch(
-        EXPR = i, 
-        'colors'   = get_n_colors(n = stat_nlvls), 
-        'shapes'   = get_n_shapes(n = stat_nlvls), 
+        EXPR = i,
+        'colors'   = get_n_colors(n = stat_nlvls),
+        'shapes'   = get_n_shapes(n = stat_nlvls),
         'patterns' = get_n_patterns(n = stat_nlvls) )
-    
-    
+
+
     # Re-order named aesthetic values to match levels() order.
     if (!is.null(names(x))) {
-      
+
       xn <- names(x)
       validate_var_choices('xn', evar = i, choices = stat_lvls, max = Inf)
       names(x) <- xn
       remove("xn")
-      
+
       if (length(missing <- setdiff(stat_lvls, names(x))) > 0)
-        cli_abort("Missing `{i}` for {stat.by} {qty(missing)} level{?s} {.val {missing}}.")
-      
+        cli_abort("Missing `{i}` for {.field {by}} {qty(length(missing))} level{?s} {.val {missing}}.")
+
       if (length(dups <- unique(names(x)[duplicated(names(x))])) > 0)
-        cli_abort("Duplicated {qty(dups)} name{?s} in `{i}`: {.val {dups}}.")
-      
+        cli_abort("Duplicated {qty(length(dups))} name{?s} in `{i}`: {.val {dups}}.")
+
       x <- as.vector(x[stat_lvls])
     }
-    
-    
+
+
     params[[i]] <- rep_len(x, stat_nlvls)
   }
-  
-  remove(list = c("i", "x", "by", "stat_lvls", "stat_nlvls") %>% intersect(ls()))
-  
-  
-  
-  
+
+  remove(list = c("i", "x", "by", "by_vals", "stat_lvls", "stat_nlvls") %>% intersect(ls()))
+
+
+  if (!is.null(params$patterns) && !pkg_available('fillpattern'))
+    package_missing('fillpattern', 'to fill with patterns (`patterns`)')
+
+
   if (!is.null(names(params$.dots)))
     if (any(startsWith(names(params$.dots), 'labs.')))
       layer_names %<>% c('labs')
-  
-  
+
+
   init_layer_names <- layer_names %>%
     c('ggplot', ., 'xaxis', 'yaxis', 'theme', 'theme_bw') %>%
     unique()
-  
-  
+
+
   #________________________________________________________
   # Create and populate the layers environment.
   #________________________________________________________
   params$.plot_attrs %<>% if.null(list())
+  params$.dots_used  %<>% if.null(character())
   params$layers      <- rlang::new_environment()
-  
+
   for (layer_name in init_layer_names)
     add_layer(params, layer_name)
-  
-  
-  
-  
+
+
   return (invisible(layer_names))
 }
 
@@ -123,11 +154,11 @@ has_layer <- function (params, layer) {
 # Deletes an entire layer.
 #________________________________________________________
 del_layer <- function (params, layer) {
-  
+
   for (i in layer)
     if (hasName(params$layers, i))
       remove(list = i, pos = params$layers)
-  
+
   return (invisible(NULL))
 }
 
@@ -137,16 +168,16 @@ del_layer <- function (params, layer) {
 # Finds `layers` variable in parent env, then updates it.
 #________________________________________________________
 set_layer <- function (params, layer, ..., .fn = NULL, .overwrite = FALSE) {
-  
+
   layers <- params$layers
-  
-  
+
+
   if (!hasName(layers, layer))
     add_layer(params, layer, fn = .fn)
-  
+
   dots <- list(...)
-  
-  
+
+
   # Expand lists. For cases of e.g.
   # set_layer(params, 'box', fill="white", list(linewidth=2))
   keyvals <- list()
@@ -157,17 +188,17 @@ set_layer <- function (params, layer, ..., .fn = NULL, .overwrite = FALSE) {
       } else {
         keyvals[[key]] <- dots[[i]]
       }
-      
+
     } else {
       keyvals <- c(keyvals, dots[[i]])
     }
   }
-  
-  
+
+
   for (key in names(keyvals)) {
     val <- keyvals[[key]]
     key <- strsplit(key, "|", fixed = TRUE)[[1]]
-    
+
     # set_layer(params, 'bar', fill = "green")
     if (length(key) == 1) {
       if (!hasName(layers[[layer]], key) || .overwrite)
@@ -176,82 +207,43 @@ set_layer <- function (params, layer, ..., .fn = NULL, .overwrite = FALSE) {
         } else {
           layers[[layer]][[key]] <- val
         }
-      
+
     # set_layer(params, 'bar', "mapping|fill" = "Body Site")
     } else if (length(key) == 2) {
       key1 <- key[[1]]
       key2 <- key[[2]]
-      
+
       if (!hasName(layers[[layer]], key1))
         layers[[layer]][[key1]] <- list()
-        
+
       if (!hasName(layers[[layer]][[key1]], key2) || .overwrite)
         if (is_null(val)) {
           layers[[layer]][[key1]][key2] <- list(NULL)
         } else {
           layers[[layer]][[key1]][[key2]] <- val
         }
-      
+
     } else {
       cli_abort("Key vector is too long. Key {.val {key}} split on '|'.")
     }
-    
+
   }
-  
+
   return (invisible(NULL))
 }
 
 
 
 #________________________________________________________
-# Set up a layer with its function, function name, etc.
-# Uses attr(layers, 'params') to add in user's params.
-# Can set the underlying function using 'fn' parameter.
+# The ggplot2 (or optional package) function behind each layer.
 #________________________________________________________
-add_layer <- function (params, layer, fn = NULL) {
-  
-  stopifnot(is_scalar_character(layer))
-  stopifnot(is_bare_environment(params))
-  
-  layers <- params$layers
-  stopifnot(is_bare_environment(params))
-  
-  if (hasName(layers, layer))
-    cli_abort("Cannot add layer {.val {layer}} twice.")
-  
-  
+layer_function <- function (layer, params, fn = NULL) {
+
   xmode     <- params$.xmode
   patterned <- !is_null(params$patterns)
   facetDims <- length(params$facet.by)
-  
-  
-  
-  # Get the plotting function's `...` arguments.
-  #________________________________________________________
-  layer_params <- params$.dots
-  
-  
-  # Ensure NULLs can be inserted into a list
-  #________________________________________________________
-  for (i in seq_along(layer_params))
-    if (is_null(layer_params[[i]]))
-      layer_params[[i]] <- list(NULL)
-  
-  
-  # Arrays and functions need list wrappers too.
-  # plot(yaxis.expand=1:4, yaxis.transform=sqrt)
-  #________________________________________________________
-  for (i in seq_along(layer_params))
-    if (length(layer_params[[i]]) > 1 || is.function(layer_params[[i]]))
-      layer_params[[i]] <- list(layer_params[[i]])
-  
-  
-  
-  result <- list()
-  
-  
-  
-  attr(result, 'function') <- switch(
+
+  switch(
     EXPR = layer,
     'ggplot'       = P('ggplot2::ggplot'),
     'arrow'        = P('ggplot2::geom_segment'),
@@ -262,48 +254,61 @@ add_layer <- function (params, layer, fn = NULL) {
     'confidence'   = P('ggplot2::geom_ribbon'),
     'crossbar'     = P('ggplot2::geom_crossbar'),
     'density'      = P('ggdensity::geom_hdr'),
-    'dot'          = P('ggbeeswarm::geom_beeswarm'),
-    'errorbar'     = P('ggplot2::geom_errorbar'),
+    'dot'          = if (pkg_available('ggbeeswarm')) P('ggbeeswarm::geom_beeswarm') else P('ggplot2::geom_point'),
     'ellipse'      = P('ggplot2::stat_ellipse'),
+    'errorbar'     = P('ggplot2::geom_errorbar'),
     'facet'        = if (facetDims == 2) P('ggplot2::facet_grid') else P('ggplot2::facet_wrap'),
     'fill'         = if (patterned) P('fillpattern::scale_fill_pattern') else P('ggplot2::scale_fill_manual'),
     'flip'         = P('ggplot2::coord_flip'),
-    # 'free_y'     = P('ggplot2::facetted_pos_scales'),
     'hline'        = P('ggplot2::geom_hline'),
-    'label'        = P('ggplot2::geom_label'),
     'labs'         = P('ggplot2::labs'),
     'linerange'    = P('ggplot2::geom_linerange'),
     'mean'         = P('ggplot2::geom_point'),
     'name'         = P('ggplot2::geom_text'),
-    'pointrange'   = P('ggplot2::geom_pointrange'),
     'point'        = P('ggplot2::geom_point'),
+    'pointrange'   = P('ggplot2::geom_pointrange'),
     'rect'         = P('ggplot2::geom_rect'),
     'residual'     = P('ggplot2::geom_segment'),
     'shape'        = P('ggplot2::scale_shape_manual'),
-    'smooth'       = P('ggplot2::stat_smooth'),
     'spider'       = P('ggplot2::geom_segment'),
     'stack'        = P('ggplot2::geom_col'),
-    'stats_bg'     = P('ggplot2::geom_rect'),
-    'stats_ggtext' = P('ggtext::geom_textbox'),
+    'stats_bg'     = P('ggplot2::annotate'),
     'stats_label'  = P('ggplot2::geom_label'),
     'stats_text'   = P('ggplot2::geom_text'),
     'stats_vline'  = P('ggplot2::geom_vline'),
-    'strip'        = P('ggbeeswarm::geom_quasirandom'),
-    'stripe'       = P('ggplot2::geom_rect'),
-    'table'        = P('ggplot2::annotation_custom'),
-    'taxon'        = P('ggrepel::geom_label_repel'),
+    'strip'        = if (pkg_available('ggbeeswarm')) P('ggbeeswarm::geom_quasirandom') else P('ggplot2::geom_point'),
+    'stripe'       = P('ggplot2::annotate'),
+    'taxon'        = if (pkg_available('ggrepel')) P('ggrepel::geom_label_repel') else P('ggplot2::geom_label'),
     'theme'        = P('ggplot2::theme'),
     'theme_bw'     = P('ggplot2::theme_bw'),
-    'topo'         = P('ggdensity::geom_hdr_lines'),
     'trend'        = P('ggplot2::geom_line'),
     'violin'       = P('ggplot2::geom_violin'),
     'vline'        = P('ggplot2::geom_vline'),
-    'xaxis'        = if (xmode == "factor") P('ggplot2::scale_x_discrete') else P('ggplot2::scale_x_continuous'),
+    'xaxis'        = if (eq(xmode, "factor")) P('ggplot2::scale_x_discrete') else P('ggplot2::scale_x_continuous'),
     'yaxis'        = P('ggplot2::scale_y_continuous'),
     if (is.null(fn)) P(paste0('ggplot2::', layer)) else get(fn) )
-  
-  
-  attr(result, 'src') <- switch(
+}
+
+
+
+#________________________________________________________
+# Layers whose geoms draw lines or outlines, where `size` must be given
+# as `linewidth`. (Point and text layers keep `size`; pointrange uses
+# both, so it's excluded.)
+#________________________________________________________
+LINE_LAYERS <- c(
+  'arrow', 'bar', 'box', 'brackets', 'confidence', 'crossbar', 'ellipse',
+  'errorbar', 'hline', 'linerange', 'rect', 'residual', 'spider', 'stack',
+  'stats_vline', 'trend', 'violin', 'vline' )
+
+
+
+#________________________________________________________
+# Which derived table (an attribute of `.ggdata`) a layer draws from.
+# See plot_build() for how these become `labels <- ...` etc. in the code.
+#________________________________________________________
+layer_src <- function (layer) {
+  switch(
     EXPR = layer,
     'arrow'        = "taxa_coords",
     'brackets'     = "stat_brackets",
@@ -315,42 +320,27 @@ add_layer <- function (params, layer, fn = NULL) {
     'pointrange'   = "vline",
     'residual'     = "residual",
     'spider'       = "spider",
-    'stats_ggtext' = "stat_labels",
     'stats_label'  = "stat_labels",
     'stats_text'   = "stat_labels",
     'stats_vline'  = "stat_vline",
     'taxon'        = "taxa_coords",
-    'trend'        = "fit" )
-  
-  
-  result[['data']] <- switch(
-    EXPR = layer,
-    'arrow'        = ~ attr(., "taxa_coords"),
-    'brackets'     = ~ attr(., "stat_brackets"),
-    'confidence'   = ~ attr(., "fit"),
-    'crossbar'     = ~ attr(., "vline"),
-    'errorbar'     = ~ attr(., "vline"),
-    'linerange'    = ~ attr(., "vline"),
-    'mean'         = ~ attr(., "taxa_coords"),
-    'pointrange'   = ~ attr(., "vline"),
-    'residual'     = ~ attr(., "residual"),
-    'spider'       = ~ attr(., "spider"),
-    'stats_ggtext' = ~ attr(., "stat_labels"),
-    'stats_label'  = ~ attr(., "stat_labels"),
-    'stats_text'   = ~ attr(., "stat_labels"),
-    'stats_vline'  = ~ attr(., "stat_vline"),
-    'taxon'        = ~ attr(., "taxa_coords"),
-    'trend'        = ~ attr(., "fit") )
-  
-  
-  regex <- switch(
+    'trend'        = "fit",
+    NULL )
+}
+
+
+
+#________________________________________________________
+# The `...` prefix(es) that route an argument to a layer.
+#________________________________________________________
+layer_regex <- function (layer) {
+  switch(
     EXPR = layer,
     'ggplot'       = "^g(|gplot)\\.",
     'arrow'        = "^a(|rrow)\\.",
-    'bar'          = "^(r|bar)\\.",
-    'box'          = "^b(|ox)\\.",
-    'brackets'     = "^h(|line)\\.",
-    'cladelab'     = "^c(|lade|ladelab)\\.",
+    'bar'          = "^(b|bar)\\.",
+    'box'          = "^box\\.",
+    'brackets'     = "^brackets\\.",
     'color'        = "^color\\.",
     'confidence'   = "^c(|onfidence)\\.",
     'crossbar'     = "^c(|rossbar)\\.",
@@ -361,10 +351,7 @@ add_layer <- function (params, layer, fn = NULL) {
     'facet'        = "^f(|acet)\\.",
     'fill'         = "^(fill|pattern|patterns)\\.",
     'flip'         = "^flip\\.",
-    'heat'         = "^h(|eat|eatmap)\\.",
-    'hexpand'      = "^h(|expand)\\.",
     'hline'        = "^[rh](|line)\\.",
-    'label'        = "^l(|abel)\\.",
     'labs'         = "^labs\\.",
     'linerange'    = "^l(|inerange)\\.",
     'mean'         = "^m(|ean)\\.",
@@ -376,274 +363,125 @@ add_layer <- function (params, layer, fn = NULL) {
     'size'         = "^size\\.",
     'spider'       = "^s(|pider)\\.",
     'stack'        = "^s(|tack)\\.",
-    'stats_ggtext' = "^stats\\.",
     'stats_label'  = "^stats\\.",
     'stats_text'   = "^stats\\.",
     'strip'        = "^(pt|s|strip)\\.",
     'taxon'        = "^taxon\\.",
     'theme'        = "^theme\\.",
     'theme_bw'     = "^theme_bw\\.",
-    'tiplab'       = "^tip(|lab)\\.",
     'trend'        = "^t(|rend)\\.",
-    'topo'         = "^topo\\.",
     'vline'        = "^[rv](|line)\\.",
     'violin'       = "^v(|iolin)\\.",
     'xaxis'        = "^x(|axis)\\.",
     'yaxis'        = "^y(|axis)\\.",
     sprintf("^%s\\.", layer) )
-  
-  
-  
-  
+}
+
+
+
+#________________________________________________________
+# Set up a layer with its function, function name, etc.
+# Uses attr(layers, 'params') to add in user's params.
+# Can set the underlying function using 'fn' parameter.
+#________________________________________________________
+add_layer <- function (params, layer, fn = NULL) {
+
+  stopifnot(is_scalar_character(layer))
+  stopifnot(is_bare_environment(params))
+
+  layers <- params$layers
+
+  if (hasName(layers, layer))
+    cli_abort("Cannot add layer {.val {layer}} twice.")
+
+
+  # Get the plotting function's `...` arguments.
+  #________________________________________________________
+  layer_params <- params$.dots
+
+
+  # Ensure NULLs can be inserted into a list
+  #________________________________________________________
+  for (i in seq_along(layer_params))
+    if (is_null(layer_params[[i]]))
+      layer_params[[i]] <- list(NULL)
+
+
+  # Arrays and functions need list wrappers too.
+  # plot(yaxis.expand=1:4, yaxis.transform=sqrt)
+  #________________________________________________________
+  for (i in seq_along(layer_params))
+    if (length(layer_params[[i]]) > 1 || is.function(layer_params[[i]]))
+      layer_params[[i]] <- list(layer_params[[i]])
+
+
+  result <- list()
+  attr(result, 'function') <- layer_function(layer, params, fn)
+  attr(result, 'src')      <- layer_src(layer)
+
+  regex <- layer_regex(layer)
+  used  <- character()
+
+
   # Unprefixed dot arguments, e.g. 'scales'="free_x"
   #________________________________________________________
   layer_fun <- attr(result, 'function', exact = TRUE)
   f_args    <- intersect(
-    x = names(layer_params), 
+    x = names(layer_params),
     y = attr(layer_fun, 'formalArgs') %||% formalArgs(layer_fun) )
   for (i in f_args)
-    if (!isFALSE(attr(layer_params[[i]], 'display')))
+    if (!isFALSE(attr(layer_params[[i]], 'display'))) {
       result[i] <- layer_params[[i]]
-  
-  
+      used      <- c(used, i)
+    }
+
+
   # Prefixed dot arguments, e.g. 'facet.scales'="free_x"
   #________________________________________________________
   for (i in grep(regex, names(layer_params), value = TRUE))
     if (!isFALSE(attr(layer_params[[i]], 'display')))
-      if (!i %in% c('p.top', 'p.label', 'p.adj'))
+      if (!i %in% c('p.top', 'p.label', 'p.adj')) {
         result[sub(regex, "", i, perl = TRUE)] <- layer_params[[i]]
-  
-  
-  
-  # #________________________________________________________
-  # # Synchronize user's facet scales with params$.free_x/y
-  # #________________________________________________________
-  # if (layer == "facet") {
-  #   
-  #   scales <- if.null(layers[['facet']][['scales']], 'fixed')
-  #   
-  #   params$.free_x %<>% if.null(scales %in% c('free', 'free_x'))
-  #   params$.free_y %<>% if.null(scales %in% c('free', 'free_y'))
-  #   
-  #   if (params$.free_x || params$.free_y)
-  #     layers[['facet']][['scales']] <- switch(
-  #       paste(params$.free_x, params$.free_y),
-  #       'TRUE TRUE'  = "free", 
-  #       'TRUE FALSE' = "free_x", 
-  #       'FALSE TRUE' = "free_y" )
-  # }
-  
-  
-  
-  
-  layers[[layer]] <- result
-  
-  
+        used <- c(used, i)
+      }
+
+
+  # ggplot2 >= 3.4 sizes lines with `linewidth`; `size` is deprecated for
+  # them. Translate it, e.g. `t.size = 2` for a thicker trendline.
+  if (layer %in% LINE_LAYERS && hasName(result, 'size')) {
+    if (!hasName(result, 'linewidth')) result['linewidth'] <- result['size']
+    result[['size']] <- NULL
+  }
+
+  params$.dots_used <- union(params$.dots_used, used)
+  layers[[layer]]   <- result
+
+
   return (invisible(NULL))
 }
 
 
 
-# #________________________________________________________
-# #' Subset `biom` by `*.by` args. Assign colors, etc.
-# #' 
-# #' @noRd
-# #' @keywords internal
-# sync_metadata <- function (md, params = parent.frame()) {
-#   
-#   
-#   by_params <- c(
-#     "x", "y", "color.by", "shape.by", "facet.by", 
-#     "pattern.by", "label.by", "order.by", "stat.by", "limit.by" )
-#   
-#   
-#   
-#   #________________________________________________________
-#   # Tracks which metadata columns are used.
-#   #________________________________________________________
-#   md_params <- intersect(by_params, env_names(params))
-#   col_names <- c(params[['within']], params[['between']]) # Metadata columns needed in ggdata.
-#   revsort   <- c() # For order.by, reverse if '-' prefix.
-#   group_by  <- c() # ggdata cols to use for ggplot group.
-#   
-#   subset_vals <- list()
-#   subset_lo   <- list()
-#   subset_hi   <- list()
-#   
-#   
-#   #________________________________________________________
-#   # Apply subseting defined by 'range' or 'values'.
-#   #________________________________________________________
-#   for (md_param in md_params) {
-#     for (i in seq_along(params[[md_param]])) {
-#       
-#       col_spec <- params[[md_param]][[i]]
-#       col_name <- names(params[[md_param]])[[i]]
-#       
-#       col_names %<>% c(col_name)
-#       revsort   %<>% c(attr(col_spec, 'revsort', exact = TRUE))
-#       
-#       
-#       if (hasName(col_spec, 'range')) {
-#         
-#         lo <- min(col_spec[['range']])
-#         hi <- max(col_spec[['range']])
-#         
-#         subset_lo[[col_name]] <- max(c(lo, subset_lo[[col_name]]))
-#         subset_hi[[col_name]] <- min(c(hi, subset_hi[[col_name]]))
-#         if (subset_lo[[col_name]] > subset_hi[[col_name]]) cli_abort("All {col_name} values dropped.")
-#       }
-#       
-#       
-#       if (hasName(col_spec, 'values')) {
-#         
-#         values <- col_spec[['values']]
-#         
-#         lvls <- names(values) # color.by = list('Sex' = c(Male = "green", Female = "teal"))
-#         if (is.null(lvls)) {  # color.by = list('Sex' = c("Male", "Female"))
-#           lvls <- as.vector(values)
-#           params[[md_param]][[i]][['values']] <- NULL
-#         }
-#         validate_var_choices( # color.by = list('Sex' = c("m", "f"))
-#           var     = 'lvls', 
-#           choices = levels(md[[col_name]]), 
-#           evar    = paste0(md_param, ": ", col_name), 
-#           max     = Inf )
-#         
-#         if (is.null(subset_vals[[col_name]])) { subset_vals[[col_name]] <- lvls                 }
-#         else                                  { subset_vals[[col_name]] %<>% intersect(lvls, .) }
-#         if (length(subset_vals[[col_name]]) == 0) cli_abort("All {col_name} values dropped.")
-#       }
-#       
-#     }
-#   }
-#   
-#   
-#   #________________________________________________________
-#   # Drop rows according to subset specs.
-#   #________________________________________________________
-#   col_names %<>% unique()
-#   md <- md[,intersect(colnames(md), unique(c(".sample", col_names)))]
-#   
-#   subset_cmds <- c()
-#   factor_cmds <- c()
-#   omit_cmds   <- c()
-#   
-#   for (i in col_names) {
-#     
-#     if (hasName(subset_vals, i) && !identical(levels(md[[i]]), subset_vals[[i]])) {
-#       lvls <- subset_vals[[i]]
-#       md[[i]] %<>% factor(levels = lvls)
-#       lvls_str <- as.args(list(lvls))
-#       factor_cmds %<>% c(glue("biom$metadata${coan(i)} %<>% factor(levels = {lvls_str})"))
-#     }
-#     
-#     if (hasName(subset_lo, i) && min(c(Inf, md[[i]]), na.rm = TRUE) < subset_lo[[i]]) {
-#       md <- md[md[[i]] >= subset_lo[[i]],]
-#       subset_cmds %<>% c(glue("{coan(i)} >= {subset_lo[[i]]}"))
-#     }
-#     
-#     if (hasName(subset_hi, i) && max(c(-Inf, md[[i]]), na.rm = TRUE) > subset_hi[[i]]) {
-#       md <- md[md[[i]] <= subset_hi[[i]],]
-#       subset_cmds %<>% c(glue("{coan(i)} <= {subset_hi[[i]]}"))
-#     }
-#     
-#   }
-#   
-#   if (anyNA(md)) {
-#     md        <- stats::na.omit(md)
-#     omit_cmds <- glue("biom$metadata %<>% na.omit()")
-#   }
-#   
-#   if (length(subset_cmds) > 0)
-#     subset_cmds <- glue("biom %<>% subset({paste0(subset_cmds, collapse = ' & ')})")
-#   
-#   if (length(c(subset_cmds, factor_cmds, omit_cmds)) > 0)
-#     params$.subset_code <- paste0(c(subset_cmds, factor_cmds, omit_cmds), collapse = "\n")
-#   
-#   
-#   
-#   #________________________________________________________
-#   # Discard vestigial factor levels.
-#   #________________________________________________________
-#   for (i in seq_len(ncol(md)))
-#     if (is.factor(md[[i]]))
-#       md[[i]] %<>% {factor(., levels = intersect(levels(.), .))}
-#   
-#   
-#   #________________________________________________________
-#   # Re-order the samples according to metadata.
-#   #________________________________________________________
-#   for (i in rev(names(params$order.by)))
-#     md <- md[order(md[[i]], decreasing = i %in% revsort),,drop=FALSE]
-#   
-#   
-#   
-#   #________________________________________________________
-#   # Simplify all *.by params except color/shape/pattern.
-#   #________________________________________________________
-#   for (param in md_params) {
-#     
-#     if (length(params[[param]]) == 0) {
-#       rlang::env_poke(params, nm = param, value = NULL)
-#       
-#     } else if (!param %in% c("color.by", "shape.by", "pattern.by", "within", "between")) {
-#       params[[param]] %<>% names()
-#     }
-#   }
-#   
-#   
-#   
-#   #________________________________________________________
-#   # Explicitly map color/shape/pattern to values.
-#   #________________________________________________________
-#   for (param in c("color.by", "shape.by", "pattern.by")) {
-#     
-#     for (i in seq_along(params[[param]])) {
-#       
-#       col_spec <- params[[param]][[i]]
-#       col_name <- attr(col_spec, 'col_name', exact = TRUE)
-#       col_type <- attr(col_spec, 'col_type', exact = TRUE)
-#       values   <- col_spec[['values']]
-#       
-#       
-#       if (eq(col_type, "cat")) {
-#         
-#         n <- nlevels(md[[col_name]])
-#         
-#         
-#         # Will need additional colors/shapes/patterns for bdiv box/corr.
-#         if (hasName(params, 'within') && n > 1)
-#           n <- as.integer(local({
-#             if (col_name %in% params$within)  return (n)
-#             if (col_name %in% params$between) return ((n * (n - 1) / 2))
-#             return ((n * (n - 1) / 2) + n)
-#           }))
-#         
-#         
-#         if (is_null(values))
-#           values <- switch(
-#             EXPR = param,
-#             'color.by'   = get_n_colors(n, col_spec[['colors']]),
-#             'shape.by'   = get_n_shapes(n),
-#             'pattern.by' = get_n_patterns(n) )
-#         
-#         
-#       } else if (eq(col_type, "num")) {
-#         if (hasName(col_spec, 'colors')) values <- col_spec[['colors']]
-#         if (is_palette(values))          values %<>% get_palette()
-#       }
-#       
-#       col_spec[['colors']] <- NULL
-#       col_spec[['values']] <- values
-#       params[[param]][[i]] <- col_spec
-#     }
-#   }
-#   
-#   
-#   
-#   return (md)
-# }
+#________________________________________________________
+# Reject `...` arguments that no layer consumed, naming the prefixes
+# that would have worked. Called by plot_build() once every layer exists.
+#________________________________________________________
+check_unused_dots <- function (params, exempt = NULL) {
 
+  dots <- names(params$.dots)
+  if (length(dots) == 0) return (invisible(NULL))
 
+  unused <- setdiff(dots, c(params$.dots_used, exempt, 'ci.min', 'ci.max'))
+  unused <- unused[nzchar(unused)]
+  if (length(unused) == 0) return (invisible(NULL))
 
+  layers   <- setdiff(env_names(params$layers), c('ggplot', 'stats_bg', 'stripe', 'stats_text', 'stats_label', 'stats_vline', 'brackets'))
+  prefixes <- paste0(sort(c(layers, if (!'labs' %in% layers) 'labs')), ".")
+
+  fn <- params$.fn %||% "this function"
+
+  cli_abort(c(
+    'x' = "{.val {unused}} {?is/are} not {?an argument/arguments} of {fn} or of any of its layers.",
+    'i' = "Prefix an argument with a layer name to pass it to that layer's ggplot2 function, e.g. {.code {prefixes[[1]]}size = 2}. Available prefixes: {.val {prefixes}}.",
+    'i' = "Groups are colored by `stat.by`; see also `colors`, `shapes`, and `facet.by`." ))
+}

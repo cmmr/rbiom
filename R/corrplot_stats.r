@@ -1,102 +1,174 @@
 #________________________________________________________
-# Computes p-values for categorical differences.
+# Computes p-values for regression plots and places them on the plot.
+#
+# Inputs read from `params`:
+#   .ggdata, .xcol, .ycol, stat.by, facet.by, test, fit, at, level, alt,
+#   mu, p.adj, p.top, caption, strata (optional), and, when
+#   .ycol == ".distance" (beta diversity corrplots): biom, bdiv, tree,
+#   alpha, cpus, seed, permutations.
+#
+# Which test runs:
+#   .ycol == ".distance": a Mantel test (bdiv_stats(test = "mantel")) of
+#       the distances against |x_i - x_j|, one per facet and stat.by
+#       group. One label per facet; no vertical line.
+#   otherwise: stats_table() with the plot's regr/resp/stat.by/facet.by,
+#       honoring test ("emmeans"/"emtrends"), fit, at, level, alt, mu,
+#       p.adj, and strata. Tests evaluated at an `at` position (pairwise
+#       means; gam slopes) get a label and a dotted vertical line at that
+#       position (the most significant row per facet when several); global
+#       tests get a label in the top-left corner.
+#
+# Outputs:
+#   params$.plot_attrs$stats     - the statistics table.
+#   attr(.ggdata, 'stat_labels') - tibble: facet.by columns, .xcol, .ycol,
+#                                  .label, .hjust, .vjust ('stats_label').
+#   attr(.ggdata, 'stat_vline')  - tibble: facet.by columns, .xcol
+#                                  ('stats_vline'); absent for global tests.
 #________________________________________________________
 corrplot_stats <- function (params) {
-  
+
   stopifnot(is_bare_environment(params))
-  
-  
+
+
   # Validation of user arguments handled by corrplot_build()
-  
-  
+
+
   #________________________________________________________
   # Omit stats from this plot.
   #________________________________________________________
-  if (params$test == 'none')
+  if (eq(params$test, 'none'))
     return (params)
-  
-  
-  
+
+  is_bdiv <- eq(params$.ycol, '.distance')
+
+
   #________________________________________________________
-  # If anything goes wrong, skip stats.
+  # If anything goes wrong, skip stats. (Optional parameters such as
+  # `strata` or `biom` are NULL when the plot function doesn't set them.)
   #________________________________________________________
-  tryCatch(
-    error = function (e) { warning(e); return (params) },
-    expr  = with(params, {
-      .plot_attrs[['stats']] <- stats_table(
-        df       = .ggdata, 
-        regr     = .xcol, 
-        resp     = .ycol, 
-        stat.by  = stat.by, 
-        split.by = facet.by, 
-        test     = test, 
-        fit      = fit, 
-        at       = at, 
-        level    = level, 
-        alt      = alt, 
-        mu       = mu, 
-        p.adj    = p.adj )
-    }))
-  
-  
-  
+  stats <- tryCatch(
+    error = function (e) { cli_warn(c('!' = "Statistics skipped: {conditionMessage(e)}")); NULL },
+    expr  = {
+
+      if (is_bdiv) {
+
+        if (!inherits(params$biom, 'rbiom') || is.null(params$bdiv))
+          cli_abort("Beta diversity statistics need the rbiom object (`biom`) and `bdiv` in the plot parameters.")
+
+        bdiv_stats(
+          biom         = params$biom,
+          regr         = params$.xcol,
+          stat.by      = params$stat.by,
+          bdiv         = params$bdiv,
+          tree         = params$tree,
+          split.by     = setdiff(params$facet.by, c('.bdiv', '.adiv', '.rank', '.taxa')),
+          strata       = params$strata,
+          test         = "mantel",
+          seed         = params$seed %||% 0,
+          permutations = params$permutations %||% 999,
+          p.adj        = params$p.adj,
+          alpha        = params$alpha %||% 0.5,
+          cpus         = params$cpus %||% n_cpus() )
+
+      } else {
+
+        stats_table(
+          df       = params$.ggdata,
+          regr     = params$.xcol,
+          resp     = params$.ycol,
+          stat.by  = params$stat.by,
+          split.by = params$facet.by,
+          strata   = params$strata,
+          test     = params$test,
+          fit      = params$fit,
+          at       = params$at,
+          level    = params$level,
+          alt      = params$alt,
+          mu       = params$mu,
+          p.adj    = params$p.adj )
+      }
+    })
+
+  if (is.null(stats))
+    return (params)
+
+  # Match the plot's factor levels for faceting.
+  if (hasName(stats, '.bdiv') && is.factor(params$.ggdata[['.bdiv']]))
+    stats[['.bdiv']] <- factor(as.character(stats[['.bdiv']]), levels = levels(params$.ggdata[['.bdiv']]))
+
+  params$.plot_attrs[['stats']] <- stats
+
+
   #________________________________________________________
   # Use p.top to retain only most significant taxa.
   #________________________________________________________
-  apply_p.top(params)
-  if (plyr::empty(params$.ggdata))
+  apply_p_top(params)
+  if (is_empty_df(params$.ggdata))
     return (invisible(params))
-  
-  
-  
+
+
+
   #________________________________________________________
-  # Show p-values on the plot. One per facet.
+  # Show p-values on the plot. One per facet (and stat.by group for
+  # Mantel tests), at `at` when the test was evaluated there.
   #________________________________________________________
-  
-  with(params, {
-    
-    attr(.ggdata, 'stat_labels') <- plyr::ddply(
-      .data      = .plot_attrs[['stats']],
-      .variables = ply_cols(facet.by),
-      .fun       = function (df) {
-        
-        plabel <- paste("p =", format(df$.adj.p[[1]], digits=2))
-        
-        if (fit == "lm" && test == "emtrends")
-          return (tibble(
-            !!.xcol := -Inf, 
-            !!.ycol :=  Inf,
-            .label   =  plabel, 
-            .hjust   = -0.1,
-            .vjust   =  1.2 ))
-        
-        
-        xpos   <- df[[.xcol]][[1]]
-        xlabel <- paste("x =", xpos)
-        
-        if (nrow(df) > 1)
-          xlabel <- paste(df[[stat.by]][[1]], "\n", xlabel)
-        
-        tibble(
-          !!.xcol := c(xpos, xpos), 
-          !!.ycol := c(Inf, -Inf),
-          .label   = c(plabel, xlabel), 
-          .hjust   = c(0.5,  0.5),
-          .vjust   = c(1, 0) )
-        
-      }) %>% as_tibble()
-    
-    
-    if (fit != "lm" || test != "emtrends")
-      attr(.ggdata, 'stat_vline') <- plyr::ddply(
-        .data      = .plot_attrs[['stats']],
-        .variables = ply_cols(facet.by),
-        .fun       = function (df) {
-          tibble(!!.xcol := df[[.xcol]][[1]])
-        }) %>% as_tibble()
-  })
-  
-  
+  xcol     <- params$.xcol
+  ycol     <- params$.ycol
+  stat.by  <- params$stat.by
+  facet.by <- params$facet.by
+  ggdata   <- params$.ggdata
+
+  stats  <- params$.plot_attrs[['stats']]
+  stats  <- stats[!is.na(stats[['.p.val']]), , drop = FALSE]
+
+  if (nrow(stats) == 0)
+    return (invisible(params))
+  at_col <- !is_bdiv && hasName(stats, xcol)
+  by     <- intersect(c(facet.by, if (is_bdiv) stat.by), names(stats))
+
+  attr(ggdata, 'stat_labels') <- split_apply(stats, by, function (df) {
+
+    df     <- df[order(df[['.p.val']]), , drop = FALSE]
+    plabel <- paste("p =", format(df$.adj.p[[1]], digits = 2))
+
+    if (is_bdiv)
+      plabel <- paste0("Mantel r = ", format(df$.stat[[1]], digits = 2), "; ", plabel)
+
+    if (!at_col)
+      return (tibble(
+        !!xcol  := -Inf,
+        !!ycol  :=  Inf,
+        .label   =  plabel,
+        .hjust   = -0.1,
+        .vjust   =  1.2 ))
+
+    xpos   <- df[[xcol]][[1]]
+    xlabel <- paste("x =", format(xpos, digits = 3))
+
+    if (!is.null(stat.by) && hasName(df, stat.by))
+      xlabel <- paste(df[[stat.by]][[1]], "\n", xlabel)
+
+    tibble(
+      !!xcol  := c(xpos, xpos),
+      !!ycol  := c(Inf, -Inf),
+      .label   = c(plabel, xlabel),
+      .hjust   = c(0.5,  0.5),
+      .vjust   = c(1, 0) )
+
+  }) %>% as_tibble()
+
+
+  attr(ggdata, 'stat_vline') <- NULL
+
+  if (at_col)
+    attr(ggdata, 'stat_vline') <- split_apply(stats, by, function (df) {
+      df <- df[order(df[['.p.val']]), , drop = FALSE]
+      tibble(!!xcol := df[[xcol]][[1]])
+    }) %>% as_tibble()
+
+  params$.ggdata <- ggdata
+
+
   set_layer(
     params = params,
     layer  = 'stats_label',
@@ -104,120 +176,69 @@ corrplot_stats <- function (params) {
     'mapping|hjust' = ".hjust",
     'mapping|vjust' = ".vjust",
     'size'          = 4 )
-  
+
   if ("linewidth" %in% names(ggplot2::GeomLabel$default_aes)) {
     set_layer(params, 'stats_label', 'linewidth' = NA)
   } else {
     set_layer(params, 'stats_label', 'label.size' = NA)
   }
-  
-  
+
+
   set_layer(
     params = params,
     layer  = 'yaxis',
     'expand' = c(0.15, 0, .15, 0) )
-  
-  if (!plyr::empty(attr(params$.ggdata, 'stat_vline')))
+
+  if (!is_empty_df(attr(params$.ggdata, 'stat_vline', exact = TRUE)))
     set_layer(
       params = params,
       layer  = 'stats_vline',
       'mapping|xintercept' = params$.xcol,
       'linetype'           = 'dotdash',
       'alpha'              = 0.2 )
-  
-  
-  
+
+
+
   if (isTRUE(params$caption)) {
-    
+
     .element_text <- P('ggplot2::element_text')
-    
-    # element_markdown
+
     set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     set_layer(params, 'labs', .overwrite = TRUE, caption = local({
-      
+
       curr <- params$layers$labs$caption
       curr <- if (is.null(curr)) '' else paste0(curr, "\n")
-      
-      interp <- with(params, glue(switch(
-        EXPR = paste0(test, "_", is.null(stat.by)),
-        emmeans_TRUE   = "trendline mean {alt} {mu}",
-        emmeans_FALSE  = "trendline means are different",
-        emtrends_TRUE  = "trendline slope {alt} {mu}",
-        emtrends_FALSE = "trendline slopes are different" )))
-      
-      if (nrow(params$.plot_attrs[['stats']]) <= 1) {
-        meth <- ""
+
+      test <- params$test
+      fit  <- params$fit
+
+      interp <- if (is_bdiv) {
+        sprintf("distances correlate with differences in %s (Mantel test, %s permutations)", xcol, params$permutations %||% 999)
+
+      } else if (is.null(stat.by)) {
+        if (test == "emmeans" && fit == "gam") "a non-flat trend (smooth term)"
+        else if (fit == "gam")                 sprintf("trendline slope at x %s %s", params$alt, params$mu)
+        else if (fit == "log")                 sprintf("trendline slope (vs log x) %s %s", params$alt, params$mu)
+        else                                   sprintf("trendline slope %s %s", params$alt, params$mu)
+
       } else {
-        meth <- switch(
-          EXPR = params$p.adj,
-          holm       = "Holm",                  # (1979)
-          hochberg   = "Hochberg",              # (1988)
-          hommel     = "Hommel",                # (1988)
-          BH         = "Benjamini & Hochberg",  # (1995)
-          fdr        = "Benjamini & Hochberg",  # (1995)
-          BY         = "Benjamini & Yekutieli", # (2001)
-          bonferroni = "Bonferroni",
-          none       = "no" )
-        meth <- paste0("\n", meth, " FDR correction in use.")
+        if (test == "emmeans") "trendline means differ at x"
+        else if (fit == "gam") "trendline slopes differ at x"
+        else                   "trendline slopes differ"
       }
-      
-      return(glue("{curr}Low p-value indicates {interp}.{meth}"))
-      
+
+      if (!is.null(params$strata))
+        interp <- sprintf("%s (random intercept per %s)", interp, params$strata)
+
+      adj  <- p_adj_label(params$p.adj)
+      meth <- if (is.null(adj) || nrow(params$.plot_attrs[['stats']]) <= 1) "" else
+        sprintf("\np-values adjusted with the %s method.", adj)
+
+      return (sprintf("%sLow p-value indicates %s.%s", curr, interp, meth))
+
     }))
   }
-  
-  
-  
-  
-  # if (!is.null(stats[['fit']])) {
-  #
-  #   stats_text <- sprintf(
-  #     fmt = "*p* = %s; *R<sup>2</sup>* = %s; *F* = %s",
-  #     format(stats[['fit']][['p.value']],   digits=3),
-  #     format(stats[['fit']][['r.squared']], digits=3),
-  #     format(stats[['fit']][['statistic']], digits=3) )
-  #
-  #
-  #
-  #   #________________________________________________________
-  #   # Add caption describing the model/formula.
-  #   #________________________________________________________
-  #   model_cmd <- local({
-  #
-  #     fun  <- model[[1]]
-  #     args <- model[[2]]
-  #
-  #     fm <- capture.output(args[['formula']])[[1]]
-  #     for (i in predictors)
-  #       fm %<>% paste(sep = " + ", capture.output(as.symbol(i)))
-  #     args[['formula']] <- structure(fm, display = fm)
-  #
-  #     str <- sprintf("%s(%s)", attr(fun, 'display'), as.args(args, fun = fun))
-  #
-  #     # Ensure that nothing in the formula is interpreted as markdown syntax.
-  #     entities <- c(
-  #       setNames(paste0("&#", 33:42,    ";"), strsplit("!\"#$%&'()*", "")[[1]]),
-  #       setNames(paste0("&#", c(60,62), ";"), strsplit("<>", "")[[1]]),
-  #       setNames(paste0("&#", 91:96,    ";"), strsplit("[\\]^_`", "")[[1]]),
-  #       setNames(paste0("&#", 123:126,  ";"), strsplit("{|}~", "")[[1]]) )
-  #     for (i in seq_along(entities))
-  #       str <- gsub(str, pattern = names(entities)[[i]], replacement = entities[[i]], fixed = TRUE)
-  #
-  #     return (str)
-  #   })
-  #
-  #   methods_text <- ifelse(
-  #     test = isFALSE(ci),
-  #     yes  = sprintf("Curve fitted using %s", model_cmd),
-  #     no   = sprintf("Curve and %g%% CI fitted using %s", level * 100, model_cmd) )
-  #
-  #   subtitle <- sprintf("%s<br><span style='font-size:9pt'>%s</span>", stats_text[[1]], methods_text)
-  #   set_layer(params, 'labs',  subtitle = subtitle)
-  #   set_layer(params, 'theme', plot.subtitle = element_markdown(size = 11, lineheight = 1.2))
-  #
-  # }
-  
-  
-  
+
+
   return (params)
 }

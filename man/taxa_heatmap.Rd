@@ -46,7 +46,8 @@ Default: \code{6}.}
 
 \item{tracks}{A character vector of metadata fields to display as tracks
 at the top of the plot. Or, a list as expected by the \code{tracks}
-argument of \code{\link[=plot_heatmap]{plot_heatmap()}}. Default: \code{NULL}}
+argument of \code{\link[=plot_heatmap]{plot_heatmap()}}. Tracks describe samples, so they are
+always placed on top (\code{side = "left"} is ignored). Default: \code{NULL}}
 
 \item{grid}{Color palette name, or a list as expected \code{\link[=plot_heatmap]{plot_heatmap()}}.
 Default: \code{"bilbao"}}
@@ -90,7 +91,7 @@ can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
 Default: \code{NULL}, which computes:
-\code{pmax(8, pmin(20, 100 / dim(mtx)))}}
+\code{pmax(5, pmin(14, 100 / dim(mtx)))}}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
@@ -151,7 +152,9 @@ no title, or any character string. Default: \code{TRUE}}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
-\item{...}{Additional arguments to pass on to ggplot2::theme().}
+\item{...}{Additional arguments to pass on to ggplot2::theme().
+Arguments prefixed with \code{labs.} go to ggplot2::labs() instead,
+for example \code{labs.subtitle = "Plot subtitle"}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -191,7 +194,8 @@ The following entries in the track definitions are understood:
 \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
 \item{\code{range} - }{ The c(min,max) to use for scale values. }
 \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
-\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}.
+\code{taxa_heatmap()} places all tracks on top. }
 \item{\code{na.color} - }{ The color to use for \code{NA} values. }
 \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
@@ -207,7 +211,7 @@ Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 \code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
 \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
-\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
+\code{"devon"}, \code{"hawaii"}, \code{"imola"},
 \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
 \code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
 \code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
@@ -216,46 +220,46 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 
 \examples{
     library(rbiom)
-    
+
     # Subset to 10 samples and rarefy them.
     hmp10 <- rarefy(hmp50[1:10])
-    
+
     taxa_heatmap(hmp10, rank = "Phylum", tracks = "Body Site")
-    
+
     taxa_heatmap(hmp10, rank = "Genus", tracks = c("sex", "bo"))
-    
+
     taxa_heatmap(hmp10, rank = "Phylum", tracks = list(
-      'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")), 
+      'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")),
       'Body Site' = list(colors = "muted", label = "Source") ))
-    
+
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

@@ -13,6 +13,7 @@ taxa_corrplot(
   lineage = FALSE,
   unc = "singly",
   other = FALSE,
+  p.top = Inf,
   stat.by = NULL,
   facet.by = NULL,
   colors = TRUE,
@@ -27,6 +28,7 @@ taxa_corrplot(
   seed = 0,
   alt = "!=",
   mu = 0,
+  strata = NULL,
   caption = TRUE,
   check = FALSE,
   ...
@@ -82,6 +84,14 @@ A string can also be given to imply \code{TRUE}, but with that
 value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
+\item{p.top}{Only display taxa with the most significant differences in
+abundance. If \code{p.top} is >= 1, then the \code{p.top} most
+significant taxa are displayed. If \code{p.top} is less than one, all
+taxa with an adjusted p-value <= \code{p.top} are displayed.
+Recommended to be used in combination with the \code{taxa} parameter
+to set a lower bound on the mean abundance of considered taxa.
+Default: \code{Inf}}
+
 \item{stat.by}{Dataset field with the statistical groups. Must be
 categorical. Default: \code{NULL}}
 
@@ -107,39 +117,50 @@ See "Aesthetics" section below for additional information.
 Default: \code{TRUE}}
 
 \item{test}{Method for computing p-values: \code{'none'}, \code{'emmeans'}, or
-\code{'emtrends'}. Default: \code{'emmeans'}}
+\code{'emtrends'}. See \code{\link[=stats_table]{stats_table()}}. Default: \code{'emmeans'}}
 
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
 Default: \code{'gam'}}
 
-\item{at}{Position(s) along the x-axis where the means or slopes should be
-evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
-and selects the position where the p-value is most significant.}
+\item{at}{Position(s) along \code{regr} where group means or local slopes are
+evaluated. Default: \code{NULL}, which uses the median of \code{regr} within
+each \code{split.by} stratum. A vector gives one row per position, and
+p-values are adjusted across all of them. Ignored by tests that do
+not depend on a position (e.g. a global slope with \code{fit = "lm"}).}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans every p-value in the returned
+table (all metrics, strata, pairs, and positions).
+Default: \code{"fdr"}}
 
 \item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normal distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{alt}{Alternative hypothesis direction. Options are \code{'!='}
 (two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
 (greater than \code{mu}). Default: \code{'!='}}
 
 \item{mu}{Reference value to test against. Default: \code{0}}
+
+\item{strata}{Dataset field with the blocking/subject variable.
+Permutation tests permute within strata; regression models
+include a random intercept per stratum. The plotted trendlines
+are descriptive fits without the strata term. Default: \code{NULL}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
@@ -150,7 +171,9 @@ Default: \code{FALSE}}
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that
 layer. For instance, \code{p.size = 2} ensures only the points have their
-size set to \code{2}.}
+size set to \code{2}. Unprefixed parameters go to every layer whose
+function accepts them. An argument that no layer accepts is an
+error.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points, ggplot2 command,
@@ -175,38 +198,38 @@ letters instead of shapes on the plot. Character strings may used as well.
 }
 
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     biom <- rarefy(subset(hmp50, `Body Site` \%in\% c('Buccal mucosa', 'Saliva')))
     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 'Streptococcus')
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

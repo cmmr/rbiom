@@ -75,17 +75,23 @@ A string can also be given to imply \code{TRUE}, but with that
 value as the name to use instead of "Other".
 Default: \code{FALSE}}
 
-\item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
+\item{transform}{Transformation to apply to the abundance values.
+Options are: \code{c("none", "rank", "log", "log1p", "sqrt", "percent")}.
+\code{"percent"} converts counts to relative abundances before summing
+by taxa. \code{"log"} adds a pseudocount of half the smallest non-zero
+value in the matrix before taking the logarithm, so that absent
+taxa rank below the rarest observed ones. \code{"rank"} is useful for
+correcting for non-normally distributions before applying
 regression statistics. Default: \code{"none"}}
 
 \item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{sparse}{If \code{TRUE}, returns a
 sparse matrix from the \code{Matrix} package, otherwise returns a
@@ -98,6 +104,8 @@ A numeric matrix with taxa as rows, and samples as columns. }
 \item{\code{taxa_table()} - }{
 A tibble data frame with column names .sample, .taxa, .abundance, and any requested by \code{md}. }
 }
+Each result carries \verb{$code}: the R code that regenerates it, including
+the steps that produced \code{biom}.
 }
 \description{
 \describe{
@@ -107,22 +115,22 @@ A tibble data frame with column names .sample, .taxa, .abundance, and any reques
 }
 \examples{
     library(rbiom)
-    
+
     hmp50$ranks
-    
+
     taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
-    
+
     taxa_table(hmp50, 'Phylum')
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}}
 }
 \concept{taxa_abundance}

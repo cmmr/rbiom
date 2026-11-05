@@ -14,13 +14,10 @@ bdiv_stats(
   within = NULL,
   between = NULL,
   split.by = NULL,
-  transform = "none",
-  test = "emmeans",
-  fit = "gam",
-  at = NULL,
-  level = 0.95,
-  alt = "!=",
-  mu = 0,
+  strata = NULL,
+  test = if (is.null(regr)) "adonis2" else "mantel",
+  seed = 0,
+  permutations = 999,
   p.adj = "fdr",
   alpha = 0.5,
   cpus = n_cpus()
@@ -29,11 +26,13 @@ bdiv_stats(
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{regr}{Dataset field with the x-axis (independent; predictive)
-values. Must be numeric. Default: \code{NULL}}
+\item{regr}{Dataset field with a numeric variable to correlate the
+distances with (Mantel test). When both \code{regr} and \code{stat.by} are
+given, the Mantel test is run within each \code{stat.by} group.
+Default: \code{NULL}}
 
-\item{stat.by}{Dataset field with the statistical groups. Must be
-categorical. Default: \code{NULL}}
+\item{stat.by}{Dataset field with the groups to compare. Must be
+categorical. Any \code{==}/\code{!=} prefix is ignored. Default: \code{NULL}}
 
 \item{bdiv}{Beta diversity distance algorithm(s) to use. Options are:
 \code{c("aitchison", "bhattacharyya", "bray", "canberra", "chebyshev",  "chord", "clark", "sorensen", "divergence", "euclidean",  "generalized_unifrac", "gower", "hamming", "hellinger", "horn",  "jaccard", "jensen", "jsd", "lorentzian", "manhattan", "matusita",  "minkowski", "morisita", "motyka", "normalized_unifrac", "ochiai",  "psym_chisq", "soergel", "squared_chisq", "squared_chord",  "squared_euclidean", "topsoe", "unweighted_unifrac",  "variance_adjusted_unifrac", "wave_hedges", "weighted_unifrac")}.
@@ -50,106 +49,124 @@ presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{within, between}{Dataset field(s) for intra- or inter- sample
-comparisons. Alternatively, dataset field names given elsewhere can
-be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
-\code{between}, respectively. Default: \code{NULL}}
+\item{within, between}{Accepted for compatibility with \code{\link[=bdiv_table]{bdiv_table()}}
+and \code{\link[=bdiv_boxplot]{bdiv_boxplot()}}, where they select which sample \emph{pairs} are
+displayed. The tests here are computed on samples, so these
+arguments have no effect.}
 
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}
 
-\item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\item{strata}{Dataset field with a blocking variable, such as a
+subject identifier for repeated measures. Must be categorical.
+When \code{stat.by} (or \code{regr}) varies within strata, permutations are
+restricted to within each stratum; when it is constant within
+every stratum (a between-subject variable), whole strata are
+permuted instead. See the Details of \code{\link[=distmat_stats]{distmat_stats()}}.
+\code{test = "mrpp"} and \code{"betadisper"} are not available for a
+between-strata variable. Default: \code{NULL}}
 
-\item{test}{Method for computing p-values: \code{'wilcox'}, \code{'kruskal'},
-\code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}
+\item{test}{The permutation test. With \code{stat.by}: \code{"adonis2"}
+(PERMANOVA; the default), \code{"mrpp"}, or \code{"betadisper"} (homogeneity
+of dispersion). With \code{regr}: \code{"mantel"} (the default) or
+\code{"adonis2"} (PERMANOVA with a numeric covariate). See
+\code{\link[=distmat_stats]{distmat_stats()}}.}
 
-\item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
-Default: \code{'gam'}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
-\item{at}{Position(s) along the x-axis where the means or slopes should be
-evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
-and selects the position where the p-value is most significant.}
-
-\item{level}{The confidence level for calculating a confidence interval.
-Default: \code{0.95}}
-
-\item{alt}{Alternative hypothesis direction. Options are \code{'!='}
-(two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
-(greater than \code{mu}). Default: \code{'!='}}
-
-\item{mu}{Reference value to test against. Default: \code{0}}
+\item{permutations}{Number of random permutations to use.
+Default: \code{999}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans the entire returned table.
+Default: \code{"fdr"}}
 
 \item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
 to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
-A tibble data.frame with fields from the table below. This tibble
-object provides the \verb{$code} operator to print the R code used to generate
-the statistics.\tabular{ll}{
-   \strong{Field} \tab \strong{Description} \cr
-   .mean \tab Estimated marginal mean. See \code{\link[emmeans:emmeans]{emmeans::emmeans()}}. \cr
-   .mean.diff \tab Difference in means. \cr
-   .slope \tab Trendline slope. See \code{\link[emmeans:emtrends]{emmeans::emtrends()}}. \cr
-   .slope.diff \tab Difference in slopes. \cr
-   .h1 \tab Alternate hypothesis. \cr
-   .p.val \tab Probability that null hypothesis is correct. \cr
-   .adj.p \tab \code{.p.val} after adjusting for multiple comparisons. \cr
-   .effect.size \tab Effect size. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. \cr
-   .lower \tab Confidence interval lower bound. \cr
-   .upper \tab Confidence interval upper bound. \cr
-   .se \tab Standard error. \cr
-   .n \tab Number of samples. \cr
-   .df \tab Degrees of freedom. \cr
-   .stat \tab Wilcoxon or Kruskal-Wallis rank sum statistic. \cr
-   .t.ratio \tab \code{.mean} / \code{.se} \cr
-   .r.sqr \tab Percent of variation explained by the model. \cr
-   .adj.r \tab \code{.r.sqr}, taking degrees of freedom into account. \cr
-   .aic \tab Akaike Information Criterion (predictive models). \cr
-   .bic \tab Bayesian Information Criterion (descriptive models). \cr
-   .loglik \tab Log-likelihood goodness-of-fit score. \cr
-   .fit.p \tab P-value for observing this fit by chance. \cr
+A tibble data.frame with one row per test. With a categorical
+\code{stat.by} and more than two groups, each \code{split.by} stratum
+(and \code{bdiv} metric) gets an omnibus test across all groups plus
+one pairwise test per pair of groups, computed on that pair's
+samples. The columns are:
+\describe{
+\item{\code{split.by} fields, \code{.bdiv} - }{ The stratum. \code{.bdiv} is
+only present when several \code{bdiv} metrics were requested. }
+\item{\code{stat.by} field - }{ The groups compared, joined by
+\code{" vs "}. The omnibus row lists all groups. }
+\item{\code{.groups} - }{ The number of groups in the comparison:
+2 for pairwise rows, more for the omnibus row. }
+\item{\code{.n}, \code{.stat}, \code{.r.sqr}, \code{.z}, \code{.p.val} - }{
+See \code{\link[=distmat_stats]{distmat_stats()}}. }
+\item{\code{.adj.p} - }{ \code{.p.val} adjusted for multiple comparisons
+across the whole table. }
 }
+With a numeric \code{regr}, one Mantel test per stratum, with \code{.n},
+\code{.stat} (Spearman's r), \code{.p.val}, and \code{.adj.p}.
+The R code used to compute the table is in \verb{$code}.
 }
 \description{
-A convenience wrapper for \code{\link[=bdiv_table]{bdiv_table()}} + \code{\link[=stats_table]{stats_table()}}.
+Pairwise distances are not independent observations, so beta diversity
+is tested with permutation tests in which samples, not distances, are
+permuted: PERMANOVA and friends for a categorical \code{stat.by}, or a Mantel
+test for a numeric \code{regr}. See \code{\link[=distmat_stats]{distmat_stats()}} for the tests.
+}
+\details{
+With \code{strata} (e.g. repeated samples per subject), the permutation
+scheme depends on the variable being tested. A variable that varies
+within strata (e.g. time point) is permuted within each stratum. A
+variable that is constant within every stratum (e.g. delivery mode, with
+subject as the stratum) is permuted at the stratum level: whole strata
+exchange their values, so the effective sample size is the number of
+strata. When the number of distinct arrangements is no larger than
+\code{permutations}, all of them are enumerated and the p-value is exact. The
+scheme is chosen separately for each row of the table (a pair of groups
+can be a between-strata comparison even when the omnibus test is not)
+and is reported in the table header. See \code{\link[=distmat_stats]{distmat_stats()}} for details.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-      
-    bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "w_unifrac"))[,1:7]
-    
+
+    bdiv_stats(biom, stat.by = "Sex", bdiv = c("bray", "w_unifrac"))
+
     biom <- subset(biom, `Body Site` \%in\% c('Saliva', 'Stool', 'Buccal mucosa'))
-    bdiv_stats(biom, stat.by = "Body Site", split.by = "==Sex")[,1:6]
+    bdiv_stats(biom, stat.by = "Body Site", split.by = "Sex")
+
+    bdiv_stats(biom, regr = "Age")
+
+    # Repeated measures: delivery mode is constant within each subject,
+    # so whole subjects are permuted.
+    b <- rarefy(subset(babies, `Age (days)` <= 30))
+    bdiv_stats(b, stat.by = "Delivery mode", strata = "Subject ID")
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_table}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_table]{bdiv_table()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 
-Other stats_tables: 
-\code{\link{adiv_stats}()},
-\code{\link{distmat_stats}()},
-\code{\link{stats_table}()},
-\code{\link{taxa_stats}()}
+Other stats_tables:
+\code{\link[=adiv_stats]{adiv_stats()}},
+\code{\link[=distmat_stats]{distmat_stats()}},
+\code{\link[=stats_table]{stats_table()}},
+\code{\link[=taxa_stats]{taxa_stats()}}
 }
 \concept{beta_diversity}
 \concept{stats_tables}

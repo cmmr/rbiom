@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{width}{Width of output. See \code{\link[pillar:glimpse]{pillar::glimpse()}} documentation.
+\item{width}{Width of output. See \code{\link[tibble:glimpse]{tibble::glimpse()}} documentation.
 Default: \code{NULL}}
 
 \item{...}{Not used.}
@@ -22,12 +22,12 @@ Get a glimpse of your metadata.
 }
 \examples{
     library(rbiom)
-    
+
     glimpse(hmp50)
-    
+
 }
 \seealso{
-Other metadata: 
-\code{\link{bdply}()}
+Other metadata:
+\code{\link[=bdply]{bdply()}}
 }
 \concept{metadata}

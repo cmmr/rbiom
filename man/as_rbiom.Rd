@@ -10,15 +10,21 @@ as_rbiom(biom, ...)
 \item{biom}{Object which can be coerced to an rbiom-class object.
 For example:
 \describe{
-\item{\emph{file} - }{ Filepath or URL to a biom file. }
-\item{\emph{matrix} - }{ An abundance matrix with OTUs in rows and samples in columns. }
-\item{\code{phyloseq}-class object - }{ From the phyloseq Bioconductor R package. }
+\item{\emph{file} - }{ Filepath or URL to a BIOM file (JSON, HDF5, or tabular), or a JSON string. }
+\item{\emph{matrix} - }{ An abundance matrix (base or \code{Matrix}) with OTUs in rows and samples in columns. }
+\item{\emph{data.frame} - }{ Treated as an abundance matrix: OTUs in rows (row names) and samples in columns. }
 \item{\emph{list} - }{ With \code{counts} and optionally \code{metadata}, \code{taxonomy}, \code{tree}, etc (see details). }
+\item{\code{rbiom} - }{ Returned as-is, unless \code{...} requests changes, in which case a modified clone is returned. }
+\item{\code{phyloseq} - }{ From the phyloseq Bioconductor R package. }
+\item{\code{SummarizedExperiment} - }{ From the SummarizedExperiment Bioconductor R package. }
+\item{\code{TreeSummarizedExperiment} - }{ From the TreeSummarizedExperiment Bioconductor R package. }
+\item{\code{MultiAssayExperiment} - }{ From the MultiAssayExperiment Bioconductor R package (its first experiment is used). }
+\item{\code{biom} - }{ From the biomformat Bioconductor R package. }
 }}
 
 \item{...}{Properties to overwrite in biom: \code{metadata}, \code{taxonomy},
-\code{tree}, etc (see details). Setting \code{underscores} here will pass it to
-\code{read_tree()}.}
+\code{tree}, \code{sequences}, \code{id}, \code{comment}, or \code{date} (see details).
+Setting \code{underscores} here will pass it to \code{read_tree()}.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -29,20 +35,20 @@ Use \code{b <- a$clone()} to create copies, not \code{b <- a}.
 }
 \examples{
     library(rbiom)
-    
+
     # create a simple matrix ------------------------
     mtx <- matrix(
-      data     = floor(runif(24) * 1000), 
-      nrow     = 6, 
+      data     = floor(runif(24) * 1000),
+      nrow     = 6,
       dimnames = list(paste0("OTU", 1:6), paste0("Sample", 1:4)) )
     mtx
-    
+
     # and some sample metadata ----------------------
     df <- data.frame(
       .sample   = paste0("Sample", 1:4),
       treatment = c("A", "B", "A", "B"),
       days      = c(12, 3, 7, 8) )
-    
+
     # convert data set to rbiom ---------------------
     biom <- as_rbiom(mtx, metadata = df, id = "My BIOM")
     biom

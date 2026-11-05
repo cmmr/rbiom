@@ -1,6 +1,5 @@
 
 ^\.
-^conda$
 ^logo$
 ^paper$
 ^pkgdown$
@@ -25,3 +24,4 @@
 ^\.Rproj\.user$
 ^\.positai$
 ^\.claude$
+^CODE_REVIEW\.md$

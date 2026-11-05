@@ -99,7 +99,7 @@ The function `stats_table()` and functions ending in "_stats" (e.g. `adiv_stats(
 ```{r}
 p <- adiv_boxplot(
   biom     = rarefy(hmp50),           # Dataset as an rbiom object
-  adiv     = c("Shannon", "Simpson"), # Alpha diversity metrics
+  adiv     = c("shannon", "simpson"), # Alpha diversity metrics
   stat.by  = "Body Site",             # Statistical groups
   facet.by = "Sex" )                  # Split data prior to stats
 
@@ -122,7 +122,7 @@ In the upper-left corner, we see ``Model:    kruskal.test(.diversity ~ `Body Sit
 
 ## Multiple Comparisons
 
-The above table has four rows, meaning we ran data through the model four times. In this case, it was two alpha diversity metrics times two `Sex` facets. The first two columns of the table (`Sex` and `.adiv`) tell us which row is for each combination. Additionally, the `.adj.p` column is the `.p.val` adjusted for multiple comparisons.
+The above table has four rows, meaning we ran data through the model four times. In this case, it was two alpha diversity metrics times two `Sex` facets. The first two columns of the table (`Sex` and `.adiv`) tell us which row is for each combination. Additionally, the `.adj.p` column is the `.p.val` adjusted for multiple comparisons. The adjustment spans every row of the table (all metrics, facets, pairs, and positions); the method is set with `p.adj` (default: false discovery rate).
 
 
 
@@ -130,11 +130,20 @@ The above table has four rows, meaning we ran data through the model four times.
 
 ## Hypothesis
 
-The three columns `.stat`, `.h1`, and `.p.val` together show the hypothesis and its outcome. Above, we're asking if `.stat` is greater than zero. When `.p.val` is less than 0.05 we can say that it is.
+The columns `.stat` and `.p.val` show the test statistic and its outcome.
 
-That's the very simplified explanation. 
+Each test compares a null hypothesis H<sub>0</sub> against an alternative
+hypothesis H<sub>1</sub>. Here, H<sub>0</sub> is that alpha diversity has the
+same distribution in every `` `Body Site` `` group, and H<sub>1</sub> is that
+at least one group differs. The p-value is the probability, *assuming
+H<sub>0</sub> is true*, of observing a test statistic at least as extreme as
+the one observed. It is not the probability that H<sub>0</sub> is true. When
+the p-value falls below a significance level chosen in advance (usually 0.05),
+we reject H<sub>0</sub> in favor of H<sub>1</sub>.
 
-Recall from your statistic classes that you are testing a null hypothesis H<sub>0</sub> against an alternate hypothesis H<sub>1</sub>. In this case, our null hypothesis is that the Kruskal-Wallis statistic is zero (`.stat == 0`), indicating all `` `Body Site` `` groups have similar alpha diversity. The p-value is the probability that the null hypothesis is correct (a p-value of 0.6 is interpreted as a 60% chance that `.stat == 0`). When the p-value is below a certain value (usually 0.05) we accept the alternative hypothesis instead - in this case that `.stat > 0`, meaning `.diversity` does vary by `` `Body Site` ``.
+For tests with an estimate (a mean difference, a slope, etc.), the `.h1` column
+states the alternative hypothesis, e.g. `!= 0`, and immediately follows the
+estimate it refers to.
 
 
 
@@ -152,7 +161,7 @@ The last two columns are:
 
 ## Data and Code
 
-You can inspect the data passed to `kruskal.test()` by looking at `p$data`. Additionally, the code used to generate the statistics is available in `p$stats$code`. These attributes can help you reproduce and customize your data analysis.
+You can inspect the data passed to `kruskal.test()` by looking at `p$data`. The code that generated the statistics is in `p$stats$code`, and `p$code` is a complete script that recreates the plot, starting from the original dataset.
 
 ```{r}
 p$data
@@ -160,7 +169,11 @@ p$data
 p$stats$code
 ```
 
-When generating statistics with `st <- adiv_stats()`, `bdiv_stats()`, or `taxa_stats()`, the data and code are in `st$data` and `st$code`, respectively. For `st <- stats_table(df = df)`, the data and code are in `df` and `st$code`, respectively.
+When generating statistics with `st <- adiv_stats()`, `bdiv_stats()`, or `taxa_stats()`, the code is in `st$code`. It begins with the steps that produced the rbiom object (here, `rarefy(hmp50)`), so it can be run as-is in a fresh R session.
+
+```{r}
+adiv_stats(rarefy(hmp50), stat.by = "Body Site")$code
+```
 
 
 
@@ -170,32 +183,34 @@ Care has been taken to keep rbiom's statistics tables consistent across function
 
 Below is a quick reference guide to all columns that may appear in an rbiom statistics table.
 
-| **Field**      | **Description**                                       |
-| -------------- | ----------------------------------------------------- |
-| `.stat`        | Wilcoxon or Kruskal-Wallis rank sum statistic.        |
-| `.mean`        | Estimated marginal mean. See `emmeans::emmeans()`.    |
-| `.mean.diff`   | Difference in means.                                  |
-| `.slope`       | Trendline slope. See `emmeans::emtrends()`.           |
-| `.slope.diff`  | Difference in slopes.                                 |
-| `.h1`          | Alternate hypothesis.                                 |
-| `.p.val`       | Probability that null hypothesis is correct.          |
-| `.adj.p`       | `.p.val` after adjusting for multiple comparisons.    |
-| `.effect.size` | Effect size. See `emmeans::eff_size()`.               |
-| `.lower`       | Confidence interval lower bound.                      |
-| `.upper`       | Confidence interval upper bound.                      |
-| `.se`          | Standard error.                                       |
-| `.n`           | Number of samples.                                    |
-| `.df`          | Degrees of freedom.                                   |
-| `.t.ratio`     | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
-| `.z`           | Std. effect size. See `vegan::summary.permustats()`.  |
-| `.r.sqr`       | Percent of variation explained by the model.          |
-| `.adj.r`       | `.r.sqr`, taking degrees of freedom into account.     |
-| `.aic`         | Akaike Information Criterion (predictive models).     |
-| `.bic`         | Bayesian Information Criterion (descriptive models).  |
-| `.loglik`      | Log-likelihood goodness-of-fit score.                 |
-| `.fit.p`       | P-value for observing this fit by chance.             |
-
-The `.h1` field will always come immediately after the column it is testing against.
+| **Field**        | **Description**                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------- |
+| `.stat`          | Test statistic: Kruskal-Wallis *H*, Wilcoxon *W*, PERMANOVA pseudo-*F*, MRPP *delta*, dispersion *F*, or Mantel *r*. |
+| `.mean`          | Estimated marginal mean. See `emmeans::emmeans()`.                                      |
+| `.mean.diff`     | Difference in estimated marginal means.                                                 |
+| `.loc.shift`     | Hodges-Lehmann location shift between two groups (Wilcoxon rank sum test).              |
+| `.pseudomedian`  | Hodges-Lehmann pseudomedian (one-sample Wilcoxon signed rank test).                     |
+| `.slope`         | Trendline slope. See `emmeans::emtrends()`.                                             |
+| `.slope.diff`    | Difference in slopes.                                                                   |
+| `.edf`, `.ref.df`, `.f` | Effective degrees of freedom, reference degrees of freedom, and *F* statistic of a `gam` smooth term. |
+| `.h1`            | Alternative hypothesis.                                                                 |
+| `.p.val`         | Probability, under the null hypothesis, of a result at least as extreme as observed.    |
+| `.adj.p`         | `.p.val` after adjusting for multiple comparisons across the whole table.               |
+| `.effect.size`   | Effect size. See `emmeans::eff_size()`.                                                 |
+| `.lower`         | Confidence interval lower bound.                                                        |
+| `.upper`         | Confidence interval upper bound.                                                        |
+| `.se`            | Standard error.                                                                         |
+| `.n`             | Number of samples.                                                                      |
+| `.groups`        | Number of groups compared (beta diversity tests).                                       |
+| `.df`            | Degrees of freedom.                                                                     |
+| `.t.ratio`       | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se`                                   |
+| `.z`             | Standardized MRPP statistic.                                                            |
+| `.r.sqr`         | Proportion of variation explained (model *R*<sup>2</sup>, or PERMANOVA *R*<sup>2</sup>). |
+| `.adj.r`         | `.r.sqr`, taking degrees of freedom into account.                                       |
+| `.dev.expl`      | Proportion of deviance explained (`gam` models).                                        |
+| `.aic`           | Akaike Information Criterion (predictive models).                                       |
+| `.bic`           | Bayesian Information Criterion (descriptive models).                                    |
+| `.loglik`        | Log-likelihood goodness-of-fit score.                                                   |
 
 
 
@@ -219,9 +234,9 @@ inter-sample distances are correlated with that variable.
 
 ```{r}
 p <- bdiv_ord_plot(
-  biom    = rarefy(hmp50), 
-  stat.by = "Body Site", 
-  bdiv    = c("Jaccard", "Bray-Curtis"), 
+  biom    = rarefy(hmp50),
+  stat.by = "Body Site",
+  bdiv    = c("jaccard", "bray"),
   ord     = c("PCoA", "UMAP") )
 p
 p$stats
@@ -237,13 +252,23 @@ Note that the ordination statistics are not dependent on the ordination, only
 the distance metric. This is because the statistics are based on beta diversity 
 distances which are computed prior to ordination.
 
-By default, `bdiv_ord_plot()` applies the perMANOVA test. You can change this 
-to MRPP by specifying `test="mrpp"`. Details on the available tests are below.
+By default, `bdiv_ord_plot()` applies the PERMANOVA test. You can change this
+with the `test` argument. Details on the available tests are below.
 
-| Test      | Function           | Method                                                      |
-| --------- | ------------------ | ----------------------------------------------------------- |
-| `adonis2` | `vegan::adonis2()` | Permutational Multivariate Analysis of Variance (perMANOVA) |
-| `mrpp`    | `vegan::mrpp()`    | Multiple Response Permutation Procedure (MRPP)              |
+| Test         | Function                                   | Method                                                      |
+| ------------ | ------------------------------------------ | ----------------------------------------------------------- |
+| `adonis2`    | `vegan::adonis2()`                         | Permutational Multivariate Analysis of Variance (PERMANOVA) |
+| `mrpp`       | `vegan::mrpp()`                            | Multiple Response Permutation Procedure (MRPP)              |
+| `betadisper` | `vegan::betadisper()`, `vegan::permutest()` | Homogeneity of group dispersions                           |
+| `mantel`     | `vegan::mantel()`                          | Correlation of distances with a numeric variable            |
+
+PERMANOVA tests whether group *centroids* differ, but it can also be
+significant when groups differ only in their *spread*. Running
+`test = "betadisper"` alongside it helps tell these apart.
+
+All of these are permutation tests on samples. Pairwise distances are not
+independent of one another (each sample contributes to many of them), so rbiom
+does not apply rank or *t*-tests to distance values.
 
 
 
@@ -290,12 +315,15 @@ p2$stats
 p2$stats$code
 ```
 
-Internally, rbiom uses the non-parametric functions listed below.
+By default, rbiom uses the functions listed below. For alpha diversity and
+taxa abundance, set `test = "emmeans"` for pairwise comparisons of model-based
+means instead.
 
-| Test          | Function                | Method                                                   |
-| ------------- | ----------------------- | -------------------------------------------------------- |
-| pairwise      | `stats::wilcox.test()`  | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
-| group-wise    | `stats::kruskal.test()` | Kruskal-Wallis Rank Sum Test                             |
+| Plot             | Comparison | Function                | Method                                                   |
+| ---------------- | ---------- | ----------------------- | -------------------------------------------------------- |
+| `adiv_boxplot()`, `taxa_boxplot()` | pairwise   | `stats::wilcox.test()`  | Two-sample Wilcoxon Rank Sum Test, aka Mann-Whitney Test |
+| `adiv_boxplot()`, `taxa_boxplot()` | group-wise | `stats::kruskal.test()` | Kruskal-Wallis Rank Sum Test                             |
+| `bdiv_boxplot()` | pairwise / group-wise | `vegan::adonis2()` | PERMANOVA on the samples in each pair / all groups   |
 
 
 
@@ -309,10 +337,15 @@ For an in-depth description of correlation plots, see the
 
 Depending on the arguments given to `stat.by` and `test`, you can test:
 
-* Is the mean non-zero?
-* Do means vary by group?
-* Is the slope (trendline) non-horizontal?
-* Do slopes vary by group?
+* Is the response associated with `x`?
+* Do group means differ (at a given `x`)?
+* Is the slope non-zero (at a given `x`)?
+* Do slopes differ between groups?
+
+Where a test depends on a position along the x-axis, it is evaluated at the
+median of `x` unless you choose positions with `at`. Choose `at` before
+looking at the data: searching for the position with the smallest p-value
+inflates the false positive rate.
 
 
 ```{r}
@@ -327,14 +360,45 @@ p3 <- adiv_corrplot(biom, x = "age", test = "emtrends")
 p4 <- adiv_corrplot(biom, x = "age", test = "emtrends", stat.by = "country")
 
 plots <- list(
-  p1 + ggplot2::labs(subtitle = 'Is the mean non-zero?'), 
-  p2 + ggplot2::labs(subtitle = 'Do means vary by group?'), 
-  p3 + ggplot2::labs(subtitle = 'Is the slope non-horizontal?'), 
-  p4 + ggplot2::labs(subtitle = 'Do slopes vary by group?')) %>%
+  p1 + ggplot2::labs(subtitle = 'Is diversity associated with age?'),
+  p2 + ggplot2::labs(subtitle = 'Do means differ (median age)?'),
+  p3 + ggplot2::labs(subtitle = 'Is the slope non-zero (median age)?'),
+  p4 + ggplot2::labs(subtitle = 'Do slopes differ (median age)?')) %>%
   lapply(`+`, ggplot2::labs(x = NULL, y = NULL, caption = NULL))
 
 patchwork::wrap_plots(plots, guides = "collect")
 ```
+
+For beta diversity, `bdiv_corrplot()` tests the association between
+distances and differences in `x` with a Mantel test.
+
+
+
+# Repeated Measures
+
+When a study collects several samples from each subject, those samples are not
+independent. Pass the subject field to `strata` to account for this:
+
+* **Permutation tests** (PERMANOVA, MRPP, dispersion, Mantel) restrict how
+  samples are shuffled. If the tested variable changes *within* subjects (for
+  example, time point), samples are permuted within each subject. If it is
+  constant within each subject (for example, delivery mode), whole subjects
+  are permuted instead.
+* **Regression models** (`test = "emmeans"` / `"emtrends"`) include a random
+  intercept for each subject.
+* **Rank tests** (Wilcoxon, Kruskal-Wallis) can't account for strata, so
+  they report an error rather than silently ignoring it.
+
+```{r}
+babies_early <- babies %>%
+  subset(`Age (days)` <= 60) %>%
+  rarefy()
+
+bdiv_stats(babies_early, stat.by = "Delivery mode", strata = "Subject ID")
+```
+
+Without `strata`, the hundreds of samples from the same few subjects would be
+treated as independent, and the p-value would be far too small.
 
 
 
@@ -366,14 +430,15 @@ patchwork::wrap_plots(
 )
 ```
 
-To compensate for this non-normality, rbiom uses the following non-parametric 
-tests for categorical variables that are based on ranking or permutations.
+To compensate for this non-normality, rbiom's default tests for categorical
+variables are based on ranks or permutations.
 
-| Test                    | Function                | Used For                   |
-| ----------------------- | ----------------------- | -------------------------- |
-| Wilcoxon Rank-Sum       | `stats::wilcox.test()`  | Pairwise boxplot           |
-| Kruskal-Wallis Rank Sum | `stats::kruskal.test()` | Groupwise boxplot          |
-| Permutational MANOVA    | `vegan::adonis2()`      | `bdiv_ord_plot()` clusters |
+| Test                    | Function                | Used For                                           |
+| ----------------------- | ----------------------- | -------------------------------------------------- |
+| Wilcoxon Rank-Sum       | `stats::wilcox.test()`  | Pairwise alpha diversity / taxa boxplots           |
+| Kruskal-Wallis Rank Sum | `stats::kruskal.test()` | Groupwise alpha diversity / taxa boxplots          |
+| Permutational MANOVA    | `vegan::adonis2()`      | Beta diversity boxplots, `bdiv_ord_plot()` clusters |
+| Mantel                  | `vegan::mantel()`       | Beta diversity correlation plots                   |
 
 For correlation/regression analysis, rbiom provides diagnostic plots to determine when residual distributions are cause for concern. To enable this feature, set `check = TRUE`.
 

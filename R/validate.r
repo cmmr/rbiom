@@ -48,9 +48,20 @@ validate_bdiv <- function (
     lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
     metrics <- c('bray', 'jaccard', 'jsd')
   }
-  
+
+  # A bare "unifrac" is ambiguous unless the deprecated `weighted` /
+  # `normalized` arguments say which variant is meant.
+  legacy <- with(env, {
+    (exists('weighted')   && !is.null(weighted)) ||
+    (exists('normalized') && !is.null(normalized)) })
+
+  if (!legacy && any(tolower(metrics) %in% c('unifrac', 'uni', 'unif', 'unifr', 'unifra')))
+    cli_abort(c(
+      'x' = "`{evar} = \"unifrac\"` is ambiguous.",
+      'i' = "Use one of: unweighted_unifrac, weighted_unifrac, normalized_unifrac, generalized_unifrac, variance_adjusted_unifrac." ))
+
   # Back-support for `weighted` and `normalized` parameters.
-  
+
   weighted   <- TRUE
   normalized <- TRUE
   
@@ -70,7 +81,7 @@ validate_bdiv <- function (
   }
   
   x <- c()
-  
+
   for (m in metrics)
     for (w in weighted)
       for (n in normalized) {
@@ -84,17 +95,18 @@ validate_bdiv <- function (
         }
         x <- c(x, m)
       }
-  
-  
-  metrics <- unique(sapply(metrics, function (m) {
-    ecodive::match_metric(metric = m, div = 'beta')$id }))
-  
-  if (length(metrics) > 1 && !isTRUE(multiple))
+
+
+  # Canonical metric ids, e.g. "Bray" -> "bray", "jacc" -> "jaccard".
+  x <- unique(unname(sapply(x, function (m) {
+    ecodive::match_metric(metric = m, div = 'beta')$id })))
+
+  if (length(x) > 1 && !isTRUE(multiple))
     cli_abort('`{evar}` must be a single metric name.')
-  
+
   attr(x, 'validated') <- TRUE
   assign(var, x, env)
-  
+
   return(invisible())
 }
 
@@ -131,7 +143,7 @@ validate_tree <- function (
   if (inherits(x, 'phylo'))  return (invisible(NULL))
   
   if (is_scalar_character(x)) {
-    x <- ecodive::read_tree(x, underscores = underscores)
+    x <- read_tree(x, underscores = underscores)
     assign(var, x, pos = env)
     return (invisible(NULL))
   }
@@ -503,7 +515,7 @@ validate_df_field <- function (
   
   if (is_null(x))       cli_abort("`{evar}` cannot be NULL.")
   if (!is_character(x)) cli_abort("`{evar}` should be character, not {.type {x}}.")
-  if (length(x) > max)  cli_abort("`{evar}` cannot be length ", length(x), ".")
+  if (length(x) > max)  cli_abort("`{evar}` cannot be length {length(x)}; maximum is {max}.")
   if (anyNA(x))         cli_abort("`{evar}` cannot be NA.")
   x <- trimws(x)
   if (!all(nzchar(x)))  cli_abort("`{evar}` cannot be ''.")

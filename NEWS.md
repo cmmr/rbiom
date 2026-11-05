@@ -1,3 +1,131 @@
+# rbiom 4.0.0
+
+## Reproducibility
+
+* Every rbiom object now records how it was made. `biom$history` lists the
+  constructor call and each transformation (`subset()`, `rarefy()`, 
+  `mutate()`, `[`, `biom_merge()`, ...), and `biom$code` prints them as a 
+  runnable script. Direct assignments such as `biom$metadata <- df` are 
+  recorded as comments, since their values exist only in memory.
+* `$code` on tables, statistics, plots, matrices, and distance matrices is now
+  a complete script: library calls, the object's history, the data step, and 
+  the statistics / ggplot2 code. It is covered by tests that re-run the code 
+  in a fresh environment and compare the result to the original, including 
+  multi-panel figures, heatmaps, ordinations with taxa arrows, and data whose 
+  names contain quotes and other R syntax.
+* Data-derived strings (sample, OTU, taxa, and field names, metadata values, 
+  file paths) only ever appear in generated code as quoted literals, and rbiom
+  never evaluates generated code itself.
+* `$cmd` no longer re-evaluates the caller's arguments (so 
+  `adiv_boxplot(rarefy(biom))` rarefies once) and no longer records `cpus`.
+* Functions that use random numbers (`rarefy()`, rank transforms with 
+  `ties = "random"`, permutation tests, ordinations, clustering) run under 
+  `seed` and leave the caller's RNG state untouched.
+* `read_biom()` keeps the file's `generated_by` and creation date.
+
+## Statistics
+
+* Regression statistics with a numeric `regr` no longer scan ~100 positions 
+  along the x-axis for the smallest p-value (which inflated false positives to
+  ~17%). `at` defaults to the median of `regr`, and p-values are adjusted 
+  across the whole table. Without `stat.by`, the reported test is the 
+  association test (the slope for `lm`/`log`; the smooth term for `gam`) 
+  rather than a test of "mean = 0".
+* `emtrends` with `stat.by` now evaluates slope differences at each `at` 
+  position instead of averaging over them.
+* Beta diversity statistics are permutation tests on samples. `bdiv_stats()`
+  and `bdiv_boxplot()` use PERMANOVA (`adonis2`), MRPP, or a dispersion test 
+  (`betadisper`), with pairwise PERMANOVA for bracket labels; `regr` and 
+  `bdiv_corrplot()` use a Mantel test. Wilcoxon / t-tests / regressions on 
+  pairwise distances, which treated dependent distances as independent 
+  observations, are no longer offered.
+* New `strata` argument for repeated-measures designs, on the `*_stats()`, 
+  `*_boxplot()`, `*_corrplot()`, `bdiv_ord_plot()`, and `distmat_stats()` 
+  functions. Permutation tests permute samples within strata when the tested 
+  variable varies within strata, and permute whole strata when it is constant 
+  within each stratum (exact enumeration when there are few arrangements). 
+  Regression models include a random intercept per stratum. Rank tests report
+  an error rather than ignoring `strata`.
+* `bdiv_ord_table()` / `bdiv_ord_plot()` compute distances on the data as 
+  given (no hidden relativization), use `stats::cmdscale()` for PCoA with 
+  "% variance explained" axis labels, and test taxa biplot vectors with 
+  `vegan::envfit()`. `p.top` handles tied p-values and adjusts before 
+  filtering.
+* `bdiv_clusters()` uses k-medoids (`cluster::pam()`) on the distance matrix;
+  `taxa_clusters()` uses 10 k-means starts. Both accept `seed`.
+* Wilcoxon tests use `exact = NULL`; the estimate column is now `.loc.shift` 
+  (Hodges-Lehmann). `level` is honored. Captions name the p-value adjustment 
+  method correctly.
+* `adiv_boxplot()`, `bdiv_boxplot()`, and `taxa_boxplot()` gain a `test` 
+  argument.
+* Dropped rows with missing values and comparisons that could not be computed
+  are reported in one message / warning instead of silently ignored.
+* `bdiv_heatmap()` clusters samples on the chosen distance metric.
+* The log transform in `taxa_matrix()` uses a pseudocount so absent taxa rank 
+  lowest.
+
+## Data handling
+
+* `subset()` and `subset_taxa()` treat `NA` conditions as `FALSE`, like 
+  `base::subset()`.
+* Single-sample and single-OTU objects work (`biom[1]`).
+* `biom$relative` is `TRUE` for relative-abundance data; `biom$depth` is no 
+  longer reported as `1` for such data.
+* Clear errors for `NA`, negative, or non-numeric counts and unknown 
+  sample/OTU names. `as_rbiom()` accepts data frames of counts.
+* `write_biom(format = "json")` no longer rounds values to four decimals.
+* Newick output quotes labels containing metacharacters, spaces, or 
+  underscores, keeps node labels, and handles large trees. With ecodive 
+  2.3.1's standard-conforming parser, labels containing apostrophes and 
+  square brackets (e.g. `o__[Saprospirales]`) now round-trip exactly, and 
+  malformed Newick input is an error rather than a garbled tree.
+* `read_fasta()` returns a named character vector, accepts URLs and 
+  compressed files, and is linear-time.
+* `tree_subset()` handles unsorted numeric tips and keeps node labels.
+* `biom_merge()` accepts anything `as_rbiom()` accepts, keeps a tree that 
+  covers all OTUs, and reports conflicts in one warning.
+* Tabular imports no longer depend on readr; sample IDs like `"1.10"` stay 
+  character, and `Body Site` is never renamed to `Body.Site`.
+* Many fixes to TSV/HDF5 round trips (dates, column order, logical columns, 
+  blank cells), `write_xlsx()`, `convert_to_*()`, and the `exec/` scripts.
+* Caching works when disabled; keys include package versions; only rbiom's 
+  own files are ever evicted from the cache directory.
+
+## Plots
+
+* `ggbeeswarm`, `ggrepel`, and `fillpattern` are optional. Without them, dot 
+  and strip layers use jittered points and taxa labels use `geom_label()`.
+* Arguments in `...` that don't match any layer are an error that lists the 
+  valid layer prefixes (previously they produced cryptic ggplot2 errors). 
+  `b.` now refers to the bar layer and `box.` to the box layer.
+* Fixed: flipped boxplots without `x`, confidence intervals clamped at zero, 
+  heatmap dendrogram placement and `tree_height`, single-taxon heatmaps, 
+  `rare_stacked(labels = TRUE)`, `xlab.angle`, empty statistics tables, and 
+  ordination ellipses for small groups.
+* Plot titles use readable metric names.
+
+## Breaking changes
+
+* `write_*()` functions refuse to overwrite an existing file unless 
+  `overwrite = TRUE`. Text output uses LF line endings on all platforms.
+* The plyr functions `.`, `ddply`, `ldply`, and `llply` are no longer 
+  re-exported.
+* Removed `transform = "percent"` (never worked), and the never-functional 
+  `apcoa` and tree-plotting code.
+* `bdiv = "unifrac"` is now an error because it is ambiguous; name the 
+  variant (e.g. `"unweighted_unifrac"`).
+* Statistics table columns changed as described above.
+
+## Dependencies
+
+* Removed: ape, crayon, ggtext, labeling, pillar, plyr, readr. Moved to 
+  Suggests: fillpattern, ggbeeswarm, ggrepel, readxl. Packages that were 
+  always required but undeclared (cli, glue, lifecycle, Matrix, R6, rlang, 
+  scales, tibble) are now in Imports, along with cluster and permute (both 
+  already installed with vegan).
+* Requires ecodive (>= 2.3.1).
+
+
 # rbiom 3.1.1
 
 * `as_rbiom()` and `read_biom()` now accept count matrices that are triangular, diagonal, or 1x1.

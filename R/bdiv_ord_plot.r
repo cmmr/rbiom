@@ -1,96 +1,143 @@
 #' Ordinate samples and taxa on a 2D plane based on beta diversity distances.
-#' 
+#'
 #' @inherit documentation_dist_test
 #' @inherit documentation_default
-#' 
+#'
 #' @family beta_diversity
 #' @family ordination
 #' @family visualization
-#' 
-#' 
-#' @param layers   One or more of 
-#'        `c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")`. 
-#'        The first four are sample-centric; the last three are taxa-centric. 
-#'        Single letter abbreviations are also accepted. For instance, 
-#'        `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`. 
-#'        Default: `"pe"`
-#'        
-#' @param ...   Parameters for layer geoms (e.g. [ggplot2::geom_point()]). 
-#'        Prefixing parameter names with a layer name ensures that a particular 
-#'        parameter is passed to, and only to, that layer. For instance, 
-#'        \code{point.size = 2} or \code{p.size = 2} ensures only the points 
-#'        have their size set to \code{2}. Points can also be controlled with 
-#'        the \code{pt.} prefix.
-#'           
-#'        
+#'
+#'
+#' @param layers   One or more of
+#'        `c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")`.
+#'        The first four are sample-centric; the last three are taxa-centric.
+#'        Single letter abbreviations are also accepted. For instance,
+#'        `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`.
+#'        Default: `"petm"`
+#'
+#' @param stat.by   Dataset field with the groups to compare and color by.
+#'        Must be categorical. Default: `NULL`
+#'
+#' @param test    Permutational test for the sample groups (`stat.by`).
+#'        Options are `"adonis2"` (PERMANOVA; the default), `"mrpp"`,
+#'        `"betadisper"`, or `"none"`. See [distmat_stats()]. The taxa
+#'        biplot always uses [vegan::envfit()].
+#'
+#' @param strata   Dataset field with the blocking/subject variable.
+#'        Permutation tests permute within strata; regression models
+#'        include a random intercept per stratum. Default: `NULL`
+#'
+#' @param ...   Parameters for layer geoms (e.g. [ggplot2::geom_point()]).
+#'        Prefixing parameter names with a layer name ensures that a particular
+#'        parameter is passed to, and only to, that layer. For instance,
+#'        \code{point.size = 2} or \code{p.size = 2} ensures only the points
+#'        have their size set to \code{2}. Points can also be controlled with
+#'        the \code{pt.} prefix. An argument that no layer accepts is an
+#'        error.
+#'
+#' @details
+#' The \bold{ellipse} layer draws 95% normal-distribution ellipses
+#' ([ggplot2::stat_ellipse()] with `type = "norm"`); groups with fewer than
+#' four samples get no ellipse. The \bold{taxon} layer uses the ggrepel
+#' package to avoid overlapping labels when it is installed, and plain
+#' labels otherwise. Facet strips (or the subtitle) show the test
+#' statistic, R-squared (PERMANOVA), and p-value from `$stats`.
+#'
 #' @return A \code{ggplot2} plot.
-#'         The computed sample coordinates and ggplot command 
+#'         The computed sample coordinates and ggplot command
 #'         are available as \code{$data} and \code{$code} respectively.
-#'         If \code{stat.by} is given, then \code{$stats} and 
+#'         If \code{stat.by} is given, then \code{$stats} and
 #'         \code{$stats$code} are set.
-#'         If \code{rank} is given, then \code{$data$taxa_coords}, 
+#'         If \code{rank} is given, then \code{$data$taxa_coords},
 #'         \code{$taxa_stats}, and \code{$taxa_stats$code} are set.
-#' 
-#' 
+#'
+#'
 #' @export
 #' @examples
 #'     library(rbiom)
-#'     
+#'
 #'     biom <- rarefy(hmp50)
-#'     
+#'
 #'     bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
-#'     
+#'
 bdiv_ord_plot <- function (
-    biom, bdiv = "bray", ord = "PCoA", layers = "petm", 
+    biom, bdiv = "bray", ord = "PCoA", layers = "petm",
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
-    tree = NULL, test = "adonis2", seed = 0, permutations = 999, 
-    rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly", caption = TRUE, 
-    alpha = 0.5, cpus = n_cpus(), ...) {
-  
+    tree = NULL, test = "adonis2", seed = 0, permutations = 999,
+    rank = -1, taxa = 4, p.top = Inf, p.adj = "fdr", unc = "singly",
+    strata = NULL, caption = TRUE, alpha = 0.5, cpus = n_cpus(), ...) {
+
   biom <- as_rbiom(biom)
-  
-  
+  validate_tree(null_ok = TRUE)
+
+  params <- eval_envir(environment(), ...)
+  cmd    <- current_cmd('bdiv_ord_plot', cmd_params(params))
+
+
   #________________________________________________________
   # See if this result is already in the cache.
   #________________________________________________________
-  params     <- slurp_env(..., .dots = TRUE, .f = 'bdiv_heatmap')
   cache_file <- get_cache_file('bdiv_ord_plot', params)
-  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
-    return (readRDS(cache_file))
-  
-  
+  p          <- get_cache_value(cache_file)
+
+  if (is.null(p)) {
+    params$.fn <- 'bdiv_ord_plot()'
+    p <- set_cache_value(cache_file, bdiv_ord_build(params))
+  }
+
+  return (plot_prov(p, cmd, biom))
+}
+
+
+
+
+#________________________________________________________
+# bdiv_ord_plot() without the cache / provenance wrapper.
+#________________________________________________________
+bdiv_ord_build <- function (params) {
+
+  stopifnot(is_bare_environment(params))
+
+  params$.dv <- params$.data_var %||% "data"
+  params$.data_code %<>% if.null(character())
+
+
   #________________________________________________________
   # Validate and restructure user's arguments.
   #________________________________________________________
-  params <- list2env(params)
   with(params, {
-    
+
     if (biom$n_samples < 4)
       cli_abort("At least four samples are needed for an ordination.")
-    
+
     validate_bdiv(multiple = TRUE)
     validate_rank(max = Inf, null_ok = TRUE)
-    
+    validate_layers('layers', choices = c(
+      'p' = "point",   'n' = "name",  's' = "spider",
+      'd' = "density", 't' = "taxon", 'm' = "mean",
+      'a' = "arrow",   'e' = "ellipse" ))
+
     validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
-    validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat")
-    
-    na.omit(biom, clone = FALSE, fields = c(stat.by, facet.by))
-    
-  })
-  
-  
-  
-  #________________________________________________________
-  # Coordinates for ordination "points"
-  #________________________________________________________
-  with(params, {
-    
+    validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat", max = Inf)
+    validate_biom_field('strata',   null_ok = TRUE, col_type = "cat")
+    validate_var_choices('test', c("adonis2", "mrpp", "betadisper", "none"))
+    validate_bool('caption')
+
+    # The biplot is only computed when a taxa layer will show it.
+    if (!any(c('taxon', 'arrow', 'mean') %in% layers))
+      rank <- NULL
+
+
+    #________________________________________________________
+    # Coordinates for ordination "points"
+    #________________________________________________________
     .ggdata <- bdiv_ord_table(
-      biom         = biom, 
+      biom         = biom,
       bdiv         = bdiv,
       ord          = ord,
       split.by     = facet.by,
       stat.by      = stat.by,
+      strata       = strata,
       tree         = tree,
       test         = test,
       seed         = seed,
@@ -100,17 +147,14 @@ bdiv_ord_plot <- function (
       p.adj        = p.adj,
       p.top        = p.top,
       unc          = unc,
-      alpha        = alpha, 
+      alpha        = alpha,
       cpus         = cpus )
-    
-    .ggdata %<>% rename_cols('.sample' = ".label")
-    
+
     .xcol  <- ".x"
     .ycol  <- ".y"
     .xmode <- "numeric"
-    
-    
-    
+
+
     #________________________________________________________
     # Move stats tables/commands attrs from `p$data` to `p`.
     #________________________________________________________
@@ -119,174 +163,154 @@ bdiv_ord_plot <- function (
       taxa_stats = attr(.ggdata, 'taxa_stats', exact = TRUE) )
     attr(.ggdata, 'stats')      <- NULL
     attr(.ggdata, 'taxa_stats') <- NULL
-    
+
   })
-  
-  
-  
+
+
   #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
   init_layers(
-    params  = params, 
-    choices = c( 'p' = "point",   'n' = "name",  's' = "spider", 
+    params  = params,
+    choices = c( 'p' = "point",   'n' = "name",  's' = "spider",
                  'd' = "density", 't' = "taxon", 'm' = "mean",
                  'a' = "arrow",   'e' = "ellipse" ))
-  
-  
-  
-  #________________________________________________________
-  # Ignore shapes/etc without applicable layers.
-  #________________________________________________________
-  if (is.null(params$rank) || !any(has_layer(params, c('taxon', 'arrow', 'mean')))) {
-    params$rank <- NULL
+
+  if (is.null(params$rank))
     del_layer(params, c('taxon', 'arrow', 'mean'))
-  }
-  
-  
-  
-  #________________________________________________________
-  # aes() parameters - now handled by plot_build
-  #________________________________________________________
-  # specs <- list(
-  #   "arrow"      = c('x', 'y', 'xend',  'yend'),
-  #   "spider"     = c('x', 'y', 'xend',  'yend',  'color'),
-  #   "ellipse"    = c('x', 'y',                   'color'),
-  #   "point"      = c('x', 'y', 'shape', 'fill',  'color'),
-  #   "name"       = c('x', 'y',          'label', 'color'),
-  #   "stats_text" = c(                   'label'),
-  #   "taxon"      = c('x', 'y', 'size',  'label'),
-  #   "mean"       = c('x', 'y', 'size') )
-  
-  
-  
+
+  repel <- pkg_available('ggrepel')
+
+
   #________________________________________________________
   # Scale the size of biplot means and taxon labels
   #________________________________________________________
   if (has_layer(params, 'mean') || has_layer(params, 'taxon')) {
-    
-    if (has_layer(params, 'taxon') && has_layer(params, 'mean')) {
-      
+
+    if (has_layer(params, 'taxon') && has_layer(params, 'mean') && repel) {
+
       set_layer(
-        params = params, 
-        layer  = 'taxon', 
+        params = params,
+        layer  = 'taxon',
         'mapping|point.size' = ".size" )
-      
+
       set_layer(
-        params = params, 
+        params = params,
         layer  = 'continuous_scale',
-        # 'scale_name' = "size",
-        'palette'    = as.cmd(scales::area_pal(range = c(2,5))),
-        'aesthetics' = c("size", "point.size"), 
-        'name'       = "Taxa Abundance", 
+        'palette'    = as.cmd(scales::area_pal(range = c(2, 5))),
+        'aesthetics' = c("size", "point.size"),
+        'name'       = "Taxa Abundance",
         'labels'     = ~ paste0(. * 100, "%") )
-      
+
     } else if (has_layer(params, 'mean')) {
-      
+
       set_layer(
-        params = params, 
-        layer  = 'scale_size', 
+        params = params,
+        layer  = 'scale_size',
         'range'  = c(2, 5),
         'name'   = "Taxa Abundance",
         'labels' = ~ paste0(. * 100, "%") )
-      
+
     } else {
-      
+
       set_layer(
-        params = params, 
-        layer  = 'scale_size', 
+        params = params,
+        layer  = 'scale_size',
         'range' = c(2, 5) )
     }
   }
-  
-  
+
+
   #________________________________________________________
   # Provenance-tracked ggplot2 functions.
   #________________________________________________________
-  .element_blank    <- P('ggplot2::element_blank')
-  .element_rect     <- P('ggplot2::element_rect')
-  .element_markdown <- P('ggtext::element_markdown')
-  .arrow            <- P('grid::arrow')
-  .unit             <- P('grid::unit')
-  .alpha            <- P('scales::alpha')
-  
-  
+  .element_blank <- P('ggplot2::element_blank')
+  .element_rect  <- P('ggplot2::element_rect')
+  .arrow         <- P('grid::arrow')
+  .unit          <- P('grid::unit')
+  .alpha         <- P('scales::alpha')
+
+
   #________________________________________________________
   # Default aes and non-aes parameters
   #________________________________________________________
   set_layer(
-    params = params, 
-    layer  = 'ggplot', 
-    'mapping|x' = '.x', 
+    params = params,
+    layer  = 'ggplot',
+    'mapping|x' = '.x',
     'mapping|y' = '.y' )
-  
-  set_layer(
-    params = params, 
-    layer = 'labs', 
-    'x' = NULL, 
-    'y' = NULL )
-  
-  
+
+
   if (has_layer(params, 'spider'))
     set_layer(
-      params = params, 
-      layer  = 'spider', 
-      'alpha'        = 0.4, 
+      params = params,
+      layer  = 'spider',
+      'alpha'        = 0.4,
       'linewidth'    = 0.75,
       'mapping|xend' = ".xend",
       'mapping|yend' = ".yend" )
-  
+
   if (has_layer(params, 'name'))
     set_layer(
-      params = params, 
-      layer  = 'name', 
-      'mapping|label' = ".label" )
-  
+      params = params,
+      layer  = 'name',
+      'mapping|label' = ".sample" )
+
+  if (has_layer(params, 'ellipse'))
+    set_layer(params, 'ellipse', type = "norm")
+
   if (has_layer(params, 'mean'))
     set_layer(
-      params = params, 
-      layer  = 'mean', 
-      'alpha'        = 0.5, 
+      params = params,
+      layer  = 'mean',
+      'alpha'        = 0.5,
       'color'        = "darkgray",
       'mapping|size' = ".size" )
-  
+
   if (has_layer(params, 'arrow'))
     set_layer(
-      params = params, 
-      layer  = 'arrow', 
+      params = params,
+      layer  = 'arrow',
       'alpha'        = 0.4,
-      'color'        = "darkgray", 
-      'linewidth'    = 0.75, 
-      'arrow'        = .arrow(ends="first", length=.unit(.5,"cm")),
+      'color'        = "darkgray",
+      'linewidth'    = 0.75,
+      'arrow'        = .arrow(ends = "first", length = .unit(.5, "cm")),
       'mapping|xend' = ".xend",
       'mapping|yend' = ".yend" )
-  
-  if (has_layer(params, 'taxon'))
+
+  if (has_layer(params, 'taxon')) {
+
     set_layer(
-      params = params, 
-      layer  = 'taxon', 
-      'show.legend'        = FALSE,
-      'fill'               = .alpha(c("white"), 0.8),
-      'box.padding'        = 1,
-      'segment.curvature'  = -0.1, 
-      'segment.linetype'   = 8, 
-      'max.overlaps'       = 100,
-      'seed'               = 0,
-      'mapping|size'       = ".size",
-      'mapping|label'      = ".label" )
-  
-  
+      params = params,
+      layer  = 'taxon',
+      'show.legend'   = FALSE,
+      'fill'          = .alpha(c("white"), 0.8),
+      'mapping|size'  = ".size",
+      'mapping|label' = ".label" )
+
+    if (repel)
+      set_layer(
+        params = params,
+        layer  = 'taxon',
+        'box.padding'        = 1,
+        'segment.curvature'  = -0.1,
+        'segment.linetype'   = 8,
+        'max.overlaps'       = 100,
+        'seed'               = 0 )
+  }
+
+
   set_layer(
-    params = params, 
-    layer  = 'theme', 
+    params = params,
+    layer  = 'theme',
     'axis.text'        = .element_blank(),
     'axis.ticks'       = .element_blank(),
-    'panel.border'     = .element_rect(color = "black", fill = FALSE, linewidth = 1),
+    'panel.border'     = .element_rect(color = "black", fill = NA, linewidth = 1),
     'panel.grid.major' = .element_blank(),
     'panel.grid.minor' = .element_blank(),
     'panel.background' = .element_rect(fill = "white"))
-  
-  
+
+
   #________________________________________________________
   # Create the plot and add each layer with its arguments.
   # Also attach the human-readable ggplot command.
@@ -295,14 +319,10 @@ bdiv_ord_plot <- function (
     ordination_biplot() %>%
     ordination_facets() %>%
     ordination_spider() %>%
+    ordination_ellipse() %>%
     plot_build()
-  
-  
-  
-  attr(fig, 'cmd') <- current_cmd('bdiv_ord_plot')
-  set_cache_value(cache_file, fig)
-  
-  return(fig)
+
+  return (fig)
 }
 
 
@@ -312,54 +332,51 @@ bdiv_ord_plot <- function (
 # Edit ggdata and taxa_coords for ggplot compatibility
 #________________________________________________________
 ordination_biplot <- function (params) {
-  
-  if (is.null(params$rank))
-    return (invisible(params))
-  
-  
+
   ggdata      <- params$.ggdata
   taxa_coords <- attr(ggdata, 'taxa_coords', exact = TRUE)
-  
-  if (is_null(taxa_coords))
+  dv          <- params$.dv
+
+  if (is.null(params$rank) || is_null(taxa_coords)) {
+    attr(ggdata, 'taxa_coords') <- NULL
+    params$.ggdata <- ggdata
     return (invisible(params))
-  
-  
-  #________________________________________________________
-  # Duplicate ggdata rows for each biplot rank
-  #________________________________________________________
-  if (length(params$rank) == 1) {
-    ggdata[['.rank']] <- params$rank
-    
-  } else {
-    ggdata <- local({
-      
-      df <- plyr::ldply(params$rank, function (rank) {
-        data.frame(check.names = FALSE, ggdata, '.rank' = rank) })
-      
-      for (i in setdiff(names(attributes(ggdata)), names(attributes(df))))
-        attr(df, i) <- attr(ggdata, i, exact = TRUE)
-      
-      return (df)
-    })
   }
-  
-  
+
+
   #________________________________________________________
   # Restructure colnames for use in geom_segment()
   #________________________________________________________
-  
-  final_cols <- c(
-    params$facet.by, '.facet', '.bdiv', '.ord', 
-    '.rank', '.taxa', '.x', '.y', '.x0', '.y0', '.p.val', '.adj.p', '.size' )
-  
-  taxa_coords %<>% keep_cols(final_cols)
-  taxa_coords %<>% rename_cols('.taxa' = ".label", '.x0' = ".xend", '.y0' = ".yend")
-  
-  
-  
+  .taxa <- .x0 <- .y0 <- NULL # for CRAN check only
+
+  taxa_coords <- dplyr::rename(as_tibble(taxa_coords), .label = .taxa, .xend = .x0, .yend = .y0)
+
+  params$.data_code <- c(
+    params$.data_code,
+    "# Taxa biplot arrows (see `p$taxa_stats`).",
+    sprintf("taxa_coords <- dplyr::rename(%s$taxa_coords, .label = .taxa, .xend = .x0, .yend = .y0)", dv) )
+
+
+  #________________________________________________________
+  # Duplicate ggdata rows for each biplot rank
+  #________________________________________________________
+  if (length(params$rank) > 1) {
+
+    .rank <- NULL # for CRAN check only
+
+    ggdata <- dplyr::bind_rows(lapply(params$rank, function (rank) dplyr::mutate(ggdata, .rank = rank)))
+
+    params$.data_code <- c(
+      params$.data_code,
+      "",
+      "# One copy of the sample coordinates per taxonomic rank.",
+      sprintf("%s <- dplyr::bind_rows(lapply(%s, function (rank) dplyr::mutate(%s, .rank = rank)))", dv, deparse_vec(params$rank), dv) )
+  }
+
+
   attr(ggdata, 'taxa_coords') <- taxa_coords
   params$.ggdata              <- ggdata
-  
+
   # To enable %>% chaining
   return (invisible(params))
 }
@@ -368,210 +385,222 @@ ordination_biplot <- function (params) {
 
 
 #________________________________________________________
-# Faceting logic.
+# Pretty names for the beta diversity metrics.
+#________________________________________________________
+bdiv_pretty <- function (ids) {
+  vapply(as.character(ids), FUN.VALUE = '', function (id) {
+    tryCatch(ecodive::match_metric(id, div = 'beta')$name, error = function (e) id)
+  })
+}
+
+
+
+#________________________________________________________
+# One line of text summarizing a sample statistics row.
+#________________________________________________________
+ord_stats_text <- function (row, test) {
+
+  fmt <- function (x) format(x, digits = 3)
+
+  if (is.na(row[['.p.val']])) return ("statistics unavailable")
+
+  switch(
+    EXPR       = test,
+    adonis2    = sprintf("PERMANOVA F = %s; R\u00b2 = %s; p = %s", fmt(row[['.stat']]), fmt(row[['.r.sqr']]), fmt(row[['.p.val']])),
+    mrpp       = sprintf("MRPP delta = %s; z = %s; p = %s",         fmt(row[['.stat']]), fmt(row[['.z']]),     fmt(row[['.p.val']])),
+    betadisper = sprintf("Dispersion F = %s; p = %s",               fmt(row[['.stat']]), fmt(row[['.p.val']])),
+    sprintf("p = %s", fmt(row[['.p.val']])) )
+}
+
+
+
+
+#________________________________________________________
+# Faceting logic. Each combination of facet.by fields, metric,
+# ordination, and rank becomes one facet, labeled with the statistics.
+# The labels are a lookup table (`facets`) joined into the data; the
+# generated code contains it as a literal.
 #________________________________________________________
 ordination_facets <- function (params) {
-  
+
   ggdata       <- params$.ggdata
   sample_stats <- params$.plot_attrs$stats
-  taxa_coords  <- attr(ggdata, 'taxa_coords',  exact = TRUE)
+  taxa_coords  <- attr(ggdata, 'taxa_coords', exact = TRUE)
+  axes         <- attr(ggdata, 'axes',        exact = TRUE)
   ranks        <- params$rank
-  
-  .element_blank    <- P('ggplot2::element_blank')
-  .element_text     <- P('ggplot2::element_text')
-  .element_markdown <- P('ggtext::element_markdown')
-  
-  
+  facet.by     <- params$facet.by
+  dv           <- params$.dv
+
+  .element_blank <- P('ggplot2::element_blank')
+  .element_text  <- P('ggplot2::element_text')
+
+
   #________________________________________________________
-  # Facet strip text = facet.by, metrics, stats, and rank
+  # One row per facet.
   #________________________________________________________
-  df <- ggdata
-  
-  
+  key_cols <- c(facet.by, '.bdiv', '.ord', if (length(ranks) > 1) '.rank')
+
+  keys <- unique(as.data.frame(ggdata[key_cols]))
+  keys <- as.data.frame(lapply(keys, as.character), stringsAsFactors = FALSE, optional = TRUE)
+  rownames(keys) <- NULL
+
+  labels <- rep("", nrow(keys))
+
+
   #________________________________________________________
-  # Put facet.by metadata in first.
+  # Metadata facets first.
   #________________________________________________________
-  for (i in params$facet.by) {
-    
-    df %<>% within({
-      .facet <- bool_switch(
-        test  = exists(".facet", inherits = FALSE), 
-        yes   = sprintf("%s - %s", .facet, as.character(get(i))), 
-        no    = as.character(get(i)) )
-    })
-  }
-  
-  if (hasName(df, ".facet"))
-    df %<>% within(.facet %<>% sprintf(fmt="**%s**"))
-  
-  
-  
+  if (length(facet.by) > 0)
+    labels <- do.call(paste, c(keys[facet.by], sep = " - "))
+
+
   #________________________________________________________
   # Next are metrics with multiple values.
   #________________________________________________________
-  var_metrics <- c()
-  for (i in c('.bdiv', '.ord')) {
-    df[[i]] %<>% as.character()
-    if (length(unique(df[[i]])) > 1)
-      var_metrics %<>% c(i)
-  }
-  
-  if (length(var_metrics) == 0) {
-    
-    # Plot Title = "Weighted UniFrac PCoA (Phylum)"
-    metric <- paste(collapse = " ", df[1, c('.bdiv', '.ord')])
-    if (length(ranks) == 1) metric <- sprintf("%s (%s)", metric, ranks)
-    set_layer(params, 'labs', title = metric)
-    
-    
-  } else if (length(var_metrics) == 1) {
-    
-    # Plot Title = "Weighted UniFrac (Phylum)"
-    metric <- paste(collapse = " ", df[1, setdiff(c('.bdiv', '.ord'), var_metrics)])
-    if (length(ranks) == 1) metric <- sprintf("%s (%s)", metric, ranks)
-    set_layer(params, 'labs', title = metric)
-    
-    # Facet Title = "Female - Saliva: PCoA (Phylum)"
-    df[['.facet']] <- bool_switch(
-      test = hasName(df, ".facet"), 
-      yes  = sprintf("%s: %s", df[['.facet']], df[[var_metrics]]), 
-      no   = sprintf("%s",     df[[var_metrics]]) )
-    
-    
-  } else {
-    
-    # Plot Title = "Phylum"
-    if (length(ranks) == 1) set_layer(params, 'labs', title = ranks)
-    
-    # Facet Title = "Female - Saliva<br>Weighted UniFrac PCoA (Phylum)"
-    df[['.facet']] <- bool_switch(
-      test = hasName(df, ".facet"), 
-      yes  = sprintf("%s<br>%s %s", df[['.facet']], df[['.bdiv']], df[['.ord']]), 
-      no   = sprintf("**%s %s**",                   df[['.bdiv']], df[['.ord']]) )
-  }
-  remove("var_metrics")
-  
-  
+  var_metrics <- c('.bdiv', '.ord')[c(
+    length(unique(keys[['.bdiv']])) > 1,
+    length(unique(keys[['.ord']]))  > 1 )]
+
+  metric_text <- paste(
+    if ('.bdiv' %in% var_metrics) bdiv_pretty(keys[['.bdiv']]),
+    if ('.ord'  %in% var_metrics) keys[['.ord']] )
+
+  if (length(var_metrics) > 0)
+    labels <- ifelse(nzchar(labels), paste0(labels, ": ", metric_text), metric_text)
+
+  # Plot Title = "Bray-Curtis PCoA (Genus)" for the metrics that don't vary.
+  # When both vary, the title is just the rank (if any).
+  title <- paste(collapse = " ", c(
+    if (!'.bdiv' %in% var_metrics) bdiv_pretty(keys[['.bdiv']][[1]]),
+    if (!'.ord'  %in% var_metrics) as.character(keys[['.ord']][[1]]) ))
+  if (length(ranks) == 1)
+    title <- if (nzchar(title)) sprintf("%s (%s)", title, ranks) else as.character(ranks)
+  if (nzchar(title)) set_layer(params, 'labs', title = title)
+
+
   #________________________________________________________
   # Append rank to facet title when showing multiple ranks.
   #________________________________________________________
   if (length(ranks) > 1)
-    df[['.facet']] <- bool_switch(
-      test  = hasName(df, ".facet"), 
-      yes   = sprintf("%s (%s)", df[['.facet']], df[['.rank']]), 
-      no    = sprintf("**%s**", df[['.rank']]) )
-  
-  
+    labels <- ifelse(nzchar(labels), sprintf("%s (%s)", labels, keys[['.rank']]), keys[['.rank']])
+
+
   #________________________________________________________
-  # Last, add the statistics
+  # Last, add the statistics (agnostic of .ord and .rank).
   #________________________________________________________
-  if (!is_null(sample_stats)) {
-    
-    # stats are agnostic of .ord and .rank
-    stats_text <- with(
-      data = plyr::join(df, sample_stats, by = c('.bdiv', params$facet.by)), 
-      expr = sprintf(
-        fmt = "*p* = %s; *stat* = %s; *z* = %s",
-        format(.p.val, digits=3), 
-        format(.stat,  digits=3), 
-        format(.z,     digits=3) ))
-    
+  if (!is_null(sample_stats) && hasName(sample_stats, '.p.val')) {
+
+    stats_by   <- intersect(c(facet.by, '.bdiv'), names(sample_stats))
+    stats_keys <- do.call(paste, c(lapply(sample_stats[stats_by], as.character), sep = "\r"))
+    facet_keys <- do.call(paste, c(keys[stats_by], sep = "\r"))
+
+    stats_text <- vapply(facet_keys, FUN.VALUE = '', function (k) {
+      i <- match(k, stats_keys)
+      if (is.na(i)) return ("statistics unavailable")
+      ord_stats_text(sample_stats[i, ], params$test)
+    })
+
     if (length(unique(stats_text)) == 1) {
       set_layer(params, 'labs',  subtitle = stats_text[[1]])
-      set_layer(params, 'theme', plot.subtitle = .element_markdown(size = 11))
-      
+      set_layer(params, 'theme', plot.subtitle = .element_text(size = 11))
+
     } else {
-      df[['.facet']] <- bool_switch(
-        test = hasName(df, ".facet"),
-        yes  = sprintf("%s<br>%s", df[['.facet']], stats_text), 
-        no   = stats_text )
+      labels <- ifelse(nzchar(labels), paste0(labels, "\n", stats_text), stats_text)
     }
-    
-    
+
+
     # Add caption below plot describing stats method.
     if (isTRUE(params$caption)) {
-      
+
       set_layer(
-        params = params, 
-        layer  = 'labs', 
+        params = params,
+        layer  = 'labs',
         'caption' = sprintf(
-          fmt = "Statistics computed with %s (%i permutations).", 
-          sub('adonis2', 'PERMANOVA', params$test),
-          params$permutations ))
-      
+          fmt = "Statistics computed with %s (%i permutations%s).",
+          switch(params$test, adonis2 = "PERMANOVA", mrpp = "MRPP", betadisper = "betadisper", params$test),
+          params$permutations,
+          if (is.null(params$strata)) "" else sprintf(" within %s", params$strata) ))
+
       set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     }
-    
+
   }
-  
-  
+
+
   #________________________________________________________
-  # Copy .facet column from df to taxa_coords
+  # Axis titles from the ordination (e.g. "PCoA 1 (24.3%)").
   #________________________________________________________
-  if (!is_null(taxa_coords) && hasName(df, ".facet"))
-    attr(df, 'taxa_coords') <- local({
-      join_cols <- c('.bdiv', '.ord', '.rank', params$facet.by)
-      join_cols <- intersect(join_cols, intersect(colnames(df), colnames(taxa_coords)))
-      
-      plyr::join(
-          x     = taxa_coords, 
-          y     = df[,c(join_cols, '.facet')], 
-          by    = join_cols, 
-          match = "first" ) %>% 
-        drop_cols(join_cols) %>% 
-        as_rbiom_tbl()
-    })
-  
-  
-  
+  for (axis in c('.x', '.y')) {
+
+    lab <- unique(as.character(axes[['.label']][axes[['.axis']] == axis]))
+
+    if (length(lab) != 1)
+      lab <- if (length(unique(axes[['.ord']])) == 1)
+        paste(as.character(axes[['.ord']][[1]]), match(axis, c('.x', '.y'))) else NULL
+
+    if (axis == '.x') set_layer(params, 'labs', x = lab) else set_layer(params, 'labs', y = lab)
+  }
+
+
   #________________________________________________________
-  # These columns are now obsolete thanks to .facet / labs.
+  # Join the facet labels into the data (and the taxa coordinates).
   #________________________________________________________
-  df %<>% drop_cols('.bdiv', '.ord', '.rank', params$facet.by)
-  
-  
-  #________________________________________________________
-  # Overwrite facet.by with new .facet column.
-  #________________________________________________________
-  if (hasName(df, ".facet")) {
-    
-    df[['.facet']]  <- factor(df[['.facet']], levels = unique(df[['.facet']]))
+  if (nrow(keys) > 1) {
+
+    keys[['.facet']] <- factor(labels, levels = unique(labels))
+
+    join_code <- function (var, cols) {
+      sprintf("%s <- dplyr::left_join(dplyr::mutate(%s, dplyr::across(dplyr::all_of(%s), as.character)), facets, by = %s)",
+        var, var, deparse_vec(cols), deparse_vec(cols))
+    }
+
+    join <- function (df, cols) {
+      df <- dplyr::mutate(df, dplyr::across(dplyr::all_of(cols), as.character))
+      dplyr::left_join(df, keys, by = cols)
+    }
+
+    params$.data_code <- c(
+      params$.data_code,
+      "",
+      "# Facet labels (metric, ordination, and the statistics from `p$stats`).",
+      sprintf("facets <- %s", tibble_code(lapply(as.list(keys), deparse_vec, indent = 4))),
+      join_code(dv, key_cols) )
+
+    attrs  <- attributes(ggdata)
+    ggdata <- join(ggdata, key_cols)
+    for (i in setdiff(names(attrs), c('names', 'row.names', 'class')))
+      if (is.null(attr(ggdata, i, exact = TRUE)))
+        attr(ggdata, i) <- attrs[[i]]
+
+    if (!is.null(taxa_coords)) {
+      tc_cols <- intersect(key_cols, colnames(taxa_coords))
+      taxa_coords <- join(taxa_coords, tc_cols)
+      attr(ggdata, 'taxa_coords') <- taxa_coords
+      params$.data_code <- c(params$.data_code, join_code("taxa_coords", tc_cols))
+    }
+
     params$facet.by <- '.facet'
-    
+
+    set_layer(params, 'facet', 'scales' = "free")
+
     set_layer(
-      params = params, 
-      layer  = 'facet', 
-      'scales' = "free" )
-    
-    set_layer(
-      params = params, 
+      params = params,
       layer  = 'theme',
       'strip.background' = .element_blank(),
-      'strip.text'       = .element_markdown(hjust=0) )
-    
-    if (!is.null(taxa_coords <- attr(df, 'taxa_coords', exact = TRUE))) {
-      taxa_coords[['.facet']] %<>% factor(levels = levels(df[['.facet']]))
-      attr(df, 'taxa_coords') <- taxa_coords
-      remove("taxa_coords")
-    }
-    
+      'strip.text'       = .element_text(hjust = 0) )
+
   } else {
     params$facet.by <- NULL
   }
-  
-  
-  #________________________________________________________
-  # Make sure ggdata retains all its original attributes.
-  #________________________________________________________
-  for (i in names(attributes(ggdata)))
-    if (is_null(attr(df, i, exact = TRUE)))
-      attr(df, i) <- attr(ggdata, i, exact = TRUE)
-  
-  
-  params$.ggdata <- df
-  
+
+
+  if (!is.null(taxa_coords))
+    params$.derived_code[['taxa_coords']] <- ""  # defined in .data_code
+
+  params$.ggdata <- ggdata
+
   plot_facets(params)
-  
+
   # To enable %>% chaining
   return (invisible(params))
 }
@@ -583,30 +612,79 @@ ordination_facets <- function (params) {
 # Construct data.frame for 'spider' lines
 #________________________________________________________
 ordination_spider <- function (params) {
-  
+
   if (!has_layer(params, 'spider'))
     return (invisible(params))
-  
-  
+
   ggdata <- params$.ggdata
-  
-  attr(ggdata, 'spider') <- plyr::ddply(
-    .data      = as.data.frame(ggdata),
-    .variables = ply_cols(c(params$facet.by, params$stat.by)), 
-    .fun       = function (df) {
-      
-      data.frame(
-        check.names = FALSE,
-        df,
-        '.xend' = mean(df[['.x']]),
-        '.yend' = mean(df[['.y']])
-      )
-    }) %>% drop_cols(".id") %>% as_tibble()
-  
+  dv     <- params$.dv
+  by     <- unique(c(params$facet.by, params$stat.by))
+
+  .x <- .y <- NULL # for CRAN check only
+
+  spider <- as_tibble(ggdata)
+  if (length(by) > 0) spider <- dplyr::group_by(spider, !!!rlang::syms(by))
+  spider <- spider %>%
+    dplyr::mutate(.xend = mean(.x), .yend = mean(.y)) %>%
+    dplyr::ungroup()
+
+  attr(ggdata, 'spider') <- spider
+
+  params$.derived_code[['spider']] <- paste(collapse = "\n", c(
+    "# Spider lines from each sample to its group's centroid.",
+    sprintf("spider <- %s %%>%%", dv),
+    if (length(by) > 0) sprintf("  dplyr::group_by(%s) %%>%%", paste(coan(by), collapse = ", ")),
+    "  dplyr::mutate(.xend = mean(.x), .yend = mean(.y)) %>%",
+    "  dplyr::ungroup()" ))
+
   params$.ggdata <- ggdata
-  
+
   # To enable %>% chaining
   return (invisible(params))
 }
 
 
+
+
+#________________________________________________________
+# Ellipses need at least four samples per group.
+#________________________________________________________
+ordination_ellipse <- function (params) {
+
+  if (!has_layer(params, 'ellipse'))
+    return (invisible(params))
+
+  ggdata <- params$.ggdata
+  dv     <- params$.dv
+  by     <- unique(c(params$facet.by, params$stat.by))
+
+  sizes <- if (length(by) == 0) nrow(ggdata) else table(do.call(paste, c(lapply(ggdata[by], as.character), sep = "\r")))
+
+  if (all(sizes >= 4))
+    return (invisible(params))
+
+  if (!any(sizes >= 4)) {
+    del_layer(params, 'ellipse')
+    return (invisible(params))
+  }
+
+  ellipse <- as_tibble(ggdata)
+  if (length(by) > 0) ellipse <- dplyr::group_by(ellipse, !!!rlang::syms(by))
+  ellipse <- ellipse %>%
+    dplyr::filter(dplyr::n() >= 4) %>%
+    dplyr::ungroup()
+
+  attr(ggdata, 'ellipse') <- ellipse
+  attr(params$layers[['ellipse']], 'src') <- 'ellipse'
+
+  params$.derived_code[['ellipse']] <- paste(collapse = "\n", c(
+    "# Ellipses are only drawn for groups with at least four samples.",
+    sprintf("ellipse_data <- %s %%>%%", dv),
+    if (length(by) > 0) sprintf("  dplyr::group_by(%s) %%>%%", paste(coan(by), collapse = ", ")),
+    "  dplyr::filter(dplyr::n() >= 4) %>%",
+    "  dplyr::ungroup()" ))
+
+  params$.ggdata <- ggdata
+
+  return (invisible(params))
+}

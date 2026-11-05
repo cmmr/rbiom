@@ -2,85 +2,164 @@
 % Please edit documentation in R/distmat_stats.r
 \name{distmat_stats}
 \alias{distmat_stats}
-\title{Run statistics on a distance matrix vs a categorical or numeric variable.}
+\title{Run permutation statistics on a distance matrix.}
 \usage{
-distmat_stats(dm, groups, test = "adonis2", seed = 0, permutations = 999)
+distmat_stats(
+  dm,
+  groups,
+  test = "adonis2",
+  seed = 0,
+  permutations = 999,
+  strata = NULL
+)
 }
 \arguments{
 \item{dm}{A \code{dist}-class distance matrix, as returned from
 \code{\link[=bdiv_distmat]{bdiv_distmat()}} or \code{\link[stats:dist]{stats::dist()}}. Required.}
 
-\item{groups}{A named vector of grouping values. The names should
-correspond to \code{attr(dm, 'Labels')}. Values can be either
-categorical or numeric. Required.}
+\item{groups}{A vector of grouping values, one per sample. Either named
+with the sample names in \code{attr(dm, 'Labels')}, or unnamed and in
+the same order. Categorical values define groups; numeric values
+are used as a covariate (\code{test = "adonis2"}) or correlated with
+the distances (\code{test = "mantel"}). Samples with an \code{NA} value are
+dropped (with a message). Required.}
 
-\item{test}{Permutational test for accessing significance. Options are:
+\item{test}{The permutation test to run. Options are:
 \describe{
-\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
-\item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
-\item{\code{"none"} - }{ Don't run any statistics. }
+\item{\code{"adonis2"} - }{ PERMANOVA; \code{\link[vegan:adonis2]{vegan::adonis2()}}. Accepts
+categorical or numeric \code{groups}. }
+\item{\code{"mrpp"} - }{ Multiple response permutation procedure;
+\code{\link[vegan:mrpp]{vegan::mrpp()}}. Categorical \code{groups} only. }
+\item{\code{"betadisper"} - }{ Homogeneity of multivariate dispersion,
+i.e. whether groups differ in their spread rather than
+their location; \code{\link[vegan:betadisper]{vegan::betadisper()}} followed by
+\code{\link[vegan:permutest]{vegan::permutest()}}. Categorical \code{groups} only. A
+significant PERMANOVA together with a significant
+dispersion test means that group differences may be due
+to differences in spread. }
+\item{\code{"mantel"} - }{ Mantel test of the correlation (Spearman)
+between \code{dm} and the pairwise absolute differences in a
+numeric \code{groups}; \code{\link[vegan:mantel]{vegan::mantel()}}. Numeric \code{groups} only. }
+\item{\code{"none"} - }{ Don't run any statistics; returns \code{NULL}. }
 }
 Abbreviations are allowed. Default: \code{"adonis2"}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
+
+\item{strata}{A blocking variable for repeated measures, e.g. a subject
+identifier. Given like \code{groups} (one value per sample, named or in
+\code{attr(dm, 'Labels')} order). How permutations are restricted
+depends on whether \code{groups} varies within strata; see Details.
+Default: \code{NULL} (samples are exchangeable).}
 }
 \value{
-A data.frame with summary statistics from \code{\link[vegan:permustats]{vegan::permustats()}}.
-The columns are:
+A tibble data.frame with one row and the columns:
 \describe{
-\item{\emph{.n} - }{ The size of the distance matrix. }
-\item{\emph{.stat} - }{
-The observed statistic. For mrpp, this is the overall
-weighted mean of group mean distances. }
-\item{\emph{.z} - }{
-The difference of observed statistic and mean of permutations
-divided by the standard deviation of permutations (also known
-as z-values). Evaluated from permuted values without observed
-statistic. }
-\item{\emph{.p.val} - }{ Probability calculated by \code{test}. }
+\item{\code{.n} - }{ The number of samples in the distance matrix. }
+\item{\code{.stat} - }{ The observed test statistic: the pseudo-F
+ratio (adonis2, betadisper), the weighted mean within-group
+distance delta (mrpp), or Spearman's r (mantel). }
+\item{\code{.r.sqr} - }{ adonis2 only: the proportion of the total
+sum of squares explained by \code{groups}. }
+\item{\code{.z} - }{ mrpp only: the observed statistic minus the mean
+of the permuted statistics, divided by their standard
+deviation. }
+\item{\code{.p.val} - }{ The permutation p-value: the probability,
+under the null hypothesis, of a statistic at least as
+extreme as the observed one, estimated from the
+permutations (plus the observed data). Its resolution is
+limited by \code{permutations} (or by the number of distinct
+arrangements of whole strata; see Details). }
 }
-R commands for reproducing the results are in \code{$code}.
+The R code used to calculate these statistics is in \verb{$code}.
+The \code{groups} (and \code{strata}) values are embedded in that code so
+that it can be re-run as is.
 }
 \description{
-Run statistics on a distance matrix vs a categorical or numeric variable.
+Tests whether the distances in \code{dm} are structured by \code{groups}, using
+permutation tests. Samples, not distances, are the unit of permutation, so
+the n(n-1)/2 pairwise distances are never treated as independent
+observations.
+}
+\details{
+\strong{Permutation schemes with \code{strata}.} Samples from the same stratum
+(e.g. repeated samples of one subject) are not independent, so they
+can't be shuffled freely. Which restriction is valid depends on \code{groups}:
+\itemize{
+\item \strong{Within-strata variable} (\code{groups} varies within at least one
+stratum, e.g. time point or a within-subject treatment): labels are
+permuted only within each stratum, using
+\code{permute::how(nperm = permutations, blocks = strata)} with the
+\pkg{vegan} function for \code{test}.
+\item \strong{Between-strata variable} (\code{groups} is constant within every
+stratum, e.g. delivery mode with subject as the stratum): permuting
+within strata would never change the labels (every permutation would
+reproduce the observed statistic, giving p = 1). Instead, the
+stratum-level values are permuted among whole strata (strata may have
+different sizes), and the statistic is recomputed on all samples. The
+p-value is \verb{(1 + #\{permuted >= observed\}) / (1 + permutations)}. When
+there are no more distinct arrangements of the values among strata
+than \code{permutations}, all of them are enumerated instead and the
+p-value is exact: the proportion of arrangements (including the
+observed one) with a statistic at least as large. The statistics are
+computed by rbiom with the same formulas as \pkg{vegan}: the
+PERMANOVA pseudo-F and R-squared from the Gower-centred matrix of
+squared distances, and Spearman's r between the distances and
+pairwise differences in \code{groups}. The effective sample size is the
+number of strata, so a warning is given when the null distribution is
+coarse (e.g. a group present in only one stratum). Only
+\code{test = "adonis2"} and \code{test = "mantel"} support this scheme;
+\code{"mrpp"} and \code{"betadisper"} give an error.
+}
+
+The scheme used, and the number of permutations or enumerated
+arrangements, is reported in the table header.
 }
 \examples{
     library(rbiom)
-    
-    hmp10        <- hmp50$clone()
-    hmp10$counts <- hmp10$counts[,1:10]
-    
+
+    hmp10 <- hmp50[1:10]
+
     dm <- bdiv_distmat(hmp10, 'w_unifrac')
-    
+
     distmat_stats(dm, groups = pull(hmp10, 'Body Site'))
-    
-    distmat_stats(dm, groups = pull(hmp10, 'Age'))
-    
+
+    distmat_stats(dm, groups = pull(hmp10, 'Age'), test = "mantel")
+
     # See the R code used to calculate these statistics:
-    stats <- distmat_stats(dm, groups = pull(hmp10, 'Age'))
+    stats <- distmat_stats(dm, groups = pull(hmp10, 'Age'), test = "mantel")
     stats$code
+
+    # Repeated measures: delivery mode is constant within each subject,
+    # so whole subjects are permuted (all 220 arrangements of the 12
+    # infants are enumerated, giving an exact p-value).
+    b  <- rarefy(subset(babies, `Age (days)` <= 10))
+    dm <- bdiv_distmat(b, 'bray')
+    distmat_stats(dm, pull(b, 'Delivery mode'), strata = pull(b, 'Subject ID'))
 
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=bdiv_table]{bdiv_table()}}
 
-Other stats_tables: 
-\code{\link{adiv_stats}()},
-\code{\link{bdiv_stats}()},
-\code{\link{stats_table}()},
-\code{\link{taxa_stats}()}
+Other stats_tables:
+\code{\link[=adiv_stats]{adiv_stats()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=stats_table]{stats_table()}},
+\code{\link[=taxa_stats]{taxa_stats()}}
 }
 \concept{beta_diversity}
 \concept{stats_tables}

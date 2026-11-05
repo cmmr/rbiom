@@ -1,3 +1,252 @@
-test_that("provenance", {
+#________________________________________________________
+# Provenance acceptance tests.
+#
+# Every rbiom object, table, statistics table, and plot must carry `$code`
+# that, when evaluated in a fresh environment, reproduces the object.
+#________________________________________________________
+
+# Evaluate `x$code` in a clean environment. Returns a list with the
+# environment (`env`) and the value of the final expression (`value`).
+replay <- function (x) {
+  code <- if (inherits(x, 'rbiom')) x$code else x$code
+  expect_s3_class(code, 'rbiom_code')
+  expect_false(any(grepl("not reproducible", code, fixed = TRUE)), label = "code is reproducible")
+  expect_false(any(grepl("not recorded", code, fixed = TRUE)),     label = "no unrecorded edits")
+  env   <- new.env(parent = globalenv())
+  value <- eval(parse(text = code), envir = env)
+  list(env = env, value = value)
+}
+
+# Compare two data frames ignoring provenance attributes and row names.
+strip <- function (df) {
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  for (a in c('cmd', 'code', 'history', 'data_cmd', 'tbl_sum', 'stats', 'stat_labels'))
+    attr(df, a) <- NULL
+  rownames(df) <- NULL
+  df
+}
+
+# Compare the data that ggplot2 would draw for two plots.
+built_data <- function (p) {
+  lapply(ggplot2::ggplot_build(p)$data, strip)
+}
+
+expect_same_plot <- function (replayed, original) {
+  if (inherits(original, 'patchwork')) {
+    expect_true(inherits(replayed, 'patchwork'))
+    expect_equal(length(replayed$patches$plots), length(original$patches$plots))
+    for (i in seq_along(original$patches$plots))
+      expect_equal(built_data(replayed$patches$plots[[i]]), built_data(original$patches$plots[[i]]), tolerance = 1e-6)
+    expect_equal(built_data(replayed), built_data(original), tolerance = 1e-6)
+  } else {
+    expect_equal(built_data(replayed), built_data(original), tolerance = 1e-6)
+  }
+}
+
+
+biom_file <- system.file("extdata", "hmp50.bz2", package = "rbiom")
+
+
+test_that("rbiom object history replays", {
+
+  b <- read_biom(biom_file)
+  b <- subset(b, Age > 25 & `Body Site` != "Stool")
+  cutoff <- 22
+  b <- subset(b, BMI > cutoff)
+  b <- rarefy(b, depth = 1000, seed = 7)
+  b <- mutate(b, Old = Age > 35)
+  b <- rename(b, Years = "Age")
+  b <- b[head(b$samples, 12)]
+  b <- subset_taxa(b, Phylum == "Firmicutes" | Phylum == "Bacteroidetes")
+  b <- na.omit(b)
+
+  r <- replay(b)
+  expect_identical(r$env$biom$hash, b$hash)
+  expect_equal(length(b$history), 9L)
+
+  # Direct edits are recorded as non-reproducible comments.
+  b2 <- b$clone()
+  b2$metadata$Years <- 0
+  expect_true(any(grepl("not reproducible", b2$code, fixed = TRUE)))
+  expect_false(any(grepl("not reproducible", b$code, fixed = TRUE)))
+
+  # Relativize / rescale / inflate are recorded too.
+  b3 <- biom_relativize(b)
+  expect_true(b3$relative)
+  expect_identical(replay(b3)$env$biom$hash, b3$hash)
+
+  # Merging nests the inputs' histories.
+  m <- biom_merge(b[1:4], b[5:8])
+  expect_identical(replay(m)$env$biom$hash, m$hash)
+})
+
+
+test_that("cache does not interfere with provenance", {
+
+  b1 <- read_biom(biom_file)
+  b2 <- subset(read_biom(biom_file), TRUE)   # same contents, different history
+
+  t1 <- adiv_table(b1)
+  t2 <- adiv_table(b2)                       # cache hit on contents
+
+  expect_false(identical(t1$history, t2$history))
+  expect_true(grepl("subset(biom, TRUE)", t2$code, fixed = TRUE))
+})
+
+
+test_that("tables replay", {
+
+  b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
+
+  for (x in list(
+    adiv_table(b, adiv = c("shannon", "observed"), md = "Sex"),
+    adiv_matrix(b),
+    adiv_vector(b, "simpson", transform = "rank"),
+    bdiv_table(b, bdiv = c("bray", "jaccard"), md = c("Sex", "==Body Site")),
+    bdiv_matrix(b, "bray"),
+    bdiv_distmat(b, "unweighted_unifrac"),
+    taxa_table(b, rank = "Genus", taxa = 5, md = "Sex"),
+    taxa_matrix(b, rank = "Phylum", taxa = 3),
+    taxa_map(b, rank = "Genus", taxa = 4, other = TRUE),
+    bdiv_ord_table(b, bdiv = "bray", ord = "PCoA", stat.by = "Body Site", rank = "Genus", taxa = 3) )) {
+
+    r <- replay(x)
+
+    if (is.data.frame(x))      expect_equal(strip(r$env$data), strip(x))
+    else if (inherits(x, 'dist')) expect_equal(as.matrix(r$env$data), as.matrix(x))
+    else if (is.matrix(x))     expect_equal(unclass(r$env$data), unclass(x), ignore_attr = TRUE)
+    else                       expect_equal(unname(r$env$data), unname(x), ignore_attr = TRUE)
+  }
+})
+
+
+test_that("statistics replay", {
+
+  b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
+  b <- mutate(b, Old = Age > 30)
+
+  for (x in list(
+    adiv_stats(b, stat.by = "Body Site"),
+    adiv_stats(b, stat.by = "Sex", test = "wilcox"),
+    adiv_stats(b, stat.by = "Body Site", test = "kruskal", split.by = "Sex"),
+    adiv_stats(b, regr = "Age"),
+    adiv_stats(b, regr = "Age", stat.by = "Sex"),
+    adiv_stats(b, regr = "Age", stat.by = "Sex", test = "emtrends", fit = "lm"),
+    adiv_stats(b, regr = "Age", stat.by = "Sex", at = c(25, 30)),
+    bdiv_stats(b, stat.by = "Body Site"),
+    bdiv_stats(b, stat.by = "Sex", split.by = "Old"),
+    bdiv_stats(b, regr = "Age"),
+    taxa_stats(b, stat.by = "Sex", rank = "Phylum", taxa = 3),
+    taxa_stats(b, regr = "BMI", rank = "Phylum", taxa = 3, fit = "lm"),
+    distmat_stats(bdiv_distmat(b, "bray"), pull(b, "Body Site")),
+    stats_table(adiv_table(b, md = c("Sex", "Age")), stat.by = "Sex", regr = "Age") )) {
+
+    r <- replay(x)
+
+    s <- if (!is.null(r$env$stats)) r$env$stats else r$value
+    expect_equal(strip(s), strip(x), tolerance = 1e-6)
+  }
+})
+
+
+test_that("plots replay", {
+
+  b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
+  b <- mutate(b, Old = Age > 30)
+
+  for (p in list(
+    adiv_boxplot(b, x = "Body Site", stat.by = "Body Site"),
+    adiv_boxplot(b, x = "Sex", stat.by = "Sex", flip = TRUE, stripe = TRUE),
+    adiv_boxplot(b, x = "Sex", stat.by = "Sex", facet.by = "Old", adiv = c("shannon", "simpson")),
+    # Mid vagina has only one Sex, which is reported in a summary warning.
+    local({
+      expect_warning(
+        p <- adiv_boxplot(b, x = "Body Site", layers = "bdp", stat.by = "Sex", p.label = 1),
+        "could not be computed" )
+      p }),
+    adiv_boxplot(b, flip = TRUE),
+    adiv_corrplot(b, x = "Age", stat.by = "Sex", layers = "tcp"),
+    adiv_corrplot(b, x = "Age", fit = "lm", layers = "tc"),
+    bdiv_boxplot(b, x = "==Body Site", bdiv = "bray"),
+    bdiv_corrplot(b, x = "Age", stat.by = "Sex"),
+    bdiv_ord_plot(b, stat.by = "Body Site"),
+    bdiv_ord_plot(b, stat.by = "Body Site", facet.by = "Sex", rank = "Genus", taxa = 3),
+    bdiv_heatmap(b, bdiv = "bray", tracks = "Sex"),
+    bdiv_heatmap(b, bdiv = c("bray", "jaccard"), tracks = "Body Site"),
+    taxa_boxplot(b, stat.by = "Body Site", stripe = TRUE, taxa = 3),
+    taxa_corrplot(b, x = "Age", taxa = 2, layers = "ptc", fit = "lm"),
+    taxa_heatmap(b, rank = "Phylum", taxa = 5, tracks = "Sex"),
+    taxa_heatmap(b, rank = "Phylum", taxa = 1),
+    taxa_stacked(b, rank = "Phylum", taxa = 5),
+    taxa_stacked(b, rank = c("Phylum", "Genus"), taxa = 4),
+    rare_corrplot(b, stat.by = "Sex"),
+    rare_stacked(b),
+    rare_multiplot(b, stat.by = "Body Site") )) {
+
+    # Replays re-emit the same warnings as the original call.
+    r <- suppressWarnings(replay(p))
+    expect_same_plot(r$value, p)
+  }
+})
+
+
+test_that("hostile names cannot inject code", {
+
+  # Data-originating strings (sample names, metadata columns and levels, taxa
+  # names, ids, paths) must appear in generated code only as quoted data.
+  inj <- 'x"); stop("INJECTED"); ("y'
+
+  b <- hmp50[1:12]
+  b$samples <- paste0(b$samples, c(inj, ' `\\"#', "\t\\n"))
+  b$id      <- inj
+  b$comment <- paste0("# ", inj)
+  tx <- b$taxonomy
+  tx$Genus  <- paste0(as.character(tx$Genus), inj)
+  tx$Phylum <- paste0(as.character(tx$Phylum), "`'\\")
+  b$taxonomy <- tx
+  md <- b$metadata
+  md[[inj]] <- rep(c(inj, "ok"), length.out = nrow(md))
+  b$metadata <- md
+
+  dir  <- file.path(tempfile(pattern = "it's a dir "), "sub dir")
+  dir.create(dir, recursive = TRUE)
+  file <- file.path(dir, paste0("biom ", "'quote", ".biom"))
+  write_biom(b, file, format = "json")
+
+  b <- read_biom(file)
+  b <- eval(bquote(subset(b, .(as.name(inj)) == .(inj) | Sex == "Male")))
+  b <- mutate(b, !!inj := paste0(.data[[inj]], "!"))
+  b <- rarefy(b, depth = 50, seed = 1)
+
+  outputs <- list(
+    b,
+    adiv_table(b, md = inj),
+    taxa_table(b, rank = "Genus", taxa = 3, md = inj),
+    adiv_stats(b, stat.by = inj, test = "wilcox"),
+    adiv_boxplot(b, x = inj, stat.by = inj),
+    taxa_stacked(b, rank = "Genus", taxa = 3),
+    taxa_boxplot(b, rank = "Phylum", taxa = 2, x = inj) )
+
+  for (x in outputs) {
+    code <- x$code
+    expect_true(grepl("INJECTED", code, fixed = TRUE))          # recorded ...
+    r <- tryCatch(replay(x), error = function (e) e)
+    expect_false(inherits(r, 'error'), info = conditionMessage(r)) # ... but as data
+    if (inherits(x, 'rbiom'))         expect_identical(r$env$biom$hash, x$hash)
+    else if (is.data.frame(x))        expect_equal(strip(if (!is.null(r$env$stats)) r$env$stats else r$env$data), strip(x))
+    else                              expect_same_plot(r$value, x)
+  }
+})
+
+
+test_that("provenance helpers", {
   expect_error(P('wmp6CWP7kx::q8jc'))
+
+  pi <- prov_inline(quote(Age > cutoff & Sex == "Male"), env = list2env(list(cutoff = 30)), exclude = c("Age", "Sex"))
+  expect_identical(pi$expr, quote(Age > 30 & Sex == "Male"))
+  expect_true(pi$reproducible)
+
+  big <- 1:1000
+  pi <- prov_inline(quote(Age %in% big), env = environment(), exclude = "Age")
+  expect_false(pi$reproducible)
 })

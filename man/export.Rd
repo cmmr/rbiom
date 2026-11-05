@@ -6,9 +6,9 @@
 \alias{write_qiime2}
 \title{Export data to QIIME 2 or mothur.}
 \usage{
-write_mothur(biom, dir = tempfile(), prefix = "biom_")
+write_mothur(biom, dir = tempfile(), prefix = "biom_", overwrite = FALSE)
 
-write_qiime2(biom, dir = tempfile(), prefix = "biom_")
+write_qiime2(biom, dir = tempfile(), prefix = "biom_", overwrite = FALSE)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
@@ -17,6 +17,8 @@ write_qiime2(biom, dir = tempfile(), prefix = "biom_")
 be created. Default: \code{tempfile()}}
 
 \item{prefix}{A string to prepend to each file name. Default: \code{'biom_'}}
+
+\item{overwrite}{Replace files that already exist? Default: \code{FALSE}}
 }
 \value{
 The normalized directory path that was written to (invisibly).
@@ -34,21 +36,26 @@ QIIME 2 or mothur's specifications.
 
 \code{biom_counts.tsv} will always be created. The others are dependent on
 whether the content is present in the \code{biom} argument.
+
+For QIIME 2, metadata columns are typed \code{numeric} or \code{categorical}
+(logical and \code{Date} fields are categorical; dates are written as
+\code{YYYY-MM-DD}). For mothur, taxonomy rows use the OTU IDs from the counts
+file, and missing ranks are written as \code{unclassified}.
 }
 \examples{
     library(rbiom)
-    
+
     tdir <- tempfile()
-    
+
     write_qiime2(hmp50, tdir, 'qiime2_')
     write_mothur(hmp50, tdir, 'mothur_')
-    
+
     list.files(tdir)
-    
+
     readLines(file.path(tdir, 'qiime2_metadata.tsv'), n = 4)
-    
+
     readLines(file.path(tdir, 'mothur_taxonomy.tsv'), n = 3)
-    
+
     unlink(tdir, recursive = TRUE)
 
 }

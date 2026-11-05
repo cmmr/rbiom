@@ -48,10 +48,11 @@ drop.}
 
 \item{upsample}{If the count data is in percentages, provide an integer
 value here to scale each sample's observations to integers that sum
-to this value. Maps to \code{inflate} in the new syntax.}
+to this value before rarefying. See \code{\link[=biom_inflate]{biom_inflate()}}.}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{range}{When rescaling, what should the minimum and maximum values
 be? Default: \code{c(0, 1)}}
@@ -65,23 +66,23 @@ A collection of transformations that operate directly on matrices.
 }
 \examples{
     mtx <- matrix(1:12, ncol = 3, dimnames = list(paste0("OTU", 1:4), paste0("Sample", 1:3)))
-    
+
     mtx
-    
+
     suppressWarnings({
-    
+
       mtx_rarefy(mtx)
-      
+
       rarefy_cols(mtx)
-      
+
       mtx_percent(mtx)
-      
+
       mtx_rescale(mtx)
-      
+
       rescale_rows(mtx)
-      
+
       rescale_cols(mtx)
-      
+
     })
-    
+
 }

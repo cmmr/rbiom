@@ -41,12 +41,18 @@ this peak to correspond to an integer count of 1.
 This approach effectively "shoehorns" relative abundance data into integer
 formats required by diversity metrics (like rarefaction or Chao1) by
 maximizing the number of singletons in the resulting matrix.
+
+Samples with fewer than two non-zero features carry no information about
+the distribution's shape; they are assigned the median depth of the other
+samples (or, if there are too few informative samples for the heuristic,
+every sample is scaled so that its smallest non-zero value becomes 1).
+Counts that are already integers are returned as their current sums.
 }
 
 \examples{
     library(rbiom)
-    
-    depths <- suggest_inflate_depths(hmp50)
+
+    depths <- suggest_inflate_depths(biom_relativize(hmp50))
     head(depths)
 
 }

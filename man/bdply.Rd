@@ -16,7 +16,8 @@ blply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
 of values in these columns will be used to create a subsetted
 rbiom object to pass to \code{FUN.} If \code{NULL},
 \code{biom} will be passed to \code{FUN} unaltered. Unambiguous
-abbreviations of metadata fields are also accepted.}
+abbreviations of metadata fields are also accepted. Samples with an
+\code{NA} in any of these fields are left out.}
 
 \item{FUN}{The function to execute on each subset of \code{biom}.
 For \code{bdply()}, the returned value will be coerced to a data.frame.
@@ -47,20 +48,22 @@ results as a data.frame or list.
 You can also specify additional variables for your function to iterate over
 in unique combinations.
 
-Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::dlply()}} internally.
+Each subset passed to \code{FUN} is a proper rbiom object whose history records
+how it was made, e.g. \code{subset(biom, Sex == "Male")}, so that results
+computed from it (and their \verb{$code}) are reproducible.
 }
 \examples{
     library(rbiom)
-    
+
     bdply(hmp50, "Sex", `$`, 'n_samples')
-    
+
     blply(hmp50, "Sex", `$`, 'n_samples') \%>\% unlist()
-    
+
     bdply(hmp50, c("Body Site", "Sex"), function (b) {
       adm <- adiv_matrix(b)[,c("shannon", "simpson")]
       apply(adm, 2L, mean)
     })
-    
+
     iters <- list(d = c("bray", "euclid"))
     bdply(hmp50, "Sex", iters = iters, function (b, d) {
       r <- range(bdiv_distmat(biom = b, bdiv = d))
@@ -69,11 +72,11 @@ Calls \code{\link[plyr:ddply]{plyr::ddply()}} or \code{\link[plyr:dlply]{plyr::d
 
 }
 \seealso{
-Other metadata: 
-\code{\link{glimpse.rbiom}()}
+Other metadata:
+\code{\link[=glimpse.rbiom]{glimpse.rbiom()}}
 
-Other biom: 
-\code{\link{biom_merge}()}
+Other biom:
+\code{\link[=biom_merge]{biom_merge()}}
 }
 \concept{biom}
 \concept{metadata}

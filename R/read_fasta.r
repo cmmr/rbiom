@@ -1,76 +1,98 @@
 
 #' Parse a fasta file into a named character vector.
 #'
-#' @param file   A file/URL with fasta-formatted sequences. Can optionally be 
-#'        compressed with gzip, bzip2, xz, or lzma.
-#' 
-#' @param ids   Character vector of IDs to retrieve. The default, `NULL`, 
+#' @param file   A file path, URL, or literal string with fasta-formatted
+#'        sequences. Files can optionally be compressed with gzip or bzip2.
+#'
+#' @param ids   Character vector of IDs to retrieve. The default, `NULL`,
 #'        will retrieve everything.
-#' 
-#' @return A named character vector in which names are the fasta headers and 
-#'         values are the sequences.
-#' 
+#'
+#' @return A named character vector in which names are the fasta headers
+#'         (the text after `>` up to the first whitespace) and values are the
+#'         sequences. Sequences spanning multiple lines are joined, and
+#'         whitespace within sequences is removed.
+#'
 #' @export
+#' @examples
+#'     library(rbiom)
+#'
+#'     fasta <- ">OTU1 first sequence\nATCG\nGGCC\n>OTU2\nTTAA\n"
+#'     read_fasta(fasta)
+#'
+#'     outfile <- write_fasta(hmp50, tempfile(fileext = ".fna.gz"))
+#'     seqs    <- read_fasta(outfile)
+#'     unlink(outfile)
+#'
+#'     identical(seqs, hmp50$sequences)
 #'
 
 read_fasta <- function (file, ids = NULL) {
-  
-  if (!file.exists(file))
-    cli_abort("Fasta file {.file {file}} does not exist.")
-  
-  
+
+  if (!is_scalar_character(file) || is_na(file))
+    cli_abort("`file` must be a file path, URL, or fasta string, not {.type {file}}.")
+
+  if (!is.null(ids) && !is.character(ids))
+    cli_abort("`ids` must be NULL or a character vector, not {.type {ids}}.")
+
+
   #________________________________________________________
-  # Open uncompressed files as well as gzip/bzip2/xz/lzma.
+  # Fetch URLs; write literal strings to a temp file.
   #________________________________________________________
-  con <- gzfile(file, "r")
-  on.exit(close(con), add = TRUE)
-  
-  
+  fpath <- as_filepath(file)
+  on.exit(fpath$cleanup(), add = TRUE)
+
+  if (!identical(fpath$format, 'text'))
+    cli_abort("{.file {fpath$id}} is not a fasta file ({fpath$format} format detected).")
+
+
   #________________________________________________________
-  # Parse headers and potentially multi-line sequences.
+  # Headers start with '>'; everything else is sequence.
   #________________________________________________________
-  sid <- NULL
-  res <- c()
-  
-  while (length(line <- readLines(con, 1)) > 0) {
-    
-    if (eq(substr(line, 1, 1), ">")) {
-      sid <- substr(line, 2, nchar(line))
-      
-      if (sid %in% names(res))
-        cli_abort(c(
-          '!' = "Fasta file {.file {file}}", 
-          'x' = 'Has multiple entries for {.val {sid}}.' ))
-      
-      if (!is_null(ids))
-        if (!sid %in% ids)
-          sid <- NULL
-      
-    } else if (!is_null(sid)) {
-      
-      if (sid %in% names(res)) {
-        res[[sid]] <- paste0(res[[sid]], line)
-      } else {
-        res[[sid]] <- line
-      }
-    }
-    
-  }
-  
-  
+  lines <- readLines(fpath$path, warn = FALSE, encoding = "UTF-8")
+  lines <- sub("\r$", "", strip_bom(lines))
+  lines <- lines[nzchar(trimws(lines))]
+
+  is_hdr <- startsWith(lines, ">")
+
+  if (!any(is_hdr))
+    cli_abort("No fasta headers (lines beginning with {.val >}) found in {.file {fpath$id}}.")
+
+  if (!is_hdr[[1]])
+    cli_abort("Sequence data precedes the first fasta header in {.file {fpath$id}}.")
+
+  n_hdr <- sum(is_hdr)
+  grp   <- cumsum(is_hdr)
+  nms   <- sub("\\s.*$", "", trimws(substring(lines[is_hdr], 2)))
+
+  seqs <- gsub("[[:space:]]", "", lines[!is_hdr])
+  seqs <- split(seqs, factor(grp[!is_hdr], levels = seq_len(n_hdr)))
+  seqs <- vapply(seqs, paste, "", collapse = "", USE.NAMES = FALSE)
+
+  res <- setNames(seqs, nms)
+
+
+  #________________________________________________________
+  # IDs must be unique.
+  #________________________________________________________
+  if (length(x <- unique(nms[duplicated(nms)])) > 0)
+    cli_abort(c(
+      '!' = "Fasta file {.file {fpath$id}}",
+      'x' = 'Has multiple entries for {.val {x}}.' ))
+
+
   #________________________________________________________
   # Ensure we return as many IDs as requested
   #________________________________________________________
   if (!is_null(ids)) {
-    
-    if (length(x <- setdiff(ids, names(res))))
+
+    if (length(x <- setdiff(ids, nms)))
       cli_abort(c(
-        '!' = "In fasta file {.file {file}}", 
+        '!' = "In fasta file {.file {fpath$id}}",
         'x' = 'Expected IDs are missing: {.val {x}}.' ))
-    
+
     res <- res[ids]
   }
-  
-  
+
+
   return (res)
 }

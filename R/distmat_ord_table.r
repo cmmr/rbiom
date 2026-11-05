@@ -1,125 +1,154 @@
 
 #' Run ordinations on a distance matrix.
-#' 
+#'
 #' @inherit documentation_default
-#' 
+#'
 #' @family ordination
-#'        
-#' @param ...  Additional arguments for \code{ord}.
-#'        
-#' @return A data.frame with columns \code{.sample}, \code{.ord}, \code{.x}, 
-#'         \code{.y}, and (optionally) \code{.z}.
-#' 
+#'
+#' @param ord    Method for reducing dimensionality. Options are:
+#'        \describe{
+#'            \item{`"PCoA"` - }{ Principal coordinate analysis; [stats::cmdscale()]. }
+#'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
+#'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
+#'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
+#'        }
+#'        Multiple/abbreviated values allowed. Default: `"PCoA"`
+#'
+#' @param seed   Random seed for the stochastic ordinations (NMDS, tSNE,
+#'        UMAP), so that they are reproducible. PCoA is deterministic.
+#'        Must be a non-negative integer. Default: `0`
+#'
+#' @param ...  Additional arguments for the `ord` function.
+#'
+#' @return A tibble data.frame with columns \code{.ord}, \code{.sample},
+#'         \code{.x}, \code{.y}, and (optionally) \code{.z}. The attribute
+#'         `'axes'` is a tibble with one row per axis (`.ord`, `.axis`,
+#'         `.label`, `.var`): for PCoA, `.var` is the percent of the
+#'         variance (the positive eigenvalues) explained by that axis and
+#'         `.label` reads e.g. `"PCoA 1 (24.3%)"`; for the other ordinations
+#'         `.var` is `NA`.
+#'
 #' @export
 #' @examples
-#'     library(rbiom) 
-#'     
+#'     library(rbiom)
+#'
 #'     dm  <- bdiv_distmat(hmp50, "bray")
 #'     ord <- distmat_ord_table(dm, "PCoA")
 #'     head(ord)
-#'     
+#'
+#'     attr(ord, 'axes')
+#'
 
-distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, ...) {
-  
-  # browser() ## below code intermittently crashes R session
-  
-  
-  
-  #________________________________________________________
-  # See if this result is already in the cache.
-  #________________________________________________________
-  params     <- slurp_env(..., .dots = TRUE)
-  cache_file <- get_cache_file('distmat_ord_table', params)
-  if (isTRUE(attr(cache_file, 'exists', exact = TRUE)))
-    return (readRDS(cache_file))
-  
-  
-  
+distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
+
+  params <- eval_envir(environment(), ...)
+
+  cmd <- local({
+    p <- as.list(params)
+    p$dm <- aa(NA, display = "dm")
+    current_cmd('distmat_ord_table', p)
+  })
+
+
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  params <- list2env(params)
-  with(params, {
-    
-    validate_ord(max = Inf)
-    validate_var_range('k', range = c(2, 3), n = 1, int = TRUE)
-    stopifnot(inherits(dm, 'dist'))
-    
-    if (is.null(attr(dm, 'display', exact = TRUE)))
-      attr(dm, 'display') <- "dm"
-    
-  })
-  
-  
-  
-  
-  #________________________________________________________
-  # Call 3rd party function with proper arguments.
-  #________________________________________________________
-  dm   <- params$dm
-  k    <- params$k
-  ords <- setNames(params$ord, params$ord)
-  dots <- params$.dots
-  
-  tbl <- plyr::ldply(ords, .id = ".ord", function (o) {
-    
-    if (o == "PCoA") {
-      args <- c(fun_params(pcoa, dots), list(D = dm))
-      res  <- do.call(pcoa, args)[['vectors']][,1:k]
-      
-    } else if (o == "tSNE") {
-      require_package('tsne', 'to use "tSNE" ordination')
-      args <- c(fun_params(tsne::tsne, dots), list(X = dm, k = k))
-      res  <- suppressMessages(do.call(tsne::tsne, args))
-      rownames(res) <- attr(dm, "Labels", exact = TRUE)
-      
-    } else if (o == "NMDS") {
-      args <- c(fun_params(vegan::metaMDS, dots), list(comm = dm, k = k))
-      args[['trace']] %<>% if.null(0)
-      res  <- do.call(vegan::metaMDS, args)[['points']]
-      rownames(res) <- attr(dm, "Labels", exact = TRUE)
-      
-    } else if (o == "UMAP") {
-      require_package('uwot', 'to use "UMAP" ordination')
-      args <- c(fun_params(uwot::umap, dots), list(X = dm))
-      args[['n_components']] %<>% if.null(k)
-      args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))
-      res  <- do.call(uwot::umap, args)
-    }
-    
-    params$.args <- args
-    
-    res <- as.data.frame(res)
-    colnames(res) <- head(c(".x", ".y", ".z"), ncol(res))
-    res[[".sample"]] <- rownames(res)
-    rownames(res) <- NULL
-    res %<>% keep_cols(".sample", ".x", ".y", ".z")
-    
-    return (res)
-    
-  }) %>% as_rbiom_tbl()
-  
-  
-  
-  
-  #________________________________________________________
-  # Table header.
-  #________________________________________________________
-  if (length(ords) == 1)
-    attr(tbl, 'tbl_sum') <- c(
-      'Ordination' = switch(
-        EXPR = unname(ords),
-        PCoA = "pcoa(%s)",
-        tSNE = "tsne::tsne(%s)",
-        NMDS = "vegan::metaMDS(%s)",
-        UMAP = "uwot::umap(%s)" ) %>%
-      sprintf(as.args(params$.args)) )
-  
-  
-  attr(tbl, 'cmd') <- current_cmd('distmat_ord_table')
-  
-  set_cache_value(cache_file, tbl)
-  
-  return (tbl)
-}
+  if (!inherits(dm, 'dist'))
+    cli_abort("`dm` must be a dist object, not {.type {dm}}.")
 
+  if (attr(dm, 'Size') < 3)
+    cli_abort("At least three samples are needed for an ordination; `dm` has {attr(dm, 'Size')}.")
+
+  validate_ord(max = Inf)
+  validate_var_range('k', range = c(2, 3), n = 1, int = TRUE)
+  validate_seed()
+
+
+  #________________________________________________________
+  # See if this result is already in the cache.
+  #________________________________________________________
+  cache_file <- get_cache_file('distmat_ord_table', params)
+  tbl        <- get_cache_value(cache_file)
+
+  if (is.null(tbl)) {
+
+    dots   <- params$.dots
+    labels <- attr(dm, "Labels", exact = TRUE)
+    axes   <- list()
+
+
+    #________________________________________________________
+    # Call 3rd party function with proper arguments. Stochastic
+    # methods run with the RNG seeded by `seed`.
+    #________________________________________________________
+    tbl <- dplyr::bind_rows(lapply(ord, function (o) {
+
+      var <- rep(NA_real_, k)
+
+      if (o == "PCoA") {
+        args <- c(list(d = dm, k = k, eig = TRUE), fun_params(stats::cmdscale, dots)[setdiff(names(dots), c('d', 'k', 'eig'))])
+        pc   <- do.call(stats::cmdscale, args)
+        res  <- pc$points
+        eig  <- pc$eig
+        var  <- 100 * eig[seq_len(k)] / sum(eig[eig > 0])
+
+      } else if (o == "tSNE") {
+        require_package('tsne', 'to use "tSNE" ordination')
+        args <- c(list(X = dm, k = k), fun_params(tsne::tsne, dots)[setdiff(names(dots), c('X', 'k'))])
+        res  <- with_seed(seed, suppressMessages(do.call(tsne::tsne, args)))
+        rownames(res) <- labels
+
+      } else if (o == "NMDS") {
+        args <- c(list(comm = dm, k = k), fun_params(vegan::metaMDS, dots)[setdiff(names(dots), c('comm', 'k'))])
+        args[['trace']] %<>% if.null(0)
+        res  <- with_seed(seed, do.call(vegan::metaMDS, args))[['points']]
+        rownames(res) <- labels
+
+      } else if (o == "UMAP") {
+        require_package('uwot', 'to use "UMAP" ordination')
+        args <- c(list(X = dm), fun_params(uwot::umap, dots)[setdiff(names(dots), 'X')])
+        args[['n_components']] %<>% if.null(k)
+        args[['n_neighbors']]  %<>% if.null(max(2, min(100, as.integer(attr(dm, 'Size') / 3))))
+        res  <- with_seed(seed, do.call(uwot::umap, args))
+        rownames(res) <- labels
+      }
+
+      axis_names <- head(c(".x", ".y", ".z"), k)
+      axes[[o]] <<- tibble(
+        .ord   = o,
+        .axis  = axis_names,
+        .label = ifelse(is.na(var), paste(o, seq_len(k)), sprintf("%s %d (%.1f%%)", o, seq_len(k), var)),
+        .var   = var )
+
+      res <- as.data.frame(res[, seq_len(k), drop = FALSE])
+      colnames(res) <- axis_names
+
+      tibble(.ord = o, .sample = rownames(res), res)
+    }))
+
+    tbl[['.ord']] %<>% factor(levels = ord)
+
+    axes <- dplyr::bind_rows(axes)
+    axes[['.ord']] %<>% factor(levels = ord)
+
+
+    #________________________________________________________
+    # Table header.
+    #________________________________________________________
+    tbl %<>% as_rbiom_tbl()
+    attr(tbl, 'axes') <- axes
+
+    if (length(ord) == 1)
+      attr(tbl, 'tbl_sum') <- c('Ordination' = switch(
+        EXPR = ord,
+        PCoA = sprintf("stats::cmdscale(dm, k = %s, eig = TRUE)", k),
+        tSNE = sprintf("tsne::tsne(dm, k = %s)", k),
+        NMDS = sprintf("vegan::metaMDS(dm, k = %s)", k),
+        UMAP = sprintf("uwot::umap(dm, n_components = %s)", k) ))
+
+    set_cache_value(cache_file, tbl)
+  }
+
+
+  return (prov_attach(tbl, cmd, data = dm))
+}

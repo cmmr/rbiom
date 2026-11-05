@@ -28,28 +28,28 @@ metadata fields. It can also modify (if the name is the same as an existing
 field) and delete fields (by setting their value to NULL).
 }
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     biom <- slice_max(hmp50, BMI, n = 6)
     biom$metadata
-    
+
     # Add a new field to the metadata
     biom <- mutate(biom, Obsese = BMI >= 30)
     biom$metadata
-    
+
     # Rename a metadata field
     biom <- rename(biom, 'Age (years)' = "Age")
     biom$metadata
 
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
-\code{\link{rarefy}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

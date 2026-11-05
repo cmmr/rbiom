@@ -7,13 +7,21 @@
 \item{stat.by}{The categorical or numeric metadata field over which
 statistics should be calculated. Required.}
 
-\item{test}{Permutational test for accessing significance. Options are:
+\item{test}{Permutational test for assessing significance. Options are:
 \describe{
-\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
+\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis2]{vegan::adonis2()}}. }
 \item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
+\item{\code{"betadisper"} - }{ Homogeneity of group dispersions; \code{\link[vegan:betadisper]{vegan::betadisper()}} with \code{\link[vegan:permutest]{vegan::permutest()}}. }
+\item{\code{"mantel"} - }{ Mantel test of the distance matrix against a numeric variable; \code{\link[vegan:mantel]{vegan::mantel()}}. }
 \item{\code{"none"} - }{ Don't run any statistics. }
 }
-Abbreviations are allowed. Default: \code{"adonis2"}}
+Abbreviations are allowed. Default: \code{"adonis2"} for categorical
+groups and \code{"mantel"} for numeric groups.}
+
+\item{strata}{Dataset field (or vector) naming the blocking / subject
+variable for repeated-measures designs. Permutations are restricted
+to within strata via \code{\link[permute:how]{permute::how()}}, and regression models include
+a random intercept per stratum. Default: \code{NULL}}
 }
 \description{
 documentation_dist_test

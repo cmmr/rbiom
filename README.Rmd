@@ -73,6 +73,16 @@ taxa_table(biom, 'Phylum')
 ```
 
 
+#### Reproduce any result from code.
+Every table, statistics table, and plot records the complete R code that
+regenerates it, starting from the original data.
+```{r code}
+biom <- rarefy(hmp50)
+p    <- adiv_boxplot(biom, x = 'Sex', stat.by = 'Sex')
+p$code
+```
+
+
 
 ## Documentation
 

@@ -70,9 +70,9 @@ taxa names. Options are:
 Abbreviations are allowed. Default: \code{"singly"}}
 
 \item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normal distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{FUN}{The function to apply to each row of the \code{taxa_matrix()}.}
 
@@ -87,25 +87,25 @@ The names are the taxa IDs.
 Get summary taxa abundances.
 }
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     taxa_sums(hmp50) \%>\% head(4)
-    
+
     taxa_means(hmp50, 'Family') \%>\% head(5)
-    
+
     taxa_apply(hmp50, max) \%>\% head(5)
-    
+
     taxa_apply(hmp50, fivenum) \%>\% head(5)
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_table]{taxa_table()}}
 }
 \concept{taxa_abundance}

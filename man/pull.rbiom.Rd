@@ -30,16 +30,16 @@ Map sample names to metadata field values.
 }
 \examples{
     library(rbiom)
-    
+
     pull(hmp50, 'Age') \%>\% head()
-    
+
     pull(hmp50, 'bod') \%>\% head(4)
-    
+
 }
 \seealso{
 \code{taxa_map()}
 
-Other samples: 
-\code{\link{sample_sums}()}
+Other samples:
+\code{\link[=sample_sums]{sample_sums()}}
 }
 \concept{samples}

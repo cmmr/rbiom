@@ -1,6 +1,9 @@
 
+# Colorblind-friendly color sets and gradients.
+# Hardcoded here to avoid additional dependencies on khroma and/or other R packages.
+
 PALETTES <- list(
-  
+
   # Discrete color palettes from various sources.
   'bright'     = c("4477AA", "EE6677", "228833", "CCBB44", "66CCEE", "AA3377", "BBBBBB"),
   'vibrant'    = c("EE7733", "0077BB", "33BBEE", "EE3377", "CC3311", "009988", "BBBBBB"),
@@ -17,7 +20,7 @@ PALETTES <- list(
   'kelly'      = c("F3C300", "875692", "F38400", "A1CAF1", "BE0032", "C2B280", "848482", "008856", "E68FAC", "0067A5", "F99379", "604E97", "F6A600", "B3446C", "DCD300", "882D17", "8DB600", "654522", "E25822", "2B3D26", "222222"),
   'alphabet'   = c("AA0DFE", "3283FE", "85660D", "782AB6", "565656", "1C8356", "16FF32", "F7E1A0", "E2E2E2", "1CBE4F", "C4451C", "DEA0FD", "FE00FA", "325A9B", "FEAF16", "F8A19F", "90AD1C", "F6222E", "1CFFCE", "2ED9FF", "B10DA1", "C075A6", "FC1CBF", "B00068", "FBE426", "FA0087"),
   'polychrome' = c("5A5156", "E4E1E3", "F6222E", "FE00FA", "16FF32", "3283FE", "FEAF16", "B00068", "1CFFCE", "90AD1C", "2ED9FF", "DEA0FD", "AA0DFE", "F8A19F", "325A9B", "C4451C", "1C8356", "85660D", "B10DA1", "FBE426", "1CBE4F", "FA0087", "FC1CBF", "F7E1A0", "C075A6", "782AB6", "AAF400", "BDCDFF", "822E1C", "B5EFB5", "7ED7D1", "1C7F93", "D85FF7", "683B79", "66B0FF", "3B00FB"),
-  
+
   # Sequential and diverging palettes from khroma R package. khroma::color("acton")(9)
   'acton'      = c("2D204C", "4F3D69", "765985", "9E6592", "C36C99", "D48CB1", "D3A5C4", "D9C5D8", "E5E5F0"),
   'bamako'     = c("003F4C", "144C40", "2A5933", "426A25", "5F7D13", "868D02", "B8A525", "E3C960", "FFE599"),
@@ -43,7 +46,7 @@ PALETTES <- list(
   'tofino'     = c("DED8FF", "879DD8", "3E5E9A", "1D2C4A", "0C1413", "1B3B1F", "37723B", "7BB268", "DAE59A"),
   'vanimo'     = c("FFCDFD", "CD78BD", "923E80", "401B37", "1A1513", "293516", "517026", "7EAC45", "BEFDA5"),
   'vik'        = c("001260", "01437F", "2D7CA5", "91BCD1", "EAECE9", "D3BF95", "AF893D", "854B00", "601200"),
-  
+
   # Basic sequential palettes from base R. RColorBrewer::brewer.pal(9, "Reds")
   'reds'       = c("FFF5F0", "FEE0D2", "FCBBA1", "FC9272", "FB6A4A", "EF3B2C", "CB181D", "A50F15", "67000D"),
   'oranges'    = c("FFF5EB", "FEE6CE", "FDD0A2", "FDAE6B", "FD8D3C", "F16913", "D94801", "A63603", "7F2704"),
@@ -58,15 +61,15 @@ PALETTES <- list(
 # See if a given string is a palette name.
 #________________________________________________________
 is_palette <- function (palette) {
-  
+
   if (!is_scalar_character(palette) || is.na(palette)) return (FALSE)
-  
+
   palette <- tolower(palette)
   if (eq(substr(palette, 1, 1), "-"))
     palette <- substr(palette, 2, nchar(palette))
-  
+
   if (!is_string(palette, names(PALETTES))) return (FALSE)
-  
+
   return (TRUE)
 }
 
@@ -77,16 +80,16 @@ is_palette <- function (palette) {
 # Reverse the order of colors when prefixed with a '-'.
 #________________________________________________________
 get_palette <- function (palette) {
-  
+
   stopifnot(is_scalar_character(palette) && !is_na(palette))
   palette <- tolower(palette)
-  
+
   if (eq(substr(palette, 1, 1), "-")) {
     palette <- substr(palette, 2, nchar(palette))
-    
+
     stopifnot(is_string(palette, names(PALETTES)))
     return (rev(paste0("#", PALETTES[[palette]])))
-    
+
   } else {
     stopifnot(is_string(palette, names(PALETTES)))
     return (paste0("#", PALETTES[[palette]]))
@@ -99,20 +102,20 @@ get_palette <- function (palette) {
 # Return a vector of discrete colors.
 #________________________________________________________
 get_n_colors <- function (n, palette = NULL) {
-  
+
   stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(palette)) palette <- NULL
-  
+
   if (is_null(palette)) {
     if (n <= 10)        { palette <- "classic"
     } else if (n <= 12) { palette <- "tol"
     } else if (n <= 20) { palette <- "tableau20"
     } else              { palette <- "alphabet" }
   }
-  
-  if (is_palette(palette)) 
+
+  if (is_palette(palette))
     return (rep_len(get_palette(palette), n))
-  
+
   return (rep_len(palette, n))
 }
 
@@ -122,17 +125,17 @@ get_n_colors <- function (n, palette = NULL) {
 # Return a vector of discrete shapes.
 #________________________________________________________
 get_n_shapes <- function (n, values = NULL) {
-  
+
   stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(values)) values <- NULL
-  
+
   if (is_null(values))
     values <- local({
       if (n <= 3)  return (15:17)
       if (n <= 15) return (c(0:14))
       return (c(65:90, 97:122))
     })
-  
+
   return (rep_len(values, n))
 }
 
@@ -142,148 +145,72 @@ get_n_shapes <- function (n, values = NULL) {
 # Return a vector of discrete patterns.
 #________________________________________________________
 get_n_patterns <- function (n, values = NULL) {
-  
+
   stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(values)) values <- NULL
-  
+
   if (is_null(values))
     values <- seq_len(n)
-  
+
   return (rep_len(values, n))
 }
 
 
 
-
-
-
-
-# get_palette <- function (pal, n) {
-#   if (pal == "color")   return (color_palette(n = n))
-#   if (pal == "shape")   return (shape_palette(n = n))
-#   if (pal == "pattern") return (pattern_palette(n = n))
-# }
-# 
-# 
-# shape_palette <- function (n) {
-#   
-#   pal <- if (n <= 6)  { c(16, 17, 15, 3, 7, 8)
-#   } else if (n <= 15) { c(0:14)
-#   } else              { c(65:90, 97:122) }
-#   
-#   pal[((seq_len(n) - 1) %% (length(pal) + 1)) + 1]
-# }
-# 
-# 
-# pattern_palette <- function (n) {
-#   pal <- c(
-#     "bricks", "hexagons", "horizontalsaw", "hs_fdiagonal", 
-#     "fishscales", "verticalsaw", "checkerboard", "octagons", 
-#     "right45", "hs_cross", "hs_bdiagonal", "hs_diagcross", 
-#     "hs_horizontal", "hs_vertical", "left45", "leftshingle", 
-#     "rightshingle", "verticalbricks", "verticalleftshingle", 
-#     "verticalrightshingle" )
-#   
-#   pal[((seq_len(n) - 1) %% (length(pal) + 1)) + 1]
-# }
-
-
-
-# Colorblind-friendly color sets and gradients.
-# Hardcoded here to avoid additional dependencies on khroma and/or other R packages.
-
+#________________________________________________________
+# Resolve a `colors` specification to a vector of colors.
+#
+#   pal  - A palette name (optionally prefixed with "-" to reverse it),
+#          a vector of colors, or NULL to pick a discrete palette that
+#          suits `n` colors. A named vector is returned as-is.
+#   n    - How many colors to return (the palette is recycled).
+#   keys - Names for the returned colors; a factor contributes its
+#          levels, a character vector its unique values.
+#
 # Example calls/returns:
-# 
+#
 # color_palette(pal = "okabe") or color_palette(n = 8)
 # c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
 #
 # color_palette(pal = "r4", keys = c("Male", "Female"))
 # c(Male = "#DF536B", Female = "#61D04F")
-# 
+#
 # color_palette(n = 3)
-# c("#E69F00", "#56B4E9", "#009E73")
-# 
-# color_palette(pal = "-ha")
+# c("#1F77B4", "#FF7F0E", "#2CA02C")
+#
+# color_palette(pal = "-hawaii")
 # c("#B2F2FD", "#66E7D2", "#6BD38C", "#89BB48", "#9B951B", "#9A6D27", "#964C3E", "#922C54", "#8C0172")
-# 
-# color_palette(pal = "Orange")
-# c("#FFFFFF", "Orange")
-
+#________________________________________________________
 color_palette <- function (pal = NULL, n = NULL, keys = NULL) {
-  
-  if (!is_null(names(pal)))  return (unlist(pal[nzchar(names(pal))]))
-  if (!is_null(names(keys))) return (unlist(keys[nzchar(names(keys))]))
-  
-  
-  # Handle case where keys is an entire metadata column.
-  if (!is_null(keys)) {
-    
-    if (is.factor(keys)) {
-      keys <- levels(keys)
-      n    <- length(keys)
-      
-    } else if (is.character(keys)) {
-      if (any(duplicated(keys))) keys <- sort(unique(keys))
-      n <- length(keys)
-      
-    } else {
-      
-      # Cycle through simple gradients for default use.
-      if (is_null(pal)) pal <- 0
-      if (is.numeric(pal))
-        pal <- c('reds', 'oranges', 'greens', 'grays', 'purples')[(pal %% 5) + 1]
-      keys <- NULL
-    }
+
+  if (!is_null(names(pal))) {
+    pal <- unlist(pal[nzchar(names(pal))])
+    if (!is.character(pal)) cli_abort("Named colors must be character strings, not {.type {pal}}.")
+    return (pal)
   }
-  
-  
-  # Pick a discrete palette based on the number of unique colors required.
-  if (!is.character(pal) && !is_null(n)) {
-    
-    if (is_null(pal)) {
-      pal <- if (n <= 8)  { "okabe"
-      } else if (n <= 12) { "tol"
-      } else if (n <= 20) { "tableau20"
-      } else              { "alphabet" } # 26
-      
-    } else if (is.numeric(pal)) {
-      pals <- c(
-        'okabe', 'carto', 'r4', 'polychrome', 'tol', 'bright', 'light', 'muted', 
-        'vibrant', 'tableau', 'classic', 'alphabet', 'tableau20', 'kelly', 'fishy' )
-      pals <- sapply(pals, function (p) { length(PALETTES[[p]]) - n })
-      pals <- names(head(sort(pals[pals > -1])))
-      if (length(pals) == 0) pals <- "alphabet"
-      if (pal < 0)           pals <- paste0("-", pals)
-      pal <- pals[(as.integer(pal) %% length(pals)) + 1]
-      
-    } else {
-      stop("Invalid color_palette() `pal` argument: ", as.character(pal))
-    }
+
+  if (is.factor(keys))         { keys <- levels(keys)
+  } else if (is.character(keys)) { keys <- unique(keys)
+  } else                         { keys <- NULL }
+
+  if (is_null(n)) n <- length(keys)
+  stopifnot(is_scalar_integerish(n) && !is_na(n) && n >= 0)
+
+  colors <- if (is_null(pal)) {
+    get_n_colors(max(n, 1))
+
+  } else if (is_palette(pal)) {
+    get_palette(pal)
+
+  } else if (is.character(pal) && !anyNA(pal)) {
+    pal
+
+  } else {
+    cli_abort("`pal` must be a palette name or a vector of colors, not {.type {pal}}.")
   }
-  
-  
-  # Look up this palette name (or partial name).
-  if (length(pal) == 1) {
-    
-    pal_rev <- startsWith(pal, '-');
-    pal     <- sub('-', '', pal)
-    
-    if (hasName(PALETTES, pal)) {
-      pal <- paste0('#', PALETTES[[pal]])
-    } else {
-      pal_index <- pmatch(trimws(tolower(pal)), names(PALETTES))
-      if (!is.na(pal_index)) { pal <- paste0('#', PALETTES[[pal_index]])
-      } else                 { pal <- c("#FFFFFF", pal) }
-    }
-    
-    if (pal_rev) pal <- rev(pal)
-  }
-    
-  if (!is_null(n))    pal <- pal[((seq_len(n) - 1) %% (length(pal) + 1)) + 1]
-  if (!is_null(keys)) pal <- setNames(pal, keys)
-  
-  return (pal)
+
+  if (n > 0)            colors <- rep_len(colors, n)
+  if (length(keys) > 0) colors <- setNames(colors, keys)
+
+  return (colors)
 }
-
-
-

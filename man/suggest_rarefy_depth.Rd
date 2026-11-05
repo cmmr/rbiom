@@ -39,7 +39,7 @@ doing so doesn't discard more than 90\% of the dataset's total information.
 
 \examples{
     library(rbiom)
-    
+
     suggest_rarefy_depth(hmp50)
 
 }

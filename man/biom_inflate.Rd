@@ -9,10 +9,12 @@ biom_inflate(biom, depth = NULL, clone = TRUE)
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{depth}{The target library size (sum) for each sample. Must be an
-integer greater than 0. If \code{NULL} (the default), the depth is
-estimated per-sample using the "Singleton Peak Heuristic". See
-\code{\link[=suggest_inflate_depths]{suggest_inflate_depths()}} for algorithm details.}
+\item{depth}{The target library size (sum) for each sample: a single
+integer, or one integer per sample. Must be greater than 0. If
+\code{NULL} (the default), the depth is estimated per-sample using the
+"Singleton Peak Heuristic". See \code{\link[=suggest_inflate_depths]{suggest_inflate_depths()}} for
+algorithm details. Counts that are already integers are left
+unchanged when \code{depth = NULL}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
@@ -40,13 +42,13 @@ parts.
 
 \examples{
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
     sample_sums(biom)
-    
+
     biom <- biom_relativize(biom)
     sample_sums(biom)
-    
+
     biom <- biom_inflate(biom)
     sample_sums(biom)
 
@@ -55,13 +57,13 @@ parts.
 \code{\link[=suggest_inflate_depths]{suggest_inflate_depths()}} for details on how target depths are
 estimated when \code{depth = NULL}.
 
-Other transformations: 
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

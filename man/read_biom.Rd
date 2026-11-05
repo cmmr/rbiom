@@ -12,19 +12,31 @@ BIOM files can be formatted according to
 version 1.0 (JSON) or 2.1 (HDF5)
 \href{http://biom-format.org/documentation/}{specifications}, or as
 classical tabular format. URLs must begin with \code{http://},
-\code{https://}, \code{ftp://}, or \code{ftps://}. JSON files must
-have \code{\{} as their first character. Compressed (gzip or bzip2)
-BIOM files are also supported. NOTE: to read HDF5 formatted BIOM
-files, the BioConductor R package \code{rhdf5} must be installed.}
+\code{https://}, \code{ftp://}, or \code{ftps://}. JSON strings are
+recognized by their first non-whitespace character being \code{\{}.
+Compressed (gzip or bzip2) BIOM files are also supported. NOTE: to
+read HDF5 formatted BIOM files, the \code{h5lite} R package must be
+installed.}
 
 \item{...}{Properties to set in the new rbiom object, for example,
-\code{metadata}, \code{id}, \code{comment}, or \code{tree}.}
+\code{metadata}, \code{id}, \code{comment}, or \code{tree}. These override the
+corresponding content of the file.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
 }
 \description{
 Parse counts, metadata, taxonomy, and phylogeny from a BIOM file.
+}
+\details{
+The file's \code{generated_by} and date fields are kept in the returned object's
+\verb{$generated_by} and \verb{$date}.
+
+For classic tabular files, the first column must hold OTU IDs and a column
+named \code{taxonomy} (or \code{lineage}) is parsed into taxonomic ranks. All other
+columns are abundance counts: blank cells are read as \code{0} with a warning,
+and columns containing non-numeric text are ignored with a warning.
+Empty taxonomic ranks are \code{NA}.
 }
 \examples{
     library(rbiom)
@@ -36,20 +48,21 @@ Parse counts, metadata, taxonomy, and phylogeny from a BIOM file.
 
     # Taxa Abundances
     biom$counts[1:4,1:10] \%>\% as.matrix()
-    
+
     biom$taxonomy \%>\% head()
 
     # Metadata
     biom$metadata \%>\% head()
-    
+
     table(biom$metadata$Sex, biom$metadata$`Body Site`)
-    
+
     sprintf("Mean age: \%.1f", mean(biom$metadata$Age))
 
-    # Phylogenetic tree
-    biom$tree \%>\%
-      tree_subset(1:10) \%>\%
-      plot()
+    # Phylogenetic tree (plotting requires the 'ape' package)
+    tree <- tree_subset(biom$tree, 1:10)
+    tree
+    if (requireNamespace("ape", quietly = TRUE))
+      ape::plot.phylo(tree)
 
 }
 \seealso{

@@ -1,4 +1,12 @@
 
+# Evaluate `x$code` in a clean environment and return `data`.
+replay_data <- function (x) {
+  env <- new.env(parent = globalenv())
+  eval(parse(text = x$code), envir = env)
+  env$data
+}
+
+
 test_that("adiv_matrix", {
   df <- as.data.frame(adiv_matrix(min5))
   expect_equal(df$depth, c(1660, 1371, 1353, 1895, 3939))
@@ -14,10 +22,56 @@ test_that("adiv_table", {
   expect_equal(df$.depth, c(1660, 1371, 1353, 1895, 3939))
   expect_equal(df$.adiv, factor(rep('shannon', 5)))
   expect_equal(df$.diversity, c(2, 3, 4, 5, 1))
-  
+
   df <- adiv_table(min5, adiv = c("observed", "inv_simpson"))
   expect_equal(nrow(df), 10)
   expect_equal(round(df$.diversity), c(49, 75, 75, 83, 67, 2, 5, 9, 15, 2))
+
+  # "percent" is not a diversity transform.
+  expect_error(adiv_vector(min5, transform = "percent"))
+})
+
+test_that("adiv provenance replays", {
+
+  skip_on_cran()
+
+  b <- rarefy(hmp5, depth = 1000, seed = 3)
+
+  tbl <- adiv_table(b, adiv = c("shannon", "simpson"), md = "Sex")
+  expect_s3_class(tbl$code, 'rbiom_code')
+  expect_true(grepl("rarefy(biom, depth = 1000L, seed = 3)", tbl$code, fixed = TRUE))
+  expect_equal(as.data.frame(replay_data(tbl)), as.data.frame(tbl), ignore_attr = TRUE)
+
+  mtx <- adiv_matrix(b)
+  expect_s3_class(mtx, 'rbiom_obj')
+  expect_true(is.matrix(mtx))
+  expect_equal(unclass(replay_data(mtx)), unclass(mtx), ignore_attr = TRUE)
+
+  vec <- adiv_vector(b, "simpson", transform = "rank")
+  expect_equal(unname(replay_data(vec)), unname(vec), ignore_attr = TRUE)
+
+  # Printing hides the provenance attributes.
+  expect_output(print(adiv_vector(rare50)), "HMP01")
+  expect_no_match(paste(capture.output(print(adiv_vector(rare50))), collapse = "\n"), "cmd")
+})
+
+test_that("adiv works with the cache disabled", {
+  skip_on_cran()
+  rlang::with_options(rbiom.cache_dir = "FALSE", {
+    expect_s3_class(adiv_table(min5), 'rbiom_tbl')
+    expect_equal(length(adiv_vector(min5)), 5L)
+  })
+})
+
+test_that("rank transforms do not disturb the RNG", {
+  skip_on_cran()
+  set.seed(42)
+  before <- .Random.seed
+  adiv_vector(min5, transform = "rank", seed = 1)
+  expect_identical(.Random.seed, before)
+  rm(list = '.Random.seed', envir = globalenv())
+  adiv_vector(min5, transform = "rank", seed = 2)
+  expect_false(exists('.Random.seed', envir = globalenv()))
 })
 
 test_that("sample_sums", {

@@ -19,12 +19,12 @@ Identical to running \code{as.matrix(biom$counts)}.
 }
 \examples{
     library(rbiom)
-    
+
     as.matrix(hmp50)[1:5,1:5]
 
 }
 \seealso{
-Other conversion: 
-\code{\link{as.list.rbiom}()}
+Other conversion:
+\code{\link[=as.list.rbiom]{as.list.rbiom()}}
 }
 \concept{conversion}

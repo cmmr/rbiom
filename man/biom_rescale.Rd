@@ -50,29 +50,29 @@ scaling them to a \verb{[0, 1]} range relative to the sample's peak.
 
 \examples{
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
-    
+
     # Original range
     range(as.matrix(biom))
-    
+
     # Rescaled to 0-1
     biom_01 <- biom_rescale(biom)
     range(as.matrix(biom_01))
-    
+
     # Rescaled to 0-100 (Percentages)
     biom_100 <- biom_rescale(biom, range = c(0, 100))
     range(as.matrix(biom_100))
-    
+
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

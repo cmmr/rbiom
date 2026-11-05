@@ -17,11 +17,8 @@
 #' hmp50$metadata
 #' @export
 delayedAssign(
-  x     = 'hmp50', 
-  value = local({
-    f <- system.file(package = 'rbiom', 'extdata', 'hmp50.bz2')
-    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
-  })
+  x     = 'hmp50',
+  value = load_dataset('hmp50')
 )
 
 
@@ -43,11 +40,8 @@ delayedAssign(
 #' table(gems$metadata$country)
 #' @export
 delayedAssign(
-  x     = 'gems', 
-  value = local({
-    f <- system.file(package = 'rbiom', 'extdata', 'gems.bz2')
-    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
-  })
+  x     = 'gems',
+  value = load_dataset('gems')
 )
 
 
@@ -75,9 +69,21 @@ delayedAssign(
 #' head(babies$metadata$Age)
 #' @export
 delayedAssign(
-  x     = 'babies', 
-  value = local({
-    f <- system.file(package = 'rbiom', 'extdata', 'babies.bz2')
-    if (nzchar(f)) rbiom::as_rbiom(f) else NULL
-  })
+  x     = 'babies',
+  value = load_dataset('babies')
 )
+
+
+
+#________________________________________________________
+# Read a built-in dataset from inst/extdata. Its history is the bare
+# dataset name (e.g. `biom <- hmp50`), which is reproducible anywhere
+# rbiom is installed, rather than a machine-specific file path.
+#________________________________________________________
+load_dataset <- function (name) {
+  f <- system.file(package = 'rbiom', 'extdata', paste0(name, '.bz2'))
+  if (!nzchar(f)) return (NULL)
+  biom <- read_biom(f)
+  prov_init(biom, list(call = as.name(name), reproducible = TRUE))
+  return (biom)
+}

@@ -23,12 +23,14 @@ integer greater than 0.
 that retains at least 10\% of the dataset's total abundance
 while maximizing the number of samples kept. See
 \code{\link[=suggest_rarefy_depth]{suggest_rarefy_depth()}} for the specific heuristic used.
+The selected depth is recorded in \code{biom$code}.
 \item Samples with total counts less than \code{depth} will be
 dropped from the result.
 }}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for selecting which observations to keep. The
+same \code{seed}, \code{depth}, and input always give the same result.
+Must be a non-negative integer. Default: \code{0}}
 
 \item{inflate}{Logical. Handling for non-integer data (e.g. relative abundances).
 \itemize{
@@ -45,7 +47,8 @@ is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -58,6 +61,8 @@ specified depth are discarded.
 Rarefaction is a common technique in microbiome analysis used to account for
 uneven sequencing effort across samples. By standardizing the library size,
 it allows for fair comparisons of alpha and beta diversity metrics.
+
+The transformation is recorded in the object's history (\code{biom$code}).
 }
 \details{
 Normalizes the library sizes of a dataset by randomly sub-sampling
@@ -65,30 +70,32 @@ observations from each sample to a specific depth.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
     sample_sums(biom)
-    
-    # Rarefy to the lowest sample depth 
+
+    # Rarefy to the lowest sample depth
     # (All samples are kept, but counts are reduced)
     biom_rare <- rarefy(biom, depth = min(sample_sums(biom)))
     sample_sums(biom_rare)
-    
+
     # Auto-select depth (may drop samples with low coverage)
     biom_auto <- rarefy(biom)
     sample_sums(biom_auto)
+
+    biom_auto$code
 
 }
 \seealso{
 \code{\link[=suggest_rarefy_depth]{suggest_rarefy_depth()}} for details on the default depth selection.
 
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

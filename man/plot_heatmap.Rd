@@ -48,7 +48,7 @@ can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
 Default: \code{NULL}, which computes:
-\code{pmax(8, pmin(20, 100 / dim(mtx)))}}
+\code{pmax(5, pmin(14, 100 / dim(mtx)))}}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
@@ -108,7 +108,9 @@ Default: \code{10} (10\% of the grid's height)}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
-\item{...}{Additional arguments to pass on to ggplot2::theme().}
+\item{...}{Additional arguments to pass on to \code{\link[ggplot2:theme]{ggplot2::theme()}}.
+Arguments prefixed with \code{labs.} go to \code{\link[ggplot2:labs]{ggplot2::labs()}} instead,
+for example \code{labs.subtitle = "Plot subtitle"}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -129,7 +131,7 @@ cat_vals <- sample(c("Male", "Female"), 10, replace = TRUE)
 tracks   <- list('Sex' = cat_vals)
 tracks   <- list('Sex' = list(values = cat_vals, colors = "bright"))
 tracks   <- list('Sex' = list(
-  values = cat_vals, 
+  values = cat_vals,
   colors = c('Male' = "blue", 'Female' = "red")) )
 
 ## Numeric --------------------------------
@@ -139,7 +141,7 @@ tracks   <- list('Age' = list(values = num_vals, colors = "greens"))
 tracks   <- list('Age' = list(values = num_vals, range = c(0,50)))
 tracks   <- list('Age' = list(
   label  = "Age (Years)",
-  values = num_vals, 
+  values = num_vals,
   colors = c("azure", "darkblue", "darkorchid") ))
 
 ## Multiple Tracks ------------------------
@@ -147,8 +149,8 @@ tracks <- list('Sex' = cat_vals, 'Age' = num_vals)
 tracks <- list(
   list(label = "Sex", values = cat_vals, colors = "bright"),
   list(label = "Age", values = num_vals, colors = "greens") )
-  
-  
+
+
 mtx           <- matrix(sample(1:50), ncol = 10)
 dimnames(mtx) <- list(letters[1:5], LETTERS[1:10])
 plot_heatmap(mtx = mtx, tracks = tracks)
@@ -167,35 +169,33 @@ The following entries in the track definitions are understood:
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 }
 
-All built-in color palettes are colorblind-friendly. See
-\href{https://cmmr.github.io/rbiom/articles/aes.html#discrete-palettes}{Mapping Metadata to Aesthetics}
-for images of the palettes.
+All built-in color palettes are colorblind-friendly.
 
-Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
-\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
-\code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
-\code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and \code{"fishy"}.
+The available categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
+\code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, \code{"muted"}, \code{"vibrant"},
+\code{"tableau"}, \code{"classic"}, \code{"alphabet"}, \code{"tableau20"}, \code{"kelly"}, and
+\code{"fishy"}.
 
-Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
-\code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
-\code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
-\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
-\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
-\code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
-\code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
-\code{"tofino"}, \code{"vanimo"}, and \code{"vik"}.
+The available numeric palette names are: \code{"reds"}, \code{"oranges"},
+\code{"greens"}, \code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"}, \code{"batlow"},
+\code{"bilbao"}, \code{"buda"}, \code{"davos"}, \code{"devon"}, \code{"hawaii"}, \code{"imola"},
+\code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"}, \code{"tokyo"}, \code{"turku"}, \code{"bam"},
+\code{"berlin"}, \code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"}, \code{"tofino"},
+\code{"vanimo"}, and \code{"vik"}.
 }
 
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     set.seed(123)
     mtx <- matrix(runif(5*8), nrow = 5, dimnames = list(LETTERS[1:5], letters[1:8]))
-    
+
     plot_heatmap(mtx)
     plot_heatmap(mtx, grid="oranges")
-    plot_heatmap(mtx, grid=list(colors = "oranges", label = "Some \%", bins = 5))
-    
+    plot_heatmap(mtx, grid=list(colors = "oranges", label = "Litres"))
+
+    # Tracks go on top (one value per column) unless side = "left"
+    # (one value per row).
     tracks <- list(
       'Number' = sample(1:ncol(mtx)),
       'Person' = list(
@@ -206,26 +206,26 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
         values = sample(c("TX", "OR", "WA"), nrow(mtx), TRUE),
         colors = "bright" )
     )
-    
+
     plot_heatmap(mtx, tracks=tracks)
-    
+
 }
 \seealso{
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{visualization}

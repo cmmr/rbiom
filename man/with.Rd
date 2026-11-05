@@ -13,7 +13,7 @@
 \arguments{
 \item{data}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{expr}{Passed on to \code{\link[base:with]{base::with()}} or \code{\link[base:with]{base::within()}}.}
+\item{expr}{Passed on to \code{\link[base:with]{base::with()}} or \code{\link[base:within]{base::within()}}.}
 
 \item{...}{Not used.}
 
@@ -29,10 +29,10 @@ See description.
 an rbiom object.
 }
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     with(hmp50, table(`Body Site`, Sex))
-    
+
     biom <- within(hmp50, {
       age_bin = cut(Age, 5)
       bmi_bin = cut(BMI, 5)
@@ -41,13 +41,13 @@ an rbiom object.
 
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()}
+\code{\link{subset}}
 }
 \concept{transformations}

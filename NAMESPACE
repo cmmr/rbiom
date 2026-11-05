@@ -1,35 +1,39 @@
 
-importFrom("ape", "pcoa")
-
-importFrom("dplyr", 
-           ".data", "any_of", "mutate", "pull", "rename", "select", 
+importFrom("dplyr",
+           ".data", "any_of", "mutate", "pull", "rename", "select",
            "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
            "filter", "relocate", "across", "everything", "left_join")
 
 importFrom("ecodive", "list_metrics", "match_metric", "n_cpus")
 importFrom("emmeans", "emmeans", "emtrends", "eff_size")
-importFrom("fillpattern", "fill_pattern", "scale_fill_pattern")
-importFrom("ggbeeswarm", "geom_beeswarm", "geom_quasirandom")
 importFrom("ggnewscale", "new_scale_fill")
 importFrom("ggplot2", "aes", "ggsave")
-importFrom("ggrepel", "geom_label_repel")
-importFrom("ggtext", "element_markdown", "geom_textbox")
-importFrom("jsonlite", "base64_enc", "read_json", "toJSON")
+importFrom("grid", "unit", "arrow")
+importFrom("R6", "R6Class")
+importFrom("jsonlite", "read_json", "toJSON")
 importFrom("magrittr","%>%", "%<>%")
 importFrom("methods", "as", "formalArgs")
-importFrom("patchwork", "free", "inset_element", "wrap_plots")
-importFrom("pillar", "tbl_sum", "glimpse")
-importFrom("plyr", ".", "ddply", "ldply", "llply")
-importFrom("readr", "read_delim")
-importFrom("readxl", "read_excel")
+importFrom("patchwork", "free", "wrap_plots")
+importFrom("tibble", "tibble", "as_tibble", "tbl_sum", "glimpse")
 
-importFrom("stats", 
-           "as.formula", "median", "na.omit", "p.adjust", "runif", 
+importFrom("cli", "cli_text", "cli_abort", "cli_warn", "qty")
+importFrom("glue", "glue", "single_quote", "double_quote")
+importFrom("Matrix", "colMeans", "colSums", "Matrix", "rowMeans", "rowSums", "sparseMatrix", "t")
+
+importFrom("rlang",
+           "%||%", ":=", "hash", "env_bind", "is_empty", "env_has", "env_names",
+           "is_na", "is_null", "is_bare_environment", "is_list", "is_formula",
+           "is_true", "is_false", "is_logical", "is_scalar_logical",
+           "is_character", "is_scalar_character", "is_string", "is_integerish",
+           "is_scalar_integerish", "is_double", "is_scalar_double")
+
+importFrom("stats",
+           "as.formula", "median", "na.omit", "p.adjust", "p.adjust.methods", "runif",
            "sd", "setNames", "t.test", "var")
 
 importFrom("utils",
-           "capture.output", "combn", "download.file", "getFromNamespace", "hasName", 
-           "head", "object.size", "packageVersion", "read.table", "str", "tail", 
+           "capture.output", "combn", "download.file", "getFromNamespace", "hasName",
+           "head", "object.size", "packageVersion", "read.table", "str", "tail",
            "write.csv", "write.table")
 
 importFrom("vegan", "adonis2", "metaMDS", "mrpp", "permustats")
@@ -146,19 +150,17 @@ S3method(within,       rbiom)
 S3method(tbl_sum,      rbiom_tbl)
 S3method("$",          rbiom_tbl)
 S3method("$",          rbiom_plot)
+S3method("$",          rbiom_obj)
+S3method(print,        rbiom_obj)
 S3method(print,        rbiom_code)
 
 # Re-exports
-export(".")
 export("%>%")
 export("%<>%")
-export("ddply")
 export("glimpse")
 export("ggsave")
 export("left_join")
-export("ldply")
 export("list_metrics")
-export("llply")
 export("match_metric")
 export("mutate")
 export("n_cpus")

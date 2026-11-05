@@ -19,7 +19,7 @@ A list with names
 Convert an rbiom object to a base R list.
 }
 \seealso{
-Other conversion: 
-\code{\link{as.matrix.rbiom}()}
+Other conversion:
+\code{\link[=as.matrix.rbiom]{as.matrix.rbiom()}}
 }
 \concept{conversion}

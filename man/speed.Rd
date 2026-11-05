@@ -25,11 +25,9 @@ Modify \code{biom} in place like this:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{subset(biom, clone = FALSE, ...)
 rarefy(biom, clone = FALSE)
-
-# Or:
-biom$metadata \%<>\% subset(...)
-biom$counts \%<>\% rarefy_cols()
 }\if{html}{\out{</div>}}
+
+Both forms record the step in \code{biom$code}.
 }
 
 \section{Drop Components}{

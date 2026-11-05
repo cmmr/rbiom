@@ -1,165 +1,159 @@
+#________________________________________________________
+# Rank-based tests: Wilcoxon / Mann-Whitney and Kruskal-Wallis.
+#
+# As in stats_emmeans.r, each test is written twice, side by side: the
+# closure that computes it and the code text recorded in `$code`. Keep
+# them in step. See stats_table() for the user-facing documentation.
+#________________________________________________________
+
 
 stats_wilcox <- function (
-    df, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, 
+    df, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, strata = NULL,
     level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
-  
-  
-  regr <- NULL
-  test <- "wilcox"
-  fit  <- "lm"
-  
-  stats_validate()
-  
-  alternative <- switch(alt, '!=' = "two.sided", '>' = "greater", '<' = "less")
-  
-  # for CRAN check only
-  estimate <- p.value <- conf.int <- statistic <- .stat.by <- NULL
-  
-  func     <- NULL
-  pairwise <- NULL
-  
-  if (is.null(stat.by)) {
-    
-    pairwise <- FALSE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-      
-      stats::wilcox.test(
-          formula     = .resp ~ 1, 
-          data        = data, 
-          conf.int    = TRUE, 
-          conf.level  = level, 
-          exact       = FALSE, 
-          alternative = alternative, 
-          mu          = mu ) %>%
-        with(tibble(
-          row.names = NULL, 
-          .mean     = estimate, 
-          .h1       = factor(paste(alt, mu)), 
-          .p.val    = p.value,
-          .lower    = conf.int[[1]], 
-          .upper    = conf.int[[2]], 
-          .n        = nrow(data), 
-          .stat     = statistic ))
-      
-    }
-    
-    code <- glue("
-        stats <- wilcox.test(
-            formula     = .resp ~ 1, 
-            data        = data, 
-            conf.int    = TRUE, 
-            conf.level  = {level}, 
-            exact       = FALSE, 
-            alternative = '{alternative}', 
-            mu          = {mu} ) %>%
-          with(tibble(
-            row.names = NULL, 
-            .mean     = estimate, 
-            .h1       = factor('{paste(alt, mu)}'), 
-            .p.val    = p.value,
-            .lower    = conf.int[[1]], 
-            .upper    = conf.int[[2]], 
-            .n        = nrow(data), 
-            .stat     = statistic )) ")
-    
-    
-  } else {
-    
-    pairwise <- TRUE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-        
-        stats::wilcox.test(
-            formula    = .resp ~ .stat.by, 
-            data       = subset(data, .stat.by %in% pair), 
-            conf.int   = TRUE, 
-            conf.level = level, 
-            exact      = FALSE ) %>%
-          with(tibble(
-            .mean.diff = estimate, 
-            .h1        = factor('!= 0'), 
-            .p.val     = p.value,
-            .lower     = conf.int[[1]], 
-            .upper     = conf.int[[2]], 
-            .n         = sum(data$.stat.by %in% pair), 
-            .stat      = statistic ))
 
-    }
-    code <- glue("
-        stats <- wilcox.test(
-            formula    = .resp ~ .stat.by, 
-            data       = subset(data, .stat.by %in% pair), 
-            conf.int   = TRUE, 
-            conf.level = {level}, 
-            exact      = FALSE ) %>%
-          with(tibble(
-            .mean.diff = estimate, 
-            .h1        = factor('!= 0'), 
-            .p.val     = p.value,
-            .lower     = conf.int[[1]], 
-            .upper     = conf.int[[2]], 
-            .n         = sum(data$.stat.by %in% pair), 
-            .stat      = statistic ))" )
-    
+  if (!is.null(strata))
+    cli_abort(c(
+      'x' = "`strata` is not supported by rank tests.",
+      'i' = "Use `test = \"emmeans\"` for a mixed model with a random intercept per stratum." ))
+
+  stats_validate(df, regr = NULL, resp, stat.by, split.by, strata = NULL)
+
+  alternative <- switch(alt, '!=' = "two.sided", '>' = "greater", '<' = "less")
+  pairwise    <- !is.null(stat.by)
+  h1          <- paste(alt, mu)
+
+
+  if (!pairwise) {
+
+    #________________________________________________________
+    # One-sample test: is the (pseudo)median different from `mu`?
+    #________________________________________________________
+    test <- list(
+
+      fun = function (data, pair, at) {
+        test <- stats::wilcox.test(data$.resp, mu = mu, alternative = alternative, conf.int = TRUE, conf.level = level)
+        tibble::tibble(
+          .pseudomedian = unname(test$estimate),
+          .h1           = factor(h1),
+          .p.val        = test$p.value,
+          .lower        = test$conf.int[[1]],
+          .upper        = test$conf.int[[2]],
+          .n            = nrow(data),
+          .stat         = unname(test$statistic) )
+      },
+
+      code = paste(sep = "\n",
+        sprintf("test <- stats::wilcox.test(data$.resp, mu = %s, alternative = %s, conf.int = TRUE, conf.level = %s)", deparse_vec(mu), double_quote(alternative), deparse_vec(level)),
+        tibble_code(c(
+          .pseudomedian = "unname(test$estimate)",
+          .h1           = sprintf("factor(%s)", double_quote(h1)),
+          .p.val        = "test$p.value",
+          .lower        = "test$conf.int[[1]]",
+          .upper        = "test$conf.int[[2]]",
+          .n            = "nrow(data)",
+          .stat         = "unname(test$statistic)" )) ))
+
+    model <- "wilcox.test(.resp)"
+
+  } else {
+
+    #________________________________________________________
+    # Two-sample test for each pair of groups. The estimate is the
+    # Hodges-Lehmann location shift (first group minus second).
+    #________________________________________________________
+    test <- list(
+
+      fun = function (pdata, pair, at) {
+        pdata$.stat.by <- factor(pdata$.stat.by, levels = pair)
+        test <- stats::wilcox.test(.resp ~ .stat.by, data = pdata, conf.int = TRUE, conf.level = level)
+        tibble::tibble(
+          !!stat.by := paste(pair, collapse = ' - '),
+          .loc.shift = unname(test$estimate),
+          .h1        = factor('!= 0'),
+          .p.val     = test$p.value,
+          .lower     = test$conf.int[[1]],
+          .upper     = test$conf.int[[2]],
+          .n         = nrow(pdata),
+          .stat      = unname(test$statistic) )
+      },
+
+      code = paste(sep = "\n",
+        "pdata$.stat.by <- factor(pdata$.stat.by, levels = pair)",
+        sprintf("test <- stats::wilcox.test(.resp ~ .stat.by, data = pdata, conf.int = TRUE, conf.level = %s)", deparse_vec(level)),
+        tibble_code(c(
+          stats::setNames(list("paste(pair, collapse = ' - ')"), stat.by),
+          .loc.shift = "unname(test$estimate)",
+          .h1        = "factor('!= 0')",
+          .p.val     = "test$p.value",
+          .lower     = "test$conf.int[[1]]",
+          .upper     = "test$conf.int[[2]]",
+          .n         = "nrow(pdata)",
+          .stat      = "unname(test$statistic)" )) ))
+
+    model <- "wilcox.test(.resp ~ .stat.by)"
   }
-  
-  
-  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
-  stats <- stats_finalize(stats, df, regr = NULL, resp, stat.by, split.by, fit = "lm", p.adj)
-  
-  attr(stats, 'tbl_sum')[['Model']] %<>% sub("^lm", "wilcox.test", .)
-  
-  return (stats)
+
+
+  stats_finalize(
+    df       = df,
+    pre      = NULL,
+    test     = test,
+    regr     = NULL,
+    resp     = resp,
+    stat.by  = stat.by,
+    split.by = split.by,
+    strata   = NULL,
+    p.adj    = p.adj,
+    pairwise = pairwise,
+    model    = model )
 }
 
 
 
 stats_kruskal <- function (
-    df, resp = attr(df, 'response'), stat.by, split.by = NULL, p.adj = 'fdr') {
-  
-  
-  regr <- NULL
-  test <- "kruskal"
-  fit  <- "lm"
-  
-  
-  stats_validate()
-  
+    df, resp = attr(df, 'response'), stat.by, split.by = NULL, strata = NULL, p.adj = 'fdr') {
+
+  if (!is.null(strata))
+    cli_abort(c(
+      'x' = "`strata` is not supported by rank tests.",
+      'i' = "Use `test = \"emmeans\"` for a mixed model with a random intercept per stratum." ))
+
   if (is.null(stat.by))
-    cli_abort("`stat.by` required when `test` = 'kruskal'.")
-  
-  
-  pairwise <- FALSE
-  func <- function (data, pair) {
-    
-    statistic <- p.value <- parameter <- NULL # for CRAN check only
-    
-    data %>% 
-      stats::kruskal.test(.resp ~ .stat.by, .) %>%
-      with(tibble(
-        .stat  = statistic, 
-        .h1    = factor('> 0'),
-        .p.val = p.value, 
-        .n     = nrow(data), 
-        .df    = parameter ))
-    
-  }
-  
-  code <- glue("
-    stats <- data %>% 
-      stats::kruskal.test(.resp ~ .stat.by, .) %>%
-      with(tibble(
-        .stat  = statistic, 
-        .h1    = factor('> 0'), 
-        .p.val = p.value, 
-        .n     = nrow(data), 
-        .df    = parameter ))" )
-  
-  
-  
-  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
-  stats <- stats_finalize(stats, df, regr = NULL, resp, stat.by, split.by, fit = "lm", p.adj, pairwise = FALSE)
-  
-  attr(stats, 'tbl_sum')[['Model']] %<>% sub("^lm", "kruskal.test", .)
-  
-  return (stats)
+    cli_abort("`stat.by` is required when `test` = 'kruskal'.")
+
+  stats_validate(df, regr = NULL, resp, stat.by, split.by, strata = NULL)
+
+
+  test <- list(
+
+    fun = function (data, pair, at) {
+      test <- stats::kruskal.test(.resp ~ .stat.by, data = data)
+      tibble::tibble(
+        .stat  = unname(test$statistic),
+        .df    = unname(test$parameter),
+        .p.val = test$p.value,
+        .n     = nrow(data) )
+    },
+
+    code = paste(sep = "\n",
+      "test <- stats::kruskal.test(.resp ~ .stat.by, data = data)",
+      tibble_code(c(
+        .stat  = "unname(test$statistic)",
+        .df    = "unname(test$parameter)",
+        .p.val = "test$p.value",
+        .n     = "nrow(data)" )) ))
+
+
+  stats_finalize(
+    df       = df,
+    pre      = NULL,
+    test     = test,
+    regr     = NULL,
+    resp     = resp,
+    stat.by  = stat.by,
+    split.by = split.by,
+    strata   = NULL,
+    p.adj    = p.adj,
+    pairwise = FALSE,
+    model    = "kruskal.test(.resp ~ .stat.by)" )
 }

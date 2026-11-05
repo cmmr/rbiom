@@ -14,6 +14,7 @@ taxa_stats(
   unc = "singly",
   other = FALSE,
   split.by = NULL,
+  strata = NULL,
   transform = "none",
   test = "emmeans",
   fit = "gam",
@@ -74,10 +75,17 @@ Default: \code{FALSE}}
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}
 
+\item{strata}{Dataset field with a blocking variable, such as a subject
+identifier for repeated measures. Must be categorical. When given,
+regression models (\code{test = "emmeans"} or \code{"emtrends"}) include a
+random intercept per stratum, fitted with \code{\link[mgcv:gam]{mgcv::gam()}} as
+\code{s(strata, bs = "re")} (a linear mixed model for \code{fit = "lm"} and
+\code{"log"}). Not supported by the rank tests. Default: \code{NULL}}
+
 \item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normal distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{test}{Method for computing p-values: \code{'wilcox'}, \code{'kruskal'},
 \code{'emmeans'}, or \code{'emtrends'}. Default: \code{'emmeans'}}
@@ -85,9 +93,14 @@ regression statistics. Default: \code{"none"}}
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
 Default: \code{'gam'}}
 
-\item{at}{Position(s) along the x-axis where the means or slopes should be
-evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
-and selects the position where the p-value is most significant.}
+\item{at}{Position(s) along \code{regr} where group means or local slopes
+are evaluated. Only used by \code{test = "emmeans"} with \code{stat.by}, and
+by \code{test = "emtrends"} with \code{fit = "gam"} (the other combinations
+test a single, global slope). Default: \code{NULL}, which evaluates at
+one prespecified position: the median of \code{regr} (computed within
+each \code{split.by} stratum). A vector evaluates at each position; the
+returned table then has one row per position, and the p-values are
+adjusted across all of them.}
 
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
@@ -100,62 +113,94 @@ Default: \code{0.95}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans the entire returned table: every
+combination of \code{split.by} strata, \code{stat.by} pairs, and \code{at}
+positions. Default: \code{"fdr"}}
 }
 \value{
-A tibble data.frame with fields from the table below. This tibble
-object provides the \verb{$code} operator to print the R code used to generate
-the statistics.\tabular{ll}{
+A tibble data.frame with the fields below. The R code used to
+generate the statistics is in \verb{$code}.\tabular{ll}{
    \strong{Field} \tab \strong{Description} \cr
    .mean \tab Estimated marginal mean. See \code{\link[emmeans:emmeans]{emmeans::emmeans()}}. \cr
-   .mean.diff \tab Difference in means. \cr
+   .mean.diff \tab Difference in means (first group minus second). \cr
    .slope \tab Trendline slope. See \code{\link[emmeans:emtrends]{emmeans::emtrends()}}. \cr
-   .slope.diff \tab Difference in slopes. \cr
-   .h1 \tab Alternate hypothesis. \cr
-   .p.val \tab Probability that null hypothesis is correct. \cr
-   .adj.p \tab \code{.p.val} after adjusting for multiple comparisons. \cr
-   .effect.size \tab Effect size. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. \cr
+   .slope.diff \tab Difference in slopes (first group minus second). \cr
+   .loc.shift \tab Hodges-Lehmann estimate of the location shift between two groups (wilcox). \cr
+   .pseudomedian \tab Hodges-Lehmann estimate of the location (one-sample wilcox). \cr
+   .h1 \tab Alternative hypothesis. \cr
+   .p.val \tab The probability, under the null hypothesis, of a test statistic at least as extreme as the one observed. \cr
+   .adj.p \tab \code{.p.val} after adjusting for multiple comparisons across the whole table. \cr
+   .effect.size \tab Cohen's d effect size. See \code{\link[emmeans:eff_size]{emmeans::eff_size()}}. \cr
    .lower \tab Confidence interval lower bound. \cr
    .upper \tab Confidence interval upper bound. \cr
    .se \tab Standard error. \cr
-   .n \tab Number of samples. \cr
+   .n \tab Number of observations used. \cr
    .df \tab Degrees of freedom. \cr
    .stat \tab Wilcoxon or Kruskal-Wallis rank sum statistic. \cr
-   .t.ratio \tab \code{.mean} / \code{.se} \cr
-   .r.sqr \tab Percent of variation explained by the model. \cr
-   .adj.r \tab \code{.r.sqr}, taking degrees of freedom into account. \cr
-   .aic \tab Akaike Information Criterion (predictive models). \cr
-   .bic \tab Bayesian Information Criterion (descriptive models). \cr
-   .loglik \tab Log-likelihood goodness-of-fit score. \cr
-   .fit.p \tab P-value for observing this fit by chance. \cr
+   .t.ratio \tab t statistic: estimate divided by \code{.se}. \cr
+   .edf, .ref.df \tab Effective and reference degrees of freedom of the smooth term (gam). \cr
+   .f \tab F statistic for the smooth term (gam). \cr
+   .r.sqr \tab R-squared (lm); adjusted R-squared (gam). \cr
+   .adj.r \tab Adjusted R-squared (lm). \cr
+   .dev.expl \tab Proportion of deviance explained (gam). \cr
+   .aic \tab Akaike Information Criterion. \cr
+   .bic \tab Bayesian Information Criterion. \cr
+   .loglik \tab Log-likelihood of the fitted model. \cr
 }
 }
 \description{
 A convenience wrapper for \code{\link[=taxa_table]{taxa_table()}} + \code{\link[=stats_table]{stats_table()}}.
 }
+\section{Tests}{
+
+
+Which quantity is tested depends on \code{test} and on whether \code{regr} and
+\code{stat.by} are given. Rows with an \code{NA} in any of the \code{regr}, \code{resp},
+\code{stat.by}, \code{split.by}, or \code{strata} fields are dropped (with a message).\tabular{llll}{
+   \code{regr} \tab \code{stat.by} \tab \code{test = "emmeans"} \tab \code{test = "emtrends"} \cr
+   no \tab no \tab mean of \code{resp} vs \code{mu} \tab (not allowed) \cr
+   no \tab yes \tab pairwise differences in group means (\code{.mean.diff}) \tab (not allowed) \cr
+   yes \tab no \tab \code{fit = "lm"}/\code{"log"}: the slope's t-test (\code{.slope}). \code{fit = "gam"}: the smooth term's approximate significance (\code{.edf}, \code{.f}) \tab the slope at \code{at} (\code{.slope}; global for \code{"lm"}/\code{"log"}, local for \code{"gam"}) \cr
+   yes \tab yes \tab pairwise differences in group means at \code{at} (\code{.mean.diff}) \tab pairwise differences in slopes (\code{.slope.diff}; global for \code{"lm"}/\code{"log"}, local at \code{at} for \code{"gam"}) \cr
+}
+
+
+For \code{fit = "log"}, the slope is with respect to \code{log(regr)}.
+\code{mu} and \code{alt} apply to the mean or slope being tested; they are ignored
+for pairwise comparisons (always \verb{!= 0}) and for the smooth-term test.
+Pairwise comparisons fit a separate model to each pair of groups.
+Without \code{regr}, \code{fit} is irrelevant: the model is \code{resp ~ stat.by}.
+
+\code{test = "wilcox"} runs \code{\link[stats:wilcox.test]{stats::wilcox.test()}} (one-sample against \code{mu},
+or two-sample for each pair of \code{stat.by} groups) with \code{exact = NULL}, so
+R chooses an exact or normal-approximation p-value based on the sample
+sizes and ties. \code{test = "kruskal"} runs \code{\link[stats:kruskal.test]{stats::kruskal.test()}} across
+all \code{stat.by} groups.
+}
+
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     taxa_stats(biom, stat.by = "Body Site", rank = "Family")[,1:6]
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 
-Other stats_tables: 
-\code{\link{adiv_stats}()},
-\code{\link{bdiv_stats}()},
-\code{\link{distmat_stats}()},
-\code{\link{stats_table}()}
+Other stats_tables:
+\code{\link[=adiv_stats]{adiv_stats()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=distmat_stats]{distmat_stats()}},
+\code{\link[=stats_table]{stats_table()}}
 }
 \concept{stats_tables}
 \concept{taxa_abundance}

@@ -19,21 +19,24 @@ is quoted). Default \code{FALSE}}
 A \code{phylo} object for the subtree.
 }
 \description{
-Create a subtree by specifying tips to keep.
+Internal nodes left with a single descendant are collapsed (their branch
+lengths are summed), node labels are kept, and the result is rooted at
+the most recent common ancestor of the retained tips. Tips are kept in
+their original order regardless of the order of \code{tips}.
 }
 \examples{
     library(rbiom)
-    
+
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
     tree <- read_tree(infile)
     tree
-    
+
     subtree <- tree_subset(tree, tips = head(tree$tip.label))
     subtree
 
 }
 \seealso{
-Other phylogeny: 
-\code{\link{read_tree}()}
+Other phylogeny:
+\code{\link[=read_tree]{read_tree()}}
 }
 \concept{phylogeny}

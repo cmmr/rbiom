@@ -22,6 +22,7 @@ bdiv_ord_plot(
   p.top = Inf,
   p.adj = "fdr",
   unc = "singly",
+  strata = NULL,
   caption = TRUE,
   alpha = 0.5,
   cpus = n_cpus(),
@@ -40,7 +41,7 @@ plot. Default: \code{"bray"}}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
-\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
+\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
@@ -52,10 +53,10 @@ Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 The first four are sample-centric; the last three are taxa-centric.
 Single letter abbreviations are also accepted. For instance,
 \code{c("point", "ellipse")} is equivalent to \code{c("p", "e")} and \code{"pe"}.
-Default: \code{"pe"}}
+Default: \code{"petm"}}
 
-\item{stat.by}{The categorical or numeric metadata field over which
-statistics should be calculated. Required.}
+\item{stat.by}{Dataset field with the groups to compare and color by.
+Must be categorical. Default: \code{NULL}}
 
 \item{facet.by}{Dataset field(s) to use for faceting. Must be categorical.
 Default: \code{NULL}}
@@ -82,16 +83,15 @@ Default: \code{TRUE}}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{test}{Permutational test for accessing significance. Options are:
-\describe{
-\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
-\item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
-\item{\code{"none"} - }{ Don't run any statistics. }
-}
-Abbreviations are allowed. Default: \code{"adonis2"}}
+\item{test}{Permutational test for the sample groups (\code{stat.by}).
+Options are \code{"adonis2"} (PERMANOVA; the default), \code{"mrpp"},
+\code{"betadisper"}, or \code{"none"}. See \code{\link[=distmat_stats]{distmat_stats()}}. The taxa
+biplot always uses \code{\link[vegan:envfit]{vegan::envfit()}}.}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
@@ -119,7 +119,9 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans every p-value in the returned
+table (all metrics, strata, pairs, and positions).
+Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -131,6 +133,10 @@ taxa names. Options are:
 }
 Abbreviations are allowed. Default: \code{"singly"}}
 
+\item{strata}{Dataset field with the blocking/subject variable.
+Permutation tests permute within strata; regression models
+include a random intercept per stratum. Default: \code{NULL}}
+
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
 
@@ -139,14 +145,16 @@ to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Parameters for layer geoms (e.g. \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}).
 Prefixing parameter names with a layer name ensures that a particular
 parameter is passed to, and only to, that layer. For instance,
 \code{point.size = 2} or \code{p.size = 2} ensures only the points
 have their size set to \code{2}. Points can also be controlled with
-the \code{pt.} prefix.}
+the \code{pt.} prefix. An argument that no layer accepts is an
+error.}
 }
 \value{
 A \code{ggplot2} plot.
@@ -160,45 +168,53 @@ If \code{rank} is given, then \code{$data$taxa_coords},
 \description{
 Ordinate samples and taxa on a 2D plane based on beta diversity distances.
 }
+\details{
+The \bold{ellipse} layer draws 95\% normal-distribution ellipses
+(\code{\link[ggplot2:stat_ellipse]{ggplot2::stat_ellipse()}} with \code{type = "norm"}); groups with fewer than
+four samples get no ellipse. The \bold{taxon} layer uses the ggrepel
+package to avoid overlapping labels when it is installed, and plain
+labels otherwise. Facet strips (or the subtitle) show the test
+statistic, R-squared (PERMANOVA), and p-value from \verb{$stats}.
+}
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
-    
+
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=bdiv_table]{bdiv_table()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 
-Other ordination: 
-\code{\link{bdiv_ord_table}()},
-\code{\link{distmat_ord_table}()}
+Other ordination:
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=distmat_ord_table]{distmat_ord_table()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{beta_diversity}
 \concept{ordination}

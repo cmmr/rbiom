@@ -63,26 +63,17 @@ can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
 Default: \code{NULL}, which computes:
-\code{pmax(8, pmin(20, 100 / dim(mtx)))}}
+\code{pmax(5, pmin(14, 100 / dim(mtx)))}}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
 Default: \code{"none"}}
 
-\item{clust}{Clustering algorithm for reordering the rows and columns by
-similarity. You can supply a list or character vector of length two to
-control the row and column clustering separately, for example
-\code{clust = c(rows = "complete", cols = NA)}, or simply
-\code{clust = c("complete", NA)}. Options are:
-\describe{
-\item{\code{FALSE} or \code{NA} - }{ Disable reordering. }
-\item{An \code{hclust} class object}{ E.g. from \code{\link[stats:hclust]{stats::hclust()}}. }
-\item{A method name - }{ \code{"ward.D"},
-\code{"ward.D2"}, \code{"single"}, \code{"complete"},
-\code{"average"}, \code{"mcquitty"}, \code{"median"}, or
-\code{"centroid"}. }
-}
-Default: \code{"complete"}}
+\item{clust}{Clustering algorithm for reordering the samples by
+similarity, applied to the \code{bdiv} distances. Options are:
+\code{"ward.D"}, \code{"ward.D2"}, \code{"single"}, \code{"complete"}, \code{"average"},
+\code{"mcquitty"}, \code{"median"}, \code{"centroid"}, or \code{FALSE} to disable
+reordering. Default: \code{"complete"}}
 
 \item{trees}{Draw a dendrogram for rows (left) and columns (top). You can
 supply a list or logical vector of length two to control the row tree
@@ -116,10 +107,12 @@ to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
-For example, \code{labs.subtitle = "Plot subtitle"}.}
+Arguments prefixed with \code{labs.} go to ggplot2::labs() instead,
+for example \code{labs.subtitle = "Plot subtitle"}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -159,7 +152,8 @@ The following entries in the track definitions are understood:
 \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
 \item{\code{range} - }{ The c(min,max) to use for scale values. }
 \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
-\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
+\item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}.
+\code{taxa_heatmap()} places all tracks on top. }
 \item{\code{na.color} - }{ The color to use for \code{NA} values. }
 \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
@@ -175,7 +169,7 @@ Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 \code{"purples"}, \code{"grays"}, \code{"acton"}, \code{"bamako"},
 \code{"batlow"}, \code{"bilbao"}, \code{"buda"}, \code{"davos"},
-\code{"devon"}, \code{"grayC"}, \code{"hawaii"}, \code{"imola"},
+\code{"devon"}, \code{"hawaii"}, \code{"imola"},
 \code{"lajolla"}, \code{"lapaz"}, \code{"nuuk"}, \code{"oslo"},
 \code{"tokyo"}, \code{"turku"}, \code{"bam"}, \code{"berlin"},
 \code{"broc"}, \code{"cork"}, \code{"lisbon"}, \code{"roma"},
@@ -184,41 +178,41 @@ Numeric palette names: \code{"reds"}, \code{"oranges"}, \code{"greens"},
 
 \examples{
     library(rbiom)
-    
+
     # Subset to 10 samples and rarefy them.
     hmp10 <- rarefy(hmp50[1:10])
-    
+
     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
-    
+
     bdiv_heatmap(hmp10, bdiv=c("u_unifrac", "n_unifrac"), tracks="sex")
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=bdiv_table]{bdiv_table()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}}
 }
 \concept{beta_diversity}
 \concept{visualization}

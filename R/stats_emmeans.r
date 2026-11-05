@@ -1,762 +1,484 @@
 
-#' Test for x/y numeric relationships using regression models.
-#' 
-#' Calculates estimated marginal means (aka least-squares means) using the 
-#' [`emmeans`][emmeans::emmeans] package. The `stats_emmeans()` function will 
-#' estimate means at any location along the x-axis, and can test for 
-#' differences between categories. The `stats_emtrends()` function examines 
-#' the slope of the trendlines, also with support for testing differences 
-#' between categories.
-#' 
-#' For further reading on this topic, see 
-#' <https://stats.oarc.ucla.edu/r/seminars/interactions-r/>.
-#' 
-#' 
+#' Regression statistics: estimated marginal means and trends.
+#'
+#' `stats_emmeans()` and `stats_emtrends()` fit a regression model to `df`
+#' and summarize it with the [`emmeans`][emmeans::emmeans] package. They are
+#' the workhorses behind `stats_table(test = "emmeans")` and
+#' `stats_table(test = "emtrends")`; see [stats_table()] for the user-facing
+#' documentation of the arguments and the returned columns.
+#'
+#' Each case below is written twice, side by side: once as the closure that
+#' computes the result, and once as the code text recorded in `$code`. Keep
+#' them in step. The text is a record only and is never evaluated.
+#'
 #' @inherit documentation_default
-#' 
+#'
 #' @noRd
-#' 
-#' @param df   A data.frame with any columns named by `regr`, `resp`, 
-#'        `stat.by`, and `split.by.` Required.
-#' 
-#' @param regr   The predictive (independent; x-axis) variable in `df`.
-#'        Must be a numeric column. Required.
-#' 
-#' @param resp   The response (dependent; y-axis) variable in `df`, such as 
-#'        taxa abundance or alpha diversity. Must be numeric. 
-#'        Default: `attr(df, 'response')`
-#' 
-#' @param fit   How to fit the trendline. Options are `'lm'`, `'log'`, and 
-#'        `'gam'`. Default: `'lm'`
-#' 
-#' @param stat.by   The variable in `df` defining the statistical groups. 
-#'        Must be categorical. Default: `NULL`
-#'        
-#' @param split.by   The variable(s) in `df` for splitting the data by prior to 
-#'        any calculations. Must all be categorical. Default: `NULL`
-#'        
-#' @param alt   Alternative hypothesis direction. Options are `'!='` 
-#'        (two-sided; not equal to `mu`), `'<'` (less than `mu`), or `'>'` 
-#'        (greater than `mu`). Default: `'!='`
-#'        
-#' @param mu   Reference value to test against. Default: `0`
-#'        
-#' @param at   Calculate means or slopes at this `regr` value. Default: `NULL`, 
-#'        which sets `at` to the median of `regr`'s values.
-#' 
-#' 
-#' @return A tibble data.frame with fields from the following table:
-#' 
-#' | **Field**    | **Description**                                      |
-#' | ------------ | ---------------------------------------------------- |
-#' | .mean        | Estimated marginal mean. See [emmeans::emmeans()].   |
-#' | .mean.diff   | Difference in means.                                 |
-#' | .slope       | Trendline slope. See [emmeans::emtrends()].          |
-#' | .slope.diff  | Difference in slopes.                                |
-#' | .h1          | Alternate hypothesis.                                |
-#' | .p.val       | Probability that null hypothesis is correct.         |
-#' | .adj.p       | `.p.val` after adjusting for multiple comparisons.   |
-#' | .effect.size | Effect size. See [emmeans::eff_size()].              |
-#' | .lower       | Confidence interval lower bound.                     |
-#' | .upper       | Confidence interval upper bound.                     |
-#' | .se          | Standard error.                                      |
-#' | .n           | Number of samples.                                   |
-#' | .df          | Degrees of freedom.                                  |
-#' | .stat        | Wilcoxon or Kruskal-Wallis rank sum statistic.       |
-#' | .t.ratio     | `.mean` / `.se`                                      |
-#' | .r.sqr       | Percent of variation explained by the model.         |
-#' | .adj.r       | `.r.sqr`, taking degrees of freedom into account.    |
-#' | .aic         | Akaike Information Criterion (predictive models).    |
-#' | .bic         | Bayesian Information Criterion (descriptive models). |
-#' | .loglik      | Log-likelihood goodness-of-fit score.                |
-#' | .fit.p       | P-value for observing this fit by chance.            |
-#' 
-#' 
-#' 
-#' 
-#' @examples
-#'     library(rbiom)
-#'     library(ggplot2)
-#'     
-#'     df <- adiv_table(babies)
-#'     
-#'     # Does Shannon diversity increase with Age? ------------------------
-#'     stats_emtrends(df, regr = "Age") %>% select(!.n:.df)
-#'     
-#'     
-#'     # Does Sex make a difference? ------------------------
-#'     stats_emtrends(df, "Age", split.by = "Sex") %>% select(!.n:.upper)
-#'     
-#'     stats_emtrends(df, "Age", stat.by = "Sex") %>% select(!.n:.t.ratio)
-#'     
-#'     
-#'     # Run a generalized additive model at three time points. ----------------------
-#'     stats_emmeans(df, "Age", fit = "gam", at = c(30, 90, 150))
-#'     
-#'     stats_emtrends(df, "Age", fit = "gam", at = c(30, 90, 150))
-#'     
-#'     
-#'     # Pipe results into a figure. ------------------------
-#'     stats_emmeans(df, "Age", fit = "gam", at = c(1:40) * 5, split.by = "Sex") %>% 
-#'       ggplot(aes(x = `Age (days)`)) + 
-#'       geom_ribbon(aes(ymin = .lower, ymax = .upper, fill = Sex), alpha = 0.4) + 
-#'       geom_line(aes(y = .mean, color = Sex))
-#'     
-#'     
-#'     # See the underlying stats calculations: ------------------------
-#'     stats_emtrends(df, regr = "Age")$code
-#'     
+#' @keywords internal
+#'
 
 stats_emmeans <- function (
-    df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, 
-    fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
-  
-  stats_validate()
-  
-  # for CRAN check only
-  emmean <- contrast <- estimate <- NULL
-  p.value <- lower.CL <- upper.CL <- SE <- t.ratio <- NULL
-  .regr <- .p.val <- .t.ratio <- .se <- .stat.by <- NULL
-  
-  
-  func     <- NULL
-  pairwise <- NULL
-  .pairs   <- P('graphics::pairs')
-  
-  if (is.null(regr) && is.null(stat.by)) {
-    
-    pairwise <- FALSE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-      
-      data %>% 
-        stats::lm(.resp ~ 1, .) %>% 
-        emmeans::emmeans(
-          specs = '1', 
-          infer = TRUE, 
-          level = level ) %>% 
-        summary(side = alt, null = mu) %>% 
-        with(tibble(
-          .mean    = emmean,
-          .h1      = factor(paste(alt, mu)),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio ))
-    }
-    
-    code <- glue("
-      stats <- data %>% 
-        stats::lm(.resp ~ 1, .) %>% 
-        emmeans::emmeans(
-          specs = '1', 
-          infer = TRUE, 
-          level = {level} ) %>% 
-        summary(side = '{alt}', null = {mu}) %>% 
-        with(tibble(
-          .mean    = emmean,
-          .h1      = factor('{paste(alt, mu)}'),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio ))" )
-    
-  }
-  
-  else if (!is.null(regr) && is.null(stat.by)) {
-    
-    pairwise <- FALSE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-      
-      model <- stats_fit_model(data, fit, stat.by = FALSE, regr = TRUE)
-      
-      gof <- stats_glance(model)
-      
-      # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at)) {
-        lo <- min(data$.regr)
-        hi <- max(data$.regr)
-        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
-        at <- at[at > lo & at < hi]
-        remove("lo", "hi")
-      }
-      
-      stats <- model %>% 
-        emmeans::emmeans(
-          specs = ".regr", 
-          at    = list(.regr = at), 
-          infer = TRUE, 
-          level = level ) %>% 
-        summary(side = alt, null = mu) %>% 
-        with(tibble(
-          !!regr  := .regr, 
-          .mean    = emmean,
-          .h1      = factor(paste(alt, mu)),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio,
-          .r.sqr   = gof$r.squared,
-          .adj.r   = gof$adj.r.squared,
-          .aic     = gof$AIC,
-          .bic     = gof$BIC,
-          .loglik  = gof$logLik,
-          .fit.p   = gof$p.value ))
-      
-      if (p_slice)
-        stats <- stats %>%
-          dplyr::arrange(.p.val, dplyr::desc(.t.ratio), .se) %>% 
-          dplyr::slice_head(n = 1)
-      
-      return (stats)
-    }
-    
-    
-    if (is.null(at)) {
-      at_str <- "scales::breaks_extended(100)(data$.regr)"
-    } else {
-      at_str <- as.args(list(at))
-    }
-    
-    
-    code <- glue("
-      {stats_model_code('data', fit, stat.by = FALSE)}
-      
-      gof <- broom::glance(model)
-      
-      stats <- model %>% 
-        emmeans::emmeans(
-          specs = '.regr', 
-          at    = list(.regr = {at_str}), 
-          infer = TRUE, 
-          level = {level} ) %>% 
-        summary(side = '{alt}', null = {mu}) %>% 
-        with(tibble(
-          {single_quote(regr)} = .regr,
-          .mean    = emmean,
-          .h1      = factor('{paste(alt, mu)}'),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio,
-          .r.sqr   = gof$r.squared,
-          .adj.r   = gof$adj.r.squared,
-          .aic     = gof$AIC,
-          .bic     = gof$BIC,
-          .loglik  = gof$logLik,
-          .fit.p   = gof$p.value ))" )
-    
-  }
-  
-  else if (is.null(regr) && !is.null(stat.by)) {
-    
-    pairwise <- TRUE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-      
-      model <- data %>%
-        subset(.stat.by %in% pair) %>%
-        stats::lm(.resp ~ .stat.by, .)
-      
-      emm <- model %>% 
-        emmeans::emmeans(
-          specs = '.stat.by', 
-          infer = TRUE )
-      
-      eff <- emm %>% 
-        emmeans::eff_size(
-          sigma  = stats::sigma(model), 
-          edf    = stats::df.residual(model), 
-          simple = '.stat.by' ) %>%
-        as.data.frame()
-      
-      emm %>% 
-        .pairs(simple = '.stat.by') %>%
-        as.data.frame() %>% 
-        with(tibble(
-          !!stat.by   := contrast, 
-          .mean.diff   = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value, 
-          .effect.size = eff$effect.size, 
-          .se          = SE, 
-          .n           = sum(data$.stat.by %in% pair),
-          .df          = as.integer(df), 
-          .t.ratio     = t.ratio ))
-    }
-    
-    code <- glue("
-      model <- data %>%
-        subset(.stat.by %in% pair) %>%
-        stats::lm(.resp ~ .stat.by, .)
-      
-      emm <- model %>% 
-        emmeans::emmeans(
-          specs = '.stat.by', 
-          infer = TRUE )
-      
-      eff <- emm %>% 
-        emmeans::eff_size(
-          sigma  = stats::sigma(model), 
-          edf    = stats::df.residual(model), 
-          simple = '.stat.by' ) %>%
-        as.data.frame()
-      
-      stats <- emm %>% 
-        pairs(simple = '.stat.by') %>%
-        as.data.frame() %>% 
-        with(tibble(
-          {single_quote(stat.by)} = contrast, 
-          .mean.diff   = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value, 
-          .effect.size = eff$effect.size, 
-          .se          = SE, 
-          .n           = sum(data$.stat.by %in% pair), 
-          .df          = as.integer(df), 
-          .t.ratio     = t.ratio ))")
-    
-  }
-  
-  else if (!is.null(regr) && !is.null(stat.by)) {
-    
-    pairwise <- TRUE # CRAN check requires consistent func signature
-    func <- function (data, pair) {
-      
-      pdata <- subset(data, .stat.by %in% pair)
-      model <- stats_fit_model(pdata, fit, TRUE)
-      
-      gof <- stats_glance(model)
-      
-      # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at)) {
-        lo <- max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr)
-        hi <- min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr)
-        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
-        at <- at[at > lo & at < hi]
-        remove("lo", "hi")
-      }
-      
-      emm <- model %>% 
-        emmeans::emmeans(
-          infer  = TRUE, 
-          specs  = c('.regr', '.stat.by'), 
-          at     = list(.regr = at) )
-      
-      eff <- emm %>% 
-        emmeans::eff_size(
-          sigma  = stats::sigma(model), 
-          edf    = stats::df.residual(model), 
-          simple = '.stat.by' ) %>%
-        as.data.frame()
-      
-      stats <- emm %>% 
-        .pairs(simple = '.stat.by') %>%
-        as.data.frame() %>% 
-        with(tibble(
-          !!regr      := .regr, 
-          !!stat.by   := contrast, 
-          .mean.diff   = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value,
-          .effect.size = eff$effect.size, 
-          .se          = SE,  
-          .n           = nrow(pdata),
-          .df          = as.integer(df),
-          .t.ratio     = t.ratio, 
-          .r.sqr       = gof$r.squared,
-          .adj.r       = gof$adj.r.squared,
-          .aic         = gof$AIC,
-          .bic         = gof$BIC,
-          .loglik      = gof$logLik,
-          .fit.p       = gof$p.value ))
-      
-      if (p_slice)
-        stats <- stats %>%
-          dplyr::arrange(.p.val, dplyr::desc(.t.ratio), .se) %>% 
-          dplyr::slice_head(n = 1)
-      
-      return (stats)
-    }
-    
-    
-    if (is.null(at)) {
-      at_str <- "at"
-      at_def <- glue("
-        
-        at    <- labeling::extended(
-          dmin = max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          dmax = min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
-          m    = 100 ){ifelse(fit == 'gam', '', '\n        ')}
-        ")
-    } else {
-      at_str <- as.args(list(at))
-      at_def <- ""
-    }
-    
-    
-    code <- glue("
-      pdata <- subset(data, .stat.by %in% pair){at_def}
-      {stats_model_code('pdata', fit, stat.by = TRUE)}
-      
-      gof <- broom::glance(model)
-      
-      emm <- model %>% 
-        emmeans::emmeans(
-        specs  = c('.regr', '.stat.by'), 
-        at     = list(.regr = {at_str}), 
-        infer  = TRUE )
-      
-      eff <- emm %>% 
-        emmeans::eff_size(
-          sigma  = stats::sigma(model), 
-          edf    = stats::df.residual(model), 
-          simple = '.stat.by' ) %>%
-        as.data.frame()
-      
-      stats <- emm %>% 
-        pairs(simple = '.stat.by') %>%
-        as.data.frame() %>% 
-        with(tibble(
-          {single_quote(regr)} = .regr, 
-          {single_quote(stat.by)} = contrast, 
-          .mean.diff   = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value,
-          .effect.size = eff$effect.size, 
-          .se          = SE,  
-          .n           = nrow(pdata), 
-          .df          = as.integer(df),
-          .t.ratio     = t.ratio, 
-          .r.sqr       = gof$r.squared,
-          .adj.r       = gof$adj.r.squared,
-          .aic         = gof$AIC,
-          .bic         = gof$BIC,
-          .loglik      = gof$logLik,
-          .fit.p       = gof$p.value ))" )
-    
-  }
-  
-  
-  
-  if (!is.null(regr) && is.null(at))
-    code %<>% paste0(' %>% \n  dplyr::arrange(.p.val, desc(.t.ratio), .se) %>% \n  dplyr::slice_head(n = 1)')
-  
-  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
-  stats <- stats_finalize(stats, df, regr, resp, stat.by, split.by, fit, p.adj)
-  
-  return (stats)
+    df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL,
+    strata = NULL, fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+
+  stats_regression(
+    df = df, regr = regr, resp = resp, stat.by = stat.by, split.by = split.by,
+    strata = strata, test = "emmeans", fit = fit, at = at, level = level,
+    alt = alt, mu = mu, p.adj = p.adj )
 }
-
-
-
-
 
 
 
 stats_emtrends <- function (
-    df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, 
-    fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
-  
-  stats_validate()
-  
+    df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL,
+    strata = NULL, fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+
   if (is.null(regr))
-    cli_abort('`regr` field is required when `test` = "emtrends".')
-  
-  
-  # for CRAN check only
-  .regr <- .regr.trend <- .stat.by <- NULL
-  p.value <- lower.CL <- upper.CL <- NULL
-  SE <- t.ratio <- contrast <- estimate <- NULL
-  
-  
-  func     <- NULL
-  pairwise <- NULL
-  .pairs   <- P('graphics::pairs')
-  
-  if (is.null(stat.by)) {
-    
-    pairwise <- FALSE
-    func <- function (data, pair) {
-      
-      model <- stats_fit_model(data, fit, stat.by = FALSE)
-      
-      gof <- stats_glance(model)
-      
-      # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at)) {
-        lo <- min(data$.regr)
-        hi <- max(data$.regr)
-        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
-        at <- at[at > lo & at < hi]
-        remove("lo", "hi")
-      }
-      
-      stats <- model %>% 
-        emmeans::emtrends(
-          specs = NULL, 
-          var   = '.regr', 
-          at    = list(.regr = at), 
-          infer = TRUE, 
-          level = level ) %>% 
-        summary(side = alt, null = mu) %>%
-        with(tibble(
-          !!regr  := .regr, 
-          .slope   = .regr.trend,
-          .h1      = factor(paste(alt, mu)),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio,
-          .r.sqr   = gof$r.squared,
-          .adj.r   = gof$adj.r.squared,
-          .aic     = gof$AIC,
-          .bic     = gof$BIC,
-          .loglik  = gof$logLik,
-          .fit.p   = gof$p.value ))
-      
-      if (p_slice)
-        stats <- stats[which.min(stats$.p.val),,drop=FALSE]
-      
-      return (stats)
-      
-    }
-    
-    
-    if (is.null(at)) {
-      at_str <- "scales::breaks_extended(100)(data$.regr)"
-    } else {
-      at_str <- as.args(list(at))
-    }
-    
-    
-    code <- glue("
-      {stats_model_code('data', fit, stat.by = FALSE)}
-      
-      gof <- broom::glance(model)
-      
-      stats <- model %>% 
-        emmeans::emtrends(
-          specs = NULL, 
-          var   = '.regr', 
-          at    = list(.regr = {at_str}), 
-          infer = TRUE, 
-          level = {level} ) %>% 
-        summary(side = '{alt}', null = {mu}) %>% 
-        with(tibble(
-          {single_quote(regr)} = .regr, 
-          .slope   = .regr.trend,
-          .h1      = factor('{paste(alt, mu)}'),
-          .p.val   = p.value,
-          .lower   = lower.CL,
-          .upper   = upper.CL,
-          .se      = SE,
-          .n       = nrow(data),
-          .df      = as.integer(df),
-          .t.ratio = t.ratio,
-          .r.sqr   = gof$r.squared,
-          .adj.r   = gof$adj.r.squared,
-          .aic     = gof$AIC,
-          .bic     = gof$BIC,
-          .loglik  = gof$logLik,
-          .fit.p   = gof$p.value ))" )
-    
-    
-  }
-  
-  else if (!is.null(stat.by)) {
-    
-    pairwise <- TRUE
-    func <- function (data, pair) {
-      
-      pdata <- subset(data, .stat.by %in% pair)
-      model <- stats_fit_model(pdata, fit, stat.by = TRUE)
-      
-      gof <- stats_glance(model)
-      
-      # Find pseudo-minimum p-value
-      if (p_slice <- is.null(at)) {
-        lo <- max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr)
-        hi <- min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr)
-        at <- labeling::extended(dmin = lo, dmax = hi, m = 100)
-        at <- at[at > lo & at < hi]
-        remove("lo", "hi")
-      }
-      
-      
-      emt <- model %>% 
-        emmeans::emtrends(
-        specs = '.stat.by', 
-        var   = '.regr', 
-        at    = list(.regr = at), 
-        infer = TRUE )
-      
-      eff <- emt %>% 
-        emmeans::eff_size(
-        sigma = stats::sigma(model), 
-        edf   = stats::df.residual(model) ) %>%
-        as.data.frame()
-      
-      stats <- emt %>% 
-        .pairs() %>%
-        as.data.frame() %>% 
-        with(tibble(
-          !!regr      := at, 
-          !!stat.by   := contrast, 
-          .slope.diff  = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value,
-          .effect.size = eff$effect.size, 
-          .se          = SE, 
-          .n           = nrow(pdata),
-          .df          = as.integer(df), 
-          .t.ratio     = t.ratio, 
-          .r.sqr       = gof$r.squared,
-          .adj.r       = gof$adj.r.squared,
-          .aic         = gof$AIC,
-          .bic         = gof$BIC,
-          .loglik      = gof$logLik,
-          .fit.p       = gof$p.value ))
-      
-      if (p_slice)
-        stats <- stats[which.min(stats$.p.val),,drop=FALSE]
-      
-      return (stats)
-    }
-    
-    
-    if (is.null(at)) {
-      at_str <- "at"
-      at_def <- glue("
-        
-        at    <- labeling::extended(
-          dmin = max(stats::aggregate(pdata, .regr ~ .stat.by, min)$.regr), 
-          dmax = min(stats::aggregate(pdata, .regr ~ .stat.by, max)$.regr), 
-          m    = 100 ){ifelse(fit == 'gam', '', '\n        ')}
-        ")
-    } else {
-      at_str <- as.args(list(at))
-      at_def <- ""
-    }
-    
-    
-    code <- glue("
-      pdata <- subset(data, .stat.by %in% pair){at_def}
-      {stats_model_code('pdata', fit, stat.by = TRUE)}
-      
-      gof <- broom::glance(model)
-      
-      emt <- model %>% 
-        emmeans::emmeans(
-        specs = '.stat.by', 
-        var   = '.regr', 
-        at    = list(.regr = {at_str}), 
-        infer = TRUE )
-      
-      eff <- emt %>% 
-        emmeans::eff_size(
-          sigma = stats::sigma(model), 
-          edf   = stats::df.residual(model) ) %>%
-        as.data.frame()
-      
-      stats <- emt %>% 
-        pairs() %>%
-        as.data.frame() %>% 
-        with(tibble(
-          {single_quote(regr)} = {at_str}, 
-          {single_quote(stat.by)} = contrast, 
-          .slope.diff  = estimate, 
-          .h1          = factor('!= 0'), 
-          .p.val       = p.value,
-          .effect.size = eff$effect.size, 
-          .se          = SE, 
-          .n           = nrow(pdata),
-          .df          = as.integer(df), 
-          .t.ratio     = t.ratio, 
-          .r.sqr       = gof$r.squared,
-          .adj.r       = gof$adj.r.squared,
-          .aic         = gof$AIC,
-          .bic         = gof$BIC,
-          .loglik      = gof$logLik,
-          .fit.p       = gof$p.value ))" )
-    
-  }
-  
-  
-  
-  if (is.null(at))
-    code %<>% paste0(' %>% \n  dplyr::slice_min(.p.val)')
-  
-  stats <- stats_run(df, stat.by, split.by, func, pairwise) %>% aa(code = code)
-  stats <- stats_finalize(stats, df, regr, resp, stat.by, split.by, fit, p.adj)
-  
-  return (stats)
+    cli_abort('`regr` is required when `test` = "emtrends".')
+
+  stats_regression(
+    df = df, regr = regr, resp = resp, stat.by = stat.by, split.by = split.by,
+    strata = strata, test = "emtrends", fit = fit, at = at, level = level,
+    alt = alt, mu = mu, p.adj = p.adj )
 }
 
 
 
-# Copied from broom package (https://github.com/tidymodels/broom)
-stats_glance <- function (model) {
-  
-  x <- model
-  s <- summary(x)
-  
-  if (inherits(x, 'gam')) { # broom:::glance.gam
-    
-    tbl <- tibble(
-      df            = sum(x$edf), 
-      logLik        = as.numeric(stats::logLik(x)), 
-      AIC           = stats::AIC(x), 
-      BIC           = stats::BIC(x), 
-      deviance      = stats::deviance(x), 
-      df.residual   = stats::df.residual(x), 
-      nobs          = stats::nobs(x), 
-      adj.r.squared = s$r.sq, 
-      npar          = s$np )
-    
-  } else { # broom:::glance.lm
-    
-    tbl <- tibble(
-      r.squared     = s$r.squared, 
-      adj.r.squared = s$adj.r.squared, 
-      sigma         = s$sigma, 
-      statistic     = NA_real_, 
-      p.value       = NA_real_, 
-      df            = NA_real_, 
-      logLik        = as.numeric(stats::logLik(x)), 
-      AIC           = stats::AIC(x), 
-      BIC           = stats::BIC(x), 
-      deviance      = stats::deviance(x), 
-      df.residual   = stats::df.residual(x), 
-      nobs          = stats::nobs(x) )
-    
-    
-    # check whether the model was fitted with only an intercept, in which
-    # case don't compute the fstatistic related columns
-    if (!identical(row.names(s$coefficients), "(Intercept)")) {
-      
-      fs <- s$fstatistic
-      
-      tbl$statistic <- fs[['value']]
-      tbl$p.value   <- stats::pf(fs[['value']], fs[['numdf']], fs[['dendf']], lower.tail = FALSE)
-      tbl$df        <- fs[['numdf']]
-    }
-    
-  }
-  
-  return (tbl)
-}
 
+#________________________________________________________
+# Build and run the regression for one (test, fit, regr, stat.by)
+# combination. See stats_table() for the semantics of each case.
+#________________________________________________________
+stats_regression <- function (
+    df, regr, resp, stat.by, split.by, strata, test, fit, at, level, alt, mu, p.adj ) {
+
+  stats_validate(df, regr, resp, stat.by, split.by, strata)
+
+  has_regr    <- !is.null(regr)
+  has_stat.by <- !is.null(stat.by)
+  has_strata  <- !is.null(strata)
+
+  # Without `regr` there is no trend to fit: the model is `.resp ~ .stat.by`
+  # (or `.resp ~ 1`), fitted with lm(), or with gam() only to add `strata`.
+  if (!has_regr) fit <- "lm"
+
+  type      <- stats_model_type(fit, has_strata)
+  pairwise  <- has_stat.by
+  var       <- if (pairwise) "pdata" else "data"
+  trend_var <- if (fit == "log") "log(.regr)" else ".regr"
+  trend_col <- paste0(trend_var, ".trend")
+  h1        <- paste(alt, mu)
+
+
+  #________________________________________________________
+  # Which cases evaluate the model at `at`?
+  #________________________________________________________
+  uses_at <- has_regr && (
+    (test == "emmeans"  && has_stat.by) ||
+    (test == "emtrends" && fit == "gam") )
+
+  if (!is.null(at) && has_regr && !uses_at)
+    cli::cli_inform(c(
+      'i' = "`at` is ignored: with `fit = \"{fit}\"` the slope{?s} {?is/are} the same at every `regr` value." ),
+      .frequency = "once", .frequency_id = "rbiom_at_ignored_slope" )
+
+  if (has_regr && !has_stat.by && test == "emmeans" && fit == "gam" && (!eq(alt, "!=") || !eq(mu, 0)))
+    cli::cli_inform(c(
+      'i' = "`alt` and `mu` are ignored for the smooth-term test (`fit = \"gam\"`, `test = \"emmeans\"`)." ),
+      .frequency = "once", .frequency_id = "rbiom_alt_mu_ignored_gam" )
+
+  pre <- if (uses_at) {
+    if (is.null(at)) {
+      list(fun = function (data) median(data$.regr), code = "at <- median(data$.regr)")
+    } else {
+      list(fun = function (data) at, code = sprintf("at <- %s", deparse_vec(at)))
+    }
+  }
+
+
+  #________________________________________________________
+  # Model fitting, shared by the cases below.
+  #________________________________________________________
+  fit_model <- function (data) {
+    stats_fit_model(
+      df      = data,
+      fit     = fit,
+      stat.by = has_stat.by,
+      regr    = if (has_regr)   ".regr",
+      strata  = if (has_strata) ".strata" )
+  }
+
+  fit_code <- paste(sep = "\n",
+    stats_model_code(var, fit, stat.by = has_stat.by, regr = has_regr, strata = has_strata),
+    "gof   <- summary(model)" )
+
+  gof_vals <- function (model, gof) stats_gof_vals(type, model, gof)
+  gof_code <- stats_gof_code(type)
+
+  level_code <- deparse_vec(level)
+  side_code  <- sprintf("side = %s, null = %s", double_quote(alt), deparse_vec(mu))
+  h1_code    <- sprintf("factor(%s)", double_quote(h1))
+
+
+
+  #________________________________________________________
+  # Case A: no regr, no stat.by. Is the mean different from `mu`?
+  #________________________________________________________
+  if (!has_regr && !has_stat.by) {
+
+    test <- list(
+
+      fun = function (data, pair, at) {
+        model <- fit_model(data)
+        emm   <- emmeans::emmeans(model, specs = ~ 1, infer = TRUE, level = level)
+        summ  <- summary(emm, side = alt, null = mu)
+        tibble::tibble(
+          .mean    = summ$emmean,
+          .h1      = factor(h1),
+          .p.val   = summ$p.value,
+          .lower   = summ$lower.CL,
+          .upper   = summ$upper.CL,
+          .se      = summ$SE,
+          .n       = nrow(data),
+          .df      = summ$df,
+          .t.ratio = summ$t.ratio )
+      },
+
+      code = paste(sep = "\n",
+        stats_model_code("data", fit, stat.by = FALSE, regr = FALSE, strata = has_strata),
+        sprintf("emm   <- emmeans::emmeans(model, specs = ~ 1, infer = TRUE, level = %s)", level_code),
+        sprintf("summ  <- summary(emm, %s)", side_code),
+        tibble_code(c(
+          .mean    = "summ$emmean",
+          .h1      = h1_code,
+          .p.val   = "summ$p.value",
+          .lower   = "summ$lower.CL",
+          .upper   = "summ$upper.CL",
+          .se      = "summ$SE",
+          .n       = "nrow(data)",
+          .df      = "summ$df",
+          .t.ratio = "summ$t.ratio" )) ))
+  }
+
+
+  #________________________________________________________
+  # Case B: regr only.
+  #________________________________________________________
+  else if (has_regr && !has_stat.by) {
+
+    if (test == "emmeans" && fit == "gam") {
+
+      # The smooth term's approximate significance (mgcv::summary.gam).
+      test <- list(
+
+        fun = function (data, pair, at) {
+          model <- fit_model(data)
+          gof   <- summary(model)
+          sm    <- gof$s.table['s(.regr)', ]
+          tibble::tibble(
+            .edf      = sm[['edf']],
+            .ref.df   = sm[['Ref.df']],
+            .f        = sm[['F']],
+            .p.val    = sm[['p-value']],
+            .r.sqr    = gof$r.sq,
+            .dev.expl = gof$dev.expl,
+            .aic      = stats::AIC(model),
+            .bic      = stats::BIC(model),
+            .loglik   = as.numeric(stats::logLik(model)),
+            .n        = nrow(data) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          "sm    <- gof$s.table['s(.regr)', ]",
+          tibble_code(c(
+            .edf      = "sm[['edf']]",
+            .ref.df   = "sm[['Ref.df']]",
+            .f        = "sm[['F']]",
+            .p.val    = "sm[['p-value']]",
+            .r.sqr    = "gof$r.sq",
+            .dev.expl = "gof$dev.expl",
+            .aic      = "stats::AIC(model)",
+            .bic      = "stats::BIC(model)",
+            .loglik   = "as.numeric(stats::logLik(model))",
+            .n        = "nrow(data)" )) ))
+
+    } else if (fit == "gam") {
+
+      # Local slope of the smooth at `at`.
+      test <- list(
+
+        fun = function (data, pair, at) {
+          model <- fit_model(data)
+          gof   <- summary(model)
+          emt   <- emmeans::emtrends(model, specs = ~ .regr, var = '.regr', at = list(.regr = at), infer = TRUE, level = level)
+          summ  <- summary(emt, side = alt, null = mu)
+          tibble::tibble(
+            !!regr  := summ$.regr,
+            .slope   = summ$.regr.trend,
+            .h1      = factor(h1),
+            .p.val   = summ$p.value,
+            .lower   = summ$lower.CL,
+            .upper   = summ$upper.CL,
+            .se      = summ$SE,
+            .n       = nrow(data),
+            .df      = summ$df,
+            .t.ratio = summ$t.ratio,
+            !!!gof_vals(model, gof) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          sprintf("emt   <- emmeans::emtrends(model, specs = ~ .regr, var = '.regr', at = list(.regr = at), infer = TRUE, level = %s)", level_code),
+          sprintf("summ  <- summary(emt, %s)", side_code),
+          tibble_code(c(
+            stats::setNames(list("summ$.regr"), regr),
+            .slope   = "summ$.regr.trend",
+            .h1      = h1_code,
+            .p.val   = "summ$p.value",
+            .lower   = "summ$lower.CL",
+            .upper   = "summ$upper.CL",
+            .se      = "summ$SE",
+            .n       = "nrow(data)",
+            .df      = "summ$df",
+            .t.ratio = "summ$t.ratio",
+            gof_code )) ))
+
+    } else {
+
+      # The (global) slope's t-test: d .resp / d .regr, or d .resp / d log(.regr).
+      test <- list(
+
+        fun = function (data, pair, at) {
+          model <- fit_model(data)
+          gof   <- summary(model)
+          emt   <- emmeans::emtrends(model, specs = ~ 1, var = trend_var, infer = TRUE, level = level)
+          summ  <- summary(emt, side = alt, null = mu)
+          tibble::tibble(
+            .slope   = summ[[trend_col]],
+            .h1      = factor(h1),
+            .p.val   = summ$p.value,
+            .lower   = summ$lower.CL,
+            .upper   = summ$upper.CL,
+            .se      = summ$SE,
+            .n       = nrow(data),
+            .df      = summ$df,
+            .t.ratio = summ$t.ratio,
+            !!!gof_vals(model, gof) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          sprintf("emt   <- emmeans::emtrends(model, specs = ~ 1, var = %s, infer = TRUE, level = %s)", double_quote(trend_var), level_code),
+          sprintf("summ  <- summary(emt, %s)", side_code),
+          tibble_code(c(
+            .slope   = sprintf("summ[[%s]]", double_quote(trend_col)),
+            .h1      = h1_code,
+            .p.val   = "summ$p.value",
+            .lower   = "summ$lower.CL",
+            .upper   = "summ$upper.CL",
+            .se      = "summ$SE",
+            .n       = "nrow(data)",
+            .df      = "summ$df",
+            .t.ratio = "summ$t.ratio",
+            gof_code )) ))
+    }
+  }
+
+
+  #________________________________________________________
+  # Case C: stat.by only. Pairwise differences in group means.
+  #________________________________________________________
+  else if (!has_regr && has_stat.by) {
+
+    test <- list(
+
+      fun = function (pdata, pair, at) {
+        model <- fit_model(pdata)
+        emm   <- emmeans::emmeans(model, specs = ~ .stat.by)
+        summ  <- summary(emmeans::contrast(emm, method = 'pairwise'), infer = TRUE)
+        eff   <- as.data.frame(emmeans::eff_size(emm, sigma = stats::sigma(model), edf = stats::df.residual(model)))
+        tibble::tibble(
+          !!stat.by   := as.character(summ$contrast),
+          .mean.diff   = summ$estimate,
+          .h1          = factor('!= 0'),
+          .p.val       = summ$p.value,
+          .lower       = summ$lower.CL,
+          .upper       = summ$upper.CL,
+          .effect.size = eff$effect.size,
+          .se          = summ$SE,
+          .n           = nrow(pdata),
+          .df          = summ$df,
+          .t.ratio     = summ$t.ratio )
+      },
+
+      code = paste(sep = "\n",
+        stats_model_code("pdata", fit, stat.by = TRUE, regr = FALSE, strata = has_strata),
+        "emm   <- emmeans::emmeans(model, specs = ~ .stat.by)",
+        "summ  <- summary(emmeans::contrast(emm, method = 'pairwise'), infer = TRUE)",
+        "eff   <- as.data.frame(emmeans::eff_size(emm, sigma = stats::sigma(model), edf = stats::df.residual(model)))",
+        tibble_code(c(
+          stats::setNames(list("as.character(summ$contrast)"), stat.by),
+          .mean.diff   = "summ$estimate",
+          .h1          = "factor('!= 0')",
+          .p.val       = "summ$p.value",
+          .lower       = "summ$lower.CL",
+          .upper       = "summ$upper.CL",
+          .effect.size = "eff$effect.size",
+          .se          = "summ$SE",
+          .n           = "nrow(pdata)",
+          .df          = "summ$df",
+          .t.ratio     = "summ$t.ratio" )) ))
+  }
+
+
+  #________________________________________________________
+  # Case D: regr and stat.by.
+  #________________________________________________________
+  else {
+
+    if (test == "emmeans") {
+
+      # Pairwise differences in group means at `at`.
+      test <- list(
+
+        fun = function (pdata, pair, at) {
+          model <- fit_model(pdata)
+          gof   <- summary(model)
+          emm   <- emmeans::emmeans(model, specs = c('.regr', '.stat.by'), at = list(.regr = at))
+          summ  <- summary(emmeans::contrast(emm, method = 'pairwise', simple = '.stat.by'), infer = TRUE)
+          eff   <- as.data.frame(emmeans::eff_size(emm, sigma = stats::sigma(model), edf = stats::df.residual(model), simple = '.stat.by'))
+          tibble::tibble(
+            !!regr      := summ$.regr,
+            !!stat.by   := as.character(summ$contrast),
+            .mean.diff   = summ$estimate,
+            .h1          = factor('!= 0'),
+            .p.val       = summ$p.value,
+            .lower       = summ$lower.CL,
+            .upper       = summ$upper.CL,
+            .effect.size = eff$effect.size,
+            .se          = summ$SE,
+            .n           = nrow(pdata),
+            .df          = summ$df,
+            .t.ratio     = summ$t.ratio,
+            !!!gof_vals(model, gof) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          "emm   <- emmeans::emmeans(model, specs = c('.regr', '.stat.by'), at = list(.regr = at))",
+          "summ  <- summary(emmeans::contrast(emm, method = 'pairwise', simple = '.stat.by'), infer = TRUE)",
+          "eff   <- as.data.frame(emmeans::eff_size(emm, sigma = stats::sigma(model), edf = stats::df.residual(model), simple = '.stat.by'))",
+          tibble_code(c(
+            stats::setNames(list("summ$.regr", "as.character(summ$contrast)"), c(regr, stat.by)),
+            .mean.diff   = "summ$estimate",
+            .h1          = "factor('!= 0')",
+            .p.val       = "summ$p.value",
+            .lower       = "summ$lower.CL",
+            .upper       = "summ$upper.CL",
+            .effect.size = "eff$effect.size",
+            .se          = "summ$SE",
+            .n           = "nrow(pdata)",
+            .df          = "summ$df",
+            .t.ratio     = "summ$t.ratio",
+            gof_code )) ))
+
+    } else if (fit == "gam") {
+
+      # Pairwise differences in local slopes at `at`.
+      test <- list(
+
+        fun = function (pdata, pair, at) {
+          model <- fit_model(pdata)
+          gof   <- summary(model)
+          emt   <- emmeans::emtrends(model, specs = c('.regr', '.stat.by'), var = '.regr', at = list(.regr = at))
+          summ  <- summary(emmeans::contrast(emt, method = 'pairwise', simple = '.stat.by'), infer = TRUE)
+          tibble::tibble(
+            !!regr      := summ$.regr,
+            !!stat.by   := as.character(summ$contrast),
+            .slope.diff  = summ$estimate,
+            .h1          = factor('!= 0'),
+            .p.val       = summ$p.value,
+            .lower       = summ$lower.CL,
+            .upper       = summ$upper.CL,
+            .se          = summ$SE,
+            .n           = nrow(pdata),
+            .df          = summ$df,
+            .t.ratio     = summ$t.ratio,
+            !!!gof_vals(model, gof) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          "emt   <- emmeans::emtrends(model, specs = c('.regr', '.stat.by'), var = '.regr', at = list(.regr = at))",
+          "summ  <- summary(emmeans::contrast(emt, method = 'pairwise', simple = '.stat.by'), infer = TRUE)",
+          tibble_code(c(
+            stats::setNames(list("summ$.regr", "as.character(summ$contrast)"), c(regr, stat.by)),
+            .slope.diff  = "summ$estimate",
+            .h1          = "factor('!= 0')",
+            .p.val       = "summ$p.value",
+            .lower       = "summ$lower.CL",
+            .upper       = "summ$upper.CL",
+            .se          = "summ$SE",
+            .n           = "nrow(pdata)",
+            .df          = "summ$df",
+            .t.ratio     = "summ$t.ratio",
+            gof_code )) ))
+
+    } else {
+
+      # Pairwise differences in (global) slopes.
+      test <- list(
+
+        fun = function (pdata, pair, at) {
+          model <- fit_model(pdata)
+          gof   <- summary(model)
+          emt   <- emmeans::emtrends(model, specs = ~ .stat.by, var = trend_var)
+          summ  <- summary(emmeans::contrast(emt, method = 'pairwise'), infer = TRUE)
+          tibble::tibble(
+            !!stat.by   := as.character(summ$contrast),
+            .slope.diff  = summ$estimate,
+            .h1          = factor('!= 0'),
+            .p.val       = summ$p.value,
+            .lower       = summ$lower.CL,
+            .upper       = summ$upper.CL,
+            .se          = summ$SE,
+            .n           = nrow(pdata),
+            .df          = summ$df,
+            .t.ratio     = summ$t.ratio,
+            !!!gof_vals(model, gof) )
+        },
+
+        code = paste(sep = "\n",
+          fit_code,
+          sprintf("emt   <- emmeans::emtrends(model, specs = ~ .stat.by, var = %s)", double_quote(trend_var)),
+          "summ  <- summary(emmeans::contrast(emt, method = 'pairwise'), infer = TRUE)",
+          tibble_code(c(
+            stats::setNames(list("as.character(summ$contrast)"), stat.by),
+            .slope.diff  = "summ$estimate",
+            .h1          = "factor('!= 0')",
+            .p.val       = "summ$p.value",
+            .lower       = "summ$lower.CL",
+            .upper       = "summ$upper.CL",
+            .se          = "summ$SE",
+            .n           = "nrow(pdata)",
+            .df          = "summ$df",
+            .t.ratio     = "summ$t.ratio",
+            gof_code )) ))
+    }
+  }
+
+
+  stats_finalize(
+    df       = df,
+    pre      = pre,
+    test     = test,
+    regr     = regr,
+    resp     = resp,
+    stat.by  = stat.by,
+    split.by = split.by,
+    strata   = strata,
+    p.adj    = p.adj,
+    pairwise = pairwise,
+    model    = stats_model_str(fit, has_stat.by, has_regr, has_strata) )
+}

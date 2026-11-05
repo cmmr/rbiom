@@ -2,25 +2,13 @@
 ecodive::n_cpus
 
 #' @export
-plyr::`.`
-
-#' @export
-plyr::ddply
-
-#' @export
-plyr::ldply
-
-#' @export
-plyr::llply
-
-#' @export
 magrittr::`%>%`
 
 #' @export
 magrittr::`%<>%`
 
 #' @export
-pillar::glimpse
+tibble::glimpse
 
 #' @export
 stats::na.omit

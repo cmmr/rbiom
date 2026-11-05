@@ -120,19 +120,22 @@ to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normal distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Not used.}
 }
@@ -146,6 +149,8 @@ A tibble data.frame with columns named .sample1, .sample2,
 fields will be returned as \code{abs(x - y)}; categorical metadata fields as
 \code{"x"}, \code{"y"}, or \code{"x vs y"}. }
 }
+Each result carries \verb{$code}: the R code that regenerates it, including
+the steps that produced \code{biom}.
 }
 \description{
 Distance / dissimilarity between samples.
@@ -167,23 +172,22 @@ parameters. \code{stat.by = '==Sex'} is equivalent to
 
 \examples{
     library(rbiom)
-    
+
     # Subset to four samples
-    biom <- hmp50$clone()
-    biom$counts <- biom$counts[,c("HMP18", "HMP19", "HMP20", "HMP21")]
-    
+    biom <- hmp50[c("HMP18", "HMP19", "HMP20", "HMP21")]
+
     # Return in long format with metadata
     bdiv_table(biom, 'w_unifrac', md = ".all")
-    
+
     # Only look at distances among the stool samples
     bdiv_table(biom, 'w_unifrac', md = c("==Body Site", "Sex"))
-    
+
     # Or between males and females
     bdiv_table(biom, 'w_unifrac', md = c("Body Site", "!=Sex"))
-    
+
     # All-vs-all matrix
     bdiv_matrix(biom, 'w_unifrac')
-    
+
     # All-vs-all distance matrix
     dm <- bdiv_distmat(biom, 'w_unifrac')
     dm
@@ -191,14 +195,14 @@ parameters. \code{stat.by = '==Sex'} is equivalent to
 
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 }
 \concept{beta_diversity}

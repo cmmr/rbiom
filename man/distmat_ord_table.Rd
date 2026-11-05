@@ -4,7 +4,7 @@
 \alias{distmat_ord_table}
 \title{Run ordinations on a distance matrix.}
 \usage{
-distmat_ord_table(dm, ord = "PCoA", k = 2L, ...)
+distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
 }
 \arguments{
 \item{dm}{A \code{dist}-class distance matrix, as returned from
@@ -12,7 +12,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, ...)
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
-\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
+\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
@@ -22,26 +22,37 @@ Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 \item{k}{Number of ordination dimensions to return. Either \code{2L} or
 \code{3L}. Default: \code{2L}}
 
-\item{...}{Additional arguments for \code{ord}.}
+\item{seed}{Random seed for the stochastic ordinations (NMDS, tSNE,
+UMAP), so that they are reproducible. PCoA is deterministic.
+Must be a non-negative integer. Default: \code{0}}
+
+\item{...}{Additional arguments for the \code{ord} function.}
 }
 \value{
-A data.frame with columns \code{.sample}, \code{.ord}, \code{.x},
-\code{.y}, and (optionally) \code{.z}.
+A tibble data.frame with columns \code{.ord}, \code{.sample},
+\code{.x}, \code{.y}, and (optionally) \code{.z}. The attribute
+\code{'axes'} is a tibble with one row per axis (\code{.ord}, \code{.axis},
+\code{.label}, \code{.var}): for PCoA, \code{.var} is the percent of the
+variance (the positive eigenvalues) explained by that axis and
+\code{.label} reads e.g. \code{"PCoA 1 (24.3\%)"}; for the other ordinations
+\code{.var} is \code{NA}.
 }
 \description{
 Run ordinations on a distance matrix.
 }
 \examples{
-    library(rbiom) 
-    
+    library(rbiom)
+
     dm  <- bdiv_distmat(hmp50, "bray")
     ord <- distmat_ord_table(dm, "PCoA")
     head(ord)
-    
+
+    attr(ord, 'axes')
+
 }
 \seealso{
-Other ordination: 
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()}
+Other ordination:
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}}
 }
 \concept{ordination}

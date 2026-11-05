@@ -23,7 +23,7 @@ library size of its sample. The resulting values represent the proportion
 
 This is a common transformation for microbiome data, as it accounts for
 differences in sequencing depth across samples, allowing for comparison of
-community composition.
+community composition. The result has \code{biom$relative == TRUE}.
 }
 \details{
 Convert absolute counts to relative abundances (proportions) where each
@@ -31,25 +31,26 @@ sample sums to 1.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
-    
+
     # Raw counts sum to different library sizes
     sample_sums(biom)
-    
+
     # Relativized counts sum to 1
     biom_rel <- biom_relativize(biom)
     sample_sums(biom_rel)
+    biom_rel$relative
 
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

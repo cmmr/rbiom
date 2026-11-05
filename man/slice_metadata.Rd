@@ -109,28 +109,28 @@ Subset to a specific number of samples.
 }
 \examples{
     library(rbiom)
-    
+
     # The last 3 samples in the metadata table.
     biom <- slice_tail(hmp50, n = 3)
     biom$metadata
-    
+
     # The 3 oldest subjects sampled.
     biom <- slice_max(hmp50, Age, n = 3)
     biom$metadata
-    
+
     # Pick 3 samples at random.
     biom <- slice_sample(hmp50, n = 3)
     biom$metadata
 
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
-\code{\link{subset}()},
-\code{\link{with}()}
+\code{\link[=rarefy]{rarefy()}},
+\code{\link{subset}},
+\code{\link{with}}
 }
 \concept{transformations}

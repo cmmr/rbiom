@@ -8,22 +8,22 @@ biom_merge(
   ...,
   metadata = NA,
   taxonomy = NA,
-  tree = NULL,
+  tree = NA,
   sequences = NA,
   id = NA,
   comment = NA
 )
 }
 \arguments{
-\item{...}{Any number of rbiom objects (e.g. from \code{\link[=as_rbiom]{as_rbiom()}}), lists of
-rbiom objects, or valid arguments to the \code{biom} parameter of
-\code{\link[=as_rbiom]{as_rbiom()}} (for instance file names).}
+\item{...}{Any number of rbiom objects, or anything accepted by the
+\code{biom} parameter of \code{\link[=as_rbiom]{as_rbiom()}} (matrices, file names, lists with a
+\code{counts} element, phyloseq objects, ...). Lists of such inputs are
+flattened.}
 
-\item{metadata, taxonomy, tree, sequences, id, comment}{Replace the corresponding
-data in the merged rbiom object with these values. Set to \code{NULL} to
-not inherit a particular component. The default, \code{NA}, will attempt
-to create the component based on \code{...} values. The merged
-phylogenetic tree cannot be inferred.}
+\item{metadata, taxonomy, tree, sequences, id, comment}{Replace the
+corresponding data in the merged rbiom object with these values.
+The default, \code{NA}, derives the component from the inputs (see
+details). Set to \code{NULL} to omit the component.}
 }
 \value{
 An \link[=rbiom_objects]{rbiom object}.
@@ -33,21 +33,50 @@ WARNING: It is generally ill-advised to merge BIOM datasets, as OTUs
 mappings are dependent on upstream clustering and are not equivalent
 between BIOM files.
 }
+\details{
+Samples present in more than one input must have identical counts;
+otherwise an error is raised. OTUs are matched by name.
+
+With the default \code{NA} arguments:
+\itemize{
+\item \code{metadata} and \code{taxonomy} are the union of the inputs' tables. A field
+whose type differs between inputs (for example numeric in one and
+categorical in another) is converted to categorical, with a single
+warning listing the affected fields. An OTU with different lineages in
+different inputs keeps the most detailed one (one summarizing warning).
+\item \code{sequences} are the union of the inputs' sequences. If only some inputs
+have sequences, OTUs without one get \code{NA} and a warning is issued once.
+\item \code{tree} is taken from the first input whose tree contains every OTU of
+the merged object (pruned to those OTUs). This is the case when the
+inputs are subsets of one dataset. If no input tree covers all of the
+OTUs, the merged object has no tree and a message says so; a merged
+tree can't be inferred, so supply \verb{tree=} in that case.
+\item \code{id} and \code{comment} are kept when all inputs agree, and are otherwise
+\code{"Merged BIOM"} and \code{""}.
+}
+
+The merged object's \verb{$history} nests the histories of its inputs, so its
+\verb{$code} reproduces the entire pipeline.
+}
 \examples{
     library(rbiom)
-    
+
     b1 <- as_rbiom(hmp50$counts[,1:4])
     b2 <- as_rbiom(hmp50$counts[,5:8])
-    
+
     biom <- biom_merge(b1, b2)
     print(biom)
-    
+
     biom$tree     <- hmp50$tree
-    biom$metadata <- hmp50$metadata
+    biom$metadata <- subset(hmp50$metadata, .sample \%in\% biom$samples)
     print(biom)
+
+    # Subsets of one dataset keep its tree, and record their history.
+    biom <- biom_merge(hmp50[1:10], hmp50[11:20])
+    biom$code
 }
 \seealso{
-Other biom: 
-\code{\link{bdply}()}
+Other biom:
+\code{\link[=bdply]{bdply()}}
 }
 \concept{biom}

@@ -19,7 +19,8 @@ subset_taxa(x, subset, clone = TRUE, ...)
 \arguments{
 \item{x}{An \link[=rbiom_objects]{rbiom object}, such as from \code{\link[=as_rbiom]{as_rbiom()}}.}
 
-\item{subset}{Logical expression for rows to keep. See \code{\link[base:subset]{base::subset()}}.}
+\item{subset}{Logical expression for rows to keep. See \code{\link[base:subset]{base::subset()}}.
+As with \code{\link[base:subset]{base::subset()}}, \code{NA} values are treated as \code{FALSE}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
@@ -51,42 +52,45 @@ automatically removed from the rbiom object.
 \examples{
     library(rbiom)
     library(dplyr)
-    
+
     # Subset to specific samples
     biom <- hmp50[c('HMP20', 'HMP42', 'HMP12')]
     biom$metadata
-    
+
     # Subset to specific OTUs
     biom <- hmp50[c('LtbAci52', 'UncO2012'),] # <- Trailing ,
     biom$taxonomy
-    
+
     # Subset to specific samples and OTUs
     biom <- hmp50[c('LtbAci52', 'UncO2012'), c('HMP20', 'HMP42', 'HMP12')]
     as.matrix(biom)
-    
+
     # Subset samples according to metadata
     biom <- subset(hmp50, `Body Site` \%in\% c('Saliva') & Age < 25)
     biom$metadata
-    
+
     # Subset OTUs according to taxonomy
     biom <- subset_taxa(hmp50, Phylum == 'Cyanobacteria')
     biom$taxonomy
-    
+
     # Remove samples with NA metadata values
     biom <- mutate(hmp50, BS2 = na_if(`Body Site`, 'Saliva'))
     biom$metadata
     biom <- na.omit(biom)
     biom$metadata
 
+    # The steps that produced an object are recorded.
+    biom$code
+
 }
 \seealso{
-Other transformations: 
-\code{\link{biom_inflate}()},
-\code{\link{biom_relativize}()},
-\code{\link{biom_rescale}()},
+Other transformations:
+\code{\link[=biom_inflate]{biom_inflate()}},
+\code{\link[=biom_relativize]{biom_relativize()}},
+\code{\link[=biom_rescale]{biom_rescale()}},
 \code{\link{modify_metadata}},
-\code{\link{rarefy}()},
+\code{\link[=rarefy]{rarefy()}},
 \code{\link{slice_metadata}},
-\code{\link{with}()}
+\code{\link{with}}
 }
 \concept{transformations}

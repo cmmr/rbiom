@@ -60,5 +60,23 @@ test_that("validate", {
   x <- 'supp';        expect_error(validate_df_field('x', col_type = 'num', force = FALSE))
   df <- data.frame('.sample' = letters)
   x <- '.all'; expect_null(validate_df_field('x', null_ok = TRUE)); expect_null(x)
-  
+
+})
+
+
+test_that("validate_bdiv canonicalizes metric names", {
+
+  bdiv <- c("Bray", "jacc"); validate_bdiv(multiple = TRUE)
+  expect_identical(as.character(bdiv), c("bray", "jaccard"))
+
+  bdiv <- "unifrac"; expect_error(validate_bdiv(), "ambiguous")
+  bdiv <- "unw";     validate_bdiv(); expect_identical(as.character(bdiv), "unweighted_unifrac")
+  bdiv <- c("bray", "jaccard"); expect_error(validate_bdiv(), "single")
+})
+
+
+test_that("validate_df_field reports lengths clearly", {
+  df <- ToothGrowth
+  x  <- c('dose', 'supp', 'len')
+  expect_error(validate_df_field('x'), "maximum is 1")
 })

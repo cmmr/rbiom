@@ -93,8 +93,9 @@ patchwork::wrap_plots(
 
 ## Statistics
 
-The categorical groups defined by `x`, `stat.by`, etc are used to calculate 
-non-parametric statistics with the Mann-Whitney or Kruskal-Wallis algorithms. 
+The categorical groups defined by `x`, `stat.by`, etc are used to calculate
+statistics: Mann-Whitney or Kruskal-Wallis tests for alpha diversity and taxa
+abundance, and PERMANOVA (permutation tests on samples) for beta diversity.
 See [Statistics](statistics.html) for details.
 
 
@@ -146,12 +147,12 @@ biom <- rarefy(hmp50, depth = 1000)
 adiv <- adiv_corrplot(biom, layers = "ts", x = "BMI")
   
 bdiv <- bdiv_corrplot(
-  biom = biom, layers = "tc", x = "BMI", stat.by = "==Body Site", 
-  limit.by = list("Body Site" = c("Buccal mucosa", "Stool")) )
+  biom    = subset(biom, `Body Site` %in% c("Buccal mucosa", "Stool")),
+  layers  = "tc", x = "BMI", stat.by = "==Body Site" )
 
 taxa <- taxa_corrplot(
-  biom = biom, layers = "tsr", x = "Age", taxa = 3, stat.by = "Body Site", 
-  limit.by = list("Body Site" = c("Mid vagina", "Saliva", "Stool")),
+  biom    = subset(biom, `Body Site` %in% c("Buccal mucosa", "Saliva", "Stool")),
+  layers  = "tsr", x = "Age", taxa = 3, stat.by = "Body Site",
   facet.ncol = 1, facet.strip.position = "right" )
 
 patchwork::wrap_plots(

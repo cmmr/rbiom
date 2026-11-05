@@ -1,6 +1,34 @@
 
 
 #____________________________________________________________________
+# Extract attributes *with* exact matching by default.
+#____________________________________________________________________
+attr <- function (x, which, exact = TRUE) {
+  base::attr(x, which, exact = exact)
+}
+
+
+#____________________________________________________________________
+# Evaluate `expr` with the RNG seeded to `seed`, then restore the
+# caller's RNG state so that rbiom never perturbs the user's random stream.
+#____________________________________________________________________
+with_seed <- function (seed, expr) {
+
+  genv <- globalenv()
+  old  <- if (exists('.Random.seed', envir = genv, inherits = FALSE))
+    get('.Random.seed', envir = genv, inherits = FALSE)
+
+  on.exit(add = TRUE, {
+    if (is.null(old)) { suppressWarnings(rm(list = '.Random.seed', envir = genv)) }
+    else              { assign('.Random.seed', old, envir = genv)                 }
+  })
+
+  set.seed(seed)
+  expr
+}
+
+
+#____________________________________________________________________
 # Ensure something's a factor with minimal levels.
 #____________________________________________________________________
 refactor <- function (values) {
@@ -19,18 +47,57 @@ default <- function (var, value, env = parent.frame()) {
 
 
 #____________________________________________________________________
-# A string representation of the function call.
+# A string representation of the current function call, e.g.
+# `adiv_table(biom, "shannon", md = "Sex")`. Built from the function's
+# already-evaluated arguments, so the caller's expressions are never
+# re-evaluated. Pass `params` (e.g. from `eval_envir()`) when the
+# function's formals have been modified or unbound.
 #____________________________________________________________________
-current_cmd <- function (fn, indent = 0) {
-  
-  fun  <- get(fn)
-  env  <- rlang::caller_env(2)
-  args <- rlang::caller_call() %>% 
-    rlang::call_match(fun) %>% 
-    rlang::call_args() %>% 
-    lapply(eval, envir = env)
-  
-  glue("{fn}({as.args(args, indent, fun)})")
+current_cmd <- function (fn, params = NULL, indent = 0) {
+
+  fun <- get(fn, envir = asNamespace('rbiom'), mode = 'function')
+
+  if (is.null(params)) {
+
+    env    <- rlang::caller_env()
+    params <- list()
+
+    for (arg in setdiff(formalArgs(fun), '...')) {
+      if (!exists(arg, envir = env, inherits = FALSE))        next
+      if (eval(call('missing', as.name(arg)), envir = env))   next
+      params[arg] <- list(get(arg, envir = env, inherits = FALSE))
+    }
+
+    if ('...' %in% formalArgs(fun) && exists('...', envir = env, inherits = FALSE))
+      params <- c(params, eval(quote(list(...)), envir = env))
+  }
+
+  glue("{fn}({as.args(params, indent, fun)})")
+}
+
+
+#____________________________________________________________________
+# The (evaluated) default value of a function's argument, or a sentinel
+# when there is none. Defaults are evaluated with the other arguments
+# in scope, so `stat.by = x` resolves to the value of `x`.
+#____________________________________________________________________
+NO_DEFAULT <- structure(list(), class = 'rbiom_no_default')
+
+default_value <- function (fun, name, args = list()) {
+
+  f_args <- formals(fun)
+
+  if (!hasName(f_args, name))                       return (NO_DEFAULT)
+  if (identical(f_args[[name]], quote(expr = )))    return (NO_DEFAULT)
+
+  d <- f_args[[name]]
+
+  if (is.language(d)) {
+    env <- list2env(args, parent = environment(fun) %||% baseenv())
+    d   <- tryCatch(eval(d, envir = env), error = function (e) NO_DEFAULT)
+  }
+
+  return (d)
 }
 
 
@@ -95,7 +162,7 @@ eval_envir <- function (env, ...) {
         x = names(dots),
         y = c(
           'x', 'y', 'color.by', 'shape.by', 'facet.by', 
-          'pattern.by', 'label.by', 'order.by', 'stat.by', 'limit.by',
+          'pattern.by', 'label.by', 'order.by', 'stat.by',
           'adiv', 'bdiv', 'taxa', 'rank', 'weighted', 
           'within', 'between', 'tree', 'params',
           'regr', 'resp', 'cpus', 'alpha' ))))
@@ -169,22 +236,34 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
   if (is.environment(args)) args <- as.list(args)
   stopifnot(is_list(args))
   stopifnot(is_scalar_integerish(indent) && !is_na(indent))
-  
-  
+
+
+  # Flatten `.dots` (from eval_envir) into the argument list.
+  if (hasName(args, '.dots')) {
+    dots <- args[['.dots']]
+    args <- args[names(args) != '.dots']
+    if (is_list(dots)) args <- c(args, dots)
+  }
+
+
+  # `cpus` never affects a result; keep it out of displayed commands.
+  if (hasName(args, 'cpus')) args[['cpus']] <- NULL
+
+
   # Discard arguments with `display = FALSE` attribute.
   for (i in rev(seq_along(args)))
     if (isFALSE(attr(args[[i]], 'display', exact = TRUE)))
       args[[i]] <- NULL
-  
-  
+
+
   # Re-arrange parameter order; omit names where implicitly known; ignore if default.
   if (is.function(fun) && !is_null(names(args))) {
     f_args <- formals(fun)
-    
-    for (i in names(args))
-      if (hasName(f_args, i) && eq(args[[i]], f_args[[i]]))
+
+    for (i in unique(names(args)))
+      if (nzchar(i) && hasName(f_args, i) && eq(args[[i]], default_value(fun, i, args)))
         args[[i]] <- NULL
-    
+
     f_args <- names(f_args)
     args   <- args[c(intersect(f_args, names(args)), sort(setdiff(names(args), f_args)))]
     if (!'...' %in% f_args) args <- args[intersect(f_args, names(args))]
@@ -225,11 +304,15 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
     } else                                { capture.output(val) }
     
     
-    if (isTRUE(is_character(val) && !is_null(names(val))))
+    # Names and values are quoted with encodeString(), so data-originating
+    # strings can only ever appear in the generated code as string literals.
+    if (isTRUE(is_character(val) && !is_null(names(val)))) {
       val <- paste(single_quote(names(val)), "=", unname(val))
-    
-    if (length(val) > 1)
       val <- paste0("c(", paste(collapse=", ", val), ")")
+
+    } else if (length(val) > 1) {
+      val <- paste0("c(", paste(collapse=", ", val), ")")
+    }
     
     if (nzchar(key)) {
       val <- sprintf(fmt = fmt, coan(key), val)

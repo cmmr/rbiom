@@ -49,37 +49,37 @@ Summarize the taxa observations in each sample.
 \examples{
     library(rbiom)
     library(ggplot2)
-    
+
     sample_sums(hmp50, sort = 'asc') \%>\% head()
-    
+
     # Unique OTUs and "cultured" classes per sample
     nnz <- function (x) sum(x > 0) # number of non-zeroes
     sample_apply(hmp50, nnz, 'otu') \%>\% head()
     sample_apply(hmp50, nnz, 'class', unc = 'drop') \%>\% head()
-    
+
     # Number of reads in each sample's most abundant family
     sample_apply(hmp50, base::max, 'f', sort = 'desc') \%>\% head()
-    
+
     ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 }
 \seealso{
-Other samples: 
-\code{\link{pull.rbiom}()}
+Other samples:
+\code{\link[=pull.rbiom]{pull.rbiom()}}
 
-Other rarefaction: 
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()}
+Other rarefaction:
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}}
 
-Other taxa_abundance: 
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 }
 \concept{rarefaction}
 \concept{samples}

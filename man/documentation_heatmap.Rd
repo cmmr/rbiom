@@ -23,7 +23,7 @@ can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
 Default: \code{NULL}, which computes:
-\code{pmax(8, pmin(20, 100 / dim(mtx)))}}
+\code{pmax(5, pmin(14, 100 / dim(mtx)))}}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
@@ -80,7 +80,10 @@ Default: \code{1} (square)}
 \item{title}{Plot title. Set to \code{TRUE} for a default title, \code{NULL} for
 no title, or any character string. Default: \code{TRUE}}
 
-\item{...}{Additional arguments to pass on to ggplot2::theme().}
+\item{...}{Additional arguments to pass on to \code{\link[ggplot2:theme]{ggplot2::theme()}}.
+Arguments prefixed with \code{labs.} (e.g. \code{labs.subtitle = "..."}) are
+passed to \code{\link[ggplot2:labs]{ggplot2::labs()}} instead. Unrecognized arguments are
+an error.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot

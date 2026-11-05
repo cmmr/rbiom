@@ -42,7 +42,9 @@ Each function requires the corresponding target package to be installed.
 class for reading and writing BIOM data.
 \emph{Includes: counts, metadata, and taxonomy.}
 \item \strong{\code{convert_to_phyloseq()}}: Converts to a \code{phyloseq} object for use with the comprehensive
-\href{https://bioconductor.org/packages/phyloseq/}{phyloseq} ecosystem.
+\href{https://bioconductor.org/packages/phyloseq/}{phyloseq} ecosystem. Rank names, metadata
+field names, and metadata column types are preserved. Sequences are included only
+when every OTU has one (requires the Biostrings package).
 \emph{Includes: counts, metadata, taxonomy, phylogenetic tree, and sequences.}
 \item \strong{\code{convert_to_SE()}}: Converts to a \code{SummarizedExperiment} object, a core
 \href{https://bioconductor.org/packages/SummarizedExperiment/}{SummarizedExperiment} Bioconductor
@@ -50,44 +52,45 @@ container for matrix-like data and annotations.
 \emph{Includes: counts, metadata, and taxonomy.}
 \item \strong{\code{convert_to_TSE()}}: Converts to a \code{TreeSummarizedExperiment} object. This extends the SE class
 to natively support hierarchical \href{https://bioconductor.org/packages/TreeSummarizedExperiment/}{TreeSummarizedExperiment}
-relationships.
+relationships. The tree and sequences are included when present.
 \emph{Includes: counts, metadata, taxonomy, phylogenetic tree, and sequences.}
 }
 }
 \examples{
-\dontrun{
     library(rbiom)
 
     print(hmp50)
 
-    # Requires 'animalcules', a Bioconductor R package
-    if (nzchar(system.file(package = "animalcules"))) {
+    \donttest{
+    # Requires 'animalcules' dependencies, Bioconductor R packages
+    if (requireNamespace("MultiAssayExperiment", quietly = TRUE) &&
+        requireNamespace("SummarizedExperiment", quietly = TRUE)) {
       ani <- convert_to_animalcules(hmp50)
       print(ani)
     }
 
     # Requires 'biomformat', a Bioconductor R package
-    if (nzchar(system.file(package = "biomformat"))) {
+    if (requireNamespace("biomformat", quietly = TRUE)) {
       bio <- convert_to_biomformat(hmp50)
       print(bio)
     }
 
     # Requires 'phyloseq', a Bioconductor R package
-    if (nzchar(system.file(package = "phyloseq"))) {
+    if (requireNamespace("phyloseq", quietly = TRUE)) {
       phy <- convert_to_phyloseq(hmp50)
       print(phy)
     }
 
     # Requires 'SummarizedExperiment', a Bioconductor R package
-    if (nzchar(system.file(package = "SummarizedExperiment"))) {
+    if (requireNamespace("SummarizedExperiment", quietly = TRUE)) {
       se <- convert_to_SE(hmp50)
       print(se)
     }
 
     # Requires 'TreeSummarizedExperiment', a Bioconductor R package
-    if (nzchar(system.file(package = "TreeSummarizedExperiment"))) {
+    if (requireNamespace("TreeSummarizedExperiment", quietly = TRUE)) {
       tse <- convert_to_TSE(hmp50)
       print(tse)
     }
-}
+    }
 }

@@ -233,6 +233,36 @@ p$stats$code
 
 
 
+# Reproduce
+
+Every rbiom object remembers how it was made, and every table, statistics
+table, and plot carries a complete script for regenerating it. The script
+starts from the original data, includes each transformation in order, and can
+be run in a fresh R session.
+
+```{r}
+biom <- hmp50 %>%
+  subset(`Body Site` != "Stool") %>%
+  rarefy(depth = 1000) %>%
+  mutate(Older = Age > 30)
+
+biom$code
+```
+
+```{r, fig.asp = 0.45}
+p <- adiv_boxplot(biom, x = "Older", stat.by = "Older")
+p$code
+```
+
+Values that exist only in memory (for example, a data frame assigned directly
+with `biom$metadata <- df`) can't be written as code. They appear in `$code`
+as comments marked "not reproducible from code", so you can see exactly where
+a script needs your input. Use transformation functions like `mutate()` or
+`subset()`, or read data from files, to keep the record complete.
+
+
+
+
 # Share
 
 Plots are essentially ggplot objects, and `ggplot2::ggsave()` can save them as 

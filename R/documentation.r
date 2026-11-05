@@ -50,7 +50,7 @@
 #'        
 #' @param ord    Method for reducing dimensionality. Options are:
 #'        \describe{
-#'            \item{`"PCoA"` - }{ Principal coordinate analysis; [ape::pcoa()]. }
+#'            \item{`"PCoA"` - }{ Principal coordinate analysis; [stats::cmdscale()]. }
 #'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
 #'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
@@ -235,9 +235,11 @@
 #' @param fit   How to fit the trendline. `'lm'`, `'log'`, or `'gam'`. 
 #'        Default: `'gam'`
 #'        
-#' @param at   Position(s) along the x-axis where the means or slopes should be 
-#'        evaluated. Default: `NULL`, which samples 100 evenly spaced positions 
-#'        and selects the position where the p-value is most significant.
+#' @param at   Position(s) along `regr` where group means or local slopes are
+#'        evaluated. Default: `NULL`, which uses the median of `regr` within
+#'        each `split.by` stratum. A vector gives one row per position, and
+#'        p-values are adjusted across all of them. Ignored by tests that do
+#'        not depend on a position (e.g. a global slope with `fit = "lm"`).
 #'        
 #' @param alt   Alternative hypothesis direction. Options are `'!='` 
 #'        (two-sided; not equal to `mu`), `'<'` (less than `mu`), or `'>'` 
@@ -279,37 +281,42 @@
 #'        to give to relative abundances; a value between 0 and 1, inclusive. 
 #'        Setting `alpha=1` is equivalent to Normalized UniFrac. Default: `0.5`
 #'        
-#' @param seed  Random seed for permutations. Must be a non-negative integer. 
-#'        Default: `0`
-#'        
-#' @param cpus  The number of CPUs to use. Set to `NULL` to use all available, 
-#'        or to `1` to disable parallel processing. Default: `NULL`
+#' @param seed  Random seed for permutations, rarefaction, random tie-breaking,
+#'        and stochastic ordinations. Results are reproducible for a given
+#'        seed, and the caller's random number generator state is left
+#'        unchanged. Must be a non-negative integer. Default: `0`
+#'
+#' @param cpus  The number of CPUs to use. Set to `NULL` to use all available,
+#'        or to `1` to disable parallel processing. Does not affect results.
+#'        Default: `ecodive::n_cpus()` (all available cores)
 #'        
 #' @param permutations  Number of random permutations to use. 
 #'        Default: `999`
 #' 
-#' @param p.adj   Method to use for multiple comparisons adjustment of 
-#'        p-values. Run `p.adjust.methods` for a list of available 
-#'        options. Default: `"fdr"`
+#' @param p.adj   Method to use for multiple comparisons adjustment of
+#'        p-values. Run `p.adjust.methods` for a list of available
+#'        options. The adjustment spans every p-value in the returned
+#'        table (all metrics, strata, pairs, and positions).
+#'        Default: `"fdr"`
 #' 
 #' @param depths   Rarefaction depths to show in the plot, or `NULL` to 
 #'        auto-select. Default: `NULL`
 #'        
 #' @param rline   Where to draw a horizontal line on the plot, intended to show
-#'        a particular rarefaction depth. Set to `TRUE` to show an 
-#'        auto-selected rarefaction depth or `FALSE` to not show a line.
-#'        Default: `NULL`
+#'        a particular rarefaction depth. Set to `TRUE` to show an
+#'        auto-selected rarefaction depth, an integer to show that depth, or
+#'        `FALSE` to not show a line. Default: `TRUE`
 #'        
 #' @param clone   Create a copy of `biom` before modifying. If `FALSE`, `biom` 
 #'        is modified in place as a side-effect. See [speed ups][speed] for 
 #'        use cases. Default: `TRUE`
 #' 
-#' @param labels   Show sample names under each bar. Default: `FALSE`
+#' @param labels   Show sample names under each bar. Default: `TRUE`
 #' 
-#' @param transform   Transformation to apply to calculated values. Options are: 
-#'        `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is 
-#'        useful for correcting for non-normally distributions before applying 
-#'        regression statistics. Default: `"none"`
+#' @param transform   Transformation to apply to calculated values. Options are:
+#'        `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+#'        correcting for non-normal distributions before applying regression
+#'        statistics. Default: `"none"`
 #' 
 #' @param ties   When `transform="rank"`, how to rank identical values.
 #'        Options are: `c("average", "first", "last", "random", "max", "min")`. 
@@ -473,8 +480,8 @@ NULL
 #'        can supply a numeric vector of length two to control row label sizes 
 #'        and column label sizes separately, for example 
 #'        `c(rows = 20, cols = 8)`, or simply `c(20, 8)`.
-#'        Default: `NULL`, which computes: 
-#'        `pmax(8, pmin(20, 100 / dim(mtx)))`
+#'        Default: `NULL`, which computes:
+#'        `pmax(5, pmin(14, 100 / dim(mtx)))`
 #'        
 #' @param rescale   Rescale rows or columns to all have a common min/max.
 #'        Options: `"none"`, `"rows"`, or `"cols"`.
@@ -528,10 +535,13 @@ NULL
 #' @param legend   Where to place the legend. Options are: `"right"` or
 #'        `"bottom"`. Default: `"right"`
 #'        
-#' @param title   Plot title. Set to `TRUE` for a default title, `NULL` for 
+#' @param title   Plot title. Set to `TRUE` for a default title, `NULL` for
 #'        no title, or any character string. Default: `TRUE`
-#'        
-#' @param ...   Additional arguments to pass on to ggplot2::theme().
+#'
+#' @param ...   Additional arguments to pass on to [ggplot2::theme()].
+#'        Arguments prefixed with `labs.` (e.g. `labs.subtitle = "..."`) are
+#'        passed to [ggplot2::labs()] instead. Unrecognized arguments are
+#'        an error.
 #' 
 NULL
 
@@ -546,13 +556,21 @@ NULL
 #' @param stat.by   The categorical or numeric metadata field over which 
 #'        statistics should be calculated. Required.
 #'        
-#' @param test    Permutational test for accessing significance. Options are:
+#' @param test    Permutational test for assessing significance. Options are:
 #'        \describe{
 #'            \item{`"adonis2"` - }{ Permutational MANOVA; [vegan::adonis2()]. }
 #'            \item{`"mrpp"` - }{ Multiple response permutation procedure; [vegan::mrpp()]. }
+#'            \item{`"betadisper"` - }{ Homogeneity of group dispersions; [vegan::betadisper()] with [vegan::permutest()]. }
+#'            \item{`"mantel"` - }{ Mantel test of the distance matrix against a numeric variable; [vegan::mantel()]. }
 #'            \item{`"none"` - }{ Don't run any statistics. }
 #'        }
-#'        Abbreviations are allowed. Default: `"adonis2"`
+#'        Abbreviations are allowed. Default: `"adonis2"` for categorical
+#'        groups and `"mantel"` for numeric groups.
+#'
+#' @param strata   Dataset field (or vector) naming the blocking / subject
+#'        variable for repeated-measures designs. Permutations are restricted
+#'        to within strata via [permute::how()], and regression models include
+#'        a random intercept per stratum. Default: `NULL`
 #'       
 #'        
 NULL

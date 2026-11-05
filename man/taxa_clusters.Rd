@@ -2,9 +2,9 @@
 % Please edit documentation in R/clustering.r
 \name{taxa_clusters}
 \alias{taxa_clusters}
-\title{Cluster samples by taxa abundances k-means.}
+\title{Cluster samples by taxa abundances (k-means).}
 \usage{
-taxa_clusters(biom, rank = ".otu", k = 5, ...)
+taxa_clusters(biom, rank = ".otu", k = 5, seed = 0, ...)
 }
 \arguments{
 \item{biom}{An \link[=rbiom_objects]{rbiom object}, or any value accepted by \code{\link[=as_rbiom]{as_rbiom()}}.}
@@ -18,37 +18,42 @@ see all options for a given rbiom object. Default: \code{.otu}.}
 
 \item{k}{Number of clusters. Default: \code{5L}}
 
-\item{...}{Passed on to \code{stats::kmeans()}.}
+\item{seed}{Random seed for the k-means starting centers.
+Default: \code{0}}
+
+\item{...}{Passed on to \code{\link[stats:kmeans]{stats::kmeans()}}.}
 }
 \value{
 A numeric factor assigning samples to clusters.
 }
 \description{
-Cluster samples by taxa abundances k-means.
+Runs \code{\link[stats:kmeans]{stats::kmeans()}} on the samples x taxa abundance matrix, with
+\code{nstart = 10} random starts so that the partition is stable, and with the
+random number generator seeded by \code{seed} so that it is reproducible.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
     biom$metadata$otu_cluster <- taxa_clusters(biom)
-    
+
     pull(biom, 'otu_cluster')[1:10]
-    
+
     bdiv_ord_plot(biom, layers = "p", stat.by = "otu_cluster")
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stacked}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 
-Other clustering: 
-\code{\link{bdiv_clusters}()}
+Other clustering:
+\code{\link[=bdiv_clusters]{bdiv_clusters()}}
 }
 \concept{clustering}
 \concept{taxa_abundance}

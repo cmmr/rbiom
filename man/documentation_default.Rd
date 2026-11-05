@@ -40,7 +40,7 @@ Default: \code{6}.}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
-\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
+\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
@@ -222,9 +222,11 @@ Default: \code{FALSE}}
 \item{fit}{How to fit the trendline. \code{'lm'}, \code{'log'}, or \code{'gam'}.
 Default: \code{'gam'}}
 
-\item{at}{Position(s) along the x-axis where the means or slopes should be
-evaluated. Default: \code{NULL}, which samples 100 evenly spaced positions
-and selects the position where the p-value is most significant.}
+\item{at}{Position(s) along \code{regr} where group means or local slopes are
+evaluated. Default: \code{NULL}, which uses the median of \code{regr} within
+each \code{split.by} stratum. A vector gives one row per position, and
+p-values are adjusted across all of them. Ignored by tests that do
+not depend on a position (e.g. a global slope with \code{fit = "lm"}).}
 
 \item{alt}{Alternative hypothesis direction. Options are \code{'!='}
 (two-sided; not equal to \code{mu}), \code{'<'} (less than \code{mu}), or \code{'>'}
@@ -267,37 +269,42 @@ Default: \code{NULL} (emits a warning).}
 to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans every p-value in the returned
+table (all metrics, strata, pairs, and positions).
+Default: \code{"fdr"}}
 
 \item{depths}{Rarefaction depths to show in the plot, or \code{NULL} to
 auto-select. Default: \code{NULL}}
 
 \item{rline}{Where to draw a horizontal line on the plot, intended to show
 a particular rarefaction depth. Set to \code{TRUE} to show an
-auto-selected rarefaction depth or \code{FALSE} to not show a line.
-Default: \code{NULL}}
+auto-selected rarefaction depth, an integer to show that depth, or
+\code{FALSE} to not show a line. Default: \code{TRUE}}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for
 use cases. Default: \code{TRUE}}
 
-\item{labels}{Show sample names under each bar. Default: \code{FALSE}}
+\item{labels}{Show sample names under each bar. Default: \code{TRUE}}
 
 \item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"} is useful for
+correcting for non-normal distributions before applying regression
+statistics. Default: \code{"none"}}
 
 \item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.

@@ -4,10 +4,6 @@
 \name{reexports}
 \alias{reexports}
 \alias{n_cpus}
-\alias{.}
-\alias{ddply}
-\alias{ldply}
-\alias{llply}
 \alias{\%>\%}
 \alias{\%<>\%}
 \alias{glimpse}
@@ -34,18 +30,16 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dplyr}{\code{\link[dplyr:mutate-joins]{left_join}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{relocate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:slice]{slice_head}}, \code{\link[dplyr:slice]{slice_max}}, \code{\link[dplyr:slice]{slice_min}}, \code{\link[dplyr:slice]{slice_sample}}, \code{\link[dplyr:slice]{slice_tail}}}
+  \item{dplyr}{\code{\link[dplyr:left_join]{left_join()}}, \code{\link[dplyr:mutate]{mutate()}}, \code{\link[dplyr:pull]{pull()}}, \code{\link[dplyr:relocate]{relocate()}}, \code{\link[dplyr:rename]{rename()}}, \code{\link[dplyr:select]{select()}}, \code{\link[dplyr:slice]{slice()}}, \code{\link[dplyr:slice_head]{slice_head()}}, \code{\link[dplyr:slice_max]{slice_max()}}, \code{\link[dplyr:slice_min]{slice_min()}}, \code{\link[dplyr:slice_sample]{slice_sample()}}, \code{\link[dplyr:slice_tail]{slice_tail()}}}
 
-  \item{ecodive}{\code{\link[ecodive:metrics]{list_metrics}}, \code{\link[ecodive:metrics]{match_metric}}, \code{\link[ecodive]{n_cpus}}}
+  \item{ecodive}{\code{\link[ecodive:list_metrics]{list_metrics()}}, \code{\link[ecodive:match_metric]{match_metric()}}, \code{\link[ecodive:n_cpus]{n_cpus()}}}
 
-  \item{ggplot2}{\code{\link[ggplot2]{ggsave}}}
+  \item{ggplot2}{\code{\link[ggplot2:ggsave]{ggsave()}}}
 
-  \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
+  \item{magrittr}{\code{\link[magrittr:\%<>\%]{\%<>\%}}, \code{\link[magrittr:\%>\%]{\%>\%}}}
 
-  \item{pillar}{\code{\link[pillar]{glimpse}}}
+  \item{stats}{\code{\link[stats:na.omit]{na.omit()}}}
 
-  \item{plyr}{\code{\link[plyr:quoted]{.}}, \code{\link[plyr]{ddply}}, \code{\link[plyr]{ldply}}, \code{\link[plyr]{llply}}}
-
-  \item{stats}{\code{\link[stats:na.fail]{na.omit}}}
+  \item{tibble}{\code{\link[tibble:glimpse]{glimpse}}}
 }}
 

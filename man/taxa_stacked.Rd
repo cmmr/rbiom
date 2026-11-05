@@ -42,6 +42,7 @@ Default: \code{6}.}
 the graph. A named character vector can be used to map taxon names to
 specific colors or patterns. Set to \code{TRUE} to auto-select colors
 or patterns, or to \code{FALSE} to disable per-taxa colors or patterns.
+Patterns require the fillpattern package.
 Default: \code{colors=TRUE, patterns=FALSE}.}
 
 \item{label.by, order.by}{What metadata column to use for labeling and/or
@@ -83,13 +84,13 @@ want to set this to TRUE when \code{unc = "asis"} and you have taxa
 names (such as \emph{Incertae_Sedis}) that map to multiple higher
 level ranks. Default: \code{FALSE}}
 
-\item{xlab.angle}{Angle of the labels at the bottom of the plot.
-Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
-Default: \code{"auto"}.}
+\item{xlab.angle}{Angle of the sample labels at the bottom of the plot.
+Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}. Default: \code{90}}
 
 \item{...}{Parameters for underlying functions. Prefixing parameter names
 with a layer name ensures that a particular parameter is passed to,
-and only to, that layer.}
+and only to, that layer. An argument that no layer accepts is an
+error.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -100,46 +101,48 @@ respectively.
 Display taxa abundances as a stacked bar graph.
 }
 \details{
-If \code{biom} is rarefied, then relative abundance will be shown on the y-axis.
-Otherwise, raw abundance will be displayed.
+If \code{biom} is rarefied (or holds relative abundances), then relative
+abundance will be shown on the y-axis. Otherwise, raw abundance will be
+displayed. Samples with \code{NA} values in \code{label.by}, \code{order.by}, or
+\code{facet.by} are dropped.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     taxa_stacked(biom, rank="Phylum")
-    
+
     taxa_stacked(biom, rank = "genus", facet.by = "body site")
-    
+
 }
 \seealso{
-Other taxa_abundance: 
-\code{\link{sample_sums}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_clusters}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()},
-\code{\link{taxa_stats}()},
-\code{\link{taxa_sums}()},
-\code{\link{taxa_table}()}
+Other taxa_abundance:
+\code{\link[=sample_sums]{sample_sums()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_clusters]{taxa_clusters()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_stats]{taxa_stats()}},
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_table]{taxa_table()}}
 
-Other visualization: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{plot_heatmap}()},
-\code{\link{rare_corrplot}()},
-\code{\link{rare_multiplot}()},
-\code{\link{rare_stacked}()},
-\code{\link{stats_boxplot}()},
-\code{\link{stats_corrplot}()},
-\code{\link{taxa_boxplot}()},
-\code{\link{taxa_corrplot}()},
-\code{\link{taxa_heatmap}()}
+Other visualization:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=plot_heatmap]{plot_heatmap()}},
+\code{\link[=rare_corrplot]{rare_corrplot()}},
+\code{\link[=rare_multiplot]{rare_multiplot()}},
+\code{\link[=rare_stacked]{rare_stacked()}},
+\code{\link[=stats_boxplot]{stats_boxplot()}},
+\code{\link[=stats_corrplot]{stats_corrplot()}},
+\code{\link[=taxa_boxplot]{taxa_boxplot()}},
+\code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

@@ -13,6 +13,7 @@ bdiv_ord_table(
   k = 2,
   stat.by = NULL,
   split.by = NULL,
+  strata = NULL,
   tree = NULL,
   test = "adonis2",
   seed = 0,
@@ -39,7 +40,7 @@ plot. Default: \code{"bray"}}
 
 \item{ord}{Method for reducing dimensionality. Options are:
 \describe{
-\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[ape:pcoa]{ape::pcoa()}}. }
+\item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
 \item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
@@ -57,25 +58,30 @@ to include all metadata fields. Default: \code{'.all'}}
 \code{3L}. Default: \code{2L}}
 
 \item{stat.by}{The categorical or numeric metadata field over which
-statistics should be calculated. Required.}
+statistics should be calculated. Default: \code{NULL}}
 
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}
+
+\item{strata}{Metadata field with a blocking variable (e.g. a subject
+identifier). For the sample statistics, a \code{stat.by} that varies
+within strata is permuted within each stratum, and one that is
+constant within every stratum is permuted at the stratum level
+(whole strata exchange their values); see the Details of
+\code{\link[=distmat_stats]{distmat_stats()}}. For the taxa biplot, taxa abundances are
+permuted within each stratum. Default: \code{NULL}}
 
 \item{tree}{A \code{phylo} object representing the phylogenetic
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{test}{Permutational test for accessing significance. Options are:
-\describe{
-\item{\code{"adonis2"} - }{ Permutational MANOVA; \code{\link[vegan:adonis]{vegan::adonis2()}}. }
-\item{\code{"mrpp"} - }{ Multiple response permutation procedure; \code{\link[vegan:mrpp]{vegan::mrpp()}}. }
-\item{\code{"none"} - }{ Don't run any statistics. }
-}
-Abbreviations are allowed. Default: \code{"adonis2"}}
+\item{test}{Permutational test for the sample groups (\code{stat.by}).
+Options are \code{"adonis2"} (PERMANOVA; the default), \code{"mrpp"},
+\code{"betadisper"}, or \code{"none"}. See \code{\link[=distmat_stats]{distmat_stats()}}. The taxa
+biplot always uses \code{\link[vegan:envfit]{vegan::envfit()}}.}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for the permutation tests and the stochastic
+ordinations (NMDS, tSNE, UMAP). Default: \code{0}}
 
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
@@ -104,7 +110,9 @@ Default: \code{Inf}}
 
 \item{p.adj}{Method to use for multiple comparisons adjustment of
 p-values. Run \code{p.adjust.methods} for a list of available
-options. Default: \code{"fdr"}}
+options. The adjustment spans every p-value in the returned
+table (all metrics, strata, pairs, and positions).
+Default: \code{"fdr"}}
 
 \item{unc}{How to handle unclassified, uncultured, and similarly ambiguous
 taxa names. Options are:
@@ -121,10 +129,11 @@ to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
-\item{...}{Additional arguments to pass on to \code{\link[uwot:umap]{uwot::umap()}},
-\code{\link[ape:pcoa]{ape::pcoa()}}, \code{\link[vegan:metaMDS]{vegan::metaMDS()}}, or \code{\link[tsne:tsne]{tsne::tsne()}}.}
+\item{...}{Additional arguments to pass on to \code{\link[stats:cmdscale]{stats::cmdscale()}},
+\code{\link[vegan:metaMDS]{vegan::metaMDS()}}, \code{\link[tsne:tsne]{tsne::tsne()}}, or \code{\link[uwot:umap]{uwot::umap()}}.}
 }
 \value{
 A data.frame with columns \code{.sample},
@@ -132,40 +141,55 @@ A data.frame with columns \code{.sample},
 \code{.z}. Any columns given by \code{md}, \code{split.by}, and
 \code{stat.by} are included as well.
 If \code{stat.by} is given, then \code{$stats} and
-\code{$stats$code)} are set.
+\code{$stats$code} are set (see \code{\link[=distmat_stats]{distmat_stats()}}).
 If \code{rank} is given, then \code{$taxa_coords},
-\code{$taxa_stats}, and \code{$taxa_stats$code} are set.
+\code{$taxa_stats}, and \code{$taxa_stats$code} are set:
+\verb{$taxa_stats} has one row per taxon and ordination with
+\code{.r.sqr} (the squared correlation of the taxon's relative
+abundance with the ordination axes, from \code{\link[vegan:envfit]{vegan::envfit()}}),
+\code{.p.val} (its permutation p-value), and \code{.adj.p} (adjusted
+across all tested taxa, before any \code{p.top} filtering);
+\verb{$taxa_coords} holds the arrow for each taxon (\code{.x0}/\code{.y0} at
+the centroid of the samples, \code{.x}/\code{.y} at its tip, scaled to
+fit the sample cloud) and \code{.size}, its mean relative abundance.
+The \code{'axes'} attribute gives the axis labels (see
+\code{\link[=distmat_ord_table]{distmat_ord_table()}}).
 }
 \description{
 The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and
 \code{p.adj}) only only have an effect when \code{rank} is not \code{NULL}.
 }
+\details{
+Distances are computed from \code{biom} as given (not relativized first), so
+they are identical to \code{\link[=bdiv_distmat]{bdiv_distmat()}} on the same object. Relative
+abundances are used only for the taxa biplot.
+}
 \examples{
     library(rbiom)
-    
+
     ord <- bdiv_ord_table(hmp50, "bray", "pcoa", stat.by="Body Site", rank="g")
     head(ord)
-    
+
     ord$stats
-    
+
     ord$taxa_stats
-    
-    
+
+
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_clusters}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_clusters]{bdiv_clusters()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=bdiv_table]{bdiv_table()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 
-Other ordination: 
-\code{\link{bdiv_ord_plot}()},
-\code{\link{distmat_ord_table}()}
+Other ordination:
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=distmat_ord_table]{distmat_ord_table()}}
 }
 \concept{beta_diversity}
 \concept{ordination}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.r
 \name{bdiv_clusters}
 \alias{bdiv_clusters}
-\title{Cluster samples by beta diversity k-means.}
+\title{Cluster samples by beta diversity (k-medoids).}
 \usage{
 bdiv_clusters(
   biom,
@@ -11,6 +11,7 @@ bdiv_clusters(
   normalized = NULL,
   tree = NULL,
   k = 5,
+  seed = 0,
   alpha = 0.5,
   cpus = n_cpus(),
   ...
@@ -40,44 +41,51 @@ computing UniFrac distances. Default: \code{biom$tree}}
 
 \item{k}{Number of clusters. Default: \code{5L}}
 
+\item{seed}{Random seed; only used when \code{\link[cluster:pam]{cluster::pam()}} is asked to
+sample medoids (\code{medoids = "random"}). Default: \code{0}}
+
 \item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
 to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
-\item{...}{Passed on to \code{stats::kmeans()}.}
+\item{...}{Passed on to \code{\link[cluster:pam]{cluster::pam()}}.}
 }
 \value{
 A numeric factor assigning samples to clusters.
 }
 \description{
-Cluster samples by beta diversity k-means.
+Partitions the samples around \code{k} medoids with \code{\link[cluster:pam]{cluster::pam()}}, which
+works directly on the dissimilarity matrix. (k-means is not a valid
+clustering of a dissimilarity matrix, since it would treat the rows of
+the matrix as coordinates.)
 }
 \examples{
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
     biom$metadata$bray_cluster <- bdiv_clusters(biom)
-    
+
     pull(biom, 'bray_cluster')[1:10]
-    
+
     bdiv_ord_plot(biom, stat.by = "bray_cluster")
 }
 \seealso{
-Other beta_diversity: 
-\code{\link{bdiv_boxplot}()},
-\code{\link{bdiv_corrplot}()},
-\code{\link{bdiv_heatmap}()},
-\code{\link{bdiv_ord_plot}()},
-\code{\link{bdiv_ord_table}()},
-\code{\link{bdiv_stats}()},
-\code{\link{bdiv_table}()},
-\code{\link{distmat_stats}()}
+Other beta_diversity:
+\code{\link[=bdiv_boxplot]{bdiv_boxplot()}},
+\code{\link[=bdiv_corrplot]{bdiv_corrplot()}},
+\code{\link[=bdiv_heatmap]{bdiv_heatmap()}},
+\code{\link[=bdiv_ord_plot]{bdiv_ord_plot()}},
+\code{\link[=bdiv_ord_table]{bdiv_ord_table()}},
+\code{\link[=bdiv_stats]{bdiv_stats()}},
+\code{\link[=bdiv_table]{bdiv_table()}},
+\code{\link[=distmat_stats]{distmat_stats()}}
 
-Other clustering: 
-\code{\link{taxa_clusters}()}
+Other clustering:
+\code{\link[=taxa_clusters]{taxa_clusters()}}
 }
 \concept{beta_diversity}
 \concept{clustering}

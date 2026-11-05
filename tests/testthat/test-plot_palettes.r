@@ -1,31 +1,36 @@
 test_that("plot_palettes", {
-  
+
   expect_true(is_palette('-okabe'))
+  expect_true(is_palette('Okabe'))
   expect_false(is_palette('dne'))
-  
+  expect_false(is_palette(NULL))
+
   skip_on_cran()
-  
-  
-  expect_silent(get_palette('-okabe'))
-  expect_silent(get_n_colors(12, TRUE))
-  expect_silent(get_n_colors(20))
-  expect_silent(get_n_colors(25))
-  expect_silent(get_n_colors(5, c('red', 'blue')))
-  expect_silent(get_n_shapes(12, TRUE))
-  expect_silent(get_n_shapes(25))
-  expect_silent(get_n_patterns(2, TRUE))
-  
-  expect_silent(color_palette(pal  = c(green = 'green')))
-  expect_silent(color_palette(keys = c(green = 'green')))
-  expect_silent(color_palette(keys = factor(LETTERS[1:3])))
-  expect_silent(color_palette(keys = LETTERS[1:3]))
-  expect_silent(color_palette(keys = FALSE))
-  expect_silent(color_palette(n = 8))
-  expect_silent(color_palette(n = 12))
-  expect_silent(color_palette(n = 20))
-  expect_silent(color_palette(n = 21))
-  expect_silent(color_palette(pal =  1, n = 4))
-  expect_silent(color_palette(pal = -1, n = 4))
+
+  expect_identical(get_palette('okabe')[[1]], "#E69F00")
+  expect_identical(get_palette('-okabe')[[1]], "#999999")
+  expect_length(get_n_colors(12, TRUE), 12)
+  expect_length(get_n_colors(20), 20)
+  expect_length(get_n_colors(25), 25)
+  expect_identical(get_n_colors(5, c('red', 'blue')), c('red', 'blue', 'red', 'blue', 'red'))
+  expect_length(get_n_shapes(12, TRUE), 12)
+  expect_length(get_n_shapes(25), 25)
+  expect_length(get_n_patterns(2, TRUE), 2)
+
+  # color_palette(): palette names, custom colors, recycling, keys.
+  expect_identical(color_palette(pal = c(green = 'green')), c(green = 'green'))
+  expect_identical(color_palette('okabe'), get_palette('okabe'))
+  expect_identical(color_palette('-okabe'), rev(get_palette('okabe')))
+  expect_identical(color_palette('okabe', n = 2), get_palette('okabe')[1:2])
+  expect_false(anyNA(color_palette('okabe', n = 9)))
+  expect_length(color_palette('okabe', n = 9), 9)
+  expect_length(color_palette(n = 8), 8)
+  expect_length(color_palette(n = 12), 12)
+  expect_length(color_palette(n = 21), 21)
+  expect_identical(names(color_palette(keys = factor(LETTERS[1:3]))), LETTERS[1:3])
+  expect_identical(names(color_palette(keys = c("b", "a", "b"))), c("b", "a"))
+  expect_identical(color_palette(c('red', 'blue'), n = 3), c('red', 'blue', 'red'))
+  expect_identical(color_palette('r4', keys = c("Male", "Female")), c(Male = "#DF536B", Female = "#61D04F"))
   expect_error(color_palette(pal = FALSE, n = 4))
-  
+  expect_error(color_palette(pal = 1, n = 4))
 })

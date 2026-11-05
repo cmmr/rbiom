@@ -31,8 +31,27 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
    \verb{$tree}, \verb{$sequences} \tab Phylogenetic tree / sequences for the OTUs, or \code{NULL}. \cr
    \verb{$id}, \verb{$comment} \tab Arbitrary strings for describing the dataset. \cr
    \verb{$depth} \tab Rarefaction depth, or \code{NULL} if unrarefied. \cr
+   \verb{$relative} \tab \code{TRUE} when counts are relative abundances (sum to 1). \cr
    \verb{$date} \tab Date from BIOM file. \cr
+   \verb{$history} \tab List of the calls that produced this object. \cr
+   \verb{$code} \tab R code that reproduces this object (see below). \cr
 }
+}
+
+\section{Provenance}{
+
+
+Every rbiom object records how it was made. The constructor call
+(\code{\link[=read_biom]{read_biom()}}, \code{\link[=as_rbiom]{as_rbiom()}}) and each subsequent transformation
+(\code{\link[=subset]{subset()}}, \code{\link[=rarefy]{rarefy()}}, \code{\link[=mutate]{mutate()}}, etc.) are appended to \verb{$history}, and
+\verb{$code} prints them as a runnable script. Tables, statistics, and plots
+derived from the object inherit this history, so their \verb{$code} is a
+complete, self-contained recipe.
+
+Assigning directly to a field (e.g. \code{biom$metadata <- df}) is also
+recorded, but as a comment, since the assigned value only exists in memory.
+Prefer the transformation functions, or build the object from files, when
+a fully reproducible script is wanted.
 }
 
 \section{Writable Fields}{

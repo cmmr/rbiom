@@ -4,12 +4,25 @@ test_that("as_rbiom", {
   expect_equal_rbiom(as_rbiom(old_hmp5), hmp5)
   expect_equal_rbiom(as_rbiom(hmp5$counts), min5)
   expect_equal_rbiom(as_rbiom(as.matrix(hmp5$counts)), min5)
+  expect_equal_rbiom(as_rbiom(as.data.frame(as.matrix(hmp5$counts))), min5)
   expect_error(as_rbiom(NULL))
+  expect_error(as_rbiom(NA))
+
+  # Same object is returned when nothing changes; a clone otherwise.
+  expect_identical(as_rbiom(hmp5), hmp5)
+  x <- as_rbiom(hmp5, id = "renamed")
+  expect_identical(x$id, "renamed")
+  expect_false(identical(x, hmp5))
+  expect_error(as_rbiom(hmp5, bogus = 1))
 })
 
 test_that("as_rbiom.default", {
   json <- write_biom(hmp5, file = NULL, format = "json")
   expect_equal_rbiom(as_rbiom(json), hmp5)
+
+  df <- as.data.frame(matrix(1:4, 2, dimnames = list(c('a','b'), c('x','y'))))
+  expect_s3_class(as_rbiom(df), 'rbiom')
+  expect_false(as_rbiom(df)$history[[1]] %>% identical(NULL))
 })
 
 
@@ -28,5 +41,6 @@ test_that("as_rbiom accepts triangular, diagonal, and 1x1 matrices", {
     path <- tempfile(fileext = ".tsv")
     write_biom(biom, path, format = "tab")
     expect_equal(as.matrix(read_biom(path)$counts), mtx)
+    unlink(path)
   }
 })

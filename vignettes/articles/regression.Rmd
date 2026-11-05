@@ -48,7 +48,7 @@ stats_corrplot(
   pt.alpha = 0.2 )                 # and semi-transparent
 ```
 
-As you'd expect, the trendline's slope is positive (p-value = 0). Therefore it's safe to say that height changes with age.
+As you'd expect, the trendline's slope is positive, with a p-value far below 0.05. Therefore it's safe to say that height changes with age.
 
 
 ## Grouped by Sex
@@ -67,12 +67,15 @@ stats_corrplot(
   pt.size  = 0.2 )                 # make points smaller
 ```
 
-Here, a p-value of 3.9e-51 indicates that males and females do have different growth rates.
+Here, the very small p-value indicates that males and females do have different growth rates.
 
 If you look at the captions of the last two plots, you'll notice that the p-value test automatically changes.
 
-* When `stat.by = NULL`, `test = "emtrends"` will test if the **slope is zero**. 
+* When `stat.by = NULL`, `test = "emtrends"` will test if the **slope is zero**.
 * When `stat.by` is not `NULL`, `test = "emtrends"` will test if the trendline **slopes are equal**.
+
+With `fit = "lm"` the slope is the same everywhere, so these are tests of the
+fitted lines as a whole.
 
 
 
@@ -94,7 +97,10 @@ stats_corrplot(
 
 This gives us a much better idea of the moving average over time.
 
-We still have `test = "emtrends"`, so the p-value is reported where the difference in slope is most significant - in this case, at age = 5.9 years.
+With a smoothed fit, the slope changes along the curve, so the difference in
+slopes has to be evaluated at a particular age. By default rbiom uses the
+median age, marked on the plot with a vertical line. See
+[Specific Timepoints](#specific-timepoints) to choose other ages.
 
 
 ## Difference in Means
@@ -112,8 +118,8 @@ stats_corrplot(
   test     = 'emmeans' )           # run stats on the means   <====
 ```
 
-Differences in height are most significant at age = 16.8 
-(where p-value = 8.9e-40).
+The difference in mean height between males and females is tested at the
+median age.
 
 
 
@@ -138,34 +144,40 @@ t(st)
 
 Depending on the arguments given, the *estimate* term will be one of:
 
-| **Field**   | **Description**          | `test`                | `stat.by`  |
-| ----------- | ------------------------ | --------------------- | ---------- |
-| .mean       | Estimated marginal mean. | `emmeans::emmeans()`  | `NULL`     |
-| .mean.diff  | Difference in means.     | `emmeans::emmeans()`  | not `NULL` |
-| .slope      | Trendline slope.         | `emmeans::emtrends()` | `NULL`     | 
-| .slope.diff | Difference in slopes.    | `emmeans::emtrends()` | not `NULL` |
+| **Field**   | **Description**                         | `test`       | `stat.by`  | `fit`           |
+| ----------- | --------------------------------------- | ------------ | ---------- | --------------- |
+| .slope      | Slope of the fitted line.               | either       | `NULL`     | `"lm"`, `"log"` |
+| .f          | *F* statistic of the smooth term.       | `"emmeans"`  | `NULL`     | `"gam"`         |
+| .slope      | Local slope at `at`.                    | `"emtrends"` | `NULL`     | `"gam"`         |
+| .mean.diff  | Difference in means at `at`.            | `"emmeans"`  | not `NULL` | any             |
+| .slope.diff | Difference in slopes (at `at` for gam). | `"emtrends"` | not `NULL` | any             |
+
+Without `stat.by`, the question is whether the response is associated with
+`regr` at all: a test of the slope for straight-line fits, or of the whole
+smooth curve for `fit = "gam"`.
 
 
 Other fields in this table include:
 
-| **Field**    | **Description**                                       |
-| ------------ | ----------------------------------------------------- |
-| .h1          | Alternate hypothesis.                                 |
-| .p.val       | Probability that null hypothesis is correct.          |
-| .adj.p       | `.p.val` after adjusting for multiple comparisons.    |
-| .effect.size | Effect size. See `emmeans::eff_size()`.               |
-| .lower       | Confidence interval lower bound.                      |
-| .upper       | Confidence interval upper bound.                      |
-| .se          | Standard error.                                       |
-| .n           | Number of samples.                                    |
-| .df          | Degrees of freedom.                                   |
-| .t.ratio     | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
-| .r.sqr       | Percent of variation explained by the model.          |
-| .adj.r       | `.r.sqr`, taking degrees of freedom into account.     |
-| .aic         | Akaike Information Criterion (predictive models).     |
-| .bic         | Bayesian Information Criterion (descriptive models).  |
-| .loglik      | Log-likelihood goodness-of-fit score.                 |
-| .fit.p       | P-value for observing this fit by chance.             |
+| **Field**    | **Description**                                                                  |
+| ------------ | -------------------------------------------------------------------------------- |
+| .h1          | Alternative hypothesis.                                                          |
+| .p.val       | Probability, under the null hypothesis, of a result at least as extreme as observed. |
+| .adj.p       | `.p.val` after adjusting for multiple comparisons across the whole table.        |
+| .effect.size | Effect size. See `emmeans::eff_size()`.                                          |
+| .lower       | Confidence interval lower bound.                                                 |
+| .upper       | Confidence interval upper bound.                                                 |
+| .se          | Standard error.                                                                  |
+| .n           | Number of samples.                                                               |
+| .df          | Degrees of freedom.                                                              |
+| .t.ratio     | *(.mean.diff, .slope, or .slope.diff)* / `.se`                                   |
+| .edf         | Effective degrees of freedom of a `gam` smooth term.                             |
+| .r.sqr       | Proportion of variation explained by the model.                                  |
+| .adj.r       | `.r.sqr`, taking degrees of freedom into account.                                |
+| .dev.expl    | Proportion of deviance explained (`gam` models).                                 |
+| .aic         | Akaike Information Criterion (predictive models).                                |
+| .bic         | Bayesian Information Criterion (descriptive models).                             |
+| .loglik      | Log-likelihood goodness-of-fit score.                                            |
 
 
 
@@ -184,12 +196,12 @@ Additional information on EMMs is available at:
 
 The statistics table has several fields for assessing how well the model fits the data.
 
-* `.r.sqr` - Coefficient of Determination (<i>R</i><sup>2</sup>); range: 0-1, lower is better. Percent of variation explained by the model.
-* `.adj.r` - <i>R</i><sup>2</sup>, taking degrees of freedom into account.
+* `.r.sqr` - Coefficient of Determination (<i>R</i><sup>2</sup>); range: 0-1, higher is better. Proportion of variation explained by the model.
+* `.adj.r` - <i>R</i><sup>2</sup>, taking degrees of freedom into account (straight-line fits).
+* `.dev.expl` - Proportion of deviance explained (`gam` fits); higher is better.
 * `.aic` - Akaike Information Criterion; lower is better. Preferred when using model for prediction.
 * `.bic` - Bayesian Information Criterion; lower is better. Preferred when using model for interpretation.
-* `.loglik` - Log-Likelihood (negative values); higher values (closer to zero) are better.
-* `.fit.p` - P-value for observing this fit by chance; range: 0-1, lower is better.
+* `.loglik` - Log-Likelihood; higher values are better.
 
 Not all of these values can be computed for every model.
 
@@ -199,12 +211,15 @@ As an example, lets pull the AIC value from the statistics table generated in th
 st$.aic
 ```
 
-These values can be used to decide which `fit` argument to use (`"lm"`, `"log"`, or `"gam"`).
+These values can be used to decide which `fit` argument to use (`"lm"`, `"log"`, or `"gam"`), as long as the models are fit to the same data.
 
 ```{r}
-plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
-  stats_table(npregfast::children, "age", "height", "sex", fit = fit) ) %>%
-  dplyr::select(fit, .r.sqr:.fit.p)
+gof <- lapply(c("lm", "log", "gam"), function (fit) {
+  st <- stats_table(npregfast::children, "age", "height", "sex", fit = fit)
+  data.frame(fit = fit, .r.sqr = st$.r.sqr, .aic = st$.aic, .bic = st$.bic, .loglik = st$.loglik)
+})
+
+do.call(rbind, gof)
 ```
 
 Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC, and highest Log-Likelihood, and is therefore the best model of the three to use for this set of data and variables.
@@ -307,7 +322,7 @@ adiv_corrplot(
   check   = TRUE )       # display diagnostic plots
 ```
 
-Here, the diagnostic plots look pretty good, so we can confidently say that children have different Shannon diversity index values, depending on whether they live in Bangladesh vs Kenya, and that this difference is most significant at around 1.25 years old.
+Here, the diagnostic plots look pretty good, so we can trust the model's comparison of Shannon diversity between children in Bangladesh and Kenya at the median age.
 
 
 
@@ -370,77 +385,41 @@ Beta diversity correlation plots are more conceptually complex, so let's quickly
 
 As with most `bdiv_*` functions, we can supply a `within` and/or `between` parameters to limit which pairs of samples are included in the plot. Setting `within = "country"` as below will only plot pairs of samples that came from the same country, and prevent `stat.by` from producing a "Bangladesh vs Kenya" trendline.
 
-```{r, fig.asp = 0.8}
+```{r, fig.asp = 0.4}
 bdiv_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   x       = "age",       # x-axis variable
-  stat.by = "country",   # statistical groups 
+  stat.by = "country",   # statistical groups
   within  = "country",   # don't compare samples from different countries
-  fit     = "gam",       # smoothed trendline
-  check   = TRUE )       # display diagnostic plots
+  fit     = "gam" )      # smoothed trendline
 ```
 
-Here, the main plot tells us:
+The trendlines show how microbiome dissimilarity grows with the difference in
+age, separately for each country.
 
-* In Bangladesh, the closer two children are in age to each other, the more similar their microbiomes will be. Therefore, you could infer that age is an important factor driving microbiome structure for this population.
-* Kenyan children's microbiomes are more consistently structured, compared to children in Bangladesh. Additionally, the age effect is much less pronounced.
-* Children about 1 year apart in age have much more similar microbiome if they live in Kenya, compared to Bangladesh (p = 6.2e-153).
-
-The diagnostic plots here indicate less than optimal distributions of residuals, with the "Normal Q-Q" plot showing that many more points lie above the trendline than below it. The main plot's trendlines don't spend much time between y = 0.75 and 0.83, hence the sparsity of points between x = 0.75 and 0.83 on the "Residuals vs Fitted" and "Scale-Location" plots.
-
-
-## Rank Transformation
-
-Running `bdiv_corrplot()` with `trans = "rank"` could help make the residuals more normally distributed.
-
-```{r, fig.asp = 0.8}
-bdiv_corrplot(
-  biom    = hbk,         # healthy controls from Bangladesh and Kenya
-  x       = "age",       # x-axis variable
-  stat.by = "country",   # statistical groups 
-  within  = "country",   # don't compare samples from different countries
-  fit     = "gam",       # smoothed trendline
-  trans   = "rank",      # rank-transform the abundances   <====
-  check   = TRUE )       # display diagnostic plots
-```
-
-After rank-transforming:
-
-* The main plot tells a slightly different story.
-* The "Normal Q-Q" plot indicates that the residuals now have a light-tailed distribution.
-
-You could argue either for or against preferring the transformed figure over the original.
-
-
-## Goodness of Fit
-
-Comparing the AIC, BIC, and Log-Likelihood values for the untransformed and rank-transformed data can tell you which model is better, right? Wrong! These values scale with the range of the data, so the untransformed beta diversity data in the range of 0 - 1 will result in drastically different AIC, BIC, and Log-Likelihood values than the rank-transformed data in the range of 1 - 16400.
-
-Generally speaking, you cannot compare goodness-of-fit values derived from different datasets. However, it is arguable that these two datasets are the same, just scaled differently. Therefore if you don't mind potentially incurring a reviewer's wrath, you can rescale both datasets to the same range and compare goodness-of-fit values on those.
-
+The p-values come from Mantel tests, not from the trendlines. Each sample
+appears in many pairs, so pairwise distances are not independent observations,
+and regression p-values computed on them would be far too small. A Mantel test
+instead correlates the distance matrix with the age differences and judges
+that correlation against permutations of the samples. With `stat.by`, one
+Mantel test is run per group.
 
 ```{r}
-plyr::ldply(c(none="none", rank="rank"), .id = "trans", function (trans)
-  bdiv_table(biom = hbk, within = "country", trans = trans) %>%
-    dplyr::mutate(.distance = scales::rescale(.distance, to = c(0, 1))) %>%
-    stats_table(regr = "age", resp = ".distance", stat.by = "country", fit = "gam") %>%
-    dplyr::select(.aic, .bic, .loglik) )
+bdiv_stats(hbk, regr = "age", stat.by = "country")
 ```
-
-These goodness-of-fit metrics strongly favor the untransformed data.
 
 
 
 
 # Specific Timepoints
 
-By default, the `*_corrplot()` functions will automatically find the x-axis location with the most significant term of interest. However, you can override this by providing the `at` parameter.
+By default, group means (and, for smoothed fits, slopes) are compared at the median of the x-axis variable. You can choose a different position by providing the `at` parameter. Pick these positions based on your research question, before looking at the results: scanning many positions for the smallest p-value produces false positives.
 
 ```{r, fig.asp = 0.4}
 stats_corrplot(npregfast::children, 'age', 'height', stat.by = 'sex', at = 12)
 ```
 
-Although you're limited to one `at` value for `*_corrplot()` functions, you can provide multiple `at` locations to `stats_table()` or `*_stats()` functions.
+Although you're limited to one `at` value for `*_corrplot()` functions, you can provide multiple `at` locations to `stats_table()` or `*_stats()` functions. The `.adj.p` column adjusts for all of them together.
 
 ```{r}
 stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)

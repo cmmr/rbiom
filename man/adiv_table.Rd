@@ -53,20 +53,23 @@ to include all metadata fields. Default: \code{'.all'}}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{transform}{Transformation to apply to calculated values. Options are:
-\code{c("none", "rank", "log", "log1p", "sqrt", "percent")}. \code{"rank"} is
-useful for correcting for non-normally distributions before applying
-regression statistics. Default: \code{"none"}}
+\item{transform}{Transformation to apply to the diversity values.
+Options are: \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"}
+is useful for correcting for non-normally distributions before
+applying regression statistics. Default: \code{"none"}}
 
 \item{ties}{When \code{transform="rank"}, how to rank identical values.
 Options are: \code{c("average", "first", "last", "random", "max", "min")}.
 See \code{rank()} for details. Default: \code{"random"}}
 
-\item{seed}{Random seed for permutations. Must be a non-negative integer.
-Default: \code{0}}
+\item{seed}{Random seed for permutations, rarefaction, random tie-breaking,
+and stochastic ordinations. Results are reproducible for a given
+seed, and the caller's random number generator state is left
+unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Default: \code{NULL}}
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
 \describe{
@@ -81,30 +84,34 @@ Column names are \bold{.sample}, \bold{.depth}, \bold{.adiv},
 and \bold{.diversity}, followed by any metadata fields requested by
 \code{md}. }
 }
+Each result carries \verb{$code}: the R code that regenerates it, including
+the steps that produced \code{biom}.
 }
 \description{
 Calculate the alpha diversity of each sample.
 }
 \examples{
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
-    
+
     adiv_table(biom)
-    
+
     biom <- rarefy(biom)
     adiv_table(biom, md = NULL)
-    
+
     adiv_vector(biom, 'faith')
-    
+
     adiv_matrix(biom)
+
+    adiv_matrix(biom)$code
 }
 \seealso{
 \code{\link[=sample_sums]{sample_sums()}} for sample depths.
 
-Other alpha_diversity: 
-\code{\link{adiv_boxplot}()},
-\code{\link{adiv_corrplot}()},
-\code{\link{adiv_stats}()}
+Other alpha_diversity:
+\code{\link[=adiv_boxplot]{adiv_boxplot()}},
+\code{\link[=adiv_corrplot]{adiv_corrplot()}},
+\code{\link[=adiv_stats]{adiv_stats()}}
 }
 \concept{alpha_diversity}
