@@ -61,7 +61,6 @@ plot_build <- function (params) {
   .ggplot        <- P('ggplot2::ggplot')
   .geom_text     <- P('ggplot2::geom_text')
   .theme_void    <- P('ggplot2::theme_void')
-  .element_blank <- P('ggplot2::element_blank')
   .element_text  <- P('ggplot2::element_text')
   .trans_new     <- P('scales::trans_new')
   .label_number  <- P('scales::label_number')
@@ -88,22 +87,6 @@ plot_build <- function (params) {
   # Add in coord_flip when flip=TRUE
   #________________________________________________________
   if (isTRUE(params$flip)) add_layer(params, 'flip')
-
-
-  #________________________________________________________
-  # Theme arguments
-  #________________________________________________________
-  set_layer(params, 'theme', text = .element_text('size' = 14))
-
-
-  #______________________________________________________________
-  # Suppress vertical gridlines (horizontal if flipped).
-  #______________________________________________________________
-  if (isTRUE(params$flip)) {
-    set_layer(params, 'theme', panel.grid.major.y = .element_blank())
-  } else {
-    set_layer(params, 'theme', panel.grid.major.x = .element_blank())
-  }
 
 
   #______________________________________________________________
@@ -197,6 +180,7 @@ plot_build <- function (params) {
   #________________________________________________________
   specs <- list(
     "trend"      = c('color'),
+    "ci"         = c('color'),
     "name"       = c('color'),
     "residual"   = c('color'),
     "linerange"  = c('color'),
@@ -339,13 +323,13 @@ plot_build <- function (params) {
   # Standardize the list order: ggplot() first, theme() last, etc
   #______________________________________________________________
   layer_order <- c(
-    'ggplot', 'confidence', 'stats_bg', 'stripe', 'density', 'violin',
-    'residual', 'point', 'trend', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip',
+    'ggplot', 'confidence', 'stats_bg', 'stripe', 'zero', 'density', 'violin',
+    'residual', 'ci', 'point', 'trend', 'bar', 'box', 'spider', 'dot', 'ellipse', 'strip',
     'name', 'crossbar', 'linerange', 'rect', 'errorbar', 'pointrange', 'mean',
     'arrow', 'taxon', 'brackets', 'stats_vline', 'stats_label', 'stats_text', 'stack', 'hline', 'vline',
     'labs', 'color', 'fill', 'shape', 'pattern', 'size', 'continuous_scale',
     'scale_size', 'facet',
-    'xaxis', 'yaxis', 'flip', 'theme_bw', 'theme' )
+    'xaxis', 'yaxis', 'flip', 'theme_rbiom', 'theme' )
   layer_order <- c(
     intersect(layer_order, env_names(layers)),
     setdiff(env_names(layers), layer_order) )
@@ -464,15 +448,7 @@ plot_build <- function (params) {
           y        = expression(sqrt(abs(` Standardized Residual `))),
           subtitle = "Flat and horizontal trendline." )
 
-      diag <- lapply(list(qq, rf, sl), function (x) {
-        x +
-          ggplot2::theme_minimal() +
-          ggplot2::theme(
-            plot.title      = ggplot2::element_text(face = "bold", size = 10),
-            plot.subtitle   = ggplot2::element_text(face = "italic", size = 9),
-            axis.title      = ggplot2::element_text(size = 9),
-            plot.background = ggplot2::element_rect(linewidth = 1, color = "gray") )
-      })
+      diag <- lapply(list(qq, rf, sl), function (x) x + theme_rbiom(base_size = 9))
 
       # The main plot goes last so that it is patchwork's outer plot (and
       # `p$data` is its data); `design` places it above the diagnostics.
@@ -559,13 +535,7 @@ plot_check_code <- function (plot_var, assign = FALSE) {
     "  geom_smooth(method = \"gam\", formula = y ~ s(x, bs = \"cs\")) +",
     "  labs(title = \"Scale-Location\", x = \"Fitted Value\", y = expression(sqrt(abs(` Standardized Residual `))), subtitle = \"Flat and horizontal trendline.\")",
     "",
-    "diag <- lapply(list(qq, rf, sl), function (x) {",
-    "  x + theme_minimal() + theme(",
-    "    plot.title      = element_text(face = \"bold\", size = 10),",
-    "    plot.subtitle   = element_text(face = \"italic\", size = 9),",
-    "    axis.title      = element_text(size = 9),",
-    "    plot.background = element_rect(linewidth = 1, color = \"gray\") )",
-    "})",
+    "diag <- lapply(list(qq, rf, sl), function (x) x + theme_rbiom(base_size = 9))",
     "",
     sprintf("%spatchwork::wrap_plots(A = patchwork::wrap_plots(diag, nrow = 1), B = patchwork::free(%s), design = \"B\\nA\", heights = c(3, 1))", if (assign) paste(plot_var, "<- ") else "", plot_var) )
 }

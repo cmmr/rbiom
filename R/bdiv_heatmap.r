@@ -62,7 +62,9 @@
 #'   \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 #' }
 #'
-#' All built-in color palettes are colorblind-friendly.
+#' The default categorical colors are colorblind-friendly for up to 12
+#' groups: Okabe and Ito's palette (\code{"okabe"}) for up to 8, and Paul
+#' Tol's (\code{"tol"}) for 9-12.
 #'
 #' Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 #' \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},

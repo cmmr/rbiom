@@ -649,3 +649,25 @@ package_missing <- function (pkg,  reason = 'for this command') {
     '>' = " {.run pak::pkg_install('{pkg}')}" ))
 }
 
+
+
+
+#________________________________________________________
+# p-values as printed in figures: two significant digits, never in
+# scientific notation, and "< 0.001" below 0.001.
+#
+#   p_text(0.0738) -> "p = 0.074"
+#   p_text(2e-4)   -> "p < 0.001"
+#   p_math(0.0738) -> 'italic(p) == "0.074"'   (a plotmath expression)
+#________________________________________________________
+p_text <- function (p) {
+  ifelse(!is.na(p) & p < 0.001, "p < 0.001", paste("p =", p_digits(p)))
+}
+
+p_math <- function (p) {
+  ifelse(!is.na(p) & p < 0.001, 'italic(p) < "0.001"', sprintf('italic(p) == "%s"', p_digits(p)))
+}
+
+p_digits <- function (p) {
+  ifelse(is.na(p), "NA", trimws(formatC(signif(p, 2), format = "fg", digits = 2)))
+}

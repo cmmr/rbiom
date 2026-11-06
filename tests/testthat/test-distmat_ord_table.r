@@ -35,7 +35,6 @@ test_that("distmat_ord_table", {
 
   dm40 <- expect_silent(bdiv_distmat(rare50[1:40]))
   expect_silent(distmat_ord_table(dm15, ord = "PCoA", k = 3))
-  expect_silent(distmat_ord_table(dm15, ord = "tSNE"))
   expect_silent(distmat_ord_table(dm15, ord = "UMAP"))
   expect_silent(distmat_ord_table(dm40, ord = "NMDS"))
 
@@ -46,6 +45,31 @@ test_that("distmat_ord_table", {
   set.seed(99); before <- .Random.seed
   distmat_ord_table(dm40, ord = "NMDS", seed = 2)
   expect_identical(.Random.seed, before)
+})
+
+
+test_that("distmat_ord_table tSNE", {
+
+  skip_on_cran()
+  skip_if_not_installed("Rtsne")
+
+  dm15 <- bdiv_distmat(rare50[1:15])
+
+  # Rtsne under `seed`, with perplexity capped at (n - 1) / 3.
+  ord <- expect_silent(distmat_ord_table(dm15, ord = "tSNE", seed = 3))
+  ref <- with_seed(3, Rtsne::Rtsne(dm15, dims = 2, perplexity = 14 / 3)$Y)
+  expect_equal(ord$.x, ref[, 1])
+  expect_equal(ord$.y, ref[, 2])
+  expect_identical(as.character(ord$.sample), attr(dm15, 'Labels'))
+  expect_identical(attr(ord, 'tbl_sum')[['Ordination']], "Rtsne::Rtsne(dm, dims = 2)")
+
+  # `k` becomes `dims`; `...` reaches Rtsne.
+  ord <- distmat_ord_table(dm15, ord = "tSNE", k = 3, seed = 3, perplexity = 2, theta = 0)
+  ref <- with_seed(3, Rtsne::Rtsne(dm15, dims = 3, perplexity = 2, theta = 0)$Y)
+  expect_equal(ord$.z, ref[, 3])
+
+  # Works down to the three-sample minimum.
+  expect_silent(distmat_ord_table(bdiv_distmat(rare50[1:3]), ord = "tSNE"))
 })
 
 

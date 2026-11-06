@@ -5,9 +5,12 @@
 PALETTES <- list(
 
   # Discrete color palettes from various sources.
+  # 'okabe' is Okabe & Ito's palette (Wong 2011, Nature Methods 8:441),
+  # ordered so that the first colors contrast most with each other and with
+  # a white background; the yellow, which is hard to see on white, is last.
   'bright'     = c("4477AA", "EE6677", "228833", "CCBB44", "66CCEE", "AA3377", "BBBBBB"),
   'vibrant'    = c("EE7733", "0077BB", "33BBEE", "EE3377", "CC3311", "009988", "BBBBBB"),
-  'okabe'      = c("E69F00", "56B4E9", "009E73", "F0E442", "0072B2", "D55E00", "CC79A7", "999999"),
+  'okabe'      = c("0072B2", "D55E00", "009E73", "E69F00", "CC79A7", "56B4E9", "F0E442", "999999"),
   'r4'         = c("DF536B", "61D04F", "2297E6", "28E2E5", "CD0BBC", "F5C710", "9E9E9E", "000000"),
   'light'      = c("77AADD", "EE8866", "EEDD88", "FFAABB", "99DDFF", "44BB99", "BBCC33", "AAAA00"),
   'muted'      = c("CC6677", "332288", "DDCC77", "117733", "88CCEE", "882255", "44AA99", "999933", "AA4499"),
@@ -107,7 +110,7 @@ get_n_colors <- function (n, palette = NULL) {
   if (is.logical(palette)) palette <- NULL
 
   if (is_null(palette)) {
-    if (n <= 10)        { palette <- "classic"
+    if (n <= 8)         { palette <- "okabe"
     } else if (n <= 12) { palette <- "tol"
     } else if (n <= 20) { palette <- "tableau20"
     } else              { palette <- "alphabet" }
@@ -129,12 +132,9 @@ get_n_shapes <- function (n, values = NULL) {
   stopifnot(is_scalar_integerish(n) && !is_na(n))
   if (is.logical(values)) values <- NULL
 
+  # Solid shapes first, then outlines, then letters.
   if (is_null(values))
-    values <- local({
-      if (n <= 3)  return (15:17)
-      if (n <= 15) return (c(0:14))
-      return (c(65:90, 97:122))
-    })
+    values <- if (n <= 15) c(16, 17, 15, 18, 3, 4, 8, 1, 2, 0, 5, 6, 7, 9, 10) else c(65:90, 97:122)
 
   return (rep_len(values, n))
 }
@@ -170,13 +170,13 @@ get_n_patterns <- function (n, values = NULL) {
 # Example calls/returns:
 #
 # color_palette(pal = "okabe") or color_palette(n = 8)
-# c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
+# c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7", "#56B4E9", "#F0E442", "#999999")
 #
 # color_palette(pal = "r4", keys = c("Male", "Female"))
 # c(Male = "#DF536B", Female = "#61D04F")
 #
 # color_palette(n = 3)
-# c("#1F77B4", "#FF7F0E", "#2CA02C")
+# c("#0072B2", "#D55E00", "#009E73")
 #
 # color_palette(pal = "-hawaii")
 # c("#B2F2FD", "#66E7D2", "#6BD38C", "#89BB48", "#9B951B", "#9A6D27", "#964C3E", "#922C54", "#8C0172")

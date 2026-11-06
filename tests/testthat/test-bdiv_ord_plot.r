@@ -63,7 +63,8 @@ test_that("bdiv_ord_plot labels and statistics", {
   expect_true(grepl('x +=  *"PCoA 1 [(]', p$code))
   expect_true(grepl('y +=  *"PCoA 2 [(]', p$code))
   expect_true(grepl('Bray-Curtis',    p$code, fixed = TRUE))
-  expect_true(grepl('PERMANOVA F = ', p$code, fixed = TRUE))
+  expect_true(grepl('subtitle = "F = ', p$code, fixed = TRUE))
+  expect_true(grepl('Statistics computed with PERMANOVA', p$code, fixed = TRUE))
   expect_true(grepl('type += "norm"', p$code))
   expect_s3_class(p$stats, 'data.frame')
   expect_s3_class(p$taxa_stats, 'data.frame')
@@ -76,6 +77,13 @@ test_that("bdiv_ord_plot labels and statistics", {
   expect_true(grepl("facets <- tibble::tibble", p$code, fixed = TRUE))
   expect_true(grepl('x += "PCoA 1"', p$code))
   expect_equal(nlevels(p$data$.facet), 2L)
+  expect_true(all(grepl("^(Female|Male)
+F = .+, R² = .+, p [=<] ", levels(p$data$.facet))))
+
+  # Without the caption, the labels name the test.
+  p <- bdiv_ord_plot(rare50, stat.by = "Body Site", facet.by = "Sex", rank = NULL, permutations = 99, caption = FALSE)
+  expect_true(all(grepl("
+PERMANOVA: F = ", levels(p$data$.facet))))
 
   # Ellipses are skipped for groups with fewer than four samples.
   p <- bdiv_ord_plot(rare50[1:12], stat.by = "Body Site", test = "none")
@@ -119,7 +127,7 @@ test_that("bdiv_ord_plot with several metrics and ordinations", {
   # Used to fail with "argument is of length zero" (no common title).
   p <- bdiv_ord_plot(b20, stat.by = "Sex", bdiv = c("jaccard", "bray"), ord = c("PCoA", "UMAP"), layers = "pe", permutations = 99)
   expect_equal(nlevels(p$data$.facet), 4L)
-  expect_true(all(grepl("PERMANOVA", levels(p$data$.facet), fixed = TRUE)))
+  expect_true(all(grepl("F = ", levels(p$data$.facet), fixed = TRUE)))
   expect_replays(p)
 
   # With a biplot rank, the title is the rank.

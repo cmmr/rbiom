@@ -139,9 +139,11 @@ test_that("statistics replay", {
     taxa_stats(b, stat.by = "Sex", rank = "Phylum", taxa = 3),
     taxa_stats(b, regr = "BMI", rank = "Phylum", taxa = 3, fit = "lm"),
     distmat_stats(bdiv_distmat(b, "bray"), pull(b, "Body Site")),
-    stats_table(adiv_table(b, md = c("Sex", "Age")), stat.by = "Sex", regr = "Age") )) {
+    stats_table(adiv_table(b, md = c("Sex", "Age")), stat.by = "Sex", regr = "Age"),
+    suppressMessages(taxa_da(b, stat.by = "Sex", rank = "Genus", taxa = 5)),
+    suppressMessages(taxa_da(b, regr = "Age", covariates = "Sex", split.by = "Old", rank = c("Phylum", "Genus"))) )) {
 
-    r <- replay(x)
+    r <- suppressMessages(replay(x))
 
     s <- if (!is.null(r$env$stats)) r$env$stats else r$value
     expect_equal(strip(s), strip(x), tolerance = 1e-6)
@@ -179,6 +181,8 @@ test_that("plots replay", {
     taxa_heatmap(b, rank = "Phylum", taxa = 1),
     taxa_stacked(b, rank = "Phylum", taxa = 5),
     taxa_stacked(b, rank = c("Phylum", "Genus"), taxa = 4),
+    suppressMessages(taxa_forest(b, stat.by = "Body Site", rank = "Phylum", p.top = 3)),
+    suppressMessages(taxa_forest(b, regr = "Age", rank = "Genus", p.top = 0.99)),
     rare_corrplot(b, stat.by = "Sex"),
     rare_stacked(b),
     rare_multiplot(b, stat.by = "Body Site") )) {
@@ -225,7 +229,9 @@ test_that("hostile names cannot inject code", {
     adiv_stats(b, stat.by = inj, test = "wilcox"),
     adiv_boxplot(b, x = inj, stat.by = inj),
     taxa_stacked(b, rank = "Genus", taxa = 3),
-    taxa_boxplot(b, rank = "Phylum", taxa = 2, x = inj) )
+    taxa_boxplot(b, rank = "Phylum", taxa = 2, x = inj),
+    suppressMessages(taxa_da(b, stat.by = inj, rank = "Genus", prev.cut = 0)),
+    suppressMessages(taxa_forest(b, stat.by = inj, rank = "Genus", prev.cut = 0, p.top = Inf)) )
 
   for (x in outputs) {
     code <- x$code

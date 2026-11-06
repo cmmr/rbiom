@@ -43,7 +43,7 @@ plot. Default: \code{"bray"}}
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
-\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
+\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}}. }
 }
 Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
@@ -133,7 +133,7 @@ or to \code{1} to disable parallel processing. Does not affect results.
 Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Additional arguments to pass on to \code{\link[stats:cmdscale]{stats::cmdscale()}},
-\code{\link[vegan:metaMDS]{vegan::metaMDS()}}, \code{\link[tsne:tsne]{tsne::tsne()}}, or \code{\link[uwot:umap]{uwot::umap()}}.}
+\code{\link[vegan:metaMDS]{vegan::metaMDS()}}, \code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}}, or \code{\link[uwot:umap]{uwot::umap()}}.}
 }
 \value{
 A data.frame with columns \code{.sample},

@@ -15,7 +15,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
-\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
+\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}}. }
 }
 Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
@@ -26,7 +26,9 @@ Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 UMAP), so that they are reproducible. PCoA is deterministic.
 Must be a non-negative integer. Default: \code{0}}
 
-\item{...}{Additional arguments for the \code{ord} function.}
+\item{...}{Additional arguments for the \code{ord} function. For tSNE,
+\code{perplexity} defaults to 30, or to \code{(n - 1) / 3} for fewer than
+91 samples.}
 }
 \value{
 A tibble data.frame with columns \code{.ord}, \code{.sample},

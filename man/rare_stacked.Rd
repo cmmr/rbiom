@@ -77,8 +77,10 @@ Other visualization:
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{rarefaction}
 \concept{visualization}

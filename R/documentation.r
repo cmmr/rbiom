@@ -53,7 +53,7 @@
 #'            \item{`"PCoA"` - }{ Principal coordinate analysis; [stats::cmdscale()]. }
 #'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
-#'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
+#'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [Rtsne::Rtsne()]. }
 #'        }
 #'        Multiple/abbreviated values allowed. Default: `"PCoA"`
 #'        

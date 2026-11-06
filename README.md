@@ -47,20 +47,20 @@ biom   <- rarefy(infile)
 bdiv_ord_plot(biom, stat.by = 'Body Site', facet.by = 'Sex')
 ```
 
-![](man/figures/README-bdiv-1.png)<!-- -->
+<img src="man/figures/README-bdiv-1.png" alt="" width="100%" />
 
 ``` r
 adiv_boxplot(biom, x = 'Sex', adiv = c('otu', 'shan'), stat.by = 'Body Site')
 ```
 
-![](man/figures/README-bdiv-2.png)<!-- -->
+<img src="man/figures/README-bdiv-2.png" alt="" width="100%" />
 
 ``` r
 subset(biom, `Body Site` == 'Buccal mucosa') %>% 
   taxa_corrplot('Age', taxa = 2, layers = 'ptc', fit = 'lm', test = 'emtrends')
 ```
 
-![](man/figures/README-bdiv-3.png)<!-- -->
+<img src="man/figures/README-bdiv-3.png" alt="" width="100%" />
 
 #### Summarize counts by taxonomic rank.
 
@@ -68,13 +68,13 @@ subset(biom, `Body Site` == 'Buccal mucosa') %>%
 taxa_heatmap(biom, taxa = 10, tracks = c('body', 'age'))
 ```
 
-![](man/figures/README-taxa-1.png)<!-- -->
+<img src="man/figures/README-taxa-1.png" alt="" width="100%" />
 
 ``` r
 taxa_stacked(biom, rank = 'Phylum')
 ```
 
-![](man/figures/README-taxa-2.png)<!-- -->
+<img src="man/figures/README-taxa-2.png" alt="" width="100%" />
 
 ``` r
 taxa_table(biom, 'Phylum')
@@ -121,19 +121,11 @@ p$code
 #> 
 #> # p-values from the statistics table (see `p$stats$code`), placed above the boxes.
 #> labels <- tibble::tibble(
-#>   .label = "italic(p)== 0.01",
+#>   .label = "italic(p) == \"0.014\"",
 #>   .x     = 1.5,
-#>   .y     = 4.0346666666666664 )
+#>   .y     = 0x1.0237fa89e60fp+2 )
 #> 
 #> ggplot(data, aes(x = Sex, y = .diversity)) +
-#>   annotate(
-#>     geom  = "rect", 
-#>     xmin  = -Inf, 
-#>     xmax  = Inf, 
-#>     ymin  = 4, 
-#>     ymax  = Inf, 
-#>     color = NA, 
-#>     fill  = "white" ) +
 #>   geom_boxplot(
 #>     mapping      = aes(color = Sex, fill = Sex), 
 #>     outlier.size = 1.14, 
@@ -151,18 +143,13 @@ p$code
 #>   labs(
 #>     caption = "Pairwise Mann-Whitney U tests.", 
 #>     y       = "Shannon Diversity Index" ) +
-#>   scale_color_manual(values = c("#1F77B4", "#FF7F0E")) +
-#>   scale_fill_manual(values = c("#1F77B4", "#FF7F0E")) +
+#>   scale_color_manual(values = c("#0072B2", "#D55E00")) +
+#>   scale_fill_manual(values = c("#0072B2", "#D55E00")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(
-#>     breaks       = c(0, 1, 2, 3), 
-#>     minor_breaks = c(0.5, 1.5, 2.5, 3.5), 
-#>     expand       = c(0.02, 0, 0.08, 0) ) +
-#>   theme_bw() +
-#>   theme(
-#>     text               = element_text(size = 14), 
-#>     panel.grid.major.x = element_blank(), 
-#>     plot.caption       = element_text(face = "italic", size = 9) )
+#>     breaks = c(0, 1, 2, 3), 
+#>     expand = c(0.02, 0, 0.08, 0) ) +
+#>   theme_rbiom()
 ```
 
 ## Documentation

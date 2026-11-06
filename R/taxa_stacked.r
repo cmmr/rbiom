@@ -208,13 +208,22 @@ taxa_stacked_build <- function (params) {
   })
 
 
+  #________________________________________________________
+  # Automatic colors: the "Other" taxa group is light gray.
+  #________________________________________________________
+  if (isTRUE(params$colors) && !(isFALSE(params$other) || is.null(params$other))) {
+    lvls  <- levels(params$.ggdata[['.taxa']])
+    other <- if (is_scalar_character(params$other)) params$other else "Other"
+    if (eq(tail(lvls, 1), other))
+      params$colors <- c(get_n_colors(length(lvls) - 1), "#BBBBBB")
+    remove("lvls", "other")
+  }
+
+
 
   #________________________________________________________
   # Provenance-tracked ggplot2 functions.
   #________________________________________________________
-  .element_blank <- P('ggplot2::element_blank')
-  .element_text  <- P('ggplot2::element_text')
-  .unit          <- P('grid::unit')
   .label_number  <- P('scales::label_number')
   .cut_si        <- P('scales::cut_si')
 
@@ -279,7 +288,6 @@ taxa_stacked_build <- function (params) {
         sprintf("Labeled by %s and ordered by %s.", label.by, paste(order.by, collapse = ", "))
       }
     }))
-  set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
 
 
   #________________________________________________________
@@ -311,12 +319,6 @@ taxa_stacked_build <- function (params) {
       'limits' = c(0,1),
       'labels' = as.cmd(scales::percent) )
 
-    set_layer(
-      params = params,
-      layer  = 'theme',
-      'panel.grid'  = .element_blank(),
-      'plot.margin' = .unit(c(1,1,1,1), "lines") )
-
 
   } else {
 
@@ -331,12 +333,6 @@ taxa_stacked_build <- function (params) {
       'expand' = c(0, 0, 0.02, 0),
       'breaks' = base::pretty(params$.ggdata[[params$.ycol]]),
       'labels' = .label_number(scale_cut = .cut_si("")) )
-
-    set_layer(
-      params = params,
-      layer  = 'theme',
-      'panel.grid.major.x' = .element_blank(),
-      'panel.grid.minor.y' = .element_blank() )
   }
 
 

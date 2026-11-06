@@ -139,6 +139,7 @@ reference:
   - starts_with("stats_")
   - tree_subset
   - plot_heatmap
+  - theme_rbiom
   
 - title: Datasets
   desc: >

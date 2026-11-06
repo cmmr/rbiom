@@ -44,7 +44,7 @@ plot. Default: \code{"bray"}}
 \item{\code{"PCoA"} - }{ Principal coordinate analysis; \code{\link[stats:cmdscale]{stats::cmdscale()}}. }
 \item{\code{"UMAP"} - }{ Uniform manifold approximation and projection; \code{\link[uwot:umap]{uwot::umap()}}. }
 \item{\code{"NMDS"} - }{ Nonmetric multidimensional scaling; \code{\link[vegan:metaMDS]{vegan::metaMDS()}}. }
-\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[tsne:tsne]{tsne::tsne()}}. }
+\item{\code{"tSNE"} - }{ t-distributed stochastic neighbor embedding; \code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}}. }
 }
 Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
@@ -213,8 +213,10 @@ Other visualization:
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{beta_diversity}
 \concept{ordination}

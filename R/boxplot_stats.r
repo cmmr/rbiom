@@ -189,7 +189,7 @@ boxplot_stats <- function (params) {
   # Format how p-values are displayed.
   #________________________________________________________
   if (length(p.label) == 1) {
-    rows[['.label']] <- paste("italic(p)==", formatC(rows[['.adj.p']], format = "g", digits = 1))
+    rows[['.label']] <- p_math(rows[['.adj.p']])
   } else {
     rows[['.label']] <- ""
     for (i in p.label)
@@ -336,12 +336,16 @@ boxplot_stats <- function (params) {
   set_layer(
     params = params,
     layer  = 'stats_text',
-    'size'          = 3,
-    'vjust'         = ifelse(isTRUE(params$flip), 0.5, 0),
+    'size'          = annot_size(params),
+    'vjust'         = ifelse(isTRUE(params$flip), 1, 0),
     'parse'         = length(p.label) == 1,
     'mapping|x'     = ".x",
     'mapping|y'     = ".y",
     'mapping|label' = ".label" )
+
+  # Flipped: the labels run alongside the (vertical) brackets.
+  if (isTRUE(params$flip))
+    set_layer(params, 'stats_text', 'angle' = 90)
 
 
   boxplot_stats_caption(params, method, stats)
@@ -370,20 +374,20 @@ boxplot_stats <- function (params) {
     set_layer(
       params = params,
       layer  = 'yaxis',
-      breaks       = breaks[seq_along(breaks) %% 2 == 1],
-      minor_breaks = breaks[seq_along(breaks) %% 2 == 0] )
+      breaks = breaks[seq_along(breaks) %% 2 == 1] )
 
-    # Hide gridlines behind the p-values.
-    set_layer(
-      params = params,
-      layer  = 'stats_bg',
-      'geom'  = "rect",
-      'xmin'  = -Inf,
-      'xmax'  = Inf,
-      'ymin'  = signif(ymax, 3),
-      'ymax'  = Inf,
-      'fill'  = "white",
-      'color' = NA )
+    # Hide gridlines (when requested with `grid`) behind the p-values.
+    if (!isFALSE(params$layers[['theme_rbiom']][['grid']] %||% FALSE))
+      set_layer(
+        params = params,
+        layer  = 'stats_bg',
+        'geom'  = "rect",
+        'xmin'  = -Inf,
+        'xmax'  = Inf,
+        'ymin'  = signif(ymax, 3),
+        'ymax'  = Inf,
+        'fill'  = "white",
+        'color' = NA )
   }
 
 
@@ -493,9 +497,6 @@ boxplot_stats_caption <- function (params, method, stats) {
 
   if (!isTRUE(params$caption)) return (invisible(NULL))
 
-  .element_text <- P('ggplot2::element_text')
-  set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
-
   strata <- params$strata
 
   text <- switch(
@@ -512,7 +513,7 @@ boxplot_stats_caption <- function (params, method, stats) {
       omni <- stats[stats[['.groups']] == max(stats[['.groups']]), , drop = FALSE]
 
       paste0(
-        if (nrow(omni) == 1) sprintf("%s p = %s; ", tst, formatC(omni[['.p.val']][[1]], format = "g", digits = 2)),
+        if (nrow(omni) == 1) sprintf("%s %s; ", tst, p_text(omni[['.p.val']][[1]])),
         sprintf("%s with %s permutations%s", tst, params$permutations %||% 999,
           if (is.null(strata)) "" else sprintf(" within %s", strata)) )
     }) )

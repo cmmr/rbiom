@@ -215,7 +215,10 @@ Visualize BIOM data with boxplots.
 \section{Aesthetics}{
 
 
-All built-in color palettes are colorblind-friendly. The available
+The default colors are colorblind-friendly for up to 12 groups: Okabe and
+Ito's palette (\code{"okabe"}) for up to 8, and Paul Tol's (\code{"tol"}) for 9-12.
+Of the other palettes, \code{"bright"}, \code{"vibrant"}, \code{"muted"}, \code{"light"}, and
+\code{"carto"} are also designed for color vision deficiencies. The available
 categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
 \code{"muted"}, \code{"vibrant"}, \code{"tableau"}, \code{"classic"},
@@ -257,6 +260,8 @@ Other taxa_abundance:
 \code{\link[=sample_sums]{sample_sums()}},
 \code{\link[=taxa_clusters]{taxa_clusters()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_da]{taxa_da()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
@@ -277,8 +282,10 @@ Other visualization:
 \code{\link[=stats_boxplot]{stats_boxplot()}},
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

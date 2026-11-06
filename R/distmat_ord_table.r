@@ -10,7 +10,7 @@
 #'            \item{`"PCoA"` - }{ Principal coordinate analysis; [stats::cmdscale()]. }
 #'            \item{`"UMAP"` - }{ Uniform manifold approximation and projection; [uwot::umap()]. }
 #'            \item{`"NMDS"` - }{ Nonmetric multidimensional scaling; [vegan::metaMDS()]. }
-#'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [tsne::tsne()]. }
+#'            \item{`"tSNE"` - }{ t-distributed stochastic neighbor embedding; [Rtsne::Rtsne()]. }
 #'        }
 #'        Multiple/abbreviated values allowed. Default: `"PCoA"`
 #'
@@ -18,7 +18,9 @@
 #'        UMAP), so that they are reproducible. PCoA is deterministic.
 #'        Must be a non-negative integer. Default: `0`
 #'
-#' @param ...  Additional arguments for the `ord` function.
+#' @param ...  Additional arguments for the `ord` function. For tSNE,
+#'        `perplexity` defaults to 30, or to `(n - 1) / 3` for fewer than
+#'        91 samples.
 #'
 #' @return A tibble data.frame with columns \code{.ord}, \code{.sample},
 #'         \code{.x}, \code{.y}, and (optionally) \code{.z}. The attribute
@@ -93,9 +95,11 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
         var  <- 100 * eig[seq_len(k)] / sum(eig[eig > 0])
 
       } else if (o == "tSNE") {
-        require_package('tsne', 'to use "tSNE" ordination')
-        args <- c(list(X = dm, k = k), fun_params(tsne::tsne, dots)[setdiff(names(dots), c('X', 'k'))])
-        res  <- with_seed(seed, suppressMessages(do.call(tsne::tsne, args)))
+        # Rtsne requires perplexity <= (n - 1) / 3.
+        require_package('Rtsne', 'to use "tSNE" ordination')
+        args <- c(list(X = dm, dims = k), fun_params(Rtsne::Rtsne, dots)[setdiff(names(dots), c('X', 'dims', 'is_distance'))])
+        args[['perplexity']] %<>% if.null(min(30, (attr(dm, 'Size') - 1) / 3))
+        res  <- with_seed(seed, do.call(Rtsne::Rtsne, args))[['Y']]
         rownames(res) <- labels
 
       } else if (o == "NMDS") {
@@ -142,7 +146,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
       attr(tbl, 'tbl_sum') <- c('Ordination' = switch(
         EXPR = ord,
         PCoA = sprintf("stats::cmdscale(dm, k = %s, eig = TRUE)", k),
-        tSNE = sprintf("tsne::tsne(dm, k = %s)", k),
+        tSNE = sprintf("Rtsne::Rtsne(dm, dims = %s)", k),
         NMDS = sprintf("vegan::metaMDS(dm, k = %s)", k),
         UMAP = sprintf("uwot::umap(dm, n_components = %s)", k) ))
 

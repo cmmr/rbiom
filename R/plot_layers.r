@@ -120,7 +120,7 @@ init_layers <- function (
 
 
   init_layer_names <- layer_names %>%
-    c('ggplot', ., 'xaxis', 'yaxis', 'theme', 'theme_bw') %>%
+    c('ggplot', ., 'xaxis', 'yaxis', 'theme_rbiom', 'theme') %>%
     unique()
 
 
@@ -250,6 +250,7 @@ layer_function <- function (layer, params, fn = NULL) {
     'bar'          = P('ggplot2::geom_bar'),
     'box'          = P('ggplot2::geom_boxplot'),
     'brackets'     = P('ggplot2::geom_segment'),
+    'ci'           = P('ggplot2::geom_errorbar'),
     'color'        = P('ggplot2::scale_color_manual'),
     'confidence'   = P('ggplot2::geom_ribbon'),
     'crossbar'     = P('ggplot2::geom_crossbar'),
@@ -280,12 +281,13 @@ layer_function <- function (layer, params, fn = NULL) {
     'stripe'       = P('ggplot2::annotate'),
     'taxon'        = if (pkg_available('ggrepel')) P('ggrepel::geom_label_repel') else P('ggplot2::geom_label'),
     'theme'        = P('ggplot2::theme'),
-    'theme_bw'     = P('ggplot2::theme_bw'),
+    'theme_rbiom'  = P('rbiom::theme_rbiom'),
     'trend'        = P('ggplot2::geom_line'),
     'violin'       = P('ggplot2::geom_violin'),
     'vline'        = P('ggplot2::geom_vline'),
     'xaxis'        = if (eq(xmode, "factor")) P('ggplot2::scale_x_discrete') else P('ggplot2::scale_x_continuous'),
-    'yaxis'        = P('ggplot2::scale_y_continuous'),
+    'yaxis'        = if (eq(params$.ymode, "factor")) P('ggplot2::scale_y_discrete') else P('ggplot2::scale_y_continuous'),
+    'zero'         = P('ggplot2::geom_vline'),
     if (is.null(fn)) P(paste0('ggplot2::', layer)) else get(fn) )
 }
 
@@ -297,9 +299,9 @@ layer_function <- function (layer, params, fn = NULL) {
 # both, so it's excluded.)
 #________________________________________________________
 LINE_LAYERS <- c(
-  'arrow', 'bar', 'box', 'brackets', 'confidence', 'crossbar', 'ellipse',
+  'arrow', 'bar', 'box', 'brackets', 'ci', 'confidence', 'crossbar', 'ellipse',
   'errorbar', 'hline', 'linerange', 'rect', 'residual', 'spider', 'stack',
-  'stats_vline', 'trend', 'violin', 'vline' )
+  'stats_vline', 'trend', 'violin', 'vline', 'zero' )
 
 
 
@@ -341,6 +343,7 @@ layer_regex <- function (layer) {
     'bar'          = "^(b|bar)\\.",
     'box'          = "^box\\.",
     'brackets'     = "^brackets\\.",
+    'ci'           = "^ci\\.",
     'color'        = "^color\\.",
     'confidence'   = "^c(|onfidence)\\.",
     'crossbar'     = "^c(|rossbar)\\.",
@@ -368,12 +371,13 @@ layer_regex <- function (layer) {
     'strip'        = "^(pt|s|strip)\\.",
     'taxon'        = "^taxon\\.",
     'theme'        = "^theme\\.",
-    'theme_bw'     = "^theme_bw\\.",
+    'theme_rbiom'  = "^theme_(rbiom|bw)\\.",
     'trend'        = "^t(|rend)\\.",
     'vline'        = "^[rv](|line)\\.",
     'violin'       = "^v(|iolin)\\.",
     'xaxis'        = "^x(|axis)\\.",
     'yaxis'        = "^y(|axis)\\.",
+    'zero'         = "^z(|ero)\\.",
     sprintf("^%s\\.", layer) )
 }
 

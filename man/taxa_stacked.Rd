@@ -122,6 +122,8 @@ Other taxa_abundance:
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_clusters]{taxa_clusters()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_da]{taxa_da()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
@@ -142,7 +144,9 @@ Other visualization:
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
-\code{\link[=taxa_heatmap]{taxa_heatmap()}}
+\code{\link[=taxa_forest]{taxa_forest()}},
+\code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

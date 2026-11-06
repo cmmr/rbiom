@@ -166,6 +166,7 @@ Other stats_tables:
 \code{\link[=adiv_stats]{adiv_stats()}},
 \code{\link[=distmat_stats]{distmat_stats()}},
 \code{\link[=stats_table]{stats_table()}},
+\code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_stats]{taxa_stats()}}
 }
 \concept{beta_diversity}

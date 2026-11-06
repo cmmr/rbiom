@@ -16,12 +16,15 @@
 #'        can supply a numeric vector of length two to control row label sizes
 #'        and column label sizes separately, for example
 #'        `c(rows = 20, cols = 8)`, or simply `c(20, 8)`.
-#'        Default: `NULL`, which computes:
-#'        `pmax(5, pmin(14, 100 / dim(mtx)))`
+#'        Default: `NULL`, which uses the theme's tick label size, shrunk to
+#'        `pmax(5, 100 / dim(mtx))` when there are too many rows or columns
+#'        for it.
 #'
 #' @param ...   Additional arguments to pass on to [ggplot2::theme()].
 #'        Arguments prefixed with `labs.` go to [ggplot2::labs()] instead,
-#'        for example `labs.subtitle = "Plot subtitle"`.
+#'        for example `labs.subtitle = "Plot subtitle"`, and `base_size`,
+#'        `base_family`, `base_line_size`, and `base_rect_size` go to
+#'        [theme_rbiom()].
 #'
 #'
 #' @section Track Definitions:
@@ -72,7 +75,9 @@
 #'   \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 #' }
 #'
-#' All built-in color palettes are colorblind-friendly.
+#' The default categorical colors are colorblind-friendly for up to 12
+#' groups: Okabe and Ito's palette (`"okabe"`) for up to 8, and Paul Tol's
+#' (`"tol"`) for 9-12.
 #'
 #' The available categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
 #' `"polychrome"`, `"tol"`, `"bright"`, `"light"`, `"muted"`, `"vibrant"`,
@@ -227,15 +232,21 @@ plot_heatmap_build <- function (params) {
 
 
   #________________________________________________________
-  # `...` arguments: labs.* go to labs(), the rest to theme().
+  # `...` arguments: labs.* go to labs(), base_* to theme_rbiom(),
+  # and the rest to theme().
   #________________________________________________________
   labs_args  <- list()
+  rbiom_args <- list(frame = "none")
   theme_args <- list()
 
   for (i in names(dots)) {
     if (startsWith(i, "labs.")) { labs_args[[sub("^labs\\.", "", i)]] <- dots[[i]] }
+    else if (startsWith(i, "base_")) { rbiom_args[[i]] <- dots[[i]] }
     else                        { theme_args[[i]] <- dots[[i]] }
   }
+
+  if (length(bad <- setdiff(names(rbiom_args), formalArgs(theme_rbiom))) > 0)
+    cli_abort("{.val {bad}} {?is/are} not {?an argument/arguments} of {.fn theme_rbiom}.")
 
   if (length(bad <- setdiff(names(theme_args), formalArgs(ggplot2::theme))) > 0)
     cli_abort(c(
@@ -259,7 +270,7 @@ plot_heatmap_build <- function (params) {
   .geom_tile          <- P('ggplot2::geom_tile')
   .element_text       <- P('ggplot2::element_text')
   .theme              <- P('ggplot2::theme')
-  .theme_void         <- P('ggplot2::theme_void')
+  .theme_rbiom        <- P('rbiom::theme_rbiom')
   .new_scale_fill     <- P('ggnewscale::new_scale_fill')
   .element_rect       <- P('ggplot2::element_rect')
   .margin             <- P('ggplot2::margin')
@@ -353,10 +364,18 @@ plot_heatmap_build <- function (params) {
   #________________________________________________________
   # Heuristics for setting sizes and heights of elements
   #________________________________________________________
-  if (is_null(label_size))         label_size <- pmax(5, pmin(14, 100 / dim(mtx)))
+  # NA = the theme's size for tick labels (9.35 pt).
+  if (is_null(label_size))         label_size <- ifelse(100 / dim(mtx) >= 9, NA, pmax(5, 100 / dim(mtx)))
   if (!is_null(names(label_size))) label_size <- label_size[rev(order(names(label_size)))]
   label_size_x <- signif(tail(label_size, 1), digits = 3)
   label_size_y <- signif(head(label_size, 1), digits = 3)
+
+  # "auto" angle for the column labels, by how much room they need.
+  if (eq(as.character(xlab.angle), "auto")) {
+    width      <- sum(nchar(colnames(mtx))) + 2 * ncol(mtx)
+    xlab.angle <- if (width <= 50) "0" else if (width <= 100) "30" else "90"
+    remove("width")
+  }
 
   if (is.null(tracks) || length(tracks) == 0) {
     n_left <- n_top <- 0
@@ -652,7 +671,7 @@ plot_heatmap_build <- function (params) {
       x_args[['breaks']] <- structure(seq_len(ncol(mtx)), display = "seq_len(ncol(mtx))")
       x_args[['labels']] <- structure(colnames(mtx),      display = "colnames(mtx)")
     } else {
-      x_args[['breaks']] <- NULL
+      x_args['breaks'] <- list(NULL)
     }
 
     if (isTRUE(n_left > 0))
@@ -672,7 +691,7 @@ plot_heatmap_build <- function (params) {
       y_args[['breaks']] <- structure(seq_len(nrow(mtx)), display = "seq_len(nrow(mtx))")
       y_args[['labels']] <- structure(rownames(mtx),      display = "rownames(mtx)")
     } else {
-      y_args[['breaks']] <- NULL
+      y_args['breaks'] <- list(NULL)
     }
 
     if (isTRUE(n_top > 0))
@@ -748,33 +767,34 @@ plot_heatmap_build <- function (params) {
 
 
   #________________________________________________________
-  # Theming. Track labels are 10 points; grid labels `label_size`.
+  # Theming. Track labels use the theme's tick label size; grid
+  # labels use `label_size` (NA for the theme's size).
   #________________________________________________________
   args <- theme_args
 
-  if (!hasName(args, 'axis.text.y.right') && isTRUE(label_rows))
-    args[['axis.text.y.right']] <- .element_text(size = label_size_y, hjust = 0)
-
-  if (!hasName(args, 'axis.text.y.left') && isTRUE(n_top > 0))
-    args[['axis.text.y.left']] <- .element_text(size = 10, hjust = 1)
-
-  x_text <- function (size) {
-    switch(
+  x_text <- function (size = NA) {
+    el <- switch(
       EXPR = paste0("x", tolower(xlab.angle)),
-      x0   = .element_text(size = size),
-      x90  = .element_text(size = size, angle = -90, vjust = 0.3, hjust = 0),
-             .element_text(size = size, angle = -30, vjust = 1.0, hjust = 0) )
+      x0   = list(),
+      x90  = list(angle = -90, vjust = 0.3, hjust = 0),
+             list(angle = -30, vjust = 1.0, hjust = 0) )
+    if (!is.na(size)) el[['size']] <- size
+    if (length(el) == 0) NULL else do.call(.element_text, el)
   }
+
+  if (!hasName(args, 'axis.text.y.right') && isTRUE(label_rows) && !is.na(label_size_y))
+    args[['axis.text.y.right']] <- .element_text(size = label_size_y)
 
   if (!hasName(args, 'axis.text.x.bottom') && isTRUE(label_cols))
     args[['axis.text.x.bottom']] <- x_text(label_size_x)
 
   if (!hasName(args, 'axis.text.x.top') && isTRUE(n_left > 0))
-    args[['axis.text.x.top']] <- x_text(10)
+    args[['axis.text.x.top']] <- x_text()
 
 
-  gglayers %<>% ggpush(.theme_void())
-  gglayers %<>% ggpush(do.call(.theme, c(args, .indent = 4)))
+  gglayers %<>% ggpush(do.call(.theme_rbiom, rbiom_args))
+  if (length(args) > 0)
+    gglayers %<>% ggpush(do.call(.theme, c(args, .indent = 4)))
 
   remove("args")
 
@@ -817,8 +837,6 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
   binned  <- !is_null(args[['bins']])
   numeric <- is_null(args[['values']]) || is.numeric(args[['values']])
 
-  .unit           <- P('grid::unit')
-  .element_text   <- P('ggplot2::element_text')
   .theme          <- P('ggplot2::theme')
   .guide_colorbar <- P('ggplot2::guide_colorbar')
   .guide_legend   <- P('ggplot2::guide_legend')
@@ -849,10 +867,7 @@ plot_heatmap_layer <- function (args, guide_order = 0) {
     guide[['.indent']]   %<>% if.null(6)
     guide[['order']]     %<>% if.null(guide_order)
     guide[['direction']] %<>% if.null('horizontal')
-    guide[['theme']]     %<>% if.null(.theme(
-      legend.title.position = "top",
-      legend.key.height     = .unit(21.5, "points"),
-      legend.text           = .element_text(size = 8) ))
+    guide[['theme']]     %<>% if.null(.theme(legend.title.position = "top"))
     fn_args[['guide']] <- do.call(.guide_colorbar, guide)
 
   } else {

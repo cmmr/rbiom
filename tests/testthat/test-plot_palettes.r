@@ -7,7 +7,7 @@ test_that("plot_palettes", {
 
   skip_on_cran()
 
-  expect_identical(get_palette('okabe')[[1]], "#E69F00")
+  expect_identical(get_palette('okabe')[[1]], "#0072B2")
   expect_identical(get_palette('-okabe')[[1]], "#999999")
   expect_length(get_n_colors(12, TRUE), 12)
   expect_length(get_n_colors(20), 20)

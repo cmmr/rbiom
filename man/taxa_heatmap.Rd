@@ -201,7 +201,9 @@ The following entries in the track definitions are understood:
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 }
 
-All built-in color palettes are colorblind-friendly.
+The default categorical colors are colorblind-friendly for up to 12
+groups: Okabe and Ito's palette (\code{"okabe"}) for up to 8, and Paul
+Tol's (\code{"tol"}) for 9-12.
 
 Categorical palette names: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"},
@@ -239,6 +241,8 @@ Other taxa_abundance:
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_clusters]{taxa_clusters()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_da]{taxa_da()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
@@ -259,7 +263,9 @@ Other visualization:
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_forest]{taxa_forest()}},
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}
 \concept{visualization}

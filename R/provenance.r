@@ -456,7 +456,7 @@ P <- function (pkgfn) {
   require_package(pkg, reason = paste0('to use `', fn, '()`'))
 
   fun <- getFromNamespace(x = fn, ns = pkg)
-  fn  <- ifelse(pkg %in% c('base', 'ggplot2', 'grid'), fn, pkgfn)
+  fn  <- ifelse(pkg %in% c('base', 'ggplot2', 'grid', 'rbiom'), fn, pkgfn)
 
 
   newfun <- function (..., .indent = 0) {

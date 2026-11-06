@@ -46,7 +46,10 @@
 #'
 #' @section Aesthetics:
 #'
-#' All built-in color palettes are colorblind-friendly. The available
+#' The default colors are colorblind-friendly for up to 12 groups: Okabe and
+#' Ito's palette (`"okabe"`) for up to 8, and Paul Tol's (`"tol"`) for 9-12.
+#' Of the other palettes, `"bright"`, `"vibrant"`, `"muted"`, `"light"`, and
+#' `"carto"` are also designed for color vision deficiencies. The available
 #' categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
 #' `"polychrome"`, `"tol"`, `"bright"`, `"light"`,
 #' `"muted"`, `"vibrant"`, `"tableau"`, `"classic"`,

@@ -129,7 +129,7 @@ corrplot_stats <- function (params) {
   attr(ggdata, 'stat_labels') <- split_apply(stats, by, function (df) {
 
     df     <- df[order(df[['.p.val']]), , drop = FALSE]
-    plabel <- paste("p =", format(df$.adj.p[[1]], digits = 2))
+    plabel <- p_text(df$.adj.p[[1]])
 
     if (is_bdiv)
       plabel <- paste0("Mantel r = ", format(df$.stat[[1]], digits = 2), "; ", plabel)
@@ -175,7 +175,7 @@ corrplot_stats <- function (params) {
     'mapping|label' = ".label",
     'mapping|hjust' = ".hjust",
     'mapping|vjust' = ".vjust",
-    'size'          = 4 )
+    'size'          = annot_size(params) )
 
   if ("linewidth" %in% names(ggplot2::GeomLabel$default_aes)) {
     set_layer(params, 'stats_label', 'linewidth' = NA)
@@ -201,9 +201,6 @@ corrplot_stats <- function (params) {
 
   if (isTRUE(params$caption)) {
 
-    .element_text <- P('ggplot2::element_text')
-
-    set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     set_layer(params, 'labs', .overwrite = TRUE, caption = local({
 
       curr <- params$layers$labs$caption

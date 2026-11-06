@@ -183,11 +183,12 @@ bdiv_ord_build <- function (params) {
 
 
   #________________________________________________________
-  # Scale the size of biplot means and taxon labels
+  # Scale the size of the biplot means by taxa abundance. Taxon labels
+  # keep a fixed size, but are repelled from the means.
   #________________________________________________________
-  if (has_layer(params, 'mean') || has_layer(params, 'taxon')) {
+  if (has_layer(params, 'mean')) {
 
-    if (has_layer(params, 'taxon') && has_layer(params, 'mean') && repel) {
+    if (has_layer(params, 'taxon') && repel) {
 
       set_layer(
         params = params,
@@ -197,26 +198,19 @@ bdiv_ord_build <- function (params) {
       set_layer(
         params = params,
         layer  = 'continuous_scale',
-        'palette'    = as.cmd(scales::area_pal(range = c(2, 5))),
+        'palette'    = as.cmd(scales::area_pal(range = c(1.5, 4))),
         'aesthetics' = c("size", "point.size"),
         'name'       = "Taxa Abundance",
         'labels'     = ~ paste0(. * 100, "%") )
-
-    } else if (has_layer(params, 'mean')) {
-
-      set_layer(
-        params = params,
-        layer  = 'scale_size',
-        'range'  = c(2, 5),
-        'name'   = "Taxa Abundance",
-        'labels' = ~ paste0(. * 100, "%") )
 
     } else {
 
       set_layer(
         params = params,
         layer  = 'scale_size',
-        'range' = c(2, 5) )
+        'range'  = c(1.5, 4),
+        'name'   = "Taxa Abundance",
+        'labels' = ~ paste0(. * 100, "%") )
     }
   }
 
@@ -225,7 +219,6 @@ bdiv_ord_build <- function (params) {
   # Provenance-tracked ggplot2 functions.
   #________________________________________________________
   .element_blank <- P('ggplot2::element_blank')
-  .element_rect  <- P('ggplot2::element_rect')
   .arrow         <- P('grid::arrow')
   .unit          <- P('grid::unit')
   .alpha         <- P('scales::alpha')
@@ -284,8 +277,8 @@ bdiv_ord_build <- function (params) {
       params = params,
       layer  = 'taxon',
       'show.legend'   = FALSE,
+      'size'          = annot_size(params),
       'fill'          = .alpha(c("white"), 0.8),
-      'mapping|size'  = ".size",
       'mapping|label' = ".label" )
 
     if (repel)
@@ -294,21 +287,18 @@ bdiv_ord_build <- function (params) {
         layer  = 'taxon',
         'box.padding'        = 1,
         'segment.curvature'  = -0.1,
-        'segment.linetype'   = 8,
+        'segment.colour'     = "grey40",
         'max.overlaps'       = 100,
         'seed'               = 0 )
   }
 
 
-  set_layer(
-    params = params,
-    layer  = 'theme',
-    'axis.text'        = .element_blank(),
-    'axis.ticks'       = .element_blank(),
-    'panel.border'     = .element_rect(color = "black", fill = NA, linewidth = 1),
-    'panel.grid.major' = .element_blank(),
-    'panel.grid.minor' = .element_blank(),
-    'panel.background' = .element_rect(fill = "white"))
+  #________________________________________________________
+  # Ordination axes have no meaningful units: a box without
+  # tick marks or tick labels.
+  #________________________________________________________
+  set_layer(params, 'theme_rbiom', frame = "box")
+  set_layer(params, 'theme', axis.text = .element_blank(), axis.ticks = .element_blank())
 
 
   #________________________________________________________
@@ -396,20 +386,28 @@ bdiv_pretty <- function (ids) {
 
 
 #________________________________________________________
-# One line of text summarizing a sample statistics row.
+# One line of text summarizing a sample statistics row, e.g.
+# "F = 10.7, R\u00b2 = 0.63, p = 0.001". With `name = TRUE`, prefixed
+# by the name of the test ("PERMANOVA: F = ...").
 #________________________________________________________
-ord_stats_text <- function (row, test) {
+ord_stats_text <- function (row, test, name = TRUE) {
 
-  fmt <- function (x) format(x, digits = 3)
+  fmt <- function (x, digits = 3) format(signif(x, digits), digits = digits)
 
   if (is.na(row[['.p.val']])) return ("statistics unavailable")
 
-  switch(
+  p   <- p_text(row[['.p.val']])
+  txt <- switch(
     EXPR       = test,
-    adonis2    = sprintf("PERMANOVA F = %s; R\u00b2 = %s; p = %s", fmt(row[['.stat']]), fmt(row[['.r.sqr']]), fmt(row[['.p.val']])),
-    mrpp       = sprintf("MRPP delta = %s; z = %s; p = %s",         fmt(row[['.stat']]), fmt(row[['.z']]),     fmt(row[['.p.val']])),
-    betadisper = sprintf("Dispersion F = %s; p = %s",               fmt(row[['.stat']]), fmt(row[['.p.val']])),
-    sprintf("p = %s", fmt(row[['.p.val']])) )
+    adonis2    = sprintf("F = %s, R\u00b2 = %s, %s", fmt(row[['.stat']]), fmt(row[['.r.sqr']], 2), p),
+    mrpp       = sprintf("delta = %s, z = %s, %s",    fmt(row[['.stat']]), fmt(row[['.z']]),         p),
+    betadisper = sprintf("F = %s, %s",                fmt(row[['.stat']]), p),
+    p )
+
+  label <- switch(EXPR = test, adonis2 = "PERMANOVA", mrpp = "MRPP", betadisper = "Dispersion", NULL)
+  if (isTRUE(name) && !is.null(label)) txt <- paste0(label, ": ", txt)
+
+  return (txt)
 }
 
 
@@ -430,10 +428,6 @@ ordination_facets <- function (params) {
   ranks        <- params$rank
   facet.by     <- params$facet.by
   dv           <- params$.dv
-
-  .element_blank <- P('ggplot2::element_blank')
-  .element_text  <- P('ggplot2::element_text')
-
 
   #________________________________________________________
   # One row per facet.
@@ -494,15 +488,15 @@ ordination_facets <- function (params) {
     stats_keys <- do.call(paste, c(lapply(sample_stats[stats_by], as.character), sep = "\r"))
     facet_keys <- do.call(paste, c(keys[stats_by], sep = "\r"))
 
+    # The caption names the test, so the labels don't need to.
     stats_text <- vapply(facet_keys, FUN.VALUE = '', function (k) {
       i <- match(k, stats_keys)
       if (is.na(i)) return ("statistics unavailable")
-      ord_stats_text(sample_stats[i, ], params$test)
+      ord_stats_text(sample_stats[i, ], params$test, name = !isTRUE(params$caption))
     })
 
     if (length(unique(stats_text)) == 1) {
       set_layer(params, 'labs',  subtitle = stats_text[[1]])
-      set_layer(params, 'theme', plot.subtitle = .element_text(size = 11))
 
     } else {
       labels <- ifelse(nzchar(labels), paste0(labels, "\n", stats_text), stats_text)
@@ -520,8 +514,6 @@ ordination_facets <- function (params) {
           switch(params$test, adonis2 = "PERMANOVA", mrpp = "MRPP", betadisper = "betadisper", params$test),
           params$permutations,
           if (is.null(params$strata)) "" else sprintf(" within %s", params$strata) ))
-
-      set_layer(params, 'theme', plot.caption = .element_text(size = 9, face = "italic"))
     }
 
   }
@@ -582,12 +574,6 @@ ordination_facets <- function (params) {
     params$facet.by <- '.facet'
 
     set_layer(params, 'facet', 'scales' = "free")
-
-    set_layer(
-      params = params,
-      layer  = 'theme',
-      'strip.background' = .element_blank(),
-      'strip.text'       = .element_text(hjust = 0) )
 
   } else {
     params$facet.by <- NULL

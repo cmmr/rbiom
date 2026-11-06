@@ -160,17 +160,8 @@ corrplot_build <- function (params) {
       params     = params,
       layer      = 'vline',
       xintercept = params$rline,
-      color      = "red",
+      color      = "#D55E00",
       linetype   = "dashed" )
-
-
-
-  #________________________________________________________
-  # Theming specific to a numeric x-axis.
-  #________________________________________________________
-  .element_blank <- P('ggplot2::element_blank')
-  set_layer(params, 'theme', panel.grid.minor.x = .element_blank())
-
 
 
 

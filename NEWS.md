@@ -74,6 +74,33 @@
 * The log transform in `taxa_matrix()` uses a pseudocount so absent taxa rank 
   lowest.
 
+## Differential abundance
+
+* New `taxa_da()` finds differentially abundant taxa with methods that 
+  account for compositionality, between groups (`stat.by`; every pair of 
+  groups) or along a numeric variable (`regr`), with optional `covariates`,
+  `strata` (a random intercept per subject), `split.by`, and several ranks.
+  Two methods:
+  * `"linda"` (default): LinDA (Zhou et al. 2022), built in. It gives the 
+    results of `MicrobiomeStat::linda()` (to within 1e-10 on hmp50), except
+    that it imputes zeros when sequencing depth is associated with the 
+    model, as the paper describes (`MicrobiomeStat::linda()` 1.4 reports 
+    imputation but adds a pseudo-count). Comparisons between two 
+    non-reference groups are corrected by the mode of their own contrast, 
+    so they don't depend on the order of the groups.
+  * `"ancombc2"`: ANCOM-BC2 (Lin & Peddada 2024) via 
+    `ANCOMBC::ancombc2()`, with its pseudo-count sensitivity analysis 
+    (`.robust`) and, for three or more groups, its mixed directional FDR 
+    pairwise tests.
+  
+  Both report log2 fold changes with standard errors, confidence intervals,
+  t statistics, and p-values adjusted across taxa within each comparison. 
+  `$code` names the method, its model, and the exact `ancombc2()` call.
+* New `taxa_forest()` plots `taxa_da()` results: each taxon's log2 fold 
+  change and confidence interval, colored by direction when significant, 
+  with one panel per comparison (and rank and `split.by` subset) and the 
+  `p.top` most significant taxa ordered by fold change.
+
 ## Data handling
 
 * `subset()` and `subset_taxa()` treat `NA` conditions as `FALSE`, like 
@@ -114,6 +141,35 @@
   ordination ellipses for small groups.
 * Plot titles use readable metric names.
 
+## Figure style
+
+* New `theme_rbiom()`: one publication-ready theme for every rbiom plot, 
+  following common journal figure guidelines (Nature, Science, Cell). Black
+  sans-serif text sized relative to `base_size` (11 pt; previously 14 pt), 
+  open x/y axes with outward ticks, no gridlines or background shading, 
+  facet labels without boxes, and titles and captions aligned with the 
+  figure's left edge. A plot's `$code` now ends with `theme_rbiom()` instead
+  of `theme_bw()` plus a block of `theme()` settings. Options: `frame` 
+  (`"axes"`, `"box"`, `"none"`), `grid`, `base_size`, `base_family`; pass 
+  them to any plot function, e.g. `adiv_boxplot(biom, base_size = 8)`. Use 
+  `theme_rbiom()` on your own ggplots to match rbiom's figures.
+* Default colors are now Okabe-Ito for up to 8 groups. The previous default
+  (`"classic"`, the D3/Tableau 10 palette) has red/green and orange/green 
+  pairs that are hard to tell apart with color vision deficiencies. The 
+  `"okabe"` palette is reordered so that its first colors contrast most, 
+  with yellow (hard to see on white) last. The "Other" group in 
+  `taxa_stacked()` is light gray.
+* Default shapes are solid (circle, triangle, square, diamond) before 
+  outlines.
+* p-values in figures have two significant digits, are never in scientific
+  notation (`p = 2e-04`), and are shown as `p < 0.001` below 0.001.
+* Ordination facet labels no longer overflow: statistics are shortened to 
+  `F = 10.7, R² = 0.63, p = 0.001` (the caption names the test). Taxa labels 
+  have a fixed size; mean points are scaled by abundance.
+* Flipped boxplots draw p-values alongside their brackets instead of across 
+  them. Heatmap and `rare_stacked()` sample labels are rotated 90° when 
+  there are many of them.
+
 ## Breaking changes
 
 * `write_*()` functions refuse to overwrite an existing file unless 
@@ -124,6 +180,14 @@
   `apcoa` and tree-plotting code.
 * `bdiv = "unifrac"` is now an error because it is ambiguous; name the 
   variant (e.g. `"unweighted_unifrac"`).
+* `ord = "tSNE"` uses `Rtsne::Rtsne()` instead of `tsne::tsne()`. It is 
+  about 8-15x faster from a few hundred samples up and keeps more of each 
+  sample's nearest neighbors together. Coordinates differ from earlier 
+  versions for the same `seed`. Rtsne arguments such as `theta`, 
+  `max_iter`, `Y_init`, and `num_threads` can be passed through `...`; the 
+  old tsne arguments (`initial_config`, `whiten`, `epoch`, ...) are 
+  ignored. `perplexity` now defaults to `(n - 1) / 3` for fewer than 91 
+  samples, since the previous default of 30 cannot be reached with so few.
 * Statistics table columns changed as described above.
 
 ## Dependencies
@@ -133,6 +197,9 @@
   always required but undeclared (cli, glue, lifecycle, Matrix, R6, rlang, 
   scales, tibble) are now in Imports, along with cluster and permute (both 
   already installed with vegan).
+* Suggests Rtsne instead of tsne.
+* Suggests ANCOMBC (for `taxa_da(method = "ancombc2")`), and lmerTest and
+  lme4 (for `taxa_da(method = "linda")` with `strata`).
 * Requires ecodive (>= 2.3.1).
 
 

@@ -47,8 +47,9 @@ Default: \code{TRUE}}
 can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 \code{c(rows = 20, cols = 8)}, or simply \code{c(20, 8)}.
-Default: \code{NULL}, which computes:
-\code{pmax(5, pmin(14, 100 / dim(mtx)))}}
+Default: \code{NULL}, which uses the theme's tick label size, shrunk to
+\code{pmax(5, 100 / dim(mtx))} when there are too many rows or columns
+for it.}
 
 \item{rescale}{Rescale rows or columns to all have a common min/max.
 Options: \code{"none"}, \code{"rows"}, or \code{"cols"}.
@@ -110,7 +111,9 @@ Default: \code{"auto"}.}
 
 \item{...}{Additional arguments to pass on to \code{\link[ggplot2:theme]{ggplot2::theme()}}.
 Arguments prefixed with \code{labs.} go to \code{\link[ggplot2:labs]{ggplot2::labs()}} instead,
-for example \code{labs.subtitle = "Plot subtitle"}.}
+for example \code{labs.subtitle = "Plot subtitle"}, and \code{base_size},
+\code{base_family}, \code{base_line_size}, and \code{base_rect_size} go to
+\code{\link[=theme_rbiom]{theme_rbiom()}}.}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -169,7 +172,9 @@ The following entries in the track definitions are understood:
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
 }
 
-All built-in color palettes are colorblind-friendly.
+The default categorical colors are colorblind-friendly for up to 12
+groups: Okabe and Ito's palette (\code{"okabe"}) for up to 8, and Paul Tol's
+(\code{"tol"}) for 9-12.
 
 The available categorical palette names are: \code{"okabe"}, \code{"carto"}, \code{"r4"},
 \code{"polychrome"}, \code{"tol"}, \code{"bright"}, \code{"light"}, \code{"muted"}, \code{"vibrant"},
@@ -225,7 +230,9 @@ Other visualization:
 \code{\link[=stats_corrplot]{stats_corrplot()}},
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{visualization}

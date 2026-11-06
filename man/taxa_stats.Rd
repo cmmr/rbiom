@@ -191,6 +191,8 @@ Other taxa_abundance:
 \code{\link[=taxa_boxplot]{taxa_boxplot()}},
 \code{\link[=taxa_clusters]{taxa_clusters()}},
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
+\code{\link[=taxa_da]{taxa_da()}},
+\code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
@@ -200,7 +202,8 @@ Other stats_tables:
 \code{\link[=adiv_stats]{adiv_stats()}},
 \code{\link[=bdiv_stats]{bdiv_stats()}},
 \code{\link[=distmat_stats]{distmat_stats()}},
-\code{\link[=stats_table]{stats_table()}}
+\code{\link[=stats_table]{stats_table()}},
+\code{\link[=taxa_da]{taxa_da()}}
 }
 \concept{stats_tables}
 \concept{taxa_abundance}

@@ -51,6 +51,7 @@ Imports:
     tibble,
     vegan
 Suggests:
+    ANCOMBC,
     ape,
     biomformat,
     Biostrings,
@@ -59,16 +60,18 @@ Suggests:
     ggdensity,
     ggrepel,
     h5lite,
+    lme4,
+    lmerTest,
     MultiAssayExperiment,
     openxlsx,
     optparse,
     phyloseq,
     prettycode,
     readxl,
+    Rtsne,
     S4Vectors,
     SummarizedExperiment,
     testthat,
     TreeSummarizedExperiment,
-    tsne,
     uwot
 Config/roxygen2/version: 8.1.1

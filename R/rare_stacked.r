@@ -170,7 +170,6 @@ rare_stacked_build <- function (params) {
   #________________________________________________________
   # Provenance-tracked ggplot2 functions.
   #________________________________________________________
-  .element_blank <- P('ggplot2::element_blank')
   .element_text  <- P('ggplot2::element_text')
   .label_number  <- P('scales::label_number')
   .cut_si        <- P('scales::cut_si')
@@ -193,7 +192,6 @@ rare_stacked_build <- function (params) {
 
   set_layer(params, 'labs',  x = "Sample", y = "Sequencing Depth")
   set_layer(params, 'yaxis', expand = c(0,0))
-  set_layer(params, 'theme', panel.grid.major.x = .element_blank())
 
   if (is.null(params$y.transform)) {
     set_layer(params, 'yaxis', labels = .label_number(scale_cut = .cut_si("")))
@@ -202,9 +200,21 @@ rare_stacked_build <- function (params) {
   }
 
   if (isTRUE(params$labels)) {
-    set_layer(params, 'point', mapping     = list(x = ".x"), y = 1, alpha = 0)
-    set_layer(params, 'theme', axis.text.x = .element_text(angle = -30, vjust = 1, hjust = 0) )
+
+    # Rotate the sample names by how much room they need.
+    lvls  <- levels(as.factor(params$.ggdata[['.x']]))
+    width <- sum(nchar(lvls)) + 2 * length(lvls)
+
+    set_layer(params, 'point', mapping = list(x = ".x"), y = 1, alpha = 0)
     set_layer(params, 'labs',  .overwrite = TRUE, x = NULL)
+
+    if (width > 100) {
+      set_layer(params, 'theme', axis.text.x = .element_text(angle = -90, vjust = 0.3, hjust = 0))
+    } else if (width > 50) {
+      set_layer(params, 'theme', axis.text.x = .element_text(angle = -30, vjust = 1, hjust = 0))
+    }
+
+    remove("lvls", "width")
   }
 
   if (!isFALSE(params$rline)) {
@@ -213,8 +223,9 @@ rare_stacked_build <- function (params) {
     ss    <- params$.ss
 
     set_layer(params, 'rect', 'mapping|fill' = ".group")
+    set_layer(params, 'fill', values = c(Excluded = "#BBBBBB", Retained = "#0072B2"))
     set_layer(params, 'labs',  fill = "Reads")
-    set_layer(params, 'hline', yintercept = rline, color = "red", linetype = "dashed")
+    set_layer(params, 'hline', yintercept = rline, color = "#D55E00", linetype = "dashed")
 
     if (isTRUE(params$counts)) {
 
@@ -238,8 +249,6 @@ rare_stacked_build <- function (params) {
 
         return (paste0(samples_retained, "\n", reads_retained))
       }))
-
-      set_layer(params, 'theme', plot.subtitle = .element_text(size=10))
     }
 
     remove("rline", "ss")

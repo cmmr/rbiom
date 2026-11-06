@@ -34,7 +34,7 @@
 #'        ordinations (NMDS, tSNE, UMAP). Default: `0`
 #'
 #' @param ...  Additional arguments to pass on to [stats::cmdscale()],
-#'        [vegan::metaMDS()], [tsne::tsne()], or [uwot::umap()].
+#'        [vegan::metaMDS()], [Rtsne::Rtsne()], or [uwot::umap()].
 #'
 #' @return A data.frame with columns \code{.sample},
 #'         \code{.bdiv}, \code{.ord}, \code{.x}, \code{.y}, and (optionally)
