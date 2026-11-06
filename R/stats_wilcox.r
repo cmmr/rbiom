@@ -31,25 +31,27 @@ stats_wilcox <- function (
     test <- list(
 
       fun = function (data, pair, at) {
-        test <- stats::wilcox.test(data$.resp, mu = mu, alternative = alternative, conf.int = TRUE, conf.level = level)
+        test <- wilcox_quiet(stats::wilcox.test(data$.resp, mu = mu, alternative = alternative, conf.int = TRUE, conf.level = level))
+        ci   <- if (isTRUE(attr(test$conf.int, "conf.level") < level)) c(-Inf, Inf) else test$conf.int
         tibble::tibble(
           .pseudomedian = unname(test$estimate),
           .h1           = factor(h1),
           .p.val        = test$p.value,
-          .lower        = test$conf.int[[1]],
-          .upper        = test$conf.int[[2]],
+          .lower        = ci[[1]],
+          .upper        = ci[[2]],
           .n            = nrow(data),
           .stat         = unname(test$statistic) )
       },
 
       code = paste(sep = "\n",
         sprintf("test <- stats::wilcox.test(data$.resp, mu = %s, alternative = %s, conf.int = TRUE, conf.level = %s)", deparse_vec(mu), double_quote(alternative), deparse_vec(level)),
+        wilcox_ci_code(level),
         tibble_code(c(
           .pseudomedian = "unname(test$estimate)",
           .h1           = sprintf("factor(%s)", double_quote(h1)),
           .p.val        = "test$p.value",
-          .lower        = "test$conf.int[[1]]",
-          .upper        = "test$conf.int[[2]]",
+          .lower        = "ci[[1]]",
+          .upper        = "ci[[2]]",
           .n            = "nrow(data)",
           .stat         = "unname(test$statistic)" )) ))
 
@@ -65,14 +67,15 @@ stats_wilcox <- function (
 
       fun = function (pdata, pair, at) {
         pdata$.stat.by <- factor(pdata$.stat.by, levels = pair)
-        test <- stats::wilcox.test(.resp ~ .stat.by, data = pdata, conf.int = TRUE, conf.level = level)
+        test <- wilcox_quiet(stats::wilcox.test(.resp ~ .stat.by, data = pdata, conf.int = TRUE, conf.level = level))
+        ci   <- if (isTRUE(attr(test$conf.int, "conf.level") < level)) c(-Inf, Inf) else test$conf.int
         tibble::tibble(
           !!stat.by := paste(pair, collapse = ' - '),
           .loc.shift = unname(test$estimate),
           .h1        = factor('!= 0'),
           .p.val     = test$p.value,
-          .lower     = test$conf.int[[1]],
-          .upper     = test$conf.int[[2]],
+          .lower     = ci[[1]],
+          .upper     = ci[[2]],
           .n         = nrow(pdata),
           .stat      = unname(test$statistic) )
       },
@@ -80,13 +83,14 @@ stats_wilcox <- function (
       code = paste(sep = "\n",
         "pdata$.stat.by <- factor(pdata$.stat.by, levels = pair)",
         sprintf("test <- stats::wilcox.test(.resp ~ .stat.by, data = pdata, conf.int = TRUE, conf.level = %s)", deparse_vec(level)),
+        wilcox_ci_code(level),
         tibble_code(c(
           stats::setNames(list("paste(pair, collapse = ' - ')"), stat.by),
           .loc.shift = "unname(test$estimate)",
           .h1        = "factor('!= 0')",
           .p.val     = "test$p.value",
-          .lower     = "test$conf.int[[1]]",
-          .upper     = "test$conf.int[[2]]",
+          .lower     = "ci[[1]]",
+          .upper     = "ci[[2]]",
           .n         = "nrow(pdata)",
           .stat      = "unname(test$statistic)" )) ))
 
@@ -106,6 +110,47 @@ stats_wilcox <- function (
     p.adj    = p.adj,
     pairwise = pairwise,
     model    = model )
+}
+
+
+
+#________________________________________________________
+# stats::wilcox.test() changed in R 4.6. Earlier versions fall back to the
+# normal approximation when there are ties or zeros, and when the requested
+# confidence level is out of reach (very small groups) they return a
+# narrower interval at whatever level is achievable - [-1, -1] at level 0
+# for one observation per group. R >= 4.6 computes exact results with ties
+# and returns an unbounded interval instead.
+#
+# rbiom reports the unbounded interval on every R version (the code below,
+# which is also written into `$code`), so the warnings about it, and about
+# the fallback to the normal approximation, carry no information for the
+# user and are muffled. Any other warning is passed on.
+#________________________________________________________
+wilcox_quiet <- function (expr) {
+
+  msgs <- c(
+    "Requested conf.level not achievable",
+    "requested conf.level not achievable",
+    "cannot compute exact p-value with ties",
+    "cannot compute exact p-value with zeroes",
+    "cannot compute exact confidence interval with ties",
+    "cannot compute exact confidence intervals with ties",
+    "cannot compute exact confidence interval with zeroes",
+    "cannot compute exact confidence intervals with zeroes" )
+  msgs <- unique(c(msgs, gettext(msgs, domain = "R-stats")))
+
+  withCallingHandlers(
+    expr    = expr,
+    warning = function (w) {
+      if (conditionMessage(w) %in% msgs)
+        invokeRestart('muffleWarning') })
+}
+
+wilcox_ci_code <- function (level) {
+  sprintf(
+    "ci   <- if (isTRUE(attr(test$conf.int, \"conf.level\") < %s)) c(-Inf, Inf) else test$conf.int # unbounded when %s isn't achievable",
+    deparse_vec(level), deparse_vec(level) )
 }
 
 

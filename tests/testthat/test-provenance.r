@@ -250,3 +250,36 @@ test_that("provenance helpers", {
   pi <- prov_inline(quote(Age %in% big), env = environment(), exclude = "Age")
   expect_false(pi$reproducible)
 })
+
+
+test_that("numbers in generated code parse back exactly on every platform", {
+
+  # R's parser reads 16-17 digit decimals inexactly where a long double is a
+  # plain double (macOS on Apple silicon): 15.299999999999999 (9 * 1.7)
+  # came back one unit in the last place off. Literals have at most 15
+  # significant digits, or are hexadecimal.
+  x   <- c(seq_len(12) * 1.7, 0.1 + 0.2, 1/3, 1e5, 1e-30, 1e300, -2.5, 0, Inf, -Inf, NaN)
+  lit <- num_literal(x)
+  dec <- !grepl("0x", lit, fixed = TRUE)
+  expect_true(all(nchar(gsub("[^0-9]", "", sub("e.*$", "", lit[dec]))) <= 15))
+  expect_identical(vapply(lit, function (l) eval(str2lang(l)), 0, USE.NAMES = FALSE), x)
+  expect_match(num_literal(9 * 1.7), "^0x")
+  expect_identical(num_literal(c(1.7, 2, 0.5)), c("1.7", "2", "0.5"))
+  expect_identical(num_literal(NA_real_), "NA_real_")
+  expect_silent(expect_identical(num_literal(c(0, NA)), c("0", "NA")))
+
+  # Embedded vectors and logged calls; names are still quoted by deparse().
+  v <- c(`it's` = 9 * 1.7, "a`b" = 1.5, `c(1)` = 1/3, ok = 2)
+  expect_identical(eval(str2lang(deparse_vec(v))), v)
+
+  cl     <- quote(f(biom, keep = c("a", "b"), n = 3L))
+  cl$w   <- c(a = 0.1 + 0.2, b = 1)
+  cl$lvl <- 1/3
+  back   <- str2lang(paste(deparse_exact(cl), collapse = ""))
+  expect_identical(eval(back$w), cl$w)
+  expect_identical(back$lvl, cl$lvl)
+  expect_identical(back$n, 3L)
+
+  # $cmd too.
+  expect_identical(eval(str2lang(as.args(list(1/3)))), 1/3)
+})

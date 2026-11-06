@@ -200,12 +200,11 @@ tibble_code <- function (cols, fn = "tibble::tibble") {
 #________________________________________________________
 deparse_vec <- function (x, indent = 2) {
 
-  # 15 significant digits (deparse's default) unless a value needs 17 to
-  # round-trip exactly.
-  needs17 <- is.double(x) && any(!is.na(x) & as.numeric(sprintf("%.15g", x)) != x)
-  opts    <- c("keepNA", "keepInteger", "niceNames", if (needs17) "digits17")
-  sep     <- paste0("\n", strrep(" ", indent))
-  dp   <- function (v) paste(deparse(v, width.cutoff = 100L, control = opts), collapse = sep)
+  # Doubles are written so that they parse back exactly on every platform:
+  # see num_literal() in provenance.r.
+  opts <- c("keepNA", "keepInteger", "niceNames")
+  sep  <- paste0("\n", strrep(" ", indent))
+  dp   <- function (v) paste(deparse_exact(v, width.cutoff = 100L, control = opts), collapse = sep)
 
   if (is.factor(x)) {
     vals <- stats::setNames(as.character(x), names(x))

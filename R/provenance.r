@@ -219,6 +219,106 @@ prov_inline <- function (expr, env, exclude = character()) {
 
 
 #________________________________________________________
+# R literals for a double vector that parse back to exactly the same values
+# on every platform.
+#
+# deparse()'s "digits17" option is not enough: R's parser accumulates the
+# digits of a decimal literal in a long double, which on some platforms
+# (macOS on Apple silicon) is no wider than a double, so a 17-digit literal
+# such as 15.299999999999999 can come back one unit in the last place off.
+# Up to 15 significant digits with a power-of-ten scale within +/-22 always
+# parse exactly (the digits fit in 53 bits and the power of ten is exact),
+# so that form is used whenever it round-trips. Anything else - typically
+# floating-point noise such as 9 * 1.7 - is written in C99 hexadecimal
+# notation (0x1.e99999999999ap+3), which R parses exactly everywhere.
+#________________________________________________________
+num_literal <- function (x) {
+
+  x   <- as.double(x)
+  out <- sprintf("%.15g", x) # also gives "NA", "NaN", "Inf", "-Inf"
+  fin <- is.finite(x)
+
+  if (any(fin)) {
+    s     <- sub("^-", "", out[fin])
+    mant  <- sub("e.*$", "", s)
+    expo  <- ifelse(grepl("e", s, fixed = TRUE), sub("^.*e", "", s), "0")
+    scale <- as.integer(expo) - nchar(sub("^[^.]*\\.?", "", mant))
+    exact <- abs(scale) <= 22L & as.numeric(out[fin]) == x[fin]
+    out[fin][!exact] <- sprintf("%a", x[fin][!exact])
+
+    # R doesn't read subnormal hexadecimal literals back exactly.
+    bad <- as.numeric(out[fin]) != x[fin]
+    out[fin][bad] <- sprintf("%.17g", x[fin][bad])
+  }
+
+  if (length(x) > 0 && all(is.na(x) & !is.nan(x))) out[] <- "NA_real_"
+
+  return (out)
+}
+
+
+# TRUE when deparse()'s default (15 significant digits) can't represent `x`
+# exactly on every platform.
+needs_num_literal <- function (x) {
+  is.double(x) && length(x) > 0 && any(grepl("0x", num_literal(x), fixed = TRUE))
+}
+
+
+#________________________________________________________
+# deparse() for generated code, with every double constant written by
+# num_literal(). Double vectors that need hexadecimal digits are swapped for
+# placeholder symbols, the expression is deparsed as usual (so names and
+# strings are still quoted and escaped by deparse()), and the placeholders
+# are then replaced with the literals. The replacement text is built from
+# numbers only.
+#________________________________________________________
+deparse_exact <- function (expr, width.cutoff = 60L, control = c("keepNA", "keepInteger", "niceNames", "showAttributes")) {
+
+  lits <- character()
+  pfx  <- "RBIOMNUM"
+  while (any(grepl(pfx, deparse(expr, control = NULL), fixed = TRUE)))
+    pfx <- paste0(pfx, "X")
+
+  literal <- function (x) {
+    lit <- num_literal(x)
+    if (length(x) == 1 && is.null(names(x))) return (lit)
+    call <- as.call(c(as.name("c"), lapply(seq_along(x), function (i) as.name(sprintf("%s%dV_", pfx, i)))))
+    if (!is.null(names(x))) names(call) <- c("", names(x))
+    txt <- paste(deparse(call, width.cutoff = width.cutoff, control = control), collapse = "\n")
+    for (i in rev(seq_along(x)))
+      txt <- gsub(sprintf("%s%dV_", pfx, i), lit[[i]], txt, fixed = TRUE)
+    txt
+  }
+
+  walk <- function (e) {
+
+    if (needs_num_literal(e) && is.null(dim(e)) &&
+        (is.null(attributes(e)) || identical(names(attributes(e)), 'names'))) {
+      lits[[length(lits) + 1L]] <<- literal(e)
+      return (as.name(sprintf("%s%dE_", pfx, length(lits))))
+    }
+
+    if (is.call(e)) {
+      for (i in seq_along(e))
+        if (!identical(e[[i]], quote(expr = )) && !is.null(e[[i]]))
+          e[[i]] <- walk(e[[i]])
+    }
+
+    return (e)
+  }
+
+  if (!is.call(expr) && !needs_num_literal(expr))
+    return (deparse(expr, width.cutoff = width.cutoff, control = control))
+
+  txt <- deparse(walk(expr), width.cutoff = width.cutoff, control = control)
+  for (k in rev(seq_along(lits)))
+    txt <- gsub(sprintf("%s%dE_", pfx, k), lits[[k]], txt, fixed = TRUE)
+
+  return (txt)
+}
+
+
+#________________________________________________________
 # Format history entries as lines of R code.
 #________________________________________________________
 prov_entry_lines <- function (entries, var = "biom") {
@@ -239,7 +339,7 @@ prov_entry_lines <- function (entries, var = "biom") {
       # Placeholders such as `<tbl_df; 50 x 5>` keep their backticks; such
       # entries are always emitted as comments.
       call <- do.call(substitute, list(e$call, list(biom = as.name(var))))
-      txt  <- paste(deparse(call, width.cutoff = 120L), collapse = "\n  ")
+      txt  <- paste(deparse_exact(call, width.cutoff = 120L), collapse = "\n  ")
     }
 
     line <- if (isTRUE(e$prefix)) sprintf("%s <- %s", var, txt) else txt

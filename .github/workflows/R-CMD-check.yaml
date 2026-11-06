@@ -51,6 +51,9 @@ jobs:
       R_KEEP_PKG_SOURCE: no
       NOT_CRAN: true
       PAK_DEBUG: true
+      # pak's default Bioconductor mirror (bioconductor.posit.co) no longer
+      # serves Bioconductor 3.18, the release for R 4.3.
+      R_BIOC_MIRROR: https://bioconductor.org
 
     steps:
       - uses: actions/checkout@v4
@@ -66,7 +69,8 @@ jobs:
       # R >= 4.7 on macOS links Fortran/LAPACK packages (e.g. irlba) against the
       # flang runtime in /opt/R/flang-23, and CRAN has no binaries for it yet,
       # so packages build from source and need CRAN's static system libraries
-      # in /opt/R/<arch> (e.g. jpeglib.h for jpeg).
+      # in /opt/R/<arch>: jpeglib.h for jpeg, png.h for png, and libintl.h
+      # (gettext) for data.table, which phyloseq imports.
       - name: Install macOS build tools
         if: runner.os == 'macOS'
         shell: bash
@@ -87,13 +91,17 @@ jobs:
               install_tarball https://mac.r-project.org/tools/flang-23.1.0-darwin23.tar.xz
           fi
 
-          if [ ! -f "$libdir/include/jpeglib.h" ]; then
-            urls=$(SILENT_INSTALL_R=1 Rscript -e 'source("https://mac.r-project.org/bin/install.R"); cat(install.libs(c("jpeg", "libpng"), action = "list", quiet = TRUE), sep = "\n")')
-            for url in $urls; do install_tarball "$url"; done
-          fi
+          headers="jpeglib.h png.h libintl.h"
+          for h in $headers; do
+            if [ ! -f "$libdir/include/$h" ]; then
+              urls=$(SILENT_INSTALL_R=1 Rscript -e 'source("https://mac.r-project.org/bin/install.R"); cat(install.libs(c("jpeg", "libpng", "gettext"), action = "list", quiet = TRUE), sep = "\n")')
+              for url in $urls; do install_tarball "$url"; done
+              break
+            fi
+          done
 
           # Fail here rather than midway through building dependencies.
-          ls -l "$libdir/include/jpeglib.h" "$libdir/include/png.h"
+          for h in $headers; do ls -l "$libdir/include/$h"; done
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -103,7 +111,7 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          build_args: 'c("--no-manual", "--as-cran")'
+          args: 'c("--no-manual", "--as-cran")'
 
       - name: Show install log
         if: always()

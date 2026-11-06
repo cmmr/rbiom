@@ -16,6 +16,11 @@
 * Data-derived strings (sample, OTU, taxa, and field names, metadata values, 
   file paths) only ever appear in generated code as quoted literals, and rbiom
   never evaluates generated code itself.
+* Numbers in generated code parse back to exactly the same values on every 
+  platform: up to 15 significant digits when that is exact, and hexadecimal
+  notation (e.g. `0x1.e999999999999p+3` for `9 * 1.7`) otherwise. 
+  17-digit decimals were read back one unit in the last place off on macOS 
+  (Apple silicon), which changed rank-based statistics.
 * `$cmd` no longer re-evaluates the caller's arguments (so 
   `adiv_boxplot(rarefy(biom))` rarefies once) and no longer records `cpus`.
 * Functions that use random numbers (`rarefy()`, rank transforms with 
@@ -56,6 +61,11 @@
 * Wilcoxon tests use `exact = NULL`; the estimate column is now `.loc.shift` 
   (Hodges-Lehmann). `level` is honored. Captions name the p-value adjustment 
   method correctly.
+* When a Wilcoxon confidence interval can't reach the requested `level` (very
+  small groups), it is reported as unbounded (`-Inf`, `Inf`) on every R 
+  version, as R >= 4.6 does, rather than as a narrower interval at a lower 
+  level. On R < 4.6, the warnings about this and about falling back to the 
+  normal approximation for ties are no longer shown.
 * `adiv_boxplot()`, `bdiv_boxplot()`, and `taxa_boxplot()` gain a `test` 
   argument.
 * Dropped rows with missing values and comparisons that could not be computed

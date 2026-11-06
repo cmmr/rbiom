@@ -292,6 +292,7 @@ as.args <- function (args = parent.frame(), indent = 0, fun = NULL) {
     } else if (inherits(val, 'AsIs'))     { as.character(val)
     } else if (is_character(val))         { double_quote(val) 
     } else if (is_logical(val))           { as.character(val) %>% setNames(names(val))
+    } else if (is.double(val) && !is.object(val)) { num_literal(val) %>% setNames(names(val))
     } else if (is.numeric(val))           { as.character(val) %>% setNames(names(val))
     } else if (inherits(val, 'quosures')) { as.character(val)
     } else if (inherits(val, 'rbiom'))    { "biom"
