@@ -50,8 +50,8 @@ stats_corrplot(
 
 ![](regression_files/figure-html/unnamed-chunk-3-1.png)
 
-As you’d expect, the trendline’s slope is positive (p-value = 0).
-Therefore it’s safe to say that height changes with age.
+As you’d expect, the trendline’s slope is positive, with a p-value far
+below 0.05. Therefore it’s safe to say that height changes with age.
 
 ### Grouped by Sex
 
@@ -73,7 +73,7 @@ stats_corrplot(
 
 ![](regression_files/figure-html/unnamed-chunk-4-1.png)
 
-Here, a p-value of 3.9e-51 indicates that males and females do have
+Here, the very small p-value indicates that males and females do have
 different growth rates.
 
 If you look at the captions of the last two plots, you’ll notice that
@@ -83,6 +83,9 @@ the p-value test automatically changes.
   zero**.
 - When `stat.by` is not `NULL`, `test = "emtrends"` will test if the
   trendline **slopes are equal**.
+
+With `fit = "lm"` the slope is the same everywhere, so these are tests
+of the fitted lines as a whole.
 
 ### Smoothed Fit
 
@@ -107,9 +110,10 @@ stats_corrplot(
 
 This gives us a much better idea of the moving average over time.
 
-We still have `test = "emtrends"`, so the p-value is reported where the
-difference in slope is most significant - in this case, at age = 5.9
-years.
+With a smoothed fit, the slope changes along the curve, so the
+difference in slopes has to be evaluated at a particular age. By default
+rbiom uses the median age, marked on the plot with a vertical line. See
+[Specific Timepoints](#specific-timepoints) to choose other ages.
 
 ### Difference in Means
 
@@ -130,8 +134,8 @@ stats_corrplot(
 
 ![](regression_files/figure-html/unnamed-chunk-6-1.png)
 
-Differences in height are most significant at age = 16.8 (where p-value
-= 8.9e-40).
+The difference in mean height between males and females is tested at the
+median age.
 
 ## Statistics Table
 
@@ -155,52 +159,61 @@ st <- stats_table(
 # Print the table transposed, since it's one row by 14 columns.
 t(st)
 #>              [,1]           
-#> age          "16.8"         
+#> age          "13.83"        
 #> sex          "female - male"
-#> .mean.diff   "-7.770364"    
+#> .mean.diff   "2.813755"     
 #> .h1          "!= 0"         
-#> .p.val       "3.943402e-39" 
-#> .adj.p       "3.943402e-39" 
-#> .effect.size "-1.211754"    
-#> .se          "0.5835173"    
+#> .p.val       "6.840598e-07" 
+#> .adj.p       "6.840598e-07" 
+#> .lower       "1.705521"     
+#> .upper       "3.921989"     
+#> .effect.size "0.4387702"    
+#> .se          "0.5651607"    
 #> .n           "2500"         
-#> .df          "2484"         
-#> .t.ratio     "-13.31642"    
-#> .adj.r       "0.8314119"    
-#> .aic         "16403.85"     
-#> .bic         "16500.31"     
-#> .loglik      "-8185.366"
+#> .df          "2485.366"     
+#> .t.ratio     "4.978681"     
+#> .r.sqr       "0.8313946"    
+#> .dev.expl    "0.8323145"    
+#> .aic         "16403.78"     
+#> .bic         "16497.75"     
+#> .loglik      "-8185.756"
 ```
 
 Depending on the arguments given, the *estimate* term will be one of:
 
-| **Field** | **Description** | `test` | `stat.by` |
-|----|----|----|----|
-| .mean | Estimated marginal mean. | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html) | `NULL` |
-| .mean.diff | Difference in means. | [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html) | not `NULL` |
-| .slope | Trendline slope. | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | `NULL` |
-| .slope.diff | Difference in slopes. | [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html) | not `NULL` |
+| **Field** | **Description** | `test` | `stat.by` | `fit` |
+|----|----|----|----|----|
+| .slope | Slope of the fitted line. | either | `NULL` | `"lm"`, `"log"` |
+| .f | *F* statistic of the smooth term. | `"emmeans"` | `NULL` | `"gam"` |
+| .slope | Local slope at `at`. | `"emtrends"` | `NULL` | `"gam"` |
+| .mean.diff | Difference in means at `at`. | `"emmeans"` | not `NULL` | any |
+| .slope.diff | Difference in slopes (at `at` for gam). | `"emtrends"` | not `NULL` | any |
+
+Without `stat.by`, the question is whether the response is associated
+with `regr` at all: a test of the slope for straight-line fits, or of
+the whole smooth curve for `fit = "gam"`.
 
 Other fields in this table include:
 
 | **Field** | **Description** |
 |----|----|
-| .h1 | Alternate hypothesis. |
-| .p.val | Probability that null hypothesis is correct. |
-| .adj.p | `.p.val` after adjusting for multiple comparisons. |
+| .h1 | Alternative hypothesis. |
+| .p.val | Probability, under the null hypothesis, of a result at least as extreme as observed. |
+| .adj.p | `.p.val` after adjusting for multiple comparisons across the whole table. |
 | .effect.size | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
 | .lower | Confidence interval lower bound. |
 | .upper | Confidence interval upper bound. |
 | .se | Standard error. |
 | .n | Number of samples. |
 | .df | Degrees of freedom. |
-| .t.ratio | *(.mean, .mean.diff, .slope, or .slope.diff)* / `.se` |
-| .r.sqr | Percent of variation explained by the model. |
+| .t.ratio | *(.mean.diff, .slope, or .slope.diff)* / `.se` |
+| .edf | Effective degrees of freedom of a `gam` smooth term. |
+| .r.sqr | Proportion of variation explained by the model. |
 | .adj.r | `.r.sqr`, taking degrees of freedom into account. |
+| .dev.expl | Proportion of deviance explained (`gam` models). |
 | .aic | Akaike Information Criterion (predictive models). |
 | .bic | Bayesian Information Criterion (descriptive models). |
 | .loglik | Log-likelihood goodness-of-fit score. |
-| .fit.p | P-value for observing this fit by chance. |
 
 ### Marginal Means
 
@@ -224,17 +237,17 @@ Additional information on EMMs is available at:
 The statistics table has several fields for assessing how well the model
 fits the data.
 
-- `.r.sqr` - Coefficient of Determination (*R*²); range: 0-1, lower is
-  better. Percent of variation explained by the model.
-- `.adj.r` - *R*², taking degrees of freedom into account.
+- `.r.sqr` - Coefficient of Determination (*R*²); range: 0-1, higher is
+  better. Proportion of variation explained by the model.
+- `.adj.r` - *R*², taking degrees of freedom into account (straight-line
+  fits).
+- `.dev.expl` - Proportion of deviance explained (`gam` fits); higher is
+  better.
 - `.aic` - Akaike Information Criterion; lower is better. Preferred when
   using model for prediction.
 - `.bic` - Bayesian Information Criterion; lower is better. Preferred
   when using model for interpretation.
-- `.loglik` - Log-Likelihood (negative values); higher values (closer to
-  zero) are better.
-- `.fit.p` - P-value for observing this fit by chance; range: 0-1, lower
-  is better.
+- `.loglik` - Log-Likelihood; higher values are better.
 
 Not all of these values can be computed for every model.
 
@@ -244,21 +257,24 @@ generated in the last section.
 ``` r
 
 st$.aic
-#> [1] 16403.85
+#> [1] 16403.78
 ```
 
 These values can be used to decide which `fit` argument to use (`"lm"`,
-`"log"`, or `"gam"`).
+`"log"`, or `"gam"`), as long as the models are fit to the same data.
 
 ``` r
 
-plyr::ldply(c(lm="lm", log="log", gam="gam"), .id = "fit", function (fit)
-  stats_table(npregfast::children, "age", "height", "sex", fit = fit) ) %>%
-  dplyr::select(fit, .r.sqr:.fit.p)
-#>   fit    .r.sqr    .adj.r     .aic     .bic   .loglik .fit.p
-#> 1  lm 0.7896923 0.7894395 16947.72 16976.84 -8468.858      0
-#> 2 log 0.8031003 0.8028636 16783.02 16812.14 -8386.512      0
-#> 3 gam        NA 0.8314119 16403.85 16500.31 -8185.366     NA
+gof <- lapply(c("lm", "log", "gam"), function (fit) {
+  st <- stats_table(npregfast::children, "age", "height", "sex", fit = fit)
+  data.frame(fit = fit, .r.sqr = st$.r.sqr, .aic = st$.aic, .bic = st$.bic, .loglik = st$.loglik)
+})
+
+do.call(rbind, gof)
+#>   fit    .r.sqr     .aic     .bic   .loglik
+#> 1  lm 0.7896923 16947.72 16976.84 -8468.858
+#> 2 log 0.8031003 16783.02 16812.14 -8386.512
+#> 3 gam 0.8313946 16403.78 16497.75 -8185.756
 ```
 
 Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC,
@@ -274,11 +290,12 @@ non-zero. Since `.p.val` is less than 0.05 we can say that it is.
 ``` r
 
 dplyr::select(st, .mean.diff:.p.val)
-#> # Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")
+#> # Model:    gam(.resp ~ s(.regr, by = .stat.by, bs = "cs") + .stat.by, method =
+#> #   'REML')
 #> # A tibble: 1 × 3
-#>   .mean.diff .h1     .p.val
-#>        <dbl> <fct>    <dbl>
-#> 1      -7.77 != 0  3.94e-39
+#>   .mean.diff .h1        .p.val
+#>        <dbl> <fct>       <dbl>
+#> 1       2.81 != 0  0.000000684
 ```
 
 For a more complete review of alternative hypotheses, see the [rbiom
@@ -425,10 +442,9 @@ adiv_corrplot(
 
 ![](regression_files/figure-html/unnamed-chunk-14-1.png)
 
-Here, the diagnostic plots look pretty good, so we can confidently say
-that children have different Shannon diversity index values, depending
-on whether they live in Bangladesh vs Kenya, and that this difference is
-most significant at around 1.25 years old.
+Here, the diagnostic plots look pretty good, so we can trust the model’s
+comparison of Shannon diversity between children in Bangladesh and Kenya
+at the median age.
 
 ## Taxa Abundance
 
@@ -457,13 +473,6 @@ taxa_corrplot(
   fit     = "gam",       # smoothed trendline
   t.size  = 2,           # make the trendline thicker
   check   = TRUE )       # display diagnostic plots
-#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-#> ℹ Please use `linewidth` instead.
-#> ℹ The deprecated feature was likely used in the rbiom package.
-#>   Please report the issue at <https://github.com/cmmr/rbiom/issues>.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
 ```
 
 ![](regression_files/figure-html/unnamed-chunk-15-1.png)
@@ -538,122 +547,68 @@ producing a “Bangladesh vs Kenya” trendline.
 bdiv_corrplot(
   biom    = hbk,         # healthy controls from Bangladesh and Kenya
   x       = "age",       # x-axis variable
-  stat.by = "country",   # statistical groups 
+  stat.by = "country",   # statistical groups
   within  = "country",   # don't compare samples from different countries
-  fit     = "gam",       # smoothed trendline
-  check   = TRUE )       # display diagnostic plots
+  fit     = "gam" )      # smoothed trendline
 ```
 
 ![](regression_files/figure-html/unnamed-chunk-17-1.png)
 
-Here, the main plot tells us:
+The trendlines show how microbiome dissimilarity grows with the
+difference in age, separately for each country.
 
-- In Bangladesh, the closer two children are in age to each other, the
-  more similar their microbiomes will be. Therefore, you could infer
-  that age is an important factor driving microbiome structure for this
-  population.
-- Kenyan children’s microbiomes are more consistently structured,
-  compared to children in Bangladesh. Additionally, the age effect is
-  much less pronounced.
-- Children about 1 year apart in age have much more similar microbiome
-  if they live in Kenya, compared to Bangladesh (p = 6.2e-153).
-
-The diagnostic plots here indicate less than optimal distributions of
-residuals, with the “Normal Q-Q” plot showing that many more points lie
-above the trendline than below it. The main plot’s trendlines don’t
-spend much time between y = 0.75 and 0.83, hence the sparsity of points
-between x = 0.75 and 0.83 on the “Residuals vs Fitted” and
-“Scale-Location” plots.
-
-### Rank Transformation
-
-Running
-[`bdiv_corrplot()`](https://cmmr.github.io/rbiom/reference/bdiv_corrplot.md)
-with `trans = "rank"` could help make the residuals more normally
-distributed.
+The p-values come from Mantel tests, not from the trendlines. Each
+sample appears in many pairs, so pairwise distances are not independent
+observations, and regression p-values computed on them would be far too
+small. A Mantel test instead correlates the distance matrix with the age
+differences and judges that correlation against permutations of the
+samples. With `stat.by`, one Mantel test is run per group.
 
 ``` r
 
-bdiv_corrplot(
-  biom    = hbk,         # healthy controls from Bangladesh and Kenya
-  x       = "age",       # x-axis variable
-  stat.by = "country",   # statistical groups 
-  within  = "country",   # don't compare samples from different countries
-  fit     = "gam",       # smoothed trendline
-  trans   = "rank",      # rank-transform the abundances   <====
-  check   = TRUE )       # display diagnostic plots
+bdiv_stats(hbk, regr = "age", stat.by = "country")
+#> # Test:     Mantel (Spearman) ~ age; 999 permutations.
+#> # A tibble: 2 × 5
+#>   country       .n  .stat .p.val .adj.p
+#>   <fct>      <int>  <dbl>  <dbl>  <dbl>
+#> 1 Bangladesh   116 0.198   0.001  0.002
+#> 2 Kenya        140 0.0644  0.058  0.058
 ```
-
-![](regression_files/figure-html/unnamed-chunk-18-1.png)
-
-After rank-transforming:
-
-- The main plot tells a slightly different story.
-- The “Normal Q-Q” plot indicates that the residuals now have a
-  light-tailed distribution.
-
-You could argue either for or against preferring the transformed figure
-over the original.
-
-### Goodness of Fit
-
-Comparing the AIC, BIC, and Log-Likelihood values for the untransformed
-and rank-transformed data can tell you which model is better, right?
-Wrong! These values scale with the range of the data, so the
-untransformed beta diversity data in the range of 0 - 1 will result in
-drastically different AIC, BIC, and Log-Likelihood values than the
-rank-transformed data in the range of 1 - 16400.
-
-Generally speaking, you cannot compare goodness-of-fit values derived
-from different datasets. However, it is arguable that these two datasets
-are the same, just scaled differently. Therefore if you don’t mind
-potentially incurring a reviewer’s wrath, you can rescale both datasets
-to the same range and compare goodness-of-fit values on those.
-
-``` r
-
-plyr::ldply(c(none="none", rank="rank"), .id = "trans", function (trans)
-  bdiv_table(biom = hbk, within = "country", trans = trans) %>%
-    dplyr::mutate(.distance = scales::rescale(.distance, to = c(0, 1))) %>%
-    stats_table(regr = "age", resp = ".distance", stat.by = "country", fit = "gam") %>%
-    dplyr::select(.aic, .bic, .loglik) )
-#>   trans      .aic      .bic   .loglik
-#> 1  none -3112.365 -3028.741  1567.036
-#> 2  rank  4513.317  4628.890 -2241.659
-```
-
-These goodness-of-fit metrics strongly favor the untransformed data.
 
 ## Specific Timepoints
 
-By default, the `*_corrplot()` functions will automatically find the
-x-axis location with the most significant term of interest. However, you
-can override this by providing the `at` parameter.
+By default, group means (and, for smoothed fits, slopes) are compared at
+the median of the x-axis variable. You can choose a different position
+by providing the `at` parameter. Pick these positions based on your
+research question, before looking at the results: scanning many
+positions for the smallest p-value produces false positives.
 
 ``` r
 
 stats_corrplot(npregfast::children, 'age', 'height', stat.by = 'sex', at = 12)
 ```
 
-![](regression_files/figure-html/unnamed-chunk-20-1.png)
+![](regression_files/figure-html/unnamed-chunk-19-1.png)
 
 Although you’re limited to one `at` value for `*_corrplot()` functions,
 you can provide multiple `at` locations to
 [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md)
-or `*_stats()` functions.
+or `*_stats()` functions. The `.adj.p` column adjusts for all of them
+together.
 
 ``` r
 
 stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)
-#> # Model:    gam(height ~ s(age, by = sex, bs = "cs") + sex, method = "REML")
-#> # A tibble: 5 × 15
-#>     age sex    .mean.diff .h1     .p.val   .adj.p .effect.size   .se    .n   .df
-#>   <int> <fct>       <dbl> <fct>    <dbl>    <dbl>        <dbl> <dbl> <int> <int>
-#> 1    12 femal…       7.26 != 0  2.34e-28 1.17e-27        1.13  0.649  2500  2484
-#> 2    11 femal…       6.03 != 0  1.16e-21 2.90e-21        0.940 0.625  2500  2484
-#> 3    13 femal…       6.10 != 0  1.85e-20 3.09e-20        0.951 0.652  2500  2484
-#> 4    15 femal…      -2.59 != 0  9.01e- 7 1.13e- 6       -0.404 0.527  2500  2484
-#> 5    14 femal…       2.00 != 0  3.84e- 4 3.84e- 4        0.311 0.562  2500  2484
-#> # ℹ 5 more variables: .t.ratio <dbl>, .adj.r <dbl>, .aic <dbl>, .bic <dbl>,
-#> #   .loglik <dbl>
+#> # Model:    gam(.resp ~ s(.regr, by = .stat.by, bs = "cs") + .stat.by, method =
+#> #   'REML')
+#> # A tibble: 5 × 18
+#>     age sex        .mean.diff .h1     .p.val   .adj.p .lower .upper .effect.size
+#>   <int> <chr>           <dbl> <fct>    <dbl>    <dbl>  <dbl>  <dbl>        <dbl>
+#> 1    12 female - …       7.23 != 0  2.46e-29 1.23e-28  5.99    8.48        1.13 
+#> 2    11 female - …       6.02 != 0  2.75e-22 6.88e-22  4.82    7.23        0.939
+#> 3    13 female - …       6.04 != 0  6.06e-21 1.01e-20  4.79    7.30        0.943
+#> 4    15 female - …      -2.58 != 0  7.21e- 7 9.02e- 7 -3.60   -1.56       -0.402
+#> 5    14 female - …       2.00 != 0  3.14e- 4 3.14e- 4  0.912   3.08        0.311
+#> # ℹ 9 more variables: .se <dbl>, .n <int>, .df <dbl>, .t.ratio <dbl>,
+#> #   .r.sqr <dbl>, .dev.expl <dbl>, .aic <dbl>, .bic <dbl>, .loglik <dbl>
 ```

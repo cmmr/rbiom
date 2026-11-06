@@ -22,6 +22,7 @@ stats_corrplot(
   p.top = Inf,
   alt = "!=",
   mu = 0,
+  strata = NULL,
   caption = TRUE,
   check = FALSE,
   ...
@@ -101,6 +102,8 @@ stats_corrplot(
 - test:
 
   Method for computing p-values: `'none'`, `'emmeans'`, or `'emtrends'`.
+  See
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md).
   Default: `'emmeans'`
 
 - fit:
@@ -110,9 +113,11 @@ stats_corrplot(
 
 - at:
 
-  Position(s) along the x-axis where the means or slopes should be
-  evaluated. Default: `NULL`, which samples 100 evenly spaced positions
-  and selects the position where the p-value is most significant.
+  Position(s) along `regr` where group means or local slopes are
+  evaluated. Default: `NULL`, which uses the median of `regr` within
+  each `split.by` stratum. A vector gives one row per position, and
+  p-values are adjusted across all of them. Ignored by tests that do not
+  depend on a position (e.g. a global slope with `fit = "lm"`).
 
 - level:
 
@@ -122,7 +127,9 @@ stats_corrplot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - p.top:
 
@@ -143,6 +150,13 @@ stats_corrplot(
 
   Reference value to test against. Default: `0`
 
+- strata:
+
+  Dataset field with the blocking/subject variable. Permutation tests
+  permute within strata; regression models include a random intercept
+  per stratum. The plotted trendlines are descriptive fits without the
+  strata term. Default: `NULL`
+
 - caption:
 
   Add methodology caption beneath the plot. Default: `TRUE`
@@ -157,7 +171,8 @@ stats_corrplot(
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with a layer name to pass it to only that layer. For
   instance, `p.size = 2` ensures only the points have their size set to
-  `2`.
+  `2`. Unprefixed parameters go to every layer whose function accepts
+  them. An argument that no layer accepts is an error.
 
 ## Value
 
@@ -201,15 +216,15 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     biom <- subset(hmp50, `Body Site` %in% c('Saliva', 'Stool'))
     df   <- adiv_table(rarefy(biom))
     stats_corrplot(df, "age", stat.by = "body")
 
     stats_corrplot(
-      df       = df, 
-      x        = "Age", 
-      stat.by  = "Body Site", 
-      facet.by = "Sex", 
+      df       = df,
+      x        = "Age",
+      stat.by  = "Body Site",
+      facet.by = "Sex",
       layers   = "trend" )
 ```

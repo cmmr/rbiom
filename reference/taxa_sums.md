@@ -96,9 +96,9 @@ taxa_apply(
 - transform:
 
   Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+  correcting for non-normal distributions before applying regression
+  statistics. Default: `"none"`
 
 - FUN:
 
@@ -130,22 +130,22 @@ Other taxa_abundance:
 ## Examples
 
 ``` r
-    library(rbiom) 
-    
+    library(rbiom)
+
     taxa_sums(hmp50) %>% head(4)
 #>     Abiotrophia Acidaminococcus   Acinetobacter  Actinobacillus 
 #>             135              62              44             242 
-    
+
     taxa_means(hmp50, 'Family') %>% head(5)
 #>  Acidaminococcaceae    Actinomycetaceae       Aerococcaceae      Alcaligenaceae 
 #>               14.58               16.92                2.86               11.28 
 #> Alicyclobacillaceae 
 #>                0.12 
-    
+
     taxa_apply(hmp50, max) %>% head(5)
 #>     Abiotrophia Acidaminococcus   Acinetobacter  Actinobacillus     Actinomyces 
 #>              78              59              42             100             105 
-    
+
     taxa_apply(hmp50, fivenum) %>% head(5)
 #>      Abiotrophia Acidaminococcus Acinetobacter Actinobacillus Actinomyces
 #> [1,]           0               0             0              0           0

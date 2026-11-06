@@ -97,11 +97,11 @@ Other taxa_abundance:
 ``` r
     library(rbiom)
     library(ggplot2)
-    
+
     sample_sums(hmp50, sort = 'asc') %>% head()
 #> HMP36 HMP24 HMP03 HMP02 HMP42 HMP17 
 #>   182  1183  1353  1371  1489  1579 
-    
+
     # Unique OTUs and "cultured" classes per sample
     nnz <- function (x) sum(x > 0) # number of non-zeroes
     sample_apply(hmp50, nnz, 'otu') %>% head()
@@ -110,11 +110,11 @@ Other taxa_abundance:
     sample_apply(hmp50, nnz, 'class', unc = 'drop') %>% head()
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
 #>    10    13    12    13    12    15 
-    
+
     # Number of reads in each sample's most abundant family
     sample_apply(hmp50, base::max, 'f', sort = 'desc') %>% head()
 #> HMP44 HMP25 HMP11 HMP21 HMP34 HMP46 
 #> 16220  9581  6308  5786  4645  4050 
-    
+
     ggplot() + geom_histogram(aes(x=sample_sums(hmp50)), bins = 20)
 ```

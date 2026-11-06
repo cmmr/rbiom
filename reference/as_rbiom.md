@@ -17,25 +17,55 @@ as_rbiom(biom, ...)
 
   *file* -
 
-  :   Filepath or URL to a biom file.
+  :   Filepath or URL to a BIOM file (JSON, HDF5, or tabular), or a JSON
+      string.
 
   *matrix* -
 
-  :   An abundance matrix with OTUs in rows and samples in columns.
+  :   An abundance matrix (base or `Matrix`) with OTUs in rows and
+      samples in columns.
 
-  `phyloseq`-class object -
+  *data.frame* -
 
-  :   From the phyloseq Bioconductor R package.
+  :   Treated as an abundance matrix: OTUs in rows (row names) and
+      samples in columns.
 
   *list* -
 
   :   With `counts` and optionally `metadata`, `taxonomy`, `tree`, etc
       (see details).
 
+  `rbiom` -
+
+  :   Returned as-is, unless `...` requests changes, in which case a
+      modified clone is returned.
+
+  `phyloseq` -
+
+  :   From the phyloseq Bioconductor R package.
+
+  `SummarizedExperiment` -
+
+  :   From the SummarizedExperiment Bioconductor R package.
+
+  `TreeSummarizedExperiment` -
+
+  :   From the TreeSummarizedExperiment Bioconductor R package.
+
+  `MultiAssayExperiment` -
+
+  :   From the MultiAssayExperiment Bioconductor R package (its first
+      experiment is used).
+
+  `biom` -
+
+  :   From the biomformat Bioconductor R package.
+
 - ...:
 
-  Properties to overwrite in biom: `metadata`, `taxonomy`, `tree`, etc
-  (see details). Setting `underscores` here will pass it to
+  Properties to overwrite in biom: `metadata`, `taxonomy`, `tree`,
+  `sequences`, `id`, `comment`, or `date` (see details). Setting
+  `underscores` here will pass it to
   [`read_tree()`](https://cmmr.github.io/rbiom/reference/read_tree.md).
 
 ## Value
@@ -47,11 +77,11 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 
 ``` r
     library(rbiom)
-    
+
     # create a simple matrix ------------------------
     mtx <- matrix(
-      data     = floor(runif(24) * 1000), 
-      nrow     = 6, 
+      data     = floor(runif(24) * 1000),
+      nrow     = 6,
       dimnames = list(paste0("OTU", 1:6), paste0("Sample", 1:4)) )
     mtx
 #>      Sample1 Sample2 Sample3 Sample4
@@ -61,13 +91,13 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #> OTU4     157     772     195     678
 #> OTU5       7     874     403     735
 #> OTU6     466     174      63     195
-    
+
     # and some sample metadata ----------------------
     df <- data.frame(
       .sample   = paste0("Sample", 1:4),
       treatment = c("A", "B", "A", "B"),
       days      = c(12, 3, 7, 8) )
-    
+
     # convert data set to rbiom ---------------------
     biom <- as_rbiom(mtx, metadata = df, id = "My BIOM")
     biom
@@ -80,6 +110,6 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #>       3 Fields:  .sample, treatment, and days 
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-10-08 ──
+#> ── 1.4k - 3.3k reads/sample ────────────────── 2026-11-06 ──
 #> 
 ```

@@ -149,14 +149,14 @@ Other transformations:
 [`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md),
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
-[`with()`](https://cmmr.github.io/rbiom/reference/with.md)
+[`subset`](https://cmmr.github.io/rbiom/reference/subset.md),
+[`with`](https://cmmr.github.io/rbiom/reference/with.md)
 
 ## Examples
 
 ``` r
     library(rbiom)
-    
+
     # The last 3 samples in the metadata table.
     biom <- slice_tail(hmp50, n = 3)
     biom$metadata
@@ -166,7 +166,7 @@ Other transformations:
 #> 1 HMP48      24    29 Anterior nares Male  
 #> 2 HMP49      21    22 Mid vagina     Female
 #> 3 HMP50      31    20 Mid vagina     Female
-    
+
     # The 3 oldest subjects sampled.
     biom <- slice_max(hmp50, Age, n = 3)
     biom$metadata
@@ -176,7 +176,7 @@ Other transformations:
 #> 1 HMP34      40    27 Anterior nares Female
 #> 2 HMP37      38    31 Mid vagina     Female
 #> 3 HMP44      38    19 Mid vagina     Female
-    
+
     # Pick 3 samples at random.
     biom <- slice_sample(hmp50, n = 3)
     biom$metadata

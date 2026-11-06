@@ -1,11 +1,14 @@
-# Cluster samples by taxa abundances k-means.
+# Cluster samples by taxa abundances (k-means).
 
-Cluster samples by taxa abundances k-means.
+Runs [`stats::kmeans()`](https://rdrr.io/r/stats/kmeans.html) on the
+samples x taxa abundance matrix, with `nstart = 10` random starts so
+that the partition is stable, and with the random number generator
+seeded by `seed` so that it is reproducible.
 
 ## Usage
 
 ``` r
-taxa_clusters(biom, rank = ".otu", k = 5, ...)
+taxa_clusters(biom, rank = ".otu", k = 5, seed = 0, ...)
 ```
 
 ## Arguments
@@ -28,6 +31,10 @@ taxa_clusters(biom, rank = ".otu", k = 5, ...)
 - k:
 
   Number of clusters. Default: `5L`
+
+- seed:
+
+  Random seed for the k-means starting centers. Default: `0`
 
 - ...:
 
@@ -56,14 +63,14 @@ Other clustering:
 
 ``` r
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
     biom$metadata$otu_cluster <- taxa_clusters(biom)
-    
+
     pull(biom, 'otu_cluster')[1:10]
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>     3     3     4     4     3     4     3     4     4     2 
+#>     3     3     2     2     3     2     3     2     2     4 
 #> Levels: 1 2 3 4 5
-    
+
     bdiv_ord_plot(biom, layers = "p", stat.by = "otu_cluster")
 ```

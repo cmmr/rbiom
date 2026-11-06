@@ -31,7 +31,28 @@ Reading from fields will not change the rbiom object.
 | `$tree`, `$sequences` | Phylogenetic tree / sequences for the OTUs, or `NULL`. |
 | `$id`, `$comment` | Arbitrary strings for describing the dataset. |
 | `$depth` | Rarefaction depth, or `NULL` if unrarefied. |
+| `$relative` | `TRUE` when counts are relative abundances (sum to 1). |
 | `$date` | Date from BIOM file. |
+| `$history` | List of the calls that produced this object. |
+| `$code` | R code that reproduces this object (see below). |
+
+## Provenance
+
+Every rbiom object records how it was made. The constructor call
+([`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md),
+[`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md)) and
+each subsequent transformation
+([`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
+[`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
+[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html), etc.)
+are appended to `$history`, and `$code` prints them as a runnable
+script. Tables, statistics, and plots derived from the object inherit
+this history, so their `$code` is a complete, self-contained recipe.
+
+Assigning directly to a field (e.g. `biom$metadata <- df`) is also
+recorded, but as a comment, since the assigned value only exists in
+memory. Prefer the transformation functions, or build the object from
+files, when a fully reproducible script is wanted.
 
 ## Writable Fields
 

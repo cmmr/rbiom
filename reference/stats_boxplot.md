@@ -25,6 +25,7 @@ stats_boxplot(
   outliers = NULL,
   xlab.angle = "auto",
   p.label = 0.05,
+  strata = NULL,
   caption = TRUE,
   ...
 )
@@ -109,8 +110,17 @@ stats_boxplot(
 
 - test:
 
-  Method for computing p-values: `'auto'` or `'none'`. `'auto'` will
-  choose Wilcox or Kruskal-Wallis depending on the number of groups.
+  Method for computing p-values. `'auto'` runs pairwise Mann-Whitney U
+  tests (`'wilcox'`) when `x` and `stat.by` are the same field (or
+  `'emmeans'` when `strata` is given), and Kruskal-Wallis tests
+  (`'kruskal'`) across the `stat.by` groups within each `x` category
+  otherwise. Beta diversity boxplots use PERMANOVA (`'adonis2'`),
+  `'mrpp'`, or `'betadisper'` on the samples instead. `'none'` skips the
+  statistics. See
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md)
+  and
+  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md).
+  Default: `'auto'`
 
 - flip:
 
@@ -128,7 +138,11 @@ stats_boxplot(
   (confidence interval), `"range"`, `"sd"` (standard deviation), `"se"`
   (standard error), and `"mad"` (median absolute deviation). The center
   mark of **crossbar** and **pointrange** represents the mean, except
-  for `"mad"` in which case it represents the median. Default: `"ci"`
+  for `"mad"` in which case it represents the median. Intervals are
+  drawn as computed, including below zero, unless the y-axis is
+  transformed: bounds below zero are drawn at zero on a `"sqrt"` or
+  `"log1p"` axis, and bounds at or below zero are drawn at the smallest
+  positive y value on a log axis. Default: `"ci"`
 
 - level:
 
@@ -138,7 +152,9 @@ stats_boxplot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - p.top:
 
@@ -179,6 +195,12 @@ stats_boxplot(
   If a numeric vector with more than one value is provided, they will be
   used as breaks for asterisk notation. Default: `0.05`
 
+- strata:
+
+  Dataset field with the blocking/subject variable. Permutation tests
+  permute within strata; regression models include a random intercept
+  per stratum. Default: `NULL`
+
 - caption:
 
   Add methodology caption beneath the plot. Default: `TRUE`
@@ -188,7 +210,9 @@ stats_boxplot(
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with a layer name to pass it to only that layer. For
   instance, `d.size = 2` ensures only the points on the **dot** layer
-  have their size set to `2`.
+  have their size set to `2`. Unprefixed parameters go to every layer
+  whose function accepts them (e.g. `scales = "free"` for the facets).
+  An argument that no layer accepts is an error.
 
 ## Value
 
@@ -204,12 +228,12 @@ categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
 `"tableau"`, `"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, and
 `"fishy"`.
 
-Patterns are added using the fillpattern R package. Options are
-`"brick"`, `"chevron"`, `"fish"`, `"grid"`, `"herringbone"`,
-`"hexagon"`, `"octagon"`, `"rain"`, `"saw"`, `"shingle"`, `"rshingle"`,
-`"stripe"`, and `"wave"`, optionally abbreviated and/or suffixed with
-modifiers. For example, `"hex10_sm"` for the hexagon pattern rotated 10
-degrees and shrunk by 2x. See
+Patterns are added using the fillpattern R package, which must be
+installed to use `patterns`. Options are `"brick"`, `"chevron"`,
+`"fish"`, `"grid"`, `"herringbone"`, `"hexagon"`, `"octagon"`, `"rain"`,
+`"saw"`, `"shingle"`, `"rshingle"`, `"stripe"`, and `"wave"`, optionally
+abbreviated and/or suffixed with modifiers. For example, `"hex10_sm"`
+for the hexagon pattern rotated 10 degrees and shrunk by 2x. See
 [`fillpattern::fill_pattern()`](https://cmmr.github.io/fillpattern/reference/fill_pattern.html)
 for complete documentation of options.
 
@@ -217,6 +241,9 @@ Shapes can be given as per base R - numbers 0 through 17 for various
 shapes, or the decimal value of an ascii character, e.g. a-z = 65:90;
 A-Z = 97:122 to use letters instead of shapes on the plot. Character
 strings may used as well.
+
+The **dot** and **strip** layers use the ggbeeswarm package when it is
+installed, and jittered points otherwise.
 
 ## See also
 
@@ -241,7 +268,7 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     df <- adiv_table(rarefy(hmp50))
     stats_boxplot(df, x = "Body Site")
 

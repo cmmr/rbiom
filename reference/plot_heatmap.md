@@ -57,7 +57,7 @@ plot_heatmap(
   numeric vector of length two to control row label sizes and column
   label sizes separately, for example `c(rows = 20, cols = 8)`, or
   simply `c(20, 8)`. Default: `NULL`, which computes:
-  `pmax(8, pmin(20, 100 / dim(mtx)))`
+  `pmax(5, pmin(14, 100 / dim(mtx)))`
 
 - rescale:
 
@@ -143,7 +143,11 @@ plot_heatmap(
 
 - ...:
 
-  Additional arguments to pass on to ggplot2::theme().
+  Additional arguments to pass on to
+  [`ggplot2::theme()`](https://ggplot2.tidyverse.org/reference/theme.html).
+  Arguments prefixed with `labs.` go to
+  [`ggplot2::labs()`](https://ggplot2.tidyverse.org/reference/labs.html)
+  instead, for example `labs.subtitle = "Plot subtitle"`.
 
 ## Value
 
@@ -218,21 +222,19 @@ The following entries in the track definitions are understood:
 
   A list of arguments for guide_colorbar() or guide_legend().
 
-All built-in color palettes are colorblind-friendly. See [Mapping
-Metadata to
-Aesthetics](https://cmmr.github.io/rbiom/articles/aes.html#discrete-palettes)
-for images of the palettes.
+All built-in color palettes are colorblind-friendly.
 
-Categorical palette names: `"okabe"`, `"carto"`, `"r4"`, `"polychrome"`,
-`"tol"`, `"bright"`, `"light"`, `"muted"`, `"vibrant"`, `"tableau"`,
-`"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, and `"fishy"`.
+The available categorical palette names are: `"okabe"`, `"carto"`,
+`"r4"`, `"polychrome"`, `"tol"`, `"bright"`, `"light"`, `"muted"`,
+`"vibrant"`, `"tableau"`, `"classic"`, `"alphabet"`, `"tableau20"`,
+`"kelly"`, and `"fishy"`.
 
-Numeric palette names: `"reds"`, `"oranges"`, `"greens"`, `"purples"`,
-`"grays"`, `"acton"`, `"bamako"`, `"batlow"`, `"bilbao"`, `"buda"`,
-`"davos"`, `"devon"`, `"grayC"`, `"hawaii"`, `"imola"`, `"lajolla"`,
-`"lapaz"`, `"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`,
-`"berlin"`, `"broc"`, `"cork"`, `"lisbon"`, `"roma"`, `"tofino"`,
-`"vanimo"`, and `"vik"`.
+The available numeric palette names are: `"reds"`, `"oranges"`,
+`"greens"`, `"purples"`, `"grays"`, `"acton"`, `"bamako"`, `"batlow"`,
+`"bilbao"`, `"buda"`, `"davos"`, `"devon"`, `"hawaii"`, `"imola"`,
+`"lajolla"`, `"lapaz"`, `"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`,
+`"bam"`, `"berlin"`, `"broc"`, `"cork"`, `"lisbon"`, `"roma"`,
+`"tofino"`, `"vanimo"`, and `"vik"`.
 
 ## See also
 
@@ -256,18 +258,20 @@ Other visualization:
 ## Examples
 
 ``` r
-    library(rbiom) 
-    
+    library(rbiom)
+
     set.seed(123)
     mtx <- matrix(runif(5*8), nrow = 5, dimnames = list(LETTERS[1:5], letters[1:8]))
-    
+
     plot_heatmap(mtx)
 
     plot_heatmap(mtx, grid="oranges")
 
-    plot_heatmap(mtx, grid=list(colors = "oranges", label = "Some %", bins = 5))
+    plot_heatmap(mtx, grid=list(colors = "oranges", label = "Litres"))
 
-    
+
+    # Tracks go on top (one value per column) unless side = "left"
+    # (one value per row).
     tracks <- list(
       'Number' = sample(1:ncol(mtx)),
       'Person' = list(
@@ -278,8 +282,7 @@ Other visualization:
         values = sample(c("TX", "OR", "WA"), nrow(mtx), TRUE),
         colors = "bright" )
     )
-    
+
     plot_heatmap(mtx, tracks=tracks)
 
-    
 ```

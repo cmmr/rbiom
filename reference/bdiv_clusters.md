@@ -1,6 +1,10 @@
-# Cluster samples by beta diversity k-means.
+# Cluster samples by beta diversity (k-medoids).
 
-Cluster samples by beta diversity k-means.
+Partitions the samples around `k` medoids with
+[`cluster::pam()`](https://rdrr.io/pkg/cluster/man/pam.html), which
+works directly on the dissimilarity matrix. (k-means is not a valid
+clustering of a dissimilarity matrix, since it would treat the rows of
+the matrix as coordinates.)
 
 ## Usage
 
@@ -12,6 +16,7 @@ bdiv_clusters(
   normalized = NULL,
   tree = NULL,
   k = 5,
+  seed = 0,
   alpha = 0.5,
   cpus = n_cpus(),
   ...
@@ -59,6 +64,12 @@ bdiv_clusters(
 
   Number of clusters. Default: `5L`
 
+- seed:
+
+  Random seed; only used when
+  [`cluster::pam()`](https://rdrr.io/pkg/cluster/man/pam.html) is asked
+  to sample medoids (`medoids = "random"`). Default: `0`
+
 - alpha:
 
   The alpha term to use in Generalized UniFrac. How much weight to give
@@ -68,11 +79,14 @@ bdiv_clusters(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 
-  Passed on to [`stats::kmeans()`](https://rdrr.io/r/stats/kmeans.html).
+  Passed on to
+  [`cluster::pam()`](https://rdrr.io/pkg/cluster/man/pam.html).
 
 ## Value
 
@@ -97,14 +111,14 @@ Other clustering:
 
 ``` r
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
     biom$metadata$bray_cluster <- bdiv_clusters(biom)
-    
+
     pull(biom, 'bray_cluster')[1:10]
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 HMP07 HMP08 HMP09 HMP10 
-#>     1     5     5     5     1     5     1     5     5     4 
+#>     1     1     2     2     1     2     1     2     2     3 
 #> Levels: 1 2 3 4 5
-    
+
     bdiv_ord_plot(biom, stat.by = "bray_cluster")
 ```

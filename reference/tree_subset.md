@@ -1,6 +1,9 @@
 # Create a subtree by specifying tips to keep.
 
-Create a subtree by specifying tips to keep.
+Internal nodes left with a single descendant are collapsed (their branch
+lengths are summed), node labels are kept, and the result is rooted at
+the most recent common ancestor of the retained tips. Tips are kept in
+their original order regardless of the order of `tips`.
 
 ## Usage
 
@@ -38,7 +41,7 @@ Other phylogeny:
 
 ``` r
     library(rbiom)
-    
+
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
     tree <- read_tree(infile)
     tree
@@ -49,7 +52,7 @@ Other phylogeny:
 #>   Pa5Bac29, AtlPorci, AciSp313, MxlBact8, MxlBacte, PseS1107, ...
 #> 
 #> Rooted; includes branch length(s).
-    
+
     subtree <- tree_subset(tree, tips = head(tree$tip.label))
     subtree
 #> 

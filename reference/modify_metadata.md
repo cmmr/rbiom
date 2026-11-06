@@ -50,14 +50,14 @@ Other transformations:
 [`biom_rescale()`](https://cmmr.github.io/rbiom/reference/biom_rescale.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
-[`with()`](https://cmmr.github.io/rbiom/reference/with.md)
+[`subset`](https://cmmr.github.io/rbiom/reference/subset.md),
+[`with`](https://cmmr.github.io/rbiom/reference/with.md)
 
 ## Examples
 
 ``` r
-    library(rbiom) 
-    
+    library(rbiom)
+
     biom <- slice_max(hmp50, BMI, n = 6)
     biom$metadata
 #> # A tibble: 7 × 5
@@ -70,7 +70,7 @@ Other transformations:
 #> 5 HMP43      24    30 Mid vagina     Female
 #> 6 HMP36      24    29 Stool          Male  
 #> 7 HMP48      24    29 Anterior nares Male  
-    
+
     # Add a new field to the metadata
     biom <- mutate(biom, Obsese = BMI >= 30)
     biom$metadata
@@ -84,7 +84,7 @@ Other transformations:
 #> 5 HMP43      24    30 Mid vagina     Female TRUE  
 #> 6 HMP36      24    29 Stool          Male   FALSE 
 #> 7 HMP48      24    29 Anterior nares Male   FALSE 
-    
+
     # Rename a metadata field
     biom <- rename(biom, 'Age (years)' = "Age")
     biom$metadata

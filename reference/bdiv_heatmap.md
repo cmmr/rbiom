@@ -80,7 +80,7 @@ bdiv_heatmap(
   numeric vector of length two to control row label sizes and column
   label sizes separately, for example `c(rows = 20, cols = 8)`, or
   simply `c(20, 8)`. Default: `NULL`, which computes:
-  `pmax(8, pmin(20, 100 / dim(mtx)))`
+  `pmax(5, pmin(14, 100 / dim(mtx)))`
 
 - rescale:
 
@@ -89,27 +89,10 @@ bdiv_heatmap(
 
 - clust:
 
-  Clustering algorithm for reordering the rows and columns by
-  similarity. You can supply a list or character vector of length two to
-  control the row and column clustering separately, for example
-  `clust = c(rows = "complete", cols = NA)`, or simply
-  `clust = c("complete", NA)`. Options are:
-
-  `FALSE` or `NA` -
-
-  :   Disable reordering.
-
-  An `hclust` class object
-
-  :   E.g. from
-      [`stats::hclust()`](https://rdrr.io/r/stats/hclust.html).
-
-  A method name -
-
-  :   `"ward.D"`, `"ward.D2"`, `"single"`, `"complete"`, `"average"`,
-      `"mcquitty"`, `"median"`, or `"centroid"`.
-
-  Default: `"complete"`
+  Clustering algorithm for reordering the samples by similarity, applied
+  to the `bdiv` distances. Options are: `"ward.D"`, `"ward.D2"`,
+  `"single"`, `"complete"`, `"average"`, `"mcquitty"`, `"median"`,
+  `"centroid"`, or `FALSE` to disable reordering. Default: `"complete"`
 
 - trees:
 
@@ -154,11 +137,14 @@ bdiv_heatmap(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 
-  Additional arguments to pass on to ggplot2::theme(). For example,
+  Additional arguments to pass on to ggplot2::theme(). Arguments
+  prefixed with `labs.` go to ggplot2::labs() instead, for example
   `labs.subtitle = "Plot subtitle"`.
 
 ## Value
@@ -205,6 +191,8 @@ The following entries in the track definitions are understood:
 - `side` - :
 
   Options are `"top"` (default) or `"left"`.
+  [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md)
+  places all tracks on top.
 
 - `na.color` - :
 
@@ -226,10 +214,9 @@ Categorical palette names: `"okabe"`, `"carto"`, `"r4"`, `"polychrome"`,
 
 Numeric palette names: `"reds"`, `"oranges"`, `"greens"`, `"purples"`,
 `"grays"`, `"acton"`, `"bamako"`, `"batlow"`, `"bilbao"`, `"buda"`,
-`"davos"`, `"devon"`, `"grayC"`, `"hawaii"`, `"imola"`, `"lajolla"`,
-`"lapaz"`, `"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`,
-`"berlin"`, `"broc"`, `"cork"`, `"lisbon"`, `"roma"`, `"tofino"`,
-`"vanimo"`, and `"vik"`.
+`"davos"`, `"devon"`, `"hawaii"`, `"imola"`, `"lajolla"`, `"lapaz"`,
+`"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`, `"berlin"`, `"broc"`,
+`"cork"`, `"lisbon"`, `"roma"`, `"tofino"`, `"vanimo"`, and `"vik"`.
 
 ## See also
 
@@ -264,12 +251,12 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     # Subset to 10 samples and rarefy them.
     hmp10 <- rarefy(hmp50[1:10])
-    
+
     bdiv_heatmap(hmp10, tracks=c("Body Site", "Age"))
 
-    
+
     bdiv_heatmap(hmp10, bdiv=c("u_unifrac", "n_unifrac"), tracks="sex")
 ```

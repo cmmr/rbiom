@@ -16,12 +16,17 @@ QIIME 2 or mothur's specifications.
 `biom_counts.tsv` will always be created. The others are dependent on
 whether the content is present in the `biom` argument.
 
+For QIIME 2, metadata columns are typed `numeric` or `categorical`
+(logical and `Date` fields are categorical; dates are written as
+`YYYY-MM-DD`). For mothur, taxonomy rows use the OTU IDs from the counts
+file, and missing ranks are written as `unclassified`.
+
 ## Usage
 
 ``` r
-write_mothur(biom, dir = tempfile(), prefix = "biom_")
+write_mothur(biom, dir = tempfile(), prefix = "biom_", overwrite = FALSE)
 
-write_qiime2(biom, dir = tempfile(), prefix = "biom_")
+write_qiime2(biom, dir = tempfile(), prefix = "biom_", overwrite = FALSE)
 ```
 
 ## Arguments
@@ -42,6 +47,10 @@ write_qiime2(biom, dir = tempfile(), prefix = "biom_")
 
   A string to prepend to each file name. Default: `'biom_'`
 
+- overwrite:
+
+  Replace files that already exist? Default: `FALSE`
+
 ## Value
 
 The normalized directory path that was written to (invisibly).
@@ -50,28 +59,28 @@ The normalized directory path that was written to (invisibly).
 
 ``` r
     library(rbiom)
-    
+
     tdir <- tempfile()
-    
+
     write_qiime2(hmp50, tdir, 'qiime2_')
     write_mothur(hmp50, tdir, 'mothur_')
-    
+
     list.files(tdir)
 #>  [1] "mothur_counts.tsv"   "mothur_metadata.tsv" "mothur_seqs.fna"    
 #>  [4] "mothur_taxonomy.tsv" "mothur_tree.nwk"     "qiime2_counts.tsv"  
 #>  [7] "qiime2_metadata.tsv" "qiime2_seqs.fna"     "qiime2_taxonomy.tsv"
 #> [10] "qiime2_tree.nwk"    
-    
+
     readLines(file.path(tdir, 'qiime2_metadata.tsv'), n = 4)
 #> [1] "sample-id\tAge\tBMI\t\"Body Site\"\tSex"              
 #> [2] "#q2:types\tnumeric\tnumeric\tcategorical\tcategorical"
 #> [3] "HMP01\t22\t20\t\"Buccal mucosa\"\tFemale"             
 #> [4] "HMP02\t24\t23\t\"Buccal mucosa\"\tMale"               
-    
+
     readLines(file.path(tdir, 'mothur_taxonomy.tsv'), n = 3)
-#> [1] "OTU\tSize\tTaxonomy"                                                                 
-#> [2] "1\t24096\tBacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus"
-#> [3] "2\t23409\tBacteria;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Streptococcus"
-    
+#> [1] "OTU\tSize\tTaxonomy"                                                                         
+#> [2] "Unc01yki\t24096\tBacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus;"
+#> [3] "Unc53100\t23409\tBacteria;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Streptococcus;"
+
     unlink(tdir, recursive = TRUE)
 ```

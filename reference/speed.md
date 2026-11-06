@@ -22,9 +22,7 @@ Modify `biom` in place like this:
     subset(biom, clone = FALSE, ...)
     rarefy(biom, clone = FALSE)
 
-    # Or:
-    biom$metadata %<>% subset(...)
-    biom$counts %<>% rarefy_cols()
+Both forms record the step in `biom$code`.
 
 ## Drop Components
 

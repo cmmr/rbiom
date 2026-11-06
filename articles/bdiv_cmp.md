@@ -7,7 +7,7 @@ biom <- rarefy(hmp50)
 bdiv_boxplot(
   biom     = subset(biom, `Body Site` %in% c("Buccal mucosa", "Saliva")), 
   x        = "==Sex", 
-  bdiv     = c("Bray-Curtis", "Euclidean"), 
+  bdiv     = c("bray", "euclidean"),
   facet.by = "==Body Site" )
 ```
 

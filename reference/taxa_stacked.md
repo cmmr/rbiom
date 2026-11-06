@@ -53,8 +53,8 @@ taxa_stacked(
   A character vector of colors or patterns to use in the graph. A named
   character vector can be used to map taxon names to specific colors or
   patterns. Set to `TRUE` to auto-select colors or patterns, or to
-  `FALSE` to disable per-taxa colors or patterns. Default:
-  `colors=TRUE, patterns=FALSE`.
+  `FALSE` to disable per-taxa colors or patterns. Patterns require the
+  fillpattern package. Default: `colors=TRUE, patterns=FALSE`.
 
 - label.by, order.by:
 
@@ -119,14 +119,14 @@ taxa_stacked(
 
 - xlab.angle:
 
-  Angle of the labels at the bottom of the plot. Options are `"auto"`,
-  `'0'`, `'30'`, and `'90'`. Default: `"auto"`.
+  Angle of the sample labels at the bottom of the plot. Options are
+  `"auto"`, `0`, `30`, and `90`. Default: `90`
 
 - ...:
 
   Parameters for underlying functions. Prefixing parameter names with a
   layer name ensures that a particular parameter is passed to, and only
-  to, that layer.
+  to, that layer. An argument that no layer accepts is an error.
 
 ## Value
 
@@ -135,8 +135,10 @@ available as `$data` and `$code`, respectively.
 
 ## Details
 
-If `biom` is rarefied, then relative abundance will be shown on the
-y-axis. Otherwise, raw abundance will be displayed.
+If `biom` is rarefied (or holds relative abundances), then relative
+abundance will be shown on the y-axis. Otherwise, raw abundance will be
+displayed. Samples with `NA` values in `label.by`, `order.by`, or
+`facet.by` are dropped.
 
 ## See also
 
@@ -171,13 +173,12 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     taxa_stacked(biom, rank="Phylum")
 
-    
+
     taxa_stacked(biom, rank = "genus", facet.by = "body site")
 
-    
 ```

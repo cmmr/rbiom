@@ -68,28 +68,27 @@ Other transformations:
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
-[`with()`](https://cmmr.github.io/rbiom/reference/with.md)
+[`subset`](https://cmmr.github.io/rbiom/reference/subset.md),
+[`with`](https://cmmr.github.io/rbiom/reference/with.md)
 
 ## Examples
 
 ``` r
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
-    
+
     # Original range
     range(as.matrix(biom))
 #> [1]    0 2672
-    
+
     # Rescaled to 0-1
     biom_01 <- biom_rescale(biom)
     range(as.matrix(biom_01))
 #> [1] 0 1
-    
+
     # Rescaled to 0-100 (Percentages)
     biom_100 <- biom_rescale(biom, range = c(0, 100))
     range(as.matrix(biom_100))
 #> [1]   0 100
-    
 ```

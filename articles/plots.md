@@ -64,6 +64,8 @@ patchwork::wrap_plots(
     p + 
       ggplot2::labs(x = NULL, caption = NULL) + 
       ggplot2::theme(legend.position = "none") }))
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_segment()`).
 ```
 
 ![](plots_files/figure-html/unnamed-chunk-3-1.png)
@@ -71,8 +73,9 @@ patchwork::wrap_plots(
 ### Statistics
 
 The categorical groups defined by `x`, `stat.by`, etc are used to
-calculate non-parametric statistics with the Mann-Whitney or
-Kruskal-Wallis algorithms. See
+calculate statistics: Mann-Whitney or Kruskal-Wallis tests for alpha
+diversity and taxa abundance, and PERMANOVA (permutation tests on
+samples) for beta diversity. See
 [Statistics](https://cmmr.github.io/rbiom/articles/statistics.md) for
 details.
 
@@ -114,12 +117,12 @@ biom <- rarefy(hmp50, depth = 1000)
 adiv <- adiv_corrplot(biom, layers = "ts", x = "BMI")
   
 bdiv <- bdiv_corrplot(
-  biom = biom, layers = "tc", x = "BMI", stat.by = "==Body Site", 
-  limit.by = list("Body Site" = c("Buccal mucosa", "Stool")) )
+  biom    = subset(biom, `Body Site` %in% c("Buccal mucosa", "Stool")),
+  layers  = "tc", x = "BMI", stat.by = "==Body Site" )
 
 taxa <- taxa_corrplot(
-  biom = biom, layers = "tsr", x = "Age", taxa = 3, stat.by = "Body Site", 
-  limit.by = list("Body Site" = c("Mid vagina", "Saliva", "Stool")),
+  biom    = subset(biom, `Body Site` %in% c("Buccal mucosa", "Saliva", "Stool")),
+  layers  = "tsr", x = "Age", taxa = 3, stat.by = "Body Site",
   facet.ncol = 1, facet.strip.position = "right" )
 
 patchwork::wrap_plots(
@@ -158,10 +161,6 @@ p1 <- bdiv_ord_plot(biom, layers = "pse", stat.by = "Body Site") +
 p2 <- bdiv_ord_plot(biom, layers = "emt", stat.by = "Body Site")
 
 patchwork::wrap_plots(p1, p2, guides = "collect")
-#> Warning in MASS::cov.trob(data[, vars], wt = weight * nrow(data)): Probable
-#> convergence failure
-#> Warning in MASS::cov.trob(data[, vars], wt = weight * nrow(data)): Probable
-#> convergence failure
 ```
 
 ![](plots_files/figure-html/unnamed-chunk-7-1.png)

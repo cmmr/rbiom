@@ -59,7 +59,8 @@ taxa_heatmap(
   A character vector of metadata fields to display as tracks at the top
   of the plot. Or, a list as expected by the `tracks` argument of
   [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md).
-  Default: `NULL`
+  Tracks describe samples, so they are always placed on top
+  (`side = "left"` is ignored). Default: `NULL`
 
 - grid:
 
@@ -123,7 +124,7 @@ taxa_heatmap(
   numeric vector of length two to control row label sizes and column
   label sizes separately, for example `c(rows = 20, cols = 8)`, or
   simply `c(20, 8)`. Default: `NULL`, which computes:
-  `pmax(8, pmin(20, 100 / dim(mtx)))`
+  `pmax(5, pmin(14, 100 / dim(mtx)))`
 
 - rescale:
 
@@ -210,7 +211,9 @@ taxa_heatmap(
 
 - ...:
 
-  Additional arguments to pass on to ggplot2::theme().
+  Additional arguments to pass on to ggplot2::theme(). Arguments
+  prefixed with `labs.` go to ggplot2::labs() instead, for example
+  `labs.subtitle = "Plot subtitle"`.
 
 ## Value
 
@@ -255,7 +258,8 @@ The following entries in the track definitions are understood:
 
 - `side` - :
 
-  Options are `"top"` (default) or `"left"`.
+  Options are `"top"` (default) or `"left"`. `taxa_heatmap()` places all
+  tracks on top.
 
 - `na.color` - :
 
@@ -277,10 +281,9 @@ Categorical palette names: `"okabe"`, `"carto"`, `"r4"`, `"polychrome"`,
 
 Numeric palette names: `"reds"`, `"oranges"`, `"greens"`, `"purples"`,
 `"grays"`, `"acton"`, `"bamako"`, `"batlow"`, `"bilbao"`, `"buda"`,
-`"davos"`, `"devon"`, `"grayC"`, `"hawaii"`, `"imola"`, `"lajolla"`,
-`"lapaz"`, `"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`,
-`"berlin"`, `"broc"`, `"cork"`, `"lisbon"`, `"roma"`, `"tofino"`,
-`"vanimo"`, and `"vik"`.
+`"davos"`, `"devon"`, `"hawaii"`, `"imola"`, `"lajolla"`, `"lapaz"`,
+`"nuuk"`, `"oslo"`, `"tokyo"`, `"turku"`, `"bam"`, `"berlin"`, `"broc"`,
+`"cork"`, `"lisbon"`, `"roma"`, `"tofino"`, `"vanimo"`, and `"vik"`.
 
 ## See also
 
@@ -315,19 +318,18 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     # Subset to 10 samples and rarefy them.
     hmp10 <- rarefy(hmp50[1:10])
-    
+
     taxa_heatmap(hmp10, rank = "Phylum", tracks = "Body Site")
 
-    
+
     taxa_heatmap(hmp10, rank = "Genus", tracks = c("sex", "bo"))
 
-    
+
     taxa_heatmap(hmp10, rank = "Phylum", tracks = list(
-      'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")), 
+      'Sex'       = list(colors = c(m = "#0000FF", f = "violetred")),
       'Body Site' = list(colors = "muted", label = "Source") ))
 
-    
 ```

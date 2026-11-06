@@ -54,13 +54,16 @@ rescale_cols(mtx)
 - upsample:
 
   If the count data is in percentages, provide an integer value here to
-  scale each sample's observations to integers that sum to this value.
-  Maps to `inflate` in the new syntax.
+  scale each sample's observations to integers that sum to this value
+  before rarefying. See
+  [`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md).
 
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - range:
 
@@ -76,33 +79,32 @@ the same dimensions as `mtx`.
 
 ``` r
     mtx <- matrix(1:12, ncol = 3, dimnames = list(paste0("OTU", 1:4), paste0("Sample", 1:3)))
-    
+
     mtx
 #>      Sample1 Sample2 Sample3
 #> OTU1       1       5       9
 #> OTU2       2       6      10
 #> OTU3       3       7      11
 #> OTU4       4       8      12
-    
+
     suppressWarnings({
-    
+
       mtx_rarefy(mtx)
-      
+
       rarefy_cols(mtx)
-      
+
       mtx_percent(mtx)
-      
+
       mtx_rescale(mtx)
-      
+
       rescale_rows(mtx)
-      
+
       rescale_cols(mtx)
-      
+
     })
 #>      Sample1   Sample2   Sample3
 #> OTU1     0.1 0.1923077 0.2142857
 #> OTU2     0.2 0.2307692 0.2380952
 #> OTU3     0.3 0.2692308 0.2619048
 #> OTU4     0.4 0.3076923 0.2857143
-    
 ```

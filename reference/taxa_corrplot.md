@@ -14,6 +14,7 @@ taxa_corrplot(
   lineage = FALSE,
   unc = "singly",
   other = FALSE,
+  p.top = Inf,
   stat.by = NULL,
   facet.by = NULL,
   colors = TRUE,
@@ -28,6 +29,7 @@ taxa_corrplot(
   seed = 0,
   alt = "!=",
   mu = 0,
+  strata = NULL,
   caption = TRUE,
   check = FALSE,
   ...
@@ -113,6 +115,15 @@ taxa_corrplot(
   `TRUE`, but with that value as the name to use instead of "Other".
   Default: `FALSE`
 
+- p.top:
+
+  Only display taxa with the most significant differences in abundance.
+  If `p.top` is \>= 1, then the `p.top` most significant taxa are
+  displayed. If `p.top` is less than one, all taxa with an adjusted
+  p-value \<= `p.top` are displayed. Recommended to be used in
+  combination with the `taxa` parameter to set a lower bound on the mean
+  abundance of considered taxa. Default: `Inf`
+
 - stat.by:
 
   Dataset field with the statistical groups. Must be categorical.
@@ -160,6 +171,8 @@ taxa_corrplot(
 - test:
 
   Method for computing p-values: `'none'`, `'emmeans'`, or `'emtrends'`.
+  See
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md).
   Default: `'emmeans'`
 
 - fit:
@@ -169,9 +182,11 @@ taxa_corrplot(
 
 - at:
 
-  Position(s) along the x-axis where the means or slopes should be
-  evaluated. Default: `NULL`, which samples 100 evenly spaced positions
-  and selects the position where the p-value is most significant.
+  Position(s) along `regr` where group means or local slopes are
+  evaluated. Default: `NULL`, which uses the median of `regr` within
+  each `split.by` stratum. A vector gives one row per position, and
+  p-values are adjusted across all of them. Ignored by tests that do not
+  depend on a position (e.g. a global slope with `fit = "lm"`).
 
 - level:
 
@@ -181,14 +196,16 @@ taxa_corrplot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - transform:
 
   Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+  correcting for non-normal distributions before applying regression
+  statistics. Default: `"none"`
 
 - ties:
 
@@ -199,8 +216,10 @@ taxa_corrplot(
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  Random seed for permutations, rarefaction, random tie-breaking, and
+  stochastic ordinations. Results are reproducible for a given seed, and
+  the caller's random number generator state is left unchanged. Must be
+  a non-negative integer. Default: `0`
 
 - alt:
 
@@ -211,6 +230,13 @@ taxa_corrplot(
 - mu:
 
   Reference value to test against. Default: `0`
+
+- strata:
+
+  Dataset field with the blocking/subject variable. Permutation tests
+  permute within strata; regression models include a random intercept
+  per stratum. The plotted trendlines are descriptive fits without the
+  strata term. Default: `NULL`
 
 - caption:
 
@@ -226,7 +252,8 @@ taxa_corrplot(
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with a layer name to pass it to only that layer. For
   instance, `p.size = 2` ensures only the points have their size set to
-  `2`.
+  `2`. Unprefixed parameters go to every layer whose function accepts
+  them. An argument that no layer accepts is an error.
 
 ## Value
 
@@ -279,8 +306,8 @@ Other visualization:
 ## Examples
 
 ``` r
-    library(rbiom) 
-    
+    library(rbiom)
+
     biom <- rarefy(subset(hmp50, `Body Site` %in% c('Buccal mucosa', 'Saliva')))
     taxa_corrplot(biom, x = "BMI", stat.by = "Body Site", taxa = 'Streptococcus')
 ```

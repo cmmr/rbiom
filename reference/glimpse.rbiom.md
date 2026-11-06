@@ -21,7 +21,7 @@ glimpse(x, width = NULL, ...)
 - width:
 
   Width of output. See
-  [`pillar::glimpse()`](https://pillar.r-lib.org/reference/glimpse.html)
+  [`tibble::glimpse()`](https://pillar.r-lib.org/reference/glimpse.html)
   documentation. Default: `NULL`
 
 - ...:
@@ -41,7 +41,7 @@ Other metadata:
 
 ``` r
     library(rbiom)
-    
+
     glimpse(hmp50)
 #> Rows: 50
 #> Columns: 5
@@ -50,5 +50,4 @@ Other metadata:
 #> $ BMI         <dbl> 20, 23, 26, 23, 24, 25, 22, 26, 32, 20, 23, 26, 21, 26, 21…
 #> $ `Body Site` <fct> Buccal mucosa, Buccal mucosa, Saliva, Saliva, Buccal mucos…
 #> $ Sex         <fct> Female, Male, Male, Male, Female, Male, Male, Female, Male…
-    
 ```

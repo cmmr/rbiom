@@ -54,14 +54,13 @@ Other samples:
 
 ``` r
     library(rbiom)
-    
+
     pull(hmp50, 'Age') %>% head()
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
 #>    22    24    28    25    27    32 
-    
+
     pull(hmp50, 'bod') %>% head(4)
 #>         HMP01         HMP02         HMP03         HMP04 
 #> Buccal mucosa Buccal mucosa        Saliva        Saliva 
 #> Levels: Anterior nares Buccal mucosa Mid vagina Saliva Stool
-    
 ```

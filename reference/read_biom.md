@@ -16,20 +16,32 @@ read_biom(src, ...)
   be formatted according to version 1.0 (JSON) or 2.1 (HDF5)
   [specifications](http://biom-format.org/documentation/), or as
   classical tabular format. URLs must begin with `http://`, `https://`,
-  `ftp://`, or `ftps://`. JSON files must have `{` as their first
-  character. Compressed (gzip or bzip2) BIOM files are also supported.
-  NOTE: to read HDF5 formatted BIOM files, the BioConductor R package
-  `rhdf5` must be installed.
+  `ftp://`, or `ftps://`. JSON strings are recognized by their first
+  non-whitespace character being `{`. Compressed (gzip or bzip2) BIOM
+  files are also supported. NOTE: to read HDF5 formatted BIOM files, the
+  `h5lite` R package must be installed.
 
 - ...:
 
   Properties to set in the new rbiom object, for example, `metadata`,
-  `id`, `comment`, or `tree`.
+  `id`, `comment`, or `tree`. These override the corresponding content
+  of the file.
 
 ## Value
 
 An [rbiom
 object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
+
+## Details
+
+The file's `generated_by` and date fields are kept in the returned
+object's `$generated_by` and `$date`.
+
+For classic tabular files, the first column must hold OTU IDs and a
+column named `taxonomy` (or `lineage`) is parsed into taxonomic ranks.
+All other columns are abundance counts: blank cells are read as `0` with
+a warning, and columns containing non-numeric text are ignored with a
+warning. Empty taxonomic ranks are `NA`.
 
 ## See also
 
@@ -67,7 +79,7 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #> Unc53100  1083   543   301   223  2672   748  2436   321    57    28
 #> LtbAci52     0     0     0     0     0     0     0     0     0     0
 #> CnbTube3     0     0     0     0     0     0     0     0     0   659
-    
+
     biom$taxonomy %>% head()
 #> # A tibble: 6 × 7
 #>   .otu     Kingdom  Phylum         Class          Order             Family Genus
@@ -90,19 +102,27 @@ object](https://cmmr.github.io/rbiom/reference/rbiom_objects.md).
 #> 4 HMP04      25    23 Saliva        Male  
 #> 5 HMP05      27    24 Buccal mucosa Female
 #> 6 HMP06      32    25 Saliva        Male  
-    
+
     table(biom$metadata$Sex, biom$metadata$`Body Site`)
 #>         
 #>          Anterior nares Buccal mucosa Mid vagina Saliva Stool
 #>   Female              5             5         10      5     5
 #>   Male                5             5          0      5     5
-    
+
     sprintf("Mean age: %.1f", mean(biom$metadata$Age))
 #> [1] "Mean age: 27.8"
 
-    # Phylogenetic tree
-    biom$tree %>%
-      tree_subset(1:10) %>%
-      plot()
+    # Phylogenetic tree (plotting requires the 'ape' package)
+    tree <- tree_subset(biom$tree, 1:10)
+    tree
+#> 
+#> Phylogenetic tree with 10 tips and 9 internal nodes.
+#> 
+#> Tip labels:
+#>   EschC738, Unc92490, Unc02pjp, Unc26984, Unc41900, AntBa370, ...
+#> 
+#> Rooted; includes branch length(s).
+    if (requireNamespace("ape", quietly = TRUE))
+      ape::plot.phylo(tree)
 
 ```

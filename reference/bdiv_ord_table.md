@@ -15,6 +15,7 @@ bdiv_ord_table(
   k = 2,
   stat.by = NULL,
   split.by = NULL,
+  strata = NULL,
   tree = NULL,
   test = "adonis2",
   seed = 0,
@@ -55,7 +56,7 @@ bdiv_ord_table(
   `"PCoA"` -
 
   :   Principal coordinate analysis;
-      [`ape::pcoa()`](https://rdrr.io/pkg/ape/man/pcoa.html).
+      [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html).
 
   `"UMAP"` -
 
@@ -94,12 +95,23 @@ bdiv_ord_table(
 - stat.by:
 
   The categorical or numeric metadata field over which statistics should
-  be calculated. Required.
+  be calculated. Default: `NULL`
 
 - split.by:
 
   Dataset field(s) that the data should be split by prior to any
   calculations. Must be categorical. Default: `NULL`
+
+- strata:
+
+  Metadata field with a blocking variable (e.g. a subject identifier).
+  For the sample statistics, a `stat.by` that varies within strata is
+  permuted within each stratum, and one that is constant within every
+  stratum is permuted at the stratum level (whole strata exchange their
+  values); see the Details of
+  [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md).
+  For the taxa biplot, taxa abundances are permuted within each stratum.
+  Default: `NULL`
 
 - tree:
 
@@ -109,28 +121,17 @@ bdiv_ord_table(
 
 - test:
 
-  Permutational test for accessing significance. Options are:
-
-  `"adonis2"` -
-
-  :   Permutational MANOVA;
-      [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/vegan-defunct.html).
-
-  `"mrpp"` -
-
-  :   Multiple response permutation procedure;
-      [`vegan::mrpp()`](https://vegandevs.github.io/vegan/reference/mrpp.html).
-
-  `"none"` -
-
-  :   Don't run any statistics.
-
-  Abbreviations are allowed. Default: `"adonis2"`
+  Permutational test for the sample groups (`stat.by`). Options are
+  `"adonis2"` (PERMANOVA; the default), `"mrpp"`, `"betadisper"`, or
+  `"none"`. See
+  [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md).
+  The taxa biplot always uses
+  [`vegan::envfit()`](https://vegandevs.github.io/vegan/reference/envfit.html).
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  Random seed for the permutation tests and the stochastic ordinations
+  (NMDS, tSNE, UMAP). Default: `0`
 
 - permutations:
 
@@ -164,7 +165,9 @@ bdiv_ord_table(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - unc:
 
@@ -198,23 +201,45 @@ bdiv_ord_table(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 
   Additional arguments to pass on to
-  [`uwot::umap()`](https://jlmelville.github.io/uwot/reference/umap.html),
-  [`ape::pcoa()`](https://rdrr.io/pkg/ape/man/pcoa.html),
+  [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html),
   [`vegan::metaMDS()`](https://vegandevs.github.io/vegan/reference/metaMDS.html),
-  or [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html).
+  [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html), or
+  [`uwot::umap()`](https://jlmelville.github.io/uwot/reference/umap.html).
 
 ## Value
 
 A data.frame with columns `.sample`, `.bdiv`, `.ord`, `.x`, `.y`, and
 (optionally) `.z`. Any columns given by `md`, `split.by`, and `stat.by`
 are included as well. If `stat.by` is given, then `$stats` and
-`$stats$code)` are set. If `rank` is given, then `$taxa_coords`,
-`$taxa_stats`, and `$taxa_stats$code` are set.
+`$stats$code` are set (see
+[`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md)).
+If `rank` is given, then `$taxa_coords`, `$taxa_stats`, and
+`$taxa_stats$code` are set: `$taxa_stats` has one row per taxon and
+ordination with `.r.sqr` (the squared correlation of the taxon's
+relative abundance with the ordination axes, from
+[`vegan::envfit()`](https://vegandevs.github.io/vegan/reference/envfit.html)),
+`.p.val` (its permutation p-value), and `.adj.p` (adjusted across all
+tested taxa, before any `p.top` filtering); `$taxa_coords` holds the
+arrow for each taxon (`.x0`/`.y0` at the centroid of the samples,
+`.x`/`.y` at its tip, scaled to fit the sample cloud) and `.size`, its
+mean relative abundance. The `'axes'` attribute gives the axis labels
+(see
+[`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md)).
+
+## Details
+
+Distances are computed from `biom` as given (not relativized first), so
+they are identical to
+[`bdiv_distmat()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md)
+on the same object. Relative abundances are used only for the taxa
+biplot.
 
 ## See also
 
@@ -236,37 +261,36 @@ Other ordination:
 
 ``` r
     library(rbiom)
-    
+
     ord <- bdiv_ord_table(hmp50, "bray", "pcoa", stat.by="Body Site", rank="g")
     head(ord)
 #> # A tibble: 6 × 6
 #>   .bdiv .ord  .sample     .x       .y `Body Site`  
-#>   <chr> <fct> <chr>    <dbl>    <dbl> <fct>        
-#> 1 bray  PCoA  HMP01   -0.387 -0.00895 Buccal mucosa
-#> 2 bray  PCoA  HMP02   -0.461 -0.0135  Buccal mucosa
-#> 3 bray  PCoA  HMP03   -0.407 -0.0143  Saliva       
-#> 4 bray  PCoA  HMP04   -0.378 -0.0123  Saliva       
-#> 5 bray  PCoA  HMP05   -0.452 -0.0114  Buccal mucosa
-#> 6 bray  PCoA  HMP06   -0.411 -0.0123  Saliva       
-    
+#>   <fct> <fct> <chr>    <dbl>    <dbl> <fct>        
+#> 1 bray  PCoA  HMP01   -0.358  0.00236 Buccal mucosa
+#> 2 bray  PCoA  HMP02   -0.420  0.0104  Buccal mucosa
+#> 3 bray  PCoA  HMP03   -0.382  0.0135  Saliva       
+#> 4 bray  PCoA  HMP04   -0.388  0.00485 Saliva       
+#> 5 bray  PCoA  HMP05   -0.415 -0.0115  Buccal mucosa
+#> 6 bray  PCoA  HMP06   -0.414 -0.00703 Saliva       
+
     ord$stats
-#> # Test:     adonis2 ~ `Body Site`. 999 permutations.
+#> # Test:     PERMANOVA ~ `Body Site`; 999 permutations.
 #> # A tibble: 1 × 6
-#>   .bdiv    .n .stat    .z .p.val .adj.p
-#>   <chr> <int> <dbl> <dbl>  <dbl>  <dbl>
-#> 1 bray     50  19.2  72.2  0.001  0.001
-    
+#>   .bdiv    .n .stat .r.sqr .p.val .adj.p
+#>   <chr> <int> <dbl>  <dbl>  <dbl>  <dbl>
+#> 1 bray     50  13.7  0.549  0.001  0.001
+
     ord$taxa_stats
-#> # Test:     adonis2 ~ taxa. 999 permutations.
-#> # A tibble: 6 × 8
-#>   .bdiv .rank .taxa                .n .stat    .z .p.val .adj.p
-#>   <chr> <fct> <fct>             <int> <dbl> <dbl>  <dbl>  <dbl>
-#> 1 bray  Genus Lactobacillus        50  8.62  16.8  0.001  0.001
-#> 2 bray  Genus Streptococcus        50 10.1   19.5  0.001  0.001
-#> 3 bray  Genus Bacteroides          50  8.72  16.7  0.001  0.001
-#> 4 bray  Genus Corynebacterium 1    50  8.53  16.0  0.001  0.001
-#> 5 bray  Genus Haemophilus          50  6.56  12.3  0.001  0.001
-#> 6 bray  Genus Propionibacterium    50  5.84  11.3  0.001  0.001
-    
-    
+#> # Test:     vegan::envfit ~ taxa; 999 permutations.
+#> # A tibble: 6 × 7
+#>   .bdiv .rank .ord  .taxa             .r.sqr .p.val .adj.p
+#>   <chr> <chr> <chr> <chr>              <dbl>  <dbl>  <dbl>
+#> 1 bray  Genus PCoA  Lactobacillus      0.311  0.001  0.001
+#> 2 bray  Genus PCoA  Streptococcus      0.469  0.001  0.001
+#> 3 bray  Genus PCoA  Bacteroides        0.373  0.001  0.001
+#> 4 bray  Genus PCoA  Corynebacterium 1  0.817  0.001  0.001
+#> 5 bray  Genus PCoA  Haemophilus        0.431  0.001  0.001
+#> 6 bray  Genus PCoA  Propionibacterium  0.506  0.001  0.001
+
 ```

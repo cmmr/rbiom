@@ -33,10 +33,13 @@ taxa_map(
 
 - taxa:
 
-  Which taxa to display. An integer value will show the top n most
-  abundant taxa. A value 0 \<= n \< 1 will show any taxa with that mean
-  abundance or greater (e.g. `0.1` implies \>= 10%). A character vector
-  of taxa names will show only those named taxa. Default: `6`.
+  Which taxa to keep in the mapping. An integer value keeps the top n
+  most abundant taxa, and a value 0 \<= n \< 1 keeps taxa with that mean
+  relative abundance or greater, both ranked exactly as in
+  [`taxa_matrix()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md).
+  A character vector of taxa names keeps only those taxa. OTUs belonging
+  to other taxa are dropped from the mapping, or mapped to `other` when
+  it is given. Default: `Inf` (all taxa)
 
 - unc:
 
@@ -93,7 +96,7 @@ the OTU names.
 ``` r
     library(rbiom)
     library(dplyr, warn.conflicts = FALSE)
-    
+
     # In $taxonomy, .otu is the first column (like a row identifier)  -----
     hmp50$taxonomy %>% head(4)
 #> # A tibble: 4 × 7
@@ -103,7 +106,7 @@ the OTU names.
 #> 2 Unc53100 Bacteria Firmicutes     Bacilli        Lactobacillales   Strep… Stre…
 #> 3 LtbAci52 Bacteria Firmicutes     Bacilli        Lactobacillales   Lacto… Lact…
 #> 4 CnbTube3 Bacteria Actinobacteria Actinobacteria Corynebacteriales Coryn… Cory…
-    
+
     # In taxa_map, .otu is the last column (most precise rank)  -----------
     taxa_map(hmp50) %>% head(4)
 #> # A tibble: 4 × 7
@@ -113,13 +116,19 @@ the OTU names.
 #> 2 Bacteria Firmicutes     Bacilli        Lactobacillales   Streptoc… Stre… Unc5…
 #> 3 Bacteria Firmicutes     Bacilli        Lactobacillales   Lactobac… Lact… LtbA…
 #> 4 Bacteria Actinobacteria Actinobacteria Corynebacteriales Coryneba… Cory… CnbT…
-    
+
     # Generate an OTU to Genus mapping  -----------------------------------
     taxa_map(hmp50, "Genus") %>% head(4)
 #>          Unc01yki          Unc53100          LtbAci52          CnbTube3 
 #>     Lactobacillus     Streptococcus     Lactobacillus Corynebacterium 1 
 #> 251 Levels: Abiotrophia Acidaminococcus Acinetobacter ... Veillonella
-    
+
+    # Keep the five most abundant OTUs; map the rest to "Other" -----------
+    taxa_map(hmp50, ".otu", taxa = 5, other = TRUE) %>% table()
+#> .
+#> Unc53100 LtbAci52 CnbTube3 Unc01yki PpbAcne6    Other 
+#>        1        1        1        1        1      485 
+
     # Sometimes taxonomic names are incomplete ----------------------------
     otus <- c('GemAsacc', 'GcbBacte', 'Unc58411')
     taxa_map(hmp50, unc = "asis") %>% filter(.otu %in% otus) %>% select(Phylum:.otu)
@@ -129,7 +138,7 @@ the OTU names.
 #> 1 Gracilibacteria c          o              f         g       GcbBacte
 #> 2 Tenericutes     Mollicutes Mollicutes RF9 f         g       Unc58411
 #> 3 Firmicutes      Bacilli    Bacillales     Family XI Gemella GemAsacc
-    
+
     # rbiom can replace them with unique placeholders ---------------------
     taxa_map(hmp50, unc = "singly") %>% filter(.otu %in% otus) %>% select(Class:.otu)
 #> # A tibble: 3 × 5
@@ -138,7 +147,7 @@ the OTU names.
 #> 1 Unc. GcbBacte Unc. GcbBacte  Unc. GcbBacte Unc. GcbBacte GcbBacte
 #> 2 Mollicutes    Mollicutes RF9 Unc. Unc58411 Unc. Unc58411 Unc58411
 #> 3 Bacilli       Bacillales     Bacillales XI Gemella       GemAsacc
-    
+
     # Or collapse them into groups ----------------------------------------
     taxa_map(hmp50, unc = "grouped") %>% filter(.otu %in% otus) %>% select(Class:Genus)
 #> # A tibble: 3 × 4

@@ -150,6 +150,9 @@ adiv_boxplot(biom, stat.by = "Body Site", facet.by = "Sex")
 ``` r
 
 adiv_boxplot(biom, stat.by = "Sex", facet.by = "Body Site")
+#> Warning: ! Statistics could not be computed for 1 of 5 comparisons: "Mid vagina".
+#> ℹ Message from the underlying tests:
+#> • all observations are in the same group
 ```
 
 ![](aes_files/figure-html/facets-2.png)

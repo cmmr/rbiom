@@ -52,13 +52,13 @@ Other transformations:
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md)
+[`subset`](https://cmmr.github.io/rbiom/reference/subset.md)
 
 ## Examples
 
 ``` r
-    library(rbiom) 
-    
+    library(rbiom)
+
     with(hmp50, table(`Body Site`, Sex))
 #>                 Sex
 #> Body Site        Female Male
@@ -67,7 +67,7 @@ Other transformations:
 #>   Mid vagina         10    0
 #>   Saliva              5    5
 #>   Stool               5    5
-    
+
     biom <- within(hmp50, {
       age_bin = cut(Age, 5)
       bmi_bin = cut(BMI, 5)

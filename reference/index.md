@@ -93,7 +93,7 @@ bar charts, heatmaps, and boxplots.
 - [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md)
   : Visualize BIOM data with boxplots.
 - [`taxa_clusters()`](https://cmmr.github.io/rbiom/reference/taxa_clusters.md)
-  : Cluster samples by taxa abundances k-means.
+  : Cluster samples by taxa abundances (k-means).
 - [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md)
   : Visualize taxa abundance with scatterplots and trendlines.
 - [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md)
@@ -141,7 +141,7 @@ clustering.
 - [`bdiv_boxplot()`](https://cmmr.github.io/rbiom/reference/bdiv_boxplot.md)
   : Visualize BIOM data with boxplots.
 - [`bdiv_clusters()`](https://cmmr.github.io/rbiom/reference/bdiv_clusters.md)
-  : Cluster samples by beta diversity k-means.
+  : Cluster samples by beta diversity (k-medoids).
 - [`bdiv_corrplot()`](https://cmmr.github.io/rbiom/reference/bdiv_corrplot.md)
   : Visualize beta diversity with scatterplots and trendlines.
 - [`bdiv_heatmap()`](https://cmmr.github.io/rbiom/reference/bdiv_heatmap.md)
@@ -199,14 +199,13 @@ structures (matrices, data.frames, trees) rather than rbiom objects.
 - [`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md)
   : Run ordinations on a distance matrix.
 - [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md)
-  : Run statistics on a distance matrix vs a categorical or numeric
-  variable.
+  : Run permutation statistics on a distance matrix.
 - [`stats_boxplot()`](https://cmmr.github.io/rbiom/reference/stats_boxplot.md)
   : Visualize categorical metadata effects on numeric values.
 - [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md)
   : Visualize regression with scatterplots and trendlines.
 - [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md)
-  : Run non-parametric statistics on a data.frame.
+  : Run statistics on a data.frame.
 - [`tree_subset()`](https://cmmr.github.io/rbiom/reference/tree_subset.md)
   : Create a subtree by specifying tips to keep.
 - [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md)

@@ -27,7 +27,7 @@ blply(biom, vars, FUN, ..., iters = list(), prefix = FALSE)
   values in these columns will be used to create a subsetted rbiom
   object to pass to `FUN.` If `NULL`, `biom` will be passed to `FUN`
   unaltered. Unambiguous abbreviations of metadata fields are also
-  accepted.
+  accepted. Samples with an `NA` in any of these fields are left out.
 
 - FUN:
 
@@ -62,8 +62,9 @@ For `bdply()`, a tibble data.frame comprising the accumulated outputs of
 You can also specify additional variables for your function to iterate
 over in unique combinations.
 
-Calls [`plyr::ddply()`](https://rdrr.io/pkg/plyr/man/ddply.html) or
-[`plyr::dlply()`](https://rdrr.io/pkg/plyr/man/dlply.html) internally.
+Each subset passed to `FUN` is a proper rbiom object whose history
+records how it was made, e.g. `subset(biom, Sex == "Male")`, so that
+results computed from it (and their `$code`) are reproducible.
 
 ## See also
 
@@ -77,18 +78,18 @@ Other biom:
 
 ``` r
     library(rbiom)
-    
+
     bdply(hmp50, "Sex", `$`, 'n_samples')
 #> # A tibble: 2 × 2
 #>   Sex       V1
 #>   <fct>  <int>
 #> 1 Female    30
 #> 2 Male      20
-    
+
     blply(hmp50, "Sex", `$`, 'n_samples') %>% unlist()
 #> Female   Male 
 #>     30     20 
-    
+
     bdply(hmp50, c("Body Site", "Sex"), function (b) {
       adm <- adiv_matrix(b)[,c("shannon", "simpson")]
       apply(adm, 2L, mean)
@@ -105,7 +106,7 @@ Other biom:
 #> 7 Saliva         Male     3.17    0.913
 #> 8 Stool          Female   2.43    0.850
 #> 9 Stool          Male     2.51    0.835
-    
+
     iters <- list(d = c("bray", "euclid"))
     bdply(hmp50, "Sex", iters = iters, function (b, d) {
       r <- range(bdiv_distmat(biom = b, bdiv = d))

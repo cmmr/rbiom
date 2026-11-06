@@ -63,7 +63,7 @@ documentation_default
   `"PCoA"` -
 
   :   Principal coordinate analysis;
-      [`ape::pcoa()`](https://rdrr.io/pkg/ape/man/pcoa.html).
+      [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html).
 
   `"UMAP"` -
 
@@ -354,9 +354,11 @@ documentation_default
 
 - at:
 
-  Position(s) along the x-axis where the means or slopes should be
-  evaluated. Default: `NULL`, which samples 100 evenly spaced positions
-  and selects the position where the p-value is most significant.
+  Position(s) along `regr` where group means or local slopes are
+  evaluated. Default: `NULL`, which uses the median of `regr` within
+  each `split.by` stratum. A vector gives one row per position, and
+  p-values are adjusted across all of them. Ignored by tests that do not
+  depend on a position (e.g. a global slope with `fit = "lm"`).
 
 - alt:
 
@@ -421,13 +423,17 @@ documentation_default
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  Random seed for permutations, rarefaction, random tie-breaking, and
+  stochastic ordinations. Results are reproducible for a given seed, and
+  the caller's random number generator state is left unchanged. Must be
+  a non-negative integer. Default: `0`
 
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - permutations:
 
@@ -436,7 +442,9 @@ documentation_default
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - depths:
 
@@ -447,7 +455,8 @@ documentation_default
 
   Where to draw a horizontal line on the plot, intended to show a
   particular rarefaction depth. Set to `TRUE` to show an auto-selected
-  rarefaction depth or `FALSE` to not show a line. Default: `NULL`
+  rarefaction depth, an integer to show that depth, or `FALSE` to not
+  show a line. Default: `TRUE`
 
 - clone:
 
@@ -458,14 +467,14 @@ documentation_default
 
 - labels:
 
-  Show sample names under each bar. Default: `FALSE`
+  Show sample names under each bar. Default: `TRUE`
 
 - transform:
 
   Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+  correcting for non-normal distributions before applying regression
+  statistics. Default: `"none"`
 
 - ties:
 

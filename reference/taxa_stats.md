@@ -17,6 +17,7 @@ taxa_stats(
   unc = "singly",
   other = FALSE,
   split.by = NULL,
+  strata = NULL,
   transform = "none",
   test = "emmeans",
   fit = "gam",
@@ -108,12 +109,22 @@ taxa_stats(
   Dataset field(s) that the data should be split by prior to any
   calculations. Must be categorical. Default: `NULL`
 
+- strata:
+
+  Dataset field with a blocking variable, such as a subject identifier
+  for repeated measures. Must be categorical. When given, regression
+  models (`test = "emmeans"` or `"emtrends"`) include a random intercept
+  per stratum, fitted with
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) as
+  `s(strata, bs = "re")` (a linear mixed model for `fit = "lm"` and
+  `"log"`). Not supported by the rank tests. Default: `NULL`
+
 - transform:
 
   Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+  correcting for non-normal distributions before applying regression
+  statistics. Default: `"none"`
 
 - test:
 
@@ -127,9 +138,14 @@ taxa_stats(
 
 - at:
 
-  Position(s) along the x-axis where the means or slopes should be
-  evaluated. Default: `NULL`, which samples 100 evenly spaced positions
-  and selects the position where the p-value is most significant.
+  Position(s) along `regr` where group means or local slopes are
+  evaluated. Only used by `test = "emmeans"` with `stat.by`, and by
+  `test = "emtrends"` with `fit = "gam"` (the other combinations test a
+  single, global slope). Default: `NULL`, which evaluates at one
+  prespecified position: the median of `regr` (computed within each
+  `split.by` stratum). A vector evaluates at each position; the returned
+  table then has one row per position, and the p-values are adjusted
+  across all of them.
 
 - level:
 
@@ -149,38 +165,72 @@ taxa_stats(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans the entire returned table: every combination of `split.by`
+  strata, `stat.by` pairs, and `at` positions. Default: `"fdr"`
 
 ## Value
 
-A tibble data.frame with fields from the table below. This tibble object
-provides the `$code` operator to print the R code used to generate the
-statistics.
+A tibble data.frame with the fields below. The R code used to generate
+the statistics is in `$code`.
 
 |  |  |
 |----|----|
 | **Field** | **Description** |
 | .mean | Estimated marginal mean. See [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html). |
-| .mean.diff | Difference in means. |
+| .mean.diff | Difference in means (first group minus second). |
 | .slope | Trendline slope. See [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html). |
-| .slope.diff | Difference in slopes. |
-| .h1 | Alternate hypothesis. |
-| .p.val | Probability that null hypothesis is correct. |
-| .adj.p | `.p.val` after adjusting for multiple comparisons. |
-| .effect.size | Effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
+| .slope.diff | Difference in slopes (first group minus second). |
+| .loc.shift | Hodges-Lehmann estimate of the location shift between two groups (wilcox). |
+| .pseudomedian | Hodges-Lehmann estimate of the location (one-sample wilcox). |
+| .h1 | Alternative hypothesis. |
+| .p.val | The probability, under the null hypothesis, of a test statistic at least as extreme as the one observed. |
+| .adj.p | `.p.val` after adjusting for multiple comparisons across the whole table. |
+| .effect.size | Cohen's d effect size. See [`emmeans::eff_size()`](https://rvlenth.github.io/emmeans/reference/eff_size.html). |
 | .lower | Confidence interval lower bound. |
 | .upper | Confidence interval upper bound. |
 | .se | Standard error. |
-| .n | Number of samples. |
+| .n | Number of observations used. |
 | .df | Degrees of freedom. |
 | .stat | Wilcoxon or Kruskal-Wallis rank sum statistic. |
-| .t.ratio | `.mean` / `.se` |
-| .r.sqr | Percent of variation explained by the model. |
-| .adj.r | `.r.sqr`, taking degrees of freedom into account. |
-| .aic | Akaike Information Criterion (predictive models). |
-| .bic | Bayesian Information Criterion (descriptive models). |
-| .loglik | Log-likelihood goodness-of-fit score. |
-| .fit.p | P-value for observing this fit by chance. |
+| .t.ratio | t statistic: estimate divided by `.se`. |
+| .edf, .ref.df | Effective and reference degrees of freedom of the smooth term (gam). |
+| .f | F statistic for the smooth term (gam). |
+| .r.sqr | R-squared (lm); adjusted R-squared (gam). |
+| .adj.r | Adjusted R-squared (lm). |
+| .dev.expl | Proportion of deviance explained (gam). |
+| .aic | Akaike Information Criterion. |
+| .bic | Bayesian Information Criterion. |
+| .loglik | Log-likelihood of the fitted model. |
+
+## Tests
+
+Which quantity is tested depends on `test` and on whether `regr` and
+`stat.by` are given. Rows with an `NA` in any of the `regr`, `resp`,
+`stat.by`, `split.by`, or `strata` fields are dropped (with a message).
+
+|  |  |  |  |
+|----|----|----|----|
+| `regr` | `stat.by` | `test = "emmeans"` | `test = "emtrends"` |
+| no | no | mean of `resp` vs `mu` | (not allowed) |
+| no | yes | pairwise differences in group means (`.mean.diff`) | (not allowed) |
+| yes | no | `fit = "lm"`/`"log"`: the slope's t-test (`.slope`). `fit = "gam"`: the smooth term's approximate significance (`.edf`, `.f`) | the slope at `at` (`.slope`; global for `"lm"`/`"log"`, local for `"gam"`) |
+| yes | yes | pairwise differences in group means at `at` (`.mean.diff`) | pairwise differences in slopes (`.slope.diff`; global for `"lm"`/`"log"`, local at `at` for `"gam"`) |
+
+For `fit = "log"`, the slope is with respect to `log(regr)`. `mu` and
+`alt` apply to the mean or slope being tested; they are ignored for
+pairwise comparisons (always `!= 0`) and for the smooth-term test.
+Pairwise comparisons fit a separate model to each pair of groups.
+Without `regr`, `fit` is irrelevant: the model is `resp ~ stat.by`.
+
+`test = "wilcox"` runs
+[`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html)
+(one-sample against `mu`, or two-sample for each pair of `stat.by`
+groups) with `exact = NULL`, so R chooses an exact or
+normal-approximation p-value based on the sample sizes and ties.
+`test = "kruskal"` runs
+[`stats::kruskal.test()`](https://rdrr.io/r/stats/kruskal.test.html)
+across all `stat.by` groups.
 
 ## See also
 
@@ -204,11 +254,13 @@ Other stats_tables:
 
 ``` r
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     taxa_stats(biom, stat.by = "Body Site", rank = "Family")[,1:6]
-#> # Model:    gam(.abundance ~ `Body Site`, method = "REML")
+#> Warning: ! Statistics could not be computed for 1 of 60 comparisons: "Lactobacillaceae /
+#>   Saliva - Stool".
+#> # Model:    lm(.resp ~ .stat.by)
 #> # A tibble: 60 × 6
 #>    .taxa            `Body Site`                .mean.diff .h1     .p.val  .adj.p
 #>    <fct>            <chr>                           <dbl> <fct>    <dbl>   <dbl>

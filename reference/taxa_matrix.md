@@ -110,10 +110,13 @@ taxa_matrix(
 
 - transform:
 
-  Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  Transformation to apply to the abundance values. Options are:
+  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"percent"`
+  converts counts to relative abundances before summing by taxa. `"log"`
+  adds a pseudocount of half the smallest non-zero value in the matrix
+  before taking the logarithm, so that absent taxa rank below the rarest
+  observed ones. `"rank"` is useful for correcting for non-normally
+  distributions before applying regression statistics. Default: `"none"`
 
 - ties:
 
@@ -124,8 +127,10 @@ taxa_matrix(
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  Random seed for permutations, rarefaction, random tie-breaking, and
+  stochastic ordinations. Results are reproducible for a given seed, and
+  the caller's random number generator state is left unchanged. Must be
+  a non-negative integer. Default: `0`
 
 - sparse:
 
@@ -143,6 +148,9 @@ taxa_matrix(
   A tibble data frame with column names .sample, .taxa, .abundance, and
   any requested by `md`.
 
+Each result carries `$code`: the R code that regenerates it, including
+the steps that produced `biom`.
+
 ## See also
 
 Other taxa_abundance:
@@ -159,17 +167,17 @@ Other taxa_abundance:
 
 ``` r
     library(rbiom)
-    
+
     hmp50$ranks
 #> [1] ".otu"    "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus"  
-    
+
     taxa_matrix(hmp50, 'Phylum')[1:4,1:6]
 #>                     HMP01 HMP02 HMP03 HMP04 HMP05 HMP06
 #> Actinobacteria         18    60   126   120    30    71
 #> Bacteroidetes         276   221   313   218   144   880
 #> Cyanobacteria           0     0     0     0     0     0
 #> Deinococcus Thermus     0     0     0     0     0     0
-    
+
     taxa_table(hmp50, 'Phylum')
 #> # A tibble: 300 × 8
 #>    .rank  .sample .taxa          .abundance   Age   BMI `Body Site`   Sex   

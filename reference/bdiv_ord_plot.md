@@ -24,6 +24,7 @@ bdiv_ord_plot(
   p.top = Inf,
   p.adj = "fdr",
   unc = "singly",
+  strata = NULL,
   caption = TRUE,
   alpha = 0.5,
   cpus = n_cpus(),
@@ -56,7 +57,7 @@ bdiv_ord_plot(
   `"PCoA"` -
 
   :   Principal coordinate analysis;
-      [`ape::pcoa()`](https://rdrr.io/pkg/ape/man/pcoa.html).
+      [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html).
 
   `"UMAP"` -
 
@@ -82,12 +83,12 @@ bdiv_ord_plot(
   The first four are sample-centric; the last three are taxa-centric.
   Single letter abbreviations are also accepted. For instance,
   `c("point", "ellipse")` is equivalent to `c("p", "e")` and `"pe"`.
-  Default: `"pe"`
+  Default: `"petm"`
 
 - stat.by:
 
-  The categorical or numeric metadata field over which statistics should
-  be calculated. Required.
+  Dataset field with the groups to compare and color by. Must be
+  categorical. Default: `NULL`
 
 - facet.by:
 
@@ -136,28 +137,19 @@ bdiv_ord_plot(
 
 - test:
 
-  Permutational test for accessing significance. Options are:
-
-  `"adonis2"` -
-
-  :   Permutational MANOVA;
-      [`vegan::adonis2()`](https://vegandevs.github.io/vegan/reference/vegan-defunct.html).
-
-  `"mrpp"` -
-
-  :   Multiple response permutation procedure;
-      [`vegan::mrpp()`](https://vegandevs.github.io/vegan/reference/mrpp.html).
-
-  `"none"` -
-
-  :   Don't run any statistics.
-
-  Abbreviations are allowed. Default: `"adonis2"`
+  Permutational test for the sample groups (`stat.by`). Options are
+  `"adonis2"` (PERMANOVA; the default), `"mrpp"`, `"betadisper"`, or
+  `"none"`. See
+  [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md).
+  The taxa biplot always uses
+  [`vegan::envfit()`](https://vegandevs.github.io/vegan/reference/envfit.html).
 
 - seed:
 
-  Random seed for permutations. Must be a non-negative integer. Default:
-  `0`
+  Random seed for permutations, rarefaction, random tie-breaking, and
+  stochastic ordinations. Results are reproducible for a given seed, and
+  the caller's random number generator state is left unchanged. Must be
+  a non-negative integer. Default: `0`
 
 - permutations:
 
@@ -190,7 +182,9 @@ bdiv_ord_plot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - unc:
 
@@ -215,6 +209,12 @@ bdiv_ord_plot(
 
   Abbreviations are allowed. Default: `"singly"`
 
+- strata:
+
+  Dataset field with the blocking/subject variable. Permutation tests
+  permute within strata; regression models include a random intercept
+  per stratum. Default: `NULL`
+
 - caption:
 
   Add methodology caption beneath the plot. Default: `TRUE`
@@ -228,7 +228,9 @@ bdiv_ord_plot(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Default: `NULL`
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 
@@ -238,6 +240,7 @@ bdiv_ord_plot(
   parameter is passed to, and only to, that layer. For instance,
   `point.size = 2` or `p.size = 2` ensures only the points have their
   size set to `2`. Points can also be controlled with the `pt.` prefix.
+  An argument that no layer accepts is an error.
 
 ## Value
 
@@ -245,6 +248,16 @@ A `ggplot2` plot. The computed sample coordinates and ggplot command are
 available as `$data` and `$code` respectively. If `stat.by` is given,
 then `$stats` and `$stats$code` are set. If `rank` is given, then
 `$data$taxa_coords`, `$taxa_stats`, and `$taxa_stats$code` are set.
+
+## Details
+
+The **ellipse** layer draws 95% normal-distribution ellipses
+([`ggplot2::stat_ellipse()`](https://ggplot2.tidyverse.org/reference/stat_ellipse.html)
+with `type = "norm"`); groups with fewer than four samples get no
+ellipse. The **taxon** layer uses the ggrepel package to avoid
+overlapping labels when it is installed, and plain labels otherwise.
+Facet strips (or the subtitle) show the test statistic, R-squared
+(PERMANOVA), and p-value from `$stats`.
 
 ## See also
 
@@ -283,11 +296,9 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
-    biom <- rarefy(hmp50)
-    
-    bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
-#> Warning: Probable convergence failure
 
-    
+    biom <- rarefy(hmp50)
+
+    bdiv_ord_plot(biom, layers="pemt", stat.by="Body Site", rank="g")
+
 ```

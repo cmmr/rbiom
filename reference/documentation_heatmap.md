@@ -26,7 +26,7 @@ documentation_heatmap
   numeric vector of length two to control row label sizes and column
   label sizes separately, for example `c(rows = 20, cols = 8)`, or
   simply `c(20, 8)`. Default: `NULL`, which computes:
-  `pmax(8, pmin(20, 100 / dim(mtx)))`
+  `pmax(5, pmin(14, 100 / dim(mtx)))`
 
 - rescale:
 
@@ -108,7 +108,12 @@ documentation_heatmap
 
 - ...:
 
-  Additional arguments to pass on to ggplot2::theme().
+  Additional arguments to pass on to
+  [`ggplot2::theme()`](https://ggplot2.tidyverse.org/reference/theme.html).
+  Arguments prefixed with `labs.` (e.g. `labs.subtitle = "..."`) are
+  passed to
+  [`ggplot2::labs()`](https://ggplot2.tidyverse.org/reference/labs.html)
+  instead. Unrecognized arguments are an error.
 
 ## Value
 

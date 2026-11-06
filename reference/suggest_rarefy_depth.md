@@ -53,7 +53,7 @@ uses this heuristic when `depth = NULL`.
 
 ``` r
     library(rbiom)
-    
+
     suggest_rarefy_depth(hmp50)
 #> [1] 1183
 ```

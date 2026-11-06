@@ -24,6 +24,7 @@ rare_multiplot(
   mu = 0,
   caption = TRUE,
   check = FALSE,
+  cpus = n_cpus(),
   ...
 )
 ```
@@ -54,9 +55,9 @@ rare_multiplot(
 
 - rline:
 
-  Where to draw a horizontal line on the plot, intended to show a
-  particular rarefaction depth. Set to `TRUE` to show an auto-selected
-  rarefaction depth or `FALSE` to not show a line. Default: `NULL`
+  Where to draw the rarefaction depth line on both plots. Set to `TRUE`
+  to show an auto-selected rarefaction depth, `FALSE` to not show a
+  line, or an integer for a custom position. Default: `TRUE`
 
 - stat.by:
 
@@ -105,6 +106,8 @@ rare_multiplot(
 - test:
 
   Method for computing p-values: `'none'`, `'emmeans'`, or `'emtrends'`.
+  See
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md).
   Default: `'emmeans'`
 
 - fit:
@@ -114,9 +117,11 @@ rare_multiplot(
 
 - at:
 
-  Position(s) along the x-axis where the means or slopes should be
-  evaluated. Default: `NULL`, which samples 100 evenly spaced positions
-  and selects the position where the p-value is most significant.
+  Position(s) along `regr` where group means or local slopes are
+  evaluated. Default: `NULL`, which uses the median of `regr` within
+  each `split.by` stratum. A vector gives one row per position, and
+  p-values are adjusted across all of them. Ignored by tests that do not
+  depend on a position (e.g. a global slope with `fit = "lm"`).
 
 - level:
 
@@ -126,14 +131,16 @@ rare_multiplot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - transform:
 
   Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  `c("none", "rank", "log", "log1p", "sqrt")`. `"rank"` is useful for
+  correcting for non-normal distributions before applying regression
+  statistics. Default: `"none"`
 
 - alt:
 
@@ -154,12 +161,20 @@ rare_multiplot(
   Generate additional plots to aid in assessing data normality. Default:
   `FALSE`
 
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
+
 - ...:
 
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with a layer name to pass it to only that layer. For
   instance, `p.size = 2` ensures only the points have their size set to
-  `2`.
+  `2`. Unprefixed parameters go to every layer whose function accepts
+  them. An argument that no layer accepts is an error.
 
 ## Value
 
@@ -208,8 +223,7 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     rare_multiplot(hmp50, stat.by = "Body Site")
 
-    
 ```

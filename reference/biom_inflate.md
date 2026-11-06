@@ -21,11 +21,13 @@ biom_inflate(biom, depth = NULL, clone = TRUE)
 
 - depth:
 
-  The target library size (sum) for each sample. Must be an integer
-  greater than 0. If `NULL` (the default), the depth is estimated
-  per-sample using the "Singleton Peak Heuristic". See
+  The target library size (sum) for each sample: a single integer, or
+  one integer per sample. Must be greater than 0. If `NULL` (the
+  default), the depth is estimated per-sample using the "Singleton Peak
+  Heuristic". See
   [`suggest_inflate_depths()`](https://cmmr.github.io/rbiom/reference/suggest_inflate_depths.md)
-  for algorithm details.
+  for algorithm details. Counts that are already integers are left
+  unchanged when `depth = NULL`.
 
 - clone:
 
@@ -60,24 +62,24 @@ Other transformations:
 [`modify_metadata`](https://cmmr.github.io/rbiom/reference/modify_metadata.md),
 [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md),
 [`slice_metadata`](https://cmmr.github.io/rbiom/reference/slice_metadata.md),
-[`subset()`](https://cmmr.github.io/rbiom/reference/subset.md),
-[`with()`](https://cmmr.github.io/rbiom/reference/with.md)
+[`subset`](https://cmmr.github.io/rbiom/reference/subset.md),
+[`with`](https://cmmr.github.io/rbiom/reference/with.md)
 
 ## Examples
 
 ``` r
     library(rbiom)
-    
+
     biom <- hmp50[1:5]
     sample_sums(biom)
 #> HMP01 HMP02 HMP03 HMP04 HMP05 
 #>  1660  1371  1353  1895  3939 
-    
+
     biom <- biom_relativize(biom)
     sample_sums(biom)
 #> HMP01 HMP02 HMP03 HMP04 HMP05 
 #>     1     1     1     1     1 
-    
+
     biom <- biom_inflate(biom)
     sample_sums(biom)
 #> HMP01 HMP02 HMP03 HMP04 HMP05 

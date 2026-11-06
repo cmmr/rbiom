@@ -28,6 +28,17 @@ read_tree(src, underscores = FALSE)
 
 A `phylo` class object representing the tree.
 
+## Details
+
+Labels may be enclosed in single quotes, following the Newick standard:
+inside quotes every character is literal (including `( ) [ ] : ; ,` and
+whitespace), and `''` stands for one apostrophe. Quoted labels are never
+altered by `underscores`. Outside quotes, `[...]` is a comment and is
+ignored. \[write_tree()\] quotes labels the same way, so trees
+round-trip exactly.
+
+\[ \]: R:%20 \[...\]: R:... \[write_tree()\]: R:write_tree()
+
 ## See also
 
 Other phylogeny:
@@ -37,7 +48,7 @@ Other phylogeny:
 
 ``` r
     library(rbiom)
-    
+
     infile <- system.file("extdata", "newick.tre", package = "rbiom")
     tree <- read_tree(infile)
     print(tree)
@@ -48,11 +59,14 @@ Other phylogeny:
 #>   Pa5Bac29, AtlPorci, AciSp313, MxlBact8, MxlBacte, PseS1107, ...
 #> 
 #> Rooted; includes branch length(s).
-    
+
     tree <- read_tree("
         (A:0.99,((B:0.87,C:0.89):0.51,(((D:0.16,(E:0.83,F:0.96)
         :0.94):0.69,(G:0.92,(H:0.62,I:0.85):0.54):0.23):0.74,J:0.1
         2):0.43):0.67);")
-    plot(tree)
+
+    # Plotting a tree requires the 'ape' package.
+    if (requireNamespace("ape", quietly = TRUE))
+      ape::plot.phylo(tree)
 
 ```

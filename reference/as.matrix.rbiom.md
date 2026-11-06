@@ -35,7 +35,7 @@ Other conversion:
 
 ``` r
     library(rbiom)
-    
+
     as.matrix(hmp50)[1:5,1:5]
 #>          HMP01 HMP02 HMP03 HMP04 HMP05
 #> Unc01yki     0     0     0     0     0

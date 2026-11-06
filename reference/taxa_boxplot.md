@@ -19,6 +19,7 @@ taxa_boxplot(
   colors = TRUE,
   shapes = TRUE,
   patterns = FALSE,
+  test = "auto",
   flip = FALSE,
   stripe = NULL,
   ci = "ci",
@@ -29,6 +30,7 @@ taxa_boxplot(
   p.label = 0.05,
   transform = "none",
   y.transform = "sqrt",
+  strata = NULL,
   caption = TRUE,
   ...
 )
@@ -163,6 +165,20 @@ taxa_boxplot(
   names. See "Aesthetics" section below for additional information.
   Default: `FALSE`
 
+- test:
+
+  Method for computing p-values. `'auto'` runs pairwise Mann-Whitney U
+  tests (`'wilcox'`) when `x` and `stat.by` are the same field (or
+  `'emmeans'` when `strata` is given), and Kruskal-Wallis tests
+  (`'kruskal'`) across the `stat.by` groups within each `x` category
+  otherwise. Beta diversity boxplots use PERMANOVA (`'adonis2'`),
+  `'mrpp'`, or `'betadisper'` on the samples instead. `'none'` skips the
+  statistics. See
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md)
+  and
+  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md).
+  Default: `'auto'`
+
 - flip:
 
   Transpose the axes, so that taxa are present as rows instead of
@@ -179,7 +195,11 @@ taxa_boxplot(
   (confidence interval), `"range"`, `"sd"` (standard deviation), `"se"`
   (standard error), and `"mad"` (median absolute deviation). The center
   mark of **crossbar** and **pointrange** represents the mean, except
-  for `"mad"` in which case it represents the median. Default: `"ci"`
+  for `"mad"` in which case it represents the median. Intervals are
+  drawn as computed, including below zero, unless the y-axis is
+  transformed: bounds below zero are drawn at zero on a `"sqrt"` or
+  `"log1p"` axis, and bounds at or below zero are drawn at the smallest
+  positive y value on a log axis. Default: `"ci"`
 
 - level:
 
@@ -189,7 +209,9 @@ taxa_boxplot(
 - p.adj:
 
   Method to use for multiple comparisons adjustment of p-values. Run
-  `p.adjust.methods` for a list of available options. Default: `"fdr"`
+  `p.adjust.methods` for a list of available options. The adjustment
+  spans every p-value in the returned table (all metrics, strata, pairs,
+  and positions). Default: `"fdr"`
 
 - outliers:
 
@@ -223,10 +245,10 @@ taxa_boxplot(
 
 - transform:
 
-  Transformation to apply to calculated values. Options are:
-  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"rank"` is
-  useful for correcting for non-normally distributions before applying
-  regression statistics. Default: `"none"`
+  Transformation to apply to the abundance values. Options are:
+  `c("none", "rank", "log", "log1p", "sqrt", "percent")`. `"percent"`
+  (and relative-abundance data) labels the y-axis as percentages.
+  Default: `"none"`
 
 - y.transform:
 
@@ -251,6 +273,12 @@ taxa_boxplot(
   Default: `"sqrt"` Use `xaxis.transform` or `yaxis.transform` to pass
   custom values directly to ggplot2's `scale_*` functions.
 
+- strata:
+
+  Dataset field with the blocking/subject variable. Permutation tests
+  permute within strata; regression models include a random intercept
+  per stratum. Default: `NULL`
+
 - caption:
 
   Add methodology caption beneath the plot. Default: `TRUE`
@@ -260,7 +288,9 @@ taxa_boxplot(
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with a layer name to pass it to only that layer. For
   instance, `d.size = 2` ensures only the points on the **dot** layer
-  have their size set to `2`.
+  have their size set to `2`. Unprefixed parameters go to every layer
+  whose function accepts them (e.g. `scales = "free"` for the facets).
+  An argument that no layer accepts is an error.
 
 ## Value
 
@@ -276,12 +306,12 @@ categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
 `"tableau"`, `"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, and
 `"fishy"`.
 
-Patterns are added using the fillpattern R package. Options are
-`"brick"`, `"chevron"`, `"fish"`, `"grid"`, `"herringbone"`,
-`"hexagon"`, `"octagon"`, `"rain"`, `"saw"`, `"shingle"`, `"rshingle"`,
-`"stripe"`, and `"wave"`, optionally abbreviated and/or suffixed with
-modifiers. For example, `"hex10_sm"` for the hexagon pattern rotated 10
-degrees and shrunk by 2x. See
+Patterns are added using the fillpattern R package, which must be
+installed to use `patterns`. Options are `"brick"`, `"chevron"`,
+`"fish"`, `"grid"`, `"herringbone"`, `"hexagon"`, `"octagon"`, `"rain"`,
+`"saw"`, `"shingle"`, `"rshingle"`, `"stripe"`, and `"wave"`, optionally
+abbreviated and/or suffixed with modifiers. For example, `"hex10_sm"`
+for the hexagon pattern rotated 10 degrees and shrunk by 2x. See
 [`fillpattern::fill_pattern()`](https://cmmr.github.io/fillpattern/reference/fill_pattern.html)
 for complete documentation of options.
 
@@ -289,6 +319,9 @@ Shapes can be given as per base R - numbers 0 through 17 for various
 shapes, or the decimal value of an ascii character, e.g. a-z = 65:90;
 A-Z = 97:122 to use letters instead of shapes on the plot. Character
 strings may used as well.
+
+The **dot** and **strip** layers use the ggbeeswarm package when it is
+installed, and jittered points otherwise.
 
 ## See also
 
@@ -323,19 +356,20 @@ Other visualization:
 
 ``` r
     library(rbiom)
-    
+
     biom <- rarefy(hmp50)
-    
+
     taxa_boxplot(biom, stat.by = "Body Site", stripe = TRUE)
 
     taxa_boxplot(biom, layers = "bed", rank = c("Phylum", "Genus"), flip = TRUE)
 
     taxa_boxplot(
-      biom    = subset(biom, `Body Site` %in% c('Saliva', 'Stool')), 
-      taxa    = 3, 
-      layers  = "ps", 
+      biom    = subset(biom, `Body Site` %in% c('Saliva', 'Stool')),
+      taxa    = 3,
+      layers  = "ps",
       stat.by = "Body Site",
       colors  = c('Saliva' = "blue", 'Stool' = "red") )
+#> Warning: Removed 1 row containing missing values or values outside the scale range
+#> (`geom_segment()`).
 
-    
 ```
