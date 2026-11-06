@@ -235,7 +235,10 @@ stats table, and stats table commands are available as <code>$data</code>,
 
 
 
-<p>All built-in color palettes are colorblind-friendly. The available
+<p>The default colors are colorblind-friendly for up to 12 groups: Okabe and
+Ito's palette (<code>"okabe"</code>) for up to 8, and Paul Tol's (<code>"tol"</code>) for 9-12.
+Of the other palettes, <code>"bright"</code>, <code>"vibrant"</code>, <code>"muted"</code>, <code>"light"</code>, and
+<code>"carto"</code> are also designed for color vision deficiencies. The available
 categorical palette names are: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>,
 <code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>,
 <code>"muted"</code>, <code>"vibrant"</code>, <code>"tableau"</code>, <code>"classic"</code>,
@@ -264,8 +267,10 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <code><a href="stats_corrplot.html">stats_corrplot()</a></code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot()</a></code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code>,
+<code><a href="taxa_forest.html">taxa_forest()</a></code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap()</a></code>,
-<code><a href="taxa_stacked.html">taxa_stacked()</a></code></p></div>
+<code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
+<code><a href="theme_rbiom.html">theme_rbiom()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -346,20 +351,15 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mapping   = <span style="color: #00BBBB;">aes</span><span style="color: #0000BB;">(</span>label = .label, hjust = .hjust, vjust = .vjust<span style="color: #0000BB;">)</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     data      = labels, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     linewidth = <span style="color: #0000BB;">NA</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     size      = <span style="color: #0000BB;">4</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     size      = <span style="color: #0000BB;">3</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">labs</span><span style="color: #BBBB00;">(</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     caption = <span style="color: #BBBB00;">"Low p-value indicates trendline means differ at x."</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     y       = <span style="color: #BBBB00;">"Shannon Diversity Index"</span> <span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_color_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #0000BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_fill_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(</span><span style="color: #BBBB00;">"#1F77B4"</span>, <span style="color: #BBBB00;">"#FF7F0E"</span><span style="color: #0000BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_color_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(</span><span style="color: #BBBB00;">"#0072B2"</span>, <span style="color: #BBBB00;">"#D55E00"</span><span style="color: #0000BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_fill_manual</span><span style="color: #BBBB00;">(</span>values = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(</span><span style="color: #BBBB00;">"#0072B2"</span>, <span style="color: #BBBB00;">"#D55E00"</span><span style="color: #0000BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_x_continuous</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">scale_y_continuous</span><span style="color: #BBBB00;">(</span>expand = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(0.15</span>, <span style="color: #0000BB;">0</span>, <span style="color: #0000BB;">0.15</span>, <span style="color: #0000BB;">0)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_bw</span><span style="color: #BBBB00;">()</span> <span style="color: #00BB00;">+</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme</span><span style="color: #BBBB00;">(</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     text               = <span style="color: #00BBBB;">element_text</span><span style="color: #0000BB;">(</span>size = <span style="color: #0000BB;">14)</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     panel.grid.major.x = <span style="color: #00BBBB;">element_blank</span><span style="color: #0000BB;">()</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     panel.grid.minor.x = <span style="color: #00BBBB;">element_blank</span><span style="color: #0000BB;">()</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     plot.caption       = <span style="color: #00BBBB;">element_text</span><span style="color: #0000BB;">(</span>face = <span style="color: #BBBB00;">"italic"</span>, size = <span style="color: #0000BB;">9)</span> <span style="color: #BBBB00;">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">theme_rbiom</span><span style="color: #BBBB00;">()</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

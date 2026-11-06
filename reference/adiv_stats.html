@@ -64,6 +64,7 @@
 <span>  adiv <span class="op">=</span> <span class="st">"Shannon"</span>,</span>
 <span>  split.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  strata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  transform <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  test <span class="op">=</span> <span class="st">"emmeans"</span>,</span>
 <span>  fit <span class="op">=</span> <span class="st">"gam"</span>,</span>
@@ -113,6 +114,20 @@ regression models (<code>test = "emmeans"</code> or <code>"emtrends"</code>) inc
 random intercept per stratum, fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> as
 <code>s(strata, bs = "re")</code> (a linear mixed model for <code>fit = "lm"</code> and
 <code>"log"</code>). Not supported by the rank tests. Default: <code>NULL</code></p></dd>
+
+
+<dt id="arg-covariates">covariates<a class="anchor" aria-label="anchor" href="#arg-covariates"></a></dt>
+<dd><p>Dataset field(s) to adjust for, such as age or
+antibiotic use. Each is added to the regression model as a linear
+term (numeric fields) or a factor (categorical fields), and the
+reported means, slopes, and differences are adjusted for them:
+<code><a href="https://rvlenth.github.io/emmeans/reference/emmeans.html" class="external-link">emmeans::emmeans()</a></code> holds numeric covariates at their mean and
+averages over the levels of categorical ones with equal weights.
+Only for <code>test = "emmeans"</code> or <code>"emtrends"</code>; the rank tests can't
+adjust for covariates. Rows with an <code>NA</code> in a covariate are
+dropped. A covariate that has the same value in every observation
+of a comparison (e.g. within a pair of groups) gives an <code>NA</code> row
+and a warning naming it. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
@@ -177,11 +192,17 @@ generate the statistics is in <code>$code</code>.</p><table class="table table">
 
 <p>Which quantity is tested depends on <code>test</code> and on whether <code>regr</code> and
 <code>stat.by</code> are given. Rows with an <code>NA</code> in any of the <code>regr</code>, <code>resp</code>,
-<code>stat.by</code>, <code>split.by</code>, or <code>strata</code> fields are dropped (with a message).</p><table class="table table"><tr><td><code>regr</code></td><td><code>stat.by</code></td><td><code>test = "emmeans"</code></td><td><code>test = "emtrends"</code></td></tr><tr><td>no</td><td>no</td><td>mean of <code>resp</code> vs <code>mu</code></td><td>(not allowed)</td></tr><tr><td>no</td><td>yes</td><td>pairwise differences in group means (<code>.mean.diff</code>)</td><td>(not allowed)</td></tr><tr><td>yes</td><td>no</td><td><code>fit = "lm"</code>/<code>"log"</code>: the slope's t-test (<code>.slope</code>). <code>fit = "gam"</code>: the smooth term's approximate significance (<code>.edf</code>, <code>.f</code>)</td><td>the slope at <code>at</code> (<code>.slope</code>; global for <code>"lm"</code>/<code>"log"</code>, local for <code>"gam"</code>)</td></tr><tr><td>yes</td><td>yes</td><td>pairwise differences in group means at <code>at</code> (<code>.mean.diff</code>)</td><td>pairwise differences in slopes (<code>.slope.diff</code>; global for <code>"lm"</code>/<code>"log"</code>, local at <code>at</code> for <code>"gam"</code>)</td></tr></table><p>For <code>fit = "log"</code>, the slope is with respect to <code>log(regr)</code>.
+<code>stat.by</code>, <code>split.by</code>, <code>strata</code>, or <code>covariates</code> fields are dropped
+(with a message).</p><table class="table table"><tr><td><code>regr</code></td><td><code>stat.by</code></td><td><code>test = "emmeans"</code></td><td><code>test = "emtrends"</code></td></tr><tr><td>no</td><td>no</td><td>mean of <code>resp</code> vs <code>mu</code></td><td>(not allowed)</td></tr><tr><td>no</td><td>yes</td><td>pairwise differences in group means (<code>.mean.diff</code>)</td><td>(not allowed)</td></tr><tr><td>yes</td><td>no</td><td><code>fit = "lm"</code>/<code>"log"</code>: the slope's t-test (<code>.slope</code>). <code>fit = "gam"</code>: the smooth term's approximate significance (<code>.edf</code>, <code>.f</code>)</td><td>the slope at <code>at</code> (<code>.slope</code>; global for <code>"lm"</code>/<code>"log"</code>, local for <code>"gam"</code>)</td></tr><tr><td>yes</td><td>yes</td><td>pairwise differences in group means at <code>at</code> (<code>.mean.diff</code>)</td><td>pairwise differences in slopes (<code>.slope.diff</code>; global for <code>"lm"</code>/<code>"log"</code>, local at <code>at</code> for <code>"gam"</code>)</td></tr></table><p>For <code>fit = "log"</code>, the slope is with respect to <code>log(regr)</code>.
 <code>mu</code> and <code>alt</code> apply to the mean or slope being tested; they are ignored
 for pairwise comparisons (always <code>!= 0</code>) and for the smooth-term test.
 Pairwise comparisons fit a separate model to each pair of groups.
-Without <code>regr</code>, <code>fit</code> is irrelevant: the model is <code>resp ~ stat.by</code>.</p>
+Without <code>regr</code>, <code>fit</code> is irrelevant: the model is <code>resp ~ stat.by</code>.
+<code>covariates</code> are added to every model (in the formula, as <code>.cov1</code>,
+<code>.cov2</code>, ...; the table header names them), so that each of the
+quantities above is adjusted for them. For example,
+<code>stat.by = "Treatment", covariates = "Age"</code> compares the groups' means
+at the average age.</p>
 <p><code>test = "wilcox"</code> runs <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">stats::wilcox.test()</a></code> (one-sample against <code>mu</code>,
 or two-sample for each pair of <code>stat.by</code> groups) with <code>exact = NULL</code>, so
 R chooses an exact or normal-approximation p-value based on the sample
@@ -198,6 +219,7 @@ all <code>stat.by</code> groups.</p>
 <code><a href="bdiv_stats.html">bdiv_stats()</a></code>,
 <code><a href="distmat_stats.html">distmat_stats()</a></code>,
 <code><a href="stats_table.html">stats_table()</a></code>,
+<code><a href="taxa_da.html">taxa_da()</a></code>,
 <code><a href="taxa_stats.html">taxa_stats()</a></code></p></div>
     </div>
 

@@ -96,6 +96,10 @@ bar charts, heatmaps, and boxplots.
   : Cluster samples by taxa abundances (k-means).
 - [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md)
   : Visualize taxa abundance with scatterplots and trendlines.
+- [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md) :
+  Differential abundance of taxa.
+- [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md)
+  : Plot differential abundance as a forest plot.
 - [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md)
   : Display taxa abundances as a heatmap.
 - [`taxa_map()`](https://cmmr.github.io/rbiom/reference/taxa_map.md) :
@@ -210,6 +214,8 @@ structures (matrices, data.frames, trees) rather than rbiom objects.
   : Create a subtree by specifying tips to keep.
 - [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md)
   : Create a heatmap with tracks and dendrograms from any matrix.
+- [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
+  : Publication-ready ggplot2 theme.
 
 ## Datasets
 

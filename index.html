@@ -107,24 +107,24 @@
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/bdiv_ord_plot.html">bdiv_ord_plot</a></span><span class="op">(</span><span class="va">biom</span>, stat.by <span class="op">=</span> <span class="st">'Body Site'</span>, facet.by <span class="op">=</span> <span class="st">'Sex'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-bdiv-1.png"><!-- --></p>
+<p><img src="reference/figures/README-bdiv-1.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/adiv_boxplot.html">adiv_boxplot</a></span><span class="op">(</span><span class="va">biom</span>, x <span class="op">=</span> <span class="st">'Sex'</span>, adiv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'otu'</span>, <span class="st">'shan'</span><span class="op">)</span>, stat.by <span class="op">=</span> <span class="st">'Body Site'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-bdiv-2.png"><!-- --></p>
+<p><img src="reference/figures/README-bdiv-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/subset.html">subset</a></span><span class="op">(</span><span class="va">biom</span>, <span class="va">`Body Site`</span> <span class="op">==</span> <span class="st">'Buccal mucosa'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/taxa_corrplot.html">taxa_corrplot</a></span><span class="op">(</span><span class="st">'Age'</span>, taxa <span class="op">=</span> <span class="fl">2</span>, layers <span class="op">=</span> <span class="st">'ptc'</span>, fit <span class="op">=</span> <span class="st">'lm'</span>, test <span class="op">=</span> <span class="st">'emtrends'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-bdiv-3.png"><!-- --></p>
+<p><img src="reference/figures/README-bdiv-3.png" alt="" width="100%"></p>
 </div>
 <div class="section level4">
 <h4 id="summarize-counts-by-taxonomic-rank">Summarize counts by taxonomic rank.<a class="anchor" aria-label="anchor" href="#summarize-counts-by-taxonomic-rank"></a>
 </h4>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_heatmap.html">taxa_heatmap</a></span><span class="op">(</span><span class="va">biom</span>, taxa <span class="op">=</span> <span class="fl">10</span>, tracks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'body'</span>, <span class="st">'age'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-taxa-1.png"><!-- --></p>
+<p><img src="reference/figures/README-taxa-1.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_stacked.html">taxa_stacked</a></span><span class="op">(</span><span class="va">biom</span>, rank <span class="op">=</span> <span class="st">'Phylum'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-taxa-2.png"><!-- --></p>
+<p><img src="reference/figures/README-taxa-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/taxa_matrix.html">taxa_table</a></span><span class="op">(</span><span class="va">biom</span>, <span class="st">'Phylum'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 294 × 8</span></span>
@@ -168,19 +168,11 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # p-values from the statistics table (see `p$stats$code`), placed above the boxes.</span></span>
 <span><span class="co">#&gt; labels &lt;- tibble::tibble(</span></span>
-<span><span class="co">#&gt;   .label = "italic(p)== 0.01",</span></span>
+<span><span class="co">#&gt;   .label = "italic(p) == \"0.014\"",</span></span>
 <span><span class="co">#&gt;   .x     = 1.5,</span></span>
-<span><span class="co">#&gt;   .y     = 4.0346666666666664 )</span></span>
+<span><span class="co">#&gt;   .y     = 0x1.0237fa89e60fp+2 )</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ggplot(data, aes(x = Sex, y = .diversity)) +</span></span>
-<span><span class="co">#&gt;   annotate(</span></span>
-<span><span class="co">#&gt;     geom  = "rect", </span></span>
-<span><span class="co">#&gt;     xmin  = -Inf, </span></span>
-<span><span class="co">#&gt;     xmax  = Inf, </span></span>
-<span><span class="co">#&gt;     ymin  = 4, </span></span>
-<span><span class="co">#&gt;     ymax  = Inf, </span></span>
-<span><span class="co">#&gt;     color = NA, </span></span>
-<span><span class="co">#&gt;     fill  = "white" ) +</span></span>
 <span><span class="co">#&gt;   geom_boxplot(</span></span>
 <span><span class="co">#&gt;     mapping      = aes(color = Sex, fill = Sex), </span></span>
 <span><span class="co">#&gt;     outlier.size = 1.14, </span></span>
@@ -198,18 +190,13 @@
 <span><span class="co">#&gt;   labs(</span></span>
 <span><span class="co">#&gt;     caption = "Pairwise Mann-Whitney U tests.", </span></span>
 <span><span class="co">#&gt;     y       = "Shannon Diversity Index" ) +</span></span>
-<span><span class="co">#&gt;   scale_color_manual(values = c("#1F77B4", "#FF7F0E")) +</span></span>
-<span><span class="co">#&gt;   scale_fill_manual(values = c("#1F77B4", "#FF7F0E")) +</span></span>
+<span><span class="co">#&gt;   scale_color_manual(values = c("#0072B2", "#D55E00")) +</span></span>
+<span><span class="co">#&gt;   scale_fill_manual(values = c("#0072B2", "#D55E00")) +</span></span>
 <span><span class="co">#&gt;   scale_x_discrete() +</span></span>
 <span><span class="co">#&gt;   scale_y_continuous(</span></span>
-<span><span class="co">#&gt;     breaks       = c(0, 1, 2, 3), </span></span>
-<span><span class="co">#&gt;     minor_breaks = c(0.5, 1.5, 2.5, 3.5), </span></span>
-<span><span class="co">#&gt;     expand       = c(0.02, 0, 0.08, 0) ) +</span></span>
-<span><span class="co">#&gt;   theme_bw() +</span></span>
-<span><span class="co">#&gt;   theme(</span></span>
-<span><span class="co">#&gt;     text               = element_text(size = 14), </span></span>
-<span><span class="co">#&gt;     panel.grid.major.x = element_blank(), </span></span>
-<span><span class="co">#&gt;     plot.caption       = element_text(face = "italic", size = 9) )</span></span></code></pre></div>
+<span><span class="co">#&gt;     breaks = c(0, 1, 2, 3), </span></span>
+<span><span class="co">#&gt;     expand = c(0.02, 0, 0.08, 0) ) +</span></span>
+<span><span class="co">#&gt;   theme_rbiom()</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

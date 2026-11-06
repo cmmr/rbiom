@@ -414,15 +414,11 @@ p$code
 #>   labs(
 #>     caption = "Pairwise Mann-Whitney U tests.", 
 #>     y       = "Shannon Diversity Index" ) +
-#>   scale_color_manual(values = c("#1F77B4", "#FF7F0E")) +
-#>   scale_fill_manual(values = c("#1F77B4", "#FF7F0E")) +
+#>   scale_color_manual(values = c("#0072B2", "#D55E00")) +
+#>   scale_fill_manual(values = c("#0072B2", "#D55E00")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(expand = c(0.02, 0, 0.02, 0)) +
-#>   theme_bw() +
-#>   theme(
-#>     text               = element_text(size = 14), 
-#>     panel.grid.major.x = element_blank(), 
-#>     plot.caption       = element_text(face = "italic", size = 9) )
+#>   theme_rbiom()
 ```
 
 Values that exist only in memory (for example, a data frame assigned

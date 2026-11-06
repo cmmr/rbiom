@@ -71,7 +71,7 @@ bdiv_ord_table(
   `"tSNE"` -
 
   :   t-distributed stochastic neighbor embedding;
-      [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html).
+      [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html).
 
   Multiple/abbreviated values allowed. Default: `"PCoA"`
 
@@ -210,7 +210,7 @@ bdiv_ord_table(
   Additional arguments to pass on to
   [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html),
   [`vegan::metaMDS()`](https://vegandevs.github.io/vegan/reference/metaMDS.html),
-  [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html), or
+  [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html), or
   [`uwot::umap()`](https://jlmelville.github.io/uwot/reference/umap.html).
 
 ## Value

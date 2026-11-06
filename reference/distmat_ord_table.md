@@ -38,7 +38,7 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
   `"tSNE"` -
 
   :   t-distributed stochastic neighbor embedding;
-      [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html).
+      [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html).
 
   Multiple/abbreviated values allowed. Default: `"PCoA"`
 
@@ -55,7 +55,8 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
 
 - ...:
 
-  Additional arguments for the `ord` function.
+  Additional arguments for the `ord` function. For tSNE, `perplexity`
+  defaults to 30, or to `(n - 1) / 3` for fewer than 91 samples.
 
 ## Value
 

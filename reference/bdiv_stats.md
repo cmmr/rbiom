@@ -202,6 +202,7 @@ Other stats_tables:
 [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md),
 [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md),
 [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md),
+[`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md)
 
 ## Examples

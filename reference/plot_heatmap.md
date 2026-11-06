@@ -56,8 +56,9 @@ plot_heatmap(
   The font size to use for the row and column labels. You can supply a
   numeric vector of length two to control row label sizes and column
   label sizes separately, for example `c(rows = 20, cols = 8)`, or
-  simply `c(20, 8)`. Default: `NULL`, which computes:
-  `pmax(5, pmin(14, 100 / dim(mtx)))`
+  simply `c(20, 8)`. Default: `NULL`, which uses the theme's tick label
+  size, shrunk to `pmax(5, 100 / dim(mtx))` when there are too many rows
+  or columns for it.
 
 - rescale:
 
@@ -147,7 +148,10 @@ plot_heatmap(
   [`ggplot2::theme()`](https://ggplot2.tidyverse.org/reference/theme.html).
   Arguments prefixed with `labs.` go to
   [`ggplot2::labs()`](https://ggplot2.tidyverse.org/reference/labs.html)
-  instead, for example `labs.subtitle = "Plot subtitle"`.
+  instead, for example `labs.subtitle = "Plot subtitle"`, and
+  `base_size`, `base_family`, `base_line_size`, and `base_rect_size` go
+  to
+  [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md).
 
 ## Value
 
@@ -222,7 +226,9 @@ The following entries in the track definitions are understood:
 
   A list of arguments for guide_colorbar() or guide_legend().
 
-All built-in color palettes are colorblind-friendly.
+The default categorical colors are colorblind-friendly for up to 12
+groups: Okabe and Ito's palette (`"okabe"`) for up to 8, and Paul Tol's
+(`"tol"`) for 9-12.
 
 The available categorical palette names are: `"okabe"`, `"carto"`,
 `"r4"`, `"polychrome"`, `"tol"`, `"bright"`, `"light"`, `"muted"`,
@@ -252,8 +258,10 @@ Other visualization:
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 

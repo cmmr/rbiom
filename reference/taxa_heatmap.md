@@ -273,7 +273,9 @@ The following entries in the track definitions are understood:
 
   A list of arguments for guide_colorbar() or guide_legend().
 
-All built-in color palettes are colorblind-friendly.
+The default categorical colors are colorblind-friendly for up to 12
+groups: Okabe and Ito's palette (`"okabe"`) for up to 8, and Paul Tol's
+(`"tol"`) for 9-12.
 
 Categorical palette names: `"okabe"`, `"carto"`, `"r4"`, `"polychrome"`,
 `"tol"`, `"bright"`, `"light"`, `"muted"`, `"vibrant"`, `"tableau"`,
@@ -292,6 +294,8 @@ Other taxa_abundance:
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_clusters()`](https://cmmr.github.io/rbiom/reference/taxa_clusters.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+[`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
 [`taxa_sums()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md),
@@ -312,7 +316,9 @@ Other visualization:
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 

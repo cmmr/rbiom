@@ -120,19 +120,11 @@ p$code
 #> 
 #> # p-values from the statistics table (see `p$stats$code`), placed above the boxes.
 #> labels <- tibble::tibble(
-#>   .label = "italic(p)== 0.01",
+#>   .label = "italic(p) == \"0.014\"",
 #>   .x     = 1.5,
-#>   .y     = 4.0346666666666664 )
+#>   .y     = 0x1.0237fa89e60fp+2 )
 #> 
 #> ggplot(data, aes(x = Sex, y = .diversity)) +
-#>   annotate(
-#>     geom  = "rect", 
-#>     xmin  = -Inf, 
-#>     xmax  = Inf, 
-#>     ymin  = 4, 
-#>     ymax  = Inf, 
-#>     color = NA, 
-#>     fill  = "white" ) +
 #>   geom_boxplot(
 #>     mapping      = aes(color = Sex, fill = Sex), 
 #>     outlier.size = 1.14, 
@@ -150,18 +142,13 @@ p$code
 #>   labs(
 #>     caption = "Pairwise Mann-Whitney U tests.", 
 #>     y       = "Shannon Diversity Index" ) +
-#>   scale_color_manual(values = c("#1F77B4", "#FF7F0E")) +
-#>   scale_fill_manual(values = c("#1F77B4", "#FF7F0E")) +
+#>   scale_color_manual(values = c("#0072B2", "#D55E00")) +
+#>   scale_fill_manual(values = c("#0072B2", "#D55E00")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(
-#>     breaks       = c(0, 1, 2, 3), 
-#>     minor_breaks = c(0.5, 1.5, 2.5, 3.5), 
-#>     expand       = c(0.02, 0, 0.08, 0) ) +
-#>   theme_bw() +
-#>   theme(
-#>     text               = element_text(size = 14), 
-#>     panel.grid.major.x = element_blank(), 
-#>     plot.caption       = element_text(face = "italic", size = 9) )
+#>     breaks = c(0, 1, 2, 3), 
+#>     expand = c(0.02, 0, 0.08, 0) ) +
+#>   theme_rbiom()
 ```
 
 ## Documentation
@@ -293,6 +280,10 @@ bar charts, heatmaps, and boxplots.
   : Cluster samples by taxa abundances (k-means).
 - [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md)
   : Visualize taxa abundance with scatterplots and trendlines.
+- [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md) :
+  Differential abundance of taxa.
+- [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md)
+  : Plot differential abundance as a forest plot.
 - [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md)
   : Display taxa abundances as a heatmap.
 - [`taxa_map()`](https://cmmr.github.io/rbiom/reference/taxa_map.md) :
@@ -407,6 +398,8 @@ structures (matrices, data.frames, trees) rather than rbiom objects.
   : Create a subtree by specifying tips to keep.
 - [`plot_heatmap()`](https://cmmr.github.io/rbiom/reference/plot_heatmap.md)
   : Create a heatmap with tracks and dendrograms from any matrix.
+- [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
+  : Publication-ready ggplot2 theme.
 
 ## Datasets
 

@@ -14,6 +14,7 @@ adiv_stats(
   adiv = "Shannon",
   split.by = NULL,
   strata = NULL,
+  covariates = NULL,
   transform = "none",
   test = "emmeans",
   fit = "gam",
@@ -66,6 +67,20 @@ adiv_stats(
   [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) as
   `s(strata, bs = "re")` (a linear mixed model for `fit = "lm"` and
   `"log"`). Not supported by the rank tests. Default: `NULL`
+
+- covariates:
+
+  Dataset field(s) to adjust for, such as age or antibiotic use. Each is
+  added to the regression model as a linear term (numeric fields) or a
+  factor (categorical fields), and the reported means, slopes, and
+  differences are adjusted for them:
+  [`emmeans::emmeans()`](https://rvlenth.github.io/emmeans/reference/emmeans.html)
+  holds numeric covariates at their mean and averages over the levels of
+  categorical ones with equal weights. Only for `test = "emmeans"` or
+  `"emtrends"`; the rank tests can't adjust for covariates. Rows with an
+  `NA` in a covariate are dropped. A covariate that has the same value
+  in every observation of a comparison (e.g. within a pair of groups)
+  gives an `NA` row and a warning naming it. Default: `NULL`
 
 - transform:
 
@@ -155,7 +170,8 @@ the statistics is in `$code`.
 
 Which quantity is tested depends on `test` and on whether `regr` and
 `stat.by` are given. Rows with an `NA` in any of the `regr`, `resp`,
-`stat.by`, `split.by`, or `strata` fields are dropped (with a message).
+`stat.by`, `split.by`, `strata`, or `covariates` fields are dropped
+(with a message).
 
 |  |  |  |  |
 |----|----|----|----|
@@ -170,6 +186,11 @@ For `fit = "log"`, the slope is with respect to `log(regr)`. `mu` and
 pairwise comparisons (always `!= 0`) and for the smooth-term test.
 Pairwise comparisons fit a separate model to each pair of groups.
 Without `regr`, `fit` is irrelevant: the model is `resp ~ stat.by`.
+`covariates` are added to every model (in the formula, as `.cov1`,
+`.cov2`, ...; the table header names them), so that each of the
+quantities above is adjusted for them. For example,
+`stat.by = "Treatment", covariates = "Age"` compares the groups' means
+at the average age.
 
 `test = "wilcox"` runs
 [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html)
@@ -191,6 +212,7 @@ Other stats_tables:
 [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md),
 [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md),
 [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md),
+[`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md)
 
 ## Examples

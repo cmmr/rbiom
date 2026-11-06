@@ -263,11 +263,14 @@ table, and stats table commands are available as `$data`, `$code`,
 
 ## Aesthetics
 
-All built-in color palettes are colorblind-friendly. The available
-categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
-`"polychrome"`, `"tol"`, `"bright"`, `"light"`, `"muted"`, `"vibrant"`,
-`"tableau"`, `"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, and
-`"fishy"`.
+The default colors are colorblind-friendly for up to 12 groups: Okabe
+and Ito's palette (`"okabe"`) for up to 8, and Paul Tol's (`"tol"`) for
+9-12. Of the other palettes, `"bright"`, `"vibrant"`, `"muted"`,
+`"light"`, and `"carto"` are also designed for color vision
+deficiencies. The available categorical palette names are: `"okabe"`,
+`"carto"`, `"r4"`, `"polychrome"`, `"tol"`, `"bright"`, `"light"`,
+`"muted"`, `"vibrant"`, `"tableau"`, `"classic"`, `"alphabet"`,
+`"tableau20"`, `"kelly"`, and `"fishy"`.
 
 Shapes can be given as per base R - numbers 0 through 17 for various
 shapes, or the decimal value of an ascii character, e.g. a-z = 65:90;
@@ -280,6 +283,8 @@ Other taxa_abundance:
 [`sample_sums()`](https://cmmr.github.io/rbiom/reference/sample_sums.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_clusters()`](https://cmmr.github.io/rbiom/reference/taxa_clusters.md),
+[`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
@@ -300,8 +305,10 @@ Other visualization:
 [`stats_boxplot()`](https://cmmr.github.io/rbiom/reference/stats_boxplot.md),
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 

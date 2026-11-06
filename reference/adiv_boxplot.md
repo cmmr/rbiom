@@ -225,11 +225,14 @@ table, and stats table commands are available as `$data`, `$code`,
 
 ## Aesthetics
 
-All built-in color palettes are colorblind-friendly. The available
-categorical palette names are: `"okabe"`, `"carto"`, `"r4"`,
-`"polychrome"`, `"tol"`, `"bright"`, `"light"`, `"muted"`, `"vibrant"`,
-`"tableau"`, `"classic"`, `"alphabet"`, `"tableau20"`, `"kelly"`, and
-`"fishy"`.
+The default colors are colorblind-friendly for up to 12 groups: Okabe
+and Ito's palette (`"okabe"`) for up to 8, and Paul Tol's (`"tol"`) for
+9-12. Of the other palettes, `"bright"`, `"vibrant"`, `"muted"`,
+`"light"`, and `"carto"` are also designed for color vision
+deficiencies. The available categorical palette names are: `"okabe"`,
+`"carto"`, `"r4"`, `"polychrome"`, `"tol"`, `"bright"`, `"light"`,
+`"muted"`, `"vibrant"`, `"tableau"`, `"classic"`, `"alphabet"`,
+`"tableau20"`, `"kelly"`, and `"fishy"`.
 
 Patterns are added using the fillpattern R package, which must be
 installed to use `patterns`. Options are `"brick"`, `"chevron"`,
@@ -269,8 +272,10 @@ Other visualization:
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 
@@ -352,21 +357,14 @@ Other visualization:
 #> 
 #> # p-values from the statistics table (see `p$stats$code`), placed above the boxes.
 #> labels <- tibble::tibble(
-#>   .label = c("italic(p)== 4e-05", "italic(p)== 4e-05", "italic(p)== 4e-05", "italic(p)== 4e-05", "italic(p)== 4e-05", 
-#>     "italic(p)== 0.002", "italic(p)== 0.002", "italic(p)== 0.002", "italic(p)== 0.002"),
+#>   .label = c("italic(p) < \"0.001\"", "italic(p) < \"0.001\"", "italic(p) < \"0.001\"", "italic(p) < \"0.001\"", 
+#>     "italic(p) < \"0.001\"", "italic(p) == \"0.0016\"", "italic(p) == \"0.0019\"", "italic(p) == \"0.0019\"", 
+#>     "italic(p) == \"0.0023\""),
 #>   .x     = c(2.5, 3.5, 3, 3, 4, 3.5, 4.5, 2, 2.5),
 #>   .y     = c(0x1.0237fa89e60fp+2, 0x1.237fa89e60f04p+2, 0x1.44c756b2dbd19p+2, 0x1.660f04c756b2dp+2, 0x1.8756b2dbd1942p+2, 0x1.a89e60f04c756p+2, 0x1.c9e60f04c756bp+2, 0x1.eb2dbd194237fp+2, 
 #>     0x1.063ab596de8cap+3) )
 #> 
 #> ggplot(data, aes(x = `Body Site`, y = .diversity)) +
-#>   annotate(
-#>     geom  = "rect", 
-#>     xmin  = -Inf, 
-#>     xmax  = Inf, 
-#>     ymin  = 4, 
-#>     ymax  = Inf, 
-#>     color = NA, 
-#>     fill  = "white" ) +
 #>   geom_boxplot(
 #>     mapping      = aes(color = `Body Site`, fill = `Body Site`), 
 #>     outlier.size = 1.14, 
@@ -384,17 +382,12 @@ Other visualization:
 #>   labs(
 #>     caption = "Pairwise Mann-Whitney U tests; p-values adjusted with the FDR (Benjamini-Hochberg) method.", 
 #>     y       = "Shannon Diversity Index" ) +
-#>   scale_color_manual(values = c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD")) +
-#>   scale_fill_manual(values = c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD")) +
+#>   scale_color_manual(values = c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7")) +
+#>   scale_fill_manual(values = c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(
-#>     breaks       = c(0, 1, 2, 3), 
-#>     minor_breaks = c(0.5, 1.5, 2.5, 3.5), 
-#>     expand       = c(0.02, 0, 0.08, 0) ) +
-#>   theme_bw() +
-#>   theme(
-#>     text               = element_text(size = 14), 
-#>     axis.text.x        = element_text(hjust = 0, vjust = 1, angle = -30), 
-#>     panel.grid.major.x = element_blank(), 
-#>     plot.caption       = element_text(face = "italic", size = 9) )
+#>     breaks = c(0, 1, 2, 3), 
+#>     expand = c(0.02, 0, 0.08, 0) ) +
+#>   theme_rbiom() +
+#>   theme(axis.text.x = element_text(hjust = 0, vjust = 1, angle = -30))
 ```

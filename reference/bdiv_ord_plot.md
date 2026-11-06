@@ -72,7 +72,7 @@ bdiv_ord_plot(
   `"tSNE"` -
 
   :   t-distributed stochastic neighbor embedding;
-      [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html).
+      [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html).
 
   Multiple/abbreviated values allowed. Default: `"PCoA"`
 
@@ -289,8 +289,10 @@ Other visualization:
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 

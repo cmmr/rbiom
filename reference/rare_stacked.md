@@ -80,8 +80,10 @@ Other visualization:
 [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
 [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+[`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
 
@@ -126,12 +128,13 @@ Other visualization:
 #>     color   = NA ) +
 #>   geom_hline(
 #>     yintercept = 1183, 
-#>     color      = "red", 
+#>     color      = "#D55E00", 
 #>     linetype   = "dashed" ) +
 #>   labs(
 #>     fill = "Reads", 
 #>     x    = NULL, 
 #>     y    = "Sequencing Depth\n(log10 scale)" ) +
+#>   scale_fill_manual(values = c('Excluded' = "#BBBBBB", 'Retained' = "#0072B2")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(
 #>     breaks       = 10^(0:5), 
@@ -139,9 +142,6 @@ Other visualization:
 #>     labels       = scales::label_number(scale_cut = scales::cut_si("")), 
 #>     expand       = c(0, 0), 
 #>     transform    = "log10" ) +
-#>   theme_bw() +
-#>   theme(
-#>     text               = element_text(size = 14), 
-#>     axis.text.x        = element_text(hjust = 0, vjust = 1, angle = -30), 
-#>     panel.grid.major.x = element_blank() )
+#>   theme_rbiom() +
+#>   theme(axis.text.x = element_text(hjust = 0, vjust = 0.3, angle = -90))
 ```

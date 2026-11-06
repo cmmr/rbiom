@@ -78,7 +78,7 @@ documentation_default
   `"tSNE"` -
 
   :   t-distributed stochastic neighbor embedding;
-      [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html).
+      [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html).
 
   Multiple/abbreviated values allowed. Default: `"PCoA"`
 

@@ -113,8 +113,9 @@ Default: <code>TRUE</code></p></dd>
 can supply a numeric vector of length two to control row label sizes
 and column label sizes separately, for example
 <code>c(rows = 20, cols = 8)</code>, or simply <code>c(20, 8)</code>.
-Default: <code>NULL</code>, which computes:
-<code>pmax(5, pmin(14, 100 / dim(mtx)))</code></p></dd>
+Default: <code>NULL</code>, which uses the theme's tick label size, shrunk to
+<code>pmax(5, 100 / dim(mtx))</code> when there are too many rows or columns
+for it.</p></dd>
 
 
 <dt id="arg-rescale">rescale<a class="anchor" aria-label="anchor" href="#arg-rescale"></a></dt>
@@ -202,7 +203,9 @@ Default: <code>"auto"</code>.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to pass on to <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">ggplot2::theme()</a></code>.
 Arguments prefixed with <code>labs.</code> go to <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code> instead,
-for example <code>labs.subtitle = "Plot subtitle"</code>.</p></dd>
+for example <code>labs.subtitle = "Plot subtitle"</code>, and <code>base_size</code>,
+<code>base_family</code>, <code>base_line_size</code>, and <code>base_rect_size</code> go to
+<code><a href="theme_rbiom.html">theme_rbiom()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -273,7 +276,9 @@ heatmap grid to visualize associated metadata values.</p>
 <dd><p>A list of arguments for guide_colorbar() or guide_legend().</p></dd>
 
 
-</dl><p>All built-in color palettes are colorblind-friendly.</p>
+</dl><p>The default categorical colors are colorblind-friendly for up to 12
+groups: Okabe and Ito's palette (<code>"okabe"</code>) for up to 8, and Paul Tol's
+(<code>"tol"</code>) for 9-12.</p>
 <p>The available categorical palette names are: <code>"okabe"</code>, <code>"carto"</code>, <code>"r4"</code>,
 <code>"polychrome"</code>, <code>"tol"</code>, <code>"bright"</code>, <code>"light"</code>, <code>"muted"</code>, <code>"vibrant"</code>,
 <code>"tableau"</code>, <code>"classic"</code>, <code>"alphabet"</code>, <code>"tableau20"</code>, <code>"kelly"</code>, and
@@ -301,8 +306,10 @@ heatmap grid to visualize associated metadata values.</p>
 <code><a href="stats_corrplot.html">stats_corrplot()</a></code>,
 <code><a href="taxa_boxplot.html">taxa_boxplot()</a></code>,
 <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code>,
+<code><a href="taxa_forest.html">taxa_forest()</a></code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap()</a></code>,
-<code><a href="taxa_stacked.html">taxa_stacked()</a></code></p></div>
+<code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
+<code><a href="theme_rbiom.html">theme_rbiom()</a></code></p></div>
     </div>
 
     <div class="section level2">

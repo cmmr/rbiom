@@ -204,3 +204,41 @@ taxa_stacked(rarefy(hmp50), taxa = 10)
 ```
 
 ![](plots_files/figure-html/unnamed-chunk-9-1.png)
+
+## Publication Figures
+
+Every rbiom plot uses
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md):
+black sans-serif text, open axes with outward ticks, no gridlines or
+shading, and colorblind-friendly colors. Journals typically want 5-8 pt
+text at the final printed size. Set the text size with `base_size` (or
+`p + theme(text = element_text(size = 8))` afterwards) and save the
+figure at its final width, for example 7 inches (180 mm) for a
+two-column figure.
+
+``` r
+
+p <- adiv_boxplot(biom, x = "Body Site", stat.by = "Body Site", base_size = 8)
+ggsave("figure2.pdf", p, width = 7, height = 3.5)
+```
+
+Gridlines and a panel box are options of the theme, and
+[`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
+gives your own ggplot2 figures the same style.
+
+``` r
+
+adiv_boxplot(biom, x = "Body Site", stat.by = "Body Site", grid = "y", frame = "box")
+```
+
+![](plots_files/figure-html/unnamed-chunk-11-1.png)
+
+``` r
+
+
+ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+  ggplot2::geom_point() +
+  theme_rbiom()
+```
+
+![](plots_files/figure-html/unnamed-chunk-11-2.png)
