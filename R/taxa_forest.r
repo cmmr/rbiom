@@ -19,10 +19,7 @@
 #'        every tested taxon. Default: `20`
 #'
 #' @param p.sig   Taxa with an adjusted p-value <= `p.sig` are significant
-#'        and colored by the direction of the change. For ANCOM-BC2, a
-#'        significant taxon must also pass its pseudo-count sensitivity
-#'        analysis (`.robust`). Also passed to [taxa_da()], where it is
-#'        ANCOM-BC2's `alpha`. Default: `0.05`
+#'        and colored by the direction of the change. Default: `0.05`
 #'
 #' @param colors   Colors for significant taxa that are more abundant in
 #'        the first-named group of the comparison (or that increase with
@@ -69,7 +66,7 @@ taxa_forest <- function (
     method = "linda", covariates = NULL, split.by = NULL, strata = NULL,
     p.top = 20, p.sig = 0.05, colors = TRUE, caption = TRUE,
     prev.cut = 0.1, level = 0.95, p.adj = "fdr",
-    lineage = FALSE, unc = "singly", seed = 0, ... ) {
+    lineage = FALSE, unc = "singly", ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -112,10 +109,8 @@ taxa_forest <- function (
       prev.cut   = prev.cut,
       level      = level,
       p.adj      = p.adj,
-      p.sig      = p.sig,
       lineage    = lineage,
-      unc        = unc,
-      seed       = seed ))
+      unc        = unc ))
 
     p <- taxa_forest_build(params)
 
@@ -139,7 +134,6 @@ taxa_forest_build <- function (params) {
   regr    <- params$regr
   p.top   <- params$p.top
   p.sig   <- params$p.sig
-  robust  <- hasName(stats, '.robust')
   dv      <- "data"
 
   .adj.p <- .p.val <- .lfc <- NULL # for CRAN check only
@@ -208,7 +202,6 @@ taxa_forest_build <- function (params) {
   labs <- c(dirs, "Not significant")
 
   sig <- !is.na(data$.adj.p) & data$.adj.p <= p.sig
-  if (robust) sig <- sig & data$.robust %in% TRUE
 
   data$.change <- ifelse(sig, ifelse(data$.lfc > 0, labs[[1]], labs[[2]]), labs[[3]])
   data$.change <- factor(data$.change, levels = intersect(labs, data$.change))
@@ -216,12 +209,8 @@ taxa_forest_build <- function (params) {
   code <- c(
     code,
     "",
-    sprintf(
-      "# Significant: adjusted p <= %s%s.", deparse_vec(p.sig),
-      if (robust) " and robust to ANCOM-BC2's pseudo-count" else "" ),
-    sprintf(
-      "sig <- !is.na(%s$.adj.p) & %s$.adj.p <= %s%s", dv, dv, deparse_vec(p.sig),
-      if (robust) sprintf(" & %s$.robust %%in%% TRUE", dv) else "" ),
+    sprintf("# Significant: adjusted p <= %s.", deparse_vec(p.sig)),
+    sprintf("sig <- !is.na(%s$.adj.p) & %s$.adj.p <= %s", dv, dv, deparse_vec(p.sig)),
     sprintf(
       "%s$.change <- ifelse(sig, ifelse(%s$.lfc > 0, %s, %s), %s)",
       dv, dv, double_quote(labs[[1]]), double_quote(labs[[2]]), double_quote(labs[[3]]) ),
@@ -315,7 +304,7 @@ taxa_forest_build <- function (params) {
     set_layer(params, 'labs', color = sprintf("%s %s %s", forest_p_label(params$p.adj), LESS_EQUAL, format(p.sig)))
 
   if (isTRUE(params$caption))
-    set_layer(params, 'labs', caption = forest_caption(params, stats, robust, generic = !is.null(stat.by) && eq(dirs[[1]], "Increased")))
+    set_layer(params, 'labs', caption = forest_caption(params, stats, generic = !is.null(stat.by) && eq(dirs[[1]], "Increased")))
 
 
   p <- plot_build(params)
@@ -380,7 +369,7 @@ forest_colors <- function (colors, labs, present) {
 #________________________________________________________
 # The caption: method, intervals, significance, and which taxa.
 #________________________________________________________
-forest_caption <- function (params, stats, robust, generic = FALSE) {
+forest_caption <- function (params, stats, generic = FALSE) {
 
   method <- attr(stats, 'tbl_sum', exact = TRUE)[['Method']]
   p.top  <- params$p.top
@@ -392,7 +381,6 @@ forest_caption <- function (params, stats, robust, generic = FALSE) {
   paste(collapse = "\n", c(
     sprintf("%s; bars are %s%% confidence intervals.", method, format(100 * params$level)),
     if (isTRUE(generic)) "Comparisons are \"A - B\": increased taxa are more abundant in A.",
-    if (robust) "Colored taxa are also robust to ANCOM-BC2's pseudo-count sensitivity analysis.",
     shown ))
 }
 

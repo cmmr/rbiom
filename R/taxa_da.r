@@ -5,14 +5,11 @@
 #' tests each taxon's abundance on its own, these methods account for the
 #' compositional nature of sequencing data: a sample's counts are a
 #' sample from the community, so an increase in one taxon lowers the
-#' observed proportions of all the others. Two methods are available:
+#' observed proportions of all the others. The method is LinDA (Zhou et
+#' al. 2022), built into rbiom.
 #'
-#' * `"linda"` - LinDA (Zhou et al. 2022), built into rbiom.
-#' * `"ancombc2"` - ANCOM-BC2 (Lin & Peddada 2024), run by
-#'   `ANCOMBC::ancombc2()`. Requires the Bioconductor package ANCOMBC.
-#'
-#' Both methods expect unrarefied counts: they model differences in
-#' sequencing depth themselves, and rarefying discards data.
+#' LinDA expects unrarefied counts: it models differences in sequencing
+#' depth itself, and rarefying discards data.
 #'
 #' @inherit documentation_default
 #'
@@ -39,12 +36,12 @@
 #'        most abundant taxa, a value 0 <= n < 1 reports the taxa with that
 #'        mean relative abundance or greater, and a character vector reports
 #'        the named taxa. Every taxon that passes `prev.cut` is still part
-#'        of the analysis, since both methods estimate the compositional
-#'        bias from all of them, and p-values are adjusted for all of them.
+#'        of the analysis, since LinDA estimates the compositional bias
+#'        from all of them, and p-values are adjusted for all of them.
 #'        Default: `NULL` (all tested taxa).
 #'
-#' @param method   The differential abundance method: `"linda"` or
-#'        `"ancombc2"`. See Details. Default: `"linda"`
+#' @param method   The differential abundance method. Currently only
+#'        `"linda"`. See Details. Default: `"linda"`
 #'
 #' @param covariates   Dataset field(s) to adjust for, such as age or
 #'        antibiotic use. They are included in every model, but their own
@@ -56,10 +53,9 @@
 #'
 #' @param strata   Dataset field with a blocking variable, such as a subject
 #'        identifier for repeated measures. Must be categorical. Adds a
-#'        random intercept per stratum to every model: LinDA fits linear
+#'        random intercept per stratum to every model, fitted as linear
 #'        mixed models with `lmerTest::lmer()` (requires the lmerTest
-#'        package), and ANCOM-BC2 uses `rand_formula = "(1 | strata)"`.
-#'        Default: `NULL`
+#'        package). Default: `NULL`
 #'
 #' @param prev.cut   Prevalence filter: taxa found in fewer than this
 #'        proportion of the samples are not tested. Default: `0.1`
@@ -71,17 +67,7 @@
 #'        p-values. Run `p.adjust.methods` for a list of available options.
 #'        As is standard for differential abundance, p-values are adjusted
 #'        across taxa separately for each comparison (and each rank and
-#'        `split.by` subset). ANCOM-BC2's pairwise comparisons among three
-#'        or more groups use its mixed directional FDR procedure instead;
-#'        see Details. Default: `"fdr"`
-#'
-#' @param p.sig   ANCOM-BC2's significance level (its `alpha`), used by its
-#'        pseudo-count sensitivity analysis (`.robust`) and by the screening
-#'        step of its pairwise comparisons. Ignored by LinDA. Default: `0.05`
-#'
-#' @param seed   Random seed, for ANCOM-BC2. Results are reproducible for a
-#'        given seed, and the caller's random number generator state is
-#'        left unchanged. Must be a non-negative integer. Default: `0`
+#'        `split.by` subset). Default: `"fdr"`
 #'
 #' @details
 #' **Counts.** The counts are summed to `rank` with [taxa_matrix()] (using
@@ -136,24 +122,6 @@
 #' `"Imputation"` with `"imputation"`; rbiom imputes, as the paper
 #' describes.
 #'
-#' **ANCOM-BC2** (Lin & Peddada 2024) estimates the sample-specific
-#' sampling fractions and taxon-specific biases, and tests the
-#' bias-corrected log abundances. rbiom calls `ANCOMBC::ancombc2()` with
-#' the counts as a matrix, `fix_formula = "stat.by + covariates"` (or
-#' `regr`), `prv_cut = prev.cut`, `p_adj_method = p.adj`,
-#' `alpha = p.sig`, and its other defaults, which include a sensitivity
-#' analysis of the pseudo-count added to zeros (reported in `.robust`).
-#' With three or more groups, it adds `group = stat.by` and
-#' `pairwise = TRUE`: every pair of groups is compared, with p-values from
-#' ANCOM-BC2's mixed directional false discovery rate procedure, which
-#' first screens taxa with a global test (taxa that don't pass get a
-#' p-value of 1) and then adjusts each taxon's pairwise p-values. Its
-#' natural-log fold changes and standard errors are divided by `log(2)`.
-#' ANCOM-BC2 computes p-values from t-distributions but doesn't report
-#' their degrees of freedom, so rbiom recovers them from the p-values in
-#' its primary results, for the confidence intervals; where that isn't
-#' possible, the interval uses the normal distribution.
-#'
 #' @return A tibble data.frame with one row per taxon and comparison, and
 #'         the columns:
 #'        \describe{
@@ -175,11 +143,6 @@
 #'          \item{`.p.val` - }{ The p-value. }
 #'          \item{`.adj.p` - }{ `.p.val` adjusted for multiple comparisons
 #'                across taxa (see `p.adj`). }
-#'          \item{`.robust` - }{ ANCOM-BC2 only: `TRUE` when the taxon's
-#'                significance (`.adj.p <= p.sig`) doesn't depend on the
-#'                pseudo-count added to zeros. ANCOM-BC2 recommends
-#'                treating significant taxa that aren't robust as not
-#'                significant. }
 #'          \item{`.n` - }{ The number of samples analyzed. }
 #'        }
 #'         Rows are sorted by `.p.val`. The R code that reproduces the
@@ -189,10 +152,6 @@
 #' Zhou H, He K, Chen J, Zhang X (2022). LinDA: linear models for
 #' differential abundance analysis of microbiome compositional data.
 #' *Genome Biology* 23:95. \doi{10.1186/s13059-022-02655-5}
-#'
-#' Lin H, Peddada SD (2024). Multigroup analysis of compositions of
-#' microbiomes with covariate adjustment and repeated measures.
-#' *Nature Methods* 21:83-91. \doi{10.1038/s41592-023-02092-7}
 #'
 #' @seealso [taxa_forest()] to plot the results.
 #'
@@ -210,17 +169,12 @@
 #'
 #'     # See the R code that reproduces the table.
 #'     da$code
-#'
-#'     \donttest{
-#'     if (requireNamespace("ANCOMBC", quietly = TRUE))
-#'       taxa_da(biom, stat.by = "Body Site", rank = "Phylum", method = "ancombc2")
-#'     }
 
 taxa_da <- function (
     biom, stat.by = NULL, regr = NULL, rank = -1, taxa = NULL,
     method = "linda", covariates = NULL, split.by = NULL, strata = NULL,
-    prev.cut = 0.1, level = 0.95, p.adj = "fdr", p.sig = 0.05,
-    lineage = FALSE, unc = "singly", seed = 0 ) {
+    prev.cut = 0.1, level = 0.95, p.adj = "fdr",
+    lineage = FALSE, unc = "singly" ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -234,7 +188,6 @@ taxa_da <- function (
   validate_taxa(null_ok = TRUE)
   validate_unc()
   validate_bool('lineage')
-  validate_seed()
 
   validate_biom_field('stat.by',    null_ok = TRUE, col_type = "cat")
   validate_biom_field('regr',       null_ok = TRUE, col_type = "num")
@@ -242,11 +195,10 @@ taxa_da <- function (
   validate_biom_field('split.by',   null_ok = TRUE, col_type = "cat", max = Inf)
   validate_biom_field('strata',     null_ok = TRUE, col_type = "cat")
 
-  validate_var_choices('method', c("linda", "ancombc2"))
+  validate_var_choices('method', "linda")
   validate_var_choices('p.adj',  p.adjust.methods)
   validate_var_range('prev.cut', range = c(0, 1),   n = 1)
   validate_var_range('level',    range = c(0.5, 1), n = 1)
-  validate_var_range('p.sig',    range = c(0, 1),   n = 1)
 
   if (is.null(stat.by) == is.null(regr))
     cli_abort(c(
@@ -261,17 +213,14 @@ taxa_da <- function (
       'x' = "`biom` holds relative abundances, but differential abundance methods need counts.",
       'i' = "Use the unrarefied counts." ))
 
-  if (method == "ancombc2")
-    require_package('ANCOMBC', reason = 'for `method = "ancombc2"`')
-
-  if (method == "linda" && !is.null(strata))
-    require_package('lmerTest', reason = 'for `method = "linda"` with `strata`')
+  if (!is.null(strata))
+    require_package('lmerTest', reason = 'for `taxa_da()` with `strata`')
 
   if (!is.null(biom$depth))
     cli::cli_inform(
       .frequency    = "once",
       .frequency_id = "rbiom_taxa_da_rarefied",
-      message       = c('i' = "`biom` is rarefied. LinDA and ANCOM-BC2 model sequencing depth themselves, so unrarefied counts are better." ))
+      message       = c('i' = "`biom` is rarefied. LinDA models sequencing depth itself, so unrarefied counts are better." ))
 
 
   #________________________________________________________
@@ -315,10 +264,8 @@ taxa_da <- function (
       prev.cut   = prev.cut,
       level      = level,
       p.adj      = p.adj,
-      p.sig      = p.sig,
       lineage    = lineage,
-      unc        = unc,
-      seed       = seed )
+      unc        = unc )
 
     set_cache_value(cache_file, stats)
   }
@@ -362,7 +309,7 @@ taxa_da <- function (
 #________________________________________________________
 da_run <- function (
     biom, stat.by, regr, rank, method, covariates, split.by, strata,
-    prev.cut, level, p.adj, p.sig, lineage, unc, seed ) {
+    prev.cut, level, p.adj, lineage, unc ) {
 
 
   #________________________________________________________
@@ -371,7 +318,7 @@ da_run <- function (
   voi  <- if (is.null(stat.by)) ".regr" else ".stat.by"
   covs <- if (length(covariates) > 0) paste0(".cov", seq_along(covariates))
 
-  engine <- switch(method, linda = da_linda, ancombc2 = da_ancombc2)
+  engine <- switch(method, linda = da_linda)
 
 
   #________________________________________________________
@@ -403,9 +350,7 @@ da_run <- function (
       strata   = !is.null(strata),
       prev.cut = prev.cut,
       level    = level,
-      p.adj    = p.adj,
-      p.sig    = p.sig,
-      seed     = seed )
+      p.adj    = p.adj )
 
     if (!is.null(stat.by))
       names(res)[names(res) == '.cmp'] <- stat.by
@@ -488,11 +433,11 @@ da_run <- function (
   model <- da_formula_str(c(stat.by, regr), covariates, strata)
 
   attr(stats, 'tbl_sum') <- c(
-    'Method' = switch(method, linda = "LinDA (Zhou et al. 2022)", ancombc2 = "ANCOM-BC2 (Lin & Peddada 2024)"),
+    'Method' = switch(method, linda = "LinDA (Zhou et al. 2022)"),
     'Model'  = sprintf("%s, per taxon", model),
     'p.adj'  = sprintf("%s, across taxa within each comparison", p_adj_label(p.adj) %||% "none") )
 
-  attr(stats, 'method') <- da_method_comment(method, voi, covs, strata, stat.by, regr, covariates, prev.cut, p.adj, p.sig, biom)
+  attr(stats, 'method') <- da_method_comment(method, stat.by, regr, covariates, strata)
 
   return (stats)
 }
@@ -529,42 +474,16 @@ da_formula_str <- function (voi, covariates, strata) {
 # Comment lines for `$code` that describe what taxa_da() computes.
 # Field names appear only as escaped, backticked symbols (coan()).
 #________________________________________________________
-da_method_comment <- function (method, voi, covs, strata, stat.by, regr, covariates, prev.cut, p.adj, p.sig, biom) {
+da_method_comment <- function (method, stat.by, regr, covariates, strata) {
 
-  cols <- paste(collapse = ", ", sprintf(
-    "%s = %s",
-    c(voi, covs, if (!is.null(strata)) ".strata"),
-    coan(c(stat.by, regr, covariates, strata)) ))
-
-  if (method == "linda") {
-
-    c(
+  switch(
+    EXPR  = method,
+    linda = c(
       "# Differential abundance with LinDA (Zhou et al. 2022), as implemented in",
       "# rbiom; see ?taxa_da for the algorithm. For each rank, the counts from",
       "# taxa_matrix() are modeled per taxon as centered log2-ratios with",
       sprintf("#   %s", da_formula_str(c(stat.by, regr), covariates, strata)),
-      "# and each coefficient is corrected by its mode across taxa." )
-
-  } else {
-
-    multi <- voi == ".stat.by" && nlevels(as.factor(pull(biom, stat.by))) > 2
-
-    args <- c(
-      "data = counts", "meta_data = md",
-      sprintf("fix_formula = %s", double_quote(paste(c(voi, covs), collapse = " + "))),
-      if (!is.null(strata)) 'rand_formula = "(1 | .strata)"',
-      if (multi) 'group = ".stat.by", pairwise = TRUE',
-      sprintf("p_adj_method = %s", double_quote(p.adj)),
-      sprintf("prv_cut = %s", deparse_vec(prev.cut)),
-      sprintf("alpha = %s", deparse_vec(p.sig)) )
-
-    c(
-      sprintf("# Differential abundance with ANCOM-BC2 (Lin & Peddada 2024), ANCOMBC %s.", utils::packageVersion('ANCOMBC')),
-      "# For each rank, taxa_da() passes the counts from taxa_matrix() to",
-      sprintf("#   ANCOMBC::ancombc2(%s)", paste(args, collapse = ", ")),
-      sprintf("# where md has the columns %s.", cols),
-      "# The natural-log fold changes are converted to log2. See ?taxa_da." )
-  }
+      "# and each coefficient is corrected by its mode across taxa." ))
 }
 
 
@@ -645,19 +564,19 @@ da_mode <- function (x, iter = 1000, tolerance = sqrt(.Machine$double.eps)) {
 # Finish an engine's results: confidence intervals, p-value adjustment
 # within each comparison, and the column order.
 #________________________________________________________
-da_finish <- function (res, voi, level, p.adj, adjust = TRUE) {
+da_finish <- function (res, voi, level, p.adj) {
 
   q <- stats::qt(1 - (1 - level) / 2, df = res$.df)
 
   res$.lower <- res$.lfc - q * res$.se
   res$.upper <- res$.lfc + q * res$.se
 
-  if (isTRUE(adjust) && nrow(res) > 0) {
+  if (nrow(res) > 0) {
     grp <- ifelse(is.na(res$.cmp), "", res$.cmp)
     res$.adj.p <- stats::ave(res$.p.val, grp, FUN = function (p) stats::p.adjust(p, p.adj))
   }
 
-  cols <- c('.cmp', '.taxa', '.lfc', '.se', '.lower', '.upper', '.t.ratio', '.df', '.p.val', '.adj.p', '.robust', '.n')
+  cols <- c('.cmp', '.taxa', '.lfc', '.se', '.lower', '.upper', '.t.ratio', '.df', '.p.val', '.adj.p', '.n')
   if (voi == ".regr") cols <- setdiff(cols, '.cmp')
 
   res <- tibble::as_tibble(res[, intersect(cols, names(res)), drop = FALSE])
@@ -691,7 +610,7 @@ da_samples <- function (counts, md) {
 #   md     - data.frame (one row per sample, in the order of the counts'
 #            columns) with the columns `voi`, `covs`, and `.strata`.
 #________________________________________________________
-da_linda <- function (counts, md, voi, covs, strata, prev.cut, level, p.adj, ...) {
+da_linda <- function (counts, md, voi, covs, strata, prev.cut, level, p.adj) {
 
 
   #________________________________________________________
@@ -846,112 +765,4 @@ da_linda <- function (counts, md, voi, covs, strata, prev.cut, level, p.adj, ...
   res <- do.call(rbind, res)
 
   return (da_finish(res, voi, level, p.adj))
-}
-
-
-
-
-#________________________________________________________
-# ANCOM-BC2 (Lin & Peddada 2024), by ANCOMBC::ancombc2().
-#________________________________________________________
-da_ancombc2 <- function (counts, md, voi, covs, strata, prev.cut, level, p.adj, p.sig, seed) {
-
-  s      <- da_samples(counts, md)
-  counts <- s$counts
-  md     <- s$md
-
-  multi <- voi == ".stat.by" && nlevels(md[[voi]]) > 2
-
-  # ancombc2() subsets `meta_data` without `drop = FALSE`, which turns a
-  # one-column data.frame into a vector; give it a second column.
-  md[['.sample']] <- rownames(md)
-
-  fit <- with_seed(seed, suppressMessages(ANCOMBC::ancombc2(
-    data          = counts,
-    taxa_are_rows = TRUE,
-    meta_data     = md,
-    fix_formula   = paste(c(voi, covs), collapse = " + "),
-    rand_formula  = if (isTRUE(strata)) "(1 | .strata)" else NULL,
-    p_adj_method  = p.adj,
-    prv_cut       = prev.cut,
-    alpha         = p.sig,
-    group         = if (multi) voi else NULL,
-    pairwise      = multi,
-    verbose       = FALSE )))
-
-  main <- fit$res
-  pair <- if (multi) fit$res_pair else main
-  n    <- ncol(fit$feature_table)
-
-
-  #________________________________________________________
-  # Degrees of freedom: ANCOM-BC2's p-values are 2 * pt(-|W|, df), so
-  # df can be recovered from the primary results. For pairwise
-  # comparisons, the smaller of the two coefficients' df (they're
-  # equal for fixed-effects models).
-  #________________________________________________________
-  coefs <- sub("^W_", "", grep("^W_", names(main), value = TRUE))
-  dof   <- sapply(coefs, function (cf) mapply(da_t_dof, main[[paste0("W_", cf)]], main[[paste0("p_", cf)]]))
-  dof   <- matrix(dof, nrow = nrow(main), dimnames = list(main$taxon, coefs))
-  fallback <- apply(dof, 1, function (d) if (all(is.na(d))) Inf else min(d, na.rm = TRUE))
-
-
-  #________________________________________________________
-  # Column suffixes of each comparison in ANCOM-BC2's tables.
-  #________________________________________________________
-  cmps <- da_contrasts(md, voi, c("(Intercept)", if (voi == ".stat.by") paste0(voi, levels(md[[voi]])[-1]) else voi))
-
-  res <- lapply(cmps, function (cmp) {
-
-    terms <- names(cmp$L)[cmp$L != 0]
-
-    suffix <- if (length(terms) == 1) { terms }
-              else { paste(names(cmp$L)[cmp$L > 0], names(cmp$L)[cmp$L < 0], sep = "_") }
-
-    tbl <- if (length(terms) == 1 && !multi) main else pair
-    get <- function (stat) tbl[[paste0(stat, "_", suffix)]]
-
-    df <- dof[match(tbl$taxon, main$taxon), terms, drop = FALSE]
-    df <- apply(df, 1, min)
-    df[is.na(df)] <- fallback[match(tbl$taxon, main$taxon)][is.na(df)]
-
-    data.frame(
-      .cmp     = cmp$label,
-      .taxa    = tbl$taxon,
-      .lfc     = get("lfc") / log(2),
-      .se      = get("se")  / log(2),
-      .t.ratio = get("W"),
-      .df      = df,
-      .p.val   = get("p"),
-      .adj.p   = get("q"),
-      .robust  = if (is.null(get("passed_ss"))) NA else get("passed_ss"),
-      .n       = n,
-      stringsAsFactors = FALSE )
-  })
-
-  res <- do.call(rbind, res)
-  res <- res[!is.na(res$.lfc), , drop = FALSE]
-
-  return (da_finish(res, voi, level, p.adj, adjust = FALSE))
-}
-
-
-
-#________________________________________________________
-# The degrees of freedom `d` for which 2 * pt(-|t|, d) == p. NA when `p`
-# can't be inverted (t = 0, p = 0, or p = 1); Inf when `p` is at or
-# below the normal distribution's tail probability (d > 1e7).
-#________________________________________________________
-da_t_dof <- function (t, p) {
-
-  if (!is.finite(t) || t == 0 || !is.finite(p) || p <= 0 || p >= 1) return (NA_real_)
-
-  f <- function (logd) 2 * stats::pt(-abs(t), df = exp(logd)) - p
-
-  lo <- log(1e-2)
-  hi <- log(1e7)
-  if (f(lo) < 0) return (NA_real_)
-  if (f(hi) > 0) return (Inf)
-
-  exp(stats::uniroot(f, c(lo, hi), tol = 1e-10)$root)
 }

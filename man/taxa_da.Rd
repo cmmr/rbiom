@@ -17,10 +17,8 @@ taxa_da(
   prev.cut = 0.1,
   level = 0.95,
   p.adj = "fdr",
-  p.sig = 0.05,
   lineage = FALSE,
-  unc = "singly",
-  seed = 0
+  unc = "singly"
 )
 }
 \arguments{
@@ -46,12 +44,12 @@ the highest rank, \code{-1} is the lowest rank, and \code{0} is the OTU
 most abundant taxa, a value 0 <= n < 1 reports the taxa with that
 mean relative abundance or greater, and a character vector reports
 the named taxa. Every taxon that passes \code{prev.cut} is still part
-of the analysis, since both methods estimate the compositional
-bias from all of them, and p-values are adjusted for all of them.
+of the analysis, since LinDA estimates the compositional bias
+from all of them, and p-values are adjusted for all of them.
 Default: \code{NULL} (all tested taxa).}
 
-\item{method}{The differential abundance method: \code{"linda"} or
-\code{"ancombc2"}. See Details. Default: \code{"linda"}}
+\item{method}{The differential abundance method. Currently only
+\code{"linda"}. See Details. Default: \code{"linda"}}
 
 \item{covariates}{Dataset field(s) to adjust for, such as age or
 antibiotic use. They are included in every model, but their own
@@ -63,10 +61,9 @@ Default: \code{NULL}}
 
 \item{strata}{Dataset field with a blocking variable, such as a subject
 identifier for repeated measures. Must be categorical. Adds a
-random intercept per stratum to every model: LinDA fits linear
+random intercept per stratum to every model, fitted as linear
 mixed models with \code{lmerTest::lmer()} (requires the lmerTest
-package), and ANCOM-BC2 uses \code{rand_formula = "(1 | strata)"}.
-Default: \code{NULL}}
+package). Default: \code{NULL}}
 
 \item{prev.cut}{Prevalence filter: taxa found in fewer than this
 proportion of the samples are not tested. Default: \code{0.1}}
@@ -78,13 +75,7 @@ proportion of the samples are not tested. Default: \code{0.1}}
 p-values. Run \code{p.adjust.methods} for a list of available options.
 As is standard for differential abundance, p-values are adjusted
 across taxa separately for each comparison (and each rank and
-\code{split.by} subset). ANCOM-BC2's pairwise comparisons among three
-or more groups use its mixed directional FDR procedure instead;
-see Details. Default: \code{"fdr"}}
-
-\item{p.sig}{ANCOM-BC2's significance level (its \code{alpha}), used by its
-pseudo-count sensitivity analysis (\code{.robust}) and by the screening
-step of its pairwise comparisons. Ignored by LinDA. Default: \code{0.05}}
+\code{split.by} subset). Default: \code{"fdr"}}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
@@ -103,10 +94,6 @@ taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Abbreviations are allowed. Default: \code{"singly"}}
-
-\item{seed}{Random seed, for ANCOM-BC2. Results are reproducible for a
-given seed, and the caller's random number generator state is
-left unchanged. Must be a non-negative integer. Default: \code{0}}
 }
 \value{
 A tibble data.frame with one row per taxon and comparison, and
@@ -130,11 +117,6 @@ at \code{level}. }
 \item{\code{.p.val} - }{ The p-value. }
 \item{\code{.adj.p} - }{ \code{.p.val} adjusted for multiple comparisons
 across taxa (see \code{p.adj}). }
-\item{\code{.robust} - }{ ANCOM-BC2 only: \code{TRUE} when the taxon's
-significance (\code{.adj.p <= p.sig}) doesn't depend on the
-pseudo-count added to zeros. ANCOM-BC2 recommends
-treating significant taxa that aren't robust as not
-significant. }
 \item{\code{.n} - }{ The number of samples analyzed. }
 }
 Rows are sorted by \code{.p.val}. The R code that reproduces the
@@ -146,17 +128,12 @@ changes with a numeric variable (\code{regr}). Unlike \code{\link[=taxa_stats]{t
 tests each taxon's abundance on its own, these methods account for the
 compositional nature of sequencing data: a sample's counts are a
 sample from the community, so an increase in one taxon lowers the
-observed proportions of all the others. Two methods are available:
+observed proportions of all the others. The method is LinDA (Zhou et
+al. 2022), built into rbiom.
 }
 \details{
-\itemize{
-\item \code{"linda"} - LinDA (Zhou et al. 2022), built into rbiom.
-\item \code{"ancombc2"} - ANCOM-BC2 (Lin & Peddada 2024), run by
-\code{ANCOMBC::ancombc2()}. Requires the Bioconductor package ANCOMBC.
-}
-
-Both methods expect unrarefied counts: they model differences in
-sequencing depth themselves, and rarefying discards data.
+LinDA expects unrarefied counts: it models differences in sequencing
+depth itself, and rarefying discards data.
 
 \strong{Counts.} The counts are summed to \code{rank} with \code{\link[=taxa_matrix]{taxa_matrix()}} (using
 \code{unc} and \code{lineage}) and every sample with a value for all of the fields
@@ -210,24 +187,6 @@ when it reports that sequencing depth is associated with the model, it
 still adds the pseudo-count, because it compares
 \code{"Imputation"} with \code{"imputation"}; rbiom imputes, as the paper
 describes.
-
-\strong{ANCOM-BC2} (Lin & Peddada 2024) estimates the sample-specific
-sampling fractions and taxon-specific biases, and tests the
-bias-corrected log abundances. rbiom calls \code{ANCOMBC::ancombc2()} with
-the counts as a matrix, \code{fix_formula = "stat.by + covariates"} (or
-\code{regr}), \code{prv_cut = prev.cut}, \code{p_adj_method = p.adj},
-\code{alpha = p.sig}, and its other defaults, which include a sensitivity
-analysis of the pseudo-count added to zeros (reported in \code{.robust}).
-With three or more groups, it adds \code{group = stat.by} and
-\code{pairwise = TRUE}: every pair of groups is compared, with p-values from
-ANCOM-BC2's mixed directional false discovery rate procedure, which
-first screens taxa with a global test (taxa that don't pass get a
-p-value of 1) and then adjusts each taxon's pairwise p-values. Its
-natural-log fold changes and standard errors are divided by \code{log(2)}.
-ANCOM-BC2 computes p-values from t-distributions but doesn't report
-their degrees of freedom, so rbiom recovers them from the p-values in
-its primary results, for the confidence intervals; where that isn't
-possible, the interval uses the normal distribution.
 }
 \examples{
     library(rbiom)
@@ -242,20 +201,11 @@ possible, the interval uses the normal distribution.
 
     # See the R code that reproduces the table.
     da$code
-
-    \donttest{
-    if (requireNamespace("ANCOMBC", quietly = TRUE))
-      taxa_da(biom, stat.by = "Body Site", rank = "Phylum", method = "ancombc2")
-    }
 }
 \references{
 Zhou H, He K, Chen J, Zhang X (2022). LinDA: linear models for
 differential abundance analysis of microbiome compositional data.
 \emph{Genome Biology} 23:95. \doi{10.1186/s13059-022-02655-5}
-
-Lin H, Peddada SD (2024). Multigroup analysis of compositions of
-microbiomes with covariate adjustment and repeated measures.
-\emph{Nature Methods} 21:83-91. \doi{10.1038/s41592-023-02092-7}
 }
 \seealso{
 \code{\link[=taxa_forest]{taxa_forest()}} to plot the results.

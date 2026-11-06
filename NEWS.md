@@ -86,26 +86,21 @@
 
 ## Differential abundance
 
-* New `taxa_da()` finds differentially abundant taxa with methods that 
-  account for compositionality, between groups (`stat.by`; every pair of 
-  groups) or along a numeric variable (`regr`), with optional `covariates`,
-  `strata` (a random intercept per subject), `split.by`, and several ranks.
-  Two methods:
-  * `"linda"` (default): LinDA (Zhou et al. 2022), built in. It gives the 
-    results of `MicrobiomeStat::linda()` (to within 1e-10 on hmp50), except
-    that it imputes zeros when sequencing depth is associated with the 
-    model, as the paper describes (`MicrobiomeStat::linda()` 1.4 reports 
-    imputation but adds a pseudo-count). Comparisons between two 
-    non-reference groups are corrected by the mode of their own contrast, 
-    so they don't depend on the order of the groups.
-  * `"ancombc2"`: ANCOM-BC2 (Lin & Peddada 2024) via 
-    `ANCOMBC::ancombc2()`, with its pseudo-count sensitivity analysis 
-    (`.robust`) and, for three or more groups, its mixed directional FDR 
-    pairwise tests.
+* New `taxa_da()` finds differentially abundant taxa with LinDA (Zhou et al.
+  2022), which accounts for compositionality, between groups (`stat.by`; 
+  every pair of groups) or along a numeric variable (`regr`), with optional
+  `covariates`, `strata` (a random intercept per subject), `split.by`, and 
+  several ranks. LinDA is built in. It gives the results of 
+  `MicrobiomeStat::linda()` (to within 1e-10 on hmp50), except that it 
+  imputes zeros when sequencing depth is associated with the model, as the 
+  paper describes (`MicrobiomeStat::linda()` 1.4 reports imputation but adds
+  a pseudo-count). Comparisons between two non-reference groups are 
+  corrected by the mode of their own contrast, so they don't depend on the 
+  order of the groups.
   
-  Both report log2 fold changes with standard errors, confidence intervals,
+  It reports log2 fold changes with standard errors, confidence intervals,
   t statistics, and p-values adjusted across taxa within each comparison. 
-  `$code` names the method, its model, and the exact `ancombc2()` call.
+  `$code` names the method and its model.
 * New `taxa_forest()` plots `taxa_da()` results: each taxon's log2 fold 
   change and confidence interval, colored by direction when significant, 
   with one panel per comparison (and rank and `split.by` subset) and the 
@@ -208,8 +203,7 @@
   scales, tibble) are now in Imports, along with cluster and permute (both 
   already installed with vegan).
 * Suggests Rtsne instead of tsne.
-* Suggests ANCOMBC (for `taxa_da(method = "ancombc2")`), and lmerTest and
-  lme4 (for `taxa_da(method = "linda")` with `strata`).
+* Suggests lmerTest and lme4 (for `taxa_da()` with `strata`).
 * Requires ecodive (>= 2.3.1).
 
 

@@ -51,7 +51,6 @@ Imports:
     tibble,
     vegan
 Suggests:
-    ANCOMBC,
     ape,
     biomformat,
     Biostrings,

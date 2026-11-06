@@ -71,17 +71,3 @@ test_that("taxa_forest with regr and several ranks", {
   expect_true(all(levels(p$data$.change) %in% c("Increases with Age", "Decreases with Age", "Not significant")))
   expect_equal(nrow(ggplot2::ggplot_build(p)$layout$layout), 2L)
 })
-
-
-test_that("taxa_forest with ANCOM-BC2", {
-
-  skip_if_not_installed("ANCOMBC")
-  skip_on_cran()
-
-  p <- suppressWarnings(taxa_forest(saliva_stool, stat.by = "Body Site", rank = "Phylum", method = "ancombc2", p.top = Inf))
-
-  sig <- p$data$.adj.p <= 0.05 & p$data$.robust %in% TRUE
-  expect_identical(p$data$.change != "Not significant", sig)
-  expect_match(p$labels$caption, "ANCOM-BC2")
-  expect_match(p$code, ".robust %in% TRUE", fixed = TRUE)
-})

@@ -23,7 +23,6 @@ taxa_forest(
   p.adj = "fdr",
   lineage = FALSE,
   unc = "singly",
-  seed = 0,
   ...
 )
 }
@@ -50,12 +49,12 @@ the highest rank, \code{-1} is the lowest rank, and \code{0} is the OTU
 most abundant taxa, a value 0 <= n < 1 reports the taxa with that
 mean relative abundance or greater, and a character vector reports
 the named taxa. Every taxon that passes \code{prev.cut} is still part
-of the analysis, since both methods estimate the compositional
-bias from all of them, and p-values are adjusted for all of them.
+of the analysis, since LinDA estimates the compositional bias
+from all of them, and p-values are adjusted for all of them.
 Default: \code{NULL} (all tested taxa).}
 
-\item{method}{The differential abundance method: \code{"linda"} or
-\code{"ancombc2"}. See Details. Default: \code{"linda"}}
+\item{method}{The differential abundance method. Currently only
+\code{"linda"}. See Details. Default: \code{"linda"}}
 
 \item{covariates}{Dataset field(s) to adjust for, such as age or
 antibiotic use. They are included in every model, but their own
@@ -67,10 +66,9 @@ Default: \code{NULL}}
 
 \item{strata}{Dataset field with a blocking variable, such as a subject
 identifier for repeated measures. Must be categorical. Adds a
-random intercept per stratum to every model: LinDA fits linear
+random intercept per stratum to every model, fitted as linear
 mixed models with \code{lmerTest::lmer()} (requires the lmerTest
-package), and ANCOM-BC2 uses \code{rand_formula = "(1 | strata)"}.
-Default: \code{NULL}}
+package). Default: \code{NULL}}
 
 \item{p.top}{Which taxa to show in each panel. A value >= 1 shows the
 \code{p.top} taxa with the smallest adjusted p-values; a value < 1
@@ -78,10 +76,7 @@ shows the taxa with an adjusted p-value <= \code{p.top}; \code{Inf} shows
 every tested taxon. Default: \code{20}}
 
 \item{p.sig}{Taxa with an adjusted p-value <= \code{p.sig} are significant
-and colored by the direction of the change. For ANCOM-BC2, a
-significant taxon must also pass its pseudo-count sensitivity
-analysis (\code{.robust}). Also passed to \code{\link[=taxa_da]{taxa_da()}}, where it is
-ANCOM-BC2's \code{alpha}. Default: \code{0.05}}
+and colored by the direction of the change. Default: \code{0.05}}
 
 \item{colors}{Colors for significant taxa that are more abundant in
 the first-named group of the comparison (or that increase with
@@ -104,9 +99,7 @@ proportion of the samples are not tested. Default: \code{0.1}}
 p-values. Run \code{p.adjust.methods} for a list of available options.
 As is standard for differential abundance, p-values are adjusted
 across taxa separately for each comparison (and each rank and
-\code{split.by} subset). ANCOM-BC2's pairwise comparisons among three
-or more groups use its mixed directional FDR procedure instead;
-see Details. Default: \code{"fdr"}}
+\code{split.by} subset). Default: \code{"fdr"}}
 
 \item{lineage}{Include all ranks in the name of the taxa. For instance,
 setting to \code{TRUE} will produce
@@ -125,10 +118,6 @@ taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Abbreviations are allowed. Default: \code{"singly"}}
-
-\item{seed}{Random seed, for ANCOM-BC2. Results are reproducible for a
-given seed, and the caller's random number generator state is
-left unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{...}{Parameters for the underlying ggplot2 functions. Prefix a
 parameter with a layer name to pass it to that layer only:
