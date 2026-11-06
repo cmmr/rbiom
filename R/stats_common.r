@@ -28,12 +28,12 @@
 # report how many rows will be dropped because of NA values. Returns the
 # complete-case subset of the relevant columns (invisibly).
 #________________________________________________________
-stats_validate <- function (df, regr, resp, stat.by, split.by, strata) {
+stats_validate <- function (df, regr, resp, stat.by, split.by, strata, covariates = NULL) {
 
-  cols <- unique(c(regr, resp, stat.by, split.by, strata))
+  cols <- unique(c(regr, resp, stat.by, split.by, strata, covariates))
 
-  if (as.logical(anyDuplicated(c(regr, resp, stat.by, split.by, strata))))
-    cli_abort("`regr`, `resp`, `stat.by`, `split.by`, and `strata` must all be unique.")
+  if (as.logical(anyDuplicated(c(regr, resp, stat.by, split.by, strata, covariates))))
+    cli_abort("`regr`, `resp`, `stat.by`, `split.by`, `strata`, and `covariates` must all be unique.")
 
   sub  <- df[, cols, drop = FALSE]
   keep <- stats::complete.cases(sub)
@@ -92,22 +92,26 @@ stats_validate <- function (df, regr, resp, stat.by, split.by, strata) {
 # selection, NA filtering, factor handling, per-pair subsetting, error
 # handling, and p-value adjustment.
 #________________________________________________________
-stats_run <- function (df, regr, resp, stat.by, split.by, strata, pre, test, pairwise, p.adj) {
+stats_run <- function (df, regr, resp, stat.by, split.by, strata, pre, test, pairwise, p.adj, covariates = NULL) {
 
   #________________________________________________________
   # Prologue: standardized column names, complete cases.
   #________________________________________________________
+  covs <- stats_covs(covariates)
+
   cols <- c(
     .resp = resp,
     if (!is.null(regr))    c(.regr    = regr),
     if (!is.null(stat.by)) c(.stat.by = stat.by),
     if (!is.null(strata))  c(.strata  = strata),
+    covs,
     stats::setNames(split.by, split.by) )
 
   data <- dplyr::select(df, !!!rlang::syms(cols))
   data <- data[stats::complete.cases(data), , drop = FALSE]
   if (!is.null(stat.by)) data$.stat.by <- droplevels(as.factor(data$.stat.by))
   if (!is.null(strata))  data$.strata  <- droplevels(as.factor(data$.strata))
+  for (col in stats_cov_cat(df, covs)) data[[col]] <- droplevels(as.factor(data[[col]]))
   for (col in split.by)  data[[col]]   <- droplevels(as.factor(data[[col]]))
 
   multi <- !is.null(split.by) || isTRUE(pairwise)
@@ -319,13 +323,14 @@ strip_prov <- function (x) {
 # The code that selects, renames, and NA-filters the stats columns
 # (mirrors the prologue of stats_run()).
 #________________________________________________________
-stats_prologue <- function (regr, resp, stat.by, split.by, strata) {
+stats_prologue <- function (regr, resp, stat.by, split.by, strata, covs = NULL, cov_cat = NULL) {
 
   sel <- c(
     sprintf(".resp = %s", coan(resp)),
     if (!is.null(regr))    sprintf(".regr = %s",    coan(regr)),
     if (!is.null(stat.by)) sprintf(".stat.by = %s", coan(stat.by)),
     if (!is.null(strata))  sprintf(".strata = %s",  coan(strata)),
+    if (length(covs) > 0)  sprintf("%s = %s", names(covs), coan(unname(covs))),
     if (!is.null(split.by)) coan(split.by) )
 
   c(
@@ -333,6 +338,8 @@ stats_prologue <- function (regr, resp, stat.by, split.by, strata) {
     "data <- data[stats::complete.cases(data), , drop = FALSE]",
     if (!is.null(stat.by)) "data$.stat.by <- droplevels(as.factor(data$.stat.by))",
     if (!is.null(strata))  "data$.strata <- droplevels(as.factor(data$.strata))",
+    vapply(cov_cat, FUN.VALUE = '', function (col) {
+      sprintf("data$%s <- droplevels(as.factor(data$%s))", col, col) }),
     vapply(split.by, FUN.VALUE = '', function (col) {
       sprintf("data[[%s]] <- droplevels(as.factor(data[[%s]]))", double_quote(col), double_quote(col)) }) ) %>%
     paste(collapse = "\n")
@@ -409,10 +416,12 @@ stats_wrap <- function (pre_code, test_code, stat.by, split.by, pairwise) {
 # Run the test, report failures in one message, and decorate the result
 # with its code and header. `model` is the text shown as the tibble header.
 #________________________________________________________
-stats_finalize <- function (df, pre, test, regr, resp, stat.by, split.by, strata, p.adj, pairwise, model) {
+stats_finalize <- function (df, pre, test, regr, resp, stat.by, split.by, strata, p.adj, pairwise, model, covariates = NULL) {
+
+  covs <- stats_covs(covariates)
 
   code <- paste(sep = "\n\n",
-    stats_prologue(regr, resp, stat.by, split.by, strata),
+    stats_prologue(regr, resp, stat.by, split.by, strata, covs, stats_cov_cat(df, covs)),
     stats_wrap(pre$code, test$code, stat.by, split.by, pairwise),
     paste(sep = "\n",
       sprintf("stats <- dplyr::mutate(stats, .adj.p = p.adjust(.p.val, %s), .after = .p.val)", double_quote(p.adj)),
@@ -425,7 +434,7 @@ stats_finalize <- function (df, pre, test, regr, resp, stat.by, split.by, strata
   #________________________________________________________
   msgs  <- character()
   stats <- withCallingHandlers(
-    expr    = stats_run(df, regr, resp, stat.by, split.by, strata, pre, test, pairwise, p.adj),
+    expr    = stats_run(df, regr, resp, stat.by, split.by, strata, pre, test, pairwise, p.adj, covariates),
     warning = function (w) {
       msgs <<- c(msgs, conditionMessage(w))
       invokeRestart('muffleWarning') })
@@ -433,7 +442,9 @@ stats_finalize <- function (df, pre, test, regr, resp, stat.by, split.by, strata
   stats_report(stats, unique(msgs), key_cols = c(split.by, stat.by))
 
   stats <- as_rbiom_tbl(stats)
-  attr(stats, 'tbl_sum') <- c('Model' = model)
+  attr(stats, 'tbl_sum') <- c(
+    'Model' = model,
+    if (length(covs) > 0) c('Covariates' = paste(sprintf("%s = %s", names(covs), covs), collapse = ", ")) )
   attr(stats, 'code')    <- code
 
   # The data's provenance (its history and the command that made it), so
@@ -493,7 +504,8 @@ stats_model_type <- function (fit, strata = FALSE) {
 
 # The model formula. `regr`, `stat.by`, and `strata` are column names, or
 # NULL to omit the term. `k` is the gam basis dimension (NULL to omit).
-stats_formula <- function (fit, resp = ".resp", regr = ".regr", stat.by = NULL, strata = NULL, k = NULL) {
+# `covs` are covariate column names, added as linear terms (or factors).
+stats_formula <- function (fit, resp = ".resp", regr = ".regr", stat.by = NULL, strata = NULL, k = NULL, covs = NULL) {
 
   stopifnot(fit %in% c('lm', 'log', 'gam'))
 
@@ -523,6 +535,9 @@ stats_formula <- function (fit, resp = ".resp", regr = ".regr", stat.by = NULL, 
       'gam' = call('+', smooth(regr, by = stat.by), as.name(stat.by)) )
   }
 
+  for (cov in covs)
+    rhs <- if (identical(rhs, 1)) as.name(cov) else call('+', rhs, as.name(cov))
+
   if (!is.null(strata))
     rhs <- call('+', rhs, as.call(list(as.name('s'), as.name(strata), bs = 're')))
 
@@ -531,32 +546,113 @@ stats_formula <- function (fit, resp = ".resp", regr = ".regr", stat.by = NULL, 
 
 
 # The formula as code text, e.g. for the tibble header. `k` may be text
-# such as "gam_k".
-stats_formula_str <- function (fit, stat.by = FALSE, regr = TRUE, strata = FALSE, k = NULL) {
+# such as "gam_k". `covs` as for stats_covs().
+stats_formula_str <- function (fit, stat.by = FALSE, regr = TRUE, strata = FALSE, k = NULL, covs = NULL) {
 
   frm <- stats_formula(
     fit     = fit,
     regr    = if (isTRUE(regr))    ".regr",
     stat.by = if (isTRUE(stat.by)) ".stat.by",
     strata  = if (isTRUE(strata))  ".strata",
-    k       = if (!is.null(k)) as.name(k) )
+    k       = if (!is.null(k)) as.name(k),
+    covs    = names(covs) )
 
   paste(deparse(frm, width.cutoff = 500L), collapse = "")
 }
 
 
-# Code that fits `model` from the data.frame named `var`.
-stats_model_code <- function (var, fit, stat.by = FALSE, regr = TRUE, strata = FALSE) {
+# Code that fits `model` from the data.frame named `var`. With covariates,
+# it first checks that each of them varies and that they aren't confounded
+# with the other terms (see stats_cov_check()).
+stats_model_code <- function (var, fit, stat.by = FALSE, regr = TRUE, strata = FALSE, covs = NULL) {
 
-  type <- stats_model_type(fit, strata)
+  type  <- stats_model_type(fit, strata)
+  check <- stats_cov_check_code(var, covs, fit, stat.by, regr)
 
   if (type == 'lm')
-    return (sprintf("model <- stats::lm(%s, data = %s)", stats_formula_str(fit, stat.by, regr, strata), var))
+    return (paste(collapse = "\n", c(
+      check,
+      sprintf("model <- stats::lm(%s, data = %s)", stats_formula_str(fit, stat.by, regr, strata, covs = covs), var) )))
 
   paste(collapse = "\n", c(
+    check,
     if (fit == 'gam') gam_basis_k_code(var, regr, stat.by),
-    sprintf("model <- mgcv::gam(%s, data = %s, method = 'REML')", stats_formula_str(fit, stat.by, regr, strata, k = if (fit == 'gam') 'gam_k'), var) ))
+    sprintf("model <- mgcv::gam(%s, data = %s, method = 'REML')", stats_formula_str(fit, stat.by, regr, strata, k = if (fit == 'gam') 'gam_k', covs = covs), var) ))
 }
+
+
+
+#________________________________________________________
+# Covariates. In the data they are renamed `.cov1`, `.cov2`, ...;
+# stats_covs() returns the original field names named by those columns,
+# e.g. c(.cov1 = "Sex", .cov2 = "Age"), or NULL.
+#________________________________________________________
+stats_covs <- function (covariates) {
+  if (length(covariates) == 0) return (NULL)
+  stats::setNames(covariates, paste0(".cov", seq_along(covariates)))
+}
+
+# The covariate columns that are categorical (converted to factors).
+stats_cov_cat <- function (df, covs) {
+  if (length(covs) == 0) return (NULL)
+  names(covs)[!vapply(unname(covs), function (col) is.numeric(df[[col]]), logical(1))]
+}
+
+#________________________________________________________
+# Covariates that can't be in the model, reported clearly instead of
+# failing inside lm() / emmeans or, worse, being silently dropped by
+# gam(), which sets aliased coefficients to zero:
+#   * a covariate with a single value (e.g. within a pair of groups);
+#   * covariates confounded with `stat.by`, `regr`, or each other (the
+#     fixed-effects design matrix is rank deficient).
+#________________________________________________________
+stats_cov_check <- function (df, covs, fit, stat.by = FALSE, regr = FALSE) {
+
+  if (length(covs) == 0) return (invisible(NULL))
+
+  for (col in names(covs))
+    if (length(unique(df[[col]])) < 2)
+      stop(stats_cov_msg(covs[[col]]), call. = FALSE)
+
+  # droplevels(): a pair's subset still has every `.stat.by` level.
+  X <- stats::model.matrix(stats_cov_formula(fit, stat.by, regr, covs), data = droplevels(df))
+  if (qr(X)$rank < ncol(X))
+    stop(STATS_COV_CONFOUNDED, call. = FALSE)
+
+  return (invisible(NULL))
+}
+
+stats_cov_check_code <- function (var, covs, fit, stat.by = FALSE, regr = FALSE) {
+
+  if (length(covs) == 0) return (NULL)
+
+  frm <- paste(deparse(stats_cov_formula(fit, stat.by, regr, covs), width.cutoff = 500L), collapse = "")
+
+  c(
+    vapply(names(covs), FUN.VALUE = '', USE.NAMES = FALSE, function (col) {
+      sprintf(
+        "if (length(unique(%s$%s)) < 2) stop(%s)",
+        var, col, double_quote(stats_cov_msg(covs[[col]])) )
+    }),
+    sprintf("X     <- stats::model.matrix(%s, data = droplevels(%s))", frm, var),
+    sprintf("if (qr(X)$rank < ncol(X)) stop(%s)", double_quote(STATS_COV_CONFOUNDED)) )
+}
+
+# The fixed effects, additively: `~ .stat.by + .regr + .cov1 + ...`.
+stats_cov_formula <- function (fit, stat.by, regr, covs) {
+  terms <- c(
+    if (isTRUE(stat.by)) list(as.name('.stat.by')),
+    if (isTRUE(regr))    list(if (fit == 'log') quote(log(.regr)) else as.name('.regr')),
+    lapply(names(covs), as.name) )
+  rhs <- Reduce(function (a, b) call('+', a, b), terms)
+  structure(call('~', rhs), class = 'formula', .Environment = baseenv())
+}
+
+stats_cov_msg <- function (name) {
+  sprintf("covariate '%s' has the same value in every observation", name)
+}
+
+STATS_COV_CONFOUNDED <- "the covariates are confounded with `stat.by`, `regr`, or each other"
 
 
 #________________________________________________________
@@ -597,10 +693,10 @@ gam_basis_k_code <- function (var, regr = TRUE, stat.by = FALSE) {
 
 
 # The model description shown as the tibble header.
-stats_model_str <- function (fit, stat.by = FALSE, regr = TRUE, strata = FALSE) {
+stats_model_str <- function (fit, stat.by = FALSE, regr = TRUE, strata = FALSE, covs = NULL) {
 
   type <- stats_model_type(fit, strata)
-  frm  <- stats_formula_str(fit, stat.by, regr, strata)
+  frm  <- stats_formula_str(fit, stat.by, regr, strata, covs = covs)
 
   if (type == 'lm') sprintf("lm(%s)", frm) else sprintf("gam(%s, method = 'REML')", frm)
 }
@@ -634,7 +730,7 @@ stats_gof_vals <- function (type, model, gof) {
 # `lm`/`log` fits into linear mixed models. The data is embedded in the
 # model's call so that emmeans can recover it.
 #________________________________________________________
-stats_fit_model <- function (df, fit, stat.by = FALSE, regr = ".regr", resp = ".resp", strata = NULL) {
+stats_fit_model <- function (df, fit, stat.by = FALSE, regr = ".regr", resp = ".resp", strata = NULL, covs = NULL) {
 
   if (isTRUE(stat.by))  stat.by <- ".stat.by"
   if (isFALSE(stat.by)) stat.by <- NULL
@@ -642,9 +738,11 @@ stats_fit_model <- function (df, fit, stat.by = FALSE, regr = ".regr", resp = ".
   df <- as.data.frame(df)
   if (!is.null(strata)) df[[strata]] <- droplevels(as.factor(df[[strata]]))
 
+  stats_cov_check(df, covs, fit, stat.by = !is.null(stat.by), regr = !is.null(regr))
+
   type <- stats_model_type(fit, !is.null(strata))
   k    <- if (fit == 'gam') gam_basis_k(df, regr, stat.by)
-  frm  <- stats_formula(fit, resp, regr, stat.by, strata, k = k)
+  frm  <- stats_formula(fit, resp, regr, stat.by, strata, k = k, covs = names(covs))
 
   if (type == 'lm') { do.call(stats::lm, list(frm, data = df)) }
   else              { do.call(mgcv::gam, list(frm, data = df, method = "REML")) }

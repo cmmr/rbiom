@@ -11,6 +11,7 @@ adiv_stats(
   adiv = "Shannon",
   split.by = NULL,
   strata = NULL,
+  covariates = NULL,
   transform = "none",
   test = "emmeans",
   fit = "gam",
@@ -45,6 +46,18 @@ regression models (\code{test = "emmeans"} or \code{"emtrends"}) include a
 random intercept per stratum, fitted with \code{\link[mgcv:gam]{mgcv::gam()}} as
 \code{s(strata, bs = "re")} (a linear mixed model for \code{fit = "lm"} and
 \code{"log"}). Not supported by the rank tests. Default: \code{NULL}}
+
+\item{covariates}{Dataset field(s) to adjust for, such as age or
+antibiotic use. Each is added to the regression model as a linear
+term (numeric fields) or a factor (categorical fields), and the
+reported means, slopes, and differences are adjusted for them:
+\code{\link[emmeans:emmeans]{emmeans::emmeans()}} holds numeric covariates at their mean and
+averages over the levels of categorical ones with equal weights.
+Only for \code{test = "emmeans"} or \code{"emtrends"}; the rank tests can't
+adjust for covariates. Rows with an \code{NA} in a covariate are
+dropped. A covariate that has the same value in every observation
+of a comparison (e.g. within a pair of groups) gives an \code{NA} row
+and a warning naming it. Default: \code{NULL}}
 
 \item{transform}{Transformation to apply to the diversity values.
 Options are: \code{c("none", "rank", "log", "log1p", "sqrt")}. \code{"rank"}
@@ -120,7 +133,8 @@ A convenience wrapper for \code{\link[=adiv_table]{adiv_table()}} + \code{\link[
 
 Which quantity is tested depends on \code{test} and on whether \code{regr} and
 \code{stat.by} are given. Rows with an \code{NA} in any of the \code{regr}, \code{resp},
-\code{stat.by}, \code{split.by}, or \code{strata} fields are dropped (with a message).\tabular{llll}{
+\code{stat.by}, \code{split.by}, \code{strata}, or \code{covariates} fields are dropped
+(with a message).\tabular{llll}{
    \code{regr} \tab \code{stat.by} \tab \code{test = "emmeans"} \tab \code{test = "emtrends"} \cr
    no \tab no \tab mean of \code{resp} vs \code{mu} \tab (not allowed) \cr
    no \tab yes \tab pairwise differences in group means (\code{.mean.diff}) \tab (not allowed) \cr
@@ -134,6 +148,11 @@ For \code{fit = "log"}, the slope is with respect to \code{log(regr)}.
 for pairwise comparisons (always \verb{!= 0}) and for the smooth-term test.
 Pairwise comparisons fit a separate model to each pair of groups.
 Without \code{regr}, \code{fit} is irrelevant: the model is \code{resp ~ stat.by}.
+\code{covariates} are added to every model (in the formula, as \code{.cov1},
+\code{.cov2}, ...; the table header names them), so that each of the
+quantities above is adjusted for them. For example,
+\verb{stat.by = "Treatment", covariates = "Age"} compares the groups' means
+at the average age.
 
 \code{test = "wilcox"} runs \code{\link[stats:wilcox.test]{stats::wilcox.test()}} (one-sample against \code{mu},
 or two-sample for each pair of \code{stat.by} groups) with \code{exact = NULL}, so

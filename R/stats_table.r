@@ -18,6 +18,18 @@
 #'        `s(strata, bs = "re")` (a linear mixed model for `fit = "lm"` and
 #'        `"log"`). Not supported by the rank tests. Default: `NULL`
 #'
+#' @param covariates   Dataset field(s) to adjust for, such as age or
+#'        antibiotic use. Each is added to the regression model as a linear
+#'        term (numeric fields) or a factor (categorical fields), and the
+#'        reported means, slopes, and differences are adjusted for them:
+#'        [emmeans::emmeans()] holds numeric covariates at their mean and
+#'        averages over the levels of categorical ones with equal weights.
+#'        Only for `test = "emmeans"` or `"emtrends"`; the rank tests can't
+#'        adjust for covariates. Rows with an `NA` in a covariate are
+#'        dropped. A covariate that has the same value in every observation
+#'        of a comparison (e.g. within a pair of groups) gives an `NA` row
+#'        and a warning naming it. Default: `NULL`
+#'
 #' @param at   Position(s) along `regr` where group means or local slopes
 #'        are evaluated. Only used by `test = "emmeans"` with `stat.by`, and
 #'        by `test = "emtrends"` with `fit = "gam"` (the other combinations
@@ -37,7 +49,8 @@
 #'
 #' Which quantity is tested depends on `test` and on whether `regr` and
 #' `stat.by` are given. Rows with an `NA` in any of the `regr`, `resp`,
-#' `stat.by`, `split.by`, or `strata` fields are dropped (with a message).
+#' `stat.by`, `split.by`, `strata`, or `covariates` fields are dropped
+#' (with a message).
 #'
 #' | `regr` | `stat.by` | `test = "emmeans"` | `test = "emtrends"` |
 #' | ------ | --------- | ------------------ | ------------------- |
@@ -51,6 +64,11 @@
 #' for pairwise comparisons (always `!= 0`) and for the smooth-term test.
 #' Pairwise comparisons fit a separate model to each pair of groups.
 #' Without `regr`, `fit` is irrelevant: the model is `resp ~ stat.by`.
+#' `covariates` are added to every model (in the formula, as `.cov1`,
+#' `.cov2`, ...; the table header names them), so that each of the
+#' quantities above is adjusted for them. For example,
+#' `stat.by = "Treatment", covariates = "Age"` compares the groups' means
+#' at the average age.
 #'
 #' `test = "wilcox"` runs [stats::wilcox.test()] (one-sample against `mu`,
 #' or two-sample for each pair of `stat.by` groups) with `exact = NULL`, so
@@ -107,10 +125,14 @@
 #'     # Repeated measures: a random intercept per subject.
 #'     df <- adiv_table(babies)
 #'     stats_table(df, regr = "Age", stat.by = "Delivery", strata = "Subject", fit = "lm")
+#'
+#'     # Adjusting for covariates.
+#'     df <- adiv_table(biom)
+#'     stats_table(df, stat.by = "Sex", covariates = c("Age", "Body Site"))
 
 stats_table <- function (
     df, regr = NULL, resp = attr(df, 'response'),
-    stat.by = NULL, split.by = NULL, strata = NULL,
+    stat.by = NULL, split.by = NULL, strata = NULL, covariates = NULL,
     test = "emmeans", fit = "gam", at = NULL,
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
 
@@ -150,6 +172,7 @@ stats_table <- function (
       validate_df_field('stat.by',  col_type = "cat", null_ok = TRUE,            force = FALSE, drop_na = FALSE)
       validate_df_field('split.by', col_type = "cat", null_ok = TRUE, max = Inf, force = FALSE, drop_na = FALSE)
       validate_df_field('strata',   col_type = "cat", null_ok = TRUE,            force = FALSE, drop_na = FALSE)
+      validate_df_field('covariates',                  null_ok = TRUE, max = Inf, force = FALSE, drop_na = FALSE)
 
       validate_var_choices('test',  c("wilcox", "kruskal", "emmeans", "emtrends"))
       validate_var_choices('alt',   c("!=", ">", "<"))
@@ -164,11 +187,16 @@ stats_table <- function (
       #________________________________________________________
       # Warn about invalid combinations of parameters.
       #________________________________________________________
-      if (as.logical(anyDuplicated(c(regr, resp, stat.by, split.by, strata))))
-        cli_abort("`regr`, `resp`, `stat.by`, `split.by`, and `strata` must all be unique.")
+      if (as.logical(anyDuplicated(c(regr, resp, stat.by, split.by, strata, covariates))))
+        cli_abort("`regr`, `resp`, `stat.by`, `split.by`, `strata`, and `covariates` must all be unique.")
 
       if (is.null(regr) && !is.null(at))
         cli_warn('`at` is ignored when `regr` = NULL.')
+
+      if (test %in% c('wilcox', 'kruskal') && !is.null(covariates))
+        cli_abort(c(
+          'x' = "`covariates` is not supported by rank tests (`test = \"{test}\"`).",
+          'i' = "Use `test = \"emmeans\"` to adjust for covariates in a regression model." ))
 
       if (test %in% c('wilcox', 'kruskal')) {
         if (!eq(fit, "gam")) cli_warn('`fit` is ignored when `test` = "{test}".')
@@ -237,7 +265,7 @@ stats_table <- function (
 
 adiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, adiv = "Shannon",
-    split.by = NULL, strata = NULL, transform = "none",
+    split.by = NULL, strata = NULL, covariates = NULL, transform = "none",
     test = "emmeans", fit = "gam", at = NULL,
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
 
@@ -252,7 +280,7 @@ adiv_stats <- function (
   df <- adiv_table(
     biom      = biom,
     adiv      = adiv,
-    md        = unique(c(regr, stat.by, split.by, strata)),
+    md        = unique(c(regr, stat.by, split.by, strata, covariates)),
     transform = transform )
 
   if (nlevels(df$.adiv) > 1)
@@ -263,18 +291,19 @@ adiv_stats <- function (
   # Run statistics
   #________________________________________________________
   stats <- stats_table(
-    df       = df,
-    regr     = regr,
-    stat.by  = stat.by,
-    split.by = split.by,
-    strata   = strata,
-    test     = test,
-    fit      = fit,
-    at       = at,
-    level    = level,
-    alt      = alt,
-    mu       = mu,
-    p.adj    = p.adj )
+    df         = df,
+    regr       = regr,
+    stat.by    = stat.by,
+    split.by   = split.by,
+    strata     = strata,
+    covariates = covariates,
+    test       = test,
+    fit        = fit,
+    at         = at,
+    level      = level,
+    alt        = alt,
+    mu         = mu,
+    p.adj      = p.adj )
 
 
   return (prov_attach(stats, cmd, data = df))
@@ -667,7 +696,7 @@ bdiv_stats <- function (
 taxa_stats <- function (
     biom, regr = NULL, stat.by = NULL, rank = -1, taxa = 6,
     lineage = FALSE, unc = "singly", other = FALSE,
-    split.by = NULL, strata = NULL, transform = "none",
+    split.by = NULL, strata = NULL, covariates = NULL, transform = "none",
     test = "emmeans", fit = "gam", at = NULL,
     level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
 
@@ -684,7 +713,7 @@ taxa_stats <- function (
     rank      = rank,
     taxa      = taxa,
     lineage   = lineage,
-    md        = setdiff(unique(c(regr, stat.by, split.by, strata)), ".taxa"),
+    md        = setdiff(unique(c(regr, stat.by, split.by, strata, covariates)), ".taxa"),
     unc       = unc,
     other     = other,
     transform = transform )
@@ -697,18 +726,19 @@ taxa_stats <- function (
   # Run statistics
   #________________________________________________________
   stats <- stats_table(
-    df       = df,
-    regr     = regr,
-    stat.by  = stat.by,
-    split.by = split.by,
-    strata   = strata,
-    test     = test,
-    fit      = fit,
-    at       = at,
-    level    = level,
-    alt      = alt,
-    mu       = mu,
-    p.adj    = p.adj )
+    df         = df,
+    regr       = regr,
+    stat.by    = stat.by,
+    split.by   = split.by,
+    strata     = strata,
+    covariates = covariates,
+    test       = test,
+    fit        = fit,
+    at         = at,
+    level      = level,
+    alt        = alt,
+    mu         = mu,
+    p.adj      = p.adj )
 
 
   return (prov_attach(stats, cmd, data = df))

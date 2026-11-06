@@ -51,6 +51,16 @@
   within each stratum (exact enumeration when there are few arrangements). 
   Regression models include a random intercept per stratum. Rank tests report
   an error rather than ignoring `strata`.
+* New `covariates` argument for `stats_table()`, `adiv_stats()`, and 
+  `taxa_stats()`: fields to adjust for, added to the regression model as 
+  linear terms or factors, so that the reported means, slopes, and 
+  differences are adjusted (emmeans holds numeric covariates at their mean 
+  and averages over the levels of categorical ones). For `test = "emmeans"` 
+  and `"emtrends"` only; rank tests report an error. A covariate that is 
+  constant within a comparison, or confounded with `stat.by` or `regr`, is 
+  reported as such (an NA row and a warning, or an error when there is only 
+  one test), rather than as an obscure error or, for `gam` fits, a silently
+  dropped coefficient.
 * `bdiv_ord_table()` / `bdiv_ord_plot()` compute distances on the data as 
   given (no hidden relativization), use `stats::cmdscale()` for PCoA with 
   "% variance explained" axis labels, and test taxa biplot vectors with 

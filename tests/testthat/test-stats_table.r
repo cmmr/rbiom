@@ -136,6 +136,109 @@ test_that("strata fits a random intercept", {
 })
 
 
+test_that("covariates adjust the regression tests", {
+
+  # Group difference adjusted for a numeric and a categorical covariate.
+  x <- stats_table(df, stat.by = "Sex", covariates = c("Age", "Body Site"))
+  m <- stats::lm(.diversity ~ Sex + Age + `Body Site`, data = df)
+  s <- summary(m)$coefficients
+  expect_identical(x$Sex, "Female - Male")
+  expect_equal(x$.mean.diff, -s['SexMale', 'Estimate'])
+  expect_equal(x$.se,         s['SexMale', 'Std. Error'])
+  expect_equal(x$.p.val,      s['SexMale', 'Pr(>|t|)'])
+  expect_equal(x$.df,         stats::df.residual(m))
+  expect_identical(
+    attr(x, 'tbl_sum')[c('Model', 'Covariates')],
+    c(Model = "lm(.resp ~ .stat.by + .cov1 + .cov2)", Covariates = ".cov1 = Age, .cov2 = Body Site") )
+
+  # Slope adjusted for a covariate (lm and emtrends agree).
+  x <- adiv_stats(b, regr = "Age", covariates = "Sex", fit = "lm")
+  s <- summary(stats::lm(.diversity ~ Age + Sex, data = df))$coefficients
+  expect_equal(x$.slope, s['Age', 'Estimate'])
+  expect_equal(x$.p.val, s['Age', 'Pr(>|t|)'])
+  expect_equal(adiv_stats(b, regr = "Age", covariates = "Sex", fit = "lm", test = "emtrends")$.slope, x$.slope)
+
+  # The smooth term's significance, adjusted.
+  x <- adiv_stats(b, regr = "Age", covariates = "Sex")
+  g <- mgcv::gam(.diversity ~ s(Age, bs = 'cs', k = 9) + Sex, data = df, method = 'REML')
+  expect_equal(x$.p.val, unname(summary(g)$s.table['s(Age)', 'p-value']))
+
+  # A numeric covariate alone: the adjusted mean is the overall mean.
+  expect_equal(stats_table(df, covariates = "Age")$.mean, mean(df$.diversity))
+
+  # Group means at `at`, adjusted.
+  x <- adiv_stats(b, regr = "Age", stat.by = "Sex", covariates = "Body Site", fit = "lm", at = 30)
+  m <- stats::lm(.diversity ~ Age * Sex + `Body Site`, data = df)
+  expect_equal(x$.mean.diff, -unname(coef(m)[['SexMale']] + 30 * coef(m)[['Age:SexMale']]))
+
+  # taxa_stats passes covariates through.
+  x <- taxa_stats(b, stat.by = "Sex", covariates = "Age", rank = "Phylum", taxa = 2)
+  expect_identical(attr(x, 'tbl_sum')[['Covariates']], ".cov1 = Age")
+
+  # Replays, including the factor conversion of a categorical covariate.
+  x <- adiv_stats(b, stat.by = "Body Site", covariates = c("Sex", "Age"))
+  expect_match(x$code, "data$.cov1 <- droplevels(as.factor(data$.cov1))", fixed = TRUE)
+  expect_equal(strip(replay_stats(x)), strip(x), tolerance = 1e-6)
+
+  # Within split.by strata. Mid vagina is all female, so Sex can't be
+  # adjusted for there: that stratum is an NA row, named in the warning.
+  expect_warning(
+    x <- adiv_stats(b, regr = "Age", split.by = "Body Site", covariates = "Sex", fit = "lm"),
+    "covariate 'Sex' has the same value" )
+  expect_identical(as.character(x$`Body Site`[is.na(x$.p.val)]), "Mid vagina")
+  stool <- df[df$`Body Site` == "Stool", ]
+  s <- summary(stats::lm(.diversity ~ Age + Sex, data = stool))$coefficients
+  expect_equal(x$.slope[x$`Body Site` == "Stool"], s['Age', 'Estimate'])
+  expect_equal(strip(suppressWarnings(replay_stats(x))), strip(x), tolerance = 1e-6)
+})
+
+
+test_that("covariates: NA rows, constant values, and invalid uses", {
+
+  d <- df
+  d$Age[1:4] <- NA
+  expect_message(stats_table(d, stat.by = "Sex", covariates = "Age"), "Dropped 4")
+
+  # A covariate that is constant within a pair of groups (6 pairs without
+  # Stool) or confounded with them (4 pairs with Stool): NA rows and one
+  # warning that says why.
+  b2 <- mutate(b, Stool = `Body Site` == "Stool")
+  w  <- tryCatch(adiv_stats(b2, stat.by = "Body Site", covariates = "Stool"), warning = function (w) w)
+  expect_match(conditionMessage(w), "covariate 'Stool' has the same value in every observation", fixed = TRUE)
+  expect_match(conditionMessage(w), "confounded", fixed = TRUE)
+  x <- suppressWarnings(adiv_stats(b2, stat.by = "Body Site", covariates = "Stool"))
+  expect_true(all(is.na(x$.p.val)))
+  expect_equal(strip(suppressWarnings(replay_stats(x))), strip(x), tolerance = 1e-6)
+
+  # Confounded with `regr`, for lm and for gam (which would otherwise
+  # silently set the aliased coefficient to zero).
+  d <- df
+  d$Age2 <- 2 * d$Age
+  expect_error(stats_table(d, regr = "Age", covariates = "Age2", fit = "lm"), "confounded")
+  expect_error(stats_table(d, regr = "Age", covariates = "Age2"), "confounded")
+  # Pairwise comparisons are guarded: an NA row and a warning.
+  d$Group <- d$Sex
+  expect_warning(x <- stats_table(d, stat.by = "Sex", covariates = "Group"), "confounded")
+  expect_true(is.na(x$.p.val))
+
+  expect_error(stats_table(df, stat.by = "Sex", covariates = "Sex"), "unique")
+  expect_error(stats_table(df, stat.by = "Sex", covariates = "nope"), "covariates")
+  expect_error(stats_table(df, stat.by = "Sex", covariates = "Age", test = "wilcox"), "rank tests")
+  expect_error(adiv_stats(b, stat.by = "Sex", covariates = "Age", test = "kruskal"), "rank tests")
+})
+
+
+test_that("covariates with strata", {
+
+  skip_on_cran()
+
+  bb <- rarefy(babies)
+  x  <- adiv_stats(bb, regr = "Age", strata = "Subject", covariates = "Delivery", fit = "lm")
+  expect_match(attr(x, 'tbl_sum')[['Model']], ".regr + .cov1 + s(.strata, bs = \"re\")", fixed = TRUE)
+  expect_equal(strip(replay_stats(x)), strip(x), tolerance = 1e-6)
+})
+
+
 test_that("NA rows and small groups are reported", {
 
   d <- df

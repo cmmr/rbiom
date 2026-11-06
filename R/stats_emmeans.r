@@ -19,27 +19,29 @@
 
 stats_emmeans <- function (
     df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL,
-    strata = NULL, fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+    strata = NULL, covariates = NULL, fit = "gam", at = NULL, level = 0.95,
+    alt = "!=", mu = 0, p.adj = 'fdr' ) {
 
   stats_regression(
     df = df, regr = regr, resp = resp, stat.by = stat.by, split.by = split.by,
-    strata = strata, test = "emmeans", fit = fit, at = at, level = level,
-    alt = alt, mu = mu, p.adj = p.adj )
+    strata = strata, covariates = covariates, test = "emmeans", fit = fit,
+    at = at, level = level, alt = alt, mu = mu, p.adj = p.adj )
 }
 
 
 
 stats_emtrends <- function (
     df, regr = NULL, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL,
-    strata = NULL, fit = "gam", at = NULL, level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
+    strata = NULL, covariates = NULL, fit = "gam", at = NULL, level = 0.95,
+    alt = "!=", mu = 0, p.adj = 'fdr' ) {
 
   if (is.null(regr))
     cli_abort('`regr` is required when `test` = "emtrends".')
 
   stats_regression(
     df = df, regr = regr, resp = resp, stat.by = stat.by, split.by = split.by,
-    strata = strata, test = "emtrends", fit = fit, at = at, level = level,
-    alt = alt, mu = mu, p.adj = p.adj )
+    strata = strata, covariates = covariates, test = "emtrends", fit = fit,
+    at = at, level = level, alt = alt, mu = mu, p.adj = p.adj )
 }
 
 
@@ -50,13 +52,14 @@ stats_emtrends <- function (
 # combination. See stats_table() for the semantics of each case.
 #________________________________________________________
 stats_regression <- function (
-    df, regr, resp, stat.by, split.by, strata, test, fit, at, level, alt, mu, p.adj ) {
+    df, regr, resp, stat.by, split.by, strata, covariates = NULL, test, fit, at, level, alt, mu, p.adj ) {
 
-  stats_validate(df, regr, resp, stat.by, split.by, strata)
+  stats_validate(df, regr, resp, stat.by, split.by, strata, covariates)
 
   has_regr    <- !is.null(regr)
   has_stat.by <- !is.null(stat.by)
   has_strata  <- !is.null(strata)
+  covs        <- stats_covs(covariates)
 
   # Without `regr` there is no trend to fit: the model is `.resp ~ .stat.by`
   # (or `.resp ~ 1`), fitted with lm(), or with gam() only to add `strata`.
@@ -105,11 +108,12 @@ stats_regression <- function (
       fit     = fit,
       stat.by = has_stat.by,
       regr    = if (has_regr)   ".regr",
-      strata  = if (has_strata) ".strata" )
+      strata  = if (has_strata) ".strata",
+      covs    = covs )
   }
 
   fit_code <- paste(sep = "\n",
-    stats_model_code(var, fit, stat.by = has_stat.by, regr = has_regr, strata = has_strata),
+    stats_model_code(var, fit, stat.by = has_stat.by, regr = has_regr, strata = has_strata, covs = covs),
     "gof   <- summary(model)" )
 
   gof_vals <- function (model, gof) stats_gof_vals(type, model, gof)
@@ -145,7 +149,7 @@ stats_regression <- function (
       },
 
       code = paste(sep = "\n",
-        stats_model_code("data", fit, stat.by = FALSE, regr = FALSE, strata = has_strata),
+        stats_model_code("data", fit, stat.by = FALSE, regr = FALSE, strata = has_strata, covs = covs),
         sprintf("emm   <- emmeans::emmeans(model, specs = ~ 1, infer = TRUE, level = %s)", level_code),
         sprintf("summ  <- summary(emm, %s)", side_code),
         tibble_code(c(
@@ -313,7 +317,7 @@ stats_regression <- function (
       },
 
       code = paste(sep = "\n",
-        stats_model_code("pdata", fit, stat.by = TRUE, regr = FALSE, strata = has_strata),
+        stats_model_code("pdata", fit, stat.by = TRUE, regr = FALSE, strata = has_strata, covs = covs),
         "emm   <- emmeans::emmeans(model, specs = ~ .stat.by)",
         "summ  <- summary(emmeans::contrast(emm, method = 'pairwise'), infer = TRUE)",
         "eff   <- as.data.frame(emmeans::eff_size(emm, sigma = stats::sigma(model), edf = stats::df.residual(model)))",
@@ -480,5 +484,6 @@ stats_regression <- function (
     strata   = strata,
     p.adj    = p.adj,
     pairwise = pairwise,
-    model    = stats_model_str(fit, has_stat.by, has_regr, has_strata) )
+    model    = stats_model_str(fit, has_stat.by, has_regr, has_strata, covs),
+    covariates = covariates )
 }

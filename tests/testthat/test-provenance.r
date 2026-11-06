@@ -140,6 +140,9 @@ test_that("statistics replay", {
     taxa_stats(b, regr = "BMI", rank = "Phylum", taxa = 3, fit = "lm"),
     distmat_stats(bdiv_distmat(b, "bray"), pull(b, "Body Site")),
     stats_table(adiv_table(b, md = c("Sex", "Age")), stat.by = "Sex", regr = "Age"),
+    adiv_stats(b, stat.by = "Body Site", covariates = c("Sex", "Age")),
+    adiv_stats(b, regr = "Age", stat.by = "Sex", covariates = "Body Site", test = "emtrends"),
+    taxa_stats(b, regr = "BMI", covariates = c("Age", "Sex"), rank = "Phylum", taxa = 3, fit = "log"),
     suppressMessages(taxa_da(b, stat.by = "Sex", rank = "Genus", taxa = 5)),
     suppressMessages(taxa_da(b, regr = "Age", covariates = "Sex", split.by = "Old", rank = c("Phylum", "Genus"))) )) {
 
@@ -227,6 +230,7 @@ test_that("hostile names cannot inject code", {
     adiv_table(b, md = inj),
     taxa_table(b, rank = "Genus", taxa = 3, md = inj),
     adiv_stats(b, stat.by = inj, test = "wilcox"),
+    adiv_stats(b, regr = "Age", covariates = inj, fit = "lm"),
     adiv_boxplot(b, x = inj, stat.by = inj),
     taxa_stacked(b, rank = "Genus", taxa = 3),
     taxa_boxplot(b, rank = "Phylum", taxa = 2, x = inj),
