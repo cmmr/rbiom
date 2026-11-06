@@ -88,14 +88,11 @@
 </ul></div>
 <div class="section level3">
 <h3 id="differential-abundance-4-0-0">Differential abundance<a class="anchor" aria-label="anchor" href="#differential-abundance-4-0-0"></a></h3>
-<ul><li>New <code><a href="../reference/taxa_da.html">taxa_da()</a></code> finds differentially abundant taxa with methods that account for compositionality, between groups (<code>stat.by</code>; every pair of groups) or along a numeric variable (<code>regr</code>), with optional <code>covariates</code>, <code>strata</code> (a random intercept per subject), <code>split.by</code>, and several ranks. Two methods:
 <ul><li>
-<code>"linda"</code> (default): LinDA (Zhou et al. 2022), built in. It gives the results of <code>MicrobiomeStat::linda()</code> (to within 1e-10 on hmp50), except that it imputes zeros when sequencing depth is associated with the model, as the paper describes (<code>MicrobiomeStat::linda()</code> 1.4 reports imputation but adds a pseudo-count). Comparisons between two non-reference groups are corrected by the mode of their own contrast, so they don’t depend on the order of the groups.</li>
-<li>
-<code>"ancombc2"</code>: ANCOM-BC2 (Lin &amp; Peddada 2024) via <code><a href="https://rdrr.io/pkg/ANCOMBC/man/ancombc2.html" class="external-link">ANCOMBC::ancombc2()</a></code>, with its pseudo-count sensitivity analysis (<code>.robust</code>) and, for three or more groups, its mixed directional FDR pairwise tests.</li>
-</ul>
-Both report log2 fold changes with standard errors, confidence intervals, t statistics, and p-values adjusted across taxa within each comparison. <code>$code</code> names the method, its model, and the exact <code>ancombc2()</code> call.</li>
-<li>New <code><a href="../reference/taxa_forest.html">taxa_forest()</a></code> plots <code><a href="../reference/taxa_da.html">taxa_da()</a></code> results: each taxon’s log2 fold change and confidence interval, colored by direction when significant, with one panel per comparison (and rank and <code>split.by</code> subset) and the <code>p.top</code> most significant taxa ordered by fold change.</li>
+<p>New <code><a href="../reference/taxa_da.html">taxa_da()</a></code> finds differentially abundant taxa with LinDA (Zhou et al. 2022), which accounts for compositionality, between groups (<code>stat.by</code>; every pair of groups) or along a numeric variable (<code>regr</code>), with optional <code>covariates</code>, <code>strata</code> (a random intercept per subject), <code>split.by</code>, and several ranks. LinDA is built in. It gives the results of <code>MicrobiomeStat::linda()</code> (to within 1e-10 on hmp50), except that it imputes zeros when sequencing depth is associated with the model, as the paper describes (<code>MicrobiomeStat::linda()</code> 1.4 reports imputation but adds a pseudo-count). Comparisons between two non-reference groups are corrected by the mode of their own contrast, so they don’t depend on the order of the groups.</p>
+<p>It reports log2 fold changes with standard errors, confidence intervals, t statistics, and p-values adjusted across taxa within each comparison. <code>$code</code> names the method and its model.</p>
+</li>
+<li><p>New <code><a href="../reference/taxa_forest.html">taxa_forest()</a></code> plots <code><a href="../reference/taxa_da.html">taxa_da()</a></code> results: each taxon’s log2 fold change and confidence interval, colored by direction when significant, with one panel per comparison (and rank and <code>split.by</code> subset) and the <code>p.top</code> most significant taxa ordered by fold change.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="data-handling-4-0-0">Data handling<a class="anchor" aria-label="anchor" href="#data-handling-4-0-0"></a></h3>
@@ -144,14 +141,14 @@ Both report log2 fold changes with standard errors, confidence intervals, t stat
 <li>
 <code>bdiv = "unifrac"</code> is now an error because it is ambiguous; name the variant (e.g. <code>"unweighted_unifrac"</code>).</li>
 <li>
-<code>ord = "tSNE"</code> uses <code><a href="https://rdrr.io/pkg/Rtsne/man/Rtsne.html" class="external-link">Rtsne::Rtsne()</a></code> instead of <code><a href="https://rdrr.io/pkg/tsne/man/tsne.html" class="external-link">tsne::tsne()</a></code>. It is about 8-15x faster from a few hundred samples up and keeps more of each sample’s nearest neighbors together. Coordinates differ from earlier versions for the same <code>seed</code>. Rtsne arguments such as <code>theta</code>, <code>max_iter</code>, <code>Y_init</code>, and <code>num_threads</code> can be passed through <code>...</code>; the old tsne arguments (<code>initial_config</code>, <code>whiten</code>, <code>epoch</code>, …) are ignored. <code>perplexity</code> now defaults to <code>(n - 1) / 3</code> for fewer than 91 samples, since the previous default of 30 cannot be reached with so few.</li>
+<code>ord = "tSNE"</code> uses <code><a href="https://rdrr.io/pkg/Rtsne/man/Rtsne.html" class="external-link">Rtsne::Rtsne()</a></code> instead of <code>tsne::tsne()</code>. It is about 8-15x faster from a few hundred samples up and keeps more of each sample’s nearest neighbors together. Coordinates differ from earlier versions for the same <code>seed</code>. Rtsne arguments such as <code>theta</code>, <code>max_iter</code>, <code>Y_init</code>, and <code>num_threads</code> can be passed through <code>...</code>; the old tsne arguments (<code>initial_config</code>, <code>whiten</code>, <code>epoch</code>, …) are ignored. <code>perplexity</code> now defaults to <code>(n - 1) / 3</code> for fewer than 91 samples, since the previous default of 30 cannot be reached with so few.</li>
 <li>Statistics table columns changed as described above.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="dependencies-4-0-0">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-4-0-0"></a></h3>
 <ul><li>Removed: ape, crayon, ggtext, labeling, pillar, plyr, readr. Moved to Suggests: fillpattern, ggbeeswarm, ggrepel, readxl. Packages that were always required but undeclared (cli, glue, lifecycle, Matrix, R6, rlang, scales, tibble) are now in Imports, along with cluster and permute (both already installed with vegan).</li>
 <li>Suggests Rtsne instead of tsne.</li>
-<li>Suggests ANCOMBC (for <code>taxa_da(method = "ancombc2")</code>), and lmerTest and lme4 (for <code>taxa_da(method = "linda")</code> with <code>strata</code>).</li>
+<li>Suggests lmerTest and lme4 (for <code><a href="../reference/taxa_da.html">taxa_da()</a></code> with <code>strata</code>).</li>
 <li>Requires ecodive (&gt;= 2.3.1).</li>
 </ul></div>
 </div>

@@ -123,27 +123,22 @@
 ### Differential abundance
 
 - New [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md)
-  finds differentially abundant taxa with methods that account for
-  compositionality, between groups (`stat.by`; every pair of groups) or
-  along a numeric variable (`regr`), with optional `covariates`,
-  `strata` (a random intercept per subject), `split.by`, and several
-  ranks. Two methods:
-  - `"linda"` (default): LinDA (Zhou et al. 2022), built in. It gives
-    the results of `MicrobiomeStat::linda()` (to within 1e-10 on hmp50),
-    except that it imputes zeros when sequencing depth is associated
-    with the model, as the paper describes (`MicrobiomeStat::linda()`
-    1.4 reports imputation but adds a pseudo-count). Comparisons between
-    two non-reference groups are corrected by the mode of their own
-    contrast, so they don’t depend on the order of the groups.
-  - `"ancombc2"`: ANCOM-BC2 (Lin & Peddada 2024) via
-    [`ANCOMBC::ancombc2()`](https://rdrr.io/pkg/ANCOMBC/man/ancombc2.html),
-    with its pseudo-count sensitivity analysis (`.robust`) and, for
-    three or more groups, its mixed directional FDR pairwise tests.
+  finds differentially abundant taxa with LinDA (Zhou et al. 2022),
+  which accounts for compositionality, between groups (`stat.by`; every
+  pair of groups) or along a numeric variable (`regr`), with optional
+  `covariates`, `strata` (a random intercept per subject), `split.by`,
+  and several ranks. LinDA is built in. It gives the results of
+  `MicrobiomeStat::linda()` (to within 1e-10 on hmp50), except that it
+  imputes zeros when sequencing depth is associated with the model, as
+  the paper describes (`MicrobiomeStat::linda()` 1.4 reports imputation
+  but adds a pseudo-count). Comparisons between two non-reference groups
+  are corrected by the mode of their own contrast, so they don’t depend
+  on the order of the groups.
 
-  Both report log2 fold changes with standard errors, confidence
+  It reports log2 fold changes with standard errors, confidence
   intervals, t statistics, and p-values adjusted across taxa within each
-  comparison. `$code` names the method, its model, and the exact
-  `ancombc2()` call.
+  comparison. `$code` names the method and its model.
+
 - New
   [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md)
   plots [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md)
@@ -258,15 +253,14 @@
   variant (e.g. `"unweighted_unifrac"`).
 - `ord = "tSNE"` uses
   [`Rtsne::Rtsne()`](https://rdrr.io/pkg/Rtsne/man/Rtsne.html) instead
-  of [`tsne::tsne()`](https://rdrr.io/pkg/tsne/man/tsne.html). It is
-  about 8-15x faster from a few hundred samples up and keeps more of
-  each sample’s nearest neighbors together. Coordinates differ from
-  earlier versions for the same `seed`. Rtsne arguments such as `theta`,
-  `max_iter`, `Y_init`, and `num_threads` can be passed through `...`;
-  the old tsne arguments (`initial_config`, `whiten`, `epoch`, …) are
-  ignored. `perplexity` now defaults to `(n - 1) / 3` for fewer than 91
-  samples, since the previous default of 30 cannot be reached with so
-  few.
+  of `tsne::tsne()`. It is about 8-15x faster from a few hundred samples
+  up and keeps more of each sample’s nearest neighbors together.
+  Coordinates differ from earlier versions for the same `seed`. Rtsne
+  arguments such as `theta`, `max_iter`, `Y_init`, and `num_threads` can
+  be passed through `...`; the old tsne arguments (`initial_config`,
+  `whiten`, `epoch`, …) are ignored. `perplexity` now defaults to
+  `(n - 1) / 3` for fewer than 91 samples, since the previous default of
+  30 cannot be reached with so few.
 - Statistics table columns changed as described above.
 
 ### Dependencies
@@ -277,8 +271,9 @@
   rlang, scales, tibble) are now in Imports, along with cluster and
   permute (both already installed with vegan).
 - Suggests Rtsne instead of tsne.
-- Suggests ANCOMBC (for `taxa_da(method = "ancombc2")`), and lmerTest
-  and lme4 (for `taxa_da(method = "linda")` with `strata`).
+- Suggests lmerTest and lme4 (for
+  [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md) with
+  `strata`).
 - Requires ecodive (\>= 2.3.1).
 
 ## rbiom 3.1.1

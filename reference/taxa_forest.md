@@ -28,7 +28,6 @@ taxa_forest(
   p.adj = "fdr",
   lineage = FALSE,
   unc = "singly",
-  seed = 0,
   ...
 )
 ```
@@ -70,13 +69,13 @@ taxa_forest(
   taxa, a value 0 \<= n \< 1 reports the taxa with that mean relative
   abundance or greater, and a character vector reports the named taxa.
   Every taxon that passes `prev.cut` is still part of the analysis,
-  since both methods estimate the compositional bias from all of them,
-  and p-values are adjusted for all of them. Default: `NULL` (all tested
+  since LinDA estimates the compositional bias from all of them, and
+  p-values are adjusted for all of them. Default: `NULL` (all tested
   taxa).
 
 - method:
 
-  The differential abundance method: `"linda"` or `"ancombc2"`. See
+  The differential abundance method. Currently only `"linda"`. See
   Details. Default: `"linda"`
 
 - covariates:
@@ -94,10 +93,9 @@ taxa_forest(
 
   Dataset field with a blocking variable, such as a subject identifier
   for repeated measures. Must be categorical. Adds a random intercept
-  per stratum to every model: LinDA fits linear mixed models with
+  per stratum to every model, fitted as linear mixed models with
   [`lmerTest::lmer()`](https://rdrr.io/pkg/lmerTest/man/lmer.html)
-  (requires the lmerTest package), and ANCOM-BC2 uses
-  `rand_formula = "(1 | strata)"`. Default: `NULL`
+  (requires the lmerTest package). Default: `NULL`
 
 - p.top:
 
@@ -109,11 +107,7 @@ taxa_forest(
 - p.sig:
 
   Taxa with an adjusted p-value \<= `p.sig` are significant and colored
-  by the direction of the change. For ANCOM-BC2, a significant taxon
-  must also pass its pseudo-count sensitivity analysis (`.robust`). Also
-  passed to
-  [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
-  where it is ANCOM-BC2's `alpha`. Default: `0.05`
+  by the direction of the change. Default: `0.05`
 
 - colors:
 
@@ -145,9 +139,8 @@ taxa_forest(
   Method to use for multiple comparisons adjustment of p-values. Run
   `p.adjust.methods` for a list of available options. As is standard for
   differential abundance, p-values are adjusted across taxa separately
-  for each comparison (and each rank and `split.by` subset). ANCOM-BC2's
-  pairwise comparisons among three or more groups use its mixed
-  directional FDR procedure instead; see Details. Default: `"fdr"`
+  for each comparison (and each rank and `split.by` subset). Default:
+  `"fdr"`
 
 - lineage:
 
@@ -181,12 +174,6 @@ taxa_forest(
   :   To not check/modify any taxa names.
 
   Abbreviations are allowed. Default: `"singly"`
-
-- seed:
-
-  Random seed, for ANCOM-BC2. Results are reproducible for a given seed,
-  and the caller's random number generator state is left unchanged. Must
-  be a non-negative integer. Default: `0`
 
 - ...:
 

@@ -6,7 +6,8 @@ changes with a numeric variable (`regr`). Unlike
 which tests each taxon's abundance on its own, these methods account for
 the compositional nature of sequencing data: a sample's counts are a
 sample from the community, so an increase in one taxon lowers the
-observed proportions of all the others. Two methods are available:
+observed proportions of all the others. The method is LinDA (Zhou et al.
+2022), built into rbiom.
 
 ## Usage
 
@@ -24,10 +25,8 @@ taxa_da(
   prev.cut = 0.1,
   level = 0.95,
   p.adj = "fdr",
-  p.sig = 0.05,
   lineage = FALSE,
-  unc = "singly",
-  seed = 0
+  unc = "singly"
 )
 ```
 
@@ -68,13 +67,13 @@ taxa_da(
   taxa, a value 0 \<= n \< 1 reports the taxa with that mean relative
   abundance or greater, and a character vector reports the named taxa.
   Every taxon that passes `prev.cut` is still part of the analysis,
-  since both methods estimate the compositional bias from all of them,
-  and p-values are adjusted for all of them. Default: `NULL` (all tested
+  since LinDA estimates the compositional bias from all of them, and
+  p-values are adjusted for all of them. Default: `NULL` (all tested
   taxa).
 
 - method:
 
-  The differential abundance method: `"linda"` or `"ancombc2"`. See
+  The differential abundance method. Currently only `"linda"`. See
   Details. Default: `"linda"`
 
 - covariates:
@@ -92,10 +91,9 @@ taxa_da(
 
   Dataset field with a blocking variable, such as a subject identifier
   for repeated measures. Must be categorical. Adds a random intercept
-  per stratum to every model: LinDA fits linear mixed models with
+  per stratum to every model, fitted as linear mixed models with
   [`lmerTest::lmer()`](https://rdrr.io/pkg/lmerTest/man/lmer.html)
-  (requires the lmerTest package), and ANCOM-BC2 uses
-  `rand_formula = "(1 | strata)"`. Default: `NULL`
+  (requires the lmerTest package). Default: `NULL`
 
 - prev.cut:
 
@@ -112,15 +110,8 @@ taxa_da(
   Method to use for multiple comparisons adjustment of p-values. Run
   `p.adjust.methods` for a list of available options. As is standard for
   differential abundance, p-values are adjusted across taxa separately
-  for each comparison (and each rank and `split.by` subset). ANCOM-BC2's
-  pairwise comparisons among three or more groups use its mixed
-  directional FDR procedure instead; see Details. Default: `"fdr"`
-
-- p.sig:
-
-  ANCOM-BC2's significance level (its `alpha`), used by its pseudo-count
-  sensitivity analysis (`.robust`) and by the screening step of its
-  pairwise comparisons. Ignored by LinDA. Default: `0.05`
+  for each comparison (and each rank and `split.by` subset). Default:
+  `"fdr"`
 
 - lineage:
 
@@ -154,12 +145,6 @@ taxa_da(
   :   To not check/modify any taxa names.
 
   Abbreviations are allowed. Default: `"singly"`
-
-- seed:
-
-  Random seed, for ANCOM-BC2. Results are reproducible for a given seed,
-  and the caller's random number generator state is left unchanged. Must
-  be a non-negative integer. Default: `0`
 
 ## Value
 
@@ -212,13 +197,6 @@ columns:
 
   `.p.val` adjusted for multiple comparisons across taxa (see `p.adj`).
 
-- `.robust` - :
-
-  ANCOM-BC2 only: `TRUE` when the taxon's significance
-  (`.adj.p <= p.sig`) doesn't depend on the pseudo-count added to zeros.
-  ANCOM-BC2 recommends treating significant taxa that aren't robust as
-  not significant.
-
 - `.n` - :
 
   The number of samples analyzed.
@@ -228,14 +206,8 @@ Rows are sorted by `.p.val`. The R code that reproduces the table is in
 
 ## Details
 
-- `"linda"` - LinDA (Zhou et al. 2022), built into rbiom.
-
-- `"ancombc2"` - ANCOM-BC2 (Lin & Peddada 2024), run by
-  [`ANCOMBC::ancombc2()`](https://rdrr.io/pkg/ANCOMBC/man/ancombc2.html).
-  Requires the Bioconductor package ANCOMBC.
-
-Both methods expect unrarefied counts: they model differences in
-sequencing depth themselves, and rarefying discards data.
+LinDA expects unrarefied counts: it models differences in sequencing
+depth itself, and rarefying discards data.
 
 **Counts.** The counts are summed to `rank` with
 [`taxa_matrix()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
@@ -297,36 +269,12 @@ when it reports that sequencing depth is associated with the model, it
 still adds the pseudo-count, because it compares `"Imputation"` with
 `"imputation"`; rbiom imputes, as the paper describes.
 
-**ANCOM-BC2** (Lin & Peddada 2024) estimates the sample-specific
-sampling fractions and taxon-specific biases, and tests the
-bias-corrected log abundances. rbiom calls
-[`ANCOMBC::ancombc2()`](https://rdrr.io/pkg/ANCOMBC/man/ancombc2.html)
-with the counts as a matrix, `fix_formula = "stat.by + covariates"` (or
-`regr`), `prv_cut = prev.cut`, `p_adj_method = p.adj`, `alpha = p.sig`,
-and its other defaults, which include a sensitivity analysis of the
-pseudo-count added to zeros (reported in `.robust`). With three or more
-groups, it adds `group = stat.by` and `pairwise = TRUE`: every pair of
-groups is compared, with p-values from ANCOM-BC2's mixed directional
-false discovery rate procedure, which first screens taxa with a global
-test (taxa that don't pass get a p-value of 1) and then adjusts each
-taxon's pairwise p-values. Its natural-log fold changes and standard
-errors are divided by `log(2)`. ANCOM-BC2 computes p-values from
-t-distributions but doesn't report their degrees of freedom, so rbiom
-recovers them from the p-values in its primary results, for the
-confidence intervals; where that isn't possible, the interval uses the
-normal distribution.
-
 ## References
 
 Zhou H, He K, Chen J, Zhang X (2022). LinDA: linear models for
 differential abundance analysis of microbiome compositional data.
 *Genome Biology* 23:95.
 [doi:10.1186/s13059-022-02655-5](https://doi.org/10.1186/s13059-022-02655-5)
-
-Lin H, Peddada SD (2024). Multigroup analysis of compositions of
-microbiomes with covariate adjustment and repeated measures. *Nature
-Methods* 21:83-91.
-[doi:10.1038/s41592-023-02092-7](https://doi.org/10.1038/s41592-023-02092-7)
 
 ## See also
 
@@ -414,25 +362,4 @@ Other stats_tables:
 #> #   log abundance ~ `Body Site`
 #> # and each coefficient is corrected by its mode across taxa.
 #> stats <- taxa_da(biom, "Body Site", rank = "Genus")
-
-    # \donttest{
-    if (requireNamespace("ANCOMBC", quietly = TRUE))
-      taxa_da(biom, stat.by = "Body Site", rank = "Phylum", method = "ancombc2")
-#> Warning: ! Messages from the differential abundance analysis:
-#> • The number of taxa used for estimating sample-specific biases is: 11 A large
-#>   number of taxa (>50) is required for the consistent estimation of biases
-#> • NaNs produced
-#> # Method:   ANCOM-BC2 (Lin & Peddada 2024)
-#> # Model:    log abundance ~ `Body Site`, per taxon
-#> # p.adj:    FDR (Benjamini-Hochberg), across taxa within each comparison
-#> # A tibble: 5 × 12
-#>   `Body Site`    .taxa   .lfc   .se .lower .upper .t.ratio   .df  .p.val  .adj.p
-#>   <fct>          <chr>  <dbl> <dbl>  <dbl>  <dbl>    <dbl> <dbl>   <dbl>   <dbl>
-#> 1 Stool - Saliva Acti… -3.62  0.683 -5.11   -2.14   -5.31  12.0  1.86e-4 0.00205
-#> 2 Stool - Saliva Bact…  2.46  0.587  1.22    3.69    4.18  18    5.59e-4 0.00288
-#> 3 Stool - Saliva Prot… -3.80  0.942 -5.77   -1.82   -4.03  18    7.86e-4 0.00288
-#> 4 Stool - Saliva Tene…  2.47  0.820  0.530   4.41    3.01   7.00 1.96e-2 0.0540 
-#> 5 Stool - Saliva Firm… -0.222 0.610 -1.50    1.06   -0.364 18.0  7.20e-1 1      
-#> # ℹ 2 more variables: .robust <lgl>, .n <int>
-    # }
 ```
