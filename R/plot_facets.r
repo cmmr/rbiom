@@ -179,7 +179,39 @@ plot_facets <- function (params) {
   }
 
   set_layer(params, 'facet', args)
+  facet_axes(params)
 
   # To enable %>% chaining
+  return (invisible(params))
+}
+
+
+
+#________________________________________________________
+# Draw the x and y axis lines (and ticks) on every panel, not just
+# the outer ones, so each panel is framed and points near its edges
+# are clearly in it (e.g. with `facet.ncol = 1`, only the bottom
+# panel would have an x-axis line). Tick labels stay on the outer
+# panels unless the scale is free. Only added when some panel would
+# otherwise lack an axis: facet_wrap() gives every panel its own axis
+# for a free scale. Call after the facet.nrow/ncol attributes are set.
+# The user's `facet.axes` and `facet.axis.labels` take precedence.
+#________________________________________________________
+facet_axes <- function (params) {
+
+  facet <- params$layers[['facet']]
+  if (is.null(facet) || hasName(facet, 'axes')) return (invisible(params))
+
+  wrap   <- length(params$facet.by) != 2  # as in layer_function()
+  scales <- facet[['scales']] %||% "fixed"
+  nrow   <- params$.plot_attrs$facet.nrow %||% 1
+  ncol   <- params$.plot_attrs$facet.ncol %||% 1
+
+  inner_x <- nrow > 1 && !(wrap && scales %in% c('free', 'free_x'))
+  inner_y <- ncol > 1 && !(wrap && scales %in% c('free', 'free_y'))
+
+  if (inner_x || inner_y)
+    set_layer(params, 'facet', axes = "all", axis.labels = "margins")
+
   return (invisible(params))
 }

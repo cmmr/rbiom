@@ -166,6 +166,11 @@
   `taxa_stacked()` is light gray.
 * Default shapes are solid (circle, triangle, square, diamond) before 
   outlines.
+* Every facet panel has its own x and y axis lines and ticks (e.g. with 
+  `facet.ncol = 1`, panels above the bottom one previously had no x-axis 
+  line). Tick labels stay on the outer panels unless the scale is free. Pass
+  `facet.axes = "margins"` for ggplot2's default. Boxplots without `x` no 
+  longer have a lone, unlabeled x-axis tick.
 * p-values in figures have two significant digits, are never in scientific
   notation (`p = 2e-04`), and are shown as `p < 0.001` below 0.001.
 * Ordination facet labels no longer overflow: statistics are shortened to 

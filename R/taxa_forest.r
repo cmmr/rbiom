@@ -257,6 +257,7 @@ taxa_forest_build <- function (params) {
     params$.plot_attrs$facet.nrow  <- dims[[1]]
     params$.plot_attrs$facet.ncol  <- dims[[2]]
     params$.plot_attrs$facet.count <- n_panels
+    facet_axes(params)
 
   } else {
     params$.plot_attrs$facet.nrow  <- 1

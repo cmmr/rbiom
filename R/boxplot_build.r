@@ -148,8 +148,12 @@ boxplot_build <- function (params) {
   if (length(params$.labs) > 0)
     set_layer(params, 'labs', params$.labs)
 
-  if (is.null(params$.xcol))
-    set_layer(params, 'labs', x = NULL)
+  # Without `x`, every box is at one unlabeled x position: no tick mark.
+  # (On the scale rather than the theme, so it holds with `flip`.)
+  if (is.null(params$.xcol)) {
+    set_layer(params, 'labs',  x = NULL)
+    set_layer(params, 'xaxis', breaks = NULL)
+  }
 
 
   #________________________________________________________

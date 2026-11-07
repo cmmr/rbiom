@@ -77,6 +77,54 @@ test_that("rbiom plots use theme_rbiom()", {
 })
 
 
+test_that("every facet panel has axis lines", {
+
+  skip_on_cran()
+
+  has_axes <- function (p) grepl('axes\\s*= "all",\\s*axis.labels\\s*= "margins"', p$code)
+
+  # One column: only the bottom panel would have an x-axis line.
+  p <- adiv_corrplot(rare50, x = "Age", adiv = c("otu", "shan"), layers = "p", facet.ncol = 1)
+  expect_true(has_axes(p))
+  expect_identical(p$facet$params$draw_axes, list(x = TRUE, y = TRUE))
+  expect_false(p$facet$params$axis_labels$x)  # tick labels on the outer panels only
+
+  # facet_grid() always draws axes on the outer panels only.
+  p <- adiv_boxplot(rare50, adiv = c("otu", "shan"), stat.by = "Body Site", facet.by = "Sex")
+  expect_s3_class(p$facet, 'FacetGrid')
+  expect_true(has_axes(p))
+
+  # One row with free y scales: every panel has its axes already.
+  p <- adiv_boxplot(rare50, x = "Sex", adiv = c("otu", "shan"), stat.by = "Sex")
+  expect_false(grepl("axes", p$code, fixed = TRUE))
+
+  # Free scales in facet_wrap(): same.
+  p <- bdiv_ord_plot(rare50, stat.by = "Body Site", facet.by = "Sex", layers = "p", permutations = 99)
+  expect_false(grepl("axes", p$code, fixed = TRUE))
+
+  # The user's choice wins.
+  p <- adiv_corrplot(rare50, x = "Age", adiv = c("otu", "shan"), layers = "p", facet.ncol = 1, facet.axes = "margins")
+  expect_false(has_axes(p))
+  expect_false(p$facet$params$draw_axes$x)
+})
+
+
+test_that("boxplots without x have no x-axis tick", {
+
+  skip_on_cran()
+
+  p <- adiv_boxplot(rare50, stat.by = "Body Site", flip = TRUE)
+  expect_true(grepl("scale_x_discrete(breaks = NULL)", p$code, fixed = TRUE))
+  expect_null(p$scales$get_scales("x")$breaks)
+
+  p <- bdiv_boxplot(rare50, stat.by = "Sex", layers = "b")
+  expect_null(p$scales$get_scales("x")$breaks)
+
+  p <- adiv_boxplot(rare50, x = "Sex", stat.by = "Body Site")
+  expect_false(grepl("breaks = NULL", p$code, fixed = TRUE))
+})
+
+
 test_that("default colors and shapes", {
 
   expect_identical(get_n_colors(3), c("#0072B2", "#D55E00", "#009E73"))
