@@ -10,8 +10,10 @@ test_that("cache", {
   expect_identical(rlang::with_options(set_cache_value(NULL, NA), rbiom.cache_dir = 'FALSE'), NA)
   expect_null(get_cache_value(NULL))
 
+  # A path that can't be a cache directory turns caching off, silently.
   file.create(f <- tempfile())
-  expect_warning(rlang::with_options(get_cache_dir(), rbiom.cache_dir = f))
+  expect_null(expect_silent(rlang::with_options(get_cache_dir(), rbiom.cache_dir = f)))
+  expect_null(expect_silent(rlang::with_options(get_cache_dir(), rbiom.cache_dir = NA_character_)))
   unlink(f)
 
   # Keys are always rlang::hash(): `rbiom.cache_hash` is no longer used, so
@@ -425,35 +427,94 @@ test_that("processes sharing a cache directory don't interfere", {
 })
 
 
-test_that("a cache directory that can't be written to doesn't break a plot", {
+#________________________________________________________
+# Restrict access to `dir`. Returns a function that undoes it, so that the
+# directory can be deleted again.
+#
+# On Windows, a deny entry for Everyone (S-1-1-0) applies to administrators
+# too, and the owner of a directory can always reset its ACL. "No access"
+# denies write access as icacls defines it, which includes SYNCHRONIZE:
+# then nothing in the directory can be opened at all, and on some Windows
+# versions (e.g. Server 2022) dir.exists() is FALSE for the directory.
+#________________________________________________________
+restrict_dir <- function (dir, how) {
+
+  if (.Platform$OS.type == 'windows') {
+
+    icacls <- function (...) suppressWarnings(system2(
+      command = 'icacls',
+      args    = c(shQuote(dir), ...),
+      stdout  = FALSE,
+      stderr  = FALSE ))
+
+    deny <- switch(how,
+      'read-only'  = '(WD,AD)',      # add files, add subdirectories
+      'unreadable' = '(RD)',         # list the directory
+      'no access'  = '(OI)(CI)(W)' )
+
+    icacls('/deny', paste0('*S-1-1-0:', deny))
+    return (function () icacls('/reset', '/T', '/C', '/Q'))
+  }
+
+  mode <- switch(how, 'read-only' = '0555', 'unreadable' = '0333', 'no access' = '0000')
+  Sys.chmod(dir, mode, use_umask = FALSE)
+  return (function () Sys.chmod(dir, '0755', use_umask = FALSE))
+}
+
+
+for (how in c('read-only', 'unreadable', 'no access')) {
+  test_that(sprintf("a cache directory that is %s doesn't break a plot", how), {
+
+    skip_on_cran()
+
+    dir <- tempfile('cache_')
+    dir.create(dir)
+    file.create(file.path(dir, 'keep'))
+
+    undo <- restrict_dir(dir, how)
+    on.exit({ undo(); unlink(dir, recursive = TRUE) }, add = TRUE)
+
+    can_list  <- function () 'keep' %in% list.files(dir)
+    can_write <- function () suppressWarnings(file.create(file.path(dir, 'probe')))
+    restricted <- switch(how,
+      'read-only'  = !can_write(),
+      'unreadable' = !can_list(),
+      'no access'  = !can_list() && !can_write() )
+    if (!restricted)
+      skip(sprintf("Can't make a directory %s here (e.g. running as root).", how))
+
+    rlang::local_options(rbiom.cache_dir = dir)
+    expect_null(expect_silent(get_cache_dir()))
+    expect_no_warning(expect_no_error(p <- adiv_boxplot(hmp5)))
+    expect_s3_class(p, 'ggplot')
+
+    # Nothing was written to it, and it can be deleted afterwards.
+    undo()
+    expect_identical(list.files(dir), 'keep')
+    expect_identical(unlink(dir, recursive = TRUE), 0L)
+    expect_false(file.exists(dir))
+  })
+}
+
+
+test_that("a cache path that is a file doesn't break a plot", {
 
   skip_on_cran()
 
-  dir <- tempfile('cache_')
-  dir.create(dir)
-
-  # Make `dir` read-only.
-  if (.Platform$OS.type == 'windows') {
-    acl <- function (...) suppressWarnings(system2('icacls', c(shQuote(dir), ...), stdout = FALSE, stderr = FALSE))
-    on.exit(acl('/remove:d', '*S-1-1-0'), add = TRUE)
-    acl('/deny', '*S-1-1-0:(OI)(CI)(W)') # Everyone
-  } else {
-    on.exit(Sys.chmod(dir, '0755'), add = TRUE)
-    Sys.chmod(dir, '0555')
-  }
-  if (suppressWarnings(file.create(file.path(dir, 'probe'))))
-    skip("Can't make a read-only directory here (e.g. running as root).")
-
-  rlang::local_options(rbiom.cache_dir = dir)
-  expect_no_warning(expect_no_error(p <- adiv_boxplot(hmp5)))
-  expect_s3_class(p, 'ggplot')
-  expect_length(list.files(dir), 0)
-
-  # A cache directory that can't be created only warns, as before.
   file.create(f <- tempfile())
-  rlang::local_options(rbiom.cache_dir = file.path(f, 'cache'))
-  expect_no_error(p <- suppressWarnings(adiv_boxplot(hmp5)))
-  expect_s3_class(p, 'ggplot')
+  on.exit(unlink(f), add = TRUE)
+
+  # For `f` itself, dir.exists() is FALSE and dir.create() fails with
+  # "already exists", as for a directory that denies all access on some
+  # Windows versions. Below `f`, no directory can be created at all.
+  for (path in c(f, file.path(f, 'cache'))) rlang::with_options(rbiom.cache_dir = path, {
+    expect_null(expect_silent(get_cache_dir()))
+    expect_no_warning(expect_no_error(p <- adiv_boxplot(hmp5)))
+    expect_s3_class(p, 'ggplot')
+  })
+
+  expect_true(file.exists(f))
+  expect_false(dir.exists(f))
 })
 
 

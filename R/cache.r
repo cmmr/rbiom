@@ -22,7 +22,9 @@
 #     down to 80% of the limit (`cache_evict()`).
 #   * Files that other processes delete or replace in the meantime are
 #     tolerated everywhere, and a failure to read, write, or evict is a
-#     cache miss, never an error or a warning.
+#     cache miss, never an error or a warning. A cache directory that
+#     can't be created, read, or written turns caching off, silently
+#     (`get_cache_dir()`).
 #________________________________________________________
 
 CACHE <- new.env()
@@ -40,6 +42,12 @@ CACHE_TMP_AGE <- 3600  # Seconds before an abandoned temporary file is removed.
 
 #________________________________________________________
 # Fetch the cache directory, or NULL when caching is disabled.
+#
+# Caching is also off - silently - when the directory can't be created,
+# read, or written to, e.g. when the path is a file, or a directory that
+# denies access. On Windows, dir.exists() can even be FALSE for a directory
+# that exists but denies access (stat() needs to open it), in which case
+# dir.create() fails with "already exists".
 #________________________________________________________
 get_cache_dir <- function () {
 
@@ -47,10 +55,16 @@ get_cache_dir <- function () {
   if (isFALSE(cache)) return (NULL)
   if (eq(cache, "")) cache <- Sys.getenv("RBIOM_CACHE_DIR", unset = "")
   if (eq(cache, "")) cache <- file.path(tempdir(), "rbiom", "cache")
-  if (!is_scalar_character(cache) || eq(toupper(cache), "FALSE")) return (NULL)
-  if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (NULL)
+  if (!is_scalar_character(cache) || is.na(cache) || eq(toupper(cache), "FALSE")) return (NULL)
 
-  return (normalizePath(cache, winslash = '/'))
+  if (!dir.exists(cache)) dir.create(cache, recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(cache) || file.access(cache, 6L) != 0) return (NULL) # 6 = read + write
+
+  cache <- tryCatch(
+    expr  = normalizePath(cache, winslash = '/', mustWork = TRUE),
+    error = function (e) NULL )
+
+  return (cache)
 }
 
 
@@ -116,8 +130,8 @@ get_cache_file <- function (fn, params) {
 #________________________________________________________
 # Set a cache file's modification time to now, so that recently used
 # results are evicted last, and record in its 'exists' attribute whether
-# there is an entry to read. An entry that can't be touched (e.g. in a
-# read-only directory, or briefly locked by another process on Windows)
+# there is an entry to read. An entry that can't be touched (e.g. a
+# read-only file, or one briefly locked by another process on Windows)
 # can still be read.
 #________________________________________________________
 cache_touch <- function (cache_file) {
