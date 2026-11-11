@@ -161,22 +161,22 @@ t(st)
 #>              [,1]           
 #> age          "13.83"        
 #> sex          "female - male"
-#> .mean.diff   "2.813755"     
+#> .mean.diff   "2.825712"     
 #> .h1          "!= 0"         
-#> .p.val       "6.840598e-07" 
-#> .adj.p       "6.840598e-07" 
-#> .lower       "1.705521"     
-#> .upper       "3.921989"     
-#> .effect.size "0.4387702"    
-#> .se          "0.5651607"    
+#> .p.val       "9.178591e-07" 
+#> .adj.p       "9.178591e-07" 
+#> .lower       "1.699699"     
+#> .upper       "3.951725"     
+#> .effect.size "0.4406573"    
+#> .se          "0.574227"     
 #> .n           "2500"         
-#> .df          "2485.366"     
-#> .t.ratio     "4.978681"     
-#> .r.sqr       "0.8313946"    
-#> .dev.expl    "0.8323145"    
-#> .aic         "16403.78"     
-#> .bic         "16497.75"     
-#> .loglik      "-8185.756"
+#> .df          "2484.845"     
+#> .t.ratio     "4.920897"     
+#> .r.sqr       "0.8314119"    
+#> .dev.expl    "0.8323668"    
+#> .aic         "16403.85"     
+#> .bic         "16500.31"     
+#> .loglik      "-8185.366"
 ```
 
 Depending on the arguments given, the *estimate* term will be one of:
@@ -257,7 +257,7 @@ generated in the last section.
 ``` r
 
 st$.aic
-#> [1] 16403.78
+#> [1] 16403.85
 ```
 
 These values can be used to decide which `fit` argument to use (`"lm"`,
@@ -274,7 +274,7 @@ do.call(rbind, gof)
 #>   fit    .r.sqr     .aic     .bic   .loglik
 #> 1  lm 0.7896923 16947.72 16976.84 -8468.858
 #> 2 log 0.8031003 16783.02 16812.14 -8386.512
-#> 3 gam 0.8313946 16403.78 16497.75 -8185.756
+#> 3 gam 0.8314119 16403.85 16500.31 -8185.366
 ```
 
 Based on the above table, `fit = "gam"` has the lowest AIC, lowest BIC,
@@ -295,7 +295,7 @@ dplyr::select(st, .mean.diff:.p.val)
 #> # A tibble: 1 × 3
 #>   .mean.diff .h1        .p.val
 #>        <dbl> <fct>       <dbl>
-#> 1       2.81 != 0  0.000000684
+#> 1       2.83 != 0  0.000000918
 ```
 
 For a more complete review of alternative hypotheses, see the [rbiom
@@ -604,11 +604,11 @@ stats_table(npregfast::children, 'age', 'height', stat.by = 'sex', at = 11:15)
 #> # A tibble: 5 × 18
 #>     age sex        .mean.diff .h1     .p.val   .adj.p .lower .upper .effect.size
 #>   <int> <chr>           <dbl> <fct>    <dbl>    <dbl>  <dbl>  <dbl>        <dbl>
-#> 1    12 female - …       7.23 != 0  2.46e-29 1.23e-28  5.99    8.48        1.13 
-#> 2    11 female - …       6.02 != 0  2.75e-22 6.88e-22  4.82    7.23        0.939
-#> 3    13 female - …       6.04 != 0  6.06e-21 1.01e-20  4.79    7.30        0.943
-#> 4    15 female - …      -2.58 != 0  7.21e- 7 9.02e- 7 -3.60   -1.56       -0.402
-#> 5    14 female - …       2.00 != 0  3.14e- 4 3.14e- 4  0.912   3.08        0.311
+#> 1    12 female - …       7.26 != 0  2.34e-28 1.17e-27  5.99    8.53        1.13 
+#> 2    11 female - …       6.03 != 0  1.16e-21 2.90e-21  4.80    7.25        0.940
+#> 3    13 female - …       6.10 != 0  1.85e-20 3.09e-20  4.82    7.38        0.951
+#> 4    15 female - …      -2.59 != 0  9.01e- 7 1.13e- 6 -3.63   -1.56       -0.404
+#> 5    14 female - …       2.00 != 0  3.84e- 4 3.84e- 4  0.896   3.10        0.311
 #> # ℹ 9 more variables: .se <dbl>, .n <int>, .df <dbl>, .t.ratio <dbl>,
 #> #   .r.sqr <dbl>, .dev.expl <dbl>, .aic <dbl>, .bic <dbl>, .loglik <dbl>
 ```
