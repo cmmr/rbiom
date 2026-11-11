@@ -114,6 +114,9 @@
 <li>Tabular imports no longer depend on readr; sample IDs like <code>"1.10"</code> stay character, and <code>Body Site</code> is never renamed to <code>Body.Site</code>.</li>
 <li>Many fixes to TSV/HDF5 round trips (dates, column order, logical columns, blank cells), <code><a href="../reference/write_biom.html">write_xlsx()</a></code>, <code>convert_to_*()</code>, and the <code>exec/</code> scripts.</li>
 <li>Caching works when disabled; keys include package versions; only rbiom’s own files are ever evicted from the cache directory.</li>
+<li>Several R processes can share one cache directory (e.g. a pool of workers with the same <code>rbiom.cache_dir</code>). Entries are written to a temporary file and renamed into place, so no process ever reads a partly written entry. The directory is listed now and then rather than on every write, and the least recently used entries are evicted down to 80% of <code>rbiom.cache_size</code>. Temporary files left by a process that died are removed after an hour. A cache that can’t be read or written never causes an error or a warning.</li>
+<li>The default cache size is now 50 MB (previously 200 MB, although the documentation said 20 MB).</li>
+<li>Distance matrices that differ only in provenance share cache entries in <code><a href="../reference/distmat_ord_table.html">distmat_ord_table()</a></code> and <code><a href="../reference/distmat_stats.html">distmat_stats()</a></code>, as do <code><a href="../reference/tree_subset.html">tree_subset()</a></code> calls that differ only in <code>underscores</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="plots-4-0-0">Plots<a class="anchor" aria-label="anchor" href="#plots-4-0-0"></a></h3>
@@ -139,6 +142,7 @@
 <code>write_*()</code> functions refuse to overwrite an existing file unless <code>overwrite = TRUE</code>. Text output uses LF line endings on all platforms.</li>
 <li>The plyr functions <code>.</code>, <code>ddply</code>, <code>ldply</code>, and <code>llply</code> are no longer re-exported.</li>
 <li>Removed <code>transform = "percent"</code> (never worked), and the never-functional <code>apcoa</code> and tree-plotting code.</li>
+<li>Removed the <code>rbiom.cache_hash</code> option; it is ignored if set. Cache keys are always <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash()</a></code>, as <code>biom$hash</code> already was. A custom hash function could only make keys collide or, if it didn’t return 32 hex digits, stop the cache from ever being trimmed.</li>
 <li>
 <code>bdiv = "unifrac"</code> is now an error because it is ambiguous; name the variant (e.g. <code>"unweighted_unifrac"</code>).</li>
 <li>

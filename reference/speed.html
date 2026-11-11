@@ -113,18 +113,19 @@ provide it to just the functions that use it. For example:</p>
 
 
 
-<p>Caching is enabled by default - up to 20 MB per R session.</p>
+<p>Caching is enabled by default - up to 50 MB per R session.</p>
 <p>For large datasets, increasing the cache size can help. The size is
-specified in bytes by an R option or environment variable.</p>
+specified in bytes by an R option or environment variable. When the cache
+is full, the least recently used results are deleted.</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>rbiom.cache_size<span class="op">=</span><span class="fl">200</span> <span class="op">*</span> <span class="fl">1024</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># 200 MB</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>RBIOM_CACHE_SIZE<span class="op">=</span><span class="fl">1024</span> <span class="op">^</span> <span class="fl">3</span><span class="op">)</span>    <span class="co"># 1 GB</span></span></code></pre><p></p></div>
 <p>You can also specify a cache directory where results can be preserved from
-one R session to the next.</p>
+one R session to the next. Several R sessions can share one cache
+directory.</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>rbiom.cache_dir<span class="op">=</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/userdir.html" class="external-link">R_user_dir</a></span><span class="op">(</span><span class="st">"rbiom"</span>, <span class="st">"cache"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>RBIOM_CACHE_DIR<span class="op">=</span><span class="st">"~/rbiom_cache"</span><span class="op">)</span></span></code></pre><p></p></div>
 <p>Other quick notes about caching:</p><ul><li><p>Setting the cache directory to <code>"FALSE"</code> will disable caching.</p></li>
 <li><p>R options will override environment variables.</p></li>
-<li><p>The key hash algorithm can be set with <code>options(rbiom.cache_hash=rlang::hash)</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="summary-layers">Summary Layers<a class="anchor" aria-label="anchor" href="#summary-layers"></a></h2>

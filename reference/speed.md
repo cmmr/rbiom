@@ -57,16 +57,18 @@ and provide it to just the functions that use it. For example:
 
 ## Increase Caching
 
-Caching is enabled by default - up to 20 MB per R session.
+Caching is enabled by default - up to 50 MB per R session.
 
 For large datasets, increasing the cache size can help. The size is
-specified in bytes by an R option or environment variable.
+specified in bytes by an R option or environment variable. When the
+cache is full, the least recently used results are deleted.
 
     options(rbiom.cache_size=200 * 1024 ^ 2) # 200 MB
     Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 3)    # 1 GB
 
 You can also specify a cache directory where results can be preserved
-from one R session to the next.
+from one R session to the next. Several R sessions can share one cache
+directory.
 
     options(rbiom.cache_dir=tools::R_user_dir("rbiom", "cache"))
     Sys.setenv(RBIOM_CACHE_DIR="~/rbiom_cache")
@@ -76,9 +78,6 @@ Other quick notes about caching:
 - Setting the cache directory to `"FALSE"` will disable caching.
 
 - R options will override environment variables.
-
-- The key hash algorithm can be set with
-  `options(rbiom.cache_hash=rlang::hash)`.
 
 ## Summary Layers
 

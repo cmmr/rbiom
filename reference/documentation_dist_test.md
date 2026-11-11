@@ -47,6 +47,6 @@ documentation_dist_test
   Dataset field (or vector) naming the blocking / subject variable for
   repeated-measures designs. Permutations are restricted to within
   strata via
-  [`permute::how()`](https://rdrr.io/pkg/permute/man/how.html), and
-  regression models include a random intercept per stratum. Default:
+  [`permute::how()`](https://gavinsimpson.github.io/permute/reference/how.html),
+  and regression models include a random intercept per stratum. Default:
   `NULL`
