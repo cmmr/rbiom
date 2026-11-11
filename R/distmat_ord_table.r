@@ -67,9 +67,15 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
 
 
   #________________________________________________________
-  # See if this result is already in the cache.
+  # See if this result is already in the cache. Provenance attributes
+  # on `dm` are excluded from the key so that identical distances from
+  # different pipelines share an entry.
   #________________________________________________________
-  cache_file <- get_cache_file('distmat_ord_table', params)
+  cache_file <- local({
+    key <- as.list(params, all.names = TRUE)
+    key$dm <- strip_prov(dm)
+    get_cache_file('distmat_ord_table', key)
+  })
   tbl        <- get_cache_value(cache_file)
 
   if (is.null(tbl)) {

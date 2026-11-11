@@ -8,9 +8,34 @@
 # cache entries regardless of how they were produced. Provenance attributes
 # (`cmd`, `history`) are therefore attached *after* a cache lookup - see
 # `prov_attach()` in provenance.r.
+#
+# Several R processes may share one cache directory (e.g. a pool of workers
+# with the same `rbiom.cache_dir`). So that this is safe and cheap:
+#
+#   * An entry is written to a temporary file in the cache directory and
+#     renamed into place (`cache_write()`), so a reader never finds part of
+#     an entry under its final name. The same key always holds the same
+#     result, so when two processes write the same entry, the first one
+#     to finish is kept.
+#   * The directory is listed only now and then, not on every write
+#     (`cache_store()`), and least recently used entries are evicted
+#     down to 80% of the limit (`cache_evict()`).
+#   * Files that other processes delete or replace in the meantime are
+#     tolerated everywhere, and a failure to read, write, or evict is a
+#     cache miss, never an error or a warning.
 #________________________________________________________
 
 CACHE <- new.env()
+CACHE$tally <- list() # Per cache directory; see cache_store().
+
+# File names: <key>.rds for entries, <key>.rds.<pid>.<random>.tmp while
+# an entry is being written. Only files with these names are ever deleted.
+CACHE_ENTRY   <- '^[0-9a-f]{32}\\.rds$'
+CACHE_TMP     <- '^[0-9a-f]{32}\\.rds\\.[0-9]+\\.[0-9a-f]{8}\\.tmp$'
+
+CACHE_TARGET  <- 0.8   # Eviction shrinks the cache to this fraction of the limit.
+CACHE_RESCAN  <- 100L  # List the directory at least once every this many writes.
+CACHE_TMP_AGE <- 3600  # Seconds before an abandoned temporary file is removed.
 
 
 #________________________________________________________
@@ -26,23 +51,6 @@ get_cache_dir <- function () {
   if (!dir.exists(cache) && !dir.create(cache, recursive = TRUE)) return (NULL)
 
   return (normalizePath(cache, winslash = '/'))
-}
-
-
-#________________________________________________________
-# The function for hashing cached objects.
-#________________________________________________________
-get_hash_fun <- function () {
-
-  if (is.null(get_cache_dir())) {
-    hash_fun <- function (obj) NULL
-
-  } else {
-    hash_fun <- getOption("rbiom.cache_hash", default = "")
-    if (!is.function(hash_fun)) hash_fun <- rlang::hash
-  }
-
-  return (hash_fun)
 }
 
 
@@ -63,45 +71,97 @@ cache_versions <- function () {
 
 
 #________________________________________________________
+# The maximum size of the cache directory, in bytes.
+#________________________________________________________
+cache_limit <- function () {
+
+  cache_size <- suppressWarnings(abs(as.numeric(getOption(
+    x       = "rbiom.cache_size",
+    default = Sys.getenv("RBIOM_CACHE_SIZE", unset = "") ))))
+
+  if (length(cache_size) != 1 || is.na(cache_size))
+    cache_size <- 50 * 1024 ^ 2 # 50 MB
+
+  return (cache_size)
+}
+
+
+#________________________________________________________
 # Hash a function call to a cache file.
 # Returns NULL when caching is disabled. Otherwise returns the file path with
 # an 'exists' attribute indicating whether a cached result is available.
+#
+# Keys are always rlang::hash() (128-bit XXH3, 32 hex digits), which is also
+# what `biom$hash` uses, and what CACHE_ENTRY expects when evicting.
 #________________________________________________________
 get_cache_file <- function (fn, params) {
 
   cache_dir <- get_cache_dir()
   if (is.null(cache_dir)) return (NULL)
 
-  hash <- getOption("rbiom.cache_hash", default = "")
-  if (!is.function(hash)) hash <- rlang::hash
-
   if (is.environment(params)) params <- as.list(params, all.names = TRUE)
 
   # `cpus` never changes a result.
   params <- params[setdiff(names(params), 'cpus')]
-  params <- lapply(params, function (x) { if (inherits(x, "rbiom")) x$hash else hash(x) })
+  params <- lapply(params, function (x) { if (inherits(x, "rbiom")) x$hash else rlang::hash(x) })
 
-  cache_key  <- hash(list(fn, params[order(names(params))], cache_versions()))
+  cache_key  <- rlang::hash(list(fn, params[order(names(params))], cache_versions()))
   cache_file <- file.path(cache_dir, paste0(cache_key, ".rds"))
   cache_file <- normalizePath(cache_file, winslash = "/", mustWork = FALSE)
 
-  # Touch the file so that recently used results are evicted last.
-  attr(cache_file, 'exists') <- Sys.setFileTime(cache_file, Sys.time())
+  return (cache_touch(cache_file))
+}
+
+
+#________________________________________________________
+# Set a cache file's modification time to now, so that recently used
+# results are evicted last, and record in its 'exists' attribute whether
+# there is an entry to read. An entry that can't be touched (e.g. in a
+# read-only directory, or briefly locked by another process on Windows)
+# can still be read.
+#________________________________________________________
+cache_touch <- function (cache_file) {
+
+  attr(cache_file, 'exists') <-
+    Sys.setFileTime(cache_file, Sys.time()) || file.exists(cache_file)
 
   return (cache_file)
 }
 
 
 #________________________________________________________
-# Read a cached result, or NULL if there isn't one.
+# Read a cached result, or NULL if there isn't one. An entry that is
+# unreadable, or that another process evicts between `get_cache_file()` and
+# this read, is a miss: the caller recomputes and rewrites it.
 #________________________________________________________
 get_cache_value <- function (cache_file) {
 
   if (!isTRUE(attr(cache_file, 'exists', exact = TRUE))) return (NULL)
 
-  result <- tryCatch(readRDS(cache_file), error = function (e) NULL)
+  read <- function () {
+    tryCatch(
+      expr  = list(suppressWarnings(readRDS(cache_file))),
+      error = function (e) NULL )
+  }
 
-  return (result)
+  # On Windows, another process touching the entry holds it exclusively
+  # for a moment, so try twice.
+  result <- read()
+  if (is.null(result) && file.exists(cache_file)) {
+    Sys.sleep(0.01)
+    result <- read()
+  }
+
+  # Delete an unreadable entry, so that the caller's set_cache_value()
+  # replaces it (cache_write() never overwrites an entry). This silently
+  # does nothing if the file is already gone, or is open elsewhere on
+  # Windows.
+  if (is.null(result)) {
+    unlink(cache_file, expand = FALSE)
+    return (NULL)
+  }
+
+  return (result[[1]])
 }
 
 
@@ -111,45 +171,182 @@ get_cache_value <- function (cache_file) {
 #________________________________________________________
 set_cache_value <- function (cache_file, result) {
 
+  # Callers pass the computation itself, e.g. `set_cache_value(f, build())`.
+  # Its errors and warnings are the user's, so evaluate it first, outside
+  # the handlers below.
+  force(result)
+
   if (is.null(cache_file)) return (result)
 
-
-  #________________________________________________________
-  # Fetch the maximum cache size.
-  #________________________________________________________
-  cache_size <- suppressWarnings(abs(as.numeric(getOption(
-    x       = "rbiom.cache_size",
-    default = Sys.getenv("RBIOM_CACHE_SIZE", unset = "") ))))
-
-  if (length(cache_size) != 1 || is.na(cache_size))
-    cache_size <- 200 * 1024 ^ 2 # 200 MB
-
-
-  #________________________________________________________
-  # Don't write objects that are larger than the cache size.
-  #________________________________________________________
-  result_size <- as.numeric(object.size(result))
-
-  if (result_size < cache_size) {
-
-    #________________________________________________________
-    # Delete the least recently used cache files to stay under
-    # the maximum. Only files that rbiom itself wrote are removed.
-    #________________________________________________________
-    cache <- dirname(cache_file)
-    files <- list.files(cache, pattern = '^[0-9a-f]{32}\\.rds$', full.names = TRUE)
-    files <- setdiff(files, cache_file)
-    files <- files[rev(order(file.mtime(files)))]
-    files <- files[cumsum(file.size(files)) > cache_size - result_size]
-    if (length(files) > 0) suppressWarnings(file.remove(files))
-
-    # A failed cache write must never fail the user's computation.
-    tryCatch(
-      expr    = saveRDS(result, file = cache_file),
-      error   = function (e) suppressWarnings(file.remove(cache_file)),
-      warning = function (w) suppressWarnings(file.remove(cache_file)) )
-  }
-
+  # A failed write or eviction must never fail the computation.
+  tryCatch(
+    expr  = suppressWarnings(cache_store(cache_file, result)),
+    error = function (e) NULL )
 
   return (result)
+}
+
+
+#________________________________________________________
+# The body of set_cache_value(), which may fail.
+#
+# Eviction needs the size of the cache directory, but listing and stat-ing
+# every entry on every write is O(entries) and would be repeated by every
+# process sharing the directory. Instead each process keeps a running
+# estimate per directory: the size found at its last listing plus the bytes
+# it has written since. It lists the directory (and evicts, if needed) only
+# on its first write, when the estimate passes the limit, when it has
+# written more than 20% of the limit since its last listing, or after
+# CACHE_RESCAN writes.
+#
+# The estimate doesn't see other processes' writes. But each of P processes
+# writes less than 20% of the limit plus one entry between its listings,
+# and any listing evicts the whole directory, so the directory can exceed
+# the limit by at most about P x (20% of the limit + the largest entry).
+#________________________________________________________
+cache_store <- function (cache_file, result) {
+
+  limit <- cache_limit()
+
+  # Don't write objects that are larger than the cache size.
+  if (as.numeric(utils::object.size(result)) >= limit) return (invisible())
+
+  bytes <- cache_write(cache_file, result)
+  if (is.na(bytes)) return (invisible())
+
+  cache_dir <- dirname(cache_file)
+  tally     <- CACHE$tally[[cache_dir]]
+  if (is.null(tally)) tally <- list(total = NA, since = 0, writes = 0L)
+
+  tally$since  <- tally$since  + bytes
+  tally$writes <- tally$writes + 1L
+
+  if ( is.na(tally$total) ||
+       tally$total + tally$since > limit ||
+       tally$since > (1 - CACHE_TARGET) * limit ||
+       tally$writes >= CACHE_RESCAN ) {
+
+    # Reset first, so that if eviction fails it is retried after more
+    # writes rather than on every write.
+    tally <- list(total = 0, since = 0, writes = 0L)
+    CACHE$tally[[cache_dir]] <- tally
+    tally$total <- cache_evict(cache_dir, limit, keep = basename(cache_file))
+  }
+
+  CACHE$tally[[cache_dir]] <- tally
+
+  return (invisible())
+}
+
+
+#________________________________________________________
+# Write `result` to `cache_file` atomically: save it to a temporary file in
+# the same directory, then rename that into place. Returns the number of
+# bytes added to the cache, or NA if nothing was written. The temporary
+# file never outlives this call (unless the process dies).
+#
+# `save` is a seam for testing.
+#________________________________________________________
+cache_write <- function (cache_file, result, save = saveRDS) {
+
+  cache_file <- as.character(cache_file)
+
+  # Another process may have written this entry since our cache miss.
+  if (file.exists(cache_file)) return (0)
+
+  # Unique per process (pid), and per call and host (random suffix). The
+  # suffix doesn't use R's random number generator, so the caller's RNG
+  # state is left untouched.
+  CACHE$n_tmp <- if (is.null(CACHE$n_tmp)) 1 else CACHE$n_tmp + 1
+  suffix      <- substr(rlang::hash(list(
+    Sys.info()[['nodename']], Sys.getpid(), Sys.time(), CACHE$n_tmp, tempfile() )), 1, 8)
+  tmp <- sprintf("%s.%d.%s.tmp", cache_file, Sys.getpid(), suffix)
+
+  on.exit(unlink(tmp, expand = FALSE))
+
+  saved <- tryCatch(
+    expr    = { save(result, tmp); TRUE },
+    error   = function (e) FALSE,
+    warning = function (w) FALSE ) # e.g. a full disk
+  if (!saved) return (NA_real_)
+
+  bytes <- file.size(tmp)
+  if (is.na(bytes)) return (NA_real_)
+
+
+  #________________________________________________________
+  # A rename within one directory is atomic: readers find either no entry
+  # or a complete one. If another process wrote this entry while we were
+  # saving ours, keep theirs - the same key always holds the same result.
+  # Besides saving a rename, that matters on Windows, where renaming onto
+  # a file that another process has open (e.g. is reading) fails, and
+  # file.rename() itself keeps retrying for about 5 seconds first. So a
+  # failed rename is retried only briefly, and only while there is still
+  # no entry.
+  #________________________________________________________
+  for (wait in c(0, 0.05)) {
+    Sys.sleep(wait)
+    if (file.exists(cache_file)) return (0)
+    if (suppressWarnings(file.rename(tmp, cache_file))) return (bytes)
+    if (!file.exists(tmp)) break
+  }
+
+  return (if (file.exists(cache_file)) 0 else NA_real_)
+}
+
+
+#________________________________________________________
+# List the cache directory's entries and temporary files, with their sizes
+# and modification times. Only names that rbiom itself writes are returned,
+# so other files in the directory are never touched. Files deleted by
+# another process during the listing are dropped.
+#________________________________________________________
+cache_scan <- function (cache_dir) {
+
+  name <- list.files(cache_dir)
+  tmp  <- grepl(CACHE_TMP, name)
+  ok   <- tmp | grepl(CACHE_ENTRY, name)
+  name <- name[ok]
+  tmp  <- tmp[ok]
+
+  info <- file.info(file.path(cache_dir, name), extra_cols = FALSE)
+  ok   <- !is.na(info$size) & !info$isdir
+
+  data.frame(
+    name  = name[ok],
+    tmp   = tmp[ok],
+    size  = info$size[ok],
+    mtime = info$mtime[ok] )
+}
+
+
+#________________________________________________________
+# Remove temporary files abandoned by processes that died mid-write. Then,
+# if the entries total more than `limit` bytes, delete the least recently
+# used ones (by modification time, which a cache hit refreshes) until they
+# total at most CACHE_TARGET * limit. `keep` names an entry that is never
+# deleted - the one just written. Returns the size of the remaining entries.
+#
+# Another process may be evicting at the same time: deleting a file that
+# is already gone, or that is open elsewhere on Windows, fails silently.
+#________________________________________________________
+cache_evict <- function (cache_dir, limit, keep = NULL) {
+
+  files <- cache_scan(cache_dir)
+  del   <- function (x) unlink(file.path(cache_dir, x), expand = FALSE)
+
+  stale <- files$tmp & files$mtime < Sys.time() - CACHE_TMP_AGE
+  del(files$name[stale])
+
+  files <- files[!files$tmp,,drop=FALSE]
+  total <- sum(files$size)
+  if (total <= limit) return (total)
+
+  kept  <- files$name %in% keep
+  files <- files[order(!kept, -as.numeric(files$mtime)),,drop=FALSE]
+  kept  <- files$name %in% keep
+  drop  <- !kept & cumsum(files$size) > CACHE_TARGET * limit
+  del(files$name[drop])
+
+  return (total - sum(files$size[drop]))
 }

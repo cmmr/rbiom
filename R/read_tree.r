@@ -99,9 +99,15 @@ tree_subset <- function (tree, tips, underscores = FALSE) {
 
 
   #________________________________________________________
-  # See if this result is already in the cache.
+  # See if this result is already in the cache. `underscores` is left
+  # out of the key: it only affects how a file is parsed, and `tree` has
+  # already been parsed by validate_tree().
   #________________________________________________________
-  cache_file <- get_cache_file('tree_subset', params)
+  cache_file <- local({
+    key <- as.list(params, all.names = TRUE)
+    key$underscores <- NULL
+    get_cache_file('tree_subset', key)
+  })
   if (!is.null(res <- get_cache_value(cache_file)))
     return (res)
 

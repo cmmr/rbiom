@@ -67,17 +67,19 @@ dm <- bdiv_distmat(biom, 'w_unifrac', tree = tree)
 \section{Increase Caching}{
 
 
-Caching is enabled by default - up to 20 MB per R session.
+Caching is enabled by default - up to 50 MB per R session.
 
 For large datasets, increasing the cache size can help. The size is
-specified in bytes by an R option or environment variable.
+specified in bytes by an R option or environment variable. When the cache
+is full, the least recently used results are deleted.
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{options(rbiom.cache_size=200 * 1024 ^ 2) # 200 MB
 Sys.setenv(RBIOM_CACHE_SIZE=1024 ^ 3)    # 1 GB
 }\if{html}{\out{</div>}}
 
 You can also specify a cache directory where results can be preserved from
-one R session to the next.
+one R session to the next. Several R sessions can share one cache
+directory.
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{options(rbiom.cache_dir=tools::R_user_dir("rbiom", "cache"))
 Sys.setenv(RBIOM_CACHE_DIR="~/rbiom_cache")
@@ -87,7 +89,6 @@ Other quick notes about caching:
 \itemize{
 \item Setting the cache directory to \code{"FALSE"} will disable caching.
 \item R options will override environment variables.
-\item The key hash algorithm can be set with \code{options(rbiom.cache_hash=rlang::hash)}.
 }
 }
 

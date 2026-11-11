@@ -54,6 +54,7 @@ Suggests:
     ape,
     biomformat,
     Biostrings,
+    callr,
     fillpattern,
     ggbeeswarm,
     ggdensity,

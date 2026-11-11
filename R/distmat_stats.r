@@ -206,9 +206,17 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
 
 
   #________________________________________________________
-  # See if this result is already in the cache.
+  # See if this result is already in the cache. Provenance attributes
+  # on `dm` are excluded from the key so that identical distances from
+  # different pipelines share an entry - except whether `dm` has a `cmd`,
+  # which changes the cached `code`.
   #________________________________________________________
-  cache_file <- get_cache_file('distmat_stats', params)
+  cache_file <- local({
+    key <- as.list(params, all.names = TRUE)
+    key$dm     <- strip_prov(params$dm)
+    key$dm_cmd <- is.null(attr(params$dm, 'cmd', exact = TRUE))
+    get_cache_file('distmat_stats', key)
+  })
   stats      <- get_cache_value(cache_file)
 
   if (is.null(stats)) {

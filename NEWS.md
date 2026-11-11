@@ -132,6 +132,18 @@
   blank cells), `write_xlsx()`, `convert_to_*()`, and the `exec/` scripts.
 * Caching works when disabled; keys include package versions; only rbiom's 
   own files are ever evicted from the cache directory.
+* Several R processes can share one cache directory (e.g. a pool of workers
+  with the same `rbiom.cache_dir`). Entries are written to a temporary file 
+  and renamed into place, so no process ever reads a partly written entry. 
+  The directory is listed now and then rather than on every write, and the 
+  least recently used entries are evicted down to 80% of `rbiom.cache_size`.
+  Temporary files left by a process that died are removed after an hour. A 
+  cache that can't be read or written never causes an error or a warning.
+* The default cache size is now 50 MB (previously 200 MB, although the 
+  documentation said 20 MB).
+* Distance matrices that differ only in provenance share cache entries in 
+  `distmat_ord_table()` and `distmat_stats()`, as do `tree_subset()` calls 
+  that differ only in `underscores`.
 
 ## Plots
 
@@ -188,6 +200,10 @@
   re-exported.
 * Removed `transform = "percent"` (never worked), and the never-functional 
   `apcoa` and tree-plotting code.
+* Removed the `rbiom.cache_hash` option; it is ignored if set. Cache keys 
+  are always `rlang::hash()`, as `biom$hash` already was. A custom hash 
+  function could only make keys collide or, if it didn't return 32 hex 
+  digits, stop the cache from ever being trimmed.
 * `bdiv = "unifrac"` is now an error because it is ambiguous; name the 
   variant (e.g. `"unweighted_unifrac"`).
 * `ord = "tSNE"` uses `Rtsne::Rtsne()` instead of `tsne::tsne()`. It is 
