@@ -98,25 +98,30 @@ test_that("tables replay", {
 
   b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
 
-  for (x in list(
-    adiv_table(b, adiv = c("shannon", "observed"), md = "Sex"),
-    adiv_matrix(b),
-    adiv_vector(b, "simpson", transform = "rank"),
-    bdiv_table(b, bdiv = c("bray", "jaccard"), md = c("Sex", "==Body Site")),
-    bdiv_matrix(b, "bray"),
-    bdiv_distmat(b, "unweighted_unifrac"),
-    taxa_table(b, rank = "Genus", taxa = 5, md = "Sex"),
-    taxa_matrix(b, rank = "Phylum", taxa = 3),
-    taxa_map(b, rank = "Genus", taxa = 4, other = TRUE),
-    bdiv_ord_table(b, bdiv = "bray", ord = "PCoA", stat.by = "Body Site", rank = "Genus", taxa = 3) )) {
-
+  check <- function (x) {
     r <- replay(x)
-
     if (is.data.frame(x))      expect_equal(strip(r$env$data), strip(x))
     else if (inherits(x, 'dist')) expect_equal(as.matrix(r$env$data), as.matrix(x))
     else if (is.matrix(x))     expect_equal(unclass(r$env$data), unclass(x), ignore_attr = TRUE)
     else                       expect_equal(unname(r$env$data), unname(x), ignore_attr = TRUE)
   }
+
+  # A table and a distance matrix everywhere; the rest off CRAN.
+  check(adiv_table(b, adiv = c("shannon", "observed"), md = "Sex"))
+  check(bdiv_distmat(b, "unweighted_unifrac"))
+
+  skip_on_cran()
+
+  for (x in list(
+    adiv_matrix(b),
+    adiv_vector(b, "simpson", transform = "rank"),
+    bdiv_table(b, bdiv = c("bray", "jaccard"), md = c("Sex", "==Body Site")),
+    bdiv_matrix(b, "bray"),
+    taxa_table(b, rank = "Genus", taxa = 5, md = "Sex"),
+    taxa_matrix(b, rank = "Phylum", taxa = 3),
+    taxa_map(b, rank = "Genus", taxa = 4, other = TRUE),
+    bdiv_ord_table(b, bdiv = "bray", ord = "PCoA", stat.by = "Body Site", rank = "Genus", taxa = 3) ))
+    check(x)
 })
 
 
@@ -125,15 +130,25 @@ test_that("statistics replay", {
   b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
   b <- mutate(b, Old = Age > 30)
 
+  check <- function (x) {
+    r <- suppressMessages(replay(x))
+    s <- if (!is.null(r$env$stats)) r$env$stats else r$value
+    expect_equal(strip(s), strip(x), tolerance = 1e-6)
+  }
+
+  # One of each kind of test everywhere; the rest off CRAN.
+  check(adiv_stats(b, stat.by = "Body Site"))
+  check(bdiv_stats(b, stat.by = "Body Site"))
+
+  skip_on_cran()
+
   for (x in list(
-    adiv_stats(b, stat.by = "Body Site"),
     adiv_stats(b, stat.by = "Sex", test = "wilcox"),
     adiv_stats(b, stat.by = "Body Site", test = "kruskal", split.by = "Sex"),
     adiv_stats(b, regr = "Age"),
     adiv_stats(b, regr = "Age", stat.by = "Sex"),
     adiv_stats(b, regr = "Age", stat.by = "Sex", test = "emtrends", fit = "lm"),
     adiv_stats(b, regr = "Age", stat.by = "Sex", at = c(25, 30)),
-    bdiv_stats(b, stat.by = "Body Site"),
     bdiv_stats(b, stat.by = "Sex", split.by = "Old"),
     bdiv_stats(b, regr = "Age"),
     taxa_stats(b, stat.by = "Sex", rank = "Phylum", taxa = 3),
@@ -144,13 +159,8 @@ test_that("statistics replay", {
     adiv_stats(b, regr = "Age", stat.by = "Sex", covariates = "Body Site", test = "emtrends"),
     taxa_stats(b, regr = "BMI", covariates = c("Age", "Sex"), rank = "Phylum", taxa = 3, fit = "log"),
     suppressMessages(taxa_da(b, stat.by = "Sex", rank = "Genus", taxa = 5)),
-    suppressMessages(taxa_da(b, regr = "Age", covariates = "Sex", split.by = "Old", rank = c("Phylum", "Genus"))) )) {
-
-    r <- suppressMessages(replay(x))
-
-    s <- if (!is.null(r$env$stats)) r$env$stats else r$value
-    expect_equal(strip(s), strip(x), tolerance = 1e-6)
-  }
+    suppressMessages(taxa_da(b, regr = "Age", covariates = "Sex", split.by = "Old", rank = c("Phylum", "Genus"))) ))
+    check(x)
 })
 
 
@@ -159,8 +169,19 @@ test_that("plots replay", {
   b <- rarefy(read_biom(biom_file), depth = 1000, seed = 7)
   b <- mutate(b, Old = Age > 30)
 
+  # Replays re-emit the same warnings as the original call.
+  check <- function (p) {
+    r <- suppressWarnings(replay(p))
+    expect_same_plot(r$value, p)
+  }
+
+  # A plot with statistics and one without everywhere; the rest off CRAN.
+  check(adiv_boxplot(b, x = "Body Site", stat.by = "Body Site"))
+  check(taxa_stacked(b, rank = "Phylum", taxa = 5))
+
+  skip_on_cran()
+
   for (p in list(
-    adiv_boxplot(b, x = "Body Site", stat.by = "Body Site"),
     adiv_boxplot(b, x = "Sex", stat.by = "Sex", flip = TRUE, stripe = TRUE),
     adiv_boxplot(b, x = "Sex", stat.by = "Sex", facet.by = "Old", adiv = c("shannon", "simpson")),
     # Mid vagina has only one Sex, which is reported in a summary warning.
@@ -182,18 +203,13 @@ test_that("plots replay", {
     taxa_corrplot(b, x = "Age", taxa = 2, layers = "ptc", fit = "lm"),
     taxa_heatmap(b, rank = "Phylum", taxa = 5, tracks = "Sex"),
     taxa_heatmap(b, rank = "Phylum", taxa = 1),
-    taxa_stacked(b, rank = "Phylum", taxa = 5),
     taxa_stacked(b, rank = c("Phylum", "Genus"), taxa = 4),
     suppressMessages(taxa_forest(b, stat.by = "Body Site", rank = "Phylum", p.top = 3)),
     suppressMessages(taxa_forest(b, regr = "Age", rank = "Genus", p.top = 0.99)),
     rare_corrplot(b, stat.by = "Sex"),
     rare_stacked(b),
-    rare_multiplot(b, stat.by = "Body Site") )) {
-
-    # Replays re-emit the same warnings as the original call.
-    r <- suppressWarnings(replay(p))
-    expect_same_plot(r$value, p)
-  }
+    rare_multiplot(b, stat.by = "Body Site") ))
+    check(p)
 })
 
 
