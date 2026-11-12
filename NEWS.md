@@ -145,6 +145,49 @@
   `distmat_ord_table()` and `distmat_stats()`, as do `tree_subset()` calls 
   that differ only in `underscores`.
 
+## Describing and checking arguments
+
+* New `fn_schema()`: a machine-readable description of the arguments of the
+  plot functions, `taxa_da()`, `taxa_clusters()`, `bdiv_clusters()`, 
+  `rarefy()`, `adiv_matrix()`, `bdiv_distmat()`, `taxa_matrix()`, 
+  `write_biom()`, and `write_xlsx()`. For each argument: its kind, default, 
+  fixed choices (with names for layers and metrics), numeric limits, how 
+  many values it takes, what `NULL` means, where dataset-dependent choices 
+  come from (a categorical or numeric field, a rank, taxa, a metric that 
+  may need a tree), the forms it accepts, when it has any effect, and the 
+  first sentence of its help text. Plain lists, or JSON with 
+  `json = TRUE`, for programs that build input controls or check requests.
+* New `fn_check()` and `fn_check_data()`: check arguments against a 
+  dataset, or a summary of one, without running the function. Errors are 
+  the function's own.
+* New `list_palettes()`: palette names, kinds (discrete, sequential, 
+  diverging), and colors.
+* The covered functions check their arguments against the same description 
+  on entry, and the validators take their option lists and limits from it,
+  so the description and the behavior can't disagree.
+* Statistical tests that don't apply to the plotted values are refused 
+  instead of being ignored: `adonis2`, `mrpp`, and `betadisper` on alpha 
+  diversity and taxa boxplots (and `stats_boxplot()`), which ran 
+  Kruskal-Wallis tests or failed later; `wilcox`, `emmeans`, and `kruskal` 
+  on `bdiv_boxplot()`, which failed later; and `mantel` on alpha diversity,
+  taxa, and rarefaction corrplots (and `stats_corrplot()`), which skipped 
+  the statistics with a warning.
+* `clust` accepts `"ward.D"` and `"ward.D2"`, as documented (both were 
+  refused). `"ward"` still means `"ward.D"`, without `hclust()`'s message 
+  about the renamed method.
+* `taxa_stacked()`'s `xlab.angle` default is `"90"`, a string like the 
+  other choices (the number 90 was, and is, accepted too).
+* Heatmap `label`, `trees`, `rescale`, `legend`, `xlab.angle`, 
+  `label_size`, `tree_height`, and `track_height` errors name the argument
+  and list the choices, instead of quoting `stopifnot()` code. Like other 
+  choices, they may be abbreviated.
+* A phylogenetic metric (`faith`, the UniFrac family) without a tree is an 
+  error naming the metric, before any computing (previously 
+  "inherits(tree, "phylo") is not TRUE").
+* A misspelled field name is reported under the argument it was given in 
+  (e.g. `x`) rather than `md`. `k` in `taxa_clusters()` and 
+  `bdiv_clusters()` must be a whole number of at least 1.
+
 ## Plots
 
 * `ggbeeswarm`, `ggrepel`, and `fillpattern` are optional. Without them, dot 

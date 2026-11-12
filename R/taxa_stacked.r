@@ -25,7 +25,8 @@
 #'        one another. Default: \code{dist="euclidean", clust="complete"}.
 #'
 #' @param xlab.angle   Angle of the sample labels at the bottom of the plot.
-#'        Options are `"auto"`, `0`, `30`, and `90`. Default: `90`
+#'        Options are `"auto"`, `"0"`, `"30"`, and `"90"` (the numbers 0, 30,
+#'        and 90 are accepted too). Default: `"90"`
 #'
 #' @param ...   Parameters for underlying functions. Prefixing parameter names
 #'        with a layer name ensures that a particular parameter is passed to,
@@ -52,11 +53,12 @@ taxa_stacked <- function (
     biom, rank = -1, taxa = 6, colors = TRUE, patterns = FALSE,
     label.by = NULL, order.by = NULL, facet.by = NULL,
     dist = "euclidean", clust = "complete", other = TRUE,
-    unc = "singly", lineage = FALSE, xlab.angle = 90, ...) {
+    unc = "singly", lineage = FALSE, xlab.angle = "90", ...) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_stacked', params)
+  schema_check('taxa_stacked', params)
 
 
   #________________________________________________________
@@ -81,7 +83,7 @@ taxa_stacked <- function (
       validate_biom_field('facet.by', null_ok = TRUE, max = Inf, col_type = "cat")
 
       xlab.angle <- as.character(xlab.angle)
-      validate_var_choices('xlab.angle', choices = c('auto', '0', '30', '90'))
+      validate_var_choices('xlab.angle', choices = CHOICES$xlab.angle)
 
 
       #________________________________________________________

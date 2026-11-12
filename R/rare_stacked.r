@@ -47,6 +47,7 @@ rare_stacked <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('rare_stacked', params)
+  schema_check('rare_stacked', params)
 
 
   #________________________________________________________
@@ -79,12 +80,11 @@ rare_stacked_build <- function (params) {
   #________________________________________________________
   with(params, {
 
-    if (!(is_scalar_logical(rline) || is_scalar_integerish(rline)) || is.na(rline))
-      cli_abort("`rline` must be TRUE, FALSE, or an integer, not {.type {rline}}.")
+    validate_rline()
 
     validate_bool('counts')
     validate_bool('labels')
-    validate_var_choices('y.transform', c('none', 'log10'))
+    validate_var_choices('y.transform', CHOICES$rare.y.transform)
     if (y.transform == 'none' || hasName(.dots, 'yaxis.transform')) y.transform <- NULL
   })
 

@@ -72,6 +72,7 @@ bdiv_ord_plot <- function (
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_ord_plot', cmd_params(params))
+  schema_check('bdiv_ord_plot', params)
 
 
   #________________________________________________________
@@ -112,15 +113,12 @@ bdiv_ord_build <- function (params) {
 
     validate_bdiv(multiple = TRUE)
     validate_rank(max = Inf, null_ok = TRUE)
-    validate_layers('layers', choices = c(
-      'p' = "point",   'n' = "name",  's' = "spider",
-      'd' = "density", 't' = "taxon", 'm' = "mean",
-      'a' = "arrow",   'e' = "ellipse" ))
+    validate_layers('layers', choices = CHOICES$ord.layers)
 
     validate_biom_field('stat.by',  null_ok = TRUE, col_type = "cat")
     validate_biom_field('facet.by', null_ok = TRUE, col_type = "cat", max = Inf)
     validate_biom_field('strata',   null_ok = TRUE, col_type = "cat")
-    validate_var_choices('test', c("adonis2", "mrpp", "betadisper", "none"))
+    validate_var_choices('test', CHOICES$ord.test)
     validate_bool('caption')
 
     # The biplot is only computed when a taxa layer will show it.
@@ -170,11 +168,7 @@ bdiv_ord_build <- function (params) {
   #________________________________________________________
   # Initialize the `layers` object.
   #________________________________________________________
-  init_layers(
-    params  = params,
-    choices = c( 'p' = "point",   'n' = "name",  's' = "spider",
-                 'd' = "density", 't' = "taxon", 'm' = "mean",
-                 'a' = "arrow",   'e' = "ellipse" ))
+  init_layers(params = params, choices = CHOICES$ord.layers)
 
   if (is.null(params$rank))
     del_layer(params, c('taxon', 'arrow', 'mean'))

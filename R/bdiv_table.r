@@ -266,6 +266,7 @@ bdiv_distmat <- function (
 
   params <- eval_envir(environment())
   cmd    <- current_cmd('bdiv_distmat', cmd_params(params))
+  schema_check('bdiv_distmat', params)
 
 
   #________________________________________________________
@@ -283,8 +284,8 @@ bdiv_distmat <- function (
   #________________________________________________________
   validate_bdiv()
   validate_alpha()
-  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
-  validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
+  validate_var_choices('transform', CHOICES$transform)
+  validate_var_choices('ties', CHOICES$ties)
   validate_seed()
   validate_cpus()
 

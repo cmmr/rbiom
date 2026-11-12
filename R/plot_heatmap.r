@@ -206,12 +206,8 @@ plot_heatmap_build <- function (params) {
   if (nrow(mtx) < 1 || ncol(mtx) < 1)
     cli_abort("`mtx` must have at least one row and one column.")
 
-  stopifnot(
-    (is_logical(label) && length(label) <= 2) ||
-    is_string(label, c("rows", "cols", "both", "bottom", "right", "none")) )
-  stopifnot(
-    (is_logical(trees) && length(trees) <= 2) ||
-    is_string(trees, c("rows", "cols", "both", "left", "top", "none")) )
+  validate_sides('label', choices = CHOICES$heatmap.label)
+  validate_sides('trees', choices = CHOICES$heatmap.trees)
 
   if (!any(is_na(clust), is_false(clust), inherits(clust, 'hclust')))
     validate_clust(max = 2, na_ok = TRUE)
@@ -219,13 +215,14 @@ plot_heatmap_build <- function (params) {
   if (!inherits(dist, 'dist'))
     validate_dist(max = 2)
 
-  stopifnot(is_null(label_size)   || (is.numeric(label_size)   && length(label_size)   <= 2) )
-  stopifnot(is_null(tree_height)  || (is.numeric(tree_height)  && length(tree_height)  <= 2))
-  stopifnot(is_null(track_height) || (is.numeric(track_height) && length(track_height) <= 2))
+  validate_sides('label_size',   numeric = TRUE)
+  validate_sides('tree_height',  numeric = TRUE)
+  validate_sides('track_height', numeric = TRUE)
   stopifnot(is.numeric(asp) && length(asp) == 1 && !is_na(asp))
-  stopifnot(is_string(rescale, c("none", "rows", "cols")))
-  stopifnot(is_string(legend, c("right", "bottom")))
-  stopifnot(is_string(as.character(xlab.angle), c("auto", "0", "30", "90")))
+  validate_var_choices('rescale', choices = CHOICES$rescale)
+  validate_var_choices('legend',  choices = CHOICES$legend)
+  xlab.angle <- as.character(xlab.angle)
+  validate_var_choices('xlab.angle', choices = CHOICES$xlab.angle)
 
   if (!(is.null(title) || (is_scalar_character(title) && !is.na(title))))
     cli_abort("`title` must be NULL or a character string, not {.type {title}}: {title}.")

@@ -4,12 +4,13 @@
 write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly', overwrite = FALSE) {
 
   require_package('openxlsx', 'to save as an Excel file')
+  schema_check('write_xlsx', environment())
 
 
   #________________________________________________________
   # Sanity Checks
   #________________________________________________________
-  unc <- match.arg(tolower(unc), c("asis", "singly", "grouped", "drop"))
+  unc <- match.arg(tolower(unc), CHOICES$unc)
   validate_bool('overwrite')
 
   file <- check_outfile(file, overwrite)

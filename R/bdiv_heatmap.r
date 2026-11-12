@@ -104,6 +104,7 @@ bdiv_heatmap <- function (
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_heatmap', cmd_params(params))
+  schema_check('bdiv_heatmap', params)
 
 
   #________________________________________________________
@@ -124,8 +125,7 @@ bdiv_heatmap <- function (
       if (biom$n_samples < 2)
         cli_abort("At least two samples are needed for a bdiv heatmap.")
 
-      if (!(isTRUE(title) || is.null(title) || (is_scalar_character(title) && !is.na(title))))
-        cli_abort("`title` must be TRUE, NULL, or a character string, not {.type {title}}: {title}.")
+      validate_title()
 
       if (!is_list(grid)) grid <- list(label = "Dissimilarity", colors = grid)
 

@@ -141,6 +141,15 @@ reference:
   - plot_heatmap
   - theme_rbiom
   
+- title: Describing Arguments
+  desc: >
+    Machine-readable descriptions of what each function's arguments accept,
+    for programs that build input controls or check requests.
+  contents:
+  - fn_schema
+  - fn_check
+  - list_palettes
+
 - title: Datasets
   desc: >
     Built-in microbiome datasets for testing and examples.

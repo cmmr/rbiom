@@ -84,8 +84,9 @@
 write_biom <- function (biom, file, format = "json", overwrite = FALSE) {
 
   biom <- as_rbiom(biom)
+  schema_check('write_biom', environment())
 
-  format <- match.arg(tolower(format), c("tab", "json", "hdf5"))
+  format <- match.arg(tolower(format), CHOICES$biom.format)
   validate_bool('overwrite')
 
   #________________________________________________________

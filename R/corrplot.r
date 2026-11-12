@@ -131,6 +131,7 @@ adiv_corrplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('adiv_corrplot', params)
+  schema_check('adiv_corrplot', params)
 
 
   #________________________________________________________
@@ -211,6 +212,7 @@ bdiv_corrplot <- function (
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_corrplot', cmd_params(params))
+  schema_check('bdiv_corrplot', params)
 
 
   #________________________________________________________
@@ -229,9 +231,9 @@ bdiv_corrplot <- function (
       validate_var_cmp(c('stat.by', 'facet.by'))
 
       validate_bdiv(multiple = TRUE)
-      validate_var_choices('test', c('none', 'mantel'))
+      validate_var_choices('test', CHOICES$corr.bdiv.test)
       validate_seed()
-      validate_var_range('permutations', int = TRUE, range = c(1, Inf), n = 1)
+      validate_var_range('permutations', int = TRUE, range = arg_range(ARGS$permutations), n = 1)
 
 
       #________________________________________________________
@@ -315,6 +317,7 @@ rare_corrplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('rare_corrplot', params)
+  schema_check('rare_corrplot', params)
 
 
   #________________________________________________________
@@ -432,6 +435,7 @@ taxa_corrplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_corrplot', params)
+  schema_check('taxa_corrplot', params)
 
 
   #________________________________________________________

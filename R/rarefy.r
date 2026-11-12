@@ -69,8 +69,9 @@ rarefy <- function(
 
   biom <- as_rbiom(biom)
   if (isTRUE(clone)) biom <- biom$clone()
+  schema_check('rarefy', environment())
 
-  validate_var_range('depth', int = TRUE, range = c(1, Inf), null_ok = TRUE, n = 1)
+  validate_var_range('depth', int = TRUE, range = arg_range(FN_SCHEMA$rarefy$params$depth), null_ok = TRUE, n = 1)
   validate_seed()
   validate_bool('inflate')
   validate_cpus()

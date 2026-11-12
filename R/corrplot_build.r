@@ -56,13 +56,14 @@ corrplot_build <- function (params) {
       validate_df_field('strata', col_type = "cat", null_ok = TRUE)
     }
 
-    validate_var_choices('test',  choices = c('none', 'emmeans', 'emtrends', 'mantel'))
-    validate_var_choices('fit',   choices = c('lm', 'log', 'gam'))
-    validate_var_choices('p.adj', choices = p.adjust.methods)
-    validate_var_choices('alt',   choices = c("!=", ">", "<"))
+    # Beta diversity corrplots use a Mantel test on the samples.
+    validate_var_choices('test',  choices = if (eq(y, '.distance')) CHOICES$corr.bdiv.test else CHOICES$corr.test)
+    validate_var_choices('fit',   choices = CHOICES$fit)
+    validate_var_choices('p.adj', choices = CHOICES$p.adj)
+    validate_var_choices('alt',   choices = CHOICES$alt)
 
     validate_var_range('at',    null_ok = TRUE)
-    validate_var_range('level', n = 1, range = c(0.5, 1))
+    validate_var_range('level', n = 1, range = arg_range(ARGS$level))
     validate_var_range('mu',    n = 1)
 
     validate_bool('caption')
@@ -109,11 +110,7 @@ corrplot_build <- function (params) {
   #________________________________________________________
   # Convert user's `layers` spec to layer names.
   #________________________________________________________
-  init_layers(
-    params  = params,
-    choices = c(
-      't' = "trend", 'c' = "confidence", 'p' = "point",
-      'n' = "name", 'r' = "residual" ) )
+  init_layers(params = params, choices = CHOICES$corr.layers)
 
 
   #________________________________________________________

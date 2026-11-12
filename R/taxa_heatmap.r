@@ -45,6 +45,7 @@ taxa_heatmap <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_heatmap', params)
+  schema_check('taxa_heatmap', params)
 
 
   #________________________________________________________
@@ -62,11 +63,8 @@ taxa_heatmap <- function (
 
       validate_rank(max = Inf)
       validate_taxa()
-      validate_var_choices('rescale', choices = c("none", "cols", "rows"))
-
-      if (isFALSE(title)) title <- NULL
-      if (!(isTRUE(title) || is.null(title) || (is_scalar_character(title) && !is.na(title))))
-        cli_abort("`title` must be TRUE, FALSE, NULL, or a character string, not {.type {title}}: {title}.")
+      validate_var_choices('rescale', choices = CHOICES$rescale)
+      validate_title(false_ok = TRUE)
 
       if (biom$n_samples < 1)
         cli_abort("At least one sample is needed for a heatmap.")

@@ -179,6 +179,7 @@ taxa_da <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_da', params)
+  schema_check('taxa_da', params)
 
 
   #________________________________________________________
@@ -195,15 +196,11 @@ taxa_da <- function (
   validate_biom_field('split.by',   null_ok = TRUE, col_type = "cat", max = Inf)
   validate_biom_field('strata',     null_ok = TRUE, col_type = "cat")
 
-  validate_var_choices('method', "linda")
-  validate_var_choices('p.adj',  p.adjust.methods)
-  validate_var_range('prev.cut', range = c(0, 1),   n = 1)
-  validate_var_range('level',    range = c(0.5, 1), n = 1)
-
-  if (is.null(stat.by) == is.null(regr))
-    cli_abort(c(
-      'x' = "Give either `stat.by` (groups to compare) or `regr` (a numeric variable), not {if (is.null(stat.by)) 'neither' else 'both'}.",
-      'i' = "To adjust for other variables, use `covariates`." ))
+  validate_var_choices('method', CHOICES$da.method)
+  validate_var_choices('p.adj',  CHOICES$p.adj)
+  validate_var_range('prev.cut', range = arg_range(FN_SCHEMA$taxa_da$params$prev.cut), n = 1)
+  validate_var_range('level',    range = arg_range(ARGS$level), n = 1)
+  validate_stat_by_regr()
 
   if (as.logical(anyDuplicated(c(stat.by, regr, covariates, split.by, strata))))
     cli_abort("`stat.by`, `regr`, `covariates`, `split.by`, and `strata` must all be different fields.")

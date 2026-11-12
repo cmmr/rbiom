@@ -28,6 +28,7 @@ rare_multiplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('rare_multiplot', params)
+  schema_check('rare_multiplot', params)
 
 
   #________________________________________________________

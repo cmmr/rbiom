@@ -18,7 +18,7 @@ taxa_stacked(
   other = TRUE,
   unc = "singly",
   lineage = FALSE,
-  xlab.angle = 90,
+  xlab.angle = "90",
   ...
 )
 }
@@ -85,7 +85,8 @@ names (such as \emph{Incertae_Sedis}) that map to multiple higher
 level ranks. Default: \code{FALSE}}
 
 \item{xlab.angle}{Angle of the sample labels at the bottom of the plot.
-Options are \code{"auto"}, \code{0}, \code{30}, and \code{90}. Default: \code{90}}
+Options are \code{"auto"}, \code{"0"}, \code{"30"}, and \code{"90"} (the numbers 0, 30,
+and 90 are accepted too). Default: \code{"90"}}
 
 \item{...}{Parameters for underlying functions. Prefixing parameter names
 with a layer name ensures that a particular parameter is passed to,

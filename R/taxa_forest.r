@@ -71,6 +71,7 @@ taxa_forest <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_forest', params)
+  schema_check('taxa_forest', params)
 
 
   #________________________________________________________
@@ -86,8 +87,8 @@ taxa_forest <- function (
       validate_biom_field('regr',     null_ok = TRUE, col_type = "num")
       validate_biom_field('split.by', null_ok = TRUE, col_type = "cat", max = Inf)
       validate_rank(max = Inf)
-      validate_var_range('p.top', range = c(0, Inf), n = 1)
-      validate_var_range('p.sig', range = c(0, 1),   n = 1)
+      validate_var_range('p.top', range = arg_range(ARGS$p.top), n = 1)
+      validate_var_range('p.sig', range = arg_range(FN_SCHEMA$taxa_forest$params$p.sig), n = 1)
       validate_bool('caption')
       .fn <- 'taxa_forest()'
     })

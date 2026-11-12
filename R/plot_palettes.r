@@ -61,6 +61,65 @@ PALETTES <- list(
 
 
 #________________________________________________________
+# The kind of each palette in PALETTES.
+#________________________________________________________
+PALETTE_KINDS <- c(
+  setNames(rep("discrete", 15), c(
+    'bright', 'vibrant', 'okabe', 'r4', 'light', 'muted', 'fishy', 'tableau',
+    'classic', 'carto', 'tol', 'tableau20', 'kelly', 'alphabet', 'polychrome' )),
+  setNames(rep("sequential", 20), c(
+    'acton', 'bamako', 'batlow', 'bilbao', 'buda', 'davos', 'devon', 'hawaii',
+    'imola', 'lajolla', 'lapaz', 'nuuk', 'oslo', 'tokyo', 'turku',
+    'reds', 'oranges', 'greens', 'purples', 'grays' )),
+  setNames(rep("diverging", 9), c(
+    'bam', 'berlin', 'broc', 'cork', 'lisbon', 'roma', 'tofino', 'vanimo', 'vik' ))
+)
+
+
+
+#' List the color palettes.
+#'
+#' The palettes that rbiom's `colors`, `grid`, and track `colors`
+#' arguments accept by name. Prefix a name with `"-"` to reverse its
+#' colors, e.g. `"-bilbao"`.
+#'
+#' The discrete palettes are for categories. `"okabe"`, `"tol"`,
+#' `"bright"`, `"vibrant"`, `"muted"`, `"light"`, and `"carto"` are
+#' designed for color vision deficiencies. The sequential and diverging
+#' palettes are for numbers: heat map grids and numeric tracks.
+#'
+#' @param kind   Which kinds to list: any of `"discrete"`, `"sequential"`,
+#'        and `"diverging"`. `NULL` lists them all. Default: `NULL`
+#'
+#' @return A tibble with one row per palette: `name`, `kind`, and
+#'         `colors` (a list column of hex codes).
+#'
+#' @seealso [fn_schema()]
+#'
+#' @export
+#' @examples
+#'     library(rbiom)
+#'
+#'     list_palettes()
+#'
+#'     list_palettes("diverging")$name
+#'
+list_palettes <- function (kind = NULL) {
+
+  validate_var_choices('kind', c("discrete", "sequential", "diverging"), max = Inf, null_ok = TRUE)
+
+  pals <- names(PALETTES)
+  if (!is.null(kind)) pals <- pals[PALETTE_KINDS[pals] %in% kind]
+
+  tibble::tibble(
+    name   = pals,
+    kind   = unname(PALETTE_KINDS[pals]),
+    colors = unname(lapply(PALETTES[pals], function (x) paste0("#", x))) )
+}
+
+
+
+#________________________________________________________
 # See if a given string is a palette name.
 #________________________________________________________
 is_palette <- function (palette) {

@@ -133,6 +133,7 @@ adiv_matrix <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_matrix', cmd_params(params))
+  schema_check('adiv_matrix', params)
 
 
   #________________________________________________________
@@ -196,8 +197,8 @@ adiv_vector <- function (
   # Check for valid arguments.
   #________________________________________________________
   validate_adiv()
-  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt"))
-  validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
+  validate_var_choices('transform', CHOICES$adiv.transform)
+  validate_var_choices('ties', CHOICES$ties)
   validate_seed()
   validate_cpus()
 

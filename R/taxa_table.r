@@ -150,6 +150,7 @@ taxa_matrix <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_matrix', params)
+  schema_check('taxa_matrix', params)
 
 
   #________________________________________________________
@@ -158,8 +159,8 @@ taxa_matrix <- function (
   validate_taxa(null_ok = TRUE)
   validate_rank()
   validate_bool("sparse")
-  validate_var_choices('transform', c("none", "rank", "log", "log1p", "sqrt", "percent"))
-  validate_var_choices('ties', c("average", "first", "last", "random", "max", "min"))
+  validate_var_choices('transform', CHOICES$transform)
+  validate_var_choices('ties', CHOICES$ties)
   validate_seed()
 
 

@@ -170,6 +170,7 @@ adiv_boxplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('adiv_boxplot', params)
+  schema_check('adiv_boxplot', params)
 
 
   #________________________________________________________
@@ -253,6 +254,7 @@ bdiv_boxplot <- function (
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_boxplot', cmd_params(params))
+  schema_check('bdiv_boxplot', params)
 
 
   #________________________________________________________
@@ -272,7 +274,7 @@ bdiv_boxplot <- function (
 
       validate_bdiv(multiple = TRUE)
       validate_seed()
-      validate_var_range('permutations', int = TRUE, range = c(1, Inf), n = 1)
+      validate_var_range('permutations', int = TRUE, range = arg_range(ARGS$permutations), n = 1)
 
 
       #________________________________________________________
@@ -361,6 +363,7 @@ taxa_boxplot <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_boxplot', params)
+  schema_check('taxa_boxplot', params)
 
 
   #________________________________________________________
@@ -373,8 +376,8 @@ taxa_boxplot <- function (
 
     with(params, {
 
-      validate_var_choices('transform',   c('none', 'rank', 'log', 'log1p', 'sqrt', 'percent'))
-      validate_var_choices('y.transform', c('none', 'log1p', 'sqrt'))
+      validate_var_choices('transform',   CHOICES$transform)
+      validate_var_choices('y.transform', CHOICES$box.y.transform)
 
 
       #________________________________________________________

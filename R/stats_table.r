@@ -174,13 +174,13 @@ stats_table <- function (
       validate_df_field('strata',   col_type = "cat", null_ok = TRUE,            force = FALSE, drop_na = FALSE)
       validate_df_field('covariates',                  null_ok = TRUE, max = Inf, force = FALSE, drop_na = FALSE)
 
-      validate_var_choices('test',  c("wilcox", "kruskal", "emmeans", "emtrends"))
-      validate_var_choices('alt',   c("!=", ">", "<"))
-      validate_var_choices('fit',   c("lm", "log", "gam"))
-      validate_var_choices('p.adj', p.adjust.methods)
+      validate_var_choices('test',  CHOICES$stats.test)
+      validate_var_choices('alt',   CHOICES$alt)
+      validate_var_choices('fit',   CHOICES$fit)
+      validate_var_choices('p.adj', CHOICES$p.adj)
 
       validate_var_range('at',    null_ok = TRUE)
-      validate_var_range('level', n = 1, range = c(0.5, 1))
+      validate_var_range('level', n = 1, range = arg_range(ARGS$level))
       validate_var_range('mu',    n = 1)
 
 
@@ -440,8 +440,8 @@ bdiv_stats <- function (
   validate_biom_field('split.by', null_ok = TRUE, col_type = "cat", max = Inf)
   validate_biom_field('strata',   null_ok = TRUE, col_type = "cat")
 
-  validate_var_choices('p.adj', p.adjust.methods)
-  validate_var_range('permutations', int = TRUE, range = c(1, Inf), n = 1)
+  validate_var_choices('p.adj', CHOICES$p.adj)
+  validate_var_range('permutations', int = TRUE, range = arg_range(ARGS$permutations), n = 1)
   validate_seed()
   validate_alpha()
   validate_cpus()
@@ -450,9 +450,9 @@ bdiv_stats <- function (
     cli_abort("Either `stat.by` (groups to compare) or `regr` (a numeric covariate) is required.")
 
   if (is.null(regr)) {
-    validate_var_choices('test', c("adonis2", "mrpp", "betadisper"))
+    validate_var_choices('test', CHOICES$bdiv.test)
   } else {
-    validate_var_choices('test', c("mantel", "adonis2"))
+    validate_var_choices('test', CHOICES$bdiv.regr.test)
     split.by <- unique(c(split.by, stat.by))
     stat.by  <- NULL
   }

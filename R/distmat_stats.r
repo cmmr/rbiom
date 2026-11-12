@@ -143,9 +143,9 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
   if (!inherits(dm, 'dist'))
     cli_abort("`dm` must be a dist object, not {.type {dm}}.")
 
-  validate_var_choices('test', c("adonis2", "mrpp", "betadisper", "mantel", "none"))
+  validate_var_choices('test', CHOICES$distmat.test)
   validate_seed()
-  validate_var_range('permutations', int = TRUE, range = c(1, Inf), n = 1)
+  validate_var_range('permutations', int = TRUE, range = arg_range(ARGS$permutations), n = 1)
 
   if (test == "none") return (NULL)
 

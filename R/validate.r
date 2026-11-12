@@ -1,17 +1,17 @@
 
 validate_cpus <- function (
-    var = "cpus", range = c(1, 256), env = parent.frame(), evar = var, 
+    var = "cpus", range = arg_range(ARGS$cpus), env = parent.frame(), evar = var, 
     n = 1, int = TRUE, null_ok = TRUE, if_null = ecodive::n_cpus(), ...) {
   validate_var_range(var, range, env, evar, n, int, null_ok, if_null = if_null, ...)
 }
 
 validate_seed <- function (
-    var = "seed", range = c(0, Inf), env = parent.frame(), evar = var, 
+    var = "seed", range = arg_range(ARGS$seed), env = parent.frame(), evar = var, 
     n = 1, int = TRUE, ...) {
   validate_var_range(var, range, env, evar, n, int, ...)
 }
 
-validate_alpha <- function (var = "alpha", range = c(0, 1), env = parent.frame()) {
+validate_alpha <- function (var = "alpha", range = arg_range(ARGS$alpha), env = parent.frame()) {
   validate_var_range(var, range, env = env, n = 1)
 }
 
@@ -111,23 +111,124 @@ validate_bdiv <- function (
 }
 
 validate_ord <- function (var = "ord", env = parent.frame(), ...) {
-  choices <- c("PCoA", "tSNE", "NMDS", "UMAP")
-  validate_var_choices(var, choices, env, all_option = ".all", ...)
+  validate_var_choices(var, CHOICES$ord, env, all_option = ".all", ...)
 }
 
 validate_dist <- function (var = "dist", env = parent.frame(), ...) {
-  choices <- c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski")
-  validate_var_choices(var, choices, env, all_option = ".all", ...)
+  validate_var_choices(var, CHOICES$dist, env, all_option = ".all", ...)
 }
 
 validate_clust <- function (var = "clust", env = parent.frame(), ...) {
-  choices <- c("average", "ward", "mcquitty", "single", "median", "complete", "centroid")
-  validate_var_choices(var, choices, env, all_option = ".all", ...)
+
+  # "ward" is hclust()'s former name for "ward.D".
+  x <- get(var, pos = env, inherits = FALSE)
+  if (is.character(x)) {
+    x[!is.na(x) & tolower(x) == "ward"] <- "ward.D"
+    assign(var, x, pos = env)
+  }
+
+  validate_var_choices(var, CHOICES$clust, env, all_option = ".all", ...)
 }
 
 validate_unc <- function (var = "unc", env = parent.frame(), ...) {
-  choices <- c("asis", "singly", "grouped", "drop")
-  validate_var_choices(var, choices, env, ...)
+  validate_var_choices(var, CHOICES$unc, env, ...)
+}
+
+
+
+#________________________________________________________
+# Phylogenetic metrics need a tree, in `tree` or in `biom`.
+#________________________________________________________
+validate_phylo_tree <- function (var, div, env = parent.frame()) {
+
+  x     <- get(var, pos = env, inherits = FALSE)
+  phylo <- intersect(x, ecodive::list_metrics(div, 'id', phylo = TRUE))
+  if (length(phylo) == 0) return (invisible(NULL))
+
+  tree <- get0('tree', envir = env, inherits = FALSE)
+  if (is.null(tree)) tree <- get0('biom', envir = env, inherits = FALSE)$tree
+
+  if (is.null(tree))
+    cli_abort(c(
+      'x' = "{.val {phylo}} need{?s/} a phylogenetic tree, but `biom` has none.",
+      'i' = "Add one with `biom$tree <- read_tree(...)`, or pass `tree`." ))
+
+  return (invisible(NULL))
+}
+
+
+
+#________________________________________________________
+# rare_*() `rline`: TRUE, FALSE, or a depth.
+#________________________________________________________
+validate_rline <- function (var = "rline", env = parent.frame(), null_ok = FALSE) {
+
+  x <- get(var, pos = env, inherits = FALSE)
+  if (is.null(x) && null_ok) return (invisible(NULL))
+
+  if (!(is_scalar_logical(x) || is_scalar_integerish(x)) || is.na(x))
+    cli_abort("`{var}` must be TRUE, FALSE, or an integer, not {.type {x}}.")
+
+  return (invisible(NULL))
+}
+
+
+
+#________________________________________________________
+# Heat map `title`: TRUE, NULL, or a string (and FALSE, meaning NULL,
+# when `false_ok`).
+#________________________________________________________
+validate_title <- function (var = "title", env = parent.frame(), false_ok = FALSE) {
+
+  x <- get(var, pos = env, inherits = FALSE)
+
+  if (false_ok && isFALSE(x)) {
+    x <- NULL
+    assign(var, x, pos = env)
+  }
+
+  if (!(isTRUE(x) || is.null(x) || (is_scalar_character(x) && !is.na(x))))
+    cli_abort("`{var}` must be TRUE, {if (false_ok) 'FALSE, ' else ''}NULL, or a character string, not {.type {x}}: {x}.")
+
+  return (invisible(NULL))
+}
+
+
+
+#________________________________________________________
+# Heat map arguments that take one value or one per side (rows, cols):
+# numbers, or TRUE/FALSE or one of `choices`.
+#________________________________________________________
+validate_sides <- function (var, env = parent.frame(), choices = NULL, numeric = FALSE) {
+
+  x <- get(var, pos = env, inherits = FALSE)
+
+  if (numeric) {
+    if (!is.null(x) && !(is.numeric(x) && length(x) <= 2))
+      cli_abort("`{var}` must be one number or two (one per side), not {.type {x}}.")
+    return (invisible(NULL))
+  }
+
+  if (is_logical(x) && length(x) <= 2) return (invisible(NULL))
+  validate_var_choices(var, choices, env)
+}
+
+
+
+#________________________________________________________
+# taxa_da() and taxa_forest(): either `stat.by` or `regr`.
+#________________________________________________________
+validate_stat_by_regr <- function (env = parent.frame()) {
+
+  stat.by <- get0('stat.by', envir = env, inherits = FALSE)
+  regr    <- get0('regr',    envir = env, inherits = FALSE)
+
+  if (is.null(stat.by) == is.null(regr))
+    cli_abort(c(
+      'x' = "Give either `stat.by` (groups to compare) or `regr` (a numeric variable), not {if (is.null(stat.by)) 'neither' else 'both'}.",
+      'i' = "To adjust for other variables, use `covariates`." ))
+
+  return (invisible(NULL))
 }
 
 

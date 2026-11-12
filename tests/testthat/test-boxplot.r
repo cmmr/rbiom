@@ -86,7 +86,7 @@ test_that("boxplot statistics routing", {
 
   expect_null(adiv_boxplot(rare50, x = "Sex", test = "none")$stats)
   expect_null(adiv_boxplot(rare50, x = "Sex", p.label = 0)$stats)
-  expect_error(adiv_boxplot(rare50, x = "Sex", test = "mrpp"), "not available")
+  expect_error(adiv_boxplot(rare50, x = "Sex", test = "mrpp"), "Invalid `test` option")
 
   # Beta diversity: PERMANOVA on the samples, and the statistics table
   # carries the plot's history.
@@ -97,7 +97,7 @@ test_that("boxplot statistics routing", {
   expect_equal(p$stats$.n[[1]], 20L)
   expect_silent(bdiv_boxplot(rare50[1:20], x = "==Sex", test = "mrpp", permutations = 99))
   expect_silent(bdiv_boxplot(rare50[1:20], x = "==Sex", test = "betadisper", permutations = 99))
-  expect_error(bdiv_boxplot(rare50[1:20], x = "==Sex", test = "wilcox"), "not valid")
+  expect_error(bdiv_boxplot(rare50[1:20], x = "==Sex", test = "wilcox"), "Invalid `test` option")
 
   # Strata: mixed model for pairwise comparisons, blocks for permutations.
   p <- adiv_boxplot(babies, x = "Delivery", strata = "Subject")

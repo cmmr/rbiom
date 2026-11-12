@@ -29,6 +29,8 @@
 
 taxa_clusters <- function (biom, rank = ".otu", k = 5, seed = 0, ...) {
 
+  biom <- as_rbiom(biom)
+  schema_check('taxa_clusters', environment())
   validate_seed()
 
   mtx  <- taxa_matrix(biom = biom, rank = rank)
@@ -73,6 +75,8 @@ bdiv_clusters <- function (
     biom, bdiv = "bray", weighted = NULL, normalized = NULL,
     tree = NULL, k = 5, seed = 0, alpha = 0.5, cpus = n_cpus(), ...) {
 
+  biom <- as_rbiom(biom)
+  schema_check('bdiv_clusters', environment())
   validate_bdiv()
   validate_seed()
 

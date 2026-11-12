@@ -57,14 +57,15 @@ boxplot_build <- function (params) {
       validate_df_field('strata', col_type = "cat", null_ok = TRUE)
     }
 
-    validate_var_choices('test',       choices = c('auto', 'none', 'wilcox', 'emmeans', 'kruskal', 'adonis2', 'mrpp', 'betadisper'))
-    validate_var_choices('p.adj',      choices = p.adjust.methods)
-    validate_var_choices('ci',         choices = c('ci', 'range', 'sd', 'se', 'mad'))
+    # Beta diversity box plots run permutation tests on the samples.
+    validate_var_choices('test',       choices = if (eq(y, '.distance')) CHOICES$box.bdiv.test else CHOICES$box.test)
+    validate_var_choices('p.adj',      choices = CHOICES$p.adj)
+    validate_var_choices('ci',         choices = CHOICES$ci)
     xlab.angle <- as.character(xlab.angle)
-    validate_var_choices('xlab.angle', choices = c('auto', '0', '30', '90'))
+    validate_var_choices('xlab.angle', choices = CHOICES$xlab.angle)
 
-    validate_var_range('level',   range = c(0.5, 1), n = 1)
-    validate_var_range('p.label', range = c(0, 1))
+    validate_var_range('level',   range = arg_range(ARGS$level), n = 1)
+    validate_var_range('p.label', range = arg_range(ARGS$p.label))
 
     validate_bool('flip')
     validate_bool('stripe',   default = flip)
@@ -72,7 +73,7 @@ boxplot_build <- function (params) {
     validate_bool('caption')
 
     if (exists('y.transform', inherits = FALSE))
-      validate_var_choices('y.transform', c('none', 'log1p', 'sqrt'))
+      validate_var_choices('y.transform', CHOICES$box.y.transform)
 
 
     #________________________________________________________
@@ -129,11 +130,7 @@ boxplot_build <- function (params) {
   # Convert user's `layers` spec to layers environment.
   #________________________________________________________
 
-  init_layers(
-    params  = params,
-    choices = c( 'x' = "box", 'v' = "violin",   'e' = "errorbar",
-                 'b' = "bar", 's' = "strip",    'l' = "linerange",
-                 'd' = "dot", 'c' = "crossbar", 'p' = "pointrange" ) )
+  init_layers(params = params, choices = CHOICES$box.layers)
 
   layers <- params$layers
 

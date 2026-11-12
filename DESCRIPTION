@@ -49,6 +49,7 @@ Imports:
     rlang,
     scales,
     tibble,
+    tools,
     vegan
 Suggests:
     ape,
