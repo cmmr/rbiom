@@ -150,13 +150,19 @@ test_that("a between-strata variable permutes whole strata", {
   expect_identical(plan$n, 220L)
   expect_match(attr(x, 'tbl_sum')[['Test']], "whole strata permuted .*all 220 arrangements, exact")
 
-  D2 <- as.matrix(dm)^2; n <- nrow(D2)
-  G  <- -0.5 * (diag(n) - 1/n) %*% D2 %*% (diag(n) - 1/n)
+  # Pseudo-F straight from the squared distances (Anderson 2001):
+  # SS_T = sum of d^2 over pairs / n, SS_W = the same within each group /
+  # its size. No matrix products, so the check is independent of
+  # distmat_stats()'s algebra and of the platform's BLAS (OpenBLAS 0.3.20
+  # on an ubuntu-22.04 runner once got the earlier, product-based version
+  # wrong).
+  D2   <- as.matrix(dm)^2; n <- nrow(D2)
+  ss_t <- sum(D2) / (2 * n)
   pseudo_F <- function (g) {
-    q <- qr(stats::model.matrix(~ g)); Q <- qr.Q(q)
-    trHG <- sum(Q * (G %*% Q))
-    trHG / ((sum(diag(G)) - trHG) / (n - 2))
+    ss_w <- sum(vapply(split(seq_len(n), g), FUN.VALUE = 0, function (i) sum(D2[i, i]) / (2 * length(i))))
+    (ss_t - ss_w) / (ss_w / (n - 2))
   }
+  expect_equal(pseudo_F(del), x$.stat, tolerance = 1e-10)
   subjects <- sort(unique(sid))
   n_ces    <- length(unique(sid[del == "Cesarean"]))
   splits   <- utils::combn(subjects, n_ces, simplify = FALSE)
