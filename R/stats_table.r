@@ -359,10 +359,12 @@ adiv_stats <- function (
 #'        `test = "mrpp"` and `"betadisper"` are not available for a
 #'        between-strata variable. Default: `NULL`
 #'
-#' @param within,between   Accepted for compatibility with [bdiv_table()]
-#'        and [bdiv_boxplot()], where they select which sample *pairs* are
-#'        displayed. The tests here are computed on samples, so these
-#'        arguments have no effect.
+#' @param within,between   Deprecated: the tests here run on samples, not
+#'        on pairs of samples, so these have no effect (giving either is a
+#'        warning). They select sample pairs in [bdiv_table()] and the
+#'        `bdiv_*` plots. To test within each group of a field, use
+#'        `split.by`; to compare how spread out the groups are, use
+#'        `test = "betadisper"`. Default: `NULL`
 #'
 #' @param p.adj   Method to use for multiple comparisons adjustment of
 #'        p-values. Run `p.adjust.methods` for a list of available
@@ -430,6 +432,27 @@ bdiv_stats <- function (
   regr     <- strip_cmp(regr)
   stat.by  <- strip_cmp(stat.by)
   split.by <- strip_cmp(split.by)
+
+
+  #________________________________________________________
+  # `within` and `between` select sample pairs, which tests on samples
+  # can't use. (3.x ran its tests on the selected pairs.)
+  #________________________________________________________
+  if (!is.null(within))
+    lifecycle::deprecate_warn(
+      when    = "4.0.0",
+      what    = "bdiv_stats(within)",
+      details = c(
+        "Beta diversity tests run on samples, not on pairs of samples, so `within` has no effect.",
+        'i' = "To test within each group of a field, use `split.by`. To compare how spread out the groups are, use `test = \"betadisper\"`." ))
+
+  if (!is.null(between))
+    lifecycle::deprecate_warn(
+      when    = "4.0.0",
+      what    = "bdiv_stats(between)",
+      details = c(
+        "Beta diversity tests run on samples, not on pairs of samples, so `between` has no effect.",
+        'i' = "PERMANOVA (`test = \"adonis2\"`) already compares the distances between groups with those within them." ))
 
   validate_bdiv(multiple = TRUE)
   validate_tree(null_ok = TRUE)

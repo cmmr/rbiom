@@ -270,6 +270,32 @@ test_that("default regression test has nominal type-I error", {
 })
 
 
+test_that("bdiv_stats: `within` and `between` are deprecated", {
+
+  skip_on_cran()
+
+  # Show every deprecation warning, not just the first in 8 hours.
+  old <- options(lifecycle_verbosity = "warning")
+  on.exit(options(old), add = TRUE)
+
+  # Tests run on samples, so selecting sample pairs changes nothing.
+  x0 <- bdiv_stats(b, stat.by = "Sex", permutations = 99)
+  expect_warning(
+    x1 <- bdiv_stats(b, stat.by = "Sex", within = "Body Site", permutations = 99),
+    "split.by", class = "lifecycle_warning_deprecated" )
+  expect_warning(
+    x2 <- bdiv_stats(b, stat.by = "Sex", between = "Body Site", permutations = 99),
+    "adonis2", class = "lifecycle_warning_deprecated" )
+  expect_equal(strip(x1), strip(x0))
+  expect_equal(strip(x2), strip(x0))
+
+  # The plots use them to select pairs, and don't pass them on.
+  expect_no_warning(
+    bdiv_boxplot(b, x = "==Sex", permutations = 99),
+    class = "lifecycle_warning_deprecated" )
+})
+
+
 test_that("bdiv_stats runs permutation tests on samples", {
 
   skip_on_cran()

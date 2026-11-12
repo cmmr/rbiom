@@ -112,7 +112,6 @@ one of these), \code{is_not}, \code{has_any} (it includes one of these),
 \code{is_null}, \code{not_null}. Values are canonical: layer names, not
 letters, and metric ids. Absent: the argument may always matter. }
 \item{\code{deprecated}}{ The version that deprecated the argument. }
-\item{\code{unused}}{ Accepted for compatibility, but has no effect. }
 \item{\code{r_only}}{ Only an R caller can set it: an R object, a file
 path, a host setting such as \code{cpus}, or \code{...}. \code{\link[=fn_check]{fn_check()}} refuses
 it. }

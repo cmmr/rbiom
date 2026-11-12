@@ -102,7 +102,6 @@
 #'     `is_null`, `not_null`. Values are canonical: layer names, not
 #'     letters, and metric ids. Absent: the argument may always matter. }
 #'   \item{`deprecated`}{ The version that deprecated the argument. }
-#'   \item{`unused`}{ Accepted for compatibility, but has no effect. }
 #'   \item{`r_only`}{ Only an R caller can set it: an R object, a file
 #'     path, a host setting such as `cpus`, or `...`. [fn_check()] refuses
 #'     it. }
@@ -338,7 +337,7 @@ strip_validated <- function (x) {
 # The exported entry for one function.
 #________________________________________________________
 SCHEMA_FIELDS <- c(
-  'type', 'required', 'r_only', 'deprecated', 'unused',
+  'type', 'required', 'r_only', 'deprecated',
   'class', 'coerce', 'ops', 'extra', 'div', 'aes', 'by', 'forms', 'palettes', 'needs',
   'choices', 'choices_when', 'min', 'max', 'max_n', 'per_side', 'null',
   'default', 'default_expr', 'default_note', 'when', 'note', 'desc' )

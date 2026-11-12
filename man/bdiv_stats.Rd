@@ -49,10 +49,12 @@ presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 relationships of the taxa in \code{biom}. Only required when
 computing UniFrac distances. Default: \code{biom$tree}}
 
-\item{within, between}{Accepted for compatibility with \code{\link[=bdiv_table]{bdiv_table()}}
-and \code{\link[=bdiv_boxplot]{bdiv_boxplot()}}, where they select which sample \emph{pairs} are
-displayed. The tests here are computed on samples, so these
-arguments have no effect.}
+\item{within, between}{Deprecated: the tests here run on samples, not
+on pairs of samples, so these have no effect (giving either is a
+warning). They select sample pairs in \code{\link[=bdiv_table]{bdiv_table()}} and the
+\verb{bdiv_*} plots. To test within each group of a field, use
+\code{split.by}; to compare how spread out the groups are, use
+\code{test = "betadisper"}. Default: \code{NULL}}
 
 \item{split.by}{Dataset field(s) that the data should be split by prior to
 any calculations. Must be categorical. Default: \code{NULL}}

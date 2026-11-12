@@ -288,7 +288,7 @@ test_that("fields: fn_check() follows `class` and `coerce`, as the functions do"
     for (nm in names(specs)) {
 
       spec <- specs[[nm]]
-      if (spec$type != 'field' || isTRUE(spec$unused)) next
+      if (spec$type != 'field' || !is.null(spec$deprecated)) next
 
       # Other arguments that the field must not clash with.
       args <- base[setdiff(names(base), c('biom', 'file', 'overwrite', nm))]
@@ -459,7 +459,7 @@ test_that("fn_check()", {
   expect_error(fn_check("taxa_boxplot", list(x = ".taxa"), d), "Invalid `x` option")
 
   # bdiv_stats(): the tests depend on `regr`; prefixes are dropped, and
-  # `within` / `between` are not used.
+  # `within` / `between` are deprecated (not checked).
   expect_error(fn_check("bdiv_stats", list(), d), "Either `stat.by`")
   expect_error(fn_check("bdiv_stats", list(stat.by = "Sex", test = "mantel"), d), "Choices are: adonis2, mrpp, betadisper")
   expect_identical(fn_check("bdiv_stats", list(regr = "==Age", test = "man"), d), list(regr = "Age", test = "mantel"))

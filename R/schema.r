@@ -21,7 +21,6 @@
 #   r_only    Only an R caller may set it (an R object, a file path, or a
 #             host setting). fn_check() refuses it.
 #   deprecated  The version that deprecated it.
-#   unused    Accepted, for compatibility, but has no effect.
 #   class     For fields: "categorical", "numeric", or "any".
 #   coerce    For categorical fields: numeric fields are accepted too, and
 #             treated as categories.
@@ -602,8 +601,8 @@ FN_SCHEMA <- list(
       bdiv         = ARGS$bdiv,
       weighted     = ARGS$weighted,
       tree         = ARGS$tree,
-      within       = like(ARGS$within,  unused = TRUE),
-      between      = like(ARGS$between, unused = TRUE),
+      within       = like(ARGS$within,  deprecated = "4.0.0", null = "Not set.", note = "Has no effect: the tests run on samples, not sample pairs. Use `split.by` to test within each group of a field."),
+      between      = like(ARGS$between, deprecated = "4.0.0", null = "Not set.", note = "Has no effect: the tests run on samples, not sample pairs."),
       split.by     = like(STATS$split.by, ops = c('==', '!='), note = "A `==` or `!=` prefix is accepted and ignored."),
       strata       = ARGS$strata,
       test         = arg(
@@ -996,8 +995,7 @@ schema_check <- function (fn, env = parent.frame()) {
 #________________________________________________________
 schema_check_arg <- function (name, spec, env) {
 
-  if (isTRUE(spec$r_only) || !is.null(spec$deprecated) || isTRUE(spec$unused))
-    return (invisible())
+  if (isTRUE(spec$r_only) || !is.null(spec$deprecated)) return (invisible())
 
   x       <- get(name, envir = env, inherits = FALSE)
   null_ok <- !is.null(spec$null)
