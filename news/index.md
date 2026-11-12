@@ -228,6 +228,11 @@
   [`adiv_matrix()`](https://cmmr.github.io/rbiom/reference/adiv_table.md),
   [`bdiv_distmat()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md),
   [`taxa_matrix()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+  [`adiv_table()`](https://cmmr.github.io/rbiom/reference/adiv_table.md),
+  [`bdiv_table()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md),
+  [`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+  [`bdiv_ord_table()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_table.md),
+  [`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md),
   [`write_biom()`](https://cmmr.github.io/rbiom/reference/write_biom.md),
   and
   [`write_xlsx()`](https://cmmr.github.io/rbiom/reference/write_biom.md).

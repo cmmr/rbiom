@@ -114,8 +114,10 @@ bdiv_distmat(
 
 - delta:
 
-  For numeric metadata, report the absolute difference in values for the
-  two samples, for instance `2` instead of `"10 vs 12"`. Default: `TRUE`
+  Numeric dataset field(s) to report as the absolute difference between
+  the two samples, for instance `2` instead of `"10 vs 12"`, or `'.all'`
+  for every numeric field. Only fields that are also in `md`, `within`,
+  or `between` appear in the output. Default: `'.all'`
 
 - norm:
 

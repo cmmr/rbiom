@@ -163,9 +163,10 @@ be prefixed with <code>'=='</code> or <code>'!='</code> to assign them to <code>
 
 
 <dt id="arg-delta">delta<a class="anchor" aria-label="anchor" href="#arg-delta"></a></dt>
-<dd><p>For numeric metadata, report the absolute difference in values
-for the two samples, for instance <code>2</code> instead of <code>"10 vs 12"</code>.
-Default: <code>TRUE</code></p></dd>
+<dd><p>Numeric dataset field(s) to report as the absolute difference
+between the two samples, for instance <code>2</code> instead of <code>"10 vs 12"</code>,
+or <code>'.all'</code> for every numeric field. Only fields that are also in
+<code>md</code>, <code>within</code>, or <code>between</code> appear in the output. Default: <code>'.all'</code></p></dd>
 
 
 <dt id="arg-norm">norm<a class="anchor" aria-label="anchor" href="#arg-norm"></a></dt>

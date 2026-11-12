@@ -206,7 +206,7 @@ and
 
     head(names(fn_schema()))
 #> [1] "adiv_boxplot"  "adiv_corrplot" "adiv_stats"    "adiv_matrix"  
-#> [5] "bdiv_boxplot"  "bdiv_corrplot"
+#> [5] "adiv_table"    "bdiv_boxplot" 
 
     x <- fn_schema("adiv_boxplot")
     x$returns
