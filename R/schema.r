@@ -179,6 +179,14 @@ ARGS <- list(
   normalized = arg('logical', deprecated = "2.3.0", null = "Not set: the metric name decides.", note = "Use a metric name such as \"normalized_unifrac\" instead."),
   alpha      = arg('number', min = 0, max = 1, max_n = 1, when = list(when_has_any('bdiv', 'generalized_unifrac'))),
 
+  # Metadata columns in a returned table. validate_biom_field() takes
+  # ".all" for every field, but only on its own.
+  md        = arg('field', class = 'any', extra = '.all', null = "No metadata columns.", note = "\".all\" (on its own) adds every metadata field."),
+
+  # Ordination.
+  ord       = arg('choice', choices = CHOICES$ord, all = '.all', note = "\"tSNE\" needs the Rtsne package and \"UMAP\" the uwot package."),
+  ord.k     = arg('integer', min = 2, max = 3, max_n = 1),
+
   # Taxa.
   rank      = arg('rank'),
   rank1     = arg('rank', max_n = 1),
@@ -434,6 +442,18 @@ FN_SCHEMA <- list(
       seed       = ARGS$seed,
       cpus       = ARGS$cpus )),
 
+  adiv_table = list(
+    returns = RETURNS$table,
+    params  = list(
+      biom       = ARGS$biom,
+      adiv       = ARGS$adiv,
+      md         = ARGS$md,
+      tree       = ARGS$tree,
+      transform  = ARGS$adiv.transform,
+      ties       = ARGS$ties,
+      seed       = ARGS$seed,
+      cpus       = ARGS$cpus )),
+
 
   #________________________________________________________
   # Beta diversity.
@@ -534,7 +554,7 @@ FN_SCHEMA <- list(
     params  = list(
       biom         = ARGS$biom,
       bdiv         = ARGS$bdiv,
-      ord          = arg('choice', choices = CHOICES$ord, all = '.all', note = "\"tSNE\" needs the Rtsne package and \"UMAP\" the uwot package."),
+      ord          = ARGS$ord,
       layers       = arg('layers', choices = CHOICES$ord.layers),
       stat.by      = arg('field', class = 'categorical', max_n = 1, null = "No groups."),
       facet.by     = ARGS$facet.by,
@@ -551,6 +571,33 @@ FN_SCHEMA <- list(
       unc          = ARGS$unc,
       strata       = ARGS$strata,
       caption      = ARGS$caption,
+      alpha        = ARGS$alpha,
+      cpus         = ARGS$cpus,
+      '...'        = ARGS$dots )),
+
+  bdiv_ord_table = list(
+    returns = like(RETURNS$table,
+      has  = c("code", "stats", "taxa_coords", "taxa_stats"),
+      note = "`stats` is set when `stat.by` is; `taxa_coords` and `taxa_stats` with a taxa biplot." ),
+    params  = list(
+      biom         = ARGS$biom,
+      bdiv         = ARGS$bdiv,
+      ord          = ARGS$ord,
+      weighted     = ARGS$weighted,
+      md           = like(ARGS$md, null = "No metadata columns, other than `stat.by` and `split.by`."),
+      k            = ARGS$ord.k,
+      stat.by      = arg('field', class = 'any', max_n = 1, null = "No statistics."),
+      split.by     = STATS$split.by,
+      strata       = ARGS$strata,
+      tree         = ARGS$tree,
+      test         = arg('choice', choices = CHOICES$ord.test, max_n = 1),
+      seed         = ARGS$seed,
+      permutations = like(ARGS$permutations, when = list(when_is_not('test', 'none'), when_set('stat.by'))),
+      rank         = like(ARGS$rank, null = "No taxa biplot, unless `taxa` gives taxa names."),
+      taxa         = like(ARGS$taxa, note = "Taxa names also choose the rank (the one holding most of them), even when `rank` is NULL."),
+      p.top        = ARGS$p.top,
+      p.adj        = ARGS$p.adj,
+      unc          = ARGS$unc,
       alpha        = ARGS$alpha,
       cpus         = ARGS$cpus,
       '...'        = ARGS$dots )),
@@ -587,6 +634,28 @@ FN_SCHEMA <- list(
       ties        = ARGS$ties,
       seed        = ARGS$seed,
       cpus        = ARGS$cpus )),
+
+  bdiv_table = list(
+    returns = RETURNS$table,
+    params  = list(
+      biom        = ARGS$biom,
+      bdiv        = ARGS$bdiv,
+      weighted    = ARGS$weighted,
+      normalized  = ARGS$normalized,
+      tree        = ARGS$tree,
+      md          = like(ARGS$md, ops = c('==', '!='), null = "No metadata columns, other than the fields in `within` and `between`."),
+      within      = ARGS$within,
+      between     = ARGS$between,
+      delta       = arg('field', class = 'any', ops = c('==', '!='), extra = '.all', null = "Numeric fields are shown as \"x vs y\", like categorical ones.", note = "Only numeric fields in `md`, `within`, or `between` are affected. \".all\" (on its own) selects every numeric field."),
+      norm        = arg('choice', choices = CHOICES$norm, max_n = 1, matcher = 'match.arg'),
+      pseudocount = arg('number', max_n = 1, null = "None (a warning is given when one is needed)."),
+      power       = arg('number', max_n = 1, when = list(when_has_any('bdiv', 'minkowski'))),
+      alpha       = ARGS$alpha,
+      transform   = ARGS$transform,
+      ties        = ARGS$ties,
+      seed        = ARGS$seed,
+      cpus        = ARGS$cpus,
+      '...'       = ARGS$dots )),
 
 
   bdiv_stats = list(
@@ -628,6 +697,15 @@ FN_SCHEMA <- list(
       seed         = like(ARGS$seed,         when = list(when_is_not('test', 'none'))),
       permutations = like(ARGS$permutations, when = list(when_is_not('test', 'none'))),
       strata       = arg('vector', r_only = TRUE, null = "No strata.") )),
+
+  distmat_ord_table = list(
+    returns = RETURNS$table,
+    params  = list(
+      dm    = arg('dist', r_only = TRUE),
+      ord   = ARGS$ord,
+      k     = ARGS$ord.k,
+      seed  = ARGS$seed,
+      '...' = ARGS$dots )),
 
 
   #________________________________________________________
@@ -906,6 +984,20 @@ FN_SCHEMA <- list(
       ties      = ARGS$ties,
       seed      = ARGS$seed )),
 
+  taxa_table = list(
+    returns = RETURNS$table,
+    params  = list(
+      biom      = ARGS$biom,
+      rank      = ARGS$rank,
+      taxa      = like(ARGS$taxa, null = "All taxa."),
+      lineage   = ARGS$lineage,
+      md        = ARGS$md,
+      unc       = ARGS$unc,
+      other     = ARGS$other,
+      transform = ARGS$transform,
+      ties      = ARGS$ties,
+      seed      = ARGS$seed )),
+
 
   #________________________________________________________
   # Export.
@@ -1055,7 +1147,9 @@ schema_check_arg <- function (name, spec, env) {
     field = {
 
       # Values such as ".taxa" aren't dataset fields; check the rest.
-      extra <- if (is.character(x)) intersect(x, spec$extra)
+      # ".all" is left to validate_biom_field(), which accepts it only on
+      # its own, as the functions do.
+      extra <- if (is.character(x)) intersect(x, setdiff(spec$extra, '.all'))
       if (length(extra) > 0) {
         if (length(x) > (spec$max_n %||% Inf))
           cli_abort("`{name}` cannot be length {length(x)}; maximum is {spec$max_n}.")

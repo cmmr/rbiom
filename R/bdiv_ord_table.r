@@ -80,6 +80,7 @@ bdiv_ord_table <- function (
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_ord_table', cmd_params(params))
+  schema_check('bdiv_ord_table', params)
   dots   <- params$.dots
 
 

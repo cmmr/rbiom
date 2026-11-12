@@ -157,7 +157,9 @@
   plot functions, `adiv_stats()`, `bdiv_stats()`, `taxa_stats()`, 
   `distmat_stats()`, `taxa_da()`, `taxa_clusters()`, `bdiv_clusters()`, 
   `rarefy()`, `adiv_matrix()`, `bdiv_distmat()`, `taxa_matrix()`, 
-  `write_biom()`, and `write_xlsx()`. For each argument: its kind, default, 
+  `adiv_table()`, `bdiv_table()`, `taxa_table()`, `bdiv_ord_table()`, 
+  `distmat_ord_table()`, `write_biom()`, and `write_xlsx()`. For each 
+  argument: its kind, default, 
   fixed choices (with names for layers and metrics), numeric limits, how 
   many values it takes, what `NULL` means, where dataset-dependent choices 
   come from (a categorical or numeric field, a rank, taxa, a metric that 

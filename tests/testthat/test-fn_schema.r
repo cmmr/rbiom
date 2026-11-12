@@ -9,14 +9,18 @@ schema_base_args <- function (fn) {
     adiv_corrplot  = list(biom = rare50, x = "Age"),
     adiv_matrix    = list(biom = rare50),
     adiv_stats     = list(biom = rare50, stat.by = "Sex", regr = "BMI"),
+    adiv_table     = list(biom = rare50),
     bdiv_boxplot   = list(biom = rare50, x = "Sex", stat.by = "Sex", permutations = 9),
     bdiv_corrplot  = list(biom = rare50, x = "Age", permutations = 9),
     bdiv_heatmap   = list(biom = rare50),
     bdiv_ord_plot  = list(biom = rare50, stat.by = "Sex", permutations = 9),
+    bdiv_ord_table = list(biom = rare50, stat.by = "Sex", permutations = 9),
     bdiv_clusters  = list(biom = rare50),
     bdiv_distmat   = list(biom = rare50),
     bdiv_stats     = list(biom = rare50, stat.by = "Sex", permutations = 9),
+    bdiv_table     = list(biom = rare5),
     distmat_stats  = list(dm = bdiv_distmat(rare50), groups = pull(rare50, "Sex"), permutations = 9),
+    distmat_ord_table = list(dm = bdiv_distmat(rare50)),
     rare_corrplot  = list(biom = hmp50),
     rare_multiplot = list(biom = hmp50),
     rare_stacked   = list(biom = hmp50),
@@ -30,6 +34,7 @@ schema_base_args <- function (fn) {
     taxa_clusters  = list(biom = rare50),
     taxa_matrix    = list(biom = rare50),
     taxa_stats     = list(biom = rare50, stat.by = "Sex", regr = "BMI", taxa = 2),
+    taxa_table     = list(biom = rare50),
     write_biom     = list(biom = hmp5, file = tempfile(), overwrite = TRUE),
     write_xlsx     = list(biom = hmp5, file = tempfile(fileext = ".xlsx"), overwrite = TRUE),
     stop("No base arguments for ", fn) )
@@ -86,7 +91,14 @@ test_that("each entry matches the function's formals", {
     'palette', 'tracks' )
 
   schema <- fn_schema()
-  expect_true(length(schema) >= 23)
+  expect_true(length(schema) >= 32)
+
+  # Every mismatch, as "fn(arg): problem". One expectation for the whole
+  # schema: thousands of separate ones take half a minute.
+  problems <- character(0)
+  check    <- function (ok, label, problem) {
+    if (!isTRUE(ok)) problems <<- c(problems, paste0(label, ": ", problem))
+  }
 
   for (fn in names(schema)) {
 
@@ -94,43 +106,45 @@ test_that("each entry matches the function's formals", {
     fmls  <- formals(get(fn, envir = asNamespace('rbiom')))
     specs <- param_specs(entry)
 
-    expect_identical(entry$fn, fn)
-    expect_identical(names(specs), names(fmls), label = fn)
-    expect_true(entry$returns$type %in% c("plot", "table", "factor", "matrix", "dist", "biom", "file"))
+    check(identical(entry$fn, fn),               fn, "`fn` is wrong")
+    check(identical(names(specs), names(fmls)),  fn, "arguments differ from formals()")
+    check(isTRUE(entry$returns$type %in% c("plot", "table", "factor", "matrix", "dist", "biom", "file")), fn, "unknown return type")
 
     for (nm in names(specs)) {
 
       spec  <- specs[[nm]]
       label <- paste0(fn, "(", nm, ")")
 
-      expect_true(spec$type %in% types, label = label)
-      expect_true(nzchar(spec$desc),    label = label)
+      check(isTRUE(spec$type %in% types), label, "unknown type")
+      check(isTRUE(nzchar(spec$desc)),    label, "no description")
 
       if (nm == '...') next
 
       if (identical(fmls[[nm]], quote(expr = ))) {
-        expect_true(isTRUE(spec$required), label = label)
-        expect_false(hasName(spec, 'default'), label = label)
+        check(isTRUE(spec$required),     label, "not marked as required")
+        check(!hasName(spec, 'default'), label, "a required argument has a default")
         next
       }
 
-      expect_true(hasName(spec, 'default'), label = label)
+      check(hasName(spec, 'default'), label, "no default")
 
       if (is.null(spec$default_expr)) {
-        expect_identical(spec$default, eval(fmls[[nm]], baseenv()), label = label)
+        check(identical(spec$default, eval(fmls[[nm]], baseenv())), label, "default differs from formals()")
       } else {
-        expect_null(spec$default, label = label)
-        expect_identical(spec$default_expr, paste(deparse(fmls[[nm]]), collapse = " "), label = label)
-        expect_true(nzchar(spec$default_note %||% ""), label = label)
+        check(is.null(spec$default), label, "both `default` and `default_expr`")
+        check(identical(spec$default_expr, paste(deparse(fmls[[nm]]), collapse = " ")), label, "`default_expr` differs from formals()")
+        check(nzchar(spec$default_note %||% ""), label, "no `default_note`")
       }
 
       if (is.null(spec$default) && is.null(spec$default_expr))
-        expect_true(hasName(spec, 'null'), label = label)
+        check(hasName(spec, 'null'), label, "a NULL default, but no `null`")
 
       for (cond in spec$when)
-        expect_true(cond$param %in% names(specs), label = label)
+        check(isTRUE(cond$param %in% names(specs)), label, "`when` names an unknown argument")
     }
   }
+
+  expect_identical(problems, character(0))
 })
 
 
@@ -162,12 +176,12 @@ test_that("the schema survives a round trip through JSON", {
     as.character(fn_schema("rarefy", json = TRUE)),
     as.character(jsonlite::toJSON(raw$rarefy, auto_unbox = TRUE, null = "null", digits = NA)) )
 
-  # Nothing but plain data.
-  walk <- function (x) {
-    expect_false(is.function(x) || is.environment(x) || is.language(x))
-    if (is.list(x)) for (i in x) walk(i)
+  # Nothing but plain data. (One expectation, not one per node.)
+  not_data <- function (x) {
+    if (is.function(x) || is.environment(x) || is.language(x)) return (TRUE)
+    is.list(x) && any(vapply(x, not_data, logical(1)))
   }
-  walk(schema)
+  expect_false(not_data(schema))
 })
 
 
@@ -470,6 +484,17 @@ test_that("fn_check()", {
   expect_error(fn_check("distmat_stats", list(groups = 1:3), d), "R caller")
   expect_error(fn_check("distmat_stats", list(test = "zz"), d), "Invalid `test` option")
 
+  # Tables: ".all" adds every field, but only on its own.
+  expect_setequal(fn_check("adiv_table", list(md = ".all"), d)$md, setdiff(names(d$fields), ".sample"))
+  expect_error(fn_check("adiv_table", list(md = c(".all", "Sex")), d), "Invalid `md` option")
+  expect_error(adiv_table(rare5, md = c(".all", "Sex")), "Invalid `md` option")
+  expect_identical(
+    fn_check("bdiv_table", list(md = c("==Body Site", "Age"), delta = "age"), d),
+    list(md = c("Body Site", "Age"), delta = "Age", within = "Body Site") )
+  expect_identical(fn_check("bdiv_ord_table", list(ord = "nm", k = 3), d), list(ord = "NMDS", k = 3))
+  expect_error(fn_check("bdiv_ord_table", list(k = 4), d), "between 2 and 3")
+  expect_error(fn_check("distmat_ord_table", list(dm = 1), d), "R caller")
+
   # A tree is needed for phylogenetic metrics.
   d0 <- d
   d0$tree <- FALSE
@@ -534,8 +559,8 @@ test_that("list_palettes()", {
   expect_setequal(list_palettes(c("seq", "disc"))$kind, c("sequential", "discrete"))
   expect_error(list_palettes("zz"))
 
-  # Every palette the schema suggests exists.
-  for (entry in fn_schema())
-    for (spec in entry$params)
-      expect_true(all(spec$palettes %in% p$kind))
+  # Every palette kind the schema suggests exists.
+  kinds <- unlist(lapply(fn_schema(), function (e) lapply(e$params, `[[`, 'palettes')))
+  expect_true(length(kinds) > 0)
+  expect_true(all(kinds %in% p$kind))
 })

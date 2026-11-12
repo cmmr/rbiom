@@ -55,9 +55,10 @@ presence/absence is considered. Multiple values allowed. Default: \code{NULL}}
 name.) Only changes the "Weighted UniFrac" calculation. Divides result by
 the total branch weights. Default: \code{NULL}}
 
-\item{delta}{For numeric metadata, report the absolute difference in values
-for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
-Default: \code{TRUE}}
+\item{delta}{Numeric dataset field(s) to report as the absolute difference
+between the two samples, for instance \code{2} instead of \code{"10 vs 12"},
+or \code{'.all'} for every numeric field. Only fields that are also in
+\code{md}, \code{within}, or \code{between} appear in the output. Default: \code{'.all'}}
 
 \item{rank}{What rank(s) of taxa to display. E.g. \code{"Phylum"},
 \code{"Genus"}, \code{".otu"}, etc. An integer vector can also be

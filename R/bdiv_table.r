@@ -59,6 +59,7 @@ bdiv_table <- function (
 
   params <- eval_envir(environment())
   cmd    <- current_cmd('bdiv_table', cmd_params(params))
+  schema_check('bdiv_table', params)
 
 
   #________________________________________________________

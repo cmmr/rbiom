@@ -52,6 +52,7 @@ adiv_table <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_table', cmd_params(params))
+  schema_check('adiv_table', params)
 
 
   #________________________________________________________

@@ -50,6 +50,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
     p$dm <- aa(NA, display = "dm")
     current_cmd('distmat_ord_table', p)
   })
+  schema_check('distmat_ord_table', params)
 
 
   #________________________________________________________

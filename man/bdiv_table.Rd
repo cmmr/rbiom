@@ -93,9 +93,10 @@ comparisons. Alternatively, dataset field names given elsewhere can
 be prefixed with \code{'=='} or \code{'!='} to assign them to \code{within} or
 \code{between}, respectively. Default: \code{NULL}}
 
-\item{delta}{For numeric metadata, report the absolute difference in values
-for the two samples, for instance \code{2} instead of \code{"10 vs 12"}.
-Default: \code{TRUE}}
+\item{delta}{Numeric dataset field(s) to report as the absolute difference
+between the two samples, for instance \code{2} instead of \code{"10 vs 12"},
+or \code{'.all'} for every numeric field. Only fields that are also in
+\code{md}, \code{within}, or \code{between} appear in the output. Default: \code{'.all'}}
 
 \item{norm}{Normalize the incoming counts. Options are:
 \itemize{

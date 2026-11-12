@@ -10,6 +10,7 @@ taxa_table <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_table', params)
+  schema_check('taxa_table', params)
 
 
   #________________________________________________________
