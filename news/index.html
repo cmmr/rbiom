@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,16 @@
       <small>Source: <a href="https://github.com/cmmr/rbiom/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="4.0.0.9001" id="rbiom-4009001">rbiom 4.0.0.9001<a class="anchor" aria-label="anchor" href="#rbiom-4009001"></a></h2>
+<ul><li>
+<code><a href="../reference/fn_schema.html">fn_schema()</a></code> entries say which counts a function wants (<code>counts</code>: <code>"rarefied"</code> or <code>"unrarefied"</code>) and which optional package a function needs (<code>needs</code>, e.g. <code><a href="../reference/write_biom.html">write_xlsx()</a></code>). Choices that need an optional package are marked in <code>choices_needs</code> (<code>ord</code>’s <code>"tSNE"</code> and <code>"UMAP"</code>, <code><a href="../reference/bdiv_ord_plot.html">bdiv_ord_plot()</a></code>’s <code>"density"</code> layer, and <code><a href="../reference/write_biom.html">write_biom()</a></code>’s <code>"hdf5"</code> format); <code>strata</code> in <code><a href="../reference/taxa_da.html">taxa_da()</a></code> and <code><a href="../reference/taxa_forest.html">taxa_forest()</a></code> is marked as needing lmerTest.</li>
+<li>The schema is versioned: any change to what <code><a href="../reference/fn_schema.html">fn_schema()</a></code> returns comes with a new package version.</li>
+<li>
+<code><a href="../reference/fn_check.html">fn_check()</a></code> refuses deprecated arguments (<code>weighted</code>, <code>normalized</code>, and <code><a href="../reference/bdiv_stats.html">bdiv_stats()</a></code>’s <code>within</code> and <code>between</code>), saying what to use instead.</li>
+<li>A metric name that doesn’t match is reported under the caller’s argument (<code>adiv = "nosuch"</code>, <code>bdiv = "nosuch"</code>), not ecodive’s <code>metric</code>.</li>
+<li>Beta diversity heat maps, ordinations, clusterings, box plots, scatter plots, and statistics stop with a clear message when the metric gives infinite or missing distances (e.g. <code>"bhattacharyya"</code> between samples with no taxa in common), rather than an internal error.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="4.0.0" id="rbiom-400">rbiom 4.0.0<a class="anchor" aria-label="anchor" href="#rbiom-400"></a></h2>
 <div class="section level3">

@@ -13,7 +13,7 @@ that only keeps a summary can check requests before passing them on."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,8 @@ an error, with the message the function would give.</p>
     <p>Checks cover the type, choices, limits, and number of each value;
 metadata field names and their classes; ranks; metric names (and
 whether a phylogenetic metric has a tree); and the constraints in the
-entry's <code>rules</code>. Checks that need computed data are left to the
+entry's <code>rules</code>. Deprecated arguments are refused, with what to use
+instead. Checks that need computed data are left to the
 function: names in <code>colors</code>, <code>shapes</code>, and <code>patterns</code> against the
 groups, palette and color names, the parts of a <code>tracks</code> or <code>grid</code>
 list, and taxa names.</p>

@@ -14,13 +14,13 @@ Source:
 [`DESCRIPTION`](https://github.com/cmmr/rbiom/blob/master/DESCRIPTION)
 
 Smith D (2026). *rbiom: Integrated Analysis and Visualization of
-Microbiome Data*. R package version 4.0.0,
+Microbiome Data*. R package version 4.0.0.9001,
 <https://cmmr.github.io/rbiom/>.
 
     @Manual{,
       title = {rbiom: Integrated Analysis and Visualization of Microbiome Data},
       author = {Daniel P. Smith},
       year = {2026},
-      note = {R package version 4.0.0},
+      note = {R package version 4.0.0.9001},
       url = {https://cmmr.github.io/rbiom/},
     }

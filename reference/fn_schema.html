@@ -19,7 +19,7 @@ own arguments, so the two cannot disagree."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rbiom</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,6 +112,16 @@ covered functions. With <code>json = TRUE</code>, the same as a JSON string.</p>
 <code>has</code> lists the <code>$</code> fields the result carries (e.g. <code>"data"</code>,
 <code>"code"</code>, <code>"stats"</code>).</p></dd>
 
+<dt><code>counts</code></dt>
+<dd><p>(Optional) The counts the function should be given,
+where it makes a difference: <code>"rarefied"</code> (diversity and abundance
+compared at one sequencing depth), or <code>"unrarefied"</code> (rarefaction
+curves, <code><a href="rarefy.html">rarefy()</a></code> itself, and differential abundance, which models
+sequencing depth itself).</p></dd>
+
+<dt><code>needs</code></dt>
+<dd><p>(Optional) An optional package the function requires.</p></dd>
+
 <dt><code>rules</code></dt>
 <dd><p>(Optional) Constraints between arguments, each one of:
 <code>one_of</code> (exactly one of these arguments must be non-<code>NULL</code>);
@@ -167,6 +177,11 @@ and what it means. <code>default</code> is then <code>NULL</code>.</p></dd>
 <dt><code>choices</code></dt>
 <dd><p>The fixed options. Matching ignores case and
 accepts unambiguous abbreviations.</p></dd>
+
+<dt><code>choices_needs</code></dt>
+<dd><p>The choices that need an optional package,
+as choice = package (layer name = package for layers), e.g.
+<code>tSNE = "Rtsne"</code>. Choices not listed need nothing extra.</p></dd>
 
 <dt><code>choices_when</code></dt>
 <dd><p>Options that depend on other arguments: a list
@@ -239,7 +254,12 @@ it.</p></dd>
 
 </dl><p>In JSON, <code>NULL</code> is <code>null</code>, numbers are written in full, <code>Inf</code> is the
 string <code>"Inf"</code>, and the list fields (<code>choices</code>, <code>forms</code>, <code>ops</code>,
-<code>palettes</code>, <code>has</code>, and the values in <code>when</code>) are always arrays.</p>
+<code>palettes</code>, <code>has</code>, and the values in <code>when</code>) are always arrays.
+<code>choices_needs</code> is an object.</p>
+<p>The description is part of rbiom's interface: any change to it comes
+with a new package version, so a caller can cache it by
+<code>packageVersion("rbiom")</code>. The metric <code>choices</code> come from the installed
+version of the ecodive package.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -273,7 +293,7 @@ string <code>"Inf"</code>, and the list fields (<code>choices</code>, <code>form
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ desc   : chr "Method for computing p-values."</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="fu">fn_schema</span><span class="op">(</span><span class="st">"rarefy"</span>, json <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> {"fn":"rarefy","returns":{"type":"biom","has":["code"]},"params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> {"fn":"rarefy","returns":{"type":"biom","has":["code"]},"counts":"unrarefied","params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

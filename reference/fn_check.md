@@ -60,9 +60,10 @@ argument is an error, with the message the function would give.
 Checks cover the type, choices, limits, and number of each value;
 metadata field names and their classes; ranks; metric names (and whether
 a phylogenetic metric has a tree); and the constraints in the entry's
-`rules`. Checks that need computed data are left to the function: names
-in `colors`, `shapes`, and `patterns` against the groups, palette and
-color names, the parts of a `tracks` or `grid` list, and taxa names.
+`rules`. Deprecated arguments are refused, with what to use instead.
+Checks that need computed data are left to the function: names in
+`colors`, `shapes`, and `patterns` against the groups, palette and color
+names, the parts of a `tracks` or `grid` list, and taxa names.
 
 ## See also
 

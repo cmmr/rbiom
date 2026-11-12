@@ -157,7 +157,7 @@ merged with the usual 'Reads Per Sample' tab.
 
     outfile <- write_biom(hmp50, tempfile(fileext = ".biom.gz"))
     file.size(outfile)
-#> [1] 72965
+#> [1] 72975
     unlink(outfile)
 
     if (requireNamespace("openxlsx", quietly = TRUE)) {

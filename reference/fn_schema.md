@@ -47,6 +47,18 @@ Each entry has:
   the `$` fields the result carries (e.g. `"data"`, `"code"`,
   `"stats"`).
 
+- `counts`:
+
+  (Optional) The counts the function should be given, where it makes a
+  difference: `"rarefied"` (diversity and abundance compared at one
+  sequencing depth), or `"unrarefied"` (rarefaction curves,
+  [`rarefy()`](https://cmmr.github.io/rbiom/reference/rarefy.md) itself,
+  and differential abundance, which models sequencing depth itself).
+
+- `needs`:
+
+  (Optional) An optional package the function requires.
+
 - `rules`:
 
   (Optional) Constraints between arguments, each one of: `one_of`
@@ -104,6 +116,12 @@ help text). The other fields are present only when they apply.
 
   The fixed options. Matching ignores case and accepts unambiguous
   abbreviations.
+
+- `choices_needs`:
+
+  The choices that need an optional package, as choice = package (layer
+  name = package for layers), e.g. `tSNE = "Rtsne"`. Choices not listed
+  need nothing extra.
 
 - `choices_when`:
 
@@ -190,6 +208,12 @@ help text). The other fields are present only when they apply.
 In JSON, `NULL` is `null`, numbers are written in full, `Inf` is the
 string `"Inf"`, and the list fields (`choices`, `forms`, `ops`,
 `palettes`, `has`, and the values in `when`) are always arrays.
+`choices_needs` is an object.
+
+The description is part of rbiom's interface: any change to it comes
+with a new package version, so a caller can cache it by
+`packageVersion("rbiom")`. The metric `choices` come from the installed
+version of the ecodive package.
 
 ## See also
 
@@ -226,5 +250,5 @@ and
 #>  $ desc   : chr "Method for computing p-values."
 
     fn_schema("rarefy", json = TRUE)
-#> {"fn":"rarefy","returns":{"type":"biom","has":["code"]},"params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} 
+#> {"fn":"rarefy","returns":{"type":"biom","has":["code"]},"counts":"unrarefied","params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} 
 ```
