@@ -37,8 +37,11 @@ Each entry has:
 \code{"table"}, \code{"factor"}, \code{"matrix"}, \code{"dist"}, \code{"biom"}, or \code{"file"};
 \code{has} lists the \code{$} fields the result carries (e.g. \code{"data"},
 \code{"code"}, \code{"stats"}). }
-\item{\code{rules}}{ (Optional) Constraints between arguments. \code{one_of}:
-exactly one of these arguments must be non-\code{NULL}. }
+\item{\code{rules}}{ (Optional) Constraints between arguments, each one of:
+\code{one_of} (exactly one of these arguments must be non-\code{NULL});
+\code{any_of} (at least one must be); or \code{when} (conditions, as for an
+argument's \code{when}) with \code{requires} (these arguments must then be
+non-\code{NULL}) or \code{forbids} (they must then be \code{NULL}). }
 \item{\code{params}}{ One entry per argument, in the order of \code{\link[=formals]{formals()}}. }
 }
 }
@@ -65,8 +68,8 @@ tree, and whether it needs integer counts, \code{int_only});
 \code{"aesthetic"} (colors, shapes, or patterns: \code{aes}, and \code{by}, the
 argument whose values they are mapped to);
 \code{"palette"}; \code{"tracks"};
-\code{"biom"}, \code{"tree"}, \code{"file"}, \code{"dots"} (R objects, a file path,
-and \code{...}: see \code{r_only}). }
+\code{"biom"}, \code{"tree"}, \code{"dist"}, \code{"vector"}, \code{"file"}, \code{"dots"} (R
+objects, a file path, and \code{...}: see \code{r_only}). }
 \item{\code{required}}{ \code{TRUE} when the argument has no default. }
 \item{\code{default}}{ The default value, from \code{\link[=formals]{formals()}}. }
 \item{\code{default_expr}, \code{default_note}}{ For a default that is an
@@ -75,6 +78,9 @@ and what it means. \code{default} is then \code{NULL}. }
 \item{\code{null}}{ Present when \code{NULL} is accepted: what it means. }
 \item{\code{choices}}{ The fixed options. Matching ignores case and
 accepts unambiguous abbreviations. }
+\item{\code{choices_when}}{ Options that depend on other arguments: a list
+of \code{when} conditions (as below) with the \code{choices} that apply while
+they hold. The first that holds applies; otherwise \code{choices}. }
 \item{\code{min}, \code{max}}{ Numeric limits. \code{"integer"} values must be whole. }
 \item{\code{max_n}}{ How many values may be given. Absent: any number. }
 \item{\code{per_side}}{ One value for both rows and columns of a heat
@@ -84,6 +90,8 @@ map, or two: for rows, then columns. }
 too, and treated as categories. }
 \item{\code{ops}}{ For fields: field names may be prefixed with \code{"=="}
 (compare within groups) or \code{"!="} (between groups). }
+\item{\code{extra}}{ For fields: values accepted besides the dataset's
+fields, such as \code{".taxa"}. }
 \item{\code{forms}}{ The forms accepted, when there are several:
 \code{"logical"} (\code{TRUE} or \code{FALSE}); \code{"true"} (\code{TRUE} only);
 \code{"integer"}; \code{"string"}; \code{"choice"} (one of \code{choices});
@@ -104,6 +112,7 @@ one of these), \code{is_not}, \code{has_any} (it includes one of these),
 \code{is_null}, \code{not_null}. Values are canonical: layer names, not
 letters, and metric ids. Absent: the argument may always matter. }
 \item{\code{deprecated}}{ The version that deprecated the argument. }
+\item{\code{unused}}{ Accepted for compatibility, but has no effect. }
 \item{\code{r_only}}{ Only an R caller can set it: an R object, a file
 path, a host setting such as \code{cpus}, or \code{...}. \code{\link[=fn_check]{fn_check()}} refuses
 it. }

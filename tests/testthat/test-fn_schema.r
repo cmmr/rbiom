@@ -8,12 +8,15 @@ schema_base_args <- function (fn) {
     adiv_boxplot   = list(biom = rare50, x = "Sex", stat.by = "Sex"),
     adiv_corrplot  = list(biom = rare50, x = "Age"),
     adiv_matrix    = list(biom = rare50),
+    adiv_stats     = list(biom = rare50, stat.by = "Sex", regr = "BMI"),
     bdiv_boxplot   = list(biom = rare50, x = "Sex", stat.by = "Sex", permutations = 9),
     bdiv_corrplot  = list(biom = rare50, x = "Age", permutations = 9),
     bdiv_heatmap   = list(biom = rare50),
     bdiv_ord_plot  = list(biom = rare50, stat.by = "Sex", permutations = 9),
     bdiv_clusters  = list(biom = rare50),
     bdiv_distmat   = list(biom = rare50),
+    bdiv_stats     = list(biom = rare50, stat.by = "Sex", permutations = 9),
+    distmat_stats  = list(dm = bdiv_distmat(rare50), groups = pull(rare50, "Sex"), permutations = 9),
     rare_corrplot  = list(biom = hmp50),
     rare_multiplot = list(biom = hmp50),
     rare_stacked   = list(biom = hmp50),
@@ -26,9 +29,21 @@ schema_base_args <- function (fn) {
     taxa_da        = list(biom = hmp50, stat.by = "Sex"),
     taxa_clusters  = list(biom = rare50),
     taxa_matrix    = list(biom = rare50),
+    taxa_stats     = list(biom = rare50, stat.by = "Sex", regr = "BMI", taxa = 2),
     write_biom     = list(biom = hmp5, file = tempfile(), overwrite = TRUE),
     write_xlsx     = list(biom = hmp5, file = tempfile(fileext = ".xlsx"), overwrite = TRUE),
     stop("No base arguments for ", fn) )
+}
+
+# Choices that other arguments must agree with.
+schema_choice_args <- function (fn, param, value, args) {
+  if (fn == 'bdiv_stats' && param == 'test' && value == 'mantel') {
+    args$stat.by <- NULL
+    args$regr    <- "Age"
+  }
+  if (fn == 'distmat_stats' && param == 'test' && value == 'mantel')
+    args$groups <- pull(rare50, "Age")
+  args
 }
 
 # Values a choice needs packages for.
@@ -50,8 +65,10 @@ expect_runs <- function (expr, label) {
 }
 
 # The arguments fn_check() takes: all but the R-only ones.
-check_args <- function (args) {
-  args[setdiff(names(args), c('biom', 'file', 'overwrite'))]
+check_args <- function (fn, args) {
+  specs  <- param_specs(fn_schema(fn))
+  r_only <- names(specs)[vapply(specs, function (s) isTRUE(s$r_only), logical(1))]
+  args[setdiff(names(args), r_only)]
 }
 
 param_specs <- function (entry) {
@@ -64,7 +81,7 @@ param_specs <- function (entry) {
 test_that("each entry matches the function's formals", {
 
   types <- c(
-    'biom', 'tree', 'file', 'dots', 'logical', 'integer', 'number', 'string',
+    'biom', 'tree', 'dist', 'vector', 'file', 'dots', 'logical', 'integer', 'number', 'string',
     'choice', 'layers', 'field', 'rank', 'taxa', 'metric', 'aesthetic',
     'palette', 'tracks' )
 
@@ -180,18 +197,18 @@ test_that("every listed choice is accepted, and others are refused", {
 
       for (value in values) {
         if (schema_choice_skip(fn, nm, value)) next
-        args <- base
+        args <- schema_choice_args(fn, nm, value, base)
         args[[nm]] <- value
         label <- sprintf("%s(%s = %s)", fn, nm, value)
         expect_runs(schema_run(fn, args), label)
-        expect_runs(fn_check(fn, check_args(args), args$biom), paste("fn_check:", label))
+        expect_runs(fn_check(fn, check_args(fn, args), args$biom %||% rare50), paste("fn_check:", label))
       }
 
       if (schema_choice_skip(fn, nm, "")) next
       args <- base
       args[[nm]] <- "zzzz"
       expect_error(schema_run(fn, args), label = sprintf("%s(%s = 'zzzz')", fn, nm))
-      expect_error(fn_check(fn, check_args(args), args$biom))
+      expect_error(fn_check(fn, check_args(fn, args), args$biom %||% rare50))
     }
   }
 })
@@ -214,7 +231,10 @@ test_that("every metric is accepted, and others are refused", {
       if (spec$type != 'metric') next
 
       ids  <- vapply(spec$choices, `[[`, character(1), 'id')
-      args <- c(base, list(test = 'none'))[intersect(c(names(base), 'test'), c(names(specs)))]
+      args <- base[intersect(names(base), names(specs))]
+
+      # Skip the statistics where that's an option.
+      if ('none' %in% unlist(specs$test$choices)) args$test <- 'none'
 
       # On counts with zeros, Aitchison distances are NA without a
       # pseudocount (which only bdiv_distmat() takes), and Bhattacharyya
@@ -241,12 +261,12 @@ test_that("every metric is accepted, and others are refused", {
       d <- fn_check_data(rare50)
       for (id in ids) {
         args[[nm]] <- id
-        expect_runs(fn_check(fn, check_args(args), d), sprintf("fn_check: %s(%s = %s)", fn, nm, id))
+        expect_runs(fn_check(fn, check_args(fn, args), d), sprintf("fn_check: %s(%s = %s)", fn, nm, id))
       }
 
       args[[nm]] <- "zzzz"
       expect_error(schema_run(fn, args))
-      expect_error(fn_check(fn, check_args(args), d))
+      expect_error(fn_check(fn, check_args(fn, args), d))
     }
   }
 })
@@ -268,7 +288,7 @@ test_that("fields: fn_check() follows `class` and `coerce`, as the functions do"
     for (nm in names(specs)) {
 
       spec <- specs[[nm]]
-      if (spec$type != 'field') next
+      if (spec$type != 'field' || isTRUE(spec$unused)) next
 
       # Other arguments that the field must not clash with.
       args <- base[setdiff(names(base), c('biom', 'file', 'overwrite', nm))]
@@ -308,6 +328,7 @@ test_that("fields: fn_check() follows `class` and `coerce`, as the functions do"
   expect_no_error(schema_run('taxa_stacked',  list(rare50, label.by = "Age", order.by = "BMI")))
   expect_no_error(schema_run('taxa_da',       list(hmp50, stat.by = "Sex", covariates = "Age")))
   expect_no_error(schema_run('taxa_heatmap',  list(rare50, tracks = "Age")))
+  expect_no_error(schema_run('taxa_stats',    list(rare50, stat.by = ".taxa", split.by = "Sex", test = "kruskal", taxa = 3)))
 })
 
 
@@ -320,9 +341,9 @@ test_that("`when` conditions: an argument has no effect while they fail", {
   # A value that fails the condition.
   falsify <- function (cond, specs) {
     spec <- specs[[cond$param]]
-    if (!is.null(cond$not_null)) return (list(NULL))
-    if (!is.null(cond$is_null))  return (list("Sex"))
-    if (!is.null(cond$is_not))   return (list(cond$is_not[[1]]))
+    if (!is.null(cond[['not_null']])) return (list(NULL))
+    if (!is.null(cond[['is_null']]))  return (list("Sex"))
+    if (!is.null(cond[['is_not']]))   return (list(cond[['is_not']][[1]]))
     choices <- if (spec$type == 'layers') {
       vapply(spec$choices, `[[`, character(1), 'name')
     } else if (spec$type == 'metric') {
@@ -330,7 +351,7 @@ test_that("`when` conditions: an argument has no effect while they fail", {
     } else {
       unlist(spec$choices)
     }
-    list(setdiff(choices, c(cond$is, cond$has_any))[[1]])
+    list(setdiff(choices, c(cond[['is']], cond[['has_any']]))[[1]])
   }
 
   # A value other than the default (and than the base arguments').
@@ -340,7 +361,10 @@ test_that("`when` conditions: an argument has no effect while they fail", {
       aesthetic = !isTRUE(spec[['default']]),
       logical   = TRUE,
       integer   = 99,
-      number    = if (is.null(spec[['max']])) spec[['default']] * 2 + 1 else spec[['min']] + 0.9 * (spec[['max']] - spec[['min']]),
+      field     = if (identical(spec$class, 'numeric')) "Age" else "Body Site",
+      number    = if (is.null(spec[['default']])) 30
+                  else if (is.null(spec[['max']])) spec[['default']] * 2 + 1
+                  else spec[['min']] + 0.9 * (spec[['max']] - spec[['min']]),
       choice    = setdiff(unlist(spec$choices), spec[['default']])[[1]],
       taxa      = 2 )
   }
@@ -420,6 +444,31 @@ test_that("fn_check()", {
   expect_error(fn_check("taxa_da", list(), d), "Give either `stat.by`")
   expect_error(fn_check("taxa_da", list(stat.by = "Sex", regr = "Age"), d), "not both")
   expect_error(fn_check("write_biom", list(format = "xml"), d), "should be one of")
+
+  # Statistics: arguments a test needs, or can't use.
+  expect_error(fn_check("adiv_stats", list(test = "kruskal"), d), "`stat.by` is required")
+  expect_error(fn_check("adiv_stats", list(test = "emtrends"), d), "`regr` is required")
+  expect_error(fn_check("adiv_stats", list(stat.by = "Sex", test = "wilcox", strata = "Body Site"), d), "not supported by rank tests")
+  expect_error(fn_check("taxa_stats", list(stat.by = "Sex", test = "kruskal", covariates = "Age"), d), "not supported by rank tests")
+  expect_error(adiv_stats(rare50, test = "emtrends"), "`regr` is required")
+
+  # ".taxa" compares taxa in taxa_stats(), but isn't a field elsewhere.
+  x <- fn_check("taxa_stats", list(stat.by = ".taxa", split.by = c("sex", ".taxa")), d)
+  expect_identical(x, list(stat.by = ".taxa", split.by = c("Sex", ".taxa")))
+  expect_error(fn_check("taxa_stats", list(stat.by = "Sex", strata = ".taxa"), d), "Invalid `strata` option")
+  expect_error(fn_check("taxa_boxplot", list(x = ".taxa"), d), "Invalid `x` option")
+
+  # bdiv_stats(): the tests depend on `regr`; prefixes are dropped, and
+  # `within` / `between` are not used.
+  expect_error(fn_check("bdiv_stats", list(), d), "Either `stat.by`")
+  expect_error(fn_check("bdiv_stats", list(stat.by = "Sex", test = "mantel"), d), "Choices are: adonis2, mrpp, betadisper")
+  expect_identical(fn_check("bdiv_stats", list(regr = "==Age", test = "man"), d), list(regr = "Age", test = "mantel"))
+  expect_identical(fn_check("bdiv_stats", list(stat.by = "!=Sex", within = "zzz"), d), list(stat.by = "Sex", within = "zzz"))
+
+  # distmat_stats(): only the test options can be checked without R objects.
+  expect_identical(fn_check("distmat_stats", list(test = "MRPP"), d), list(test = "mrpp"))
+  expect_error(fn_check("distmat_stats", list(groups = 1:3), d), "R caller")
+  expect_error(fn_check("distmat_stats", list(test = "zz"), d), "Invalid `test` option")
 
   # A tree is needed for phylogenetic metrics.
   d0 <- d

@@ -35,8 +35,8 @@ stats_emtrends <- function (
     strata = NULL, covariates = NULL, fit = "gam", at = NULL, level = 0.95,
     alt = "!=", mu = 0, p.adj = 'fdr' ) {
 
-  if (is.null(regr))
-    cli_abort('`regr` is required when `test` = "emtrends".')
+  test <- "emtrends"
+  validate_stats_test()
 
   stats_regression(
     df = df, regr = regr, resp = resp, stat.by = stat.by, split.by = split.by,

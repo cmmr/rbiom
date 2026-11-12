@@ -21,10 +21,13 @@
 #   r_only    Only an R caller may set it (an R object, a file path, or a
 #             host setting). fn_check() refuses it.
 #   deprecated  The version that deprecated it.
+#   unused    Accepted, for compatibility, but has no effect.
 #   class     For fields: "categorical", "numeric", or "any".
 #   coerce    For categorical fields: numeric fields are accepted too, and
 #             treated as categories.
 #   ops       For fields: the accepted prefixes ("==", "!=").
+#   extra     For fields: values accepted besides the dataset's fields
+#             (e.g. ".taxa").
 #   div       For metrics: "alpha" or "beta".
 #   aes, by   For aesthetics: what is mapped (color, shape, pattern) and
 #             which argument's values are mapped.
@@ -32,6 +35,9 @@
 #   palettes  Palette kinds suited to the argument (see list_palettes()).
 #   needs     An optional package the argument requires.
 #   choices   Fixed options. Named character vector for layers.
+#   choices_when  Choices that depend on other arguments: a list of
+#             `list(when = <conditions>, choices = <chr>)`; the first
+#             whose conditions hold applies, else `choices`.
 #   min, max  Numeric limits.
 #   max_n     How many values may be given (absent: any number).
 #   per_side  One value, or two: for rows and for columns.
@@ -285,6 +291,27 @@ HEAT <- list(
 
 
 #________________________________________________________
+# Statistics tables.
+#________________________________________________________
+STATS <- list(
+  regr       = arg('field', class = 'numeric', max_n = 1, null = "No regression.", when = list(when_is('test', 'emmeans', 'emtrends'))),
+  stat.by    = arg('field', class = 'categorical', max_n = 1, null = "No groups."),
+  split.by   = arg('field', class = 'categorical', null = "No split."),
+  covariates = arg('field', class = 'any', null = "No covariates."),
+  test       = arg('choice', choices = CHOICES$stats.test, max_n = 1),
+  fit        = like(ARGS$fit, when = list(when_is('test', 'emmeans', 'emtrends'))),
+  at         = like(ARGS$at, null = "The median of `regr`.", when = list(when_set('regr')))
+)
+
+STATS$rules <- list(
+  list(when = list(when_is('test', 'wilcox', 'kruskal')), forbids  = c('strata', 'covariates')),
+  list(when = list(when_is('test', 'kruskal')),           requires = 'stat.by'),
+  list(when = list(when_is('test', 'emtrends')),          requires = 'regr') )
+
+
+
+
+#________________________________________________________
 # Return values.
 #________________________________________________________
 RETURNS <- list(
@@ -306,8 +333,18 @@ RETURNS <- list(
 # formals(). To cover another function, add an entry here and call
 # schema_check() on entry to the function.
 #
-# `rules` are constraints between arguments:
-#   one_of   Exactly one of these arguments must be set (non-NULL).
+# `rules` are constraints between arguments, exported as they are:
+#   one_of    Exactly one of these arguments must be set (non-NULL).
+#   any_of    At least one of these arguments must be set.
+#   when + requires / forbids
+#             While the `when` conditions hold, these arguments must be
+#             set (requires) or must be NULL (forbids).
+#
+# Internal fields of an entry:
+#   check     The check in SCHEMA_CHECKS that enforces the rules, with
+#             the function's own messages.
+#   drop_ops  `==` / `!=` prefixes are removed from fields, rather than
+#             moved to `within` / `between`.
 #________________________________________________________
 FN_SCHEMA <- list(
 
@@ -365,6 +402,27 @@ FN_SCHEMA <- list(
       caption    = ARGS$caption,
       check      = ARGS$check,
       '...'      = ARGS$dots )),
+
+  adiv_stats = list(
+    returns = RETURNS$table,
+    rules   = STATS$rules,
+    check   = 'check_stats_test',
+    params  = list(
+      biom       = ARGS$biom,
+      regr       = STATS$regr,
+      stat.by    = STATS$stat.by,
+      adiv       = ARGS$adiv,
+      split.by   = STATS$split.by,
+      strata     = ARGS$strata,
+      covariates = STATS$covariates,
+      transform  = ARGS$adiv.transform,
+      test       = STATS$test,
+      fit        = STATS$fit,
+      at         = STATS$at,
+      level      = ARGS$level,
+      alt        = ARGS$alt,
+      mu         = ARGS$mu,
+      p.adj      = ARGS$p.adj )),
 
   adiv_matrix = list(
     returns = RETURNS$matrix,
@@ -530,6 +588,47 @@ FN_SCHEMA <- list(
       ties        = ARGS$ties,
       seed        = ARGS$seed,
       cpus        = ARGS$cpus )),
+
+
+  bdiv_stats = list(
+    returns  = RETURNS$table,
+    rules    = list(list(any_of = c('stat.by', 'regr'))),
+    check    = 'check_regr_or_stat_by',
+    drop_ops = TRUE,
+    params   = list(
+      biom         = ARGS$biom,
+      regr         = arg('field', class = 'numeric', max_n = 1, ops = c('==', '!='), null = "No regression.", note = "A `==` or `!=` prefix is accepted and ignored."),
+      stat.by      = arg('field', class = 'categorical', max_n = 1, ops = c('==', '!='), null = "No groups.", note = "A `==` or `!=` prefix is accepted and ignored. With `regr`, the groups split the samples instead."),
+      bdiv         = ARGS$bdiv,
+      weighted     = ARGS$weighted,
+      tree         = ARGS$tree,
+      within       = like(ARGS$within,  unused = TRUE),
+      between      = like(ARGS$between, unused = TRUE),
+      split.by     = like(STATS$split.by, ops = c('==', '!='), note = "A `==` or `!=` prefix is accepted and ignored."),
+      strata       = ARGS$strata,
+      test         = arg(
+        type         = 'choice',
+        choices      = c(CHOICES$bdiv.test, setdiff(CHOICES$bdiv.regr.test, CHOICES$bdiv.test)),
+        choices_when = list(
+          list(when = list(when_null('regr')), choices = CHOICES$bdiv.test),
+          list(when = list(when_set('regr')),  choices = CHOICES$bdiv.regr.test) ),
+        max_n        = 1,
+        default_note = "\"adonis2\" without `regr`, \"mantel\" with it." ),
+      seed         = ARGS$seed,
+      permutations = ARGS$permutations,
+      p.adj        = ARGS$p.adj,
+      alpha        = ARGS$alpha,
+      cpus         = ARGS$cpus )),
+
+  distmat_stats = list(
+    returns = RETURNS$table,
+    params  = list(
+      dm           = arg('dist', r_only = TRUE),
+      groups       = arg('vector', r_only = TRUE),
+      test         = arg('choice', choices = CHOICES$distmat.test, max_n = 1, note = "Categorical `groups`: \"adonis2\", \"mrpp\", or \"betadisper\". Numeric `groups`: \"adonis2\" or \"mantel\". \"none\" skips the test."),
+      seed         = like(ARGS$seed,         when = list(when_is_not('test', 'none'))),
+      permutations = like(ARGS$permutations, when = list(when_is_not('test', 'none'))),
+      strata       = arg('vector', r_only = TRUE, null = "No strata.") )),
 
 
   #________________________________________________________
@@ -717,7 +816,8 @@ FN_SCHEMA <- list(
 
   taxa_forest = list(
     returns = RETURNS$plot_stats,
-    rules   = list(list(one_of = c('stat.by', 'regr'), check = 'check_stat_by_regr')),
+    rules   = list(list(one_of = c('stat.by', 'regr'))),
+    check   = 'check_stat_by_regr',
     params  = list(
       biom       = ARGS$biom,
       stat.by    = arg('field', class = 'categorical', max_n = 1, null = "Not used; give `regr` instead."),
@@ -741,7 +841,8 @@ FN_SCHEMA <- list(
 
   taxa_da = list(
     returns = RETURNS$table,
-    rules   = list(list(one_of = c('stat.by', 'regr'), check = 'check_stat_by_regr')),
+    rules   = list(list(one_of = c('stat.by', 'regr'))),
+    check   = 'check_stat_by_regr',
     params  = list(
       biom       = ARGS$biom,
       stat.by    = arg('field', class = 'categorical', max_n = 1, null = "Not used; give `regr` instead."),
@@ -766,6 +867,31 @@ FN_SCHEMA <- list(
       k      = arg('integer', min = 1, max_n = 1),
       seed   = ARGS$seed,
       '...'  = ARGS$dots )),
+
+  taxa_stats = list(
+    returns = RETURNS$table,
+    rules   = STATS$rules,
+    check   = 'check_stats_test',
+    params  = list(
+      biom       = ARGS$biom,
+      regr       = STATS$regr,
+      stat.by    = like(STATS$stat.by,  extra = ".taxa", note = "\".taxa\" compares the taxa with one another."),
+      rank       = ARGS$rank,
+      taxa       = ARGS$taxa,
+      lineage    = ARGS$lineage,
+      unc        = ARGS$unc,
+      other      = ARGS$other,
+      split.by   = like(STATS$split.by, extra = ".taxa"),
+      strata     = ARGS$strata,
+      covariates = STATS$covariates,
+      transform  = ARGS$transform,
+      test       = STATS$test,
+      fit        = STATS$fit,
+      at         = STATS$at,
+      level      = ARGS$level,
+      alt        = ARGS$alt,
+      mu         = ARGS$mu,
+      p.adj      = ARGS$p.adj )),
 
   taxa_matrix = list(
     returns = RETURNS$matrix,
@@ -823,7 +949,8 @@ FN_SCHEMA <- list(
 #________________________________________________________
 schema_check <- function (fn, env = parent.frame()) {
 
-  specs   <- FN_SCHEMA[[fn]]$params
+  def     <- FN_SCHEMA[[fn]]
+  specs   <- def$params
   scratch <- rlang::new_environment(parent = rlang::ns_env('rbiom'))
 
   # Copy the values to check, plus the objects the checks consult.
@@ -838,15 +965,23 @@ schema_check <- function (fn, env = parent.frame()) {
   withCallingHandlers(
     expr = {
 
-      # `==` / `!=` prefixes move the field to `within` / `between`.
+      # `==` / `!=` prefixes move the field to `within` / `between`, or
+      # are dropped.
       ops <- names(specs)[vapply(specs, function (s) !is.null(s$ops), logical(1))]
-      if (length(ops) > 0) validate_var_cmp(intersect(ops, ls(scratch)), env = scratch)
+      ops <- intersect(ops, ls(scratch))
+      if (isTRUE(def$drop_ops)) {
+        for (i in ops)
+          if (is.character(scratch[[i]])) scratch[[i]] <- sub("^(==|!=)", "", scratch[[i]])
+      } else if (length(ops) > 0) {
+        validate_var_cmp(ops, env = scratch)
+      }
 
       for (i in intersect(names(specs), ls(scratch, all.names = TRUE)))
         schema_check_arg(i, specs[[i]], scratch)
 
-      for (rule in FN_SCHEMA[[fn]]$rules)
-        schema_check_rule(rule, scratch)
+      # Constraints between arguments (`rules`).
+      if (!is.null(def$check))
+        SCHEMA_CHECKS[[def$check]](NULL, def, scratch)
     },
 
     # The function itself warns about deprecated arguments.
@@ -861,7 +996,8 @@ schema_check <- function (fn, env = parent.frame()) {
 #________________________________________________________
 schema_check_arg <- function (name, spec, env) {
 
-  if (isTRUE(spec$r_only) || !is.null(spec$deprecated)) return (invisible())
+  if (isTRUE(spec$r_only) || !is.null(spec$deprecated) || isTRUE(spec$unused))
+    return (invisible())
 
   x       <- get(name, envir = env, inherits = FALSE)
   null_ok <- !is.null(spec$null)
@@ -895,12 +1031,20 @@ schema_check_arg <- function (name, spec, env) {
     },
 
     choice = {
+
+      choices <- spec[['choices']]
+      for (cw in spec[['choices_when']])
+        if (all(vapply(cw[['when']], when_holds, logical(1), env = env))) {
+          choices <- cw[['choices']]
+          break
+        }
+
       if (identical(spec$matcher, 'match.arg')) {
-        assign(name, match.arg(tolower(x), spec$choices), envir = env)
+        assign(name, match.arg(tolower(x), choices), envir = env)
       } else {
         validate_var_choices(
           var        = name,
-          choices    = spec$choices,
+          choices    = choices,
           env        = env,
           max        = spec$max_n %||% Inf,
           null_ok    = null_ok,
@@ -910,16 +1054,31 @@ schema_check_arg <- function (name, spec, env) {
 
     layers = validate_layers(name, spec$choices, env = env),
 
-    field = validate_biom_field(
-      var      = name,
-      env      = env,
-      null_ok  = null_ok,
-      max      = spec$max_n %||% Inf,
-      col_type = if (isTRUE(spec$coerce)) NULL else switch(
-        EXPR        = spec$class,
-        categorical = 'cat',
-        numeric     = 'num',
-        NULL ) ),
+    field = {
+
+      # Values such as ".taxa" aren't dataset fields; check the rest.
+      extra <- if (is.character(x)) intersect(x, spec$extra)
+      if (length(extra) > 0) {
+        if (length(x) > (spec$max_n %||% Inf))
+          cli_abort("`{name}` cannot be length {length(x)}; maximum is {spec$max_n}.")
+        if (length(x) == length(extra)) return (invisible())
+        assign(name, setdiff(x, extra), envir = env)
+      }
+
+      validate_biom_field(
+        var      = name,
+        env      = env,
+        null_ok  = null_ok,
+        max      = spec$max_n %||% Inf,
+        col_type = if (isTRUE(spec$coerce)) NULL else switch(
+          EXPR        = spec$class,
+          categorical = 'cat',
+          numeric     = 'num',
+          NULL ) )
+
+      if (length(extra) > 0)
+        assign(name, c(get(name, envir = env), extra), envir = env)
+    },
 
     rank = validate_rank(
       var     = name,
@@ -949,21 +1108,17 @@ schema_check_arg <- function (name, spec, env) {
 
 
 #________________________________________________________
-# Constraints between arguments.
+# Does a `when` condition hold for the arguments in `env`?
 #________________________________________________________
-schema_check_rule <- function (rule, env) {
-
-  if (!is.null(rule$check))
-    return (SCHEMA_CHECKS[[rule$check]](NULL, rule, env))
-
-  if (!is.null(rule$one_of)) {
-    set <- vapply(rule$one_of, function (i) !is.null(get0(i, envir = env, inherits = FALSE)), logical(1))
-    if (sum(set) != 1)
-      cli_abort(c(
-        'x' = "Give exactly one of {.arg {rule$one_of}}, not {if (any(set)) 'several' else 'neither'}." ))
-  }
-
-  return (invisible())
+when_holds <- function (cond, env) {
+  # [[ ]] rather than $, which would match `is` to `is_null`.
+  x <- get0(cond[['param']], envir = env, inherits = FALSE)
+  if (!is.null(cond[['is']]))       return (length(x) == 1 && isTRUE(x %in% cond[['is']]))
+  if (!is.null(cond[['is_not']]))   return (!(length(x) == 1 && isTRUE(x %in% cond[['is_not']])))
+  if (!is.null(cond[['has_any']]))  return (any(x %in% cond[['has_any']]))
+  if (!is.null(cond[['is_null']]))  return (is.null(x))
+  if (!is.null(cond[['not_null']])) return (!is.null(x))
+  cli_abort("Internal error: unknown `when` condition.")
 }
 
 
@@ -1007,6 +1162,14 @@ SCHEMA_CHECKS <- list(
 
   check_stat_by_regr = function (name, spec, env) {
     validate_stat_by_regr(env = env)
+  },
+
+  check_regr_or_stat_by = function (name, spec, env) {
+    validate_regr_or_stat_by(env = env)
+  },
+
+  check_stats_test = function (name, spec, env) {
+    validate_stats_test(env = env)
   },
 
   check_tracks = function (name, spec, env) {

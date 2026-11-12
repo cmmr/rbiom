@@ -11,10 +11,8 @@ stats_wilcox <- function (
     df, resp = attr(df, 'response'), stat.by = NULL, split.by = NULL, strata = NULL,
     level = 0.95, alt = "!=", mu = 0, p.adj = 'fdr' ) {
 
-  if (!is.null(strata))
-    cli_abort(c(
-      'x' = "`strata` is not supported by rank tests.",
-      'i' = "Use `test = \"emmeans\"` for a mixed model with a random intercept per stratum." ))
+  test <- "wilcox"
+  validate_stats_test()
 
   stats_validate(df, regr = NULL, resp, stat.by, split.by, strata = NULL)
 
@@ -158,13 +156,8 @@ wilcox_ci_code <- function (level) {
 stats_kruskal <- function (
     df, resp = attr(df, 'response'), stat.by, split.by = NULL, strata = NULL, p.adj = 'fdr') {
 
-  if (!is.null(strata))
-    cli_abort(c(
-      'x' = "`strata` is not supported by rank tests.",
-      'i' = "Use `test = \"emmeans\"` for a mixed model with a random intercept per stratum." ))
-
-  if (is.null(stat.by))
-    cli_abort("`stat.by` is required when `test` = 'kruskal'.")
+  test <- "kruskal"
+  validate_stats_test()
 
   stats_validate(df, regr = NULL, resp, stat.by, split.by, strata = NULL)
 

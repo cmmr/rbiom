@@ -216,6 +216,51 @@ validate_sides <- function (var, env = parent.frame(), choices = NULL, numeric =
 
 
 #________________________________________________________
+# bdiv_stats(): `stat.by`, `regr`, or both.
+#________________________________________________________
+validate_regr_or_stat_by <- function (env = parent.frame()) {
+
+  if (is.null(get0('regr', envir = env, inherits = FALSE)) && is.null(get0('stat.by', envir = env, inherits = FALSE)))
+    cli_abort("Either `stat.by` (groups to compare) or `regr` (a numeric covariate) is required.")
+
+  return (invisible(NULL))
+}
+
+
+
+#________________________________________________________
+# stats_table(): arguments that `test` needs, or can't use.
+#________________________________________________________
+validate_stats_test <- function (env = parent.frame()) {
+
+  test       <- get('test', envir = env, inherits = FALSE)
+  regr       <- get0('regr',       envir = env, inherits = FALSE)
+  stat.by    <- get0('stat.by',    envir = env, inherits = FALSE)
+  strata     <- get0('strata',     envir = env, inherits = FALSE)
+  covariates <- get0('covariates', envir = env, inherits = FALSE)
+
+  if (test %in% c('wilcox', 'kruskal') && !is.null(covariates))
+    cli_abort(c(
+      'x' = "`covariates` is not supported by rank tests (`test = \"{test}\"`).",
+      'i' = "Use `test = \"emmeans\"` to adjust for covariates in a regression model." ))
+
+  if (test %in% c('wilcox', 'kruskal') && !is.null(strata))
+    cli_abort(c(
+      'x' = "`strata` is not supported by rank tests.",
+      'i' = "Use `test = \"emmeans\"` for a mixed model with a random intercept per stratum." ))
+
+  if (test == 'kruskal' && is.null(stat.by))
+    cli_abort("`stat.by` is required when `test` = 'kruskal'.")
+
+  if (test == 'emtrends' && is.null(regr))
+    cli_abort('`regr` is required when `test` = "emtrends".')
+
+  return (invisible(NULL))
+}
+
+
+
+#________________________________________________________
 # taxa_da() and taxa_forest(): either `stat.by` or `regr`.
 #________________________________________________________
 validate_stat_by_regr <- function (env = parent.frame()) {

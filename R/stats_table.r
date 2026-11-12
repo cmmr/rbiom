@@ -193,10 +193,7 @@ stats_table <- function (
       if (is.null(regr) && !is.null(at))
         cli_warn('`at` is ignored when `regr` = NULL.')
 
-      if (test %in% c('wilcox', 'kruskal') && !is.null(covariates))
-        cli_abort(c(
-          'x' = "`covariates` is not supported by rank tests (`test = \"{test}\"`).",
-          'i' = "Use `test = \"emmeans\"` to adjust for covariates in a regression model." ))
+      validate_stats_test()
 
       if (test %in% c('wilcox', 'kruskal')) {
         if (!eq(fit, "gam")) cli_warn('`fit` is ignored when `test` = "{test}".')
@@ -272,6 +269,7 @@ adiv_stats <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_stats', params)
+  schema_check('adiv_stats', params)
 
 
   #________________________________________________________
@@ -421,6 +419,7 @@ bdiv_stats <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('bdiv_stats', cmd_params(params))
+  schema_check('bdiv_stats', params)
 
 
   #________________________________________________________
@@ -446,8 +445,7 @@ bdiv_stats <- function (
   validate_alpha()
   validate_cpus()
 
-  if (is.null(regr) && is.null(stat.by))
-    cli_abort("Either `stat.by` (groups to compare) or `regr` (a numeric covariate) is required.")
+  validate_regr_or_stat_by()
 
   if (is.null(regr)) {
     validate_var_choices('test', CHOICES$bdiv.test)
@@ -703,6 +701,7 @@ taxa_stats <- function (
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_stats', params)
+  schema_check('taxa_stats', params)
 
 
   #________________________________________________________

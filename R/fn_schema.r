@@ -28,8 +28,11 @@
 #'     `"table"`, `"factor"`, `"matrix"`, `"dist"`, `"biom"`, or `"file"`;
 #'     `has` lists the `$` fields the result carries (e.g. `"data"`,
 #'     `"code"`, `"stats"`). }
-#'   \item{`rules`}{ (Optional) Constraints between arguments. `one_of`:
-#'     exactly one of these arguments must be non-`NULL`. }
+#'   \item{`rules`}{ (Optional) Constraints between arguments, each one of:
+#'     `one_of` (exactly one of these arguments must be non-`NULL`);
+#'     `any_of` (at least one must be); or `when` (conditions, as for an
+#'     argument's `when`) with `requires` (these arguments must then be
+#'     non-`NULL`) or `forbids` (they must then be `NULL`). }
 #'   \item{`params`}{ One entry per argument, in the order of [formals()]. }
 #' }
 #'
@@ -55,8 +58,8 @@
 #'     `"aesthetic"` (colors, shapes, or patterns: `aes`, and `by`, the
 #'       argument whose values they are mapped to);
 #'     `"palette"`; `"tracks"`;
-#'     `"biom"`, `"tree"`, `"file"`, `"dots"` (R objects, a file path,
-#'       and `...`: see `r_only`). }
+#'     `"biom"`, `"tree"`, `"dist"`, `"vector"`, `"file"`, `"dots"` (R
+#'       objects, a file path, and `...`: see `r_only`). }
 #'   \item{`required`}{ `TRUE` when the argument has no default. }
 #'   \item{`default`}{ The default value, from [formals()]. }
 #'   \item{`default_expr`, `default_note`}{ For a default that is an
@@ -65,6 +68,9 @@
 #'   \item{`null`}{ Present when `NULL` is accepted: what it means. }
 #'   \item{`choices`}{ The fixed options. Matching ignores case and
 #'     accepts unambiguous abbreviations. }
+#'   \item{`choices_when`}{ Options that depend on other arguments: a list
+#'     of `when` conditions (as below) with the `choices` that apply while
+#'     they hold. The first that holds applies; otherwise `choices`. }
 #'   \item{`min`, `max`}{ Numeric limits. `"integer"` values must be whole. }
 #'   \item{`max_n`}{ How many values may be given. Absent: any number. }
 #'   \item{`per_side`}{ One value for both rows and columns of a heat
@@ -74,6 +80,8 @@
 #'     too, and treated as categories. }
 #'   \item{`ops`}{ For fields: field names may be prefixed with `"=="`
 #'     (compare within groups) or `"!="` (between groups). }
+#'   \item{`extra`}{ For fields: values accepted besides the dataset's
+#'     fields, such as `".taxa"`. }
 #'   \item{`forms`}{ The forms accepted, when there are several:
 #'     `"logical"` (`TRUE` or `FALSE`); `"true"` (`TRUE` only);
 #'     `"integer"`; `"string"`; `"choice"` (one of `choices`);
@@ -94,6 +102,7 @@
 #'     `is_null`, `not_null`. Values are canonical: layer names, not
 #'     letters, and metric ids. Absent: the argument may always matter. }
 #'   \item{`deprecated`}{ The version that deprecated the argument. }
+#'   \item{`unused`}{ Accepted for compatibility, but has no effect. }
 #'   \item{`r_only`}{ Only an R caller can set it: an R object, a file
 #'     path, a host setting such as `cpus`, or `...`. [fn_check()] refuses
 #'     it. }
@@ -329,9 +338,9 @@ strip_validated <- function (x) {
 # The exported entry for one function.
 #________________________________________________________
 SCHEMA_FIELDS <- c(
-  'type', 'required', 'r_only', 'deprecated',
-  'class', 'coerce', 'ops', 'div', 'aes', 'by', 'forms', 'palettes', 'needs',
-  'choices', 'min', 'max', 'max_n', 'per_side', 'null',
+  'type', 'required', 'r_only', 'deprecated', 'unused',
+  'class', 'coerce', 'ops', 'extra', 'div', 'aes', 'by', 'forms', 'palettes', 'needs',
+  'choices', 'choices_when', 'min', 'max', 'max_n', 'per_side', 'null',
   'default', 'default_expr', 'default_note', 'when', 'note', 'desc' )
 
 schema_entry <- function (fn) {
@@ -377,7 +386,7 @@ schema_entry <- function (fn) {
 
   c(
     list(fn = fn, returns = def$returns),
-    if (!is.null(def$rules)) list(rules = lapply(def$rules, function (r) r['one_of'])),
+    if (!is.null(def$rules)) list(rules = def$rules),
     list(params = params) )
 }
 
@@ -412,7 +421,9 @@ metric_choices <- function (div) {
 #________________________________________________________
 # JSON with the list fields always written as arrays.
 #________________________________________________________
-SCHEMA_ARRAYS <- c('choices', 'forms', 'ops', 'palettes', 'has', 'is', 'is_not', 'has_any', 'one_of')
+SCHEMA_ARRAYS <- c(
+  'choices', 'forms', 'ops', 'extra', 'palettes', 'has',
+  'is', 'is_not', 'has_any', 'one_of', 'any_of', 'requires', 'forbids' )
 
 schema_json <- function (x) {
 

@@ -135,6 +135,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
     if (!is.null(p$strata)) p$strata <- aa(NA, display = "strata")
     current_cmd('distmat_stats', p)
   })
+  schema_check('distmat_stats', params)
 
 
   #________________________________________________________

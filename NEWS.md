@@ -148,14 +148,16 @@
 ## Describing and checking arguments
 
 * New `fn_schema()`: a machine-readable description of the arguments of the
-  plot functions, `taxa_da()`, `taxa_clusters()`, `bdiv_clusters()`, 
+  plot functions, `adiv_stats()`, `bdiv_stats()`, `taxa_stats()`, 
+  `distmat_stats()`, `taxa_da()`, `taxa_clusters()`, `bdiv_clusters()`, 
   `rarefy()`, `adiv_matrix()`, `bdiv_distmat()`, `taxa_matrix()`, 
   `write_biom()`, and `write_xlsx()`. For each argument: its kind, default, 
   fixed choices (with names for layers and metrics), numeric limits, how 
   many values it takes, what `NULL` means, where dataset-dependent choices 
   come from (a categorical or numeric field, a rank, taxa, a metric that 
   may need a tree), the forms it accepts, when it has any effect, and the 
-  first sentence of its help text. Plain lists, or JSON with 
+  first sentence of its help text; and the constraints between arguments 
+  (e.g. `test = "kruskal"` needs `stat.by`). Plain lists, or JSON with 
   `json = TRUE`, for programs that build input controls or check requests.
 * New `fn_check()` and `fn_check_data()`: check arguments against a 
   dataset, or a summary of one, without running the function. Errors are 
@@ -184,6 +186,9 @@
 * A phylogenetic metric (`faith`, the UniFrac family) without a tree is an 
   error naming the metric, before any computing (previously 
   "inherits(tree, "phylo") is not TRUE").
+* `adiv_stats()` and `taxa_stats()` report a test's missing or unsupported 
+  arguments (`stat.by` for `"kruskal"`, `regr` for `"emtrends"`, `strata` 
+  or `covariates` with a rank test) before computing anything.
 * A misspelled field name is reported under the argument it was given in 
   (e.g. `x`) rather than `md`. `k` in `taxa_clusters()` and 
   `bdiv_clusters()` must be a whole number of at least 1.
