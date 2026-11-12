@@ -176,10 +176,6 @@ help text). The other fields are present only when they apply.
 
   The version that deprecated the argument.
 
-- `unused`:
-
-  Accepted for compatibility, but has no effect.
-
 - `r_only`:
 
   Only an R caller can set it: an R object, a file path, a host setting

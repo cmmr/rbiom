@@ -128,10 +128,12 @@ computing UniFrac distances. Default: <code>biom$tree</code></p></dd>
 
 
 <dt id="arg-within-between">within, between<a class="anchor" aria-label="anchor" href="#arg-within-between"></a></dt>
-<dd><p>Accepted for compatibility with <code><a href="bdiv_table.html">bdiv_table()</a></code>
-and <code><a href="bdiv_boxplot.html">bdiv_boxplot()</a></code>, where they select which sample <em>pairs</em> are
-displayed. The tests here are computed on samples, so these
-arguments have no effect.</p></dd>
+<dd><p>Deprecated: the tests here run on samples, not
+on pairs of samples, so these have no effect (giving either is a
+warning). They select sample pairs in <code><a href="bdiv_table.html">bdiv_table()</a></code> and the
+<code>bdiv_*</code> plots. To test within each group of a field, use
+<code>split.by</code>; to compare how spread out the groups are, use
+<code>test = "betadisper"</code>. Default: <code>NULL</code></p></dd>
 
 
 <dt id="arg-split-by">split.by<a class="anchor" aria-label="anchor" href="#arg-split-by"></a></dt>

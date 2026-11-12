@@ -59,6 +59,14 @@
   use a Mantel test. Wilcoxon / t-tests / regressions on pairwise
   distances, which treated dependent distances as independent
   observations, are no longer offered.
+- `within` and `between` are deprecated in
+  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md).
+  They select sample pairs, and the tests now run on samples, so they
+  have no effect; giving either is a warning. Use `split.by` to test
+  within each group of a field, or `test = "betadisper"` to compare how
+  spread out the groups are. They still select the pairs shown by
+  [`bdiv_table()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md)
+  and the `bdiv_*` plots.
 - New `strata` argument for repeated-measures designs, on the
   `*_stats()`, `*_boxplot()`, `*_corrplot()`,
   [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md),

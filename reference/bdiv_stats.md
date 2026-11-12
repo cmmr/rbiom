@@ -74,12 +74,13 @@ bdiv_stats(
 
 - within, between:
 
-  Accepted for compatibility with
+  Deprecated: the tests here run on samples, not on pairs of samples, so
+  these have no effect (giving either is a warning). They select sample
+  pairs in
   [`bdiv_table()`](https://cmmr.github.io/rbiom/reference/bdiv_table.md)
-  and
-  [`bdiv_boxplot()`](https://cmmr.github.io/rbiom/reference/bdiv_boxplot.md),
-  where they select which sample *pairs* are displayed. The tests here
-  are computed on samples, so these arguments have no effect.
+  and the `bdiv_*` plots. To test within each group of a field, use
+  `split.by`; to compare how spread out the groups are, use
+  `test = "betadisper"`. Default: `NULL`
 
 - split.by:
 
