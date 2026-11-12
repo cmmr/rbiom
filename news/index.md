@@ -1,35 +1,5 @@
 # Changelog
 
-## rbiom 4.0.0.9001
-
-- [`fn_schema()`](https://cmmr.github.io/rbiom/reference/fn_schema.md)
-  entries say which counts a function wants (`counts`: `"rarefied"` or
-  `"unrarefied"`) and which optional package a function needs (`needs`,
-  e.g. [`write_xlsx()`](https://cmmr.github.io/rbiom/reference/write_biom.md)).
-  Choices that need an optional package are marked in `choices_needs`
-  (`ord`’s `"tSNE"` and `"UMAP"`,
-  [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md)’s
-  `"density"` layer, and
-  [`write_biom()`](https://cmmr.github.io/rbiom/reference/write_biom.md)’s
-  `"hdf5"` format); `strata` in
-  [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md) and
-  [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md)
-  is marked as needing lmerTest.
-- The schema is versioned: any change to what
-  [`fn_schema()`](https://cmmr.github.io/rbiom/reference/fn_schema.md)
-  returns comes with a new package version.
-- [`fn_check()`](https://cmmr.github.io/rbiom/reference/fn_check.md)
-  refuses deprecated arguments (`weighted`, `normalized`, and
-  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md)’s
-  `within` and `between`), saying what to use instead.
-- A metric name that doesn’t match is reported under the caller’s
-  argument (`adiv = "nosuch"`, `bdiv = "nosuch"`), not ecodive’s
-  `metric`.
-- Beta diversity heat maps, ordinations, clusterings, box plots, scatter
-  plots, and statistics stop with a clear message when the metric gives
-  infinite or missing distances (e.g. `"bhattacharyya"` between samples
-  with no taxa in common), rather than an internal error.
-
 ## rbiom 4.0.0
 
 ### Reproducibility
@@ -274,12 +244,24 @@
   its help text; and the constraints between arguments
   (e.g. `test = "kruskal"` needs `stat.by`). Plain lists, or JSON with
   `json = TRUE`, for programs that build input controls or check
-  requests.
+  requests. Entries also say which counts a function wants (`counts`:
+  `"rarefied"` or `"unrarefied"`) and which optional package it needs
+  (`needs`, e.g. 
+  [`write_xlsx()`](https://cmmr.github.io/rbiom/reference/write_biom.md));
+  choices that need an optional package are listed in `choices_needs`
+  (`ord`’s `"tSNE"` and `"UMAP"`,
+  [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md)’s
+  `"density"` layer,
+  [`write_biom()`](https://cmmr.github.io/rbiom/reference/write_biom.md)’s
+  `"hdf5"` format).
 - New [`fn_check()`](https://cmmr.github.io/rbiom/reference/fn_check.md)
   and
   [`fn_check_data()`](https://cmmr.github.io/rbiom/reference/fn_check.md):
   check arguments against a dataset, or a summary of one, without
-  running the function. Errors are the function’s own.
+  running the function. Errors are the function’s own. Deprecated
+  arguments (`weighted`, `normalized`, and
+  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md)’s
+  `within` and `between`) are refused, with what to use instead.
 - New
   [`list_palettes()`](https://cmmr.github.io/rbiom/reference/list_palettes.md):
   palette names, kinds (discrete, sequential, diverging), and colors.
@@ -324,6 +306,13 @@
   and
   [`bdiv_clusters()`](https://cmmr.github.io/rbiom/reference/bdiv_clusters.md)
   must be a whole number of at least 1.
+- A metric name that doesn’t match is reported under the caller’s
+  argument (`adiv = "nosuch"`, `bdiv = "nosuch"`), not ecodive’s
+  `metric`.
+- Beta diversity heat maps, ordinations, clusterings, box plots, scatter
+  plots, and statistics stop with a clear message when the metric gives
+  infinite or missing distances (e.g. `"bhattacharyya"` between samples
+  with no taxa in common), rather than an internal error.
 
 ### Plots
 
