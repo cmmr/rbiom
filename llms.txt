@@ -401,6 +401,19 @@ structures (matrices, data.frames, trees) rather than rbiom objects.
 - [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
   : Publication-ready ggplot2 theme.
 
+## Describing Arguments
+
+Machine-readable descriptions of what each function’s arguments accept,
+for programs that build input controls or check requests.
+
+- [`fn_schema()`](https://cmmr.github.io/rbiom/reference/fn_schema.md) :
+  Describe the arguments of rbiom functions.
+- [`fn_check()`](https://cmmr.github.io/rbiom/reference/fn_check.md)
+  [`fn_check_data()`](https://cmmr.github.io/rbiom/reference/fn_check.md)
+  : Check arguments for an rbiom function against a dataset.
+- [`list_palettes()`](https://cmmr.github.io/rbiom/reference/list_palettes.md)
+  : List the color palettes.
+
 ## Datasets
 
 Built-in microbiome datasets for testing and examples.

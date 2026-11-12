@@ -19,7 +19,7 @@ taxa_stacked(
   other = TRUE,
   unc = "singly",
   lineage = FALSE,
-  xlab.angle = 90,
+  xlab.angle = "90",
   ...
 )
 ```
@@ -120,7 +120,8 @@ taxa_stacked(
 - xlab.angle:
 
   Angle of the sample labels at the bottom of the plot. Options are
-  `"auto"`, `0`, `30`, and `90`. Default: `90`
+  `"auto"`, `"0"`, `"30"`, and `"90"` (the numbers 0, 30, and 90 are
+  accepted too). Default: `"90"`
 
 - ...:
 

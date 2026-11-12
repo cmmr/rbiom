@@ -92,7 +92,7 @@ Other biom: [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
 #>       1 Fields:  .sample 
 #>         Tree:    <absent>
 #> 
-#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-11-11 ──
+#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-11-12 ──
 #> 
 
     biom$tree     <- hmp50$tree
@@ -107,7 +107,7 @@ Other biom: [`bdply()`](https://cmmr.github.io/rbiom/reference/bdply.md)
 #>       5 Fields:  .sample, Age, BMI, Body Site, and Sex 
 #>         Tree:    <present>
 #> 
-#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-11-11 ──
+#> ── 1.4k - 4.2k reads/sample ────────────────── 2026-11-12 ──
 #> 
 
     # Subsets of one dataset keep its tree, and record their history.
