@@ -153,6 +153,7 @@ bdiv_ord_table <- function (
       FUN    = function (b, bdiv) {
 
         dm <- bdiv_distmat(b, bdiv = bdiv, tree = tree, alpha = alpha, cpus = cpus)
+        validate_finite_dist(dm, bdiv, "an ordination")
 
 
         #________________________________________________________

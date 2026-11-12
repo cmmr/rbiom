@@ -25,8 +25,7 @@ validate_adiv <- function (
     lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
     x <- c('observed', 'shannon', 'simpson')
   } else {
-    x <- unique(sapply(x, function (m) {
-      ecodive::match_metric(metric = m, div = 'alpha')$id }))
+    x <- unique(sapply(x, match_metric_id, div = 'alpha', evar = evar))
   }
   
   if (length(x) > 1 && !isTRUE(multiple))
@@ -98,8 +97,7 @@ validate_bdiv <- function (
 
 
   # Canonical metric ids, e.g. "Bray" -> "bray", "jacc" -> "jaccard".
-  x <- unique(unname(sapply(x, function (m) {
-    ecodive::match_metric(metric = m, div = 'beta')$id })))
+  x <- unique(unname(sapply(x, match_metric_id, div = 'beta', evar = evar)))
 
   if (length(x) > 1 && !isTRUE(multiple))
     cli_abort('`{evar}` must be a single metric name.')
@@ -109,6 +107,49 @@ validate_bdiv <- function (
 
   return(invisible())
 }
+
+#________________________________________________________
+# A metric's canonical id. ecodive's messages call the argument
+# `metric`; name the caller's argument instead (`adiv`, `bdiv`).
+#________________________________________________________
+match_metric_id <- function (m, div, evar) {
+  tryCatch(
+    expr  = ecodive::match_metric(metric = m, div = div)$id,
+    error = function (e) {
+      msg <- conditionMessage(e)
+      msg <- sub("^`metric( = |`)", paste0("`", evar, "\\1"), msg)
+      msg <- trimws(gsub("\\s+", " ", sub(":\\s*\n", ": ", msg)))
+      cli_abort("{msg}", call = NULL)
+    })
+}
+
+
+#________________________________________________________
+# Distances that a figure, ordination, clustering, or test can't use:
+# infinite (e.g. bhattacharyya between samples with no taxa in common)
+# or missing. `x` is a dist object or a vector of distances. (-Inf
+# only comes from a log transform of zero distances, which isn't the
+# metric's doing; plots leave those out as before.)
+#________________________________________________________
+validate_finite_dist <- function (x, bdiv, what) {
+
+  x     <- as.vector(x)
+  n_inf <- sum(x == Inf, na.rm = TRUE)
+  n_na  <- sum(is.na(x))
+
+  if (n_inf + n_na == 0) return (invisible())
+
+  n     <- length(x)
+
+  kind <- if (n_na == 0) "infinite" else if (n_inf == 0) "missing (NA)" else "infinite or missing (NA)"
+  bad  <- n_inf + n_na
+
+  cli_abort(c(
+    'x' = "The {.val {bdiv}} metric gave {kind} distances for {bad} of {n} sample pair{?s}, so it can't be used for {what}.",
+    'i' = if (n_inf > 0) "This metric gives an infinite distance between samples it can't compare, such as samples with no taxa in common.",
+    'i' = "Choose another metric." ), call = NULL)
+}
+
 
 validate_ord <- function (var = "ord", env = parent.frame(), ...) {
   validate_var_choices(var, CHOICES$ord, env, all_option = ".all", ...)

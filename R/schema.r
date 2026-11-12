@@ -34,6 +34,8 @@
 #   palettes  Palette kinds suited to the argument (see list_palettes()).
 #   needs     An optional package the argument requires.
 #   choices   Fixed options. Named character vector for layers.
+#   choices_needs  The choices that need an optional package: a named
+#             list, choice (layer name for layers) = package.
 #   choices_when  Choices that depend on other arguments: a list of
 #             `list(when = <conditions>, choices = <chr>)`; the first
 #             whose conditions hold applies, else `choices`.
@@ -175,8 +177,8 @@ ARGS <- list(
   adiv       = arg('metric', div = 'alpha'),
   bdiv       = arg('metric', div = 'beta'),
   bdiv1      = arg('metric', div = 'beta', max_n = 1),
-  weighted   = arg('logical', deprecated = "2.3.0", null = "Not set: the metric name decides.", note = "Use a metric name such as \"weighted_unifrac\" instead."),
-  normalized = arg('logical', deprecated = "2.3.0", null = "Not set: the metric name decides.", note = "Use a metric name such as \"normalized_unifrac\" instead."),
+  weighted   = arg('logical', deprecated = "2.3.0", null = "Not set: the metric name decides.", note = "Name the metric in `bdiv` instead, e.g. \"weighted_unifrac\" or \"unweighted_unifrac\"."),
+  normalized = arg('logical', deprecated = "2.3.0", null = "Not set: the metric name decides.", note = "Name the metric in `bdiv` instead, e.g. \"normalized_unifrac\" or \"weighted_unifrac\"."),
   alpha      = arg('number', min = 0, max = 1, max_n = 1, when = list(when_has_any('bdiv', 'generalized_unifrac'))),
 
   # Metadata columns in a returned table. validate_biom_field() takes
@@ -184,7 +186,7 @@ ARGS <- list(
   md        = arg('field', class = 'any', extra = '.all', null = "No metadata columns.", note = "\".all\" (on its own) adds every metadata field."),
 
   # Ordination.
-  ord       = arg('choice', choices = CHOICES$ord, all = '.all', note = "\"tSNE\" needs the Rtsne package and \"UMAP\" the uwot package."),
+  ord       = arg('choice', choices = CHOICES$ord, choices_needs = list(tSNE = 'Rtsne', UMAP = 'uwot'), all = '.all', note = "\"tSNE\" needs the Rtsne package and \"UMAP\" the uwot package."),
   ord.k     = arg('integer', min = 2, max = 3, max_n = 1),
 
   # Taxa.
@@ -340,6 +342,17 @@ RETURNS <- list(
 # formals(). To cover another function, add an entry here and call
 # schema_check() on entry to the function.
 #
+# `counts` says which counts the function should be given, where it
+# matters: "rarefied" (diversity and abundance at one depth) or
+# "unrarefied" (rarefaction curves, rarefy() itself, differential
+# abundance, which models depth itself). `needs` names an optional
+# package the whole function requires.
+#
+# Any change to what fn_schema() returns needs a new development
+# version in DESCRIPTION: callers cache the schema by rbiom version.
+# tests/testthat/test-fn_schema.r checks this against
+# tests/testthat/schema-versions.txt.
+#
 # `rules` are constraints between arguments, exported as they are:
 #   one_of    Exactly one of these arguments must be set (non-NULL).
 #   any_of    At least one of these arguments must be set.
@@ -361,6 +374,7 @@ FN_SCHEMA <- list(
   #________________________________________________________
 
   adiv_boxplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom       = ARGS$biom,
@@ -387,6 +401,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   adiv_corrplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom       = ARGS$biom,
@@ -411,6 +426,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   adiv_stats = list(
+    counts  = 'rarefied',
     returns = RETURNS$table,
     rules   = STATS$rules,
     check   = 'check_stats_test',
@@ -432,6 +448,7 @@ FN_SCHEMA <- list(
       p.adj      = ARGS$p.adj )),
 
   adiv_matrix = list(
+    counts  = 'rarefied',
     returns = RETURNS$matrix,
     params  = list(
       biom       = ARGS$biom,
@@ -443,6 +460,7 @@ FN_SCHEMA <- list(
       cpus       = ARGS$cpus )),
 
   adiv_table = list(
+    counts  = 'rarefied',
     returns = RETURNS$table,
     params  = list(
       biom       = ARGS$biom,
@@ -460,6 +478,7 @@ FN_SCHEMA <- list(
   #________________________________________________________
 
   bdiv_boxplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom         = ARGS$biom,
@@ -494,6 +513,7 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   bdiv_corrplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom         = ARGS$biom,
@@ -527,6 +547,7 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   bdiv_heatmap = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot,
     params  = list(
       biom         = ARGS$biom,
@@ -550,12 +571,13 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   bdiv_ord_plot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom         = ARGS$biom,
       bdiv         = ARGS$bdiv,
       ord          = ARGS$ord,
-      layers       = arg('layers', choices = CHOICES$ord.layers),
+      layers       = arg('layers', choices = CHOICES$ord.layers, choices_needs = list(density = 'ggdensity')),
       stat.by      = arg('field', class = 'categorical', max_n = 1, null = "No groups."),
       facet.by     = ARGS$facet.by,
       colors       = ARGS$colors,
@@ -576,6 +598,7 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   bdiv_ord_table = list(
+    counts  = 'rarefied',
     returns = like(RETURNS$table,
       has  = c("code", "stats", "taxa_coords", "taxa_stats"),
       note = "`stats` is set when `stat.by` is; `taxa_coords` and `taxa_stats` with a taxa biplot." ),
@@ -603,6 +626,7 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   bdiv_clusters = list(
+    counts  = 'rarefied',
     returns = RETURNS$factor,
     params  = list(
       biom       = ARGS$biom,
@@ -617,6 +641,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   bdiv_distmat = list(
+    counts  = 'rarefied',
     returns = RETURNS$dist,
     params  = list(
       biom        = ARGS$biom,
@@ -636,6 +661,7 @@ FN_SCHEMA <- list(
       cpus        = ARGS$cpus )),
 
   bdiv_table = list(
+    counts  = 'rarefied',
     returns = RETURNS$table,
     params  = list(
       biom        = ARGS$biom,
@@ -659,6 +685,7 @@ FN_SCHEMA <- list(
 
 
   bdiv_stats = list(
+    counts  = 'rarefied',
     returns  = RETURNS$table,
     rules    = list(list(any_of = c('stat.by', 'regr'))),
     check    = 'check_regr_or_stat_by',
@@ -713,6 +740,7 @@ FN_SCHEMA <- list(
   #________________________________________________________
 
   rare_corrplot = list(
+    counts  = 'unrarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom       = ARGS$biom,
@@ -737,6 +765,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   rare_multiplot = list(
+    counts  = 'unrarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom       = ARGS$biom,
@@ -761,6 +790,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   rare_stacked = list(
+    counts  = 'unrarefied',
     returns = RETURNS$plot,
     params  = list(
       biom        = ARGS$biom,
@@ -771,6 +801,7 @@ FN_SCHEMA <- list(
       '...'       = ARGS$dots )),
 
   rarefy = list(
+    counts  = 'unrarefied',
     returns = RETURNS$biom,
     params  = list(
       biom    = ARGS$biom,
@@ -786,6 +817,7 @@ FN_SCHEMA <- list(
   #________________________________________________________
 
   taxa_boxplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom        = ARGS$biom,
@@ -817,6 +849,7 @@ FN_SCHEMA <- list(
       '...'       = ARGS$dots )),
 
   taxa_corrplot = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot_stats,
     params  = list(
       biom       = ARGS$biom,
@@ -848,6 +881,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   taxa_heatmap = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot,
     params  = list(
       biom         = ARGS$biom,
@@ -873,6 +907,7 @@ FN_SCHEMA <- list(
       '...'        = ARGS$dots )),
 
   taxa_stacked = list(
+    counts  = 'rarefied',
     returns = RETURNS$plot,
     params  = list(
       biom       = ARGS$biom,
@@ -892,6 +927,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   taxa_forest = list(
+    counts  = 'unrarefied',
     returns = RETURNS$plot_stats,
     rules   = list(list(one_of = c('stat.by', 'regr'))),
     check   = 'check_stat_by_regr',
@@ -904,7 +940,7 @@ FN_SCHEMA <- list(
       method     = arg('choice', choices = CHOICES$da.method, max_n = 1),
       covariates = arg('field', class = 'any', null = "No covariates."),
       split.by   = arg('field', class = 'categorical', null = "No split."),
-      strata     = ARGS$strata,
+      strata     = like(ARGS$strata, needs = 'lmerTest'),
       p.top      = ARGS$p.top,
       p.sig      = arg('number', min = 0, max = 1, max_n = 1),
       colors     = arg('aesthetic', aes = 'color', forms = c('logical', 'values'), max_n = 3, note = "Up to three colors: taxa more abundant, less abundant, and not significant."),
@@ -917,6 +953,7 @@ FN_SCHEMA <- list(
       '...'      = ARGS$dots )),
 
   taxa_da = list(
+    counts  = 'unrarefied',
     returns = RETURNS$table,
     rules   = list(list(one_of = c('stat.by', 'regr'))),
     check   = 'check_stat_by_regr',
@@ -929,7 +966,7 @@ FN_SCHEMA <- list(
       method     = arg('choice', choices = CHOICES$da.method, max_n = 1),
       covariates = arg('field', class = 'any', null = "No covariates."),
       split.by   = arg('field', class = 'categorical', null = "No split."),
-      strata     = ARGS$strata,
+      strata     = like(ARGS$strata, needs = 'lmerTest'),
       prev.cut   = arg('number', min = 0, max = 1, max_n = 1),
       level      = ARGS$level,
       p.adj      = ARGS$p.adj,
@@ -937,6 +974,7 @@ FN_SCHEMA <- list(
       unc        = ARGS$unc )),
 
   taxa_clusters = list(
+    counts  = 'rarefied',
     returns = RETURNS$factor,
     params  = list(
       biom   = ARGS$biom,
@@ -946,6 +984,7 @@ FN_SCHEMA <- list(
       '...'  = ARGS$dots )),
 
   taxa_stats = list(
+    counts  = 'rarefied',
     returns = RETURNS$table,
     rules   = STATS$rules,
     check   = 'check_stats_test',
@@ -971,6 +1010,7 @@ FN_SCHEMA <- list(
       p.adj      = ARGS$p.adj )),
 
   taxa_matrix = list(
+    counts  = 'rarefied',
     returns = RETURNS$matrix,
     params  = list(
       biom      = ARGS$biom,
@@ -985,6 +1025,7 @@ FN_SCHEMA <- list(
       seed      = ARGS$seed )),
 
   taxa_table = list(
+    counts  = 'rarefied',
     returns = RETURNS$table,
     params  = list(
       biom      = ARGS$biom,
@@ -1008,10 +1049,12 @@ FN_SCHEMA <- list(
     params  = list(
       biom      = ARGS$biom,
       file      = ARGS$file,
-      format    = arg('choice', choices = CHOICES$biom.format, max_n = 1, matcher = 'match.arg'),
+      format    = arg('choice', choices = CHOICES$biom.format, choices_needs = list(hdf5 = 'h5lite'), max_n = 1, matcher = 'match.arg'),
       overwrite = ARGS$overwrite )),
 
   write_xlsx = list(
+    counts  = 'unrarefied',
+    needs   = 'openxlsx',
     returns = RETURNS$file,
     params  = list(
       biom      = ARGS$biom,

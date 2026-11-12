@@ -525,6 +525,7 @@ bdiv_stats <- function (
     run <- function (biom, bdiv) {
 
       dm <- bdiv_distmat(biom, bdiv = bdiv, tree = tree, alpha = alpha, cpus = cpus)
+      validate_finite_dist(dm, bdiv, "statistics")
 
       if (is.null(regr)) {
 

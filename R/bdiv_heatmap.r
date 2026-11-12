@@ -179,6 +179,8 @@ bdiv_heatmap_build <- function (params) {
       alpha = alpha,
       cpus  = cpus )
 
+    validate_finite_dist(dist, bdiv, "a heat map")
+
     mtx <- as.matrix(dist)
 
     .mtx_code <- c(

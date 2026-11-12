@@ -1,3 +1,23 @@
+# rbiom 4.0.0.9001
+
+* `fn_schema()` entries say which counts a function wants (`counts`:
+  `"rarefied"` or `"unrarefied"`) and which optional package a function needs
+  (`needs`, e.g. `write_xlsx()`). Choices that need an optional package are
+  marked in `choices_needs` (`ord`'s `"tSNE"` and `"UMAP"`, `bdiv_ord_plot()`'s
+  `"density"` layer, and `write_biom()`'s `"hdf5"` format); `strata` in
+  `taxa_da()` and `taxa_forest()` is marked as needing lmerTest.
+* The schema is versioned: any change to what `fn_schema()` returns comes 
+  with a new package version.
+* `fn_check()` refuses deprecated arguments (`weighted`, `normalized`, and 
+  `bdiv_stats()`'s `within` and `between`), saying what to use instead.
+* A metric name that doesn't match is reported under the caller's argument
+  (`adiv = "nosuch"`, `bdiv = "nosuch"`), not ecodive's `metric`.
+* Beta diversity heat maps, ordinations, clusterings, box plots, scatter 
+  plots, and statistics stop with a clear message when the metric gives 
+  infinite or missing distances (e.g. `"bhattacharyya"` between samples with
+  no taxa in common), rather than an internal error.
+
+
 # rbiom 4.0.0
 
 ## Reproducibility

@@ -37,6 +37,12 @@ Each entry has:
 \code{"table"}, \code{"factor"}, \code{"matrix"}, \code{"dist"}, \code{"biom"}, or \code{"file"};
 \code{has} lists the \code{$} fields the result carries (e.g. \code{"data"},
 \code{"code"}, \code{"stats"}). }
+\item{\code{counts}}{ (Optional) The counts the function should be given,
+where it makes a difference: \code{"rarefied"} (diversity and abundance
+compared at one sequencing depth), or \code{"unrarefied"} (rarefaction
+curves, \code{\link[=rarefy]{rarefy()}} itself, and differential abundance, which models
+sequencing depth itself). }
+\item{\code{needs}}{ (Optional) An optional package the function requires. }
 \item{\code{rules}}{ (Optional) Constraints between arguments, each one of:
 \code{one_of} (exactly one of these arguments must be non-\code{NULL});
 \code{any_of} (at least one must be); or \code{when} (conditions, as for an
@@ -78,6 +84,9 @@ and what it means. \code{default} is then \code{NULL}. }
 \item{\code{null}}{ Present when \code{NULL} is accepted: what it means. }
 \item{\code{choices}}{ The fixed options. Matching ignores case and
 accepts unambiguous abbreviations. }
+\item{\code{choices_needs}}{ The choices that need an optional package,
+as choice = package (layer name = package for layers), e.g.
+\code{tSNE = "Rtsne"}. Choices not listed need nothing extra. }
 \item{\code{choices_when}}{ Options that depend on other arguments: a list
 of \code{when} conditions (as below) with the \code{choices} that apply while
 they hold. The first that holds applies; otherwise \code{choices}. }
@@ -121,6 +130,12 @@ it. }
 In JSON, \code{NULL} is \code{null}, numbers are written in full, \code{Inf} is the
 string \code{"Inf"}, and the list fields (\code{choices}, \code{forms}, \code{ops},
 \code{palettes}, \code{has}, and the values in \code{when}) are always arrays.
+\code{choices_needs} is an object.
+
+The description is part of rbiom's interface: any change to it comes
+with a new package version, so a caller can cache it by
+\code{packageVersion("rbiom")}. The metric \code{choices} come from the installed
+version of the ecodive package.
 }
 
 \examples{

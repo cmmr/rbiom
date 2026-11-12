@@ -1,7 +1,7 @@
 Package: rbiom
 Type: Package
 Title: Integrated Analysis and Visualization of Microbiome Data
-Version: 4.0.0
+Version: 4.0.0.9001
 Authors@R: c(
     person(
       "Daniel P.", "Smith",

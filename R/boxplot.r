@@ -294,6 +294,16 @@ bdiv_boxplot <- function (
 
       y <- attr(df, 'response', exact = TRUE)
 
+      # Infinite or missing distances. bdiv_table() drops NA rows, since
+      # NA also marks the pairs `within` / `between` leave out; without
+      # those, every pair should be there.
+      n_pairs <- if (is.null(c(within, between))) choose(length(biom$samples), 2)
+      for (m in levels(df[['.bdiv']])) {
+        d <- df[[y]][df[['.bdiv']] == m]
+        if (!is.null(n_pairs)) d <- c(d, rep(NA, n_pairs - length(d)))
+        validate_finite_dist(d, m, "a box plot")
+      }
+
 
       #________________________________________________________
       # Facet by metric when there are several; caption the

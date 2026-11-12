@@ -47,7 +47,8 @@ that only keeps a summary can check requests before passing them on.
 Checks cover the type, choices, limits, and number of each value;
 metadata field names and their classes; ranks; metric names (and
 whether a phylogenetic metric has a tree); and the constraints in the
-entry's \code{rules}. Checks that need computed data are left to the
+entry's \code{rules}. Deprecated arguments are refused, with what to use
+instead. Checks that need computed data are left to the
 function: names in \code{colors}, \code{shapes}, and \code{patterns} against the
 groups, palette and color names, the parts of a \code{tracks} or \code{grid}
 list, and taxa names.

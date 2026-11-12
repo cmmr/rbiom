@@ -87,6 +87,8 @@ bdiv_clusters <- function (
     alpha = alpha,
     cpus  = cpus )
 
+  validate_finite_dist(dm, bdiv, "clustering")
+
   pm <- with_seed(seed, cluster::pam(dm, k = k, ...))
 
   factor(pm$clustering)

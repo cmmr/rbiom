@@ -28,6 +28,12 @@
 #'     `"table"`, `"factor"`, `"matrix"`, `"dist"`, `"biom"`, or `"file"`;
 #'     `has` lists the `$` fields the result carries (e.g. `"data"`,
 #'     `"code"`, `"stats"`). }
+#'   \item{`counts`}{ (Optional) The counts the function should be given,
+#'     where it makes a difference: `"rarefied"` (diversity and abundance
+#'     compared at one sequencing depth), or `"unrarefied"` (rarefaction
+#'     curves, [rarefy()] itself, and differential abundance, which models
+#'     sequencing depth itself). }
+#'   \item{`needs`}{ (Optional) An optional package the function requires. }
 #'   \item{`rules`}{ (Optional) Constraints between arguments, each one of:
 #'     `one_of` (exactly one of these arguments must be non-`NULL`);
 #'     `any_of` (at least one must be); or `when` (conditions, as for an
@@ -68,6 +74,9 @@
 #'   \item{`null`}{ Present when `NULL` is accepted: what it means. }
 #'   \item{`choices`}{ The fixed options. Matching ignores case and
 #'     accepts unambiguous abbreviations. }
+#'   \item{`choices_needs`}{ The choices that need an optional package,
+#'     as choice = package (layer name = package for layers), e.g.
+#'     `tSNE = "Rtsne"`. Choices not listed need nothing extra. }
 #'   \item{`choices_when`}{ Options that depend on other arguments: a list
 #'     of `when` conditions (as below) with the `choices` that apply while
 #'     they hold. The first that holds applies; otherwise `choices`. }
@@ -111,6 +120,12 @@
 #' In JSON, `NULL` is `null`, numbers are written in full, `Inf` is the
 #' string `"Inf"`, and the list fields (`choices`, `forms`, `ops`,
 #' `palettes`, `has`, and the values in `when`) are always arrays.
+#' `choices_needs` is an object.
+#'
+#' The description is part of rbiom's interface: any change to it comes
+#' with a new package version, so a caller can cache it by
+#' `packageVersion("rbiom")`. The metric `choices` come from the installed
+#' version of the ecodive package.
 #'
 #'
 #' @seealso [fn_check()] to check arguments against a dataset;
@@ -156,7 +171,8 @@ fn_schema <- function (fn = NULL, json = FALSE) {
 #' Checks cover the type, choices, limits, and number of each value;
 #' metadata field names and their classes; ranks; metric names (and
 #' whether a phylogenetic metric has a tree); and the constraints in the
-#' entry's `rules`. Checks that need computed data are left to the
+#' entry's `rules`. Deprecated arguments are refused, with what to use
+#' instead. Checks that need computed data are left to the
 #' function: names in `colors`, `shapes`, and `patterns` against the
 #' groups, palette and color names, the parts of a `tracks` or `grid`
 #' list, and taxa names.
@@ -219,6 +235,16 @@ fn_check <- function (fn, args = list(), data) {
   r_only <- names(args)[vapply(specs[names(args)], function (s) isTRUE(s$r_only), logical(1))]
   if (length(r_only) > 0)
     cli_abort("{.arg {r_only}} can only be set by an R caller.")
+
+  # The functions still accept these, with a warning; a remote caller is
+  # told what to use instead.
+  for (i in names(args)) {
+    if (is.null(when <- specs[[i]]$deprecated)) next
+    note <- specs[[i]]$note
+    cli_abort(c(
+      'x' = "{.arg {i}} is deprecated (since rbiom {when}).",
+      'i' = if (!is.null(note)) "{note}" ))
+  }
 
 
   #________________________________________________________
@@ -339,7 +365,7 @@ strip_validated <- function (x) {
 SCHEMA_FIELDS <- c(
   'type', 'required', 'r_only', 'deprecated',
   'class', 'coerce', 'ops', 'extra', 'div', 'aes', 'by', 'forms', 'palettes', 'needs',
-  'choices', 'choices_when', 'min', 'max', 'max_n', 'per_side', 'null',
+  'choices', 'choices_needs', 'choices_when', 'min', 'max', 'max_n', 'per_side', 'null',
   'default', 'default_expr', 'default_note', 'when', 'note', 'desc' )
 
 schema_entry <- function (fn) {
@@ -385,7 +411,9 @@ schema_entry <- function (fn) {
 
   c(
     list(fn = fn, returns = def$returns),
-    if (!is.null(def$rules)) list(rules = def$rules),
+    if (!is.null(def$counts)) list(counts = def$counts),
+    if (!is.null(def$needs))  list(needs  = def$needs),
+    if (!is.null(def$rules))  list(rules  = def$rules),
     list(params = params) )
 }
 

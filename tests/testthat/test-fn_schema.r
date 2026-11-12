@@ -51,12 +51,13 @@ schema_choice_args <- function (fn, param, value, args) {
   args
 }
 
-# Values a choice needs packages for.
+# Values that need a package that isn't installed, according to the
+# schema's `needs` (the function's) and `choices_needs` (the value's).
 schema_choice_skip <- function (fn, param, value) {
-  (param == 'ord'    && value == 'tSNE' && !pkg_available('Rtsne')) ||
-  (param == 'ord'    && value == 'UMAP' && !pkg_available('uwot'))  ||
-  (param == 'format' && value == 'hdf5' && !pkg_available('h5lite')) ||
-  (fn    == 'write_xlsx' && !pkg_available('openxlsx'))
+  entry <- fn_schema(fn)
+  needs <- param_specs(entry)[[param]]$choices_needs
+  pkgs  <- c(entry$needs, unlist(needs[intersect(value, names(needs))]))
+  !all(vapply(pkgs, pkg_available, logical(1)))
 }
 
 schema_run <- function (fn, args) {
@@ -250,14 +251,13 @@ test_that("every metric is accepted, and others are refused", {
       # Skip the statistics where that's an option.
       if ('none' %in% unlist(specs$test$choices)) args$test <- 'none'
 
-      # On counts with zeros, Aitchison distances are NA without a
-      # pseudocount (which only bdiv_distmat() takes), and Bhattacharyya
-      # distances between samples with no taxa in common are Inf, which
-      # clustering and ordination can't use.
+      # Aitchison distances are NA (ecodive 2.3.1 gives NaN for every
+      # pair), and Bhattacharyya distances between samples with no taxa
+      # in common are Inf. The figures, ordinations, clusterings, and
+      # tests refuse both (see "distances that can't be used").
       run_ids <- switch(
         EXPR          = fn,
         bdiv_distmat  = ids,
-        bdiv_clusters = setdiff(ids, 'aitchison'),
         setdiff(ids, c('aitchison', 'bhattacharyya')) )
 
       # One call per metric where only one is allowed; otherwise one call
@@ -473,11 +473,12 @@ test_that("fn_check()", {
   expect_error(fn_check("taxa_boxplot", list(x = ".taxa"), d), "Invalid `x` option")
 
   # bdiv_stats(): the tests depend on `regr`; prefixes are dropped, and
-  # `within` / `between` are deprecated (not checked).
+  # `within` / `between` are deprecated (refused).
   expect_error(fn_check("bdiv_stats", list(), d), "Either `stat.by`")
   expect_error(fn_check("bdiv_stats", list(stat.by = "Sex", test = "mantel"), d), "Choices are: adonis2, mrpp, betadisper")
   expect_identical(fn_check("bdiv_stats", list(regr = "==Age", test = "man"), d), list(regr = "Age", test = "mantel"))
-  expect_identical(fn_check("bdiv_stats", list(stat.by = "!=Sex", within = "zzz"), d), list(stat.by = "Sex", within = "zzz"))
+  expect_identical(fn_check("bdiv_stats", list(stat.by = "!=Sex"), d), list(stat.by = "Sex"))
+  expect_error(fn_check("bdiv_stats", list(stat.by = "Sex", within = "Sex"), d), "deprecated")
 
   # distmat_stats(): only the test options can be checked without R objects.
   expect_identical(fn_check("distmat_stats", list(test = "MRPP"), d), list(test = "mrpp"))
@@ -541,6 +542,229 @@ test_that("fixes that came with the schema", {
   expect_error(bdiv_heatmap(rare50, rescale = "z"),  "Invalid `rescale` option")
   expect_error(bdiv_heatmap(rare50, label = "z"),    "Invalid `label` option")
   expect_error(bdiv_heatmap(rare50, title = FALSE),  "must be TRUE, NULL")
+})
+
+
+
+
+test_that("fn_check() refuses deprecated arguments, saying what to use instead", {
+
+  d <- fn_check_data(rare50)
+  n <- 0
+
+  for (fn in names(fn_schema())) {
+    for (spec in fn_schema(fn)$params) {
+
+      if (is.null(spec$deprecated)) next
+      n <- n + 1
+
+      args  <- setNames(list(if (spec$type == 'logical') TRUE else "Sex"), spec$name)
+      label <- sprintf("fn_check(%s, %s)", fn, spec$name)
+      err   <- tryCatch(fn_check(fn, args, d), error = function (e) conditionMessage(e))
+
+      expect(is.character(err), paste(label, "was accepted"))
+      if (!is.character(err)) next
+      expect_match(err, paste0("`", spec$name, "` is deprecated"), fixed = TRUE, label = label)
+      expect_match(err, substr(spec$note, 1, 30), fixed = TRUE, label = label)
+    }
+  }
+
+  expect_gte(n, 12)
+
+  err <- tryCatch(fn_check("bdiv_boxplot", list(weighted = TRUE), d), error = function (e) conditionMessage(e))
+  expect_match(err, "since rbiom 2.3.0", fixed = TRUE)
+  expect_match(err, "Name the metric in `bdiv`", fixed = TRUE)
+
+  # The functions themselves still accept them, with a warning.
+  expect_warning(bdiv_distmat(rare50, bdiv = "unifrac", weighted = TRUE), "deprecated")
+})
+
+
+
+
+test_that("a bad metric is reported under the caller's argument", {
+
+  d <- fn_check_data(rare50)
+
+  for (fn in c("adiv_boxplot", "adiv_stats", "adiv_table")) {
+    expect_error(fn_check(fn, list(adiv = "nosuch"), d), '`adiv = "nosuch"` does not match any option', fixed = TRUE)
+    expect_error(fn_check(fn, list(adiv = "s"),      d), '`adiv = "s"` matches multiple options', fixed = TRUE)
+  }
+  for (fn in c("bdiv_boxplot", "bdiv_distmat", "bdiv_ord_plot")) {
+    expect_error(fn_check(fn, list(bdiv = "nosuch"), d), '`bdiv = "nosuch"` does not match any option', fixed = TRUE)
+  }
+
+  # The functions give the same message.
+  expect_error(adiv_boxplot(rare50, adiv = "nosuch"), '`adiv = "nosuch"` does not match any option', fixed = TRUE)
+  expect_error(adiv_matrix(rare50,  adiv = "nosuch"), '`adiv = "nosuch"` does not match any option', fixed = TRUE)
+  expect_error(bdiv_boxplot(rare50, bdiv = "nosuch"), '`bdiv = "nosuch"` does not match any option', fixed = TRUE)
+  expect_error(bdiv_distmat(rare50, bdiv = "nosuch"), '`bdiv = "nosuch"` does not match any option', fixed = TRUE)
+  expect_error(bdiv_distmat(rare50, bdiv = "1"),      '`bdiv` must contain alphabetic characters', fixed = TRUE)
+
+  err <- tryCatch(bdiv_heatmap(rare50, bdiv = "nosuch"), error = function (e) conditionMessage(e))
+  expect_no_match(err, "metric =", fixed = TRUE)
+  expect_match(err, "bray", fixed = TRUE)
+})
+
+
+
+
+test_that("choices and functions that need an optional package are marked", {
+
+  schema <- fn_schema()
+
+  expect_identical(param_specs(schema$bdiv_ord_plot)$ord$choices_needs,     list(tSNE = "Rtsne", UMAP = "uwot"))
+  expect_identical(param_specs(schema$bdiv_ord_table)$ord$choices_needs,    list(tSNE = "Rtsne", UMAP = "uwot"))
+  expect_identical(param_specs(schema$distmat_ord_table)$ord$choices_needs, list(tSNE = "Rtsne", UMAP = "uwot"))
+  expect_identical(param_specs(schema$bdiv_ord_plot)$layers$choices_needs,  list(density = "ggdensity"))
+  expect_identical(param_specs(schema$write_biom)$format$choices_needs,     list(hdf5 = "h5lite"))
+  expect_identical(param_specs(schema$taxa_da)$strata$needs,                "lmerTest")
+  expect_identical(param_specs(schema$taxa_forest)$strata$needs,            "lmerTest")
+  expect_identical(schema$write_xlsx$needs,                                 "openxlsx")
+
+  # `choices` stay plain strings (or letter/name pairs for layers); every
+  # marked choice is one of them, and every package is a suggested one.
+  desc     <- read.dcf(system.file("DESCRIPTION", package = "rbiom"), fields = "Suggests")
+  suggests <- trimws(sub("\\(.*", "", strsplit(desc[[1]], ",")[[1]]))
+  pkgs     <- character(0)
+
+  for (entry in schema) {
+    pkgs <- c(pkgs, entry$needs)
+    for (spec in entry$params) {
+      pkgs <- c(pkgs, spec$needs)
+      if (is.null(cn <- spec$choices_needs)) next
+      names <- if (spec$type == 'layers') vapply(spec$choices, `[[`, character(1), 'name') else unlist(spec$choices)
+      expect(all(names(cn) %in% names), sprintf("%s(%s): `choices_needs` names unknown choices", entry$fn, spec$name))
+      pkgs <- c(pkgs, unlist(cn))
+    }
+  }
+  expect_true(all(pkgs %in% suggests))
+
+  # An object in JSON.
+  raw <- jsonlite::fromJSON(fn_schema("bdiv_ord_plot", json = TRUE), simplifyVector = FALSE)
+  expect_identical(param_specs(raw)$ord$choices_needs, list(tSNE = "Rtsne", UMAP = "uwot"))
+  expect_identical(param_specs(raw)$ord$choices, list("PCoA", "tSNE", "NMDS", "UMAP"))
+})
+
+
+
+
+test_that("entries say which counts the function wants", {
+
+  counts <- vapply(fn_schema(), function (e) e$counts %||% NA_character_, character(1))
+
+  expect_true(all(counts %in% c("rarefied", "unrarefied", NA)))
+
+  expect_setequal(
+    names(which(counts == "unrarefied")),
+    c("rare_corrplot", "rare_multiplot", "rare_stacked", "rarefy", "taxa_forest", "taxa_da", "write_xlsx") )
+
+  expect_setequal(names(which(is.na(counts))), c("write_biom", "distmat_stats", "distmat_ord_table"))
+
+  for (fn in c("adiv_boxplot", "adiv_stats", "bdiv_ord_plot", "bdiv_distmat", "taxa_boxplot", "taxa_heatmap", "taxa_stats"))
+    expect_identical(counts[[fn]], "rarefied", label = fn)
+
+  # taxa_da() says so for rarefied counts, and not for unrarefied ones.
+  expect_message(taxa_da(rare50, stat.by = "Sex"), "unrarefied counts are better")
+  expect_no_message(taxa_da(hmp50, stat.by = "Sex"), message = "unrarefied counts are better")
+})
+
+
+
+
+test_that("the version changes whenever the schema does", {
+
+  skip_on_cran()
+
+  # fn_schema() without the metric choices, which come from ecodive.
+  schema <- lapply(fn_schema(), function (e) {
+    e$params <- lapply(e$params, function (p) {
+      if (identical(p$type, 'metric')) p$choices <- NULL
+      p })
+    e })
+
+  f <- tempfile()
+  on.exit(unlink(f))
+  writeBin(charToRaw(enc2utf8(as.character(schema_json(schema)))), f)
+  hash <- unname(tools::md5sum(f))
+
+  rec  <- utils::read.table(test_path("schema-versions.txt"), col.names = c("version", "md5"), colClasses = "character")
+  vers <- package_version(rec$version)
+  last <- rec[nrow(rec), ]
+
+  expect(
+    ok      = identical(hash, last$md5),
+    failure_message = sprintf(paste(
+      "fn_schema() changed. Raise `Version` in DESCRIPTION above %s,",
+      "then add this line to tests/testthat/schema-versions.txt: <new version> %s" ),
+      last$version, hash ))
+
+  expect(nrow(rec) == 1 || all(vers[-1] > vers[-length(vers)]), "schema-versions.txt: each line needs a higher version")
+  expect(package_version(last$version) <= packageVersion("rbiom"), "schema-versions.txt: version above DESCRIPTION's")
+})
+
+
+
+
+test_that("distances that can't be used are refused with a clear message", {
+
+  skip_on_cran()
+
+  # Bhattacharyya: Inf between samples with no taxa in common.
+  dm <- bdiv_distmat(rare50, bdiv = "bhattacharyya")
+  expect_true(any(is.infinite(dm)))
+
+  msg <- function (expr) tryCatch({ force(expr); "" }, error = function (e) conditionMessage(e))
+
+  x <- msg(bdiv_heatmap(rare50, bdiv = "bhattacharyya"))
+  expect_match(x, '"bhattacharyya" metric gave infinite distances for 279 of 1176 sample pairs', fixed = TRUE)
+  expect_match(x, "can't be used for a heat map", fixed = TRUE)
+  expect_match(x, "no taxa in common", fixed = TRUE)
+
+  expect_match(msg(bdiv_ord_plot(rare50, bdiv = "bhattacharyya")),                 "can't be used for an ordination",  fixed = TRUE)
+  expect_match(msg(bdiv_ord_table(rare50, bdiv = "bhattacharyya")),                "can't be used for an ordination",  fixed = TRUE)
+  expect_match(msg(bdiv_clusters(rare50, bdiv = "bhattacharyya")),                 "can't be used for clustering",     fixed = TRUE)
+  expect_match(msg(bdiv_boxplot(rare50, bdiv = "bhattacharyya", x = "Sex")),       "can't be used for a box plot",     fixed = TRUE)
+  expect_match(msg(bdiv_corrplot(rare50, bdiv = "bhattacharyya", x = "Age")),      "can't be used for a scatter plot", fixed = TRUE)
+  expect_match(msg(bdiv_stats(rare50, bdiv = "bhattacharyya", stat.by = "Sex")),   "can't be used for statistics",     fixed = TRUE)
+
+  # Several metrics: the one that can't be used is named.
+  expect_match(msg(bdiv_boxplot(rare50, bdiv = c("bray", "bhattacharyya"), x = "Sex")), '"bhattacharyya" metric', fixed = TRUE)
+
+  # Missing distances are named as such.
+  expect_match(
+    object = tryCatch(validate_finite_dist(c(1, NA, 2), "x", "a test"), error = function (e) conditionMessage(e)),
+    regexp = '"x" metric gave missing (NA) distances for 1 of 3 sample pairs', fixed = TRUE )
+  expect_no_error(validate_finite_dist(c(0.1, -Inf, 2), "x", "a test"))
+
+  # On samples that share taxa, the metric works.
+  b <- rarefy(hmp50[pull(hmp50, "Body Site") == "Stool"])
+  if (all(is.finite(bdiv_distmat(b, bdiv = "bhattacharyya"))))
+    expect_no_error(bdiv_heatmap(b, bdiv = "bhattacharyya"))
+})
+
+
+
+
+test_that("missing distances are found where bdiv_table() drops them", {
+
+  skip_on_cran()
+
+  # A metric that gives one NA distance. (No cache: the mock must run.)
+  op <- options(rbiom.cache_dir = FALSE)
+  on.exit(options(op))
+  local_mocked_bindings(bdiv_distmat = function (biom, bdiv, ...) {
+    dm <- ecodive::bray(as.matrix(biom$counts), margin = 2L)
+    dm[2] <- NA
+    dm })
+
+  msg <- function (expr) tryCatch({ force(expr); "" }, error = function (e) conditionMessage(e))
+
+  expect_match(msg(bdiv_boxplot(rare50,  bdiv = "bray", x = "Sex")), '"bray" metric gave missing (NA) distances for 1 of 1176', fixed = TRUE)
+  expect_match(msg(bdiv_corrplot(rare50, bdiv = "bray", x = "Age")), '"bray" metric gave missing (NA) distances for 1 of 1176', fixed = TRUE)
+
+  # With `within` / `between`, the NA rows are the pairs left out.
+  expect_no_error(suppressWarnings(bdiv_boxplot(rare50, bdiv = "bray", x = "==Sex", test = "none")))
 })
 
 
