@@ -113,8 +113,11 @@ covered functions. With <code>json = TRUE</code>, the same as a JSON string.</p>
 <code>"code"</code>, <code>"stats"</code>).</p></dd>
 
 <dt><code>rules</code></dt>
-<dd><p>(Optional) Constraints between arguments. <code>one_of</code>:
-exactly one of these arguments must be non-<code>NULL</code>.</p></dd>
+<dd><p>(Optional) Constraints between arguments, each one of:
+<code>one_of</code> (exactly one of these arguments must be non-<code>NULL</code>);
+<code>any_of</code> (at least one must be); or <code>when</code> (conditions, as for an
+argument's <code>when</code>) with <code>requires</code> (these arguments must then be
+non-<code>NULL</code>) or <code>forbids</code> (they must then be <code>NULL</code>).</p></dd>
 
 <dt><code>params</code></dt>
 <dd><p>One entry per argument, in the order of <code><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals()</a></code>.</p></dd>
@@ -144,8 +147,8 @@ tree, and whether it needs integer counts, <code>int_only</code>);
 <code>"aesthetic"</code> (colors, shapes, or patterns: <code>aes</code>, and <code>by</code>, the
 argument whose values they are mapped to);
 <code>"palette"</code>; <code>"tracks"</code>;
-<code>"biom"</code>, <code>"tree"</code>, <code>"file"</code>, <code>"dots"</code> (R objects, a file path,
-and <code>...</code>: see <code>r_only</code>).</p></dd>
+<code>"biom"</code>, <code>"tree"</code>, <code>"dist"</code>, <code>"vector"</code>, <code>"file"</code>, <code>"dots"</code> (R
+objects, a file path, and <code>...</code>: see <code>r_only</code>).</p></dd>
 
 <dt><code>required</code></dt>
 <dd><p><code>TRUE</code> when the argument has no default.</p></dd>
@@ -164,6 +167,11 @@ and what it means. <code>default</code> is then <code>NULL</code>.</p></dd>
 <dt><code>choices</code></dt>
 <dd><p>The fixed options. Matching ignores case and
 accepts unambiguous abbreviations.</p></dd>
+
+<dt><code>choices_when</code></dt>
+<dd><p>Options that depend on other arguments: a list
+of <code>when</code> conditions (as below) with the <code>choices</code> that apply while
+they hold. The first that holds applies; otherwise <code>choices</code>.</p></dd>
 
 <dt><code>min</code>, <code>max</code></dt>
 <dd><p>Numeric limits. <code>"integer"</code> values must be whole.</p></dd>
@@ -185,6 +193,10 @@ too, and treated as categories.</p></dd>
 <dt><code>ops</code></dt>
 <dd><p>For fields: field names may be prefixed with <code>"=="</code>
 (compare within groups) or <code>"!="</code> (between groups).</p></dd>
+
+<dt><code>extra</code></dt>
+<dd><p>For fields: values accepted besides the dataset's
+fields, such as <code>".taxa"</code>.</p></dd>
 
 <dt><code>forms</code></dt>
 <dd><p>The forms accepted, when there are several:
@@ -216,6 +228,9 @@ letters, and metric ids. Absent: the argument may always matter.</p></dd>
 <dt><code>deprecated</code></dt>
 <dd><p>The version that deprecated the argument.</p></dd>
 
+<dt><code>unused</code></dt>
+<dd><p>Accepted for compatibility, but has no effect.</p></dd>
+
 <dt><code>r_only</code></dt>
 <dd><p>Only an R caller can set it: an R object, a file
 path, a host setting such as <code>cpus</code>, or <code>...</code>. <code><a href="fn_check.html">fn_check()</a></code> refuses
@@ -240,8 +255,8 @@ string <code>"Inf"</code>, and the list fields (<code>choices</code>, <code>form
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmmr.github.io/rbiom/">rbiom</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">fn_schema</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_boxplot"  "adiv_corrplot" "adiv_matrix"   "bdiv_boxplot" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "bdiv_corrplot" "bdiv_heatmap" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "adiv_boxplot"  "adiv_corrplot" "adiv_stats"    "adiv_matrix"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "bdiv_boxplot"  "bdiv_corrplot"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">fn_schema</span><span class="op">(</span><span class="st">"adiv_boxplot"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">x</span><span class="op">$</span><span class="va">returns</span></span></span>

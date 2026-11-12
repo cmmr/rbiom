@@ -110,7 +110,7 @@ color names, the parts of a `tracks` or `grid` list, and taxa names.
 #> 
 
     try(fn_check("adiv_boxplot", list(ci = "zz"), data))
-#> Error in validate_var_choices(var = name, choices = spec$choices, env = env,  : 
+#> Error in validate_var_choices(var = name, choices = choices, env = env,  : 
 #>   Invalid `ci` option(s): zz
 #> Choices are: ci, range, sd, se, mad
 ```

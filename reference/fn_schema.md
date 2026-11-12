@@ -49,8 +49,11 @@ Each entry has:
 
 - `rules`:
 
-  (Optional) Constraints between arguments. `one_of`: exactly one of
-  these arguments must be non-`NULL`.
+  (Optional) Constraints between arguments, each one of: `one_of`
+  (exactly one of these arguments must be non-`NULL`); `any_of` (at
+  least one must be); or `when` (conditions, as for an argument's
+  `when`) with `requires` (these arguments must then be non-`NULL`) or
+  `forbids` (they must then be `NULL`).
 
 - `params`:
 
@@ -74,8 +77,9 @@ help text). The other fields are present only when they apply.
   `name`, whether it is `phylo`genetic, needing a tree, and whether it
   needs integer counts, `int_only`); `"aesthetic"` (colors, shapes, or
   patterns: `aes`, and `by`, the argument whose values they are mapped
-  to); `"palette"`; `"tracks"`; `"biom"`, `"tree"`, `"file"`, `"dots"`
-  (R objects, a file path, and `...`: see `r_only`).
+  to); `"palette"`; `"tracks"`; `"biom"`, `"tree"`, `"dist"`,
+  `"vector"`, `"file"`, `"dots"` (R objects, a file path, and `...`: see
+  `r_only`).
 
 - `required`:
 
@@ -100,6 +104,12 @@ help text). The other fields are present only when they apply.
 
   The fixed options. Matching ignores case and accepts unambiguous
   abbreviations.
+
+- `choices_when`:
+
+  Options that depend on other arguments: a list of `when` conditions
+  (as below) with the `choices` that apply while they hold. The first
+  that holds applies; otherwise `choices`.
 
 - `min`, `max`:
 
@@ -127,6 +137,11 @@ help text). The other fields are present only when they apply.
 
   For fields: field names may be prefixed with `"=="` (compare within
   groups) or `"!="` (between groups).
+
+- `extra`:
+
+  For fields: values accepted besides the dataset's fields, such as
+  `".taxa"`.
 
 - `forms`:
 
@@ -161,6 +176,10 @@ help text). The other fields are present only when they apply.
 
   The version that deprecated the argument.
 
+- `unused`:
+
+  Accepted for compatibility, but has no effect.
+
 - `r_only`:
 
   Only an R caller can set it: an R object, a file path, a host setting
@@ -190,8 +209,8 @@ and
     library(rbiom)
 
     head(names(fn_schema()))
-#> [1] "adiv_boxplot"  "adiv_corrplot" "adiv_matrix"   "bdiv_boxplot" 
-#> [5] "bdiv_corrplot" "bdiv_heatmap" 
+#> [1] "adiv_boxplot"  "adiv_corrplot" "adiv_stats"    "adiv_matrix"  
+#> [5] "bdiv_boxplot"  "bdiv_corrplot"
 
     x <- fn_schema("adiv_boxplot")
     x$returns

@@ -209,6 +209,10 @@
 - New
   [`fn_schema()`](https://cmmr.github.io/rbiom/reference/fn_schema.md):
   a machine-readable description of the arguments of the plot functions,
+  [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md),
+  [`bdiv_stats()`](https://cmmr.github.io/rbiom/reference/bdiv_stats.md),
+  [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
+  [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md),
   [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
   [`taxa_clusters()`](https://cmmr.github.io/rbiom/reference/taxa_clusters.md),
   [`bdiv_clusters()`](https://cmmr.github.io/rbiom/reference/bdiv_clusters.md),
@@ -224,8 +228,10 @@
   `NULL` means, where dataset-dependent choices come from (a categorical
   or numeric field, a rank, taxa, a metric that may need a tree), the
   forms it accepts, when it has any effect, and the first sentence of
-  its help text. Plain lists, or JSON with `json = TRUE`, for programs
-  that build input controls or check requests.
+  its help text; and the constraints between arguments
+  (e.g. `test = "kruskal"` needs `stat.by`). Plain lists, or JSON with
+  `json = TRUE`, for programs that build input controls or check
+  requests.
 - New [`fn_check()`](https://cmmr.github.io/rbiom/reference/fn_check.md)
   and
   [`fn_check_data()`](https://cmmr.github.io/rbiom/reference/fn_check.md):
@@ -263,6 +269,12 @@
 - A phylogenetic metric (`faith`, the UniFrac family) without a tree is
   an error naming the metric, before any computing (previously
   “inherits(tree,”phylo”) is not TRUE”).
+- [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md)
+  and
+  [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md)
+  report a test’s missing or unsupported arguments (`stat.by` for
+  `"kruskal"`, `regr` for `"emtrends"`, `strata` or `covariates` with a
+  rank test) before computing anything.
 - A misspelled field name is reported under the argument it was given in
   (e.g. `x`) rather than `md`. `k` in
   [`taxa_clusters()`](https://cmmr.github.io/rbiom/reference/taxa_clusters.md)
