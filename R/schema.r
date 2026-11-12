@@ -348,11 +348,6 @@ RETURNS <- list(
 # abundance, which models depth itself). `needs` names an optional
 # package the whole function requires.
 #
-# Any change to what fn_schema() returns needs a new development
-# version in DESCRIPTION: callers cache the schema by rbiom version.
-# tests/testthat/test-fn_schema.r checks this against
-# tests/testthat/schema-versions.txt.
-#
 # `rules` are constraints between arguments, exported as they are:
 #   one_of    Exactly one of these arguments must be set (non-NULL).
 #   any_of    At least one of these arguments must be set.

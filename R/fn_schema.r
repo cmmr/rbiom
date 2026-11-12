@@ -122,10 +122,8 @@
 #' `palettes`, `has`, and the values in `when`) are always arrays.
 #' `choices_needs` is an object.
 #'
-#' The description is part of rbiom's interface: any change to it comes
-#' with a new package version, so a caller can cache it by
-#' `packageVersion("rbiom")`. The metric `choices` come from the installed
-#' version of the ecodive package.
+#' The metric `choices` come from the installed version of the ecodive
+#' package.
 #'
 #'
 #' @seealso [fn_check()] to check arguments against a dataset;

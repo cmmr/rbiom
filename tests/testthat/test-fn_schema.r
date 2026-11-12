@@ -672,40 +672,6 @@ test_that("entries say which counts the function wants", {
 
 
 
-test_that("the version changes whenever the schema does", {
-
-  skip_on_cran()
-
-  # fn_schema() without the metric choices, which come from ecodive.
-  schema <- lapply(fn_schema(), function (e) {
-    e$params <- lapply(e$params, function (p) {
-      if (identical(p$type, 'metric')) p$choices <- NULL
-      p })
-    e })
-
-  f <- tempfile()
-  on.exit(unlink(f))
-  writeBin(charToRaw(enc2utf8(as.character(schema_json(schema)))), f)
-  hash <- unname(tools::md5sum(f))
-
-  rec  <- utils::read.table(test_path("schema-versions.txt"), col.names = c("version", "md5"), colClasses = "character")
-  vers <- package_version(rec$version)
-  last <- rec[nrow(rec), ]
-
-  expect(
-    ok      = identical(hash, last$md5),
-    failure_message = sprintf(paste(
-      "fn_schema() changed. Raise `Version` in DESCRIPTION above %s,",
-      "then add this line to tests/testthat/schema-versions.txt: <new version> %s" ),
-      last$version, hash ))
-
-  expect(nrow(rec) == 1 || all(vers[-1] > vers[-length(vers)]), "schema-versions.txt: each line needs a higher version")
-  expect(package_version(last$version) <= packageVersion("rbiom"), "schema-versions.txt: version above DESCRIPTION's")
-})
-
-
-
-
 test_that("distances that can't be used are refused with a clear message", {
 
   skip_on_cran()

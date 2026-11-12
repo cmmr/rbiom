@@ -132,10 +132,8 @@ string \code{"Inf"}, and the list fields (\code{choices}, \code{forms}, \code{op
 \code{palettes}, \code{has}, and the values in \code{when}) are always arrays.
 \code{choices_needs} is an object.
 
-The description is part of rbiom's interface: any change to it comes
-with a new package version, so a caller can cache it by
-\code{packageVersion("rbiom")}. The metric \code{choices} come from the installed
-version of the ecodive package.
+The metric \code{choices} come from the installed version of the ecodive
+package.
 }
 
 \examples{
