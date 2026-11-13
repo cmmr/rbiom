@@ -101,7 +101,10 @@ test_that("relative abundance detection", {
   expect_true(r$relative)
   expect_null(r$depth)
   expect_false(rarefy(hmp5)$relative)
-  out <- capture.output(print(r), type = 'message')
+  # print() writes with cli, which signals each line as a message. Catch them
+  # here, before any outer handler (e.g. suppressMessages() around the whole
+  # test run) can muffle them.
+  out <- capture_messages(print(r))
   expect_true(any(grepl("relative abundances", out, fixed = TRUE)))
 })
 
