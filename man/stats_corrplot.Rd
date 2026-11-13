@@ -37,7 +37,8 @@ argument in \code{\link[=stats_table]{stats_table()}}. Required.}
 \item{y}{A numeric metadata column name to use for the y-axis.
 Default: \code{attr(df, 'response')}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw, such as the trend line, its
+confidence band, and the points. One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.

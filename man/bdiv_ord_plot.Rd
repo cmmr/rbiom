@@ -48,7 +48,8 @@ plot. Default: \code{"bray"}}
 }
 Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw, such as sample points, group
+ellipses, and taxa labels and arrows. One or more of
 \code{c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")}.
 The first four are sample-centric; the last three are taxa-centric.
 Single letter abbreviations are also accepted. For instance,

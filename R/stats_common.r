@@ -204,8 +204,8 @@ tibble_code <- function (cols, fn = "tibble::tibble") {
 #________________________________________________________
 deparse_vec <- function (x, indent = 2) {
 
-  # Doubles are written so that they parse back exactly on every platform:
-  # see num_literal() in provenance.r.
+  # Doubles are written in decimal with enough digits to read back as the
+  # same values: see num_literal() in provenance.r.
   opts <- c("keepNA", "keepInteger", "niceNames")
   sep  <- paste0("\n", strrep(" ", indent))
   dp   <- function (v) paste(deparse_exact(v, width.cutoff = 100L, control = opts), collapse = sep)

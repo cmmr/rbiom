@@ -16,11 +16,12 @@
 * Data-derived strings (sample, OTU, taxa, and field names, metadata values, 
   file paths) only ever appear in generated code as quoted literals, and rbiom
   never evaluates generated code itself.
-* Numbers in generated code parse back to exactly the same values on every 
-  platform: up to 15 significant digits when that is exact, and hexadecimal
-  notation (e.g. `0x1.e999999999999p+3` for `9 * 1.7`) otherwise. 
-  17-digit decimals were read back one unit in the last place off on macOS 
-  (Apple silicon), which changed rank-based statistics.
+* Numbers in generated code are decimals with the fewest digits (up to 17)
+  that read back as the same value, e.g. `15.299999999999999` for `9 * 1.7`;
+  never hexadecimal. Plot positions that rbiom computes (p-value labels, axis
+  breaks) are rounded so they read well. On macOS (Apple silicon) R reads 
+  16-17 digit literals with plain doubles, so such numbers can come back one 
+  unit in the last place off there.
 * `$cmd` no longer re-evaluates the caller's arguments (so 
   `adiv_boxplot(rarefy(biom))` rarefies once) and no longer records `cpus`.
 * Functions that use random numbers (`rarefy()`, rank transforms with 
@@ -122,6 +123,12 @@
 * Clear errors for `NA`, negative, or non-numeric counts and unknown 
   sample/OTU names. `as_rbiom()` accepts data frames of counts.
 * `write_biom(format = "json")` no longer rounds values to four decimals.
+* `biom_inflate()` and `suggest_inflate_depths()` work on values of any 
+  scale: they previously assumed each sample summed to 1, so counts divided 
+  by 4 were inflated to depths of about 3. A sample whose values are all 
+  whole multiples of its smallest value now gets its original depth exactly 
+  (counts divided by a constant, or proportions of counts with a singleton); 
+  the singleton-peak heuristic, and its documented accuracy, covers the rest.
 * Newick output quotes labels containing metacharacters, spaces, or 
   underscores, keeps node labels, and handles large trees. With ecodive 
   2.3.1's standard-conforming parser, labels containing apostrophes and 

@@ -309,10 +309,11 @@ boxplot_stats <- function (params) {
 
   .xmin <- .xmax <- .step <- .ypos <- .tick <- .label <- NULL # for CRAN check only
 
+  # Rounded like the brackets, so the label positions read well in `$code`.
   attr(ggdata, 'stat_labels') <- tibble(
       rows,
       .x = (rows[['.xmin']] + rows[['.xmax']]) / 2,
-      .y = rows[['.ypos']] + (rows[['.step']] / 15) ) %>%
+      .y = signif(rows[['.ypos']] + (rows[['.step']] / 15), 10) ) %>%
     dplyr::select(-c(.xmin, .xmax, .step, .ypos, .tick))
 
   attr(ggdata, 'stat_brackets') <- tibble(
@@ -368,7 +369,8 @@ boxplot_stats <- function (params) {
   } else {
 
     ymax   <- min(rows[[".ypos"]])
-    breaks <- pretty(c(0, ymax), n = 10)
+    # pretty() can return 0.6000000000000001 (3 * 0.2).
+    breaks <- signif(pretty(c(0, ymax), n = 10), 10)
     breaks <- breaks[breaks < ymax]
 
     set_layer(

@@ -41,7 +41,8 @@ For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
 explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
 Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw for each group, such as boxes,
+violins, dots, or error bars. One or more of
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.

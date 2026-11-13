@@ -8,7 +8,8 @@
 #' @family visualization
 #'
 #'
-#' @param layers   One or more of
+#' @param layers   The elements to draw, such as sample points, group
+#'        ellipses, and taxa labels and arrows. One or more of
 #'        `c("point", "spider", "ellipse", "name", "mean", "taxon", "arrow")`.
 #'        The first four are sample-centric; the last three are taxa-centric.
 #'        Single letter abbreviations are also accepted. For instance,

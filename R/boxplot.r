@@ -14,7 +14,8 @@
 #' @param y   A numeric metadata column name to use for the y-axis.
 #'        Default: `attr(df, 'response')`
 #'
-#' @param layers   One or more of
+#' @param layers   The elements to draw for each group, such as boxes,
+#'        violins, dots, or error bars. One or more of
 #'        `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`.
 #'        Single letter abbreviations are also accepted. For instance,
 #'        `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`.

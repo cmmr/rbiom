@@ -1,6 +1,10 @@
 
 # library(testthat)
 
+# A C99 hexadecimal floating-point literal (0x1.e99999999999ap+3), which
+# generated code must never contain.
+HEX_RE <- "0x[0-9a-fA-F.]+p[+-]?[0-9]+"
+
 hmp50  <- as_rbiom(system.file(package = 'rbiom', 'extdata', 'hmp50.bz2'))
 rare50 <- rarefy(hmp50)
 min50  <- as_rbiom(list(counts = hmp50$counts))

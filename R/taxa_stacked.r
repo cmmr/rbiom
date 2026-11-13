@@ -333,7 +333,7 @@ taxa_stacked_build <- function (params) {
       params = params,
       layer  = 'yaxis',
       'expand' = c(0, 0, 0.02, 0),
-      'breaks' = base::pretty(params$.ggdata[[params$.ycol]]),
+      'breaks' = signif(base::pretty(params$.ggdata[[params$.ycol]]), 10),
       'labels' = .label_number(scale_cut = .cut_si("")) )
   }
 

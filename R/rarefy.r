@@ -140,10 +140,11 @@ rarefy <- function(
 #'
 #' @param depth   The target library size (sum) for each sample: a single
 #'        integer, or one integer per sample. Must be greater than 0. If
-#'        `NULL` (the default), the depth is estimated per-sample using the
-#'        "Singleton Peak Heuristic". See [`suggest_inflate_depths()`] for
-#'        algorithm details. Counts that are already integers are left
-#'        unchanged when `depth = NULL`.
+#'        `NULL` (the default), each sample's original depth is recovered
+#'        exactly when its values are whole multiples of its smallest value,
+#'        and otherwise estimated with the "Singleton Peak Heuristic". See
+#'        [`suggest_inflate_depths()`] for details and accuracy. Counts that
+#'        are already integers are left unchanged when `depth = NULL`.
 #'
 #' @section Rounding (Largest Remainder Method):
 #'
@@ -465,12 +466,25 @@ depth_from_sums <- function (sums) {
 #' @param adjust   Numeric. Bandwidth adjustment for the kernel density
 #'        estimation. Default: `1.5`.
 #'
+#' @section Exact Depths:
+#'
+#' When `depth = NULL`, [`biom_inflate()`] calls this function to find the
+#' original sequencing depth of each sample. Values on any scale are first
+#' divided by their sample's total, so proportions, percentages, and counts
+#' divided by a constant are all handled alike.
+#'
+#' If every non-zero value in a sample is a whole multiple of the sample's
+#' smallest non-zero value, that value is taken to be one read, and the depth
+#' is the sample's total divided by it. This recovers the original counts
+#' exactly from counts divided by a constant, and from proportions of integer
+#' counts whenever the sample contains a singleton. Other samples get the
+#' heuristic below.
+#'
 #' @section The Singleton Peak Heuristic:
 #'
-#' When `depth = NULL`, [`biom_inflate()`] calls this function to estimate the original
-#' sequencing depth for each sample. The underlying assumption is that in
-#' typical microbiome datasets, the most frequent count value (the mode of the
-#' abundance distribution) is 1 (a singleton).
+#' The underlying assumption is that in typical microbiome datasets, the most
+#' frequent count value (the mode of the abundance distribution) is 1 (a
+#' singleton).
 #'
 #' The algorithm works as follows:
 #'
@@ -494,6 +508,14 @@ depth_from_sums <- function (sums) {
 #' samples (or, if there are too few informative samples for the heuristic,
 #' every sample is scaled so that its smallest non-zero value becomes 1).
 #' Counts that are already integers are returned as their current sums.
+#'
+#' **Accuracy:** the heuristic is an estimate, not a recovery. On `hmp50`
+#' proportions perturbed so that no exact depth can be found, its depths
+#' ranged from 0.06 to 2.9 times the true depths (median 0.72), so the
+#' inflated counts, and any rarefaction depth chosen from them, can differ
+#' substantially from the original data. Rounded proportions (e.g. to 6
+#' decimal places) are in this situation too. Pass `depth` to
+#' [`biom_inflate()`] when the original depths are known.
 #'
 #' @return A named integer vector of recommended depths for each sample.
 #' @export
@@ -528,6 +550,7 @@ inflate_depths <- function (mtx, adjust = 1.5) {
   sample_medians       <- numeric(n_sams)
   sample_minimums      <- rep(NA_real_, n_sams)
   valid_samples        <- logical(n_sams)
+  exact_depths         <- rep(NA_integer_, n_sams)
 
 
   # Iterate samples using the sparse structure: column i's values are
@@ -543,8 +566,19 @@ inflate_depths <- function (mtx, adjust = 1.5) {
     vals <- vals[is.finite(vals) & vals > 0]
     if (length(vals) == 0) next
 
+    # Proportions of the sample's total: a depth is the reciprocal of the
+    # proportion that one read makes up, whatever scale the values are on.
+    vals <- vals / sum(vals)
+
     sample_minimums[i] <- min(vals)
     if (length(vals) < 2) next
+
+    # Whole multiples of the smallest value (counts divided by a constant,
+    # or proportions of counts that include a singleton): that value is one
+    # read, and the depth is exact. Tolerance covers the rounding of k / n.
+    ratio <- vals / min(vals)
+    if (max(ratio) < 1e9 && all(abs(ratio - round(ratio)) < 1e-6))
+      exact_depths[i] <- as.integer(sum(round(ratio)))
 
     lvals <- log10(vals)
     med   <- median(lvals)
@@ -585,6 +619,10 @@ inflate_depths <- function (mtx, adjust = 1.5) {
       results[i] <- as.integer(round(1 / 10^est_peak))
     }
   }
+
+  # Exact depths replace the estimates (those samples still informed the
+  # density above).
+  results[!is.na(exact_depths)] <- exact_depths[!is.na(exact_depths)]
 
 
   # Samples the heuristic can't handle: use the median of the others,

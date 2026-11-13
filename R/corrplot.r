@@ -17,7 +17,8 @@
 #' @param y   A numeric metadata column name to use for the y-axis.
 #'        Default: `attr(df, 'response')`
 #'
-#' @param layers   One or more of
+#' @param layers   The elements to draw, such as the trend line, its
+#'        confidence band, and the points. One or more of
 #'        `c("trend", "confidence", "point", "name", "residual")`. Single
 #'        letter abbreviations are also accepted. For instance,
 #'        `c("trend", "point")` is equivalent to `c("t", "p")` and `"tp"`.

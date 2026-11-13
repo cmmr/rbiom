@@ -47,7 +47,8 @@ highest, \code{-1} is the lowest rank, \code{-2} is the second
 lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
 see all options for a given rbiom object. Default: \code{-1}.}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw, such as the trend line, its
+confidence band, and the points. One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.

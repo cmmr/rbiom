@@ -49,7 +49,8 @@ or explicitly provided via \verb{tree=}. Supports partial matching.
 Multiple values are allowed for functions which return a table or
 plot. Default: \code{"bray"}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw, such as the trend line, its
+confidence band, and the points. One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.

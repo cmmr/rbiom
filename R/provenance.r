@@ -219,36 +219,30 @@ prov_inline <- function (expr, env, exclude = character()) {
 
 
 #________________________________________________________
-# R literals for a double vector that parse back to exactly the same values
-# on every platform.
+# Decimal R literals for a double vector: the fewest significant digits
+# (15, 16, or 17) that read back as the same double. Generated code is
+# shown to people, so numbers are never written in hexadecimal.
 #
-# deparse()'s "digits17" option is not enough: R's parser accumulates the
-# digits of a decimal literal in a long double, which on some platforms
-# (macOS on Apple silicon) is no wider than a double, so a 17-digit literal
-# such as 15.299999999999999 can come back one unit in the last place off.
-# Up to 15 significant digits with a power-of-ten scale within +/-22 always
-# parse exactly (the digits fit in 53 bits and the power of ten is exact),
-# so that form is used whenever it round-trips. Anything else - typically
-# floating-point noise such as 9 * 1.7 - is written in C99 hexadecimal
-# notation (0x1.e99999999999ap+3), which R parses exactly everywhere.
+# Floating-point noise such as 9 * 1.7 needs 17 digits (15.299999999999999).
+# R's parser accumulates the digits of a literal in a long double, so where
+# a long double is no wider than a double (macOS on Apple silicon) a literal
+# whose digits don't fit in 53 bits can come back one unit in the last place
+# off. That is far below anything a figure can show, but a rank-based
+# statistic on values that differ only by such noise can change on replay
+# there. Up to 15 digits (16 when they fit in 53 bits) with a power-of-ten
+# scale within +/-22 read back exactly everywhere. Plotting code rounds the
+# positions it computes (see boxplot_stats()) so they stay short.
 #________________________________________________________
 num_literal <- function (x) {
 
   x   <- as.double(x)
   out <- sprintf("%.15g", x) # also gives "NA", "NaN", "Inf", "-Inf"
-  fin <- is.finite(x)
+  fin <- which(is.finite(x))
 
-  if (any(fin)) {
-    s     <- sub("^-", "", out[fin])
-    mant  <- sub("e.*$", "", s)
-    expo  <- ifelse(grepl("e", s, fixed = TRUE), sub("^.*e", "", s), "0")
-    scale <- as.integer(expo) - nchar(sub("^[^.]*\\.?", "", mant))
-    exact <- abs(scale) <= 22L & as.numeric(out[fin]) == x[fin]
-    out[fin][!exact] <- sprintf("%a", x[fin][!exact])
-
-    # R doesn't read subnormal hexadecimal literals back exactly.
-    bad <- as.numeric(out[fin]) != x[fin]
-    out[fin][bad] <- sprintf("%.17g", x[fin][bad])
+  for (fmt in c("%.16g", "%.17g")) {
+    redo <- fin[as.numeric(out[fin]) != x[fin]]
+    if (length(redo) == 0) break
+    out[redo] <- sprintf(fmt, x[redo])
   }
 
   if (length(x) > 0 && all(is.na(x) & !is.nan(x))) out[] <- "NA_real_"
@@ -257,17 +251,19 @@ num_literal <- function (x) {
 }
 
 
-# TRUE when deparse()'s default (15 significant digits) can't represent `x`
-# exactly on every platform.
+# TRUE when deparse()'s default (15 significant digits) doesn't give back
+# the same values as `x`.
 needs_num_literal <- function (x) {
-  is.double(x) && length(x) > 0 && any(grepl("0x", num_literal(x), fixed = TRUE))
+  if (!is.double(x) || length(x) == 0) return (FALSE)
+  x <- x[is.finite(x)]
+  any(as.numeric(sprintf("%.15g", x)) != x)
 }
 
 
 #________________________________________________________
 # deparse() for generated code, with every double constant written by
-# num_literal(). Double vectors that need hexadecimal digits are swapped for
-# placeholder symbols, the expression is deparsed as usual (so names and
+# num_literal(). Double vectors that need more than 15 digits are swapped
+# for placeholder symbols, the expression is deparsed as usual (so names and
 # strings are still quoted and escaped by deparse()), and the placeholders
 # are then replaced with the literals. The replacement text is built from
 # numbers only.

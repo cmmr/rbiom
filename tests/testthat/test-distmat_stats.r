@@ -129,7 +129,11 @@ test_that("a between-strata variable permutes whole strata", {
   expect_equal(x$.stat,  v$F[[1]],  tolerance = 1e-10)
   expect_equal(x$.r.sqr, v$R2[[1]], tolerance = 1e-10)
 
-  subj <- stats::setNames(seq_along(unique(sid)) * 1.7, unique(sid))
+  # Rounded so that the covariate has no floating-point noise: the replay
+  # below must match, and a 17-digit literal such as
+  # 15.299999999999999 (9 * 1.7) can parse one unit in the last place off
+  # on macOS (Apple silicon), which changes the ranks Mantel uses.
+  subj <- stats::setNames(round(seq_along(unique(sid)) * 1.7, 1), unique(sid))
   cov  <- stats::setNames(unname(subj[sid]), lab)
   x2   <- distmat_stats(dm, cov, strata = sid, permutations = 199)
   v2   <- vegan::adonis2(dm ~ cov, permutations = 9)

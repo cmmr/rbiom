@@ -47,7 +47,8 @@ highest, \code{-1} is the lowest rank, \code{-2} is the second
 lowest, and \code{0} is the OTU "rank". Run \code{biom$ranks} to
 see all options for a given rbiom object. Default: \code{-1}.}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw for each group, such as boxes,
+violins, dots, or error bars. One or more of
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.

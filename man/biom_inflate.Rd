@@ -11,10 +11,11 @@ biom_inflate(biom, depth = NULL, clone = TRUE)
 
 \item{depth}{The target library size (sum) for each sample: a single
 integer, or one integer per sample. Must be greater than 0. If
-\code{NULL} (the default), the depth is estimated per-sample using the
-"Singleton Peak Heuristic". See \code{\link[=suggest_inflate_depths]{suggest_inflate_depths()}} for
-algorithm details. Counts that are already integers are left
-unchanged when \code{depth = NULL}.}
+\code{NULL} (the default), each sample's original depth is recovered
+exactly when its values are whole multiples of its smallest value,
+and otherwise estimated with the "Singleton Peak Heuristic". See
+\code{\link[=suggest_inflate_depths]{suggest_inflate_depths()}} for details and accuracy. Counts that
+are already integers are left unchanged when \code{depth = NULL}.}
 
 \item{clone}{Create a copy of \code{biom} before modifying. If \code{FALSE}, \code{biom}
 is modified in place as a side-effect. See \link[=speed]{speed ups} for

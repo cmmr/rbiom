@@ -39,7 +39,8 @@ For \code{"faith"}, a phylogenetic tree must be present in \code{biom} or
 explicitly provided via \verb{tree=}. Set \code{adiv=".all"} to use all metrics.
 Multiple/abbreviated values allowed. Default: \code{"shannon"}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw, such as the trend line, its
+confidence band, and the points. One or more of
 \code{c("trend", "confidence", "point", "name", "residual")}. Single
 letter abbreviations are also accepted. For instance,
 \code{c("trend", "point")} is equivalent to \code{c("t", "p")} and \code{"tp"}.

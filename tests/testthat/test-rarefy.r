@@ -82,6 +82,31 @@ test_that("biom_relativize / biom_rescale / biom_inflate", {
 })
 
 
+test_that("biom_inflate recovers counts divided by a constant, and proportions", {
+
+  # Whole multiples of each sample's smallest value give exact depths, on
+  # any scale (the atima report: counts / 4 inflated to a median depth of 3).
+  m     <- as.matrix(hmp50$counts)
+  depth <- stats::setNames(as.integer(sample_sums(hmp50)), hmp50$samples)
+
+  for (x in list(m / 4, m * 2.5, sweep(m, 2, colSums(m), "/"))) {
+    b <- as_rbiom(list(counts = x))
+    expect_identical(suggest_inflate_depths(b), depth)
+    expect_equal(as.matrix(biom_inflate(b)$counts), m)
+  }
+  expect_equal(as.matrix(biom_inflate(biom_relativize(hmp50))$counts), m)
+
+  # Otherwise the heuristic estimates depths from proportions, so the scale
+  # of the values doesn't matter.
+  set.seed(1)
+  noisy <- m * (1 + 1e-4 * matrix(stats::runif(length(m)), nrow(m)))
+  est   <- suggest_inflate_depths(as_rbiom(list(counts = noisy)))
+  expect_identical(suggest_inflate_depths(as_rbiom(list(counts = noisy / 4))), est)
+  expect_true(all(est > 10))
+  expect_false(identical(est, depth))
+})
+
+
 test_that("suggest_inflate_depths handles uninformative samples", {
 
   # Integer counts: the current sums.

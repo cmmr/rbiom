@@ -118,6 +118,9 @@ test_that("each entry matches the function's formals", {
 
       check(isTRUE(spec$type %in% types), label, "unknown type")
       check(isTRUE(nzchar(spec$desc)),    label, "no description")
+      # A plain sentence: atima shows it as a tooltip and gives it to AI
+      # models; the values are in `choices`.
+      check(!grepl("`c(", spec$desc, fixed = TRUE), label, "description is R code, not a sentence")
 
       if (nm == '...') next
 

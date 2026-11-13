@@ -39,7 +39,8 @@ mentioned below should match column names in \code{df}. Required.}
 \item{y}{A numeric metadata column name to use for the y-axis.
 Default: \code{attr(df, 'response')}}
 
-\item{layers}{One or more of
+\item{layers}{The elements to draw for each group, such as boxes,
+violins, dots, or error bars. One or more of
 \code{c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")}.
 Single letter abbreviations are also accepted. For instance,
 \code{c("box", "dot")} is equivalent to \code{c("x", "d")} and \code{"xd"}.
