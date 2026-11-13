@@ -26,9 +26,10 @@
 - Numbers in generated code are decimals with the fewest digits (up
   to 17) that read back as the same value, e.g. `15.299999999999999` for
   `9 * 1.7`; never hexadecimal. Plot positions that rbiom computes
-  (p-value labels, axis breaks) are rounded so they read well. On macOS
-  (Apple silicon) R reads 16-17 digit literals with plain doubles, so
-  such numbers can come back one unit in the last place off there.
+  (p-value labels, axis breaks, dendrogram segments) are rounded so they
+  read well. R 4.3 on macOS (Apple silicon) can read 16-17 digit
+  literals back one unit in the last place off; newer R versions on the
+  same machines replay them exactly.
 - `$cmd` no longer re-evaluates the caller’s arguments (so
   `adiv_boxplot(rarefy(biom))` rarefies once) and no longer records
   `cpus`.
