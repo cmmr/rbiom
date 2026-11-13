@@ -23,10 +23,11 @@ biom_inflate(biom, depth = NULL, clone = TRUE)
 
   The target library size (sum) for each sample: a single integer, or
   one integer per sample. Must be greater than 0. If `NULL` (the
-  default), the depth is estimated per-sample using the "Singleton Peak
-  Heuristic". See
+  default), each sample's original depth is recovered exactly when its
+  values are whole multiples of its smallest value, and otherwise
+  estimated with the "Singleton Peak Heuristic". See
   [`suggest_inflate_depths()`](https://cmmr.github.io/rbiom/reference/suggest_inflate_depths.md)
-  for algorithm details. Counts that are already integers are left
+  for details and accuracy. Counts that are already integers are left
   unchanged when `depth = NULL`.
 
 - clone:
@@ -83,5 +84,5 @@ Other transformations:
     biom <- biom_inflate(biom)
     sample_sums(biom)
 #> HMP01 HMP02 HMP03 HMP04 HMP05 
-#>  1267  1395  1032  1157  4007 
+#>  1660  1371  1353  1895  3939 
 ```

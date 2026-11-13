@@ -64,7 +64,8 @@ bdiv_boxplot(
 
 - layers:
 
-  One or more of
+  The elements to draw for each group, such as boxes, violins, dots, or
+  error bars. One or more of
   `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`.
   Single letter abbreviations are also accepted. For instance,
   `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`. Default:

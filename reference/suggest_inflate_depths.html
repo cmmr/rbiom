@@ -81,14 +81,29 @@ estimation. Default: <code>1.5</code>.</p></dd>
     <p>A named integer vector of recommended depths for each sample.</p>
     </div>
     <div class="section level2">
+    <h2 id="exact-depths">Exact Depths<a class="anchor" aria-label="anchor" href="#exact-depths"></a></h2>
+
+
+
+<p>When <code>depth = NULL</code>, <code><a href="biom_inflate.html">biom_inflate()</a></code> calls this function to find the
+original sequencing depth of each sample. Values on any scale are first
+divided by their sample's total, so proportions, percentages, and counts
+divided by a constant are all handled alike.</p>
+<p>If every non-zero value in a sample is a whole multiple of the sample's
+smallest non-zero value, that value is taken to be one read, and the depth
+is the sample's total divided by it. This recovers the original counts
+exactly from counts divided by a constant, and from proportions of integer
+counts whenever the sample contains a singleton. Other samples get the
+heuristic below.</p>
+    </div>
+    <div class="section level2">
     <h2 id="the-singleton-peak-heuristic">The Singleton Peak Heuristic<a class="anchor" aria-label="anchor" href="#the-singleton-peak-heuristic"></a></h2>
 
 
 
-<p>When <code>depth = NULL</code>, <code><a href="biom_inflate.html">biom_inflate()</a></code> calls this function to estimate the original
-sequencing depth for each sample. The underlying assumption is that in
-typical microbiome datasets, the most frequent count value (the mode of the
-abundance distribution) is 1 (a singleton).</p>
+<p>The underlying assumption is that in typical microbiome datasets, the most
+frequent count value (the mode of the abundance distribution) is 1 (a
+singleton).</p>
 <p>The algorithm works as follows:</p><ol><li><p><strong>Log-Transformation:</strong> Non-zero relative abundances are log10-transformed.</p></li>
 <li><p><strong>Global Consensus:</strong> To overcome sparsity in individual samples, distributions
 are centered by their medians and aggregated across all samples.</p></li>
@@ -104,6 +119,13 @@ the distribution's shape; they are assigned the median depth of the other
 samples (or, if there are too few informative samples for the heuristic,
 every sample is scaled so that its smallest non-zero value becomes 1).
 Counts that are already integers are returned as their current sums.</p>
+<p><strong>Accuracy:</strong> the heuristic is an estimate, not a recovery. On <code>hmp50</code>
+proportions perturbed so that no exact depth can be found, its depths
+ranged from 0.06 to 2.9 times the true depths (median 0.72), so the
+inflated counts, and any rarefaction depth chosen from them, can differ
+substantially from the original data. Rounded proportions (e.g. to 6
+decimal places) are in this situation too. Pass <code>depth</code> to
+<code><a href="biom_inflate.html">biom_inflate()</a></code> when the original depths are known.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -117,7 +139,7 @@ Counts that are already integers are returned as their current sums.</p>
 <span class="r-in"><span>    <span class="va">depths</span> <span class="op">&lt;-</span> <span class="fu">suggest_inflate_depths</span><span class="op">(</span><span class="fu"><a href="biom_relativize.html">biom_relativize</a></span><span class="op">(</span><span class="va">hmp50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">depths</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1200  1321   978  1096  3796  2000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1660  1371  1353  1895  3939  4150 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

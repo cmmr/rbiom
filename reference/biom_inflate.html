@@ -77,10 +77,11 @@ exactly.</p>
 <dt id="arg-depth">depth<a class="anchor" aria-label="anchor" href="#arg-depth"></a></dt>
 <dd><p>The target library size (sum) for each sample: a single
 integer, or one integer per sample. Must be greater than 0. If
-<code>NULL</code> (the default), the depth is estimated per-sample using the
-"Singleton Peak Heuristic". See <code><a href="suggest_inflate_depths.html">suggest_inflate_depths()</a></code> for
-algorithm details. Counts that are already integers are left
-unchanged when <code>depth = NULL</code>.</p></dd>
+<code>NULL</code> (the default), each sample's original depth is recovered
+exactly when its values are whole multiples of its smallest value,
+and otherwise estimated with the "Singleton Peak Heuristic". See
+<code><a href="suggest_inflate_depths.html">suggest_inflate_depths()</a></code> for details and accuracy. Counts that
+are already integers are left unchanged when <code>depth = NULL</code>.</p></dd>
 
 
 <dt id="arg-clone">clone<a class="anchor" aria-label="anchor" href="#arg-clone"></a></dt>
@@ -136,7 +137,7 @@ estimated when <code>depth = NULL</code>.</p>
 <span class="r-in"><span>    <span class="va">biom</span> <span class="op">&lt;-</span> <span class="fu">biom_inflate</span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="sample_sums.html">sample_sums</a></span><span class="op">(</span><span class="va">biom</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HMP01 HMP02 HMP03 HMP04 HMP05 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1267  1395  1032  1157  4007 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1660  1371  1353  1895  3939 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

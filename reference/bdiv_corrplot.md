@@ -65,7 +65,8 @@ bdiv_corrplot(
 
 - layers:
 
-  One or more of
+  The elements to draw, such as the trend line, its confidence band, and
+  the points. One or more of
   `c("trend", "confidence", "point", "name", "residual")`. Single letter
   abbreviations are also accepted. For instance, `c("trend", "point")`
   is equivalent to `c("t", "p")` and `"tp"`. Default: `"tc"`

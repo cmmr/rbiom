@@ -105,7 +105,8 @@ Multiple/abbreviated values allowed. Default: <code>"shannon"</code></p></dd>
 
 
 <dt id="arg-layers">layers<a class="anchor" aria-label="anchor" href="#arg-layers"></a></dt>
-<dd><p>One or more of
+<dd><p>The elements to draw for each group, such as boxes,
+violins, dots, or error bars. One or more of
 <code>c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")</code>.
 Single letter abbreviations are also accepted. For instance,
 <code>c("box", "dot")</code> is equivalent to <code>c("x", "d")</code> and <code>"xd"</code>.
@@ -407,8 +408,8 @@ is installed, and jittered points otherwise.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #BBBB00;">"italic(p) &lt; \"0.001\""</span>, <span style="color: #BBBB00;">"italic(p) == \"0.0016\""</span>, <span style="color: #BBBB00;">"italic(p) == \"0.0019\""</span>, <span style="color: #BBBB00;">"italic(p) == \"0.0019\""</span>, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #BBBB00;">"italic(p) == \"0.0023\""</span><span style="color: #0000BB;">)</span>,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .x     = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(2.5</span>, <span style="color: #0000BB;">3.5</span>, <span style="color: #0000BB;">3</span>, <span style="color: #0000BB;">3</span>, <span style="color: #0000BB;">4</span>, <span style="color: #0000BB;">3.5</span>, <span style="color: #0000BB;">4.5</span>, <span style="color: #0000BB;">2</span>, <span style="color: #0000BB;">2.5)</span>,</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .y     = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(0x1.0237fa89e60fp+2</span>, <span style="color: #0000BB;">0x1.237fa89e60f04p+2</span>, <span style="color: #0000BB;">0x1.44c756b2dbd19p+2</span>, <span style="color: #0000BB;">0x1.660f04c756b2dp+2</span>, <span style="color: #0000BB;">0x1.8756b2dbd1942p+2</span>, <span style="color: #0000BB;">0x1.a89e60f04c756p+2</span>, <span style="color: #0000BB;">0x1.c9e60f04c756bp+2</span>, <span style="color: #0000BB;">0x1.eb2dbd194237fp+2</span>, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">0x1.063ab596de8cap+3)</span> <span style="color: #BBBB00;">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .y     = <span style="color: #00BBBB;">c</span><span style="color: #0000BB;">(4.034666667</span>, <span style="color: #0000BB;">4.554666667</span>, <span style="color: #0000BB;">5.074666667</span>, <span style="color: #0000BB;">5.594666667</span>, <span style="color: #0000BB;">6.114666667</span>, <span style="color: #0000BB;">6.634666667</span>, <span style="color: #0000BB;">7.154666667</span>, <span style="color: #0000BB;">7.674666667</span>, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #0000BB;">8.194666667)</span> <span style="color: #BBBB00;">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ggplot</span><span style="color: #BBBB00;">(</span>data, <span style="color: #00BBBB;">aes</span><span style="color: #0000BB;">(</span>x = `Body Site`, y = .diversity<span style="color: #0000BB;">)</span><span style="color: #BBBB00;">)</span> <span style="color: #00BB00;">+</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #00BBBB;">geom_boxplot</span><span style="color: #BBBB00;">(</span></span>

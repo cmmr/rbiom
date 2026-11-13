@@ -55,7 +55,8 @@ adiv_boxplot(
 
 - layers:
 
-  One or more of
+  The elements to draw for each group, such as boxes, violins, dots, or
+  error bars. One or more of
   `c("bar", "box" ("x"), "violin", "dot", "strip", "crossbar", "errorbar", "linerange", "pointrange")`.
   Single letter abbreviations are also accepted. For instance,
   `c("box", "dot")` is equivalent to `c("x", "d")` and `"xd"`. Default:
@@ -361,8 +362,8 @@ Other visualization:
 #>     "italic(p) < \"0.001\"", "italic(p) == \"0.0016\"", "italic(p) == \"0.0019\"", "italic(p) == \"0.0019\"", 
 #>     "italic(p) == \"0.0023\""),
 #>   .x     = c(2.5, 3.5, 3, 3, 4, 3.5, 4.5, 2, 2.5),
-#>   .y     = c(0x1.0237fa89e60fp+2, 0x1.237fa89e60f04p+2, 0x1.44c756b2dbd19p+2, 0x1.660f04c756b2dp+2, 0x1.8756b2dbd1942p+2, 0x1.a89e60f04c756p+2, 0x1.c9e60f04c756bp+2, 0x1.eb2dbd194237fp+2, 
-#>     0x1.063ab596de8cap+3) )
+#>   .y     = c(4.034666667, 4.554666667, 5.074666667, 5.594666667, 6.114666667, 6.634666667, 7.154666667, 7.674666667, 
+#>     8.194666667) )
 #> 
 #> ggplot(data, aes(x = `Body Site`, y = .diversity)) +
 #>   geom_boxplot(

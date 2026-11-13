@@ -27,14 +27,27 @@ suggest_inflate_depths(biom, adjust = 1.5)
 
 A named integer vector of recommended depths for each sample.
 
-## The Singleton Peak Heuristic
+## Exact Depths
 
 When `depth = NULL`,
 [`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md)
-calls this function to estimate the original sequencing depth for each
-sample. The underlying assumption is that in typical microbiome
-datasets, the most frequent count value (the mode of the abundance
-distribution) is 1 (a singleton).
+calls this function to find the original sequencing depth of each
+sample. Values on any scale are first divided by their sample's total,
+so proportions, percentages, and counts divided by a constant are all
+handled alike.
+
+If every non-zero value in a sample is a whole multiple of the sample's
+smallest non-zero value, that value is taken to be one read, and the
+depth is the sample's total divided by it. This recovers the original
+counts exactly from counts divided by a constant, and from proportions
+of integer counts whenever the sample contains a singleton. Other
+samples get the heuristic below.
+
+## The Singleton Peak Heuristic
+
+The underlying assumption is that in typical microbiome datasets, the
+most frequent count value (the mode of the abundance distribution) is 1
+(a singleton).
 
 The algorithm works as follows:
 
@@ -62,6 +75,15 @@ heuristic, every sample is scaled so that its smallest non-zero value
 becomes 1). Counts that are already integers are returned as their
 current sums.
 
+**Accuracy:** the heuristic is an estimate, not a recovery. On `hmp50`
+proportions perturbed so that no exact depth can be found, its depths
+ranged from 0.06 to 2.9 times the true depths (median 0.72), so the
+inflated counts, and any rarefaction depth chosen from them, can differ
+substantially from the original data. Rounded proportions (e.g. to 6
+decimal places) are in this situation too. Pass `depth` to
+[`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md)
+when the original depths are known.
+
 ## See also
 
 [`biom_inflate()`](https://cmmr.github.io/rbiom/reference/biom_inflate.md)
@@ -75,5 +97,5 @@ which uses this heuristic when `depth = NULL`.
     depths <- suggest_inflate_depths(biom_relativize(hmp50))
     head(depths)
 #> HMP01 HMP02 HMP03 HMP04 HMP05 HMP06 
-#>  1200  1321   978  1096  3796  2000 
+#>  1660  1371  1353  1895  3939  4150 
 ```
