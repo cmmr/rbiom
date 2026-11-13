@@ -227,11 +227,13 @@ prov_inline <- function (expr, env, exclude = character()) {
 # R's parser accumulates the digits of a literal in a long double, so where
 # a long double is no wider than a double (macOS on Apple silicon) a literal
 # whose digits don't fit in 53 bits can come back one unit in the last place
-# off. That is far below anything a figure can show, but a rank-based
-# statistic on values that differ only by such noise can change on replay
-# there. Up to 15 digits (16 when they fit in 53 bits) with a power-of-ten
-# scale within +/-22 read back exactly everywhere. Plotting code rounds the
-# positions it computes (see boxplot_stats()) so they stay short.
+# off. CI saw this with R 4.3 there, not with newer R on the same runners.
+# That is far below anything a figure can show, but a rank-based statistic,
+# or clustering, on values whose differences are only such noise can change
+# on replay. Up to 15 digits (16 when they fit in 53 bits) with a
+# power-of-ten scale within +/-22 read back exactly everywhere. Plotting
+# code rounds the positions it computes (boxplot_stats(), plot_heatmap()) so
+# they stay short.
 #________________________________________________________
 num_literal <- function (x) {
 

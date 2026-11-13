@@ -482,6 +482,11 @@ plot_heatmap_build <- function (params) {
     if (!isFALSE(trees_cols)) trees_cols else NULL,
     if (!isFALSE(trees_rows)) trees_rows else NULL )
 
+  # Round away floating point noise so the segments read well in `$code`.
+  if (!is.null(all_trees))
+    for (i in c('x', 'y', 'xend', 'yend'))
+      all_trees[[i]] <- signif(all_trees[[i]], 10)
+
   remove("trees_cols", "trees_rows")
   remove("clust", "clust_rows", "clust_cols")
   remove("dist", "dist_rows", "dist_cols")

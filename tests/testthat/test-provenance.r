@@ -187,8 +187,12 @@ test_that("plots replay", {
 
   skip_on_cran()
 
-  # At least one call of every plotting function.
-  mtx <- matrix(seq_len(20) / 3, 4, dimnames = list(letters[1:4], LETTERS[1:5]))
+  # At least one call of every plotting function. The heatmap's values need
+  # 16-17 digits, but no two of its row or column distances tie: the code
+  # re-runs hclust(), and tied distances (as in seq_len(20) / 3) make the
+  # order hinge on the last bit, which R 4.3 on macOS (Apple silicon) can
+  # read back one unit off (see num_literal()).
+  mtx <- matrix(seq_len(20)^2 / 7, 4, dimnames = list(letters[1:4], LETTERS[1:5]))
 
   for (p in list(
     adiv_boxplot(b, "Body Site", layers = c("box", "dot")),
