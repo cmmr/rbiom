@@ -22,7 +22,8 @@ adiv_stats(
   level = 0.95,
   alt = "!=",
   mu = 0,
-  p.adj = "fdr"
+  p.adj = "fdr",
+  cpus = n_cpus()
 )
 ```
 
@@ -131,6 +132,13 @@ adiv_stats(
   `p.adjust.methods` for a list of available options. The adjustment
   spans the entire returned table: every combination of `split.by`
   strata, `stat.by` pairs, and `at` positions. Default: `"fdr"`
+
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 ## Value
 

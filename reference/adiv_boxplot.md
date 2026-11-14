@@ -27,6 +27,7 @@ adiv_boxplot(
   transform = "none",
   strata = NULL,
   caption = TRUE,
+  cpus = n_cpus(),
   ...
 )
 ```
@@ -208,6 +209,13 @@ adiv_boxplot(
 - caption:
 
   Add methodology caption beneath the plot. Default: `TRUE`
+
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 

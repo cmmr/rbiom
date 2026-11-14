@@ -83,6 +83,8 @@
 <li>When a Wilcoxon confidence interval can’t reach the requested <code>level</code> (very small groups), it is reported as unbounded (<code>-Inf</code>, <code>Inf</code>) on every R version, as R &gt;= 4.6 does, rather than as a narrower interval at a lower level. On R &lt; 4.6, the warnings about this and about falling back to the normal approximation for ties are no longer shown.</li>
 <li>
 <code><a href="../reference/adiv_boxplot.html">adiv_boxplot()</a></code>, <code><a href="../reference/bdiv_boxplot.html">bdiv_boxplot()</a></code>, and <code><a href="../reference/taxa_boxplot.html">taxa_boxplot()</a></code> gain a <code>test</code> argument.</li>
+<li>
+<code><a href="../reference/adiv_boxplot.html">adiv_boxplot()</a></code>, <code><a href="../reference/adiv_corrplot.html">adiv_corrplot()</a></code>, and <code><a href="../reference/adiv_stats.html">adiv_stats()</a></code> gain a <code>cpus</code> argument, like their beta diversity counterparts.</li>
 <li>Dropped rows with missing values and comparisons that could not be computed are reported in one message / warning instead of silently ignored.</li>
 <li>
 <code><a href="../reference/bdiv_heatmap.html">bdiv_heatmap()</a></code> clusters samples on the chosen distance metric.</li>

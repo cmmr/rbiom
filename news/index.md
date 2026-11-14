@@ -121,6 +121,11 @@
   and
   [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md)
   gain a `test` argument.
+- [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md),
+  [`adiv_corrplot()`](https://cmmr.github.io/rbiom/reference/adiv_corrplot.md),
+  and
+  [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md)
+  gain a `cpus` argument, like their beta diversity counterparts.
 - Dropped rows with missing values and comparisons that could not be
   computed are reported in one message / warning instead of silently
   ignored.

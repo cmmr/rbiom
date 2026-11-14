@@ -25,6 +25,7 @@ adiv_corrplot(
   strata = NULL,
   caption = TRUE,
   check = FALSE,
+  cpus = n_cpus(),
   ...
 )
 ```
@@ -169,6 +170,13 @@ adiv_corrplot(
 
   Generate additional plots to aid in assessing data normality. Default:
   `FALSE`
+
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 - ...:
 
