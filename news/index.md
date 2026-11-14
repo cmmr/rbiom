@@ -123,8 +123,9 @@
   gain a `test` argument.
 - [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md),
   [`adiv_corrplot()`](https://cmmr.github.io/rbiom/reference/adiv_corrplot.md),
+  [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md),
   and
-  [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md)
+  [`write_xlsx()`](https://cmmr.github.io/rbiom/reference/write_biom.md)
   gain a `cpus` argument, like their beta diversity counterparts.
 - Dropped rows with missing values and comparisons that could not be
   computed are reported in one message / warning instead of silently

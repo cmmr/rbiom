@@ -47,7 +47,8 @@ write_xlsx(
   depth = NULL,
   seed = 0,
   unc = "singly",
-  overwrite = FALSE
+  overwrite = FALSE,
+  cpus = n_cpus()
 )
 ```
 
@@ -121,6 +122,13 @@ write_xlsx(
   :   To not check/modify any taxa names.
 
   Abbreviations are allowed. Default: `"singly"`
+
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. Does not affect results. Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 ## Value
 
