@@ -264,7 +264,7 @@ adiv_stats <- function (
     biom, regr = NULL, stat.by = NULL, adiv = "Shannon",
     split.by = NULL, strata = NULL, covariates = NULL, transform = "none",
     test = "emmeans", fit = "gam", at = NULL,
-    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr", cpus = n_cpus() ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
@@ -279,7 +279,8 @@ adiv_stats <- function (
     biom      = biom,
     adiv      = adiv,
     md        = unique(c(regr, stat.by, split.by, strata, covariates)),
-    transform = transform )
+    transform = transform,
+    cpus      = cpus )
 
   if (nlevels(df$.adiv) > 1)
     split.by %<>% c('.adiv')

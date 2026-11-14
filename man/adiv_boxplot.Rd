@@ -26,6 +26,7 @@ adiv_boxplot(
   transform = "none",
   strata = NULL,
   caption = TRUE,
+  cpus = n_cpus(),
   ...
 )
 }
@@ -145,6 +146,10 @@ include a random intercept per stratum. Default: \code{NULL}}
 
 \item{caption}{Add methodology caption beneath the plot.
 Default: \code{TRUE}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with a layer name to pass it to only that

@@ -19,7 +19,8 @@ adiv_stats(
   level = 0.95,
   alt = "!=",
   mu = 0,
-  p.adj = "fdr"
+  p.adj = "fdr",
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -93,6 +94,10 @@ p-values. Run \code{p.adjust.methods} for a list of available
 options. The adjustment spans the entire returned table: every
 combination of \code{split.by} strata, \code{stat.by} pairs, and \code{at}
 positions. Default: \code{"fdr"}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
 A tibble data.frame with the fields below. The R code used to

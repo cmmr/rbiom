@@ -127,7 +127,8 @@ adiv_corrplot <- function (
     biom, x, adiv = "Shannon", layers = "tc",
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr",
-    transform = "none", alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE, ... ) {
+    transform = "none", alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE,
+    cpus = n_cpus(), ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -152,7 +153,8 @@ adiv_corrplot <- function (
         biom      = biom,
         adiv      = adiv,
         md        = unique(c(x, stat.by, facet.by, strata)),
-        transform = transform )
+        transform = transform,
+        cpus      = cpus )
 
       y <- attr(df, 'response', exact = TRUE)
 

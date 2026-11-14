@@ -166,7 +166,7 @@ adiv_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE,
     test = 'auto', flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr',
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05,
-    transform = "none", strata = NULL, caption = TRUE, ... ) {
+    transform = "none", strata = NULL, caption = TRUE, cpus = n_cpus(), ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -191,7 +191,8 @@ adiv_boxplot <- function (
         biom      = biom,
         adiv      = adiv,
         md        = unique(c(x, stat.by, facet.by, strata)),
-        transform = transform )
+        transform = transform,
+        cpus      = cpus )
 
       y <- attr(df, 'response', exact = TRUE)
 

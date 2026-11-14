@@ -393,6 +393,7 @@ FN_SCHEMA <- list(
       transform  = ARGS$adiv.transform,
       strata     = BOX$strata,
       caption    = ARGS$caption,
+      cpus       = ARGS$cpus,
       '...'      = ARGS$dots )),
 
   adiv_corrplot = list(
@@ -418,6 +419,7 @@ FN_SCHEMA <- list(
       strata     = CORR$strata,
       caption    = ARGS$caption,
       check      = ARGS$check,
+      cpus       = ARGS$cpus,
       '...'      = ARGS$dots )),
 
   adiv_stats = list(
@@ -440,7 +442,8 @@ FN_SCHEMA <- list(
       level      = ARGS$level,
       alt        = ARGS$alt,
       mu         = ARGS$mu,
-      p.adj      = ARGS$p.adj )),
+      p.adj      = ARGS$p.adj,
+      cpus       = ARGS$cpus )),
 
   adiv_matrix = list(
     counts  = 'rarefied',
