@@ -1060,7 +1060,8 @@ FN_SCHEMA <- list(
       depth     = arg('integer', min = 0, max_n = 1, null = "Chosen automatically, as by suggest_rarefy_depth().", note = "0 skips rarefaction."),
       seed      = ARGS$seed,
       unc       = like(ARGS$unc, matcher = 'match.arg'),
-      overwrite = ARGS$overwrite ))
+      overwrite = ARGS$overwrite,
+      cpus      = ARGS$cpus ))
 )
 
 

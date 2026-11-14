@@ -28,7 +28,8 @@ write_xlsx(
   depth = NULL,
   seed = 0,
   unc = "singly",
-  overwrite = FALSE
+  overwrite = FALSE,
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -68,6 +69,10 @@ taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Abbreviations are allowed. Default: \code{"singly"}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. Does not affect results.
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
 The normalized filepath that was written to (invisibly), unless

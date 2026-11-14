@@ -377,18 +377,18 @@ rare_corrplot_build <- function (params) {
     .depths <- floor(seq(from = 5, to = stats::fivenum(sample_sums(biom))[[4]], length.out = 10))
     .md     <- unique(c(stat.by, facet.by))
 
-    df <- dplyr::bind_rows(lapply(.depths, function (depth) {
+    .tbls <- lapply(.depths, function (depth) {
       adiv_table(
-        biom      = rarefy(biom, depth = depth),
+        biom      = rarefy(biom, depth = depth, cpus = cpus),
         adiv      = adiv,
         md        = .md,
         transform = transform,
         cpus      = cpus )
-    }))
+    })
 
-    df <- strip_prov(as_rbiom_tbl(df))   # built here, not by a table function
+    df <- strip_prov(as_rbiom_tbl(dplyr::bind_rows(.tbls)))   # built here, not by a table function
     attr(df, 'response')   <- '.diversity'
-    attr(df, 'resp_label') <- attr(adiv_table(rarefy(biom, depth = .depths[[1]]), adiv = adiv, md = NULL, transform = transform), 'resp_label', exact = TRUE)
+    attr(df, 'resp_label') <- attr(.tbls[[1]], 'resp_label', exact = TRUE)
 
     .data_code <- c(
       "# Alpha diversity at ten rarefaction depths.",
@@ -399,7 +399,7 @@ rare_corrplot_build <- function (params) {
         fun  = adiv_table ) %>% sprintf(fmt = "adiv_table(%s)")),
       "}))" )
 
-    remove(".depths", ".md")
+    remove(".depths", ".md", ".tbls")
 
 
     #________________________________________________________

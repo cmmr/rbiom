@@ -85,8 +85,8 @@
   normal approximation for ties are no longer shown.
 * `adiv_boxplot()`, `bdiv_boxplot()`, and `taxa_boxplot()` gain a `test` 
   argument.
-* `adiv_boxplot()`, `adiv_corrplot()`, and `adiv_stats()` gain a `cpus` 
-  argument, like their beta diversity counterparts.
+* `adiv_boxplot()`, `adiv_corrplot()`, `adiv_stats()`, and `write_xlsx()` 
+  gain a `cpus` argument, like their beta diversity counterparts.
 * Dropped rows with missing values and comparisons that could not be computed
   are reported in one message / warning instead of silently ignored.
 * `bdiv_heatmap()` clusters samples on the chosen distance metric.

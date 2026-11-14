@@ -1,7 +1,9 @@
 
 #' @rdname write_biom
 #' @export
-write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly', overwrite = FALSE) {
+write_xlsx <- function (
+    biom, file, depth = NULL, seed = 0, unc = 'singly', overwrite = FALSE,
+    cpus = n_cpus() ) {
 
   require_package('openxlsx', 'to save as an Excel file')
   schema_check('write_xlsx', environment())
@@ -12,6 +14,7 @@ write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly', over
   #________________________________________________________
   unc <- match.arg(tolower(unc), CHOICES$unc)
   validate_bool('overwrite')
+  validate_cpus()
 
   file <- check_outfile(file, overwrite)
 
@@ -32,7 +35,7 @@ write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly', over
     rare <- full$clone()
 
     if (!isTRUE(depth == 0))
-      rarefy(biom = rare, depth = depth, seed = seed, clone = FALSE)
+      rarefy(biom = rare, depth = depth, seed = seed, clone = FALSE, cpus = cpus)
 
   } else {
     rare <- NULL
@@ -109,7 +112,7 @@ write_xlsx <- function (biom, file, depth = NULL, seed = 0, unc = 'singly', over
   openxlsx::addWorksheet(wb, 'Alpha Diversity')
   if (!is.null(rare)) {
     openxlsx::writeData(wb, 'Alpha Diversity', {
-      adiv_matrix(rare) %>% tibble::as_tibble(rownames = ".sample")
+      adiv_matrix(rare, cpus = cpus) %>% tibble::as_tibble(rownames = ".sample")
     })
   }
 
