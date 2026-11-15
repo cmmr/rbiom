@@ -79,10 +79,12 @@ stats_corrplot <- function (
     df, x, y = attr(df, 'response'), layers = "tc",
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr",
-    p.top = Inf, alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE, ... ) {
+    p.top = Inf, alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE,
+    cpus = n_cpus(), ... ) {
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('stats_corrplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -134,6 +136,7 @@ adiv_corrplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('adiv_corrplot', params)
   schema_check('adiv_corrplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -216,6 +219,7 @@ bdiv_corrplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_corrplot', cmd_params(params))
   schema_check('bdiv_corrplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -331,6 +335,7 @@ rare_corrplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('rare_corrplot', params)
   schema_check('rare_corrplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -443,12 +448,14 @@ taxa_corrplot <- function (
     stat.by = NULL, facet.by = NULL, colors = TRUE, shapes = TRUE,
     test = "emmeans", fit = "gam", at = NULL, level = 0.95, p.adj = "fdr",
     transform = "none", ties = "random", seed = 0,
-    alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE, ... ) {
+    alt = "!=", mu = 0, strata = NULL, caption = TRUE, check = FALSE,
+    cpus = n_cpus(), ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_corrplot', params)
   schema_check('taxa_corrplot', params)
+  validate_cpus()
 
 
   #________________________________________________________

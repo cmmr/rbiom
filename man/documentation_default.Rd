@@ -276,7 +276,12 @@ seed, and the caller's random number generator state is left
 unchanged. Must be a non-negative integer. Default: \code{0}}
 
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
-or to \code{1} to disable parallel processing. Does not affect results.
+or to \code{1} to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when \code{cpus} is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+\link{rbiom-package}. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
 Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{permutations}{Number of random permutations to use.

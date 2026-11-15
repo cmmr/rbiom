@@ -41,7 +41,7 @@
 #'     attr(ord, 'axes')
 #'
 
-distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
+distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus(), ...) {
 
   params <- eval_envir(environment(), ...)
 
@@ -51,6 +51,7 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, ...) {
     current_cmd('distmat_ord_table', p)
   })
   schema_check('distmat_ord_table', params)
+  validate_cpus()
 
 
   #________________________________________________________

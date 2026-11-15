@@ -60,6 +60,7 @@ bdiv_table <- function (
   params <- eval_envir(environment())
   cmd    <- current_cmd('bdiv_table', cmd_params(params))
   schema_check('bdiv_table', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -229,6 +230,7 @@ bdiv_matrix <- function (
   cmd    <- current_cmd('bdiv_matrix', cmd_params(params))
 
   validate_bdiv()
+  validate_cpus()
 
   mtx <- as.matrix(bdiv_distmat(
     biom        = biom,

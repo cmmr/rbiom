@@ -29,6 +29,7 @@ rare_multiplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('rare_multiplot', params)
   schema_check('rare_multiplot', params)
+  validate_cpus()
 
 
   #________________________________________________________

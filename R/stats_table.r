@@ -134,7 +134,7 @@ stats_table <- function (
     df, regr = NULL, resp = attr(df, 'response'),
     stat.by = NULL, split.by = NULL, strata = NULL, covariates = NULL,
     test = "emmeans", fit = "gam", at = NULL,
-    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr", cpus = n_cpus() ) {
 
 
   if (!inherits(df, 'data.frame'))
@@ -142,6 +142,7 @@ stats_table <- function (
 
   params <- eval_envir(environment())
   cmd    <- current_cmd('stats_table', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -270,6 +271,7 @@ adiv_stats <- function (
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_stats', params)
   schema_check('adiv_stats', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -721,12 +723,13 @@ taxa_stats <- function (
     lineage = FALSE, unc = "singly", other = FALSE,
     split.by = NULL, strata = NULL, covariates = NULL, transform = "none",
     test = "emmeans", fit = "gam", at = NULL,
-    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr" ) {
+    level = 0.95, alt = "!=", mu = 0, p.adj = "fdr", cpus = n_cpus() ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_stats', params)
   schema_check('taxa_stats', params)
+  validate_cpus()
 
 
   #________________________________________________________

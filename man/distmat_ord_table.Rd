@@ -4,7 +4,7 @@
 \alias{distmat_ord_table}
 \title{Run ordinations on a distance matrix.}
 \usage{
-distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
+distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus(), ...)
 }
 \arguments{
 \item{dm}{A \code{dist}-class distance matrix, as returned from
@@ -25,6 +25,15 @@ Multiple/abbreviated values allowed. Default: \code{"PCoA"}}
 \item{seed}{Random seed for the stochastic ordinations (NMDS, tSNE,
 UMAP), so that they are reproducible. PCoA is deterministic.
 Must be a non-negative integer. Default: \code{0}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when \code{cpus} is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+\link{rbiom-package}. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Additional arguments for the \code{ord} function. For tSNE,
 \code{perplexity} defaults to 30, or to \code{(n - 1) / 3} for fewer than

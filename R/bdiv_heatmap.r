@@ -105,6 +105,7 @@ bdiv_heatmap <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_heatmap', cmd_params(params))
   schema_check('bdiv_heatmap', params)
+  validate_cpus()
 
 
   #________________________________________________________

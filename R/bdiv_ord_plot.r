@@ -74,6 +74,7 @@ bdiv_ord_plot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_ord_plot', cmd_params(params))
   schema_check('bdiv_ord_plot', params)
+  validate_cpus()
 
 
   #________________________________________________________

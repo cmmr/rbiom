@@ -124,7 +124,9 @@
 #'     distmat_stats(dm, pull(b, 'Delivery mode'), strata = pull(b, 'Subject ID'))
 #'
 
-distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations = 999, strata = NULL) {
+distmat_stats <- function (
+    dm, groups, test = "adonis2", seed = 0, permutations = 999, strata = NULL,
+    cpus = n_cpus() ) {
 
   params <- eval_envir(environment())
 
@@ -136,6 +138,7 @@ distmat_stats <- function (dm, groups, test = "adonis2", seed = 0, permutations 
     current_cmd('distmat_stats', p)
   })
   schema_check('distmat_stats', params)
+  validate_cpus()
 
 
   #________________________________________________________

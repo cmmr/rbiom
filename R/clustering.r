@@ -77,6 +77,7 @@ bdiv_clusters <- function (
 
   biom <- as_rbiom(biom)
   schema_check('bdiv_clusters', environment())
+  validate_cpus()
   validate_bdiv()
   validate_seed()
 

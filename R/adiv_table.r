@@ -53,6 +53,7 @@ adiv_table <- function (
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_table', cmd_params(params))
   schema_check('adiv_table', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -135,6 +136,7 @@ adiv_matrix <- function (
   params <- eval_envir(environment())
   cmd    <- current_cmd('adiv_matrix', cmd_params(params))
   schema_check('adiv_matrix', params)
+  validate_cpus()
 
 
   #________________________________________________________

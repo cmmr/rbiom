@@ -66,12 +66,13 @@ taxa_forest <- function (
     method = "linda", covariates = NULL, split.by = NULL, strata = NULL,
     p.top = 20, p.sig = 0.05, colors = TRUE, caption = TRUE,
     prev.cut = 0.1, level = 0.95, p.adj = "fdr",
-    lineage = FALSE, unc = "singly", ... ) {
+    lineage = FALSE, unc = "singly", cpus = n_cpus(), ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_forest', params)
   schema_check('taxa_forest', params)
+  validate_cpus()
 
 
   #________________________________________________________

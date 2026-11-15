@@ -23,6 +23,7 @@ taxa_forest(
   p.adj = "fdr",
   lineage = FALSE,
   unc = "singly",
+  cpus = n_cpus(),
   ...
 )
 }
@@ -118,6 +119,15 @@ taxa names. Options are:
 \item{\code{"asis"} - }{ To not check/modify any taxa names. }
 }
 Abbreviations are allowed. Default: \code{"singly"}}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when \code{cpus} is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+\link{rbiom-package}. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
+Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Parameters for the underlying ggplot2 functions. Prefix a
 parameter with a layer name to pass it to that layer only:

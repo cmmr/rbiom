@@ -10,7 +10,8 @@ distmat_stats(
   test = "adonis2",
   seed = 0,
   permutations = 999,
-  strata = NULL
+  strata = NULL,
+  cpus = n_cpus()
 )
 }
 \arguments{
@@ -57,6 +58,15 @@ identifier. Given like \code{groups} (one value per sample, named or in
 \code{attr(dm, 'Labels')} order). How permutations are restricted
 depends on whether \code{groups} varies within strata; see Details.
 Default: \code{NULL} (samples are exchangeable).}
+
+\item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
+or to \code{1} to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when \code{cpus} is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+\link{rbiom-package}. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
+Default: \code{ecodive::n_cpus()} (all available cores)}
 }
 \value{
 A tibble data.frame with one row and the columns:

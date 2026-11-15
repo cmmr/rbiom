@@ -28,6 +28,24 @@ statistic, and plot carries the R code needed to regenerate it. See
 Diversity calculations are performed by the 'ecodive' package, which runs
 on all available cores by default. Use the \code{cpus} argument of individual
 functions to limit the number of threads, e.g. \code{adiv_table(biom, cpus = 1)}.
+
+The linear algebra library (BLAS) that R is linked to may run threads of
+its own: OpenBLAS, MKL, and BLIS start up to one per core for operations
+such as the eigendecomposition behind a PCoA, whatever \code{cpus} says. So
+when \code{cpus} is less than the number of threads the library is set to
+use, rbiom runs it on one thread until the call returns, and then puts
+the previous setting back, also after an error or an interrupt. One
+thread rather than \code{cpus}: in rbiom's computations extra BLAS threads
+were at most about 20\% faster on an idle machine, and slower on a busy
+one or for model fits. With the default \code{cpus}, all available cores, the
+library is left as it is. The number of BLAS threads can change results
+only by rounding in the last digits (around 1e-15).
+
+This needs a version of 'ecodive' that provides \code{blas_threads()}. R's
+reference BLAS (the default on Windows and macOS) is single-threaded, so
+there is nothing to limit; Apple's Accelerate can't be limited this way.
+To limit the library for a whole R process instead, set an environment
+variable such as \code{OPENBLAS_NUM_THREADS=1} before R starts.
 }
 
 \seealso{

@@ -87,6 +87,23 @@
   argument.
 * `adiv_boxplot()`, `adiv_corrplot()`, `adiv_stats()`, and `write_xlsx()` 
   gain a `cpus` argument, like their beta diversity counterparts.
+* `cpus` also bounds R's linear algebra library (BLAS). OpenBLAS, MKL, and 
+  BLIS start up to one thread per core for operations such as the 
+  eigendecomposition in a PCoA, whatever `cpus` says: with `cpus = 1` and 
+  OpenBLAS on six cores, a PCoA of 4,020 samples used 55 s of processor 
+  time in 15.5 s on an idle machine, and up to 148 s in 31 s on a busy 
+  one. When `cpus` is less than the library's thread count, rbiom now runs
+  it on one thread until the call returns (that PCoA: 18.6 s, all of it on
+  one core) and then restores the setting, also after an error or an 
+  interrupt. More BLAS threads were never more than about 20% faster in 
+  rbiom's computations, and two were five times slower than one. This 
+  needs an ecodive version that provides `blas_threads()`; until then 
+  nothing changes.
+* `taxa_stats()`, `taxa_boxplot()`, `taxa_corrplot()`, `taxa_da()`, 
+  `taxa_forest()`, `stats_table()`, `stats_boxplot()`, `stats_corrplot()`, 
+  `distmat_stats()`, and `distmat_ord_table()` gain a `cpus` argument, 
+  which bounds the linear algebra threads of their model fits, permutation 
+  tests, and ordinations.
 * Dropped rows with missing values and comparisons that could not be computed
   are reported in one message / warning instead of silently ignored.
 * `bdiv_heatmap()` clusters samples on the chosen distance metric.

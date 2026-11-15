@@ -174,12 +174,13 @@ taxa_da <- function (
     biom, stat.by = NULL, regr = NULL, rank = -1, taxa = NULL,
     method = "linda", covariates = NULL, split.by = NULL, strata = NULL,
     prev.cut = 0.1, level = 0.95, p.adj = "fdr",
-    lineage = FALSE, unc = "singly" ) {
+    lineage = FALSE, unc = "singly", cpus = n_cpus() ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment())
   cmd    <- current_cmd('taxa_da', params)
   schema_check('taxa_da', params)
+  validate_cpus()
 
 
   #________________________________________________________

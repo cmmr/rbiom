@@ -1,8 +1,11 @@
 
+# Also keeps the BLAS library within `cpus` threads until the function
+# whose frame is `env` returns; see blas_limit().
 validate_cpus <- function (
-    var = "cpus", range = arg_range(ARGS$cpus), env = parent.frame(), evar = var, 
+    var = "cpus", range = arg_range(ARGS$cpus), env = parent.frame(), evar = var,
     n = 1, int = TRUE, null_ok = TRUE, if_null = ecodive::n_cpus(), ...) {
   validate_var_range(var, range, env, evar, n, int, null_ok, if_null = if_null, ...)
+  blas_limit(get(var, envir = env, inherits = FALSE), env)
 }
 
 validate_seed <- function (

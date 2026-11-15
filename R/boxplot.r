@@ -101,10 +101,11 @@ stats_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE,
     test = 'auto', flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr',
     p.top = Inf, outliers = NULL, xlab.angle = 'auto', p.label = 0.05,
-    strata = NULL, caption = TRUE, ... ) {
+    strata = NULL, caption = TRUE, cpus = n_cpus(), ... ) {
 
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('stats_boxplot', params)
+  validate_cpus()
 
   biom <- if (inherits(df, 'rbiom')) df
 
@@ -172,6 +173,7 @@ adiv_boxplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('adiv_boxplot', params)
   schema_check('adiv_boxplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -257,6 +259,7 @@ bdiv_boxplot <- function (
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('bdiv_boxplot', cmd_params(params))
   schema_check('bdiv_boxplot', params)
+  validate_cpus()
 
 
   #________________________________________________________
@@ -370,12 +373,14 @@ taxa_boxplot <- function (
     stat.by = x, facet.by = NULL, colors = TRUE, shapes = TRUE, patterns = FALSE,
     test = 'auto', flip = FALSE, stripe = NULL, ci = 'ci', level = 0.95, p.adj = 'fdr',
     outliers = NULL, xlab.angle = 'auto', p.label = 0.05,
-    transform = 'none', y.transform = 'sqrt', strata = NULL, caption = TRUE, ... ) {
+    transform = 'none', y.transform = 'sqrt', strata = NULL, caption = TRUE,
+    cpus = n_cpus(), ... ) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
   cmd    <- current_cmd('taxa_boxplot', params)
   schema_check('taxa_boxplot', params)
+  validate_cpus()
 
 
   #________________________________________________________

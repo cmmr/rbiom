@@ -721,7 +721,8 @@ FN_SCHEMA <- list(
       test         = arg('choice', choices = CHOICES$distmat.test, max_n = 1, note = "Categorical `groups`: \"adonis2\", \"mrpp\", or \"betadisper\". Numeric `groups`: \"adonis2\" or \"mantel\". \"none\" skips the test."),
       seed         = like(ARGS$seed,         when = list(when_is_not('test', 'none'))),
       permutations = like(ARGS$permutations, when = list(when_is_not('test', 'none'))),
-      strata       = arg('vector', r_only = TRUE, null = "No strata.") )),
+      strata       = arg('vector', r_only = TRUE, null = "No strata."),
+      cpus         = ARGS$cpus )),
 
   distmat_ord_table = list(
     returns = RETURNS$table,
@@ -730,6 +731,7 @@ FN_SCHEMA <- list(
       ord   = ARGS$ord,
       k     = ARGS$ord.k,
       seed  = ARGS$seed,
+      cpus  = ARGS$cpus,
       '...' = ARGS$dots )),
 
 
@@ -844,6 +846,7 @@ FN_SCHEMA <- list(
       y.transform = arg('choice', choices = CHOICES$box.y.transform, max_n = 1),
       strata      = BOX$strata,
       caption     = ARGS$caption,
+      cpus        = ARGS$cpus,
       '...'       = ARGS$dots )),
 
   taxa_corrplot = list(
@@ -876,6 +879,7 @@ FN_SCHEMA <- list(
       strata     = CORR$strata,
       caption    = ARGS$caption,
       check      = ARGS$check,
+      cpus       = ARGS$cpus,
       '...'      = ARGS$dots )),
 
   taxa_heatmap = list(
@@ -948,6 +952,7 @@ FN_SCHEMA <- list(
       p.adj      = ARGS$p.adj,
       lineage    = ARGS$lineage,
       unc        = ARGS$unc,
+      cpus       = ARGS$cpus,
       '...'      = ARGS$dots )),
 
   taxa_da = list(
@@ -969,7 +974,8 @@ FN_SCHEMA <- list(
       level      = ARGS$level,
       p.adj      = ARGS$p.adj,
       lineage    = ARGS$lineage,
-      unc        = ARGS$unc )),
+      unc        = ARGS$unc,
+      cpus       = ARGS$cpus )),
 
   taxa_clusters = list(
     counts  = 'rarefied',
@@ -1005,7 +1011,8 @@ FN_SCHEMA <- list(
       level      = ARGS$level,
       alt        = ARGS$alt,
       mu         = ARGS$mu,
-      p.adj      = ARGS$p.adj )),
+      p.adj      = ARGS$p.adj,
+      cpus       = ARGS$cpus )),
 
   taxa_matrix = list(
     counts  = 'rarefied',

@@ -712,6 +712,7 @@ mtx_rarefy <- function(
     mtx, margin = 2L, depth = 0.1, n = NULL, seed = 0L, upsample = NULL, cpus = NULL) {
 
   lifecycle::deprecate_soft("3.0.0", "mtx_rarefy()", "rarefy()")
+  validate_cpus()
 
   # 1. Handle Orientation (New functions expect samples as columns)
   # If margin=1 (rows are samples), we must transpose inputs.
@@ -809,6 +810,7 @@ mtx_rescale <- function(mtx, margin = 2L, range = c(0, 1)) {
 #' @export
 rarefy_cols <- function(mtx, depth = 0.1, n = NULL, seed = 0L, cpus = NULL) {
   lifecycle::deprecate_soft("3.0.0", "rarefy_cols()", "rarefy()")
+  validate_cpus()
   mtx_rarefy(mtx = mtx, margin = 2L, depth = depth, n = n, seed = seed, cpus = cpus)
 }
 
