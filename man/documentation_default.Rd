@@ -146,7 +146,9 @@ Default: \code{0.05}}
 \item{level}{The confidence level for calculating a confidence interval.
 Default: \code{0.95}}
 
-\item{caption}{Add methodology caption beneath the plot.
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: \code{TRUE}}
 
 \item{outliers}{Show boxplot outliers? \code{TRUE} to always show.

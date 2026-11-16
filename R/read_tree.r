@@ -10,7 +10,9 @@
 #' @inherit documentation_default
 #'
 #' @param src   Input data as either a file path, URL, or Newick string.
-#'        Compressed (gzip or bzip2) files are also supported.
+#'        Compressed (gzip or bzip2) files and QIIME 2 `Phylogeny`
+#'        artifacts (`.qza`) are also supported. NEXUS files are not; convert
+#'        them with `ape::write.tree(ape::read.nexus(file), "tree.nwk")`.
 #'
 #' @details
 #' Labels may be enclosed in single quotes, following the Newick standard:
@@ -44,20 +46,55 @@ read_tree <- function (src, underscores = FALSE) {
   if (!is_scalar_character(src) || is_na(src))
     cli_abort("`src` must be a file path, URL, or Newick string, not {.type {src}}.")
 
-  # URLs and (possibly compressed) files are read here; literal
-  # newick strings are passed straight through.
+  # URLs, (possibly compressed) files, and QIIME 2 artifacts are read
+  # here; literal newick strings are passed straight through.
   is_newick <- grepl("[(;]", src)
+  is_file   <- !grepl("\n", src, fixed = TRUE) && nchar(src) < 1000 && file.exists(src)
+  id        <- "`src`"
 
-  if (is_url(src) || (!is_newick && file.exists(src))) {
+  if (is_url(src) || is_file) {
+
     fpath <- as_filepath(src)
     on.exit(fpath$cleanup(), add = TRUE)
-    src <- paste(strip_bom(readLines(fpath$path, warn = FALSE, encoding = "UTF-8")), collapse = "")
+    id <- cli::format_inline("{.file {fpath$id}}")
+
+    check_qiime2_type(fpath, 'Phylogeny[', "a phylogenetic tree")
+
+    if (fpath$format != 'text')
+      cli_abort("{id} is {.val {fpath$format}} format, not a Newick tree.")
+
+    check_not_binary(fpath$path, fpath$id, what = "a Newick tree")
+    src <- readLines(fpath$path, warn = FALSE, encoding = "UTF-8")
+    if (any(i <- !validUTF8(src))) src[i] <- iconv(src[i], from = "latin1", to = "UTF-8")
+    src <- strip_bom(src)
+
+    if (isTRUE(grepl("^\\s*#NEXUS", src[[1]], ignore.case = TRUE)))
+      src <- "#NEXUS"
+
+    src <- paste(src, collapse = "")
 
   } else if (!is_newick) {
     cli_abort("`src` is neither an existing file nor a newick string: {.val {src}}")
   }
 
-  ecodive::read_tree(newick = src, underscores = underscores)
+
+  if (grepl("^\\s*#NEXUS", src, ignore.case = TRUE))
+    cli_abort(c(
+      'x' = "{id} is a NEXUS tree; Newick format is required.",
+      'i' = "Convert it with {.code ape::write.tree(ape::read.nexus(file), 'tree.nwk')}." ))
+
+  if (!grepl("(", src, fixed = TRUE)) {
+    eg <- "((A:1,B:2):1,C:3);"
+    cli_abort(c(
+      'x' = "{id} is not a Newick tree.",
+      'i' = "A Newick tree looks like {.val {eg}}" ))
+  }
+
+  tryCatch(
+    expr  = ecodive::read_tree(newick = src, underscores = underscores),
+    error = function (e) cli_abort(c(
+      'x' = "Can't parse {id} as a Newick tree.",
+      'i' = "{conditionMessage(e)}" )))
 }
 
 

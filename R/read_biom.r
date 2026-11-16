@@ -9,9 +9,10 @@
 #'        classical tabular format. URLs must begin with \code{http://},
 #'        \code{https://}, \code{ftp://}, or \code{ftps://}. JSON strings are
 #'        recognized by their first non-whitespace character being \code{\{}.
-#'        Compressed (gzip or bzip2) BIOM files are also supported. NOTE: to
-#'        read HDF5 formatted BIOM files, the \code{h5lite} R package must be
-#'        installed.
+#'        Compressed (gzip or bzip2) BIOM files are also supported, as are
+#'        QIIME 2 feature table artifacts (`.qza`) and mothur `.shared`
+#'        files. NOTE: to read HDF5 formatted BIOM files (including `.qza`
+#'        feature tables), the \code{h5lite} R package must be installed.
 #'
 #' @param ...   Properties to set in the new rbiom object, for example,
 #'        `metadata`, `id`, `comment`, or `tree`. These override the
@@ -26,7 +27,21 @@
 #' named `taxonomy` (or `lineage`) is parsed into taxonomic ranks. All other
 #' columns are abundance counts: blank cells are read as `0` with a warning,
 #' and columns containing non-numeric text are ignored with a warning.
-#' Empty taxonomic ranks are `NA`.
+#' Empty taxonomic ranks are `NA`. Numbers must use `.` as the decimal mark.
+#'
+#' mothur `.shared` files (samples in rows, with `label`, `Group`, and
+#' `numOtus` columns) are recognized and transposed. They must hold a single
+#' `label`.
+#'
+#' QIIME 2 artifacts (`.qza`) are unpacked automatically: a
+#' `FeatureTable` here, a `FeatureData[Taxonomy]` artifact as `taxonomy`, and
+#' a `Phylogeny` artifact as `tree` or in [read_tree()], and a
+#' `FeatureData[Sequence]` artifact in [read_fasta()]. Other artifact
+#' types, and visualizations (`.qzv`), are not supported.
+#'
+#' Categorical metadata is stored as factors, and HDF5 files written by
+#' [write_biom()] restore the order of their levels. Otherwise, levels are
+#' in alphabetical order.
 #'
 #' @seealso `as_rbiom()`
 #'
@@ -77,6 +92,8 @@ read_biom <- function (src, ...) {
   format <- fpath$format
   fp     <- fpath$path
   on.exit(fpath$cleanup(), add = TRUE)
+
+  check_qiime2_type(fpath, 'FeatureTable[', "a feature table")
 
 
   #________________________________________________________
@@ -141,6 +158,11 @@ read_biom <- function (src, ...) {
 
     remove("tsv")
 
+  } else if (format == "excel") {
+    cli_abort(c(
+      'x' = "{.file {fpath$id}} is an Excel file, which can't be read as a counts table.",
+      'i' = "Save the worksheet as tab-separated text (OTUs in rows, samples in columns) and read that instead." ))
+
   } else {
     cli_abort("`src` data type not recognized: {src}")
   }
@@ -189,6 +211,8 @@ read_biom_tsv <- function (fp, src = fp) {
 
   if (nrow(df) == 0) cli_abort("No abundance counts in {.file {src}}.")
 
+  df <- mothur_shared(df, src)
+
 
   #________________________________________________________
   # OTU IDs (first column) and sample names (other columns).
@@ -231,6 +255,11 @@ read_biom_tsv <- function (fp, src = fp) {
     blank <- x %in% c("", "NA")
     num   <- grepl(num_re, x)
     bad   <- !num & !blank
+
+    if (any(bad) && all(grepl("^[-+]?[0-9]+,[0-9]+$", x[bad])))
+      cli_abort(c(
+        'x' = "Sample column {.val {col}} of {.file {src}} looks like it has decimal commas, e.g. {.val {x[[which(bad)[[1]]]]}}.",
+        'i' = "Re-export the file with {.val .} as the decimal mark and no thousands separators." ))
 
     if (all(bad | blank) && any(bad)) {
       text_col <- c(text_col, col)
@@ -286,6 +315,35 @@ read_biom_tsv <- function (fp, src = fp) {
 
 
   return (list(counts = counts, taxonomy = taxonomy))
+}
+
+
+
+#________________________________________________________
+# mothur's .shared format has samples in rows: columns 'label', 'Group',
+# and 'numOtus', followed by one column per OTU. Returns the classic
+# layout (OTU IDs in the first column, one column per sample); any other
+# table is returned unchanged.
+#________________________________________________________
+mothur_shared <- function (df, src) {
+
+  if (ncol(df) < 4 || !identical(tolower(names(df)[1:3]), c('label', 'group', 'numotus')))
+    return (df)
+
+  if (length(labels <- unique(df[[1]])) > 1)
+    cli_abort(c(
+      'x' = "mothur shared file {.file {src}} has {length(labels)} labels: {.val {labels}}.",
+      'i' = "Remove the rows for all but one label." ))
+
+  groups <- trimws(df[[2]])
+  if (length(x <- unique(groups[duplicated(groups)])) > 0)
+    cli_abort('Duplicated {qty(length(x))}group{?s} in {.file {src}}: {.val {x}}')
+
+  mtx <- t(as.matrix(df[,-(1:3),drop=FALSE]))
+  res <- data.frame(rownames(mtx), unname(mtx), stringsAsFactors = FALSE)
+  names(res) <- c("#OTU ID", groups)
+
+  return (res)
 }
 
 
@@ -393,7 +451,15 @@ parse_hdf5_metadata <- function (h5) {
 
   md <- lapply(md, function (x) {
     cls <- attr(x, 'rbiom_class')
-    attr(x, 'rbiom_class') <- NULL
+    lvl <- attr(x, 'rbiom_levels')
+    attr(x, 'rbiom_class')  <- NULL
+    attr(x, 'rbiom_levels') <- NULL
+
+    # Factor level order, as written by rbiom. Ignored unless it covers
+    # every value (e.g. the file was edited by other software).
+    if (is.character(lvl) && is.character(x) && !anyDuplicated(lvl) && all(x[!is.na(x)] %in% lvl))
+      return (factor(x, levels = lvl))
+
     if (identical(cls, 'logical')) x <- as.logical(x)
     if (identical(cls, 'Date'))    x <- as.Date(x, format = "%Y-%m-%d")
     if (is.integer(x))             x <- as.numeric(x) # as in the JSON reader

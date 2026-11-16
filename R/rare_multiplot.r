@@ -64,6 +64,7 @@ rare_multiplot <- function (
         counts      = TRUE,
         labels      = TRUE,
         y.transform = "log10",
+        caption     = params$caption,
         .dots       = list(),
         .fn         = 'rare_multiplot()' ))
       panel_params(pp, 2)

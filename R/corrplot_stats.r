@@ -209,29 +209,39 @@ corrplot_stats <- function (params) {
       test <- params$test
       fit  <- params$fit
 
+      # The test, then the hypothesis its p-values are for.
       interp <- if (is_bdiv) {
-        sprintf("distances correlate with differences in %s (Mantel test, %s permutations)", xcol, params$permutations %||% 999)
 
-      } else if (is.null(stat.by)) {
-        if (test == "emmeans" && fit == "gam") "a non-flat trend (smooth term)"
-        else if (fit == "gam")                 sprintf("trendline slope at x %s %s", params$alt, params$mu)
-        else if (fit == "log")                 sprintf("trendline slope (vs log x) %s %s", params$alt, params$mu)
-        else                                   sprintf("trendline slope %s %s", params$alt, params$mu)
+        sprintf(
+          fmt = "Mantel test of the distances against differences in %s (%s permutations%s).",
+          xcol, params$permutations %||% 999,
+          if (is.null(params$strata)) "" else sprintf(" within %s", params$strata) )
 
       } else {
-        if (test == "emmeans") "trendline means differ at x"
-        else if (fit == "gam") "trendline slopes differ at x"
-        else                   "trendline slopes differ"
-      }
 
-      if (!is.null(params$strata))
-        interp <- sprintf("%s (random intercept per %s)", interp, params$strata)
+        model <- switch(fit, gam = "GAM", log = "Linear model on log(x)", "Linear model")
+        if (!is.null(params$strata))
+          model <- sprintf("%s with a random intercept per %s", model, params$strata)
+
+        tests <- if (is.null(stat.by)) {
+          if (test == "emmeans" && fit == "gam") "test for a non-flat trend (smooth term)"
+          else if (fit == "gam")                 sprintf("test whether the slope at x %s %s", params$alt, params$mu)
+          else                                   sprintf("test whether the slope %s %s", params$alt, params$mu)
+
+        } else {
+          if (test == "emmeans") "compare the groups' means at x"
+          else if (fit == "gam") "compare the groups' slopes at x"
+          else                   "compare the groups' slopes"
+        }
+
+        sprintf("%s; p-values %s.", model, tests)
+      }
 
       adj  <- p_adj_label(params$p.adj)
       meth <- if (is.null(adj) || nrow(params$.plot_attrs[['stats']]) <= 1) "" else
         sprintf("\np-values adjusted with the %s method.", adj)
 
-      return (sprintf("%sLow p-value indicates %s.%s", curr, interp, meth))
+      return (paste0(curr, interp, meth))
 
     }))
   }

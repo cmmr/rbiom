@@ -565,6 +565,7 @@ FN_SCHEMA <- list(
       title        = arg('logical', forms = c('true', 'string'), max_n = 1, null = "No title.", check = 'check_title', note = "TRUE: the metric's name. FALSE is not accepted; use NULL."),
       xlab.angle   = ARGS$xlab.angle,
       alpha        = ARGS$alpha,
+      caption      = ARGS$caption,
       cpus         = ARGS$cpus,
       '...'        = ARGS$dots )),
 
@@ -798,6 +799,7 @@ FN_SCHEMA <- list(
       counts      = arg('logical', max_n = 1),
       labels      = arg('logical', max_n = 1),
       y.transform = arg('choice', choices = CHOICES$rare.y.transform, max_n = 1),
+      caption      = ARGS$caption,
       '...'       = ARGS$dots )),
 
   rarefy = list(
@@ -906,6 +908,7 @@ FN_SCHEMA <- list(
       legend       = HEAT$legend,
       title        = arg('logical', forms = c('logical', 'string'), max_n = 1, null = "No title.", check = 'check_title', note = "TRUE: the rank's name. FALSE: no title."),
       xlab.angle   = ARGS$xlab.angle,
+      caption      = ARGS$caption,
       '...'        = ARGS$dots )),
 
   taxa_stacked = list(
@@ -926,6 +929,7 @@ FN_SCHEMA <- list(
       unc        = ARGS$unc,
       lineage    = ARGS$lineage,
       xlab.angle = ARGS$xlab.angle,
+      caption      = ARGS$caption,
       '...'      = ARGS$dots )),
 
   taxa_forest = list(
@@ -1043,6 +1047,45 @@ FN_SCHEMA <- list(
       transform = ARGS$transform,
       ties      = ARGS$ties,
       seed      = ARGS$seed )),
+
+  taxa_top = list(
+    counts  = 'rarefied',
+    returns = RETURNS$table,
+    params  = list(
+      biom      = ARGS$biom,
+      rank      = ARGS$rank,
+      n         = arg('integer', min = 1, max_n = 1),
+      by        = arg('field', class = 'categorical', null = "All samples in one group.", note = "\".sample\" lists the top taxa of each sample."),
+      unc       = ARGS$unc,
+      lineage   = ARGS$lineage,
+      transform = ARGS$transform )),
+
+  taxa_shared = list(
+    counts  = 'rarefied',
+    returns = RETURNS$table,
+    params  = list(
+      biom    = ARGS$biom,
+      stat.by = arg('field', class = 'categorical', max_n = 1, null = "All samples in one group."),
+      rank    = ARGS$rank1,
+      detect  = arg('number', min = 0, max = 1, max_n = 1),
+      prev    = arg('number', min = 0, max = 1, max_n = 1),
+      unc     = ARGS$unc,
+      lineage = ARGS$lineage )),
+
+  taxa_upset = list(
+    counts  = 'rarefied',
+    returns = RETURNS$plot_stats,
+    params  = list(
+      biom    = ARGS$biom,
+      stat.by = arg('field', class = 'categorical', max_n = 1),
+      rank    = ARGS$rank1,
+      detect  = arg('number', min = 0, max = 1, max_n = 1),
+      prev    = arg('number', min = 0, max = 1, max_n = 1),
+      unc     = ARGS$unc,
+      lineage = ARGS$lineage,
+      sets    = arg('integer', min = 1, max_n = 1),
+      totals  = arg('logical', max_n = 1),
+      '...'   = ARGS$dots )),
 
 
   #________________________________________________________

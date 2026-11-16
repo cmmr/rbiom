@@ -131,8 +131,11 @@ Other taxa_abundance:
 \code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_shared]{taxa_shared()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
-\code{\link[=taxa_sums]{taxa_sums()}}
+\code{\link[=taxa_sums]{taxa_sums()}},
+\code{\link[=taxa_top]{taxa_top()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 }
 \concept{taxa_abundance}

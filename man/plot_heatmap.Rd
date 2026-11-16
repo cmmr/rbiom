@@ -20,6 +20,7 @@ plot_heatmap(
   legend = "right",
   title = NULL,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 }
@@ -109,11 +110,18 @@ Default: \code{10} (10\% of the grid's height)}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: \code{TRUE}}
+
 \item{...}{Additional arguments to pass on to \code{\link[ggplot2:theme]{ggplot2::theme()}}.
 Arguments prefixed with \code{labs.} go to \code{\link[ggplot2:labs]{ggplot2::labs()}} instead,
 for example \code{labs.subtitle = "Plot subtitle"}, and \code{base_size},
 \code{base_family}, \code{base_line_size}, and \code{base_rect_size} go to
-\code{\link[=theme_rbiom]{theme_rbiom()}}.}
+\code{\link[=theme_rbiom]{theme_rbiom()}}. The caption states how the rows and columns were
+ordered; \code{labs.caption} replaces it (\code{labs.caption = NULL} for
+none).}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -233,6 +241,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{visualization}

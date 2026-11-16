@@ -44,6 +44,11 @@
 #' labels otherwise. Facet strips (or the subtitle) show the test
 #' statistic, R-squared (PERMANOVA), and p-value from `$stats`.
 #'
+#' The caption states the input table (rarefied, unrarefied, or relative
+#' abundances), the NMDS stress, and the test. When facets have different
+#' ordinations, the axis titles can't give each one's percent of variance
+#' (PCoA) or stress (NMDS), so the facet strips do.
+#'
 #' @return A \code{ggplot2} plot.
 #'         The computed sample coordinates and ggplot command
 #'         are available as \code{$data} and \code{$code} respectively.
@@ -410,6 +415,38 @@ ord_stats_text <- function (row, test, name = TRUE) {
 
 
 #________________________________________________________
+# For each facet (a row of `keys`): the percent of variance on its two
+# axes ("Axis 1: 24.2%, Axis 2: 17.3%"; PCoA only, and only when
+# `variance` is TRUE) and its stress ("0.134"; NMDS only). Empty
+# strings where there is nothing to report.
+#________________________________________________________
+ord_axes_text <- function (axes, keys, variance = TRUE) {
+
+  by <- intersect(names(keys), names(axes))
+
+  axes_keys  <- do.call(paste, c(lapply(axes[by], as.character), sep = "\r"))
+  facet_keys <- do.call(paste, c(keys[by], sep = "\r"))
+
+  var_text <- stress_text <- rep("", nrow(keys))
+
+  for (i in seq_along(facet_keys)) {
+
+    rows <- axes[axes_keys == facet_keys[[i]] & axes[['.axis']] %in% c('.x', '.y'), , drop = FALSE]
+    if (nrow(rows) == 0) next
+
+    if (isTRUE(variance) && !anyNA(rows[['.var']]))
+      var_text[[i]] <- paste(collapse = ", ", sprintf("Axis %d: %.1f%%", match(rows[['.axis']], c('.x', '.y')), rows[['.var']]))
+
+    if (hasName(rows, '.stress') && !is.na(rows[['.stress']][[1]]))
+      stress_text[[i]] <- sprintf("%.3f", rows[['.stress']][[1]])
+  }
+
+  list(variance = var_text, stress = stress_text)
+}
+
+
+
+#________________________________________________________
 # Faceting logic. Each combination of facet.by fields, metric,
 # ordination, and rank becomes one facet, labeled with the statistics.
 # The labels are a lookup table (`facets`) joined into the data; the
@@ -499,35 +536,70 @@ ordination_facets <- function (params) {
     }
 
 
-    # Add caption below plot describing stats method.
-    if (isTRUE(params$caption)) {
+    # The caption describes the stats method.
+    stats_caption <- sprintf(
+      fmt = "Statistics computed with %s (%i permutations%s).",
+      switch(params$test, adonis2 = "PERMANOVA", mrpp = "MRPP", betadisper = "betadisper", params$test),
+      params$permutations,
+      if (is.null(params$strata)) "" else sprintf(" within %s", params$strata) )
 
-      set_layer(
-        params = params,
-        layer  = 'labs',
-        'caption' = sprintf(
-          fmt = "Statistics computed with %s (%i permutations%s).",
-          switch(params$test, adonis2 = "PERMANOVA", mrpp = "MRPP", betadisper = "betadisper", params$test),
-          params$permutations,
-          if (is.null(params$strata)) "" else sprintf(" within %s", params$strata) ))
-    }
-
+  } else {
+    stats_caption <- NULL
   }
 
 
   #________________________________________________________
-  # Axis titles from the ordination (e.g. "PCoA 1 (24.3%)").
+  # Axis titles from the ordination (e.g. "PCoA 1 (24.3%)"). Facets
+  # with different ordinations can't share them, so the percent of
+  # variance then goes on each facet's strip instead.
   #________________________________________________________
+  shared_axes <- TRUE
+
   for (axis in c('.x', '.y')) {
 
     lab <- unique(as.character(axes[['.label']][axes[['.axis']] == axis]))
 
-    if (length(lab) != 1)
+    if (length(lab) != 1) {
+      shared_axes <- FALSE
       lab <- if (length(unique(axes[['.ord']])) == 1)
         paste(as.character(axes[['.ord']][[1]]), match(axis, c('.x', '.y'))) else NULL
+    }
 
     if (axis == '.x') set_layer(params, 'labs', x = lab) else set_layer(params, 'labs', y = lab)
   }
+
+  facet_axes <- ord_axes_text(axes, keys, variance = !shared_axes)
+
+
+  #________________________________________________________
+  # NMDS stress: in the caption when every facet has the same one,
+  # otherwise on the strips.
+  #________________________________________________________
+  stress         <- unique(facet_axes[['stress']][nzchar(facet_axes[['stress']])])
+  stress_caption <- if (length(stress) == 1) sprintf("NMDS stress = %s.", stress)
+  strip_text     <- facet_axes[['variance']]
+
+  if (length(stress) > 1)
+    strip_text <- ifelse(nzchar(facet_axes[['stress']]), paste("Stress =", facet_axes[['stress']]), strip_text)
+
+  labels <- ifelse(
+    test = nzchar(strip_text),
+    yes  = ifelse(nzchar(labels), paste0(labels, "\n", strip_text), strip_text),
+    no   = labels )
+
+
+  #________________________________________________________
+  # Caption: the input table, what the metric names leave out, the
+  # NMDS stress, and the test.
+  #________________________________________________________
+  if (isTRUE(params$caption))
+    set_layer(
+      params = params,
+      layer  = 'labs',
+      'caption' = caption_lines(
+        c(input_table_caption(params$biom), bdiv_caption(params$bdiv, params$alpha)),
+        stress_caption,
+        stats_caption ))
 
 
   #________________________________________________________

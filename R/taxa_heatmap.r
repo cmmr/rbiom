@@ -17,7 +17,10 @@
 #'
 #' @param ...   Additional arguments to pass on to ggplot2::theme().
 #'        Arguments prefixed with `labs.` go to ggplot2::labs() instead,
-#'        for example \code{labs.subtitle = "Plot subtitle"}.
+#'        for example \code{labs.subtitle = "Plot subtitle"}. The caption
+#'        states the input table (rarefied, unrarefied, or relative
+#'        abundances) and how the taxa and samples were ordered;
+#'        `labs.caption` replaces it (`labs.caption = NULL` for none).
 #'
 #' @export
 #' @examples
@@ -40,7 +43,8 @@ taxa_heatmap <- function (
     label = TRUE, label_size = NULL, rescale = "none", trees = TRUE,
     clust = "complete", dist = "euclidean",
     asp = 1, tree_height = 10, track_height = 10,
-    legend = "right", title = TRUE, xlab.angle = "auto", ...) {
+    legend = "right", title = TRUE, xlab.angle = "auto", caption = TRUE,
+    ...) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -131,6 +135,12 @@ taxa_heatmap_build <- function (params) {
       other   = other )
 
     .mtx_code <- sprintf("mtx <- %s", attr(mtx, 'cmd', exact = TRUE))
+
+    # For the caption.
+    .caption   <- c(
+      input_table_caption(biom),
+      if (rescale != "none") sprintf("Abundances rescaled to 0 - 1 within %s.", switch(rescale, rows = "each taxon", cols = "each sample")) )
+    .dim_names <- c("Taxa", "Samples")
   })
 
 

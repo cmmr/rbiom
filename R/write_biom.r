@@ -50,9 +50,14 @@
 #' quotes (with embedded quotes doubled), and missing taxonomic ranks are
 #' written as empty strings. In the JSON format, numbers are written at full
 #' precision and missing values are `null`. In the HDF5 format, the order of
-#' metadata fields, logical fields, and `Date` fields (stored as ISO 8601
-#' strings) are preserved through attributes on the datasets, which other
-#' BIOM readers ignore.
+#' metadata fields, logical fields, `Date` fields (stored as ISO 8601
+#' strings), and the order of factor levels are preserved through attributes
+#' on the datasets, which other BIOM readers ignore.
+#'
+#' The order of factor levels is only kept by `write_biom(format = "hdf5")`.
+#' The JSON and tabular BIOM formats and `write_metadata()` have no place to
+#' record it, so categorical metadata read back from those files has its
+#' levels in alphabetical order. Unused factor levels are never written.
 #'
 #' For `write_xlsx()`, `attributes(biom)` are saved as additional worksheets if
 #' the attribute is a data frame, matrix, or dist -class object. An attribute
@@ -401,8 +406,12 @@ write_biom_hdf5 <- function (biom, file) {
       name <- sprintf("sample/metadata/%s", field)
       data <- biom$metadata[[field]]
       cls  <- NULL
+      lvl  <- NULL
 
       if (is.factor(data)) {
+        # Stored as strings (not an HDF5 enum) so that other BIOM readers
+        # see the labels; the order of the levels in use is an attribute.
+        lvl  <- levels(data)[levels(data) %in% data]
         data <- as.character(data)
 
       } else if (is.logical(data)) {
@@ -420,7 +429,8 @@ write_biom_hdf5 <- function (biom, file) {
       }
 
       h5$write(name = name, data = data)
-      if (!is.null(cls)) h5$write(name = name, attr = "rbiom_class", data = cls)
+      if (!is.null(cls))   h5$write(name = name, attr = "rbiom_class",  data = cls)
+      if (length(lvl) > 0) h5$write(name = name, attr = "rbiom_levels", data = lvl)
     }
   }
 
@@ -447,7 +457,8 @@ write_biom_hdf5 <- function (biom, file) {
   #________________________________________________________
   if (!is.null(biom$tree)) {
     name <- 'observation/group-metadata/phylogeny'
-    h5$write(name = name, data = I(write_tree(biom$tree)))
+    # A 1-element array, not a scalar: biom-format (Python) slices it.
+    h5$write(name = name, data = write_tree(biom$tree))
     h5$write(name = name, attr = "data_type", data = "newick")
   }
 

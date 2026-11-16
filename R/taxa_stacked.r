@@ -31,7 +31,9 @@
 #' @param ...   Parameters for underlying functions. Prefixing parameter names
 #'        with a layer name ensures that a particular parameter is passed to,
 #'        and only to, that layer. An argument that no layer accepts is an
-#'        error.
+#'        error. The caption states the input table (rarefied, unrarefied,
+#'        or relative abundances) and how the samples were arranged;
+#'        `labs.caption` replaces it (`labs.caption = NULL` for none).
 #'
 #' @details
 #' If `biom` is rarefied (or holds relative abundances), then relative
@@ -53,7 +55,8 @@ taxa_stacked <- function (
     biom, rank = -1, taxa = 6, colors = TRUE, patterns = FALSE,
     label.by = NULL, order.by = NULL, facet.by = NULL,
     dist = "euclidean", clust = "complete", other = TRUE,
-    unc = "singly", lineage = FALSE, xlab.angle = "90", ...) {
+    unc = "singly", lineage = FALSE, xlab.angle = "90", caption = TRUE,
+    ...) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -84,6 +87,7 @@ taxa_stacked <- function (
 
       xlab.angle <- as.character(xlab.angle)
       validate_var_choices('xlab.angle', choices = CHOICES$xlab.angle)
+      validate_bool('caption')
 
 
       #________________________________________________________
@@ -266,30 +270,32 @@ taxa_stacked_build <- function (params) {
 
 
   #________________________________________________________
-  # Caption about labeling and ordering
+  # Caption: the input table, then the labeling and ordering.
   #________________________________________________________
   set_layer(
     params = params,
     layer  = 'labs',
     'x'       = "Sample",
-    'caption' = with(params, {
+    'caption' = if (isTRUE(params$caption)) with(params, caption_lines(
+
+      input_table_caption(biom),
 
       if ((is_null(label.by) || eq(label.by, '.sample')) && is_null(order.by)) {
-        sprintf("Arranged by %s distance and '%s' clustering.", dist, clust)
+        sprintf("Samples arranged by %s.", clust_caption(clust, dist))
 
       } else if ((is_null(label.by) || eq(label.by, '.sample'))) {
-        sprintf("Ordered by %s.", paste(order.by, collapse = ", "))
+        sprintf("Samples ordered by %s.", paste(order.by, collapse = ", "))
 
       } else if (is_null(order.by)) {
-        sprintf("Labeled by %s and arranged by\n%s distance and\n'%s' clustering.", label.by, dist, clust)
+        sprintf("Labeled by %s; arranged by %s.", label.by, clust_caption(clust, dist))
 
       } else if (eq(label.by, order.by)) {
         sprintf("Labeled and ordered by %s.", label.by)
 
       } else {
-        sprintf("Labeled by %s and ordered by %s.", label.by, paste(order.by, collapse = ", "))
+        sprintf("Labeled by %s; ordered by %s.", label.by, paste(order.by, collapse = ", "))
       }
-    }))
+    )))
 
 
   #________________________________________________________

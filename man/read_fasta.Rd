@@ -8,7 +8,9 @@ read_fasta(file, ids = NULL)
 }
 \arguments{
 \item{file}{A file path, URL, or literal string with fasta-formatted
-sequences. Files can optionally be compressed with gzip or bzip2.}
+sequences. Files can optionally be compressed with gzip or bzip2.
+QIIME 2 \code{FeatureData[Sequence]} artifacts (\code{.qza}) are also
+supported.}
 
 \item{ids}{Character vector of IDs to retrieve. The default, \code{NULL},
 will retrieve everything.}

@@ -157,8 +157,9 @@ across all tested taxa, before any \code{p.top} filtering);
 \verb{$taxa_coords} holds the arrow for each taxon (\code{.x0}/\code{.y0} at
 the centroid of the samples, \code{.x}/\code{.y} at its tip, scaled to
 fit the sample cloud) and \code{.size}, its mean relative abundance.
-The \code{'axes'} attribute gives the axis labels (see
-\code{\link[=distmat_ord_table]{distmat_ord_table()}}).
+The \code{'axes'} attribute gives the axis labels, the percent of
+variance on each PCoA axis (\code{.var}), and the NMDS stress
+(\code{.stress}); see \code{\link[=distmat_ord_table]{distmat_ord_table()}}.
 }
 \description{
 The biplot parameters (\code{taxa}, \code{unc}, \code{p.top}, and

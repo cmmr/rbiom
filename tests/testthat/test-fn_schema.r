@@ -35,7 +35,10 @@ schema_base_args <- function (fn) {
     taxa_matrix    = list(biom = rare50),
     taxa_stats     = list(biom = rare50, stat.by = "Sex", regr = "BMI", taxa = 2),
     taxa_table     = list(biom = rare50),
-    write_biom     = list(biom = hmp5, file = tempfile(), overwrite = TRUE),
+    taxa_top       = list(biom = rare50),
+    taxa_shared    = list(biom = rare50),
+    taxa_upset     = list(biom = rare50, stat.by = "Body Site"),
+    write_biom    = list(biom = hmp5, file = tempfile(), overwrite = TRUE),
     write_xlsx     = list(biom = hmp5, file = tempfile(fileext = ".xlsx"), overwrite = TRUE),
     stop("No base arguments for ", fn) )
 }

@@ -138,7 +138,9 @@ Abbreviations are allowed. Default: \code{"singly"}}
 Permutation tests permute within strata; regression models
 include a random intercept per stratum. Default: \code{NULL}}
 
-\item{caption}{Add methodology caption beneath the plot.
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: \code{TRUE}}
 
 \item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
@@ -181,6 +183,11 @@ four samples get no ellipse. The \bold{taxon} layer uses the ggrepel
 package to avoid overlapping labels when it is installed, and plain
 labels otherwise. Facet strips (or the subtitle) show the test
 statistic, R-squared (PERMANOVA), and p-value from \verb{$stats}.
+
+The caption states the input table (rarefied, unrarefied, or relative
+abundances), the NMDS stress, and the test. When facets have different
+ordinations, the axis titles can't give each one's percent of variance
+(PCoA) or stress (NMDS), so the facet strips do.
 }
 \examples{
     library(rbiom)
@@ -222,6 +229,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{beta_diversity}

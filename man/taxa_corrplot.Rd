@@ -164,7 +164,9 @@ Permutation tests permute within strata; regression models
 include a random intercept per stratum. The plotted trendlines
 are descriptive fits without the strata term. Default: \code{NULL}}
 
-\item{caption}{Add methodology caption beneath the plot.
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: \code{TRUE}}
 
 \item{check}{Generate additional plots to aid in assessing data normality.
@@ -225,10 +227,13 @@ Other taxa_abundance:
 \code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_shared]{taxa_shared()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
-\code{\link[=taxa_table]{taxa_table()}}
+\code{\link[=taxa_table]{taxa_table()}},
+\code{\link[=taxa_top]{taxa_top()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 
 Other visualization:
 \code{\link[=adiv_boxplot]{adiv_boxplot()}},
@@ -247,6 +252,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}

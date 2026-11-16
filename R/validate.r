@@ -24,8 +24,7 @@ validate_adiv <- function (
   x <- get(var, env)
   
   if (identical(x, '.all')) {
-    f <- as.character(rlang::caller_call())[[1]]
-    lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
+    deprecated_warn("2.3.0", sprintf("(%s='.all')", evar))
     x <- c('observed', 'shannon', 'simpson')
   } else {
     x <- unique(sapply(x, match_metric_id, div = 'alpha', evar = evar))
@@ -37,6 +36,60 @@ validate_adiv <- function (
   assign(var, x, env)
 }
 
+#________________________________________________________
+# The rbiom function that the user called: the outermost exported rbiom
+# function on the call stack. The validators run inside
+# `with(params, ...)`, where the immediate caller is eval().
+#
+# Returns list(name, env): the function's name and the environment it
+# was called from, or list("rbiom", NULL) when there is none.
+#________________________________________________________
+user_fn <- function () {
+
+  exported <- getNamespaceExports('rbiom')
+  calls    <- sys.calls()
+
+  for (i in seq_along(calls)) {
+
+    f <- calls[[i]][[1]]
+    if (is.call(f) && length(f) == 3 && as.character(f[[1]])[[1]] %in% c('::', ':::')) f <- f[[3]]
+
+    if (is.name(f) && as.character(f) %in% exported) {
+      parent <- sys.parents()[[i]]
+      return (list(name = as.character(f), env = if (parent == 0) globalenv() else sys.frame(parent)))
+    }
+  }
+
+  list(name = "rbiom", env = NULL)
+}
+
+
+#________________________________________________________
+# A deprecation warning that names the function the user called, e.g.
+# deprecated_warn("2.3.0", "(weighted)") for "bdiv_boxplot(weighted)".
+#
+# Nothing is signalled during schema_check(), which runs the validators
+# on a copy of the arguments and muffles their deprecation warnings:
+# lifecycle warns once per session for a given message, so that muffled
+# one would use up the warning that the function itself gives next.
+#________________________________________________________
+deprecated_warn <- function (when, what) {
+
+  checking <- any(vapply(sys.calls(), FUN.VALUE = NA, function (call) {
+    identical(call[[1]], quote(schema_check))
+  }))
+
+  if (checking) return (invisible(NULL))
+
+  fn <- user_fn()
+
+  lifecycle::deprecate_warn(
+    when     = when,
+    what     = paste0(fn$name, what),
+    user_env = fn$env %||% rlang::caller_env(2) )
+}
+
+
 validate_bdiv <- function (
     var = "bdiv", env = parent.frame(), evar = var, multiple = FALSE ) {
   
@@ -46,8 +99,7 @@ validate_bdiv <- function (
     return (invisible())
   
   if (identical(metrics, '.all')) {
-    f <- as.character(rlang::caller_call())[[1]]
-    lifecycle::deprecate_warn("2.3.0", sprintf("%s(%s='.all')", f, evar))
+    deprecated_warn("2.3.0", sprintf("(%s='.all')", evar))
     metrics <- c('bray', 'jaccard', 'jsd')
   }
 
@@ -68,15 +120,13 @@ validate_bdiv <- function (
   normalized <- TRUE
   
   if (with(env, { exists('weighted') && !is.null(weighted) })) {
-    f <- as.character(rlang::caller_call())[[1]]
-    lifecycle::deprecate_warn("2.3.0", sprintf("%s(weighted)", f))
+    deprecated_warn("2.3.0", "(weighted)")
     validate_bool('weighted', env, multiple = multiple)
     weighted <- get('weighted', env)
     remove('weighted', pos = env)
   }
   if (with(env, { exists('normalized') && !is.null(normalized) })) {
-    f <- as.character(rlang::caller_call())[[1]]
-    lifecycle::deprecate_warn("2.3.0", sprintf("%s(normalized)", f))
+    deprecated_warn("2.3.0", "(normalized)")
     validate_bool('normalized', env, multiple = multiple)
     normalized <- get('normalized', env)
     remove('normalized', pos = env)

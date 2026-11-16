@@ -52,8 +52,9 @@
 #'         `$taxa_coords` holds the arrow for each taxon (`.x0`/`.y0` at
 #'         the centroid of the samples, `.x`/`.y` at its tip, scaled to
 #'         fit the sample cloud) and `.size`, its mean relative abundance.
-#'         The `'axes'` attribute gives the axis labels (see
-#'         [distmat_ord_table()]).
+#'         The `'axes'` attribute gives the axis labels, the percent of
+#'         variance on each PCoA axis (`.var`), and the NMDS stress
+#'         (`.stress`); see [distmat_ord_table()].
 #'
 #' @export
 #' @examples
@@ -138,6 +139,10 @@ bdiv_ord_table <- function (
   #________________________________________________________
   cache_file    <- get_cache_file('bdiv_ord_table', params)
   sample_coords <- get_cache_value(cache_file)
+
+  # An entry from before the axes recorded NMDS stress is recomputed.
+  if (!is.null(sample_coords) && !hasName(attr(sample_coords, 'axes', exact = TRUE), '.stress'))
+    sample_coords <- NULL
 
   if (is.null(sample_coords)) {
 

@@ -122,3 +122,39 @@ test_that("bdiv_ord_table", {
   expect_lt(o4$stats$.p.val, 1)
   expect_equal(strip(replay_stats(o4$stats)), strip(o4$stats), tolerance = 1e-6)
 })
+
+
+test_that("the axes record NMDS stress", {
+
+  skip_on_cran()
+
+  dm <- bdiv_distmat(hmp50, "bray")
+
+  # vegan's stress, kept in the `axes` attribute (and through the cache).
+  mds <- with_seed(0, vegan::metaMDS(dm, k = 2, trace = 0))
+
+  for (i in 1:2) {
+    axes <- attr(distmat_ord_table(dm, ord = "NMDS"), 'axes')
+    expect_identical(names(axes), c('.ord', '.axis', '.label', '.var', '.stress'))
+    expect_type(axes$.stress, 'double')
+    expect_equal(axes$.stress, rep(mds$stress, 2))
+    expect_equal(round(axes$.stress[[1]], 3), 0.134)
+    expect_true(all(is.na(axes$.var)))
+  }
+
+  # NA for the other ordinations.
+  axes <- attr(distmat_ord_table(dm, ord = "PCoA"), 'axes')
+  expect_type(axes$.stress, 'double')
+  expect_true(all(is.na(axes$.stress)))
+
+  axes <- attr(distmat_ord_table(dm, ord = c("PCoA", "NMDS"), k = 3), 'axes')
+  expect_equal(nrow(axes), 6L)
+  expect_identical(is.na(axes$.stress), rep(c(TRUE, FALSE), each = 3))
+
+  # bdiv_ord_table() carries it along, per metric.
+  axes <- attr(bdiv_ord_table(hmp50, bdiv = c("bray", "jaccard"), ord = c("PCoA", "NMDS")), 'axes')
+  expect_true(hasName(axes, '.stress'))
+  expect_identical(is.na(axes$.stress), as.character(axes$.ord) != "NMDS")
+  expect_equal(unique(axes$.stress[axes$.bdiv == "bray" & axes$.ord == "NMDS"]), mds$stress)
+  expect_equal(length(unique(stats::na.omit(axes$.stress))), 2L)
+})

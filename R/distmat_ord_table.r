@@ -25,10 +25,12 @@
 #' @return A tibble data.frame with columns \code{.ord}, \code{.sample},
 #'         \code{.x}, \code{.y}, and (optionally) \code{.z}. The attribute
 #'         `'axes'` is a tibble with one row per axis (`.ord`, `.axis`,
-#'         `.label`, `.var`): for PCoA, `.var` is the percent of the
-#'         variance (the positive eigenvalues) explained by that axis and
+#'         `.label`, `.var`, `.stress`): for PCoA, `.var` is the percent of
+#'         the variance (the positive eigenvalues) explained by that axis and
 #'         `.label` reads e.g. `"PCoA 1 (24.3%)"`; for the other ordinations
-#'         `.var` is `NA`.
+#'         `.var` is `NA`. For NMDS, `.stress` is the stress of the solution
+#'         ([vegan::metaMDS()]'s `$stress`, the same on every axis); for the
+#'         other ordinations it is `NA`.
 #'
 #' @export
 #' @examples
@@ -80,6 +82,10 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus
   })
   tbl        <- get_cache_value(cache_file)
 
+  # An entry from before the axes recorded NMDS stress is recomputed.
+  if (!is.null(tbl) && !hasName(attr(tbl, 'axes', exact = TRUE), '.stress'))
+    tbl <- NULL
+
   if (is.null(tbl)) {
 
     dots   <- params$.dots
@@ -93,7 +99,8 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus
     #________________________________________________________
     tbl <- dplyr::bind_rows(lapply(ord, function (o) {
 
-      var <- rep(NA_real_, k)
+      var    <- rep(NA_real_, k)
+      stress <- NA_real_
 
       if (o == "PCoA") {
         args <- c(list(d = dm, k = k, eig = TRUE), fun_params(stats::cmdscale, dots)[setdiff(names(dots), c('d', 'k', 'eig'))])
@@ -113,7 +120,9 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus
       } else if (o == "NMDS") {
         args <- c(list(comm = dm, k = k), fun_params(vegan::metaMDS, dots)[setdiff(names(dots), c('comm', 'k'))])
         args[['trace']] %<>% if.null(0)
-        res  <- with_seed(seed, do.call(vegan::metaMDS, args))[['points']]
+        mds    <- with_seed(seed, do.call(vegan::metaMDS, args))
+        res    <- mds[['points']]
+        stress <- mds[['stress']]
         rownames(res) <- labels
 
       } else if (o == "UMAP") {
@@ -127,10 +136,11 @@ distmat_ord_table <- function (dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus
 
       axis_names <- head(c(".x", ".y", ".z"), k)
       axes[[o]] <<- tibble(
-        .ord   = o,
-        .axis  = axis_names,
-        .label = ifelse(is.na(var), paste(o, seq_len(k)), sprintf("%s %d (%.1f%%)", o, seq_len(k), var)),
-        .var   = var )
+        .ord    = o,
+        .axis   = axis_names,
+        .label  = ifelse(is.na(var), paste(o, seq_len(k)), sprintf("%s %d (%.1f%%)", o, seq_len(k), var)),
+        .var    = var,
+        .stress = stress )
 
       res <- as.data.frame(res[, seq_len(k), drop = FALSE])
       colnames(res) <- axis_names

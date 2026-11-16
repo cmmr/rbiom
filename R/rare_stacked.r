@@ -26,7 +26,9 @@
 #'        Prefix a parameter name with `r.` to ensure it gets
 #'        passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
 #'        `r.color = "black"` ensures only the horizontal rarefaction line
-#'        has its color set to `"black"`.
+#'        has its color set to `"black"`. The caption states the rarefaction
+#'        depth of the line; `labs.caption` replaces it
+#'        (`labs.caption = NULL` for none).
 #'
 #'
 #' @export
@@ -42,7 +44,8 @@
 #'
 
 rare_stacked <- function (
-    biom, rline = TRUE, counts = TRUE, labels = TRUE, y.transform = "log10", ...) {
+    biom, rline = TRUE, counts = TRUE, labels = TRUE, y.transform = "log10",
+    caption = TRUE, ...) {
 
   biom   <- as_rbiom(biom)
   params <- eval_envir(environment(), ...)
@@ -84,6 +87,7 @@ rare_stacked_build <- function (params) {
 
     validate_bool('counts')
     validate_bool('labels')
+    validate_bool('caption')
     validate_var_choices('y.transform', CHOICES$rare.y.transform)
     if (y.transform == 'none' || hasName(.dots, 'yaxis.transform')) y.transform <- NULL
   })
@@ -226,6 +230,11 @@ rare_stacked_build <- function (params) {
     set_layer(params, 'fill', values = c(Excluded = "#BBBBBB", Retained = "#0072B2"))
     set_layer(params, 'labs',  fill = "Reads")
     set_layer(params, 'hline', yintercept = rline, color = "#D55E00", linetype = "dashed")
+
+    # Caption: the depth that the line and the counts are for.
+    if (!isFALSE(params$caption))
+      set_layer(params, 'labs', caption = sprintf(
+        "Rarefaction depth (dashed line): %s reads per sample.", formatC(rline, format = "d", big.mark = ",")))
 
     if (isTRUE(params$counts)) {
 

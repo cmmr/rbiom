@@ -19,6 +19,7 @@ taxa_stacked(
   unc = "singly",
   lineage = FALSE,
   xlab.angle = "90",
+  caption = TRUE,
   ...
 )
 }
@@ -88,10 +89,17 @@ level ranks. Default: \code{FALSE}}
 Options are \code{"auto"}, \code{"0"}, \code{"30"}, and \code{"90"} (the numbers 0, 30,
 and 90 are accepted too). Default: \code{"90"}}
 
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: \code{TRUE}}
+
 \item{...}{Parameters for underlying functions. Prefixing parameter names
 with a layer name ensures that a particular parameter is passed to,
 and only to, that layer. An argument that no layer accepts is an
-error.}
+error. The caption states the input table (rarefied, unrarefied,
+or relative abundances) and how the samples were arranged;
+\code{labs.caption} replaces it (\code{labs.caption = NULL} for none).}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -126,9 +134,12 @@ Other taxa_abundance:
 \code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_shared]{taxa_shared()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
-\code{\link[=taxa_table]{taxa_table()}}
+\code{\link[=taxa_table]{taxa_table()}},
+\code{\link[=taxa_top]{taxa_top()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 
 Other visualization:
 \code{\link[=adiv_boxplot]{adiv_boxplot()}},
@@ -147,6 +158,7 @@ Other visualization:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}

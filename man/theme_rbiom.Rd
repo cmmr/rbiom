@@ -98,6 +98,7 @@ Other visualization:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
-\code{\link[=taxa_stacked]{taxa_stacked()}}
+\code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 }
 \concept{visualization}

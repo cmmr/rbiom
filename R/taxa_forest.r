@@ -29,8 +29,9 @@
 #'        gray; a palette name (e.g. `"okabe"`) uses its first two colors;
 #'        `FALSE` draws everything in black. Default: `TRUE`
 #'
-#' @param caption   Add a caption describing the method, the intervals, and
-#'        which taxa are shown. Default: `TRUE`
+#' @param caption   Add a caption describing the input table, the method,
+#'        the intervals, the p-value adjustment, and which taxa are shown.
+#'        Default: `TRUE`
 #'
 #' @param ...   Parameters for the underlying ggplot2 functions. Prefix a
 #'        parameter with a layer name to pass it to that layer only:
@@ -370,21 +371,27 @@ forest_colors <- function (colors, labs, present) {
 
 
 #________________________________________________________
-# The caption: method, intervals, significance, and which taxa.
+# The caption: input table, method, intervals, p-value adjustment, and
+# which taxa.
 #________________________________________________________
 forest_caption <- function (params, stats, generic = FALSE) {
 
   method <- attr(stats, 'tbl_sum', exact = TRUE)[['Method']]
   p.top  <- params$p.top
 
-  shown <- if (!is.finite(p.top)) { NULL
-  } else if (p.top >= 1)          { sprintf("Showing the %i taxa with the smallest adjusted p-values per panel.", as.integer(floor(p.top)))
-  } else                          { sprintf("Showing taxa with adjusted p %s %s.", LESS_EQUAL, format(p.top)) }
+  # "FDR (Benjamini-Hochberg) adjusted p-values", or "p-values" for "none".
+  adj   <- p_adj_label(params$p.adj)
+  pvals <- if (is.null(adj)) "p-values" else paste(adj, "adjusted p-values")
 
-  paste(collapse = "\n", c(
+  shown <- if (!is.finite(p.top)) { if (!is.null(adj)) sprintf("p-values adjusted with the %s method.", adj)
+  } else if (p.top >= 1)          { sprintf("Showing the %i taxa with the smallest %s per panel.", as.integer(floor(p.top)), pvals)
+  } else                          { sprintf("Showing taxa with %s %s %s.", pvals, LESS_EQUAL, format(p.top)) }
+
+  caption_lines(
+    input_table_caption(params$biom),
     sprintf("%s; bars are %s%% confidence intervals.", method, format(100 * params$level)),
     if (isTRUE(generic)) "Comparisons are \"A - B\": increased taxa are more abundant in A.",
-    shown ))
+    shown )
 }
 
 

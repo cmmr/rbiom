@@ -102,3 +102,63 @@ test_that("tree_subset", {
   off <- rlang::with_options(tree_subset(hmp50$tree, 1:10), rbiom.cache_dir = "FALSE")
   expect_identical(on, off)
 })
+
+
+test_that("read_tree explains files that are not Newick", {
+
+  f <- tempfile(fileext = ".tre")
+  on.exit(unlink(f), add = TRUE)
+
+  nexus <- c("#NEXUS", "begin trees;", "  tree t = (A:1,B:2);", "end;")
+  writeLines(nexus, f)
+  expect_error(read_tree(f), "NEXUS")
+  expect_error(read_tree(f), "ape::read.nexus", fixed = TRUE)
+  expect_error(read_tree(paste(nexus, collapse = "\n")), "NEXUS")
+
+  writeLines("just some text", f)
+  expect_error(read_tree(f), "not a Newick tree")
+
+  writeLines("(A:1,B:x);", f)
+  expect_error(read_tree(f), "Can't parse")
+  expect_error(read_tree("(A:1,(B:2,C:3);"), "Can't parse")
+
+  writeBin(as.raw(rep(c(0, 200, 7, 255, 31, 129), 50)), f)
+  expect_error(read_tree(f), "binary file")
+
+  expect_error(read_tree(test_path('inputs/biom.hdf5')), "not a Newick tree")
+  expect_error(read_tree(test_path('inputs/viz.qzv')),   "visualization")
+
+  # A file whose path has parentheses is still a file.
+  d <- tempfile("tree (1)")
+  dir.create(d)
+  on.exit(unlink(d, recursive = TRUE), add = TRUE)
+  writeLines("(A:1,B:2);", file.path(d, "t.nwk"))
+  expect_identical(read_tree(file.path(d, "t.nwk"))$tip.label, c("A", "B"))
+})
+
+
+test_that("tree/OTU mismatches are counted and explained", {
+
+  mtx <- matrix(1:8, nrow = 4, dimnames = list(paste0("otu_", 1:4), c("A", "B")))
+
+  # Unquoted underscores become spaces by default.
+  tree <- "((otu_1:1,otu_2:1):1,(OTU_3:1,otu_4:1):1,extra:1);"
+  expect_error(as_rbiom(mtx, tree = tree), "OTUs missing from tree: 4 of 4")
+  expect_error(as_rbiom(mtx, tree = tree), "not in the counts table: 5 of 5")
+  expect_error(as_rbiom(mtx, tree = tree), "differ only by")
+  expect_error(as_rbiom(mtx, tree = tree), "underscores")
+
+  # Case still differs with underscores = TRUE.
+  expect_error(as_rbiom(mtx, tree = tree, underscores = TRUE), "OTUs missing from tree: 1 of 4")
+  expect_error(as_rbiom(mtx, tree = tree, underscores = TRUE), '"otu_3" vs "OTU_3"')
+
+  # Unrelated names: no hint.
+  err <- tryCatch(as_rbiom(mtx, tree = "((a:1,b:1):1,(c:1,d:1):1);"), error = conditionMessage)
+  expect_match(err, "OTUs missing from tree: 4 of 4")
+  expect_false(grepl("differ only by", err))
+
+  # Extra tips alone are fine.
+  tree <- "((otu_1:1,otu_2:1):1,(otu_3:1,otu_4:1):1,extra:1);"
+  x <- expect_silent(as_rbiom(mtx, tree = tree, underscores = TRUE))
+  expect_identical(sort(x$tree$tip.label), x$otus)
+})

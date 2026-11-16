@@ -159,7 +159,9 @@
 #' @param level   The confidence level for calculating a confidence interval. 
 #'        Default: `0.95`
 #'        
-#' @param caption   Add methodology caption beneath the plot.
+#' @param caption   Add a caption beneath the plot that states the input
+#'        table (rarefied, unrarefied, or relative abundances) and the
+#'        methods (metric parameters, statistical test, p-value adjustment).
 #'        Default: `TRUE`
 #'        
 #' @param outliers   Show boxplot outliers? `TRUE` to always show. 

@@ -132,5 +132,54 @@ test_that("bdiv_ord_plot with several metrics and ordinations", {
 
   # With a biplot rank, the title is the rank.
   p <- bdiv_ord_plot(b20, bdiv = c("jaccard", "bray"), ord = c("PCoA", "UMAP"), layers = "pt", rank = "Phylum", taxa = 2, test = "none")
-  expect_true(grepl('title = "Phylum"', p$code, fixed = TRUE))
+  expect_true(grepl('title += "Phylum"', p$code))
+})
+
+
+test_that("bdiv_ord_plot states NMDS stress and percent of variance", {
+
+  skip_on_cran()
+
+  # One NMDS panel: the stress is in the caption.
+  p <- bdiv_ord_plot(hmp50, ord = "NMDS", rank = NULL)
+  expect_match(p$labels$caption, "NMDS stress = 0.134.", fixed = TRUE)
+  expect_true(hasName(attr(p$data, 'axes'), '.stress'))
+  expect_true(grepl('NMDS stress = 0.134.', p$code, fixed = TRUE))
+  expect_replays(p)
+
+  # PCoA has no stress; the caption states the input table.
+  p <- bdiv_ord_plot(rare50, rank = NULL)
+  expect_match(p$labels$caption, "^Rarefied to [0-9,]+ reads per sample[.]$")
+  expect_no_match(p$labels$caption, "stress")
+
+  # With statistics, the test comes last.
+  p <- bdiv_ord_plot(rare50, stat.by = "Sex", rank = NULL, permutations = 99)
+  expect_match(p$labels$caption, "^Rarefied to [0-9,]+ reads per sample[.]\nStatistics computed with PERMANOVA [(]99 permutations[)][.]$")
+
+  # No caption: nothing about stress either.
+  p <- bdiv_ord_plot(hmp50, ord = "NMDS", rank = NULL, caption = FALSE)
+  expect_null(p$labels$caption)
+
+  # Facets with different ordinations can't share axis titles, so each
+  # strip gives its percent of variance (PCoA) or stress (NMDS).
+  p <- bdiv_ord_plot(rare50, bdiv = c("bray", "jaccard"), ord = c("PCoA", "NMDS"), rank = NULL)
+  lvls <- levels(p$data$.facet)
+  expect_equal(length(lvls), 4L)
+  expect_equal(sum(grepl("PCoA\nAxis 1: [0-9.]+%, Axis 2: [0-9.]+%$", lvls)), 2L)
+  expect_equal(sum(grepl("NMDS\nStress = 0[.][0-9]{3}$", lvls)), 2L)
+  expect_no_match(p$labels$caption, "stress")
+  expect_replays(p)
+
+  axes <- attr(p$data, 'axes')
+  row  <- axes[axes$.bdiv == "bray" & axes$.ord == "PCoA", ]
+  expect_true(sprintf("Bray-Curtis Dissimilarity PCoA\nAxis 1: %.1f%%, Axis 2: %.1f%%", row$.var[[1]], row$.var[[2]]) %in% lvls)
+
+  # Metadata facets: one ordination each, so the same applies.
+  p <- bdiv_ord_plot(rare50, facet.by = "Sex", rank = NULL)
+  expect_true(all(grepl("^(Female|Male)\nAxis 1: [0-9.]+%, Axis 2: [0-9.]+%$", levels(p$data$.facet))))
+
+  # Panels that share an ordination keep the axis titles and caption.
+  p <- bdiv_ord_plot(hmp50, ord = "NMDS", rank = c("Phylum", "Genus"), taxa = 2)
+  expect_identical(levels(p$data$.facet), c("Phylum", "Genus"))
+  expect_match(p$labels$caption, "NMDS stress = 0.134.", fixed = TRUE)
 })

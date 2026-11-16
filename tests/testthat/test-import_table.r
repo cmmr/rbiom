@@ -180,3 +180,93 @@ test_that("QIIME 2 taxonomy with a single lineage column", {
   expect_identical(m[3,], c(NA_character_, NA, NA))
   expect_identical(m[5,], c("a", "b", NA))
 })
+
+
+test_that("metadata import names the file and explains mismatches", {
+
+  sids <- c("S1", "S2", "S3")
+  f    <- tempfile(pattern = "mdfile", fileext = ".tsv")
+  on.exit(unlink(f), add = TRUE)
+
+  # Decimal commas: a warning, and the column stays categorical.
+  writeLines(c("sample\tpH\tgrp", "S1\t6,5\ta", "S2\t7,1\tb", "S3\t7\ta"), f)
+  expect_warning(x <- import_metadata(f, sids), "decimal commas")
+  expect_warning(import_metadata(f, sids), "mdfile")
+  expect_s3_class(x$pH, "factor")
+
+  # Lists such as "1,2" mixed with words are not flagged.
+  writeLines(c("sample\tarms", "S1\t1,2", "S2\tnone", "S3\t1,3"), f)
+  expect_silent(import_metadata(f, sids))
+
+  # No sample names in common.
+  writeLines(c("sample\tpH", "s1\t6", "s2\t7", "s3\t7"), f)
+  expect_error(import_metadata(f, sids), "No matching sample names")
+  expect_error(import_metadata(f, sids), "mdfile")
+  expect_error(import_metadata(f, sids), 'differ only by case, whitespace, or punctuation: "S1" vs "s1"')
+
+  # Partial match with a near miss.
+  writeLines(c("sample\tpH", "S1\t6", "S-2\t7", "S3\t7"), f)
+  w <- capture_warnings(x <- import_metadata(f, sids))
+  expect_length(w, 2)
+  expect_match(w[[1]], "Dropping 1 sample")
+  expect_match(w[[1]], "mdfile")
+  expect_match(w[[1]], '"S2" vs "S-2"', fixed = TRUE)
+  expect_identical(x$.sample, c("S1", "S3"))
+
+  # Names with braces don't break the message.
+  expect_error(import_metadata(data.frame(.sample = "{x}", a = 1), "{X}"), 'vs "{x}"', fixed = TRUE)
+
+  # Unrelated names: no hint.
+  err <- tryCatch(import_metadata(data.frame(.sample = "a", z = 1), sids), error = conditionMessage)
+  expect_false(grepl("differ only by", err))
+
+  # Files that aren't tables.
+  expect_error(import_table(test_path('inputs/biom.hdf5')), "not a table")
+  writeBin(as.raw(rep(c(0, 200, 7, 255, 31, 129), 50)), f)
+  expect_error(import_metadata(f, sids), "binary file")
+})
+
+
+test_that("taxonomy from mothur and comma-separated lineages", {
+
+  otus <- paste0("otu", 1:4)
+  f    <- tempfile(fileext = ".tsv")
+  on.exit(unlink(f), add = TRUE)
+
+  # mothur cons.taxonomy: 'Size' column, confidence scores, trailing ';'.
+  writeLines(con = f, c(
+    "OTU\tSize\tTaxonomy",
+    "otu1\t10\tBacteria(100);Firmicutes(98);Bacilli(98);",
+    "otu2\t9\tBacteria(100);Firmicutes(100);Clostridia(87.5);",
+    "otu3\t8\tBacteria(100);Bacteroidetes(99);unclassified;",
+    "otu4\t7\tArchaea(100);Euryarchaeota(55);Methanobacteria(50);" ))
+  x <- expect_silent(import_taxonomy(f, otus = otus))
+  expect_identical(names(x), c(".otu", "Level.1", "Level.2", "Level.3"))
+  expect_identical(as.character(x$Level.1), c("Bacteria", "Bacteria", "Bacteria", "Archaea"))
+  expect_identical(as.character(x$Level.3), c("Bacilli", "Clostridia", "unclassified", "Methanobacteria"))
+
+  # A 'Size' rank that isn't a count is kept.
+  tx <- data.frame(.otu = otus, Size = c("big", "big", "small", "small"), Genus = letters[1:4])
+  expect_identical(names(import_taxonomy(tx, otus = otus)), c(".otu", "Size", "Genus"))
+
+  # Parentheses that aren't trailing scores are kept.
+  tx <- data.frame(.otu = otus, Taxon = c("A;B (x);C(100)", "A;B;C", "A;B;C", "A;B;D"))
+  x  <- import_taxonomy(tx, otus = otus)
+  expect_identical(as.character(x$Level.2[[1]]), "B (x)")
+  expect_identical(as.character(x$Level.3[[1]]), "C")
+
+  # Comma-separated lineages.
+  writeLines(con = f, c(
+    "OTU\tTaxonomy",
+    "otu1\tBacteria,Firmicutes,Bacilli",
+    "otu2\tBacteria, Firmicutes, Clostridia",
+    "otu3\tBacteria",
+    "otu4\tArchaea,Euryarchaeota,Methanobacteria" ))
+  x <- expect_silent(import_taxonomy(f, otus = otus))
+  expect_identical(names(x), c(".otu", "Level.1", "Level.2", "Level.3"))
+  expect_identical(as.character(x$Level.2), c("Firmicutes", "Firmicutes", NA, "Euryarchaeota"))
+
+  # A single rank with the odd comma is left alone.
+  tx <- data.frame(.otu = otus, Genus = c("a, b", "c", "d", "e"))
+  expect_identical(names(import_taxonomy(tx, otus = otus)), c(".otu", "Genus"))
+})

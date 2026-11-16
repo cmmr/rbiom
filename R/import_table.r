@@ -10,7 +10,8 @@
 #' @return A tibble data.frame. For delimited text, every column is character
 #'         and the attribute `rbiom_untyped` is `TRUE`; the caller decides
 #'         which columns to type-convert (see `convert_col_types()`), so that
-#'         identifier columns such as `"1.10"` survive unchanged.
+#'         identifier columns such as `"1.10"` survive unchanged. The
+#'         attribute `rbiom_src` names the file, for use in messages.
 #'
 
 import_table <- function (src) {
@@ -22,6 +23,8 @@ import_table <- function (src) {
   format <- fpath$format
   path   <- fpath$path
   on.exit(fpath$cleanup(), add = TRUE)
+
+  check_qiime2_type(fpath, 'FeatureData[Taxonomy]', "a table of taxonomy or metadata")
 
 
   #________________________________________________________
@@ -47,7 +50,9 @@ import_table <- function (src) {
     as_tibble(df, .name_repair = "minimal")
 
   } else {
-    cli_abort("`src` data type not recognized: {src}")
+    cli_abort(c(
+      'x' = "{.file {fpath$id}} is {.val {format}} format, not a table.",
+      'i' = "Tables can be read from delimited text (tsv/csv), Excel, or JSON files." ))
   }
 
   colnames(tbl) <- trimws(colnames(tbl))
@@ -63,6 +68,7 @@ import_table <- function (src) {
   }
 
   attr(tbl, 'rbiom_untyped') <- untyped
+  attr(tbl, 'rbiom_src')     <- fpath$id
 
   return (tbl)
 }
@@ -89,9 +95,15 @@ import_table <- function (src) {
 #'
 read_delim_text <- function (path, src = path, header_pattern = NULL) {
 
+  check_not_binary(path, src)
+
   lines <- tryCatch(
     expr  = readLines(path, warn = FALSE, encoding = "UTF-8"),
     error = function (e) cli_abort("Can't read {.file {src}}: {conditionMessage(e)}") )
+
+  # Not UTF-8: assume Latin-1 (e.g. saved from Excel on Windows).
+  if (any(i <- !validUTF8(lines)))
+    lines[i] <- iconv(lines[i], from = "latin1", to = "UTF-8")
 
   lines <- strip_bom(lines)
   lines <- sub("\r$", "", lines)
@@ -332,7 +344,7 @@ file_type <- function (src, filename = src) {
   close(con)
 
   if (identical(peek[1:4], charToRaw('\x89HDF')))                          return ('hdf5')
-  if (identical(peek[1:4], charToRaw('\x50\x4B\x03\x04')))                 return ('excel')
+  if (identical(peek[1:4], charToRaw('\x50\x4B\x03\x04')))                 return ('zip') # see unwrap_zip()
   if (identical(peek[1:8], charToRaw('\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'))) return ('excel')
 
   # Skip a UTF-8 BOM and whitespace before checking for JSON.
@@ -395,7 +407,172 @@ as_filepath <- function (src) {
   result <- list(id = id, path = path, format = format, cleanup = cleanup)
 
 
+  #________________________________________________________
+  # Zip archives: Excel workbooks and QIIME 2 artifacts (.qza).
+  #________________________________________________________
+  if (identical(format, 'zip'))
+    result <- tryCatch(
+      expr  = unwrap_zip(result),
+      error = function (e) { cleanup(); stop(e) })
+
+
   return (result)
+}
+
+
+
+#' Resolve a zip archive to an Excel workbook or to the payload of a
+#' QIIME 2 artifact.
+#'
+#' A `.qza` file is a zip archive holding `<uuid>/metadata.yaml` and
+#' `<uuid>/data/<payload>`. The payload (`feature-table.biom`,
+#' `taxonomy.tsv`, `tree.nwk`, or `dna-sequences.fasta`) is extracted to a temporary file and
+#' returned as though the caller had passed it directly.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param fpath  The `list(id, path, format, cleanup)` from `as_filepath()`.
+#'
+#' @return `fpath`, updated. For artifacts, `$qiime2_type` holds the
+#'         artifact's semantic type, e.g. `"FeatureTable[Frequency]"`.
+#'
+unwrap_zip <- function (fpath) {
+
+  id <- fpath$id
+
+  entries <- tryCatch(
+    expr  = utils::unzip(fpath$path, list = TRUE)$Name,
+    error = function (e) cli_abort("Can't read zip archive {.file {id}}: {conditionMessage(e)}") )
+
+
+  #________________________________________________________
+  # Excel workbook (.xlsx).
+  #________________________________________________________
+  if (any(c('[Content_Types].xml', 'xl/workbook.xml') %in% entries)) {
+    fpath$format <- 'excel'
+    return (fpath)
+  }
+
+
+  #________________________________________________________
+  # QIIME 2 artifact or visualization.
+  #________________________________________________________
+  yaml <- grep("^[^/]+/metadata\\.yaml$", entries, value = TRUE)
+  data <- grep("^[^/]+/data/.*[^/]$",     entries, value = TRUE)
+
+  if (length(yaml) != 1) {
+    found <- utils::head(unique(sub("/.*$", "", entries)), 5)
+    cli_abort(c(
+      'x' = "{.file {id}} is a zip archive, but not an Excel file or QIIME 2 artifact.",
+      'i' = "It contains: {.val {found}}.",
+      'i' = "Unzip it and provide the data file directly." ))
+  }
+
+  tdir <- tempfile("qza")
+  dir.create(tdir)
+  ok <- FALSE
+  on.exit(if (!ok) unlink(tdir, recursive = TRUE), add = TRUE)
+  prev_cleanup  <- fpath$cleanup
+  fpath$cleanup <- function () { unlink(tdir, recursive = TRUE); prev_cleanup() }
+
+  utils::unzip(fpath$path, files = yaml, exdir = tdir, junkpaths = TRUE)
+  meta <- readLines(file.path(tdir, 'metadata.yaml'), warn = FALSE)
+  type <- grep("^type:", meta, value = TRUE)
+  type <- if (length(type) == 0) NA_character_ else trimws(gsub("^type:|[\"']", "", type[[1]]))
+
+  if (identical(type, 'Visualization') || grepl("\\.qzv$", tolower(id)))
+    cli_abort(c(
+      'x' = "{.file {id}} is a QIIME 2 visualization, not data.",
+      'i' = "Provide the {.file .qza} artifact that the visualization was made from." ))
+
+  payload <- if (isTRUE(startsWith(type, 'FeatureTable['))) { "\\.biom$"
+  } else if (identical(type, 'FeatureData[Taxonomy]'))      { "\\.tsv$"
+  } else if (isTRUE(startsWith(type, 'Phylogeny[')))        { "\\.nwk$"
+  } else if (identical(type, 'FeatureData[Sequence]'))      { "\\.fasta$"
+  } else {
+    cli_abort(c(
+      'x' = "Can't read QIIME 2 artifacts of type {.val {type}}: {.file {id}}",
+      'i' = "Supported types: {.val FeatureTable[Frequency]}, {.val FeatureData[Taxonomy]}, {.val FeatureData[Sequence]}, and {.val Phylogeny[Rooted]}.",
+      'i' = "Use {.code qiime tools export} to convert other artifacts to plain files." ))
+  }
+
+  data <- grep(payload, data, value = TRUE)
+  if (length(data) != 1)
+    cli_abort(c(
+      'x' = "Expected one data file in QIIME 2 artifact {.file {id}}, not {length(data)}.",
+      'i' = "Artifact type: {.val {type}}." ))
+
+  utils::unzip(fpath$path, files = data, exdir = tdir, junkpaths = TRUE)
+
+  fpath$path <- file.path(tdir, basename(data))
+  if (!file.exists(fpath$path))
+    cli_abort("Can't extract {.val {data}} from {.file {id}}.")
+
+  fpath$format      <- file_type(src = fpath$path)
+  fpath$qiime2_type <- type
+  ok <- TRUE
+
+  return (fpath)
+}
+
+
+
+#' Ensure a QIIME 2 artifact holds the kind of data the caller reads.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param fpath   From `as_filepath()`.
+#' @param prefix  The required start of the artifact's type.
+#' @param what    Description of what the caller reads, e.g. "a feature table".
+#'
+check_qiime2_type <- function (fpath, prefix, what) {
+  type <- fpath$qiime2_type
+  if (!is.null(type) && !startsWith(type, prefix))
+    cli_abort(c(
+      'x' = "{.file {fpath$id}} is a QIIME 2 {.val {type}} artifact, not {what}." ))
+  invisible(NULL)
+}
+
+
+
+#' Abort when a file that should be delimited text is binary.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param path   Path to a (possibly gzip/bzip2 compressed) file.
+#' @param src    How to refer to the file in messages.
+#' @param what   What the file was expected to be.
+#'
+check_not_binary <- function (path, src = path, what = "delimited text") {
+
+  bytes <- tryCatch(
+    expr  = {
+      con <- gzfile(path, 'rb')
+      on.exit(close(con))
+      suppressWarnings(readBin(con, 'raw', 8192L))
+    },
+    error = function (e) raw(0) )
+
+  if (length(bytes) == 0) return (invisible(NULL))
+
+  ints  <- as.integer(bytes)
+  utf16 <- length(ints) >= 2 && ((ints[[1]] == 255 && ints[[2]] == 254) || (ints[[1]] == 254 && ints[[2]] == 255))
+  ctrl  <- ints < 9 | (ints > 13 & ints < 32)
+
+  if (utf16)
+    cli_abort(c(
+      'x' = "{.file {src}} is UTF-16 encoded.",
+      'i' = "Re-save it as UTF-8 text." ))
+
+  if (any(ints == 0) || mean(ctrl) > 0.1)
+    cli_abort(c(
+      'x' = "{.file {src}} is a binary file, not {what}.",
+      'i' = "Check that this is the right file and that it isn't corrupted." ))
+
+  invisible(NULL)
 }
 
 
@@ -464,6 +641,53 @@ find_id_column <- function (tbl, ids, dot, aliases, what) {
 
 
 
+#' Names of character/factor columns where most values look like numbers
+#' written with a decimal comma (`"1,5"`), and the rest are numbers.
+#'
+#' @noRd
+#' @keywords internal
+decimal_comma_cols <- function (df) {
+  names(df)[vapply(df, FUN.VALUE = TRUE, function (x) {
+    if (!is.character(x) && !is.factor(x)) return (FALSE)
+    x <- as.character(x[!is.na(x)])
+    if (length(x) == 0) return (FALSE)
+    dc <- grepl("^[-+]?[0-9]+,[0-9]+$", x)
+    mean(dc) > 0.5 && all(dc | grepl("^[-+]?[0-9]+(\\.[0-9]+)?$", x))
+  })]
+}
+
+
+
+#' A hint for when names fail to match only because of letter case,
+#' whitespace, quotes, or punctuation such as `_`, `-`, and `.`.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x,y   The unmatched names from either side.
+#' @param what  "Sample" or "OTU".
+#'
+#' @return A cli bullet to splice into a message, or `NULL`. The bullet
+#'         refers to `near`, which is assigned in the caller's environment.
+#'
+near_match_hint <- function (x, y, what, env = parent.frame()) {
+
+  norm <- function (s) gsub("[^a-z0-9]+", "", tolower(s))
+  i    <- match(norm(x), norm(y))
+  i[!nzchar(norm(x))] <- NA
+
+  if (all(is.na(i))) return (NULL)
+
+  k <- which(!is.na(i))[[1]]
+  assign('near', c(x[[k]], y[[i[[k]]]]), envir = env)
+
+  c('i' = paste0(
+    what, " names differ only by case, whitespace, or punctuation: ",
+    "{.val {near[[1]]}} vs {.val {near[[2]]}}." ))
+}
+
+
+
 #' @noRd
 #' @keywords internal
 import_metadata <- function (value, sids) {
@@ -477,11 +701,15 @@ import_metadata <- function (value, sids) {
   # Load metadata from a file.
   #________________________________________________________
   untyped <- FALSE
+  src     <- NULL
   if (is_scalar_character(value)) {
     value   <- import_table(src = value)
     untyped <- isTRUE(attr(value, 'rbiom_untyped'))
+    src     <- attr(value, 'rbiom_src')
     attr(value, 'rbiom_untyped') <- NULL
+    attr(value, 'rbiom_src')     <- NULL
   }
+  in_src <- if (is.null(src)) "" else paste0(" in ", cli::format_inline("{.file {src}}"))
 
   #________________________________________________________
   # Convert data.frame/matrix to tibble.
@@ -515,6 +743,15 @@ import_metadata <- function (value, sids) {
 
 
   #________________________________________________________
+  # Numbers written with a decimal comma stay categorical.
+  #________________________________________________________
+  if (!is.null(src) && length(i <- decimal_comma_cols(value[-1])) > 0)
+    cli_warn(c(
+      '!' = "Looks like decimal commas in metadata{in_src}; read as categorical: {.val {i}}.",
+      'i' = "For numeric fields, re-export the file with {.val .} as the decimal mark." ))
+
+
+  #________________________________________________________
   # Convert all character cols (except .sample) to factor.
   #________________________________________________________
   value[['.sample']] %<>% as.character() %>% trimws()
@@ -528,25 +765,30 @@ import_metadata <- function (value, sids) {
   expected <- sids
   provided <- unique(value[['.sample']])
 
+  hint <- near_match_hint(setdiff(expected, provided), setdiff(provided, expected), "Sample")
+
   if (length(intersect(expected, provided)) == 0)
     cli_abort(c(
-      'i' = "No matching sample names.",
+      'i' = "No matching sample names between counts and metadata{in_src}.",
       '*' = "Expected: {.val {expected}}",
       '*' = "Provided: {.val {provided}}",
+      hint,
       'x' = "Can't subset to zero samples." ))
 
   if (length(i <- setdiff(expected, provided)) > 0)
-    cli_warn(c('i' = paste(
-      "Dropping {length(i)} sample{?s} from biom object",
-      "since they are not in the new metadata: {.val {i}}." )))
+    cli_warn(c(
+      'i' = paste(
+        "Dropping {length(i)} sample{?s} from biom object",
+        "since they are not in the new metadata{in_src}: {.val {i}}." ),
+      hint ))
 
   if (length(i <- setdiff(provided, expected)) > 0)
     cli_warn(c('i' = paste(
-      "Ignoring metadata for {length(i)} sample{?s}",
+      "Ignoring metadata{in_src} for {length(i)} sample{?s}",
       "not currently in biom object: {.val {i}}." )))
 
   value <- value[value[['.sample']] %in% expected,,drop=FALSE]
-  remove('expected', 'provided', 'i')
+  remove('expected', 'provided', 'i', 'hint')
 
 
   #________________________________________________________
@@ -595,6 +837,7 @@ import_taxonomy <- function (value, otus) {
   if (is_scalar_character(value)) {
     value <- import_table(src = value)
     attr(value, 'rbiom_untyped') <- NULL
+    attr(value, 'rbiom_src')     <- NULL
   }
 
   #________________________________________________________
@@ -699,10 +942,30 @@ import_taxonomy <- function (value, otus) {
 
 
   #________________________________________________________
-  # Split semicolon-separated lineages into one column per rank.
+  # Drop 'Size' column (from mothur's cons.taxonomy).
   #________________________________________________________
-  if (ncol(value) == 2 && any(grepl("[|;]", as.character(value[[2]])))) {
-    ssv <- split_lineages(value[[2]])
+  if (ncol(value) == 3 && identical(tolower(colnames(value)[[2]]), 'size'))
+    if (all(grepl("^[0-9]+$", as.character(value[[2]]))))
+      value <- value[,-2]
+
+
+  #________________________________________________________
+  # Split lineages into one column per rank. Separators are ';' or
+  # '|', or else ','. mothur's confidence scores, as in
+  # "Bacteria(100);Firmicutes(98);", are removed.
+  #________________________________________________________
+  sep <- NULL
+  if (ncol(value) == 2) {
+    lineage <- as.character(value[[2]])
+    if (any(grepl("[|;]", lineage)))                                { sep <- "[|;]"
+    } else if (isTRUE(mean(grepl(",.*,", lineage)) > 0.5))          { sep <- ","    }
+  }
+
+  if (!is.null(sep)) {
+    lineage <- gsub(paste0("\\([0-9.]+\\)(?=\\s*(", sep, "|$))"), "", lineage, perl = TRUE)
+    ssv <- split_lineages(lineage, sep = sep)
+    while (ncol(ssv) > 1 && all(is.na(ssv[,ncol(ssv)]))) # trailing separator
+      ssv <- ssv[,-ncol(ssv),drop=FALSE]
     colnames(ssv) <- default_taxa_ranks(ncol(ssv))
     ssv <- as_tibble(ssv, .name_repair = "minimal")
     for (i in seq_len(ncol(ssv))) ssv[[i]] <- as.factor(ssv[[i]])

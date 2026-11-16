@@ -167,6 +167,10 @@ adiv_corrplot <- function (
       #________________________________________________________
       if (nlevels(df$.adiv) > 1) facet.by %<>% c('.adiv')
 
+      # The caption starts with the input table; the test is added later.
+      .labs <- list()
+      if (isTRUE(caption)) .labs$caption <- input_table_caption(biom)
+
       .dots$ci.min %<>% if.null(0)
       .fn <- 'adiv_corrplot()'
     })
@@ -236,6 +240,8 @@ bdiv_corrplot <- function (
       # Strip '==' and '!='. Append to within/between.
       #________________________________________________________
       validate_var_cmp(c('stat.by', 'facet.by'))
+      within  <- unique(within)
+      between <- unique(between)
 
       validate_bdiv(multiple = TRUE)
       validate_var_choices('test', CHOICES$corr.bdiv.test)
@@ -274,17 +280,19 @@ bdiv_corrplot <- function (
 
 
       #________________________________________________________
-      # Facet by metric when there are several; caption the
-      # within/between selection.
+      # Facet by metric when there are several; caption the input
+      # table and the within/between selection (the test is added
+      # later).
       #________________________________________________________
       if (nlevels(df$.bdiv) > 1) facet.by %<>% c('.bdiv')
 
       .labs <- list(x = paste("Change in", x))
 
-      if (length(c(within, between)) > 0 && isTRUE(caption))
-        .labs$caption <- paste(sep = "\n", c(
-          if (length(within)  > 0) paste0("within: ",  paste(within,  collapse = ", ")),
-          if (length(between) > 0) paste0("between: ", paste(between, collapse = ", ")) ))
+      if (isTRUE(caption))
+        .labs$caption <- caption_lines(c(
+          input_table_caption(biom),
+          bdiv_caption(bdiv, alpha),
+          within_between_caption(within, between) ))
 
       .dots$ci.min %<>% if.null(0)
       .fn <- 'bdiv_corrplot()'
@@ -404,6 +412,13 @@ rare_corrplot_build <- function (params) {
         fun  = adiv_table ) %>% sprintf(fmt = "adiv_table(%s)")),
       "}))" )
 
+    # The caption states what was analysed: the table at ten depths.
+    # (In rare_multiplot(), the other panel's caption gives the line.)
+    .caption <- if (isTRUE(caption)) caption_lines(c(
+      input_table_caption(biom, depth = .depths),
+      if (!is.null(rline) && !eq(.fn, 'rare_multiplot()')) sprintf(
+        "Dashed line: %s reads per sample.", formatC(rline, format = "d", big.mark = ",")) ))
+
     remove(".depths", ".md", ".tbls")
 
 
@@ -417,6 +432,8 @@ rare_corrplot_build <- function (params) {
 
     .labs <- list(x = "Rarefaction Depth")
     if (nlevels(df$.adiv) > 1) .labs$y <- "Alpha Diversity"
+    if (!is.null(.caption))    .labs$caption <- .caption
+    remove(".caption")
 
     .dots$ci.min %<>% if.null(0)
   })
@@ -490,6 +507,9 @@ taxa_corrplot <- function (
       # Facet by taxon (and rank) when there are several.
       #________________________________________________________
       .labs <- list()
+
+      # The caption starts with the input table; the test is added later.
+      if (isTRUE(caption)) .labs$caption <- input_table_caption(biom)
 
       if (nlevels(df$.rank) > 1) facet.by %<>% c('.rank')
 

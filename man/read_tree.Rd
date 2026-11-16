@@ -8,7 +8,9 @@ read_tree(src, underscores = FALSE)
 }
 \arguments{
 \item{src}{Input data as either a file path, URL, or Newick string.
-Compressed (gzip or bzip2) files are also supported.}
+Compressed (gzip or bzip2) files and QIIME 2 \code{Phylogeny}
+artifacts (\code{.qza}) are also supported. NEXUS files are not; convert
+them with \code{ape::write.tree(ape::read.nexus(file), "tree.nwk")}.}
 
 \item{underscores}{When parsing the tree, should underscores be kept as
 is? By default they will be converted to spaces (unless the entire ID

@@ -3,6 +3,8 @@
 #'
 #' @param file   A file path, URL, or literal string with fasta-formatted
 #'        sequences. Files can optionally be compressed with gzip or bzip2.
+#'        QIIME 2 `FeatureData[Sequence]` artifacts (`.qza`) are also
+#'        supported.
 #'
 #' @param ids   Character vector of IDs to retrieve. The default, `NULL`,
 #'        will retrieve everything.
@@ -40,6 +42,8 @@ read_fasta <- function (file, ids = NULL) {
   #________________________________________________________
   fpath <- as_filepath(file)
   on.exit(fpath$cleanup(), add = TRUE)
+
+  check_qiime2_type(fpath, 'FeatureData[Sequence]', "sequences")
 
   if (!identical(fpath$format, 'text'))
     cli_abort("{.file {fpath$id}} is not a fasta file ({fpath$format} format detected).")

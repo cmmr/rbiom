@@ -25,6 +25,7 @@ taxa_heatmap(
   legend = "right",
   title = TRUE,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 }
@@ -152,9 +153,17 @@ no title, or any character string. Default: \code{TRUE}}
 Options are \code{"auto"}, \code{'0'}, \code{'30'}, and \code{'90'}.
 Default: \code{"auto"}.}
 
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: \code{TRUE}}
+
 \item{...}{Additional arguments to pass on to ggplot2::theme().
 Arguments prefixed with \code{labs.} go to ggplot2::labs() instead,
-for example \code{labs.subtitle = "Plot subtitle"}.}
+for example \code{labs.subtitle = "Plot subtitle"}. The caption
+states the input table (rarefied, unrarefied, or relative
+abundances) and how the taxa and samples were ordered;
+\code{labs.caption} replaces it (\code{labs.caption = NULL} for none).}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -243,10 +252,13 @@ Other taxa_abundance:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
+\code{\link[=taxa_shared]{taxa_shared()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
-\code{\link[=taxa_table]{taxa_table()}}
+\code{\link[=taxa_table]{taxa_table()}},
+\code{\link[=taxa_top]{taxa_top()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 
 Other visualization:
 \code{\link[=adiv_boxplot]{adiv_boxplot()}},
@@ -265,6 +277,7 @@ Other visualization:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}

@@ -87,8 +87,9 @@ default gray for the third. \code{TRUE} uses vermillion, blue, and
 gray; a palette name (e.g. \code{"okabe"}) uses its first two colors;
 \code{FALSE} draws everything in black. Default: \code{TRUE}}
 
-\item{caption}{Add a caption describing the method, the intervals, and
-which taxa are shown. Default: \code{TRUE}}
+\item{caption}{Add a caption describing the input table, the method,
+the intervals, the p-value adjustment, and which taxa are shown.
+Default: \code{TRUE}}
 
 \item{prev.cut}{Prevalence filter: taxa found in fewer than this
 proportion of the samples are not tested. Default: \code{0.1}}
@@ -177,10 +178,13 @@ Other taxa_abundance:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_da]{taxa_da()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
+\code{\link[=taxa_shared]{taxa_shared()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
 \code{\link[=taxa_stats]{taxa_stats()}},
 \code{\link[=taxa_sums]{taxa_sums()}},
-\code{\link[=taxa_table]{taxa_table()}}
+\code{\link[=taxa_table]{taxa_table()}},
+\code{\link[=taxa_top]{taxa_top()}},
+\code{\link[=taxa_upset]{taxa_upset()}}
 
 Other visualization:
 \code{\link[=adiv_boxplot]{adiv_boxplot()}},
@@ -199,6 +203,7 @@ Other visualization:
 \code{\link[=taxa_corrplot]{taxa_corrplot()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{taxa_abundance}

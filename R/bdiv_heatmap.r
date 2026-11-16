@@ -23,7 +23,10 @@
 #'
 #' @param ...   Additional arguments to pass on to ggplot2::theme().
 #'        Arguments prefixed with `labs.` go to ggplot2::labs() instead,
-#'        for example \code{labs.subtitle = "Plot subtitle"}.
+#'        for example \code{labs.subtitle = "Plot subtitle"}. The caption
+#'        states the input table (rarefied, unrarefied, or relative
+#'        abundances) and how the samples were ordered; `labs.caption`
+#'        replaces it (`labs.caption = NULL` for none).
 #'
 #'
 #' @section Annotation Tracks:
@@ -97,7 +100,7 @@ bdiv_heatmap <- function (
     grid = "devon", label = TRUE, label_size = NULL, rescale = "none",
     clust = "complete", trees = TRUE, asp = 1, tree_height = 10,
     track_height = 10, legend = "right", title = TRUE, xlab.angle = "auto",
-    alpha = 0.5, cpus = n_cpus(), ...) {
+    alpha = 0.5, caption = TRUE, cpus = n_cpus(), ...) {
 
   biom <- as_rbiom(biom)
   validate_tree(null_ok = TRUE)
@@ -127,6 +130,7 @@ bdiv_heatmap <- function (
         cli_abort("At least two samples are needed for a bdiv heatmap.")
 
       validate_title()
+      validate_bool('caption')
 
       if (!is_list(grid)) grid <- list(label = "Dissimilarity", colors = grid)
 
@@ -189,6 +193,11 @@ bdiv_heatmap_build <- function (params) {
       "mtx <- as.matrix(dm)" )
 
     .dist_code <- "dm"
+
+    # For the caption.
+    .caption    <- c(input_table_caption(biom), bdiv_caption(bdiv, alpha))
+    .dim_names  <- c("Samples", "Samples")
+    .dist_label <- "the plotted distances"
   })
 
 

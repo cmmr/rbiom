@@ -105,7 +105,9 @@ statistics. Default: \code{"none"}}
 
 \item{mu}{Reference value to test against. Default: \code{0}}
 
-\item{caption}{Add methodology caption beneath the plot.
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: \code{TRUE}}
 
 \item{check}{Generate additional plots to aid in assessing data normality.
@@ -182,6 +184,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{rarefaction}

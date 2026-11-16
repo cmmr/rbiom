@@ -102,9 +102,14 @@ that contain a tab, a double quote, or a line break are enclosed in double
 quotes (with embedded quotes doubled), and missing taxonomic ranks are
 written as empty strings. In the JSON format, numbers are written at full
 precision and missing values are \code{null}. In the HDF5 format, the order of
-metadata fields, logical fields, and \code{Date} fields (stored as ISO 8601
-strings) are preserved through attributes on the datasets, which other
-BIOM readers ignore.
+metadata fields, logical fields, \code{Date} fields (stored as ISO 8601
+strings), and the order of factor levels are preserved through attributes
+on the datasets, which other BIOM readers ignore.
+
+The order of factor levels is only kept by \code{write_biom(format = "hdf5")}.
+The JSON and tabular BIOM formats and \code{write_metadata()} have no place to
+record it, so categorical metadata read back from those files has its
+levels in alphabetical order. Unused factor levels are never written.
 
 For \code{write_xlsx()}, \code{attributes(biom)} are saved as additional worksheets if
 the attribute is a data frame, matrix, or dist -class object. An attribute

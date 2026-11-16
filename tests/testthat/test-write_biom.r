@@ -165,3 +165,37 @@ test_that("write_tree quotes newick metacharacters", {
   expect_identical(read_tree(f)$tip.label, hmp5$tree$tip.label)
   unlink(f)
 })
+
+
+test_that("factor level order is kept in-session, and lost by JSON/TSV", {
+
+  biom <- hmp50$clone()
+  lvls <- c("Stool", "Saliva", "Mid vagina", "Buccal mucosa", "Anterior nares")
+  md   <- biom$metadata
+  md$`Body Site` <- factor(md$`Body Site`, levels = lvls)
+  biom$metadata  <- md
+  expect_identical(levels(biom$metadata$`Body Site`), lvls)
+
+  # mutate -> subset -> rarefy keeps the order (minus unused levels).
+  x <- mutate(biom, Old = Age > 30)
+  expect_identical(levels(x$metadata$`Body Site`), lvls)
+  x <- subset(x, `Body Site` != "Saliva")
+  expect_identical(levels(x$metadata$`Body Site`), lvls[-2])
+  x <- rarefy(x)
+  expect_identical(levels(x$metadata$`Body Site`), lvls[-2])
+  x <- x[1:10]$clone()
+  expect_identical(levels(x$metadata$`Body Site`), intersect(lvls, x$metadata$`Body Site`))
+
+  skip_on_cran()
+
+  # JSON BIOM and write_metadata() don't record the order.
+  f <- tempfile(fileext = ".biom")
+  on.exit(unlink(f), add = TRUE)
+  write_biom(biom, f, 'json')
+  expect_identical(levels(read_biom(f)$metadata$`Body Site`), sort(lvls))
+
+  write_metadata(biom, f, overwrite = TRUE)
+  x <- min50$clone()
+  x$metadata <- f
+  expect_identical(levels(x$metadata$`Body Site`), sort(lvls))
+})

@@ -24,7 +24,9 @@
 #'        Arguments prefixed with `labs.` go to [ggplot2::labs()] instead,
 #'        for example `labs.subtitle = "Plot subtitle"`, and `base_size`,
 #'        `base_family`, `base_line_size`, and `base_rect_size` go to
-#'        [theme_rbiom()].
+#'        [theme_rbiom()]. The caption states how the rows and columns were
+#'        ordered; `labs.caption` replaces it (`labs.caption = NULL` for
+#'        none).
 #'
 #'
 #' @section Track Definitions:
@@ -123,7 +125,8 @@ plot_heatmap <- function (
     label = TRUE, label_size = NULL, rescale = "none",
     trees = TRUE, clust = "complete", dist = "euclidean",
     asp = 1, tree_height = 10, track_height = 10,
-    legend = "right", title = NULL, xlab.angle = "auto", ... ) {
+    legend = "right", title = NULL, xlab.angle = "auto", caption = TRUE,
+    ... ) {
 
   params <- eval_envir(environment(), ...)
 
@@ -169,6 +172,10 @@ plot_heatmap <- function (
 #   .mtx_code   - code lines that create `mtx` (default: the matrix's own
 #                 `cmd` attribute, else a literal matrix).
 #   .dist_code  - code for the `dist` object when one was given.
+#   .caption    - sentences to start the caption with (the input table).
+#   .dim_names  - what the rows and columns are, for the caption, e.g.
+#                 c("Taxa", "Samples"). Default: c("Rows", "Columns").
+#   .dist_label - what a given `dist` object holds, for the caption.
 #   .data_var / .plot_var - see plot_build().
 #________________________________________________________
 plot_heatmap_build <- function (params) {
@@ -193,6 +200,7 @@ plot_heatmap_build <- function (params) {
   legend       <- params$legend
   title        <- params$title
   xlab.angle   <- params$xlab.angle
+  caption      <- params$caption %||% TRUE
   dots         <- params$.dots
 
 
@@ -219,6 +227,7 @@ plot_heatmap_build <- function (params) {
   validate_sides('tree_height',  numeric = TRUE)
   validate_sides('track_height', numeric = TRUE)
   stopifnot(is.numeric(asp) && length(asp) == 1 && !is_na(asp))
+  validate_bool('caption')
   validate_var_choices('rescale', choices = CHOICES$rescale)
   validate_var_choices('legend',  choices = CHOICES$legend)
   xlab.angle <- as.character(xlab.angle)
@@ -433,6 +442,36 @@ plot_heatmap_build <- function (params) {
     }
 
     list(hc = hc, lines = lines, var = var)
+  }
+
+
+  #________________________________________________________
+  # Caption: any sentences from the calling function (`.caption`),
+  # then how the rows and columns were ordered. `labs.caption`
+  # replaces it (`labs.caption = NULL` for none).
+  #________________________________________________________
+  if (isTRUE(caption) && !'labs.caption' %in% names(dots)) {
+
+    dims       <- params$.dim_names  %||% c("Rows", "Columns")
+    dist_label <- params$.dist_label %||% "the given distances"
+
+    ordered <- c(
+      if (clust_wanted(clust_rows) && nrow(mtx) > 1) clust_caption(clust_rows, dist_rows, dist_label) else NA,
+      if (clust_wanted(clust_cols) && ncol(mtx) > 1) clust_caption(clust_cols, dist_cols, dist_label) else NA )
+
+    ordered <- if (all(is.na(ordered))) { NULL
+    } else if (eq(dims[[1]], dims[[2]]) && !anyNA(ordered) && eq(ordered[[1]], ordered[[2]])) {
+      sprintf("%s ordered by %s.", dims[[1]], ordered[[1]])
+    } else if (!anyNA(ordered) && eq(ordered[[1]], ordered[[2]])) {
+      sprintf("%s and %s ordered by %s.", dims[[1]], tolower(dims[[2]]), ordered[[1]])
+    } else {
+      paste(collapse = " ", sprintf("%s ordered by %s.", dims, ordered)[!is.na(ordered)])
+    }
+
+    cap <- caption_lines(params$.caption, ordered)
+    if (!is.null(cap)) labs_args[['caption']] <- cap
+
+    remove("dims", "dist_label", "ordered", "cap")
   }
 
 

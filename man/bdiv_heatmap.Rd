@@ -22,6 +22,7 @@ bdiv_heatmap(
   title = TRUE,
   xlab.angle = "auto",
   alpha = 0.5,
+  caption = TRUE,
   cpus = n_cpus(),
   ...
 )
@@ -106,6 +107,11 @@ Default: \code{"auto"}.}
 to give to relative abundances; a value between 0 and 1, inclusive.
 Setting \code{alpha=1} is equivalent to Normalized UniFrac. Default: \code{0.5}}
 
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: \code{TRUE}}
+
 \item{cpus}{The number of CPUs to use. Set to \code{NULL} to use all available,
 or to \code{1} to disable parallel processing. This also bounds R's
 linear algebra library (BLAS): when \code{cpus} is less than the number
@@ -117,7 +123,10 @@ Default: \code{ecodive::n_cpus()} (all available cores)}
 
 \item{...}{Additional arguments to pass on to ggplot2::theme().
 Arguments prefixed with \code{labs.} go to ggplot2::labs() instead,
-for example \code{labs.subtitle = "Plot subtitle"}.}
+for example \code{labs.subtitle = "Plot subtitle"}. The caption
+states the input table (rarefied, unrarefied, or relative
+abundances) and how the samples were ordered; \code{labs.caption}
+replaces it (\code{labs.caption = NULL} for none).}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -221,6 +230,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{beta_diversity}

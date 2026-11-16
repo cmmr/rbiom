@@ -72,7 +72,7 @@
 #' | `$otus`           | Character vector with new names for the OTUs.           |
 #' | `$samples`        | Character vector with new names for the samples.        |
 #' | `$tree`           | Phylo object with the phylogenetic tree for the OTUs.   |
-#' | `$sequences`      | Named character vector of OTU reference sequences.      |
+#' | `$sequences`      | Named character vector of OTU sequences, or fasta file. |
 #' | `$id`, `$comment` | String with dataset's title or comment.                 |
 #' | `$date`           | Date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string.     |
 #' 
@@ -540,10 +540,15 @@ rb_sequences <- function (self, private, value) {
   if (missing(value)) return (private$.sequences)
   
   
+  # A fasta file, URL, QIIME 2 artifact, or fasta string.
+  src <- value
+  if (is_scalar_character(value) && is.null(names(value)) && !is.na(value))
+    value <- read_fasta(value)
+
   if (!is_null(value) && !(is_character(value) && !is.null(names(value))))
-    cli_abort(c(x = "`value` must be NULL or a named character vector, not {.type {value}}."))
-  
-  
+    cli_abort(c(x = "`value` must be NULL, a named character vector, or a fasta file, not {.type {value}}."))
+
+
   if (is_character(value)) {
     
     names(value) %<>% trimws()
@@ -558,7 +563,7 @@ rb_sequences <- function (self, private, value) {
   
   private$.hash      <-  NULL
   private$.sequences <- value
-  prov_setter(self, 'sequences', value)
+  prov_setter(self, 'sequences', if (is.null(names(src))) src else value)
 }
 
 
@@ -584,8 +589,16 @@ rb_tree <- function (self, private, value) {
     
     otus <- private$.counts@Dimnames[[1]]
     tips <- value$tip.label <- trimws(value$tip.label)
-    if (length(missing <- setdiff(otus, tips)) > 0)
-      cli_abort(c('x' = sprintf("OTUs missing from tree: {missing}")))
+    if (length(missing <- setdiff(otus, tips)) > 0) {
+      extra <- setdiff(tips, otus)
+      hint  <- near_match_hint(missing, extra, "OTU")
+      cli_abort(c(
+        'x' = "OTUs missing from tree: {length(missing)} of {length(otus)}, e.g. {.val {head(missing, 5)}}.",
+        'i' = if (length(extra) > 0) "Tree tips not in the counts table: {length(extra)} of {length(tips)}, e.g. {.val {head(extra, 5)}}.",
+        hint,
+        'i' = if (!is.null(hint)) "Unquoted underscores in a Newick tree are read as spaces unless {.code underscores = TRUE}.",
+        'i' = "Every OTU must be a tip in the tree." ))
+    }
   }
   
   private$.hash      <- NULL

@@ -14,9 +14,10 @@ version 1.0 (JSON) or 2.1 (HDF5)
 classical tabular format. URLs must begin with \code{http://},
 \code{https://}, \code{ftp://}, or \code{ftps://}. JSON strings are
 recognized by their first non-whitespace character being \code{\{}.
-Compressed (gzip or bzip2) BIOM files are also supported. NOTE: to
-read HDF5 formatted BIOM files, the \code{h5lite} R package must be
-installed.}
+Compressed (gzip or bzip2) BIOM files are also supported, as are
+QIIME 2 feature table artifacts (\code{.qza}) and mothur \code{.shared}
+files. NOTE: to read HDF5 formatted BIOM files (including \code{.qza}
+feature tables), the \code{h5lite} R package must be installed.}
 
 \item{...}{Properties to set in the new rbiom object, for example,
 \code{metadata}, \code{id}, \code{comment}, or \code{tree}. These override the
@@ -36,7 +37,21 @@ For classic tabular files, the first column must hold OTU IDs and a column
 named \code{taxonomy} (or \code{lineage}) is parsed into taxonomic ranks. All other
 columns are abundance counts: blank cells are read as \code{0} with a warning,
 and columns containing non-numeric text are ignored with a warning.
-Empty taxonomic ranks are \code{NA}.
+Empty taxonomic ranks are \code{NA}. Numbers must use \code{.} as the decimal mark.
+
+mothur \code{.shared} files (samples in rows, with \code{label}, \code{Group}, and
+\code{numOtus} columns) are recognized and transposed. They must hold a single
+\code{label}.
+
+QIIME 2 artifacts (\code{.qza}) are unpacked automatically: a
+\code{FeatureTable} here, a \code{FeatureData[Taxonomy]} artifact as \code{taxonomy}, and
+a \code{Phylogeny} artifact as \code{tree} or in \code{\link[=read_tree]{read_tree()}}, and a
+\code{FeatureData[Sequence]} artifact in \code{\link[=read_fasta]{read_fasta()}}. Other artifact
+types, and visualizations (\code{.qzv}), are not supported.
+
+Categorical metadata is stored as factors, and HDF5 files written by
+\code{\link[=write_biom]{write_biom()}} restore the order of their levels. Otherwise, levels are
+in alphabetical order.
 }
 \examples{
     library(rbiom)

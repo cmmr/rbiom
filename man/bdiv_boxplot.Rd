@@ -170,7 +170,9 @@ unchanged. Must be a non-negative integer. Default: \code{0}}
 \item{permutations}{Number of random permutations to use.
 Default: \code{999}}
 
-\item{caption}{Add methodology caption beneath the plot.
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: \code{TRUE}}
 
 \item{alpha}{The alpha term to use in Generalized UniFrac. How much weight
@@ -265,6 +267,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{beta_diversity}

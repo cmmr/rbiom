@@ -10,6 +10,7 @@ rare_stacked(
   counts = TRUE,
   labels = TRUE,
   y.transform = "log10",
+  caption = TRUE,
   ...
 )
 }
@@ -32,11 +33,18 @@ rarefying to \code{rline} reads per sample. Default: \code{TRUE}.}
 Use \code{xaxis.transform} or \code{yaxis.transform} to pass custom values
 directly to ggplot2's \verb{scale_*} functions.}
 
+\item{caption}{Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: \code{TRUE}}
+
 \item{...}{Additional parameters to pass along to ggplot2 functions.
 Prefix a parameter name with \code{r.} to ensure it gets
 passed to (and only to) \link[ggplot2]{geom_hline}. For instance,
 \code{r.color = "black"} ensures only the horizontal rarefaction line
-has its color set to \code{"black"}.}
+has its color set to \code{"black"}. The caption states the rarefaction
+depth of the line; \code{labs.caption} replaces it
+(\code{labs.caption = NULL} for none).}
 }
 \value{
 A \code{ggplot2} plot. The computed data points and ggplot
@@ -80,6 +88,7 @@ Other visualization:
 \code{\link[=taxa_forest]{taxa_forest()}},
 \code{\link[=taxa_heatmap]{taxa_heatmap()}},
 \code{\link[=taxa_stacked]{taxa_stacked()}},
+\code{\link[=taxa_upset]{taxa_upset()}},
 \code{\link[=theme_rbiom]{theme_rbiom()}}
 }
 \concept{rarefaction}

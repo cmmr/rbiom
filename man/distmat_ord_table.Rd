@@ -43,10 +43,12 @@ Default: \code{ecodive::n_cpus()} (all available cores)}
 A tibble data.frame with columns \code{.ord}, \code{.sample},
 \code{.x}, \code{.y}, and (optionally) \code{.z}. The attribute
 \code{'axes'} is a tibble with one row per axis (\code{.ord}, \code{.axis},
-\code{.label}, \code{.var}): for PCoA, \code{.var} is the percent of the
-variance (the positive eigenvalues) explained by that axis and
+\code{.label}, \code{.var}, \code{.stress}): for PCoA, \code{.var} is the percent of
+the variance (the positive eigenvalues) explained by that axis and
 \code{.label} reads e.g. \code{"PCoA 1 (24.3\%)"}; for the other ordinations
-\code{.var} is \code{NA}.
+\code{.var} is \code{NA}. For NMDS, \code{.stress} is the stress of the solution
+(\code{\link[vegan:metaMDS]{vegan::metaMDS()}}'s \verb{$stress}, the same on every axis); for the
+other ordinations it is \code{NA}.
 }
 \description{
 Run ordinations on a distance matrix.

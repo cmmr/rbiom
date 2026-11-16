@@ -204,6 +204,10 @@ adiv_boxplot <- function (
       #________________________________________________________
       if (nlevels(df$.adiv) > 1) facet.by %<>% c('.adiv')
 
+      # The caption starts with the input table; the test is added later.
+      .labs <- list()
+      if (isTRUE(caption)) .labs$caption <- input_table_caption(biom)
+
       .fn <- 'adiv_boxplot()'
     })
 
@@ -276,6 +280,8 @@ bdiv_boxplot <- function (
       # Strip '==' and '!='. Append to within/between.
       #________________________________________________________
       validate_var_cmp(c('x', 'stat.by', 'facet.by'))
+      within  <- unique(within)    # `stat.by` defaults to `x`, so "==Sex" arrives twice
+      between <- unique(between)
 
       validate_bdiv(multiple = TRUE)
       validate_seed()
@@ -311,17 +317,19 @@ bdiv_boxplot <- function (
 
 
       #________________________________________________________
-      # Facet by metric when there are several; caption the
-      # within/between selection.
+      # Facet by metric when there are several; caption the input
+      # table and the within/between selection (the test is added
+      # later).
       #________________________________________________________
       if (nlevels(df$.bdiv) > 1) facet.by %<>% c('.bdiv')
 
       .labs <- list()
 
-      if (length(c(within, between)) > 0 && isTRUE(caption))
-        .labs$caption <- paste(sep = "\n", c(
-          if (length(within)  > 0) paste0("within: ",  paste(within,  collapse = ", ")),
-          if (length(between) > 0) paste0("between: ", paste(between, collapse = ", ")) ))
+      if (isTRUE(caption))
+        .labs$caption <- caption_lines(c(
+          input_table_caption(biom),
+          bdiv_caption(bdiv, alpha),
+          within_between_caption(within, between) ))
 
       .fn <- 'bdiv_boxplot()'
     })
@@ -416,6 +424,9 @@ taxa_boxplot <- function (
       # Percent labels for relative abundances.
       #________________________________________________________
       .labs <- list()
+
+      # The caption starts with the input table; the test is added later.
+      if (isTRUE(caption)) .labs$caption <- input_table_caption(biom)
 
       if (eq(transform, 'percent') || isTRUE(biom$relative))
         .dots$yaxis.labels %<>% if.null(as.cmd(scales::percent))

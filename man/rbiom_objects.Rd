@@ -66,7 +66,7 @@ validation checks and inter-component synchronization.\tabular{ll}{
    \verb{$otus} \tab Character vector with new names for the OTUs. \cr
    \verb{$samples} \tab Character vector with new names for the samples. \cr
    \verb{$tree} \tab Phylo object with the phylogenetic tree for the OTUs. \cr
-   \verb{$sequences} \tab Named character vector of OTU reference sequences. \cr
+   \verb{$sequences} \tab Named character vector of OTU sequences, or fasta file. \cr
    \verb{$id}, \verb{$comment} \tab String with dataset's title or comment. \cr
    \verb{$date} \tab Date-like object, or \code{"\%Y-\%m-\%dT\%H:\%M:\%SZ"} string. \cr
 }
