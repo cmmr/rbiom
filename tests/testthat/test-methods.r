@@ -108,7 +108,7 @@ test_that("data preparation comes from the history", {
   expect_mentions(txt, sprintf("rarefied to %s reads per sample", formatC(rare50$depth, format = "d", big.mark = ",")))
   expect_mentions(txt, "random seed 0", sprintf("comprised %i samples", rare50$n_samples))
   expect_mentions(txt, sprintf("rbiom %s", packageVersion("rbiom")), "ecodive")
-  expect_mentions(m_refs(rare50), "R Core Team", "Smith DP. rbiom:", "Smith DP. ecodive:")
+  expect_mentions(m_refs(rare50), "R Core Team", "Smith DP. rbiom:", "Smith DP, Cregeen SJJ, Petrosino JF (2026). ecodive:")
 
   # Subsetting, with the expression that was used.
   b <- subset(rare50, Age > 25)
@@ -180,7 +180,7 @@ test_that("regression models: emmeans, GAM, strata", {
   t   <- adiv_stats(rare50, regr = "Age", stat.by = "Sex", test = "emtrends", fit = "lm")
   txt <- m_text(t)
   expect_mentions(txt, "a linear model", "slope of alpha diversity against Age", "estimated marginal trends from the emmeans package")
-  expect_mentions(m_refs(t), "Lenth RV. emmeans:")
+  expect_mentions(m_refs(t), "Lenth R, Piaskowski J. emmeans:")
   expect_omits(m_refs(t), "Wood SN")
 
   p   <- adiv_corrplot(rare50, x = "Age", stat.by = "Sex", test = "emmeans", fit = "gam")
@@ -290,7 +290,7 @@ test_that("taxa abundance: rank, transform, selection, tests", {
   p   <- taxa_corrplot(rare50, x = "Age", rank = "Phylum", taxa = 2, stat.by = "Sex", test = "emtrends", fit = "lm")
   txt <- m_text(p)
   expect_mentions(txt, "the Phylum rank", "The 2 most abundant taxa", "slope of taxon abundance against Age", "each taxon", "emmeans")
-  expect_mentions(m_refs(p), "Lenth RV", "Benjamini Y, Hochberg Y (1995)")
+  expect_mentions(m_refs(p), "Lenth R, Piaskowski J", "Benjamini Y, Hochberg Y (1995)")
 
   t   <- taxa_table(rare50, rank = "Genus", taxa = 0.01, transform = "log1p")
   txt <- m_text(t)
@@ -527,4 +527,22 @@ test_that("metric references match ecodive's manual pages", {
     if (length(doi))
       expect(grepl(doi, ref$ref, fixed = TRUE),         sprintf("%s: doi %s", id, doi))
   }
+})
+
+
+test_that("package references match the packages' own citations", {
+
+  skip_on_cran()
+
+  # Hand-set author strings start with the first author in citation().
+  for (pkg in c("vegan", "emmeans", "Rtsne", "uwot")) {
+    skip_if_not_installed(pkg)
+    first <- utils::citation(pkg)[[1]]$author[[1]]$family
+    expect(startsWith(METHODS_PKGS[[pkg]]$authors, first),
+           sprintf("%s: authors should start with %s", pkg, first))
+  }
+
+  # ecodive is cited by its paper, with the DOI from its CITATION file.
+  doi <- utils::citation("ecodive")[[1]]$doi
+  expect(grepl(doi, CITATIONS$smith2026$ref, fixed = TRUE), "ecodive: DOI differs from citation('ecodive')")
 })

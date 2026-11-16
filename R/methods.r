@@ -33,16 +33,16 @@ CITATIONS <- list(
   # Ordination.
   gower1966 = list(
     cite = "Gower 1966",
-    ref  = "Gower JC (1966). Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika 53(3-4):325-338." ),
+    ref  = "Gower JC (1966). Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika 53(3-4):325-338. doi:10.2307/2333639" ),
   kruskal1964 = list(
     cite = "Kruskal 1964",
-    ref  = "Kruskal JB (1964). Multidimensional scaling by optimizing goodness of fit to a nonmetric hypothesis. Psychometrika 29(1):1-27." ),
+    ref  = "Kruskal JB (1964). Multidimensional scaling by optimizing goodness of fit to a nonmetric hypothesis. Psychometrika 29(1):1-27. doi:10.1007/BF02289565" ),
   maaten2008 = list(
     cite = "van der Maaten and Hinton 2008",
     ref  = "van der Maaten L, Hinton G (2008). Visualizing data using t-SNE. Journal of Machine Learning Research 9:2579-2605." ),
   mcinnes2018 = list(
     cite = "McInnes et al. 2018",
-    ref  = "McInnes L, Healy J, Melville J (2018). UMAP: Uniform Manifold Approximation and Projection for dimension reduction. arXiv:1802.03426." ),
+    ref  = "McInnes L, Healy J, Melville J (2018). UMAP: Uniform Manifold Approximation and Projection for dimension reduction. arXiv preprint arXiv:1802.03426." ),
 
   # Tests on distance matrices.
   anderson2001 = list(
@@ -53,7 +53,7 @@ CITATIONS <- list(
     ref  = "Anderson MJ (2006). Distance-based tests for homogeneity of multivariate dispersions. Biometrics 62(1):245-253." ),
   mielke2001 = list(
     cite = "Mielke and Berry 2001",
-    ref  = "Mielke PW, Berry KJ (2001). Permutation Methods: A Distance Function Approach. Springer, New York." ),
+    ref  = "Mielke PW, Berry KJ (2001). Permutation Methods: A Distance Function Approach. Springer Series in Statistics. Springer, New York." ),
   mantel1967 = list(
     cite = "Mantel 1967",
     ref  = "Mantel N (1967). The detection of disease clustering and a generalized regression approach. Cancer Research 27(2):209-220." ),
@@ -70,7 +70,7 @@ CITATIONS <- list(
     ref  = "Mann HB, Whitney DR (1947). On a test of whether one of two random variables is stochastically larger than the other. Annals of Mathematical Statistics 18(1):50-60." ),
   wood2011 = list(
     cite = "Wood 2011",
-    ref  = "Wood SN (2011). Fast stable restricted maximum likelihood and marginal likelihood estimation of semiparametric generalized linear models. Journal of the Royal Statistical Society: Series B 73(1):3-36." ),
+    ref  = "Wood SN (2011). Fast stable restricted maximum likelihood and marginal likelihood estimation of semiparametric generalized linear models. Journal of the Royal Statistical Society: Series B 73(1):3-36. doi:10.1111/j.1467-9868.2010.00749.x" ),
 
   # Differential abundance.
   zhou2022 = list(
@@ -78,24 +78,29 @@ CITATIONS <- list(
     ref  = "Zhou H, He K, Chen J, Zhang X (2022). LinDA: linear models for differential abundance analysis of microbiome compositional data. Genome Biology 23:95." ),
   kuznetsova2017 = list(
     cite = "Kuznetsova et al. 2017",
-    ref  = "Kuznetsova A, Brockhoff PB, Christensen RHB (2017). lmerTest package: tests in linear mixed effects models. Journal of Statistical Software 82(13):1-26." ),
+    ref  = "Kuznetsova A, Brockhoff PB, Christensen RHB (2017). lmerTest package: tests in linear mixed effects models. Journal of Statistical Software 82(13):1-26. doi:10.18637/jss.v082.i13" ),
 
   # Multiple comparisons.
   benjamini1995 = list(
     cite = "Benjamini and Hochberg 1995",
-    ref  = "Benjamini Y, Hochberg Y (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society: Series B 57(1):289-300." ),
+    ref  = "Benjamini Y, Hochberg Y (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society: Series B 57(1):289-300. doi:10.1111/j.2517-6161.1995.tb02031.x" ),
   benjamini2001 = list(
     cite = "Benjamini and Yekutieli 2001",
-    ref  = "Benjamini Y, Yekutieli D (2001). The control of the false discovery rate in multiple testing under dependency. Annals of Statistics 29(4):1165-1188." ),
+    ref  = "Benjamini Y, Yekutieli D (2001). The control of the false discovery rate in multiple testing under dependency. Annals of Statistics 29(4):1165-1188. doi:10.1214/aos/1013699998" ),
   holm1979 = list(
     cite = "Holm 1979",
     ref  = "Holm S (1979). A simple sequentially rejective multiple test procedure. Scandinavian Journal of Statistics 6(2):65-70." ),
   hochberg1988 = list(
     cite = "Hochberg 1988",
-    ref  = "Hochberg Y (1988). A sharper Bonferroni procedure for multiple tests of significance. Biometrika 75(4):800-802." ),
+    ref  = "Hochberg Y (1988). A sharper Bonferroni procedure for multiple tests of significance. Biometrika 75(4):800-802. doi:10.1093/biomet/75.4.800" ),
   hommel1988 = list(
     cite = "Hommel 1988",
-    ref  = "Hommel G (1988). A stagewise rejective multiple test procedure based on a modified Bonferroni test. Biometrika 75(2):383-386." ),
+    ref  = "Hommel G (1988). A stagewise rejective multiple test procedure based on a modified Bonferroni test. Biometrika 75(2):383-386. doi:10.1093/biomet/75.2.383" ),
+
+  # Software with a paper to cite (the package's own CITATION file).
+  smith2026 = list(
+    cite = "Smith et al. 2026",
+    ref  = "Smith DP, Cregeen SJJ, Petrosino JF (2026). ecodive: Parallel and Memory-Efficient R Package for Ecological Diversity Analysis. Journal of Open Source Software 11(121):9777. doi:10.21105/joss.09777" ),
 
   # Graphics.
   lex2014 = list(
@@ -272,9 +277,9 @@ CITATIONS <- c(CITATIONS, stats::setNames(METRIC_REFS, paste0("metric_", names(M
 # `key` is a paper in CITATIONS that is cited for the package instead.
 METHODS_PKGS <- list(
   rbiom    = list(authors = "Smith DP",                                title = "Integrated Analysis and Visualization of Microbiome Data"),
-  ecodive  = list(authors = "Smith DP",                                title = "Parallel and Memory-Efficient Ecological Diversity Metrics"),
-  vegan    = list(authors = "Oksanen J, Simpson GL, Blanchet FG, et al", title = "Community Ecology Package"),
-  emmeans  = list(authors = "Lenth RV",                                title = "Estimated Marginal Means, aka Least-Squares Means"),
+  ecodive  = list(key = 'smith2026'),
+  vegan    = list(authors = "Oksanen J, Simpson G, Blanchet F, et al", title = "Community Ecology Package"),
+  emmeans  = list(authors = "Lenth R, Piaskowski J",                   title = "Estimated Marginal Means, aka Least-Squares Means"),
   mgcv     = list(key = 'wood2011'),
   lmerTest = list(key = 'kuznetsova2017'),
   ggplot2  = list(key = 'wickham2016'),
