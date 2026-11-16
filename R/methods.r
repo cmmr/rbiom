@@ -30,43 +30,6 @@
 #________________________________________________________
 CITATIONS <- list(
 
-  # Alpha diversity.
-  shannon1948 = list(
-    cite = "Shannon 1948",
-    ref  = "Shannon CE (1948). A mathematical theory of communication. Bell System Technical Journal 27(3):379-423." ),
-  simpson1949 = list(
-    cite = "Simpson 1949",
-    ref  = "Simpson EH (1949). Measurement of diversity. Nature 163:688." ),
-  faith1992 = list(
-    cite = "Faith 1992",
-    ref  = "Faith DP (1992). Conservation evaluation and phylogenetic diversity. Biological Conservation 61(1):1-10." ),
-  chao1984 = list(
-    cite = "Chao 1984",
-    ref  = "Chao A (1984). Non-parametric estimation of the number of classes in a population. Scandinavian Journal of Statistics 11(4):265-270." ),
-
-  # Beta diversity.
-  bray1957 = list(
-    cite = "Bray and Curtis 1957",
-    ref  = "Bray JR, Curtis JT (1957). An ordination of the upland forest communities of southern Wisconsin. Ecological Monographs 27(4):325-349." ),
-  jaccard1912 = list(
-    cite = "Jaccard 1912",
-    ref  = "Jaccard P (1912). The distribution of the flora in the alpine zone. New Phytologist 11(2):37-50." ),
-  lozupone2005 = list(
-    cite = "Lozupone and Knight 2005",
-    ref  = "Lozupone C, Knight R (2005). UniFrac: a new phylogenetic method for comparing microbial communities. Applied and Environmental Microbiology 71(12):8228-8235." ),
-  lozupone2007 = list(
-    cite = "Lozupone et al. 2007",
-    ref  = "Lozupone CA, Hamady M, Kelley ST, Knight R (2007). Quantitative and qualitative beta diversity measures lead to different insights into factors that structure microbial communities. Applied and Environmental Microbiology 73(5):1576-1585." ),
-  chen2012 = list(
-    cite = "Chen et al. 2012",
-    ref  = "Chen J, Bittinger K, Charlson ES, Hoffmann C, Lewis J, Wu GD, Collman RG, Bushman FD, Li H (2012). Associating microbiome composition with environmental covariates using generalized UniFrac distances. Bioinformatics 28(16):2106-2113." ),
-  chang2011 = list(
-    cite = "Chang et al. 2011",
-    ref  = "Chang Q, Luan Y, Sun F (2011). Variance adjusted weighted UniFrac: a powerful beta diversity measure for comparing communities based on phylogeny. BMC Bioinformatics 12:118." ),
-  aitchison1986 = list(
-    cite = "Aitchison 1986",
-    ref  = "Aitchison J (1986). The Statistical Analysis of Compositional Data. Chapman and Hall, London." ),
-
   # Ordination.
   gower1966 = list(
     cite = "Gower 1966",
@@ -144,21 +107,164 @@ CITATIONS <- list(
 )
 
 
-# Which reference goes with which metric id (ecodive's ids).
-METRIC_CITATIONS <- c(
-  shannon                   = 'shannon1948',
-  simpson                   = 'simpson1949',
-  inv_simpson               = 'simpson1949',
-  faith                     = 'faith1992',
-  chao1                     = 'chao1984',
-  bray                      = 'bray1957',
-  jaccard                   = 'jaccard1912',
-  unweighted_unifrac        = 'lozupone2005',
-  weighted_unifrac          = 'lozupone2007',
-  normalized_unifrac        = 'lozupone2007',
-  generalized_unifrac       = 'chen2012',
-  variance_adjusted_unifrac = 'chang2011',
-  aitchison                 = 'aitchison1986' )
+# A reference for each diversity metric, keyed by ecodive's metric id:
+# the first reference on the metric's page in ecodive's manual (its
+# \references section), in the style of CITATIONS. Kept in step with
+# the installed ecodive by a test in test-methods.r.
+METRIC_REFS <- list(
+  ace = list(
+    cite = "Chao and Lee 1992",
+    ref  = "Chao A, Lee SM (1992). Estimating the number of classes via sample coverage. Journal of the American Statistical Association 87(417):210-217. doi:10.1080/01621459.1992.10475194" ),
+  aitchison = list(
+    cite = "Aitchison 1986",
+    ref  = "Aitchison J (1986). The statistical analysis of compositional data. Chapman and Hall. doi:10.1002/bimj.4710300705" ),
+  berger = list(
+    cite = "Berger and Parker 1970",
+    ref  = "Berger WH, Parker FL (1970). Diversity of planktonic foraminifera in deep-sea sediments. Science 168(3937):1345-1347. doi:10.1126/science.168.3937.1345" ),
+  bhattacharyya = list(
+    cite = "Bhattacharyya 1943",
+    ref  = "Bhattacharyya A (1943). On a measure of divergence between two statistical populations defined by their probability distributions. Bulletin of the Calcutta Mathematical Society 35:99-109." ),
+  bray = list(
+    cite = "Bray and Curtis 1957",
+    ref  = "Bray JR, Curtis JT (1957). An ordination of the upland forest communities of southern Wisconsin. Ecological Monographs 27(4):325-349. doi:10.2307/1942268" ),
+  brillouin = list(
+    cite = "Brillouin 1956",
+    ref  = "Brillouin L (1956). Science and information theory. Academic Press." ),
+  canberra = list(
+    cite = "Lance and Williams 1966",
+    ref  = "Lance GN, Williams WT (1966). Computer programs for hierarchical polythetic classification (\"similarity analyses\"). The Computer Journal 9(1):60-64. doi:10.1093/comjnl/9.1.60" ),
+  chao1 = list(
+    cite = "Chao 1984",
+    ref  = "Chao A (1984). Nonparametric estimation of the number of classes in a population. Scandinavian Journal of Statistics 11:265-270." ),
+  chebyshev = list(
+    cite = "Cantrell 2000",
+    ref  = "Cantrell CD (2000). Modern mathematical methods for physicists and engineers. Cambridge University Press." ),
+  chord = list(
+    cite = "Orl\u00f3ci 1967",
+    ref  = "Orl\u00f3ci L (1967). An agglomerative method for classification of plant communities. Journal of Ecology 55(1):193-206. doi:10.2307/2257725" ),
+  clark = list(
+    cite = "Clark 1952",
+    ref  = "Clark PJ (1952). An extension of the coefficient of divergence for use with multiple characters. Copeia 1952(2):61-64. doi:10.2307/1438598" ),
+  sorensen = list(
+    cite = "S\u00f8rensen 1948",
+    ref  = "S\u00f8rensen T (1948). A method of establishing groups of equal amplitude in plant sociology based on similarity of species content. Kongelige Danske Videnskabernes Selskab, Biologiske Skrifter 5:1-34." ),
+  divergence = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  euclidean = list(
+    cite = "Legendre and Legendre 2012",
+    ref  = "Legendre P, Legendre L (2012). Numerical ecology. Elsevier." ),
+  faith = list(
+    cite = "Faith 1992",
+    ref  = "Faith DP (1992). Conservation evaluation and phylogenetic diversity. Biological Conservation 61(1):1-10. doi:10.1016/0006-3207(92)91201-3" ),
+  fisher = list(
+    cite = "Fisher et al. 1943",
+    ref  = "Fisher RA, Corbet AS, Williams CB (1943). The relation between the number of species and the number of individuals in a random sample of an animal population. Journal of Animal Ecology 12:42-58. doi:10.2307/1411" ),
+  generalized_unifrac = list(
+    cite = "Chen et al. 2012",
+    ref  = "Chen J, Bittinger K, Charlson ES, Hoffmann C, Lewis J, Wu GD, ..., Li H (2012). Associating microbiome composition with environmental covariates using generalized UniFrac distances. Bioinformatics 28(16):2106-2113. doi:10.1093/bioinformatics/bts342" ),
+  simpson = list(
+    cite = "Simpson 1949",
+    ref  = "Simpson EH (1949). Measurement of diversity. Nature 163:688. doi:10.1038/163688a0" ),
+  gower = list(
+    cite = "Gower 1971",
+    ref  = "Gower JC (1971). A general coefficient of similarity and some of its properties. Biometrics 27(4):857-871. doi:10.2307/2528823" ),
+  hamming = list(
+    cite = "Hamming 1950",
+    ref  = "Hamming RW (1950). Error detecting and error correcting codes. Bell System Technical Journal 29(2):147-160. doi:10.1002/j.1538-7305.1950.tb00463.x" ),
+  hellinger = list(
+    cite = "Rao 1995",
+    ref  = "Rao CR (1995). A review of canonical coordinates and an alternative to correspondence analysis using Hellinger distance. Q\u00fcestii\u00f3 19:23-63." ),
+  horn = list(
+    cite = "Horn 1966",
+    ref  = "Horn HS (1966). Measurement of \"overlap\" in comparative ecological studies. The American Naturalist 100(914):419-424. doi:10.1086/282436" ),
+  inv_simpson = list(
+    cite = "Simpson 1949",
+    ref  = "Simpson EH (1949). Measurement of diversity. Nature 163:688. doi:10.1038/163688a0" ),
+  jaccard = list(
+    cite = "Jaccard 1912",
+    ref  = "Jaccard P (1912). The distribution of the flora in the alpine zone. New Phytologist 11(2):37-50. doi:10.1111/j.1469-8137.1912.tb05611.x" ),
+  jensen = list(
+    cite = "Endres and Schindelin 2003",
+    ref  = "Endres DM, Schindelin JE (2003). A new metric for probability distributions. IEEE Transactions on Information Theory 49(7):1858-1860. doi:10.1109/TIT.2003.813506" ),
+  jsd = list(
+    cite = "Lin 1991",
+    ref  = "Lin J (1991). Divergence measures based on the Shannon entropy. IEEE Transactions on Information Theory 37(1):145-151. doi:10.1109/18.61115" ),
+  lorentzian = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  manhattan = list(
+    cite = "Krause 1987",
+    ref  = "Krause EF (1987). Taxicab geometry: An adventure in non-Euclidean geometry. Dover Publications." ),
+  margalef = list(
+    cite = "Margalef 1958",
+    ref  = "Margalef R (1958). Information theory in ecology. General Systems 3:36-71." ),
+  matusita = list(
+    cite = "Matusita 1955",
+    ref  = "Matusita K (1955). Decision rules, based on the distance, for problems of fit, two samples, and estimation. The Annals of Mathematical Statistics 26(4):631-640. doi:10.1214/aoms/1177728422" ),
+  mcintosh = list(
+    cite = "McIntosh 1967",
+    ref  = "McIntosh RP (1967). An index of diversity and the relation of certain concepts to diversity. Ecology 48(3):392-404. doi:10.2307/1932674" ),
+  menhinick = list(
+    cite = "Menhinick 1964",
+    ref  = "Menhinick EF (1964). A comparison of some species-individuals diversity indices applied to samples of field insects. Ecology 45(4):859-861. doi:10.2307/1934933" ),
+  minkowski = list(
+    cite = "Deza and Deza 2009",
+    ref  = "Deza MM, Deza E (2009). Encyclopedia of distances. Springer." ),
+  morisita = list(
+    cite = "Morisita 1959",
+    ref  = "Morisita M (1959). Measuring of interspecific association and similarity between communities. Memoirs of the Faculty of Science, Kyushu University, Series E (Biology) 3:65-80." ),
+  motyka = list(
+    cite = "Motyka 1947",
+    ref  = "Motyka J (1947). O celach i metodach badan geobotanicznych. Annales Universitatis Mariae Curie-Sklodowska, Sectio C 3:1-168." ),
+  normalized_unifrac = list(
+    cite = "Lozupone et al. 2007",
+    ref  = "Lozupone CA, Hamady M, Kelley ST, Knight R (2007). Quantitative and qualitative beta diversity measures lead to different insights into factors that structure microbial communities. Applied and Environmental Microbiology 73(5):1576-1585. doi:10.1128/AEM.01996-06" ),
+  ochiai = list(
+    cite = "Ochiai 1957",
+    ref  = "Ochiai A (1957). Zoogeographic studies on the soleoid fishes found in Japan and its neighbouring regions. Bulletin of the Japanese Society of Scientific Fisheries 22:526-530." ),
+  psym_chisq = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  robust_aitchison = list(
+    cite = "Martino et al. 2019",
+    ref  = "Martino C, Morton JT, Marotz CA, Thompson LR, Tripathi A, Knight R, Zengler K (2019). A novel sparse compositional technique reveals microbial perturbations. mSystems 4(1):e00016-19. doi:10.1128/mSystems.00016-19" ),
+  shannon = list(
+    cite = "Shannon 1948",
+    ref  = "Shannon CE (1948). A mathematical theory of communication. Bell System Technical Journal 27:379-423." ),
+  soergel = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  squared_chisq = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  squared_chord = list(
+    cite = "Legendre and Legendre 2012",
+    ref  = "Legendre P, Legendre L (2012). Numerical ecology. Elsevier." ),
+  squared_euclidean = list(
+    cite = "Legendre and Legendre 2012",
+    ref  = "Legendre P, Legendre L (2012). Numerical ecology. Elsevier." ),
+  squares = list(
+    cite = "Alroy 2018",
+    ref  = "Alroy J (2018). Limits to species richness estimates based on subsampling. Paleobiology 44(2):177-194. doi:10.1017/pab.2017.38" ),
+  topsoe = list(
+    cite = "Topsoe 2000",
+    ref  = "Topsoe F (2000). Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory 46(4):1602-1609. doi:10.1109/18.850703" ),
+  unweighted_unifrac = list(
+    cite = "Lozupone and Knight 2005",
+    ref  = "Lozupone C, Knight R (2005). UniFrac: a new phylogenetic method for comparing microbial communities. Applied and Environmental Microbiology 71(12):8228-8235. doi:10.1128/AEM.71.12.8228-8235.2005" ),
+  variance_adjusted_unifrac = list(
+    cite = "Chang et al. 2011",
+    ref  = "Chang Q, Luan Y, Sun F (2011). Variance adjusted weighted UniFrac: a powerful beta diversity measure for comparing communities based on phylogeny. BMC Bioinformatics 12:118. doi:10.1186/1471-2105-12-118" ),
+  wave_hedges = list(
+    cite = "Cha 2007",
+    ref  = "Cha S-H (2007). Comprehensive survey on distance/similarity measures between probability density functions. International Journal of Mathematical Models and Methods in Applied Sciences 1(4):300-307." ),
+  weighted_unifrac = list(
+    cite = "Lozupone et al. 2007",
+    ref  = "Lozupone CA, Hamady M, Kelley ST, Knight R (2007). Quantitative and qualitative beta diversity measures lead to different insights into factors that structure microbial communities. Applied and Environmental Microbiology 73(5):1576-1585. doi:10.1128/AEM.01996-06" ) )
+
+# Metric references are cited through CITATIONS as "metric_<id>".
+CITATIONS <- c(CITATIONS, stats::setNames(METRIC_REFS, paste0("metric_", names(METRIC_REFS))))
 
 
 # R packages named in the software sentence: authors and a fallback
@@ -801,7 +907,7 @@ methods_metrics <- function (ids, div, ctx, alpha = NULL) {
     if (is.null(m)) return (x)
 
     name <- methods_metric_name(m$name)
-    key  <- METRIC_CITATIONS[m$id]
+    key  <- if (is.null(METRIC_REFS[[m$id]])) NA else paste0("metric_", m$id)
     note <- c(
       if (identical(m$id, 'generalized_unifrac') && is.numeric(alpha)) sprintf("alpha = %s", methods_num(alpha)),
       if (!is.na(key)) ctx$cite(unname(key)) )

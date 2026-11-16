@@ -483,3 +483,48 @@ test_that("the text is deterministic and leaves the result's code alone", {
   # An object built the same way twice gives the same text.
   expect_identical(rarefy(hmp50)$methods, rarefy(hmp50)$methods)
 })
+
+
+test_that("metric references match ecodive's manual pages", {
+
+  skip_on_cran()
+
+  db <- tools::Rd_db("ecodive")
+
+  # The first reference in a page's references section, as plain text.
+  first_ref <- function (id) {
+    rd <- db[[paste0(id, ".Rd")]]
+    if (is.null(rd)) return (NULL)
+    tags <- vapply(rd, function (x) attr(x, "Rd_tag"), "")
+    i    <- which(tags == "\\references")
+    if (!length(i)) return (NULL)
+    txt <- paste(utils::capture.output(tools::Rd2txt(
+      rd[i], fragment = TRUE,
+      options = list(underline_titles = FALSE, width = 100000L) )), collapse = "\n")
+    txt <- sub("^\\s*References:?\\s*", "", txt)
+    gsub("\\s+", " ", trimws(strsplit(txt, "\n\\s*\n")[[1]][[1]]))
+  }
+
+  for (id in ecodive::list_metrics()$id) {
+
+    eco <- first_ref(id)
+    ref <- METRIC_REFS[[id]]
+
+    if (is.null(eco)) {
+      expect(is.null(ref), sprintf("%s: ecodive has no reference, rbiom has one", id))
+      next
+    }
+    expect(!is.null(ref), sprintf("%s: ecodive's reference is missing from METRIC_REFS", id))
+    if (is.null(ref)) next
+
+    year   <- regmatches(eco, regexpr("\\(\\d{4}\\)", eco))
+    author <- sub(",.*$", "", eco)
+    doi    <- regmatches(eco, regexpr("10\\.\\d{4,}/[^ <>]+[^ <>.]", eco))
+
+    expect(grepl(year, ref$ref, fixed = TRUE),          sprintf("%s: year %s", id, year))
+    expect(startsWith(ref$ref, author),                 sprintf("%s: first author %s", id, author))
+    expect(startsWith(ref$cite, author),                sprintf("%s: in-text citation %s", id, ref$cite))
+    if (length(doi))
+      expect(grepl(doi, ref$ref, fixed = TRUE),         sprintf("%s: doi %s", id, doi))
+  }
+})
