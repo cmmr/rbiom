@@ -1,7 +1,8 @@
 
-# A stand-in for a multi-threaded BLAS that rbiom can control, so that
-# blas_limit() can be tested anywhere: R's BLAS is single-threaded on
-# Windows and CRAN. `fake$sets` records every count that was set.
+# A stand-in for a multi-threaded BLAS whose count ecodive::blas_threads()
+# can read and set, so that blas_limit() can be tested anywhere: R's BLAS
+# is single-threaded on Windows and CRAN. `fake$sets` records every count
+# that was set.
 local_fake_blas <- function (n = 6L, env = parent.frame()) {
 
   fake <- new.env()
@@ -9,7 +10,6 @@ local_fake_blas <- function (n = 6L, env = parent.frame()) {
   fake$sets <- integer(0)
 
   local_mocked_bindings(
-    blas_ctl     = function () TRUE,
     blas_threads = function (n = NULL) {
       if (is.null(n)) return (fake$n)
       fake$n    <- as.integer(n)
@@ -100,29 +100,25 @@ test_that("blas_limit does nothing it can't undo, or can't do", {
   for (cpus in list(NULL, NA, 0, -1, 1.5, "1", 1:2))
     expect_identical(count_in(fake, cpus), 6L)
   expect_identical(fake$sets, integer(0))
-
-  # The library's count can't be read.
-  fake$n <- NA_integer_
-  expect_identical(count_in(fake, 1L), NA_integer_)
-  expect_identical(fake$sets, integer(0))
 })
 
 
-test_that("blas_limit is silent and does nothing without control", {
+test_that("blas_limit is silent and does nothing when the count can't be read", {
 
-  fake <- local_fake_blas(6L)
-  local_mocked_bindings(blas_ctl = function () FALSE)
+  # ecodive::blas_threads() returns NA for R's reference BLAS, Accelerate,
+  # and any library it doesn't know.
+  fake <- local_fake_blas(NA_integer_)
 
   fun <- function () { blas_limit(1L); fake$n }
-  expect_silent(expect_identical(fun(), 6L))
+  expect_silent(expect_identical(fun(), NA_integer_))
   expect_identical(fake$sets, integer(0))
 })
 
 
-test_that("the real control is silent, whatever ecodive and the BLAS provide", {
+test_that("the real control is silent, whatever the BLAS", {
 
   before <- blas_threads()
-  if (!blas_ctl()) expect_identical(before, NA_integer_)
+  expect_true(is.na(before) || (is.integer(before) && before >= 1L))
 
   fun <- function () { blas_limit(1L); blas_threads() }
   expect_silent(n <- fun())
@@ -207,8 +203,7 @@ test_that("every exported function with `cpus` applies it before computing", {
 
 test_that("cpus limits a multi-threaded BLAS during an ordination", {
 
-  skip_if_not(blas_ctl(), "ecodive can't control the BLAS")
-  skip_if(is.na(blas_threads()) || blas_threads() < 2, "BLAS is single-threaded")
+  skip_if(is.na(blas_threads()) || blas_threads() < 2, "BLAS is single-threaded or its count can't be read")
   rlang::local_options(rbiom.cache_dir = FALSE)
 
   before <- blas_threads()

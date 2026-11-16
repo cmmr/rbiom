@@ -4,7 +4,7 @@ importFrom("dplyr",
            "slice", "slice_head", "slice_tail", "slice_min", "slice_max", "slice_sample",
            "filter", "relocate", "across", "everything", "left_join")
 
-importFrom("ecodive", "list_metrics", "match_metric", "n_cpus")
+importFrom("ecodive", "blas_threads", "list_metrics", "match_metric", "n_cpus")
 importFrom("emmeans", "emmeans", "emtrends", "eff_size")
 importFrom("ggnewscale", "new_scale_fill")
 importFrom("ggplot2", "aes", "ggsave", "%+replace%")

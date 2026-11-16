@@ -34,7 +34,7 @@ Imports:
     cli,
     cluster,
     dplyr,
-    ecodive (>= 2.3.1),
+    ecodive (>= 2.4.0),
     emmeans,
     ggnewscale,
     ggplot2 (>= 3.5.0),

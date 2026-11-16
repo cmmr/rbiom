@@ -93,11 +93,12 @@
   OpenBLAS on six cores, a PCoA of 4,020 samples used 55 s of processor 
   time in 15.5 s on an idle machine, and up to 148 s in 31 s on a busy 
   one. When `cpus` is less than the library's thread count, rbiom now runs
-  it on one thread until the call returns (that PCoA: 18.6 s, all of it on
+  it on one thread until the call returns (that PCoA: 17.5 s, all of it on
   one core) and then restores the setting, also after an error or an 
   interrupt. More BLAS threads were never more than about 20% faster in 
-  rbiom's computations, and two were five times slower than one. This 
-  needs an ecodive version that provides `blas_threads()`; until then 
+  rbiom's computations, and two were five times slower than one. The 
+  count is read and set with `ecodive::blas_threads()`, new in ecodive 
+  2.4.0; where it can't be read (R's reference BLAS, Apple's Accelerate), 
   nothing changes.
 * `taxa_stats()`, `taxa_boxplot()`, `taxa_corrplot()`, `taxa_da()`, 
   `taxa_forest()`, `stats_table()`, `stats_boxplot()`, `stats_corrplot()`, 
@@ -368,7 +369,7 @@
   already installed with vegan).
 * Suggests Rtsne instead of tsne.
 * Suggests lmerTest and lme4 (for `taxa_da()` with `strata`).
-* Requires ecodive (>= 2.3.1).
+* Requires ecodive (>= 2.4.0).
 
 
 # rbiom 3.1.1
