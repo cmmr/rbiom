@@ -174,7 +174,11 @@ The following entries in the track definitions are understood:
 \item{\code{range} - }{ The c(min,max) to use for scale values. }
 \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
 \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
-\item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+\item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to.
+For categorical values, a named vector assigns colors to specific values,
+e.g. \code{c('Male' = "blue", 'Female' = "red")}: names for values that
+aren't in the track are ignored, and values without a name get
+default colors. }
 \item{\code{na.color} - }{ The color to use for \code{NA} values. }
 \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
 \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }

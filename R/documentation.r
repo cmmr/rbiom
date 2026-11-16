@@ -215,20 +215,34 @@
 #'            \item{character vector - }{ Custom colors to use. E.g. `c("red", "#00FF00")` }
 #'            \item{named character vector - }{ Explicit mapping. E.g. `c(Male = "blue", Female = "red")` }
 #'        }
+#'        A named vector doesn't have to match the plotted groups exactly.
+#'        Names for groups that aren't in the plot (for instance, after
+#'        filtering samples) are ignored, and groups without a name get
+#'        default colors that aren't already in use. Any unnamed entries
+#'        in the vector are used for those groups first, in order. A
+#'        warning is given only when a name isn't recognized and a group
+#'        was left without one, as a misspelled name would do. Names can
+#'        be case-insensitive abbreviations (`c(m = "blue", f = "red")`).
+#'        For between-group beta diversity, a pair is named as its label
+#'        shows it, e.g. `c("Female vs Male" = "purple")`.
 #'        See "Aesthetics" section below for additional information.
 #'        Default: `TRUE`
 #'        
 #' @param shapes   Shapes for each group. 
 #'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, shape 
 #'        names (typically integers 0 - 17), or a named vector mapping 
-#'        groups to specific shape names.
+#'        groups to specific shape names. As with `colors`, names for
+#'        groups that aren't in the plot are ignored and groups without a
+#'        name get default shapes.
 #'        See "Aesthetics" section below for additional information.
 #'        Default: `TRUE`
 #'        
 #' @param patterns   Patterns for each group. 
 #'        Options are similar to `colors`'s: `TRUE`, `FALSE`, `NULL`, pattern 
 #'        names (`"brick"`, `"chevron"`, `"fish"`, `"grid"`, etc), or a named 
-#'        vector mapping groups to specific pattern names.
+#'        vector mapping groups to specific pattern names. As with
+#'        `colors`, names for groups that aren't in the plot are ignored
+#'        and groups without a name get default patterns.
 #'        See "Aesthetics" section below for additional information.
 #'        Default: `FALSE`
 #' 

@@ -71,7 +71,11 @@
 #'   \item{\code{range} - }{ The c(min,max) to use for scale values. }
 #'   \item{\code{label} - }{ Label for this track. Defaults to the name of this list element. }
 #'   \item{\code{side} - }{ Options are \code{"top"} (default) or \code{"left"}. }
-#'   \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to. }
+#'   \item{\code{colors} - }{ A pre-defined palette name or custom set of colors to map to.
+#'        For categorical values, a named vector assigns colors to specific values,
+#'        e.g. \code{c('Male' = "blue", 'Female' = "red")}: names for values that
+#'        aren't in the track are ignored, and values without a name get
+#'        default colors. }
 #'   \item{\code{na.color} - }{ The color to use for \code{NA} values. }
 #'   \item{\code{bins} - }{ Bin a gradient into this many bins/steps. }
 #'   \item{\code{guide} - }{ A list of arguments for guide_colorbar() or guide_legend(). }
@@ -596,9 +600,14 @@ plot_heatmap_build <- function (params) {
           colors <- get_n_colors(length(keys), colors)
 
         } else {
-          if (length(missing <- setdiff(keys, names(colors))) > 0)
-            cli_abort("Track {.val {track[['label']]}} is missing colors for {length(missing)} value{?s}: {.val {head(missing)}}.")
-          colors <- as.vector(colors[keys])
+          # Names for values that aren't in this track are ignored;
+          # values without a name get default colors.
+          colors <- resolve_named_aes(
+            x       = colors,
+            lvls    = keys,
+            default = get_n_colors(length(keys)),
+            what    = "colors",
+            by      = track[['label']] )
         }
       }
 
@@ -953,7 +962,7 @@ biom_tracks <- function (params, side = NULL) {
     key <- keys[[i]] %||% ""
     val <- tracks[[i]]
 
-    if (is.character(val) && !is.na(val)) {
+    if (is.character(val) && !anyNA(val)) {
       if (key == "" && length(val) == 1) {
         key <- val
         val <- list()
@@ -972,11 +981,10 @@ biom_tracks <- function (params, side = NULL) {
 
     } else {
 
-      # allow abbreviations in color mapping, e.g. sex = c(m = "blue", f = "red")
+      # Abbreviations in the color mapping, e.g. sex = c(m = "blue",
+      # f = "red"), and names for absent groups are handled by
+      # plot_heatmap(); see resolve_named_aes().
       validate_df_field('key', evar = 'tracks', col_type = "cat", drop_na = FALSE)
-      nms <- names(val$colors)
-      validate_var_choices('nms', choices = levels(df[[key]]), evar = key, max = Inf)
-      names(val$colors) <- nms
     }
 
     if (!is.null(side)) val$side <- side

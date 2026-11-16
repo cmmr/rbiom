@@ -2,6 +2,11 @@
 
 ## Reproducibility
 
+* `$methods` on any table, statistics table, plot, matrix, distance matrix, 
+  or rbiom object returns a paragraph for a manuscript's methods section: 
+  data preparation, metrics, ordination, tests, permutations, p-value 
+  adjustment, and software versions, followed by the references it cites. 
+  `fn_schema()` lists `"methods"` in `returns$has`.
 * Every rbiom object now records how it was made. `biom$history` lists the
   constructor call and each transformation (`subset()`, `rarefy()`, 
   `mutate()`, `[`, `biom_merge()`, ...), and `biom$code` prints them as a 
@@ -301,6 +306,18 @@
   or stress in its strip.
 * Fixed: `bdiv_boxplot(x = "==Sex")` captioned "within: Sex, Sex", and 
   deprecation warnings named `eval()` rather than the function called.
+* Named `colors`, `shapes`, and `patterns` no longer need a value for every 
+  group, and names for groups that aren't in the plot are ignored, so one 
+  map can serve every subset of a dataset. Groups without a name get the 
+  default palette, skipping values already in use. A warning is given only 
+  when an unrecognised name meets a group left without a value. Between-group
+  pairs such as "Female vs Male" can be named in either order. Heatmap track 
+  colors work the same way, and the documented shorthand 
+  `tracks = list('Body Site' = c(Saliva = "red", ...))` works again.
+* `taxa_forest(colors = )` accepts a named vector, keyed by `"Increased"`, 
+  `"Decreased"`, and `"Not significant"`, or for two groups by the `stat.by` 
+  groups. A named vector of two or three colors was previously applied by 
+  position.
 
 ## Figure style
 

@@ -26,13 +26,15 @@ print.rbiom_code <- function (x, ...) {
 #'
 #' `$code` assembles the full reproducible script (library calls, the rbiom
 #' object's history, the data step, and the statistics / ggplot2 code).
+#' `$methods` gives a manuscript-ready description of how the result was
+#' produced, with references (see methods.r).
 #'
 #' @noRd
 #' @keywords internal
 #' @export
 `$.rbiom_tbl` <- function (obj, nm) {
 
-  if (!nm %in% c('cmd', 'code', 'history', 'stats', 'taxa_coords', 'taxa_stats')) {
+  if (!nm %in% c('cmd', 'code', 'history', 'methods', 'stats', 'taxa_coords', 'taxa_stats')) {
     NextMethod()
 
   } else if (hasName(obj, nm)) {
@@ -40,6 +42,9 @@ print.rbiom_code <- function (x, ...) {
 
   } else if (nm == 'code') {
     assemble_code(obj)
+
+  } else if (nm == 'methods') {
+    methods_text(obj)
 
   } else {
 

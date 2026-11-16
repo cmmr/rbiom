@@ -35,6 +35,7 @@ Reading from fields will not change the rbiom object.\tabular{ll}{
    \verb{$date} \tab Date from BIOM file. \cr
    \verb{$history} \tab List of the calls that produced this object. \cr
    \verb{$code} \tab R code that reproduces this object (see below). \cr
+   \verb{$methods} \tab Methods text for a manuscript, with references (see below). \cr
 }
 }
 
@@ -47,6 +48,16 @@ Every rbiom object records how it was made. The constructor call
 \verb{$code} prints them as a runnable script. Tables, statistics, and plots
 derived from the object inherit this history, so their \verb{$code} is a
 complete, self-contained recipe.
+
+\verb{$methods} describes the same steps in prose: a short paragraph, written
+for the methods section of a manuscript, that states how the data were
+imported, subset, and rarefied, and names the software versions,
+followed by the references it cites. On a table, statistics table, or
+plot, \verb{$methods} also describes the analysis: the diversity metrics or
+taxonomic rank, the ordination, and the statistical test with its
+permutations and p-value adjustment. \code{print()} wraps the text;
+\code{as.character()} gives it as one string, and \code{attr(, "text")} and
+\code{attr(, "references")} give the paragraph and the references separately.
 
 Assigning directly to a field (e.g. \code{biom$metadata <- df}) is also
 recorded, but as a comment, since the assigned value only exists in memory.

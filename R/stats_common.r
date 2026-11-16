@@ -239,7 +239,7 @@ prov_result <- function (res, cmd = NULL, biom = NULL, data = NULL) {
 
 #' Provenance accessors for non-data.frame results.
 #'
-#' `$cmd`, `$history`, and `$code` on the matrices, distance matrices, and
+#' `$cmd`, `$history`, `$code`, and `$methods` on the matrices, distance matrices, and
 #' vectors returned by rbiom functions. Printing hides the provenance
 #' attributes.
 #'
@@ -248,7 +248,8 @@ prov_result <- function (res, cmd = NULL, biom = NULL, data = NULL) {
 #' @export
 `$.rbiom_obj` <- function (obj, nm) {
 
-  if (nm == 'code') return (assemble_code(obj))
+  if (nm == 'code')    return (assemble_code(obj))
+  if (nm == 'methods') return (methods_text(obj))
 
   val <- attr(obj, nm, exact = TRUE)
 

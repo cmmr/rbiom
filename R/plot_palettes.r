@@ -273,3 +273,146 @@ color_palette <- function (pal = NULL, n = NULL, keys = NULL) {
 
   return (colors)
 }
+
+
+
+#________________________________________________________
+# Resolve a named `colors`, `shapes`, or `patterns` vector to one value
+# per level, in level order. Used for plot groups and heat map tracks.
+#
+#   x       - The user's vector; at least one entry is named.
+#   lvls    - The levels being drawn.
+#   default - Fallback values (the plot's default palette).
+#   known   - Other values that a name may legitimately refer to, e.g.
+#             the field's levels in the input rbiom object.
+#   what    - "colors", "shapes", or "patterns"; `by` - what is mapped.
+#
+# Rules:
+#   * A name is matched to a level exactly; else as an "A vs B" pair
+#     given in the other order; else, unless it's one of `known`, as a
+#     case-insensitive abbreviation of a level that has no name yet.
+#   * Names that match no level are ignored. Since filtering samples
+#     drops a field's unused levels, a name for an absent group can't be
+#     told from a misspelled one, so a warning is given only when it
+#     matters: a name is unrecognized AND a level was left unnamed.
+#   * Levels without a name take the unnamed entries of `x`, in order,
+#     then the `default` values that aren't already in use.
+#________________________________________________________
+resolve_named_aes <- function (x, lvls, default, known = NULL, what = "colors", by = NULL) {
+
+  nms   <- names(x)
+  named <- !is.na(nms) & nzchar(nms)
+  pool  <- unname(as.list(x[!named]))
+  x     <- as.list(x[named])
+  nms   <- nms[named]
+
+  if (length(dups <- unique(nms[duplicated(nms)])) > 0)
+    cli_abort("Duplicated {qty(length(dups))} name{?s} in `{what}`: {.val {dups}}.")
+
+
+  # Splits "A vs B vs C" into every (left, right) pair.
+  #________________________________________________________
+  vs_splits <- function (nm) {
+    at <- gregexpr(" vs ", nm, fixed = TRUE)[[1]]
+    if (at[[1]] < 0) return (list())
+    lapply(at, function (i) c(substr(nm, 1, i - 1), substr(nm, i + 4, nchar(nm))))
+  }
+
+
+  # Which level does each name refer to?
+  #________________________________________________________
+  idx <- match(nms, lvls)
+
+  for (i in which(is.na(idx)))
+    for (ab in vs_splits(nms[[i]])) {
+      j <- match(paste(ab[[2]], "vs", ab[[1]]), lvls)
+      if (!is.na(j) && !j %in% idx) { idx[[i]] <- j; break }
+    }
+
+  is_known <- vapply(nms, FUN.VALUE = logical(1), USE.NAMES = FALSE, function (nm) {
+    if (nm %in% known) return (TRUE)
+    any(vapply(vs_splits(nm), function (ab) all(ab %in% known), logical(1)))
+  })
+
+  for (i in which(is.na(idx) & !is_known)) {
+    free <- setdiff(seq_along(lvls), idx)
+    j    <- free[pmatch(tolower(nms[[i]]), tolower(lvls[free]))]
+    if (is.na(j)) { # "f" is "Female", not "Female vs Male".
+      free <- free[!grepl(" vs ", lvls[free], fixed = TRUE)]
+      j    <- free[pmatch(tolower(nms[[i]]), tolower(lvls[free]))]
+    }
+    if (length(j) == 1 && !is.na(j)) idx[[i]] <- j
+  }
+
+
+  result <- vector("list", length(lvls))
+  result[idx[!is.na(idx)]] <- x[!is.na(idx)]
+  unnamed <- which(vapply(result, is.null, logical(1)))
+
+
+  # Fill in the levels that weren't named.
+  #________________________________________________________
+  if (length(unnamed) > 0) {
+
+    unknown <- nms[is.na(idx) & !is_known]
+
+    if (length(unknown) > 0)
+      cli_warn(c(
+        '!' = "Ignoring {qty(length(unknown))} name{?s} in `{what}` that {?doesn't/don't} match any{if (!is.null(by)) paste0(' ', by)} group: {.val {unknown}}.",
+        'i' = "Using default {what} for {.val {lvls[unnamed]}}." ))
+
+    # Compare colors by value, so that "red" and "#FF0000" are the same.
+    norm <- function (v) {
+      v <- unlist(lapply(v, as.character))
+      if (!eq(what, "colors") || length(v) == 0) return (v)
+      tryCatch(
+        expr  = grDevices::rgb(t(grDevices::col2rgb(v, alpha = TRUE)), maxColorValue = 255),
+        error = function (e) toupper(v) )
+    }
+
+    used    <- norm(c(x, pool))
+    default <- as.list(default)
+    unused  <- default[!norm(default) %in% used]
+    fill    <- c(pool, unused)
+
+    if (length(fill) < length(unnamed))
+      fill <- c(fill, rep_len(default, length(unnamed) - length(fill)))
+
+    result[unnamed] <- fill[seq_along(unnamed)]
+  }
+
+  return (unlist(result, use.names = FALSE))
+}
+
+
+
+#________________________________________________________
+# fillpattern's pattern names, for combining default patterns with
+# patterns that the user gave by name.
+#________________________________________________________
+PATTERN_NAMES <- c(
+  "brick", "chevron", "fish", "grid", "herringbone", "hexagon", "octagon",
+  "rain", "saw", "shingle", "rshingle", "stripe", "wave" )
+
+
+
+#________________________________________________________
+# Default shapes as ggplot2 shape names or letters, for combining with
+# shapes that the user gave as character strings.
+#________________________________________________________
+shape_names <- function (shapes) {
+
+  if (!is.numeric(shapes)) return (shapes)
+
+  pch <- c(
+    "square open", "circle open", "triangle open", "plus", "cross",
+    "diamond open", "triangle down open", "square cross", "asterisk",
+    "diamond plus", "circle plus", "star", "square plus", "circle cross",
+    "square triangle", "square", "circle small", "triangle", "diamond",
+    "circle", "bullet", "circle filled", "square filled", "diamond filled",
+    "triangle filled", "triangle down filled" )
+
+  vapply(shapes, FUN.VALUE = character(1), function (i) {
+    if (i >= 0 && i <= 25) pch[[i + 1]] else intToUtf8(i)
+  })
+}

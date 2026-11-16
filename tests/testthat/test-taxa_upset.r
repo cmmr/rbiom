@@ -187,7 +187,7 @@ test_that("taxa_upset: schema", {
 
   x <- fn_schema("taxa_upset")
   expect_identical(x$fn, "taxa_upset")
-  expect_identical(x$returns, list(type = "plot", has = c("data", "code", "stats")))
+  expect_identical(x$returns, list(type = "plot", has = c("data", "code", "methods", "stats")))
   expect_identical(x$counts, "rarefied")
   expect_identical(vapply(x$params, `[[`, "", 'name'), names(formals(taxa_upset)))
   expect_true(x$params[[2]]$required)

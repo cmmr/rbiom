@@ -380,7 +380,12 @@ prov_attach <- function (res, cmd = NULL, biom = NULL, data = NULL) {
   if (!is.null(cmd)) attr(res, 'cmd') <- as.character(cmd)
 
   if (inherits(biom, 'rbiom')) {
-    attr(res, 'history') <- prov_lines(biom)
+
+    # The history lines carry a description of the object they belong to
+    # (for `$methods`), so that it travels wherever the history is copied.
+    history <- prov_lines(biom)
+    attr(history, 'biom_info') <- prov_biom_info(biom)
+    attr(res, 'history') <- history
 
   } else if (!is.null(data)) {
     attr(res, 'history')  <- attr(data, 'history', exact = TRUE)
@@ -388,6 +393,43 @@ prov_attach <- function (res, cmd = NULL, biom = NULL, data = NULL) {
   }
 
   return (res)
+}
+
+
+#________________________________________________________
+# What `$methods` says about the rbiom object a result was made from:
+# its size and input_table_caption()'s description of the abundance
+# table. Kept per content hash, since every result made from an object
+# asks for it.
+#________________________________________________________
+PROV$info <- new.env()
+
+prov_biom_info <- function (biom) {
+
+  hash <- tryCatch(biom$hash, error = function (e) NULL)
+  memo <- is_scalar_character(hash) && !is.na(hash)
+
+  if (memo && !is.null(PROV$info[[hash]])) return (PROV$info[[hash]])
+
+  # input_table_caption() calls sample_sums(), whose result gets its
+  # provenance attached too; don't describe the object again for that.
+  if (isTRUE(PROV$describing)) return (NULL)
+  PROV$describing <- TRUE
+  on.exit(PROV$describing <- FALSE, add = TRUE)
+
+  info <- tryCatch(
+    error = function (e) NULL,
+    expr  = list(
+      samples = biom$n_samples,
+      otus    = biom$n_otus,
+      table   = input_table_caption(biom) ))
+
+  if (memo && !is.null(info)) {
+    if (length(PROV$info) >= 200L) PROV$info <- new.env()
+    PROV$info[[hash]] <- info
+  }
+
+  return (info)
 }
 
 

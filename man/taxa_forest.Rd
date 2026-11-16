@@ -85,7 +85,14 @@ the first-named group of the comparison (or that increase with
 taxa that aren't significant, in that order. Two colors use the
 default gray for the third. \code{TRUE} uses vermillion, blue, and
 gray; a palette name (e.g. \code{"okabe"}) uses its first two colors;
-\code{FALSE} draws everything in black. Default: \code{TRUE}}
+\code{FALSE} draws everything in black. A named vector sets colors by
+what they stand for instead of by position: the names can be
+the legend's labels, \code{"Increased"}, \code{"Decreased"}, and
+\code{"Not significant"}, or, when two groups are compared, the
+\code{stat.by} groups (e.g. \code{c(Saliva = "red", Stool = "brown")}), each
+coloring the taxa that are more abundant in that group. Names
+for other \code{stat.by} groups are ignored, and anything left
+unnamed keeps its default color. Default: \code{TRUE}}
 
 \item{caption}{Add a caption describing the input table, the method,
 the intervals, the p-value adjustment, and which taxa are shown.

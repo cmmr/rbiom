@@ -86,21 +86,29 @@ init_layers <- function (
         'patterns' = get_n_patterns(n = stat_nlvls) )
 
 
-    # Re-order named aesthetic values to match levels() order.
+    # Named values: one per level, in levels() order. Names for groups
+    # that aren't drawn are ignored; groups without a name get defaults.
     if (!is.null(names(x))) {
 
-      xn <- names(x)
-      validate_var_choices('xn', evar = i, choices = stat_lvls, max = Inf)
-      names(x) <- xn
-      remove("xn")
+      dflt <- switch(
+        EXPR = i,
+        'colors'   = get_n_colors(n = stat_nlvls),
+        'shapes'   = get_n_shapes(n = stat_nlvls),
+        'patterns' = get_n_patterns(n = stat_nlvls) )
 
-      if (length(missing <- setdiff(stat_lvls, names(x))) > 0)
-        cli_abort("Missing `{i}` for {.field {by}} {qty(length(missing))} level{?s} {.val {missing}}.")
+      # Defaults of the same type as the user's values.
+      if (eq(i, 'shapes')   && is.character(x)) dflt <- shape_names(dflt)
+      if (eq(i, 'patterns') && is.character(x)) dflt <- rep_len(PATTERN_NAMES, stat_nlvls)
 
-      if (length(dups <- unique(names(x)[duplicated(names(x))])) > 0)
-        cli_abort("Duplicated {qty(length(dups))} name{?s} in `{i}`: {.val {dups}}.")
+      x <- resolve_named_aes(
+        x       = x,
+        lvls    = stat_lvls,
+        default = dflt,
+        known   = aes_known_names(params$biom, by),
+        what    = i,
+        by      = if (!startsWith(by, '.')) by )
 
-      x <- as.vector(x[stat_lvls])
+      remove("dflt")
     }
 
 
@@ -138,6 +146,27 @@ init_layers <- function (
   return (invisible(layer_names))
 }
 
+
+
+
+#________________________________________________________
+# Group names that `colors` / `shapes` / `patterns` may refer to even
+# when that group isn't drawn: the field's values in the input rbiom
+# object, e.g. "Male" when only "Female vs Male" distances are plotted,
+# or a taxon that isn't among the most abundant.
+#________________________________________________________
+aes_known_names <- function (biom, by) {
+
+  if (!inherits(biom, 'rbiom') || !is_scalar_character(by)) return (NULL)
+
+  if (eq(by, '.taxa'))
+    return (unique(c(biom$otus, unlist(lapply(biom$taxonomy, as.character), use.names = FALSE))))
+
+  if (!hasName(biom$metadata, by)) return (NULL)
+
+  vals <- biom$metadata[[by]]
+  if (is.factor(vals)) levels(vals) else unique(as.character(vals))
+}
 
 
 

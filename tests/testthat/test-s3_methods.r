@@ -8,6 +8,7 @@ test_that("s3_methods", {
   expect_output(print(df$cmd)) # print.rbiom_code
   expect_output(print(df$code))
   expect_s3_class(df$history, 'rbiom_code')
+  expect_s3_class(df$methods, 'rbiom_methods')
 
   expect_silent(as.list(min5))   # as.list.rbiom
   expect_silent(as.matrix(min5)) # as.matrix.rbiom

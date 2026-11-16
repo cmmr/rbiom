@@ -163,6 +163,8 @@ S3method("$",          rbiom_plot)
 S3method("$",          rbiom_obj)
 S3method(print,        rbiom_obj)
 S3method(print,        rbiom_code)
+S3method(print,        rbiom_methods)
+S3method(format,       rbiom_methods)
 
 # Re-exports
 export("%>%")

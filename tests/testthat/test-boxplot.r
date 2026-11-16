@@ -171,8 +171,8 @@ test_that("boxplot errors", {
   expect_error(adiv_boxplot(rare50, x = "Sex", size = 2),        "not an argument")
   expect_error(adiv_boxplot(rare50, x = "Sex", colour.by = "Sex"), "not an argument")
   expect_error(adiv_boxplot(rare50, x = "Sex", color.by = "Sex"),  "color.by")
-  expect_error(adiv_boxplot(rare50, x = "Sex", colors = c(Male = "red", Zzz = "blue")), "Zzz")
-  expect_error(adiv_boxplot(rare50, x = "Sex", colors = c(Male = "red")), "Missing")
+  expect_warning(adiv_boxplot(rare50, x = "Sex", colors = c(Male = "red", Zzz = "blue")), "Zzz")
+  expect_error(adiv_boxplot(rare50, x = "Sex", colors = c(Male = "red", Male = "blue")), "Duplicated")
   expect_error(adiv_boxplot(rare50, x = "Sex", test = "nope"))
   expect_error(stats_boxplot(1:10), "data.frame")
 

@@ -324,13 +324,13 @@ STATS$rules <- list(
 # Return values.
 #________________________________________________________
 RETURNS <- list(
-  plot_stats = list(type = "plot", has = c("data", "code", "stats")),
-  plot       = list(type = "plot", has = c("data", "code")),
-  table      = list(type = "table", has = c("code")),
+  plot_stats = list(type = "plot", has = c("data", "code", "methods", "stats")),
+  plot       = list(type = "plot", has = c("data", "code", "methods")),
+  table      = list(type = "table", has = c("code", "methods")),
   factor     = list(type = "factor"),
-  matrix     = list(type = "matrix", has = c("code")),
-  dist       = list(type = "dist", has = c("code")),
-  biom       = list(type = "biom", has = c("code")),
+  matrix     = list(type = "matrix", has = c("code", "methods")),
+  dist       = list(type = "dist", has = c("code", "methods")),
+  biom       = list(type = "biom", has = c("code", "methods")),
   file       = list(type = "file")
 )
 
@@ -599,7 +599,7 @@ FN_SCHEMA <- list(
   bdiv_ord_table = list(
     counts  = 'rarefied',
     returns = like(RETURNS$table,
-      has  = c("code", "stats", "taxa_coords", "taxa_stats"),
+      has  = c("code", "methods", "stats", "taxa_coords", "taxa_stats"),
       note = "`stats` is set when `stat.by` is; `taxa_coords` and `taxa_stats` with a taxa biplot." ),
     params  = list(
       biom         = ARGS$biom,
@@ -949,7 +949,7 @@ FN_SCHEMA <- list(
       strata     = like(ARGS$strata, needs = 'lmerTest'),
       p.top      = ARGS$p.top,
       p.sig      = arg('number', min = 0, max = 1, max_n = 1),
-      colors     = arg('aesthetic', aes = 'color', forms = c('logical', 'values'), max_n = 3, note = "Up to three colors: taxa more abundant, less abundant, and not significant."),
+      colors     = arg('aesthetic', aes = 'color', by = 'stat.by', forms = c('logical', 'palette', 'values', 'named_values'), palettes = 'discrete', note = "Up to three unnamed colors: taxa more abundant, less abundant, and not significant. Or named by \"Increased\", \"Decreased\", \"Not significant\", or (two groups) the stat.by groups; other names are ignored."),
       caption    = ARGS$caption,
       prev.cut   = arg('number', min = 0, max = 1, max_n = 1),
       level      = ARGS$level,

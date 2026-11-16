@@ -27,7 +27,14 @@
 #'        taxa that aren't significant, in that order. Two colors use the
 #'        default gray for the third. `TRUE` uses vermillion, blue, and
 #'        gray; a palette name (e.g. `"okabe"`) uses its first two colors;
-#'        `FALSE` draws everything in black. Default: `TRUE`
+#'        `FALSE` draws everything in black. A named vector sets colors by
+#'        what they stand for instead of by position: the names can be
+#'        the legend's labels, `"Increased"`, `"Decreased"`, and
+#'        `"Not significant"`, or, when two groups are compared, the
+#'        `stat.by` groups (e.g. `c(Saliva = "red", Stool = "brown")`), each
+#'        coloring the taxa that are more abundant in that group. Names
+#'        for other `stat.by` groups are ignored, and anything left
+#'        unnamed keeps its default color. Default: `TRUE`
 #'
 #' @param caption   Add a caption describing the input table, the method,
 #'        the intervals, the p-value adjustment, and which taxa are shown.
@@ -233,7 +240,7 @@ taxa_forest_build <- function (params) {
   #________________________________________________________
   # Colors for the significance/direction categories.
   #________________________________________________________
-  params$colors   <- forest_colors(params$colors, labs, levels(data$.change))
+  params$colors   <- forest_colors(params$colors, labs, levels(data$.change), forest_groups(params, stat.by))
   params$color.by <- '.change'
   params$stat.by  <- NULL
 
@@ -345,7 +352,7 @@ forest_directions <- function (params, stats, stat.by, regr) {
 #________________________________________________________
 # Named colors for the `.change` levels that are present.
 #________________________________________________________
-forest_colors <- function (colors, labs, present) {
+forest_colors <- function (colors, labs, present, groups = NULL) {
 
   gray <- "#999999"
 
@@ -354,6 +361,9 @@ forest_colors <- function (colors, labs, present) {
 
   if (isTRUE(colors)) {
     colors <- c("#D55E00", "#0072B2", gray)
+
+  } else if (is.character(colors) && !is.null(names(colors))) {
+    colors <- forest_named_colors(colors, labs, present, groups, c("#D55E00", "#0072B2", gray))
 
   } else if (is_palette(colors)) {
     colors <- c(get_n_colors(2, colors), gray)
@@ -366,6 +376,63 @@ forest_colors <- function (colors, labs, present) {
   }
 
   stats::setNames(colors, labs)[present]
+}
+
+
+
+#________________________________________________________
+# The `stat.by` groups in the input, for naming colors by group.
+#________________________________________________________
+forest_groups <- function (params, stat.by) {
+  if (is.null(stat.by)) return (NULL)
+  vals <- pull(params$biom, stat.by)
+  if (is.factor(vals)) levels(vals) else unique(as.character(vals))
+}
+
+
+
+#________________________________________________________
+# Colors given by name. A name can be a legend label (`labs`), one of
+# "Increased" / "Decreased" / "Not significant" (case-insensitive), or,
+# when the labels are "Higher in <group>", that group. Names for other
+# `stat.by` groups are ignored; other names are too, with a warning when
+# a direction that's drawn was left without a color of its own.
+#________________________________________________________
+forest_named_colors <- function (colors, labs, present, groups, defaults) {
+
+  nms   <- names(colors)
+  named <- !is.na(nms) & nzchar(nms)
+
+  if (!all(named))
+    cli_abort("`colors` must be either all named or all unnamed.")
+
+  if (length(dups <- unique(nms[duplicated(nms)])) > 0)
+    cli_abort("Duplicated {qty(length(dups))} name{?s} in `colors`: {.val {dups}}.")
+
+  generic <- c("increased", "decreased", "not significant")
+  aliases <- list(labs, generic, sub("^Higher in ", "", labs))
+
+  idx <- rep(NA_integer_, length(nms))
+  for (alias in aliases) {
+    todo      <- is.na(idx)
+    key       <- if (identical(alias, generic)) tolower(nms) else nms
+    hit       <- match(key, alias)
+    hit[hit %in% idx] <- NA  # Labels already claimed by a more exact name.
+    idx[todo] <- hit[todo]
+  }
+
+  result      <- defaults
+  result[idx[!is.na(idx)]] <- unname(colors[!is.na(idx)])
+
+  unknown <- setdiff(nms[is.na(idx)], groups)
+  unnamed <- setdiff(intersect(labs[1:2], present), labs[idx])
+
+  if (length(unknown) > 0 && length(unnamed) > 0)
+    cli_warn(c(
+      '!' = "Ignoring {qty(length(unknown))} name{?s} in `colors` that {?doesn't/don't} match a legend label or group: {.val {unknown}}.",
+      'i' = "Using default colors for {.val {unnamed}}. Names can be {.val {labs}}." ))
+
+  return (result)
 }
 
 
