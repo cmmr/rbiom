@@ -100,9 +100,10 @@ were at most about 20% faster on an idle machine, and slower on a busy
 one or for model fits. With the default <code>cpus</code>, all available cores, the
 library is left as it is. The number of BLAS threads can change results
 only by rounding in the last digits (around 1e-15).</p>
-<p>This needs a version of 'ecodive' that provides <code>blas_threads()</code>. R's
-reference BLAS (the default on Windows and macOS) is single-threaded, so
-there is nothing to limit; Apple's Accelerate can't be limited this way.
+<p>The count is read and set with <code><a href="https://cmmr.github.io/ecodive/reference/blas_threads.html" class="external-link">ecodive::blas_threads()</a></code>, which also
+reports it. R's reference BLAS (the default on Windows and macOS) is
+single-threaded, so there is nothing to limit; Apple's Accelerate can't
+be limited this way.
 To limit the library for a whole R process instead, set an environment
 variable such as <code>OPENBLAS_NUM_THREADS=1</code> before R starts.</p>
     </div>

@@ -34,11 +34,13 @@ one or for model fits. With the default `cpus`, all available cores, the
 library is left as it is. The number of BLAS threads can change results
 only by rounding in the last digits (around 1e-15).
 
-This needs a version of 'ecodive' that provides `blas_threads()`. R's
-reference BLAS (the default on Windows and macOS) is single-threaded, so
-there is nothing to limit; Apple's Accelerate can't be limited this way.
-To limit the library for a whole R process instead, set an environment
-variable such as `OPENBLAS_NUM_THREADS=1` before R starts.
+The count is read and set with
+[`ecodive::blas_threads()`](https://cmmr.github.io/ecodive/reference/blas_threads.html),
+which also reports it. R's reference BLAS (the default on Windows and
+macOS) is single-threaded, so there is nothing to limit; Apple's
+Accelerate can't be limited this way. To limit the library for a whole R
+process instead, set an environment variable such as
+`OPENBLAS_NUM_THREADS=1` before R starts.
 
 ## See also
 
