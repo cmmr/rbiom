@@ -117,8 +117,14 @@ taxa_forest(
   are less abundant (or decrease), and for taxa that aren't significant,
   in that order. Two colors use the default gray for the third. `TRUE`
   uses vermillion, blue, and gray; a palette name (e.g. `"okabe"`) uses
-  its first two colors; `FALSE` draws everything in black. Default:
-  `TRUE`
+  its first two colors; `FALSE` draws everything in black. A named
+  vector sets colors by what they stand for instead of by position: the
+  names can be the legend's labels, `"Increased"`, `"Decreased"`, and
+  `"Not significant"`, or, when two groups are compared, the `stat.by`
+  groups (e.g. `c(Saliva = "red", Stool = "brown")`), each coloring the
+  taxa that are more abundant in that group. Names for other `stat.by`
+  groups are ignored, and anything left unnamed keeps its default color.
+  Default: `TRUE`
 
 - caption:
 

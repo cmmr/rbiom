@@ -88,7 +88,7 @@ not create a second object. See <a href="speed.html">speed ups</a> for more deta
 
 
 
-<p>Reading from fields will not change the rbiom object.</p><table class="table table"><tr><td><strong>Accessor</strong></td><td><strong>Content</strong></td></tr><tr><td><code>$counts</code></td><td>Abundance of each OTU in each sample.</td></tr><tr><td><code>$metadata</code></td><td>Sample mappings to metadata (treatment, patient, etc).</td></tr><tr><td><code>$taxonomy</code></td><td>OTU mappings to taxonomic ranks (genus, phylum, etc).</td></tr><tr><td><code>$otus</code>, <code>$n_otus</code></td><td>OTU names.</td></tr><tr><td><code>$samples</code>, <code>$n_samples</code></td><td>Sample names.</td></tr><tr><td><code>$fields</code>, <code>$n_fields</code></td><td>Metadata field names.</td></tr><tr><td><code>$ranks</code>, <code>$n_ranks</code></td><td>Taxonomic rank names.</td></tr><tr><td><code>$tree</code>, <code>$sequences</code></td><td>Phylogenetic tree / sequences for the OTUs, or <code>NULL</code>.</td></tr><tr><td><code>$id</code>, <code>$comment</code></td><td>Arbitrary strings for describing the dataset.</td></tr><tr><td><code>$depth</code></td><td>Rarefaction depth, or <code>NULL</code> if unrarefied.</td></tr><tr><td><code>$relative</code></td><td><code>TRUE</code> when counts are relative abundances (sum to 1).</td></tr><tr><td><code>$date</code></td><td>Date from BIOM file.</td></tr><tr><td><code>$history</code></td><td>List of the calls that produced this object.</td></tr><tr><td><code>$code</code></td><td>R code that reproduces this object (see below).</td></tr></table></div>
+<p>Reading from fields will not change the rbiom object.</p><table class="table table"><tr><td><strong>Accessor</strong></td><td><strong>Content</strong></td></tr><tr><td><code>$counts</code></td><td>Abundance of each OTU in each sample.</td></tr><tr><td><code>$metadata</code></td><td>Sample mappings to metadata (treatment, patient, etc).</td></tr><tr><td><code>$taxonomy</code></td><td>OTU mappings to taxonomic ranks (genus, phylum, etc).</td></tr><tr><td><code>$otus</code>, <code>$n_otus</code></td><td>OTU names.</td></tr><tr><td><code>$samples</code>, <code>$n_samples</code></td><td>Sample names.</td></tr><tr><td><code>$fields</code>, <code>$n_fields</code></td><td>Metadata field names.</td></tr><tr><td><code>$ranks</code>, <code>$n_ranks</code></td><td>Taxonomic rank names.</td></tr><tr><td><code>$tree</code>, <code>$sequences</code></td><td>Phylogenetic tree / sequences for the OTUs, or <code>NULL</code>.</td></tr><tr><td><code>$id</code>, <code>$comment</code></td><td>Arbitrary strings for describing the dataset.</td></tr><tr><td><code>$depth</code></td><td>Rarefaction depth, or <code>NULL</code> if unrarefied.</td></tr><tr><td><code>$relative</code></td><td><code>TRUE</code> when counts are relative abundances (sum to 1).</td></tr><tr><td><code>$date</code></td><td>Date from BIOM file.</td></tr><tr><td><code>$history</code></td><td>List of the calls that produced this object.</td></tr><tr><td><code>$code</code></td><td>R code that reproduces this object (see below).</td></tr><tr><td><code>$methods</code></td><td>Methods text for a manuscript, with references (see below).</td></tr></table></div>
     <div class="section level2">
     <h2 id="provenance">Provenance<a class="anchor" aria-label="anchor" href="#provenance"></a></h2>
 
@@ -100,6 +100,15 @@ not create a second object. See <a href="speed.html">speed ups</a> for more deta
 <code>$code</code> prints them as a runnable script. Tables, statistics, and plots
 derived from the object inherit this history, so their <code>$code</code> is a
 complete, self-contained recipe.</p>
+<p><code>$methods</code> describes the same steps in prose: a short paragraph, written
+for the methods section of a manuscript, that states how the data were
+imported, subset, and rarefied, and names the software versions,
+followed by the references it cites. On a table, statistics table, or
+plot, <code>$methods</code> also describes the analysis: the diversity metrics or
+taxonomic rank, the ordination, and the statistical test with its
+permutations and p-value adjustment. <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> wraps the text;
+<code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> gives it as one string, and <code>attr(, "text")</code> and
+<code>attr(, "references")</code> give the paragraph and the references separately.</p>
 <p>Assigning directly to a field (e.g. <code>biom$metadata &lt;- df</code>) is also
 recorded, but as a comment, since the assigned value only exists in memory.
 Prefer the transformation functions, or build the object from files, when

@@ -221,7 +221,11 @@ The following entries in the track definitions are understood:
 
 - `colors` - :
 
-  A pre-defined palette name or custom set of colors to map to.
+  A pre-defined palette name or custom set of colors to map to. For
+  categorical values, a named vector assigns colors to specific values,
+  e.g. `c('Male' = "blue", 'Female' = "red")`: names for values that
+  aren't in the track are ignored, and values without a name get default
+  colors.
 
 - `na.color` - :
 

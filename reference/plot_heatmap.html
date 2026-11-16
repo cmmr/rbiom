@@ -274,7 +274,11 @@ heatmap grid to visualize associated metadata values.</p>
 <dd><p>Options are <code>"top"</code> (default) or <code>"left"</code>.</p></dd>
 
 <dt><code>colors</code> - </dt>
-<dd><p>A pre-defined palette name or custom set of colors to map to.</p></dd>
+<dd><p>A pre-defined palette name or custom set of colors to map to.
+For categorical values, a named vector assigns colors to specific values,
+e.g. <code>c('Male' = "blue", 'Female' = "red")</code>: names for values that
+aren't in the track are ignored, and values without a name get
+default colors.</p></dd>
 
 <dt><code>na.color</code> - </dt>
 <dd><p>The color to use for <code>NA</code> values.</p></dd>

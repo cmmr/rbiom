@@ -35,6 +35,7 @@ Reading from fields will not change the rbiom object.
 | `$date` | Date from BIOM file. |
 | `$history` | List of the calls that produced this object. |
 | `$code` | R code that reproduces this object (see below). |
+| `$methods` | Methods text for a manuscript, with references (see below). |
 
 ## Provenance
 
@@ -48,6 +49,18 @@ each subsequent transformation
 are appended to `$history`, and `$code` prints them as a runnable
 script. Tables, statistics, and plots derived from the object inherit
 this history, so their `$code` is a complete, self-contained recipe.
+
+`$methods` describes the same steps in prose: a short paragraph, written
+for the methods section of a manuscript, that states how the data were
+imported, subset, and rarefied, and names the software versions,
+followed by the references it cites. On a table, statistics table, or
+plot, `$methods` also describes the analysis: the diversity metrics or
+taxonomic rank, the ordination, and the statistical test with its
+permutations and p-value adjustment.
+[`print()`](https://rdrr.io/r/base/print.html) wraps the text;
+[`as.character()`](https://rdrr.io/r/base/character.html) gives it as
+one string, and `attr(, "text")` and `attr(, "references")` give the
+paragraph and the references separately.
 
 Assigning directly to a field (e.g. `biom$metadata <- df`) is also
 recorded, but as a comment, since the assigned value only exists in

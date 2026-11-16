@@ -236,7 +236,7 @@ and
 #> [1] "plot"
 #> 
 #> $has
-#> [1] "data"  "code"  "stats"
+#> [1] "data"    "code"    "methods" "stats"  
 #> 
     str(x$params[[10]])
 #> List of 6
@@ -248,5 +248,5 @@ and
 #>  $ desc   : chr "Method for computing p-values."
 
     fn_schema("rarefy", json = TRUE)
-#> {"fn":"rarefy","returns":{"type":"biom","has":["code"]},"counts":"unrarefied","params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} 
+#> {"fn":"rarefy","returns":{"type":"biom","has":["code","methods"]},"counts":"unrarefied","params":[{"name":"biom","type":"biom","required":true,"r_only":true,"desc":"An rbiom object, or any value accepted by `as_rbiom()`."},{"name":"depth","type":"integer","min":1,"max_n":1,"null":"Chosen automatically, as by suggest_rarefy_depth().","default":null,"desc":"The number of observations to keep per sample."},{"name":"seed","type":"integer","min":0,"max_n":1,"default":0,"desc":"Random seed for selecting which observations to keep."},{"name":"inflate","type":"logical","max_n":1,"default":false,"desc":"Logical. Handling for non-integer data (e.g. relative abundances)."},{"name":"clone","type":"logical","r_only":true,"max_n":1,"default":true,"desc":"Create a copy of `biom` before modifying."},{"name":"cpus","type":"integer","r_only":true,"min":1,"max":256,"max_n":1,"null":"All available cores.","default":null,"default_expr":"n_cpus()","default_note":"All available cores.","desc":"The number of CPUs to use."}]} 
 ```
