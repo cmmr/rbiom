@@ -21,6 +21,7 @@ plot_heatmap(
   legend = "right",
   title = NULL,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 ```
@@ -142,6 +143,12 @@ plot_heatmap(
   Angle of the labels at the bottom of the plot. Options are `"auto"`,
   `'0'`, `'30'`, and `'90'`. Default: `"auto"`.
 
+- caption:
+
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
+
 - ...:
 
   Additional arguments to pass on to
@@ -152,6 +159,8 @@ plot_heatmap(
   `base_size`, `base_family`, `base_line_size`, and `base_rect_size` go
   to
   [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md).
+  The caption states how the rows and columns were ordered;
+  `labs.caption` replaces it (`labs.caption = NULL` for none).
 
 ## Value
 
@@ -261,6 +270,7 @@ Other visualization:
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

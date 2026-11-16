@@ -78,7 +78,13 @@ rarefy(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Does not affect results. Default:
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
   [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
   (all available cores)
 

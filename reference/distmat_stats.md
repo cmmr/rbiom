@@ -14,7 +14,8 @@ distmat_stats(
   test = "adonis2",
   seed = 0,
   permutations = 999,
-  strata = NULL
+  strata = NULL,
+  cpus = n_cpus()
 )
 ```
 
@@ -93,6 +94,19 @@ distmat_stats(
   `attr(dm, 'Labels')` order). How permutations are restricted depends
   on whether `groups` varies within strata; see Details. Default: `NULL`
   (samples are exchangeable).
+
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
 
 ## Value
 

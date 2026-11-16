@@ -11,6 +11,7 @@ rare_stacked(
   counts = TRUE,
   labels = TRUE,
   y.transform = "log10",
+  caption = TRUE,
   ...
 )
 ```
@@ -46,13 +47,21 @@ rare_stacked(
   `"log10"`. Use `xaxis.transform` or `yaxis.transform` to pass custom
   values directly to ggplot2's `scale_*` functions.
 
+- caption:
+
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
+
 - ...:
 
   Additional parameters to pass along to ggplot2 functions. Prefix a
   parameter name with `r.` to ensure it gets passed to (and only to)
   [geom_hline](https://ggplot2.tidyverse.org/reference/geom_abline.html).
   For instance, `r.color = "black"` ensures only the horizontal
-  rarefaction line has its color set to `"black"`.
+  rarefaction line has its color set to `"black"`. The caption states
+  the rarefaction depth of the line; `labs.caption` replaces it
+  (`labs.caption = NULL` for none).
 
 ## Value
 
@@ -83,6 +92,7 @@ Other visualization:
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
@@ -131,9 +141,10 @@ Other visualization:
 #>     color      = "#D55E00", 
 #>     linetype   = "dashed" ) +
 #>   labs(
-#>     fill = "Reads", 
-#>     x    = NULL, 
-#>     y    = "Sequencing Depth\n(log10 scale)" ) +
+#>     caption = "Rarefaction depth (dashed line): 1,183 reads per sample.", 
+#>     fill    = "Reads", 
+#>     x       = NULL, 
+#>     y       = "Sequencing Depth\n(log10 scale)" ) +
 #>   scale_fill_manual(values = c('Excluded' = "#BBBBBB", 'Retained' = "#0072B2")) +
 #>   scale_x_discrete() +
 #>   scale_y_continuous(

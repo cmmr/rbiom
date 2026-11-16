@@ -5,7 +5,7 @@ Run ordinations on a distance matrix.
 ## Usage
 
 ``` r
-distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
+distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, cpus = n_cpus(), ...)
 ```
 
 ## Arguments
@@ -53,6 +53,19 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
   they are reproducible. PCoA is deterministic. Must be a non-negative
   integer. Default: `0`
 
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
+
 - ...:
 
   Additional arguments for the `ord` function. For tSNE, `perplexity`
@@ -62,10 +75,14 @@ distmat_ord_table(dm, ord = "PCoA", k = 2L, seed = 0, ...)
 
 A tibble data.frame with columns `.ord`, `.sample`, `.x`, `.y`, and
 (optionally) `.z`. The attribute `'axes'` is a tibble with one row per
-axis (`.ord`, `.axis`, `.label`, `.var`): for PCoA, `.var` is the
-percent of the variance (the positive eigenvalues) explained by that
+axis (`.ord`, `.axis`, `.label`, `.var`, `.stress`): for PCoA, `.var` is
+the percent of the variance (the positive eigenvalues) explained by that
 axis and `.label` reads e.g. `"PCoA 1 (24.3%)"`; for the other
-ordinations `.var` is `NA`.
+ordinations `.var` is `NA`. For NMDS, `.stress` is the stress of the
+solution
+([`vegan::metaMDS()`](https://vegandevs.github.io/vegan/reference/metaMDS.html)'s
+`$stress`, the same on every axis); for the other ordinations it is
+`NA`.
 
 ## See also
 
@@ -93,9 +110,9 @@ Other ordination:
 #> 6 PCoA  HMP06   -0.414 -0.00703
 
     attr(ord, 'axes')
-#> # A tibble: 2 × 4
-#>   .ord  .axis .label          .var
-#>   <fct> <chr> <chr>          <dbl>
-#> 1 PCoA  .x    PCoA 1 (21.6%)  21.6
-#> 2 PCoA  .y    PCoA 2 (14.7%)  14.7
+#> # A tibble: 2 × 5
+#>   .ord  .axis .label          .var .stress
+#>   <fct> <chr> <chr>          <dbl>   <dbl>
+#> 1 PCoA  .x    PCoA 1 (21.6%)  21.6      NA
+#> 2 PCoA  .y    PCoA 2 (14.7%)  14.7      NA
 ```

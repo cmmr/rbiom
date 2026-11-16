@@ -26,6 +26,7 @@ taxa_heatmap(
   legend = "right",
   title = TRUE,
   xlab.angle = "auto",
+  caption = TRUE,
   ...
 )
 ```
@@ -209,11 +210,20 @@ taxa_heatmap(
   Angle of the labels at the bottom of the plot. Options are `"auto"`,
   `'0'`, `'30'`, and `'90'`. Default: `"auto"`.
 
+- caption:
+
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
+
 - ...:
 
   Additional arguments to pass on to ggplot2::theme(). Arguments
   prefixed with `labs.` go to ggplot2::labs() instead, for example
-  `labs.subtitle = "Plot subtitle"`.
+  `labs.subtitle = "Plot subtitle"`. The caption states the input table
+  (rarefied, unrarefied, or relative abundances) and how the taxa and
+  samples were ordered; `labs.caption` replaces it
+  (`labs.caption = NULL` for none).
 
 ## Value
 
@@ -296,10 +306,13 @@ Other taxa_abundance:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
+[`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
 [`taxa_sums()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md),
-[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+[`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 Other visualization:
 [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md),
@@ -318,6 +331,7 @@ Other visualization:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

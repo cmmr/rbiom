@@ -203,7 +203,9 @@ statistics. Default: <code>"none"</code></p></dd>
 
 
 <dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
-<dd><p>Add methodology caption beneath the plot.
+<dd><p>Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
 Default: <code>TRUE</code></p></dd>
 
 
@@ -214,7 +216,12 @@ Default: <code>FALSE</code></p></dd>
 
 <dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
 <dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
-or to <code>1</code> to disable parallel processing. Does not affect results.
+or to <code>1</code> to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when <code>cpus</code> is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+<a href="rbiom-package.html">rbiom-package</a>. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
 Default: <code><a href="https://cmmr.github.io/ecodive/reference/n_cpus.html" class="external-link">ecodive::n_cpus()</a></code> (all available cores)</p></dd>
 
 
@@ -273,6 +280,7 @@ letters instead of shapes on the plot. Character strings may used as well.</p>
 <code><a href="taxa_forest.html">taxa_forest()</a></code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap()</a></code>,
 <code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
+<code><a href="taxa_upset.html">taxa_upset()</a></code>,
 <code><a href="theme_rbiom.html">theme_rbiom()</a></code></p></div>
     </div>
 

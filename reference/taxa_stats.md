@@ -26,7 +26,8 @@ taxa_stats(
   level = 0.95,
   alt = "!=",
   mu = 0,
-  p.adj = "fdr"
+  p.adj = "fdr",
+  cpus = n_cpus()
 )
 ```
 
@@ -184,6 +185,19 @@ taxa_stats(
   spans the entire returned table: every combination of `split.by`
   strata, `stat.by` pairs, and `at` positions. Default: `"fdr"`
 
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
+
 ## Value
 
 A tibble data.frame with the fields below. The R code used to generate
@@ -263,9 +277,12 @@ Other taxa_abundance:
 [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
+[`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_sums()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md),
-[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+[`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 Other stats_tables:
 [`adiv_stats()`](https://cmmr.github.io/rbiom/reference/adiv_stats.md),

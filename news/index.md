@@ -127,6 +127,31 @@
   and
   [`write_xlsx()`](https://cmmr.github.io/rbiom/reference/write_biom.md)
   gain a `cpus` argument, like their beta diversity counterparts.
+- `cpus` also bounds R’s linear algebra library (BLAS). OpenBLAS, MKL,
+  and BLIS start up to one thread per core for operations such as the
+  eigendecomposition in a PCoA, whatever `cpus` says: with `cpus = 1`
+  and OpenBLAS on six cores, a PCoA of 4,020 samples used 55 s of
+  processor time in 15.5 s on an idle machine, and up to 148 s in 31 s
+  on a busy one. When `cpus` is less than the library’s thread count,
+  rbiom now runs it on one thread until the call returns (that PCoA:
+  18.6 s, all of it on one core) and then restores the setting, also
+  after an error or an interrupt. More BLAS threads were never more than
+  about 20% faster in rbiom’s computations, and two were five times
+  slower than one. This needs an ecodive version that provides
+  `blas_threads()`; until then nothing changes.
+- [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
+  [`taxa_boxplot()`](https://cmmr.github.io/rbiom/reference/taxa_boxplot.md),
+  [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
+  [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
+  [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
+  [`stats_table()`](https://cmmr.github.io/rbiom/reference/stats_table.md),
+  [`stats_boxplot()`](https://cmmr.github.io/rbiom/reference/stats_boxplot.md),
+  [`stats_corrplot()`](https://cmmr.github.io/rbiom/reference/stats_corrplot.md),
+  [`distmat_stats()`](https://cmmr.github.io/rbiom/reference/distmat_stats.md),
+  and
+  [`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md)
+  gain a `cpus` argument, which bounds the linear algebra threads of
+  their model fits, permutation tests, and ordinations.
 - Dropped rows with missing values and comparisons that could not be
   computed are reported in one message / warning instead of silently
   ignored.
@@ -229,6 +254,54 @@
   as do
   [`tree_subset()`](https://cmmr.github.io/rbiom/reference/tree_subset.md)
   calls that differ only in `underscores`.
+
+### Importing files
+
+- QIIME 2 artifacts are read directly:
+  [`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md)
+  and [`as_rbiom()`](https://cmmr.github.io/rbiom/reference/as_rbiom.md)
+  take a feature table `.qza`, `taxonomy =` a taxonomy `.qza`, `tree =`
+  and
+  [`read_tree()`](https://cmmr.github.io/rbiom/reference/read_tree.md) a
+  phylogeny `.qza`, and
+  [`read_fasta()`](https://cmmr.github.io/rbiom/reference/read_fasta.md)
+  and `sequences =` a sequence `.qza`. Visualizations (`.qzv`), other
+  artifact types, and an artifact given to the wrong reader are errors
+  that name what the file is.
+- `biom$sequences <-` and `as_rbiom(sequences = )` accept a fasta file,
+  URL, or fasta string as well as a named character vector.
+- [`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md)
+  reads mothur `.shared` files. mothur taxonomy files have their `(100)`
+  confidence scores and `Size` column removed, and lineages separated by
+  commas are split into ranks.
+- `write_biom(format = "hdf5")` records the order of factor levels, and
+  [`read_biom()`](https://cmmr.github.io/rbiom/reference/read_biom.md)
+  restores it. A factor whose labels look like numbers is now read back
+  as a factor. The JSON and tabular formats and
+  [`write_metadata()`](https://cmmr.github.io/rbiom/reference/write_biom.md)
+  cannot record the order.
+- `write_biom(format = "hdf5")` writes the tree in the form that the
+  Python biom-format package expects; it previously rejected rbiom’s
+  HDF5 files that had a tree.
+- Import errors name the file and the problem: decimal commas in counts
+  (an error) or metadata (a warning; the field stays categorical), Excel
+  or binary files given as counts, UTF-16 text, NEXUS and other
+  non-Newick tree files, and trees whose tips don’t match the OTUs (with
+  counts and examples from both sides). Sample or OTU names that differ
+  only by case, whitespace, or punctuation are pointed out.
+- Text files in Latin-1 encoding are read instead of failing.
+
+### Shared and dominant taxa
+
+- [`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md)
+  lists the most abundant taxa overall, per metadata group, or per
+  sample.
+- [`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md)
+  reports which taxa each group has, at a chosen detection level and
+  prevalence, and the size of every combination of groups. With no
+  grouping it gives the core taxa of the whole dataset.
+- [`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
+  draws those combinations as an UpSet plot.
 
 ### Describing and checking arguments
 
@@ -345,6 +418,26 @@
   heatmaps, `rare_stacked(labels = TRUE)`, `xlab.angle`, empty
   statistics tables, and ordination ellipses for small groups.
 - Plot titles use readable metric names.
+- Every plot’s caption states the input table (rarefied to a depth,
+  unrarefied, or relative abundances) and the method: the metric and its
+  parameters, the test, the p-value adjustment, and the number of
+  permutations. Heatmaps, stacked bar plots, and rarefaction plots have
+  captions and a `caption` argument, and
+  [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md)
+  has a caption without `stat.by`.
+- NMDS stress is reported: in the `.stress` column of the `axes`
+  attribute of
+  [`distmat_ord_table()`](https://cmmr.github.io/rbiom/reference/distmat_ord_table.md)
+  and
+  [`bdiv_ord_table()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_table.md),
+  and in the caption of
+  [`bdiv_ord_plot()`](https://cmmr.github.io/rbiom/reference/bdiv_ord_plot.md).
+  Faceted ordinations show each panel’s percent variance or stress in
+  its strip.
+- Fixed: `bdiv_boxplot(x = "==Sex")` captioned “within: Sex, Sex”, and
+  deprecation warnings named
+  [`eval()`](https://rdrr.io/r/base/eval.html) rather than the function
+  called.
 
 ### Figure style
 

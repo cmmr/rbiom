@@ -13,7 +13,8 @@ read_fasta(file, ids = NULL)
 - file:
 
   A file path, URL, or literal string with fasta-formatted sequences.
-  Files can optionally be compressed with gzip or bzip2.
+  Files can optionally be compressed with gzip or bzip2. QIIME 2
+  `FeatureData[Sequence]` artifacts (`.qza`) are also supported.
 
 - ids:
 

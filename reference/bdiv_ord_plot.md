@@ -218,7 +218,9 @@ bdiv_ord_plot(
 
 - caption:
 
-  Add methodology caption beneath the plot. Default: `TRUE`
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
 
 - alpha:
 
@@ -229,7 +231,13 @@ bdiv_ord_plot(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Does not affect results. Default:
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
   [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
   (all available cores)
 
@@ -259,6 +267,11 @@ ellipse. The **taxon** layer uses the ggrepel package to avoid
 overlapping labels when it is installed, and plain labels otherwise.
 Facet strips (or the subtitle) show the test statistic, R-squared
 (PERMANOVA), and p-value from `$stats`.
+
+The caption states the input table (rarefied, unrarefied, or relative
+abundances), the NMDS stress, and the test. When facets have different
+ordinations, the axis titles can't give each one's percent of variance
+(PCoA) or stress (NMDS), so the facet strips do.
 
 ## See also
 
@@ -293,6 +306,7 @@ Other visualization:
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

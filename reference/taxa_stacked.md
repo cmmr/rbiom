@@ -20,6 +20,7 @@ taxa_stacked(
   unc = "singly",
   lineage = FALSE,
   xlab.angle = "90",
+  caption = TRUE,
   ...
 )
 ```
@@ -123,11 +124,20 @@ taxa_stacked(
   `"auto"`, `"0"`, `"30"`, and `"90"` (the numbers 0, 30, and 90 are
   accepted too). Default: `"90"`
 
+- caption:
+
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
+
 - ...:
 
   Parameters for underlying functions. Prefixing parameter names with a
   layer name ensures that a particular parameter is passed to, and only
-  to, that layer. An argument that no layer accepts is an error.
+  to, that layer. An argument that no layer accepts is an error. The
+  caption states the input table (rarefied, unrarefied, or relative
+  abundances) and how the samples were arranged; `labs.caption` replaces
+  it (`labs.caption = NULL` for none).
 
 ## Value
 
@@ -151,9 +161,12 @@ Other taxa_abundance:
 [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
+[`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
 [`taxa_sums()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md),
-[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+[`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 Other visualization:
 [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md),
@@ -172,6 +185,7 @@ Other visualization:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

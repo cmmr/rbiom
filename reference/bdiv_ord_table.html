@@ -240,7 +240,12 @@ Setting <code>alpha=1</code> is equivalent to Normalized UniFrac. Default: <code
 
 <dt id="arg-cpus">cpus<a class="anchor" aria-label="anchor" href="#arg-cpus"></a></dt>
 <dd><p>The number of CPUs to use. Set to <code>NULL</code> to use all available,
-or to <code>1</code> to disable parallel processing. Does not affect results.
+or to <code>1</code> to disable parallel processing. This also bounds R's
+linear algebra library (BLAS): when <code>cpus</code> is less than the number
+of threads that library is set to use, it runs on one thread until
+the call returns. See the Multithreading section of
+<a href="rbiom-package.html">rbiom-package</a>. Does not affect results, apart from rounding in
+the last digits of linear algebra (around 1e-15).
 Default: <code><a href="https://cmmr.github.io/ecodive/reference/n_cpus.html" class="external-link">ecodive::n_cpus()</a></code> (all available cores)</p></dd>
 
 
@@ -267,8 +272,9 @@ across all tested taxa, before any <code>p.top</code> filtering);
 <code>$taxa_coords</code> holds the arrow for each taxon (<code>.x0</code>/<code>.y0</code> at
 the centroid of the samples, <code>.x</code>/<code>.y</code> at its tip, scaled to
 fit the sample cloud) and <code>.size</code>, its mean relative abundance.
-The <code>'axes'</code> attribute gives the axis labels (see
-<code><a href="distmat_ord_table.html">distmat_ord_table()</a></code>).</p>
+The <code>'axes'</code> attribute gives the axis labels, the percent of
+variance on each PCoA axis (<code>.var</code>), and the NMDS stress
+(<code>.stress</code>); see <code><a href="distmat_ord_table.html">distmat_ord_table()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

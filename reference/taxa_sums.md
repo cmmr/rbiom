@@ -125,9 +125,12 @@ Other taxa_abundance:
 [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
+[`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
-[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+[`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 ## Examples
 

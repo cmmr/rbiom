@@ -208,12 +208,20 @@ adiv_boxplot(
 
 - caption:
 
-  Add methodology caption beneath the plot. Default: `TRUE`
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
 
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Does not affect results. Default:
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
   [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
   (all available cores)
 
@@ -284,6 +292,7 @@ Other visualization:
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples
@@ -389,7 +398,7 @@ Other visualization:
 #>     size    = 3, 
 #>     vjust   = 0 ) +
 #>   labs(
-#>     caption = "Pairwise Mann-Whitney U tests; p-values adjusted with the FDR (Benjamini-Hochberg) method.", 
+#>     caption = "Rarefied to 1,183 reads per sample.\nPairwise Mann-Whitney U tests; p-values adjusted with the FDR (Benjamini-Hochberg) method.", 
 #>     y       = "Shannon Diversity Index" ) +
 #>   scale_color_manual(values = c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7")) +
 #>   scale_fill_manual(values = c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7")) +

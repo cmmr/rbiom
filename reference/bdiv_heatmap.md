@@ -23,6 +23,7 @@ bdiv_heatmap(
   title = TRUE,
   xlab.angle = "auto",
   alpha = 0.5,
+  caption = TRUE,
   cpus = n_cpus(),
   ...
 )
@@ -134,10 +135,22 @@ bdiv_heatmap(
   to relative abundances; a value between 0 and 1, inclusive. Setting
   `alpha=1` is equivalent to Normalized UniFrac. Default: `0.5`
 
+- caption:
+
+  Add a caption beneath the plot that states the input table (rarefied,
+  unrarefied, or relative abundances) and the methods (metric
+  parameters, statistical test, p-value adjustment). Default: `TRUE`
+
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Does not affect results. Default:
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
   [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
   (all available cores)
 
@@ -145,7 +158,10 @@ bdiv_heatmap(
 
   Additional arguments to pass on to ggplot2::theme(). Arguments
   prefixed with `labs.` go to ggplot2::labs() instead, for example
-  `labs.subtitle = "Plot subtitle"`.
+  `labs.subtitle = "Plot subtitle"`. The caption states the input table
+  (rarefied, unrarefied, or relative abundances) and how the samples
+  were ordered; `labs.caption` replaces it (`labs.caption = NULL` for
+  none).
 
 ## Value
 
@@ -249,6 +265,7 @@ Other visualization:
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

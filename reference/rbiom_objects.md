@@ -68,7 +68,7 @@ and inter-component synchronization.
 | `$otus`           | Character vector with new names for the OTUs.           |
 | `$samples`        | Character vector with new names for the samples.        |
 | `$tree`           | Phylo object with the phylogenetic tree for the OTUs.   |
-| `$sequences`      | Named character vector of OTU reference sequences.      |
+| `$sequences`      | Named character vector of OTU sequences, or fasta file. |
 | `$id`, `$comment` | String with dataset's title or comment.                 |
 | `$date`           | Date-like object, or `"%Y-%m-%dT%H:%M:%SZ"` string.     |
 

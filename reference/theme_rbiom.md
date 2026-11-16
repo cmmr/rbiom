@@ -107,7 +107,8 @@ Other visualization:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_forest()`](https://cmmr.github.io/rbiom/reference/taxa_forest.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
-[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
+[`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 ## Examples
 

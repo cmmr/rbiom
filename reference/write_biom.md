@@ -126,7 +126,13 @@ write_xlsx(
 - cpus:
 
   The number of CPUs to use. Set to `NULL` to use all available, or to
-  `1` to disable parallel processing. Does not affect results. Default:
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
   [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
   (all available cores)
 
@@ -146,9 +152,16 @@ strings that contain a tab, a double quote, or a line break are enclosed
 in double quotes (with embedded quotes doubled), and missing taxonomic
 ranks are written as empty strings. In the JSON format, numbers are
 written at full precision and missing values are `null`. In the HDF5
-format, the order of metadata fields, logical fields, and `Date` fields
-(stored as ISO 8601 strings) are preserved through attributes on the
-datasets, which other BIOM readers ignore.
+format, the order of metadata fields, logical fields, `Date` fields
+(stored as ISO 8601 strings), and the order of factor levels are
+preserved through attributes on the datasets, which other BIOM readers
+ignore.
+
+The order of factor levels is only kept by
+`write_biom(format = "hdf5")`. The JSON and tabular BIOM formats and
+`write_metadata()` have no place to record it, so categorical metadata
+read back from those files has its levels in alphabetical order. Unused
+factor levels are never written.
 
 For `write_xlsx()`, `attributes(biom)` are saved as additional
 worksheets if the attribute is a data frame, matrix, or dist -class

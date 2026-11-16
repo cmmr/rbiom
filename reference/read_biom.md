@@ -18,8 +18,10 @@ read_biom(src, ...)
   classical tabular format. URLs must begin with `http://`, `https://`,
   `ftp://`, or `ftps://`. JSON strings are recognized by their first
   non-whitespace character being `{`. Compressed (gzip or bzip2) BIOM
-  files are also supported. NOTE: to read HDF5 formatted BIOM files, the
-  `h5lite` R package must be installed.
+  files are also supported, as are QIIME 2 feature table artifacts
+  (`.qza`) and mothur `.shared` files. NOTE: to read HDF5 formatted BIOM
+  files (including `.qza` feature tables), the `h5lite` R package must
+  be installed.
 
 - ...:
 
@@ -41,7 +43,25 @@ For classic tabular files, the first column must hold OTU IDs and a
 column named `taxonomy` (or `lineage`) is parsed into taxonomic ranks.
 All other columns are abundance counts: blank cells are read as `0` with
 a warning, and columns containing non-numeric text are ignored with a
-warning. Empty taxonomic ranks are `NA`.
+warning. Empty taxonomic ranks are `NA`. Numbers must use `.` as the
+decimal mark.
+
+mothur `.shared` files (samples in rows, with `label`, `Group`, and
+`numOtus` columns) are recognized and transposed. They must hold a
+single `label`.
+
+QIIME 2 artifacts (`.qza`) are unpacked automatically: a `FeatureTable`
+here, a `FeatureData[Taxonomy]` artifact as `taxonomy`, and a
+`Phylogeny` artifact as `tree` or in
+[`read_tree()`](https://cmmr.github.io/rbiom/reference/read_tree.md),
+and a `FeatureData[Sequence]` artifact in
+[`read_fasta()`](https://cmmr.github.io/rbiom/reference/read_fasta.md).
+Other artifact types, and visualizations (`.qzv`), are not supported.
+
+Categorical metadata is stored as factors, and HDF5 files written by
+[`write_biom()`](https://cmmr.github.io/rbiom/reference/write_biom.md)
+restore the order of their levels. Otherwise, levels are in alphabetical
+order.
 
 ## See also
 

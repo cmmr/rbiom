@@ -28,6 +28,7 @@ taxa_forest(
   p.adj = "fdr",
   lineage = FALSE,
   unc = "singly",
+  cpus = n_cpus(),
   ...
 )
 ```
@@ -121,8 +122,8 @@ taxa_forest(
 
 - caption:
 
-  Add a caption describing the method, the intervals, and which taxa are
-  shown. Default: `TRUE`
+  Add a caption describing the input table, the method, the intervals,
+  the p-value adjustment, and which taxa are shown. Default: `TRUE`
 
 - prev.cut:
 
@@ -175,6 +176,19 @@ taxa_forest(
 
   Abbreviations are allowed. Default: `"singly"`
 
+- cpus:
+
+  The number of CPUs to use. Set to `NULL` to use all available, or to
+  `1` to disable parallel processing. This also bounds R's linear
+  algebra library (BLAS): when `cpus` is less than the number of threads
+  that library is set to use, it runs on one thread until the call
+  returns. See the Multithreading section of
+  [rbiom-package](https://cmmr.github.io/rbiom/reference/rbiom-package.md).
+  Does not affect results, apart from rounding in the last digits of
+  linear algebra (around 1e-15). Default:
+  [`ecodive::n_cpus()`](https://cmmr.github.io/ecodive/reference/n_cpus.html)
+  (all available cores)
+
 - ...:
 
   Parameters for the underlying ggplot2 functions. Prefix a parameter
@@ -215,10 +229,13 @@ Other taxa_abundance:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_da()`](https://cmmr.github.io/rbiom/reference/taxa_da.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
+[`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
 [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md),
 [`taxa_sums()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md),
-[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
+[`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md),
+[`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
 
 Other visualization:
 [`adiv_boxplot()`](https://cmmr.github.io/rbiom/reference/adiv_boxplot.md),
@@ -237,6 +254,7 @@ Other visualization:
 [`taxa_corrplot()`](https://cmmr.github.io/rbiom/reference/taxa_corrplot.md),
 [`taxa_heatmap()`](https://cmmr.github.io/rbiom/reference/taxa_heatmap.md),
 [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md),
+[`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md),
 [`theme_rbiom()`](https://cmmr.github.io/rbiom/reference/theme_rbiom.md)
 
 ## Examples

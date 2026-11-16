@@ -412,7 +412,7 @@ p$code
 #>     alpha        = 0.6, 
 #>     width        = 0.7 ) +
 #>   labs(
-#>     caption = "Pairwise Mann-Whitney U tests.", 
+#>     caption = "Rarefied to 1,000 reads per sample.\nPairwise Mann-Whitney U tests.", 
 #>     y       = "Shannon Diversity Index" ) +
 #>   scale_color_manual(values = c("#0072B2", "#D55E00")) +
 #>   scale_fill_manual(values = c("#0072B2", "#D55E00")) +

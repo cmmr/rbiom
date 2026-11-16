@@ -75,7 +75,9 @@ New Hampshire format.</p>
 
 <dl><dt id="arg-src">src<a class="anchor" aria-label="anchor" href="#arg-src"></a></dt>
 <dd><p>Input data as either a file path, URL, or Newick string.
-Compressed (gzip or bzip2) files are also supported.</p></dd>
+Compressed (gzip or bzip2) files and QIIME 2 <code>Phylogeny</code>
+artifacts (<code>.qza</code>) are also supported. NEXUS files are not; convert
+them with <code>ape::write.tree(ape::read.nexus(file), "tree.nwk")</code>.</p></dd>
 
 
 <dt id="arg-underscores">underscores<a class="anchor" aria-label="anchor" href="#arg-underscores"></a></dt>

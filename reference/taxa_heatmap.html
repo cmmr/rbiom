@@ -78,6 +78,7 @@
 <span>  legend <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -259,10 +260,20 @@ Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>
 Default: <code>"auto"</code>.</p></dd>
 
 
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p>Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: <code>TRUE</code></p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to pass on to ggplot2::theme().
 Arguments prefixed with <code>labs.</code> go to ggplot2::labs() instead,
-for example <code>labs.subtitle = "Plot subtitle"</code>.</p></dd>
+for example <code>labs.subtitle = "Plot subtitle"</code>. The caption
+states the input table (rarefied, unrarefied, or relative
+abundances) and how the taxa and samples were ordered;
+<code>labs.caption</code> replaces it (<code>labs.caption = NULL</code> for none).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -344,10 +355,13 @@ Tol's (<code>"tol"</code>) for 9-12.</p>
 <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code>,
 <code><a href="taxa_da.html">taxa_da()</a></code>,
 <code><a href="taxa_forest.html">taxa_forest()</a></code>,
+<code><a href="taxa_shared.html">taxa_shared()</a></code>,
 <code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
 <code><a href="taxa_stats.html">taxa_stats()</a></code>,
 <code><a href="taxa_sums.html">taxa_sums()</a></code>,
-<code><a href="taxa_matrix.html">taxa_table()</a></code></p>
+<code><a href="taxa_matrix.html">taxa_table()</a></code>,
+<code><a href="taxa_top.html">taxa_top()</a></code>,
+<code><a href="taxa_upset.html">taxa_upset()</a></code></p>
 <p>Other visualization:
 <code><a href="adiv_boxplot.html">adiv_boxplot()</a></code>,
 <code><a href="adiv_corrplot.html">adiv_corrplot()</a></code>,
@@ -365,6 +379,7 @@ Tol's (<code>"tol"</code>) for 9-12.</p>
 <code><a href="taxa_corrplot.html">taxa_corrplot()</a></code>,
 <code><a href="taxa_forest.html">taxa_forest()</a></code>,
 <code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
+<code><a href="taxa_upset.html">taxa_upset()</a></code>,
 <code><a href="theme_rbiom.html">theme_rbiom()</a></code></p></div>
     </div>
 

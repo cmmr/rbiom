@@ -16,7 +16,9 @@ read_tree(src, underscores = FALSE)
 - src:
 
   Input data as either a file path, URL, or Newick string. Compressed
-  (gzip or bzip2) files are also supported.
+  (gzip or bzip2) files and QIIME 2 `Phylogeny` artifacts (`.qza`) are
+  also supported. NEXUS files are not; convert them with
+  `ape::write.tree(ape::read.nexus(file), "tree.nwk")`.
 
 - underscores:
 

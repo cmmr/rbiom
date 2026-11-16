@@ -73,6 +73,7 @@
 <span>  legend <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xlab.angle <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -200,12 +201,21 @@ Options are <code>"auto"</code>, <code>'0'</code>, <code>'30'</code>, and <code>
 Default: <code>"auto"</code>.</p></dd>
 
 
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p>Add a caption beneath the plot that states the input
+table (rarefied, unrarefied, or relative abundances) and the
+methods (metric parameters, statistical test, p-value adjustment).
+Default: <code>TRUE</code></p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to pass on to <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">ggplot2::theme()</a></code>.
 Arguments prefixed with <code>labs.</code> go to <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs()</a></code> instead,
 for example <code>labs.subtitle = "Plot subtitle"</code>, and <code>base_size</code>,
 <code>base_family</code>, <code>base_line_size</code>, and <code>base_rect_size</code> go to
-<code><a href="theme_rbiom.html">theme_rbiom()</a></code>.</p></dd>
+<code><a href="theme_rbiom.html">theme_rbiom()</a></code>. The caption states how the rows and columns were
+ordered; <code>labs.caption</code> replaces it (<code>labs.caption = NULL</code> for
+none).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -309,6 +319,7 @@ groups: Okabe and Ito's palette (<code>"okabe"</code>) for up to 8, and Paul Tol
 <code><a href="taxa_forest.html">taxa_forest()</a></code>,
 <code><a href="taxa_heatmap.html">taxa_heatmap()</a></code>,
 <code><a href="taxa_stacked.html">taxa_stacked()</a></code>,
+<code><a href="taxa_upset.html">taxa_upset()</a></code>,
 <code><a href="theme_rbiom.html">theme_rbiom()</a></code></p></div>
     </div>
 

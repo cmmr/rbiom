@@ -72,9 +72,10 @@ version 1.0 (JSON) or 2.1 (HDF5)
 classical tabular format. URLs must begin with <code>http://</code>,
 <code>https://</code>, <code>ftp://</code>, or <code>ftps://</code>. JSON strings are
 recognized by their first non-whitespace character being <code>{</code>.
-Compressed (gzip or bzip2) BIOM files are also supported. NOTE: to
-read HDF5 formatted BIOM files, the <code>h5lite</code> R package must be
-installed.</p></dd>
+Compressed (gzip or bzip2) BIOM files are also supported, as are
+QIIME 2 feature table artifacts (<code>.qza</code>) and mothur <code>.shared</code>
+files. NOTE: to read HDF5 formatted BIOM files (including <code>.qza</code>
+feature tables), the <code>h5lite</code> R package must be installed.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -95,7 +96,18 @@ corresponding content of the file.</p></dd>
 named <code>taxonomy</code> (or <code>lineage</code>) is parsed into taxonomic ranks. All other
 columns are abundance counts: blank cells are read as <code>0</code> with a warning,
 and columns containing non-numeric text are ignored with a warning.
-Empty taxonomic ranks are <code>NA</code>.</p>
+Empty taxonomic ranks are <code>NA</code>. Numbers must use <code>.</code> as the decimal mark.</p>
+<p>mothur <code>.shared</code> files (samples in rows, with <code>label</code>, <code>Group</code>, and
+<code>numOtus</code> columns) are recognized and transposed. They must hold a single
+<code>label</code>.</p>
+<p>QIIME 2 artifacts (<code>.qza</code>) are unpacked automatically: a
+<code>FeatureTable</code> here, a <code>FeatureData[Taxonomy]</code> artifact as <code>taxonomy</code>, and
+a <code>Phylogeny</code> artifact as <code>tree</code> or in <code><a href="read_tree.html">read_tree()</a></code>, and a
+<code>FeatureData[Sequence]</code> artifact in <code><a href="read_fasta.html">read_fasta()</a></code>. Other artifact
+types, and visualizations (<code>.qzv</code>), are not supported.</p>
+<p>Categorical metadata is stored as factors, and HDF5 files written by
+<code><a href="write_biom.html">write_biom()</a></code> restore the order of their levels. Otherwise, levels are
+in alphabetical order.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

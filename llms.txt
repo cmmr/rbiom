@@ -291,6 +291,8 @@ bar charts, heatmaps, and boxplots.
 - [`taxa_table()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
   [`taxa_matrix()`](https://cmmr.github.io/rbiom/reference/taxa_matrix.md)
   : Taxa abundances per sample.
+- [`taxa_shared()`](https://cmmr.github.io/rbiom/reference/taxa_shared.md)
+  : Taxa shared between groups, and the core microbiome.
 - [`taxa_stacked()`](https://cmmr.github.io/rbiom/reference/taxa_stacked.md)
   : Display taxa abundances as a stacked bar graph.
 - [`taxa_stats()`](https://cmmr.github.io/rbiom/reference/taxa_stats.md)
@@ -299,6 +301,10 @@ bar charts, heatmaps, and boxplots.
   [`taxa_means()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md)
   [`taxa_apply()`](https://cmmr.github.io/rbiom/reference/taxa_sums.md)
   : Get summary taxa abundances.
+- [`taxa_top()`](https://cmmr.github.io/rbiom/reference/taxa_top.md) :
+  The most abundant taxa overall, per group, or per sample.
+- [`taxa_upset()`](https://cmmr.github.io/rbiom/reference/taxa_upset.md)
+  : Display taxa shared between groups as an UpSet plot.
 
 ## Alpha Diversity
 
